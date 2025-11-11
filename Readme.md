@@ -7,8 +7,8 @@
 
 ## 🌍 Overview
 
-The **Matter Library** is an open project to build a shared, physically-accurate material ecosystem that behaves identically across Blender and Unreal Engine.  
-It replaces traditional texture fakery with **true-scale, physically based materials**, authored once in **MaterialX**, and converted automatically to native Blender and Unreal formats.
+The **Matter Library** is an open project to build a shared, physically-accurate material ecosystem that behaves identically across Blender and Unreal Engine (others TBD with communty support).  
+It replaces traditional texture fakery with **true-scale, physically based materials**, authored once in **MaterialX**, and converted (?) to native Blender and Unreal formats.
 
 > **“Write a material once — render it anywhere — and it looks the same.”**
 
@@ -18,9 +18,9 @@ It replaces traditional texture fakery with **true-scale, physically based mater
 
 - **MaterialX as the single source of truth** for all materials  
 - **Physically correct scale** and tiling (meters-per-tile defined per material)  
-- **Visual parity across engines** — Blender 5.1 (Principled BSDF) and Unreal 5.6+ (Substrate + Lumen)  
+- **Visual parity across engines** — Blender 5.1 (Principled BSDF) and Unreal 5.6+ (Substrate + Lumen)  - others TBD
 - **Open-source and extensible** — a foundation others can build upon  
-- **Future-ready** — 8K physically-based textures, downsampled dynamically for performance
+- **Future-ready** — 8K physically-based textures, downsampled dynamically (?) for performance
 
 ---
 
@@ -95,14 +95,14 @@ Each material references one or more overlays and one MaskSet, enabling visual v
 
 **Format:**
 ```
-<origin>_<family>_<subtype>-<finish>_clean_v###
+<origin>_<family>_<subtype>-<finish>_<scale>_<resolution>_<version ###>
 ```
 
 **Example:**
 ```
-engineered_metal_steel-brushed_clean_v001
-natural_stone_granite-honed_clean_v001
-synthetic_plastic_abs-matte_clean_v001
+engineered_metal_steel-brushed_clean_01_8k_v001
+natural_stone_granite-honed_clean_10_4k_v001
+synthetic_plastic_abs-matte_clean_0001_8k_v001
 ```
 
 This deterministic naming allows automatic lookup and runtime mapping across tools.
@@ -151,18 +151,6 @@ This deterministic naming allows automatic lookup and runtime mapping across too
 
 ---
 
-## 🤝 Open Source and Licensing
-
-- Built on **MaterialX** (BSD license, Academy Software Foundation)  
-- All materials and templates released under a permissive open-source license  
-- Contributed assets validated through automated schema checks  
-
-```
-SPDX-License-Identifier: BSD-3-Clause
-```
-
----
-
 ## 🧭 Why It Matters
 
 - Enables **consistent realism** across render engines  
@@ -194,12 +182,12 @@ We welcome collaboration!
 ## 🪪 Credits
 
 **Project Contributors:**  
-GPT-5 (technical planning) • Core Team (taxonomy & data) • Open Source Community  
+GPT-5 (technical planning) obvy:) • Core Team (taxonomy & data) • Open Source Community  
 
 **Contact:**  
 For discussion, feedback, or collaboration proposals:  
-📧 *openmatter@project-domain.org*
+📧 *peter@imrsv.tools*
 
 ---
 
-© 2025 The Matter Library Project — released under the BSD-3-Clause License.
+© 2025 The Matter Library Project
