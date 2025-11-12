@@ -109,6 +109,28 @@ This deterministic naming allows automatic lookup and runtime mapping across too
 
 ---
 
+### ⚖️ Texture Scale Reference
+
+Every base texture in the Matter Library uses a **real-world physical scale** — expressed as the number of **meters per UV tile**.  
+This ensures that materials appear at consistent detail levels across Blender, Unreal, and any future engines, maintaining physical accuracy when scaled in scene units.
+
+Each base texture set folder name includes a **scale tag** (`s###`) that defines its intended UV scale.  
+Smaller values represent finer, more detailed surfaces; larger values represent broader, macro-scale textures.
+
+| **Scale Tag** | **Meters per Tile** | **Relative Detail** | **Typical Use Case** |
+|:--------------:|:-------------------:|:--------------------|:----------------------|
+| `s0001` | 0.001 m | Ultra-micro | Dust, pores, micro-scratches |
+| `s001`  | 0.01 m  | Very fine | Fabric weave, paint texture, sand grains |
+| `s01`   | 0.1 m   | Fine | Wood grain, brick faces, small tiles |
+| `s1`    | 1 m     | Medium | Concrete, flooring, wall panels |
+| `s10`   | 10 m    | Large | Terrain detail, large stone faces |
+| `s100`  | 100 m   | Macro | Geological scale, landscapes, cliffs |
+
+**Example Folder Naming**
+
+
+
+
 ## 🧰 Integration Details
 
 ### **MaterialX (canonical)**

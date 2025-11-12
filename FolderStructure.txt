@@ -1,0 +1,90 @@
+Matter-Library
+│
+├─ MatterLibrary/
+│  ├─ materials/
+│  │  ├─ natural/
+│  │  │  ├─ stone/
+│  │  │  ├─ wood/
+│  │  │  ├─ soil/
+│  │  │  └─ mineral/
+│  │  ├─ engineered/
+│  │  │  ├─ metal/
+│  │  │  ├─ glass/
+│  │  │  ├─ cementitious/
+│  │  │  └─ composite/
+│  │  ├─ synthetic/
+│  │  │  ├─ plastic/
+│  │  │  ├─ polymer/
+│  │  │  ├─ textile/
+│  │  │  └─ coating/
+│  │  ├─ environmental/
+│  │  │  ├─ sand/
+│  │  │  ├─ vegetation/
+│  │  │  ├─ liquid/
+│  │  │  └─ atmospheric/
+│  │  └─ utility/
+│  │     ├─ emissive/
+│  │     ├─ virtual/
+│  │     └─ energy/
+│  │
+│  └─ textures/
+│     ├─ base/
+│     │  ├─ natural/
+│     │  │  ├─ stone/
+│     │  │  ├─ wood/
+│     │  │  ├─ soil/
+│     │  │  └─ mineral/
+│     │  ├─ engineered/
+│     │  │  ├─ metal/
+│     │  │  ├─ glass/
+│     │  │  ├─ cementitious/
+│     │  │  └─ composite/
+│     │  ├─ synthetic/
+│     │  │  ├─ plastic/
+│     │  │  ├─ polymer/
+│     │  │  ├─ textile/
+│     │  │  └─ coating/
+│     │  ├─ environmental/
+│     │  │  ├─ sand/
+│     │  │  ├─ vegetation/
+│     │  │  ├─ liquid/
+│     │  │  └─ atmospheric/
+│     │  └─ utility/
+│     │     ├─ emissive/
+│     │     ├─ virtual/
+│     │     └─ energy/
+│     │
+│     └─ shared/
+│        ├─ overlays/
+│        │  ├─ dust/
+│        │  ├─ scratches/
+│        │  ├─ fingerprints/
+│        │  ├─ smudges/
+│        │  └─ watermarks/
+│        └─ masks/
+│           ├─ wear/
+│           ├─ paint/
+│           ├─ rust/
+│           ├─ dirt/
+│           └─ edge/
+│
+├─ bridges/
+│  ├─ unreal/
+│  │  ├─ master_materials/
+│  │  └─ import_scripts/
+│  ├─ blender/
+│  │  ├─ node_groups/
+│  │  └─ import_scripts/
+│  └─ usd/
+│
+├─ tools/
+│  ├─ matter_manager/
+│  ├─ converters/
+│  ├─ validators/
+│  └─ preview_generators/
+│
+├─ _SupportingDocs/
+│  ├─ Integration_Plan_v2.0.pdf
+│  └─ Executive_Summary_v2.0.pdf
+|
+└─readme.md
