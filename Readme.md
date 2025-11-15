@@ -19,7 +19,9 @@ It replaces traditional texture fakery with **true-scale, physically based mater
 - **MaterialX as the single source of truth** for all materials  
 - **Physically correct scale** and tiling (meters-per-tile defined per material)  
 - **Visual parity across engines** — Blender 5.1 (Principled BSDF) and Unreal 5.6+ (Substrate + Lumen)  - others TBD
-- **Open-source and extensible** — a foundation others can build upon  
+- **Open-source and extensible** — a foundation others can build upon
+- **Flexable taxonomy** — tight structure (deep not broad), with room for all matter and variations
+- **Filename strategy** - accounting for many variations and versions of a material  
 - **Future-ready** — 8K physically-based textures, downsampled dynamically (?) for performance
 
 ---
