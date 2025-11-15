@@ -79,11 +79,14 @@ All share the same **Least Common Denominator (LCD)** parameter set — verified
 These are the top level:
 <Domain><Class>
 
-If you want to connect the library to an even larger library of “Non-matter” (containing compound materials brick wall, tile roof, cobblestone street with gutters or whatever). We could add a level above (Group, Category, Sector, Realm or some such) where “Matter” could be one and another could be “Buildings” with its own taxonomy etc.
-Realm / Domain / Class /
+If you want to connect the library to an even larger library of “Non-matter” (containing compound materials brick wall, tile roof, cobblestone street with gutters or whatever), we could add a level above (Group, Category, Sector, Realm or some such) where “Matter” could be one and another could be “Buildings” with its own taxonomy etc.
+
+**Realm / Domain / Class /**
+
 So a full categorization might be something like:
 Realm_Domain_Class_Material_Variant_Condition_Detail 
 Matter_Natural_Stone_Limestone_Veined_Distressed_Dusty
+
 Gives room for lots of query vectors.
 (More in filename below)
 
@@ -103,21 +106,22 @@ Each material references one or more overlays and one MaskSet, enabling visual v
 ## ⚙️ Material composition
 Pulling it together.
 Each Material will use and specify:
-Master Material
-The base texture set (normal, …)  - where applicable
-Up to 1 mask layer (perforations, etc)
-Up to 2 overlay layers (dust, etc)
-The Lowest Common Denominator (LCD) parameter settings
-The non-LCD settings - where applicable
+- Master Material
+- The base texture set (normal, …)  - where applicable
+- Up to 1 mask layer (perforations, etc)
+- Up to 2 overlay layers (dust, etc)
+- The Lowest Common Denominator (LCD) parameter settings
+- The non-LCD settings - where applicable
 
 ---
 
 ## 🧩 Library Folder Structure
 
 Since many materials may share the same textures (e.g. Steel clean, Steel Dusty, Steel brushed, etc could all use the same base texture set “CleanSteel01”), these will be stored separately.
-Materials will be in a material folder structured in matter hierarchy.
-Base textures will be in a textures folder structured in the same matter hierarchy.
-Overlay and mask textures (possibly used across materials in many domains) will have their own texture folders as well.
+
+Materials will be in a **material folder** structured in matter hierarchy.
+Base textures will be in a **textures folder** structured in the same matter hierarchy.
+Overlay and mask textures (possibly used across materials in many domains) will each have their own folders **overlay folder** and **maskset folder** inside the textures.
 
 The Material Manager will remap the texture paths in the materials when importing / exporting.
 
@@ -144,11 +148,12 @@ Smaller values represent finer, more detailed surfaces; larger values represent 
 
 ## 🧮 Material Filenaming
 Thinking of the future for both many variations of a material as well as versions of (updates to) the same material over time.
-The <Domain> / <Class> are only defined in the folder structure (so the matter materials can be recategorized in the future if needed without file renaming).
+The **Domain / Class** are only defined in the folder structure (so the matter materials can be recategorized in the future if needed without file renaming).
 The rest:
-Material / Variant / Condition / Detail / Scale / Version
+**Material / Variant / Condition / Detail / Scale / Version**
 Are in the filename:
 Limestone_Veined_Distressed_Dusty_s01_v01.mtlx
+
 This leaves plenty of room for customization / variation and mayhem, but keeps things roughly understandable.
 Limestone26b_Veinish_VeryDistressed12_ScratchedButNotVeryDusty_s01_v32.mtlx
 
