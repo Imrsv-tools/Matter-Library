@@ -77,14 +77,15 @@ All share the same **Least Common Denominator (LCD)** parameter set — verified
   - 💡 *Utility* — virtual or placeholder materials  
 
 These are the top level:
-<Domain><Class>  
+Domain/Class  
 
 If you want to connect the library to an even larger library of “Non-matter” (containing compound materials brick wall, tile roof, cobblestone street with gutters or whatever), we could add a level above (Group, Category, Sector, Realm or some such) where “Matter” could be one and another could be “Buildings” with its own taxonomy etc.  
-**Realm / Domain / Class /**  
 
-So a full categorization might be something like:  
+**Realm / Domain / Class /**  
+A full categorization might be something like:  
 Realm_Domain_Class_Material_Variant_Condition_Detail   
 Matter_Natural_Stone_Limestone_Veined_Distressed_Dusty  
+
 Gives room for lots of query vectors.  
 (More in filename below)
 
