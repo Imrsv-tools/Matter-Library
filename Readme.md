@@ -116,13 +116,13 @@ Each Material will use and specify:
 
 ## 🧩 Library Folder Structure
 
-Since many materials may share the same textures (e.g. Steel clean, Steel Dusty, Steel brushed, etc could all use the same base texture set “CleanSteel01”), these will be stored separately.
+Since many materials may share the same textures (e.g. Steel clean, Steel Dusty, Steel brushed, etc could all use the same base texture set “CleanSteel01”), these will be stored separately.  
 
-Materials will be in a **material folder** structured in matter hierarchy.
-Base textures will be in a **textures folder** structured in the same matter hierarchy.
-Overlay and mask textures (possibly used across materials in many domains) will each have their own folders **overlay folder** and **maskset folder** inside the textures.
+Materials will be in a **material folder** structured in matter hierarchy.  
+Base textures will be in a **textures folder** structured in the same matter hierarchy.  
+Overlay and mask textures (possibly used across materials in many domains) will each have their own folders **overlay folder** and **maskset folder** inside the textures.  
 
-The Material Manager will remap the texture paths in the materials when importing / exporting.
+The Material Manager will remap the texture paths in the materials when importing / exporting.  
 
 ---
 
