@@ -26,28 +26,14 @@ It is focused on **true-scale, physically based materials**, authored once in **
 
 ---
 
-## 🧩 Architecture Overview
-
-```
-┌───────────────────────────────────────────────┐
-│   Matter Library (.mtlx) — Canonical Source   │
-│   • Tons of unique base materials (Matter types)        │
-│   • Hundreds of shared base texture sets         │
-│   • Overlays / MaskSets as reusable nodegraphs│
-└───────────────────────────────────────────────┘
-               │
-     ┌─────────┴──────────┐
-     │                    │
-┌───────────────┐    ┌───────────────┐
-│  Blender 5.1  │    │ Unreal 5.6+   │
-│ Principled BSDF│←→ │ Substrate Inst │
-└───────────────┘    └───────────────┘
-```
-
-- **MaterialX** defines the canonical material structure and parameters.  
-- **Blender Transformer** converts .mtlx to Principled BSDF materials.  
-- **Unreal Transformer** builds Substrate friendly mtlx instances from the same source.  
-- **Matter Manager** handles library file management and subset creation / export
+## 🧩 Project components
+- **MaterialX** defines the canonical material structure and parameters.
+- **Master Materials** a set of versioned master materials for Blender and Unreal (others TBD).  
+- **Matter Library** a taxonomy for organizing Material and Texture files.
+- **Matter Filename** a descriptive structure for material files to be understood outside the libray.  
+- **Blender Transformer** converts .mtlx to Principled BSDF materials for blender.  
+- **Unreal Transformer** builds Substrate friendly mtlx instances.   
+- **Matter Manager** handles library file management, import, and subset creation / export. 
 
 ---
 
