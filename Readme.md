@@ -150,15 +150,11 @@ Smaller values represent finer, more detailed surfaces; larger values represent 
 Thinking of the future for both many variations of a material as well as versions of (updates to) the same material over time.
 The **Domain / Class** are only defined in the folder structure (so the matter materials can be recategorized in the future if needed without file renaming).
 The rest:
-
 **Material / Variant / Condition / Detail / Scale / Version**
-
 are in the filename:
-
 Limestone_Veined_Distressed_Dusty_s01_v01.mtlx
 
 This leaves plenty of room for customization / variation and mayhem, but keeps things roughly understandable.
-
 Limestone26b_Veinish_VeryDistressed12_ScratchedButNotVeryDusty_s01_v32.mtlx
 
 
