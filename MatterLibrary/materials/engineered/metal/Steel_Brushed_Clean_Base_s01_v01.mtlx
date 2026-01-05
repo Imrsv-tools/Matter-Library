@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<materialx version="1.39">
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="utility">
+    <input name="master_material" type="string" />
+    <input name="scale_tag" type="string" />
+    <input name="meters_per_tile" type="float" />
+    <input name="domain" type="string" />
+    <input name="class" type="string" />
+  </nodedef>
+
+  <standard_surface name="SR_steel_brushed" type="surfaceshader">
+    <input name="base" type="float" value="1.0" />
+    <input name="base_color" type="color3" value="0.6, 0.6, 0.62" />
+    <input name="metalness" type="float" value="1.0" />
+    <input name="specular_roughness" type="float" value="0.3" />
+    <input name="specular_IOR" type="float" value="1.5" />
+  </standard_surface>
+
+  <surfacematerial name="M_steel_brushed" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_steel_brushed" />
+  </surfacematerial>
+
+  <imrsv_metadata name="IMRSV_Metadata">
+    <input name="master_material" type="string" value="M_MasterMaterial_Opaque" />
+    <input name="scale_tag" type="string" value="s01" />
+    <input name="meters_per_tile" type="float" value="0.1" />
+    <input name="domain" type="string" value="engineered" />
+    <input name="class" type="string" value="metal" />
+  </imrsv_metadata>
+</materialx>

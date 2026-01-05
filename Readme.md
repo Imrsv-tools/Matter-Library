@@ -128,6 +128,7 @@ Smaller values represent finer, more detailed surfaces; larger values represent 
 | `s1`    | 1 m     | Medium | Concrete, flooring, wall panels |
 | `s10`   | 10 m    | Large | Terrain detail, large stone faces |
 | `s100`  | 100 m   | Macro | Geological scale, landscapes, cliffs |
+| `sUKN`  | Unknown | Unknown | Not defined, Unknown, or Not relevent |
 
 ---
 
