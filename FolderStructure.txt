@@ -1,75 +1,46 @@
-Matter-Library
+Matter-Library    — target layout. Tags: (exists) = on disk now, (planned) = intended design.
+│                    Nothing below is dropped just because it isn't built yet.
 │
-├─ MatterLibrary/
-│  ├─ materials/
-│  │  ├─ natural/
-│  │  │  ├─ stone/
-│  │  │  ├─ wood/
-│  │  │  ├─ soil/
-│  │  │  └─ mineral/
-│  │  ├─ engineered/
-│  │  │  ├─ metal/
-│  │  │  ├─ glass/
-│  │  │  ├─ cementitious/
-│  │  │  └─ composite/
-│  │  ├─ synthetic/
-│  │  │  ├─ plastic/
-│  │  │  ├─ polymer/
-│  │  │  ├─ textile/
-│  │  │  └─ coating/
-│  │  ├─ environmental/
-│  │  │  ├─ sand/
-│  │  │  ├─ vegetation/
-│  │  │  ├─ liquid/
-│  │  │  └─ atmospheric/
-│  │  └─ utility/
-│  │     ├─ emissive/
-│  │     ├─ virtual/
-│  │     └─ energy/
+├─ Readme.md                                    (exists)  user-facing overview
+├─ FolderStructure.txt                          (exists)  this file
+├─ AGENTS.md                                     (planned) agent entry point
+├─ .claude/CLAUDE.md                             (planned) mirrors AGENTS.md for Claude Code
+│
+├─ .ai/                                          (planned) standalone planning surface
+│  ├─ context.md                                           project identity + active phase
+│  ├─ conventions.md                                       rules & boundaries
+│  ├─ commands/{howdy.md, housekeeping.md}
+│  ├─ plan/{build_plan.md, PhaseXX_*.md}
+│  ├─ research/*.md
+│  └─ phases/{future, ignore}/
+│
+├─ MatterLibrary/                                (exists)  the library payload
+│  ├─ materials/                                 (exists, partially seeded)
+│  │  ├─ natural/        {stone, wood, soil, mineral}          stone seeded
+│  │  ├─ engineered/     {metal, glass, cementitious, composite}  metal, glass seeded
+│  │  ├─ synthetic/      {plastic, polymer, textile, coating}  plastic seeded
+│  │  ├─ environmental/  {sand, vegetation, liquid, atmospheric}
+│  │  └─ utility/        {emissive, virtual, energy}
 │  │
-│  └─ textures/
-│     ├─ base/
-│     │  ├─ natural/
-│     │  │  ├─ stone/
-│     │  │  ├─ wood/
-│     │  │  ├─ soil/
-│     │  │  └─ mineral/
-│     │  ├─ engineered/
-│     │  │  ├─ metal/
-│     │  │  ├─ glass/
-│     │  │  ├─ cementitious/
-│     │  │  └─ composite/
-│     │  ├─ synthetic/
-│     │  │  ├─ plastic/
-│     │  │  ├─ polymer/
-│     │  │  ├─ textile/
-│     │  │  └─ coating/
-│     │  ├─ environmental/
-│     │  │  ├─ sand/
-│     │  │  ├─ vegetation/
-│     │  │  ├─ liquid/
-│     │  │  └─ atmospheric/
-│     │  └─ utility/
-│     │     ├─ emissive/
-│     │     ├─ virtual/
-│     │     └─ energy/
+│  └─ textures/                                  (planned, Git LFS)
+│     ├─ base/                                   mirrors the matter hierarchy
+│     │  ├─ natural/        {stone, wood, soil, mineral}
+│     │  ├─ engineered/     {metal, glass, cementitious, composite}
+│     │  ├─ synthetic/      {plastic, polymer, textile, coating}
+│     │  ├─ environmental/  {sand, vegetation, liquid, atmospheric}
+│     │  └─ utility/        {emissive, virtual, energy}
 │     │
-│     └─ shared/
-│        ├─ overlays/
-│        │  ├─ dust/
-│        │  ├─ scratches/
-│        │  ├─ fingerprints/
-│        │  ├─ smudges/
-│        │  └─ watermarks/
-│        └─ masks/
-│           ├─ wear/
-│           ├─ paint/
-│           ├─ rust/
-│           ├─ dirt/
-│           └─ edge/
+│     └─ shared/                                 cross-domain textures
+│        ├─ overlays/  {dust, scratches, fingerprints, smudges, watermarks}
+│        └─ masks/     {wear, paint, rust, dirt, edge}
 │
-├─ bridges/
+├─ library/                                      (planned) the CONTROLLED, curated tier
+│  └─ releases/                                            matterlib-X.Y.lock.yaml manifests
+│                                                          (each release is also a git tag)
+│
+├─ bridges/                                      (planned) transformers + cook targets
 │  ├─ unreal/
+│  │  ├─ MatterLibraryUE.uproject                          standalone UE cook project
 │  │  ├─ master_materials/
 │  │  └─ import_scripts/
 │  ├─ blender/
@@ -77,14 +48,11 @@ Matter-Library
 │  │  └─ import_scripts/
 │  └─ usd/
 │
-├─ tools/
-│  ├─ matter_manager/
+├─ tools/                                        (planned)
+│  ├─ matter_manager/                                      file mgmt, import, promotion, export
 │  ├─ converters/
-│  ├─ validators/
+│  ├─ validators/                                          schema / naming / scale / parity CI
 │  └─ preview_generators/
 │
-├─ _SupportingDocs/
-│  ├─ Integration_Plan_v2.0.pdf
-│  └─ Executive_Summary_v2.0.pdf
-|
-└─readme.md
+└─ _SupportingDocs/                              (planned) supplemental design material
+                                                          (earlier v2.0 PDFs were removed; superseded)
