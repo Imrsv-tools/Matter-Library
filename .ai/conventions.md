@@ -68,7 +68,7 @@ platform docs.
 
 ## Planning & Workflow
 
-- Follow `…/AgenticEngineering_PlanningProcess.md`: research → phase plan → harden →
+- Follow `…/AgenticEngineering_Workflow.md`: research → phase plan → harden →
   implement → close.
 - Phase numbering here is **independent** of the platform's Studio/Plugin/Stage line.
 - Commit planning + docs before implementation (rollback baseline).

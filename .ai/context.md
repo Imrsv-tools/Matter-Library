@@ -57,7 +57,7 @@ library-controlled, immutability-after-promotion, Don't Delete Spec Functionalit
 
 - This repo: `Readme.md`, `FolderStructure.txt`.
 - Platform overview: `../IMRSV_Platform/IMRSV_Platform_Documentation/IMRSV_PlatformOverview.md`
-- Planning process: `…/AgenticEngineering_PlanningProcess.md`
+- Planning process: `…/AgenticEngineering_Workflow.md`
 - Folder conventions: `…/AgenticEngineering_StandaloneProjectFolders.md`
 - Studio-side material consumers (downstream): `…/Studio/Services/Service_MaterialX.md`,
   `Service_MaterialManager.md`.
