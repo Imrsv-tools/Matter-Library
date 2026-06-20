@@ -26,6 +26,7 @@ sys.path.insert(0, str(HERE.parent / "converters"))
 import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
 from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
+import project_runtime_catalog as prc  # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -82,6 +83,44 @@ def run_determinism(root: Path) -> bool:
     return ok
 
 
+def run_catalog_freshness(root: Path) -> bool:
+    """Phase 56: the committed runtime catalog is byte-current with — and deterministic
+    from — the authored lockfile. Re-project and diff: a drift between the YAML lockfile
+    and the committed .catalog.json (or a non-deterministic projector) fails here, so the
+    two can't independently 'validate' while out of sync."""
+    releases = root / "library" / "releases"
+    locks = sorted(releases.glob("*.lock.yaml")) if releases.exists() else []
+    if not locks:
+        print("== catalog freshness == (skip: no library/releases/*.lock.yaml)")
+        return True
+    print("== catalog freshness ==")
+    ok = True
+    materials_root = root / "MatterLibrary" / "materials"
+    for lock in locks:
+        catalog = lock.with_name(lock.name.replace(".lock.yaml", ".catalog.json"))
+        try:
+            projected = prc.project_to_string(lock, materials_root)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [FAIL] {lock.name}: projection error: {exc}")
+            ok = False
+            continue
+        if not catalog.exists():
+            print(f"  [FAIL] {lock.name}: committed {catalog.name} missing (run project_runtime_catalog.py)")
+            ok = False
+            continue
+        committed = catalog.read_text(encoding="utf-8")
+        # determinism: a second projection is byte-identical to the first
+        deterministic = (projected == prc.project_to_string(lock, materials_root))
+        fresh = (committed == projected)
+        good = deterministic and fresh
+        detail = "byte-current + deterministic" if good else (
+            ("NON-DETERMINISTIC; " if not deterministic else "") +
+            ("DRIFTED from lockfile" if not fresh else ""))
+        print(f"  [{'PASS' if good else 'FAIL'}] {catalog.name}: {detail}")
+        ok = ok and good
+    return ok
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -93,6 +132,7 @@ def main(argv=None) -> int:
         "materials": run_materials(root),
         "manifest": run_manifest(root),
         "determinism": run_determinism(root),
+        "catalog_freshness": run_catalog_freshness(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
