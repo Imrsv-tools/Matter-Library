@@ -1,0 +1,42 @@
+#usda 1.0
+(
+    """
+    Standalone usdview parity wrapper (Phase 53 fixture; template).
+
+    Binds ONE Matter material .mtlx onto the Catalog standard sphere under a dome light,
+    so usdview can render it WITHOUT the live Stage->Plugin chain (which doesn't exist until
+    Phases 54/55/57). Generated per-material by make_preview.py; this is the documented shape.
+
+    Path resolution (see README.md, peer-review B3):
+      * the .mtlx is referenced by RELATIVE filesystem path, resolved by USD ArDefaultResolver
+        -- NOT the @MatterLib/...@ package search-path (that is a Phase-54 Distribution concern);
+      * texture <image> paths are relative INSIDE the .mtlx, resolved by MaterialX relative to
+        the .mtlx document -- no env var owns texture lookup;
+      * PXR_MTLX_STDLIB_SEARCH_PATHS owns ONLY the MaterialX stdlib nodedefs (open_pbr_surface).
+
+    Replace <REL_MTLX> with the relative path to the material .mtlx and <NAME> with its
+    qualified Matter identity (= the <surfacematerial> name = the file stem).
+    """
+    upAxis = "Y"
+    metersPerUnit = 1.0
+)
+
+def Xform "World"
+{
+    def DomeLight "Dome"
+    {
+        float inputs:intensity = 1000
+    }
+
+    def "Library" (
+        prepend references = @<REL_MTLX>@
+    )
+    {
+    }
+
+    def Sphere "PreviewSphere"
+    {
+        double radius = 1.0
+        rel material:binding = </World/Library/MaterialX/Materials/<NAME>>
+    }
+}

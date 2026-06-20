@@ -1,0 +1,3 @@
+# Python bytecode / caches from the tools harness
+__pycache__/
+*.py[cod]

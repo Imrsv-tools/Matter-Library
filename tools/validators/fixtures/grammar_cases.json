@@ -1,0 +1,19 @@
+{
+  "_comment": "Identity-grammar regression fixture (Phase 53, Identity.md). The 7 proof names + the worst-case conforming name must PASS; the source repo's own 70-char example and assorted charset/structure violations must FAIL.",
+  "must_pass": [
+    "ABS_Matte_Clean_Base_s01_v01",
+    "Limestone_Veined_Clean_Base_s01_v01",
+    "Concrete_Smooth_Worn_Dusty_s1_v01",
+    "Copper_Verdigris_Aged_Base_s01_v01",
+    "Diagnostic_UVGrid_Clean_Base_s1_v01",
+    "IMRSV_MissingMaterial",
+    "Glass_Clear_Clean_Base_s01_v01",
+    "Limestone26b_Veinish_VeryDistressed_Scratched_s01_v32"
+  ],
+  "must_fail": [
+    "Limestone26b_Veinish_VeryDistressed12_ScratchedButNotVeryDusty_s01_v32",
+    "Limestone_Veined_Clean_Base_s01_v01.extra-hyphen",
+    "Limestone_Veined_Clean_Base_sZZ_v01",
+    "Limestone_Veined_Clean_Base_s01_x01"
+  ]
+}
