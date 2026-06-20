@@ -1,0 +1,15 @@
+{
+  "_comment": "Proof article 5 — UV/grid diagnostic. Base color = the procedural UV grid (gen_uvgrid.py); exercises uv_scale/offset/rotation + base_color_tint. Master 'Opaque' (matrix allows Opaque/Emissive; Opaque keeps it lit + validates cleanly). New.",
+  "name": "Diagnostic_UVGrid_Clean_Base_s1_v01",
+  "path": "utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "utility",
+  "class": "virtual",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/utility/virtual/UVGrid_basecolor_s1.png",
+  "roughness_const": 0.5,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation"]
+}

@@ -1,0 +1,15 @@
+{
+  "_comment": "Proof article 1 — simple plastic. Opaque master, param-only (the minimal/param path). Exercises base_color_tint + roughness_bias. Overwrites the stale standard_surface seed (D6 REFINE).",
+  "name": "ABS_Matte_Clean_Base_s01_v01",
+  "path": "synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "plastic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.85, 0.84, 0.82",
+  "roughness_const": 0.55,
+  "metalness_const": 0.0,
+  "specular_ior": 1.46,
+  "lcd_ports": ["base_color_tint", "roughness_bias"]
+}

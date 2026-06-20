@@ -1,0 +1,17 @@
+{
+  "_comment": "Proof article 6 — system fallback (off-grammar, sanctioned in MasterSet.md). Constant magenta + emission = the named-and-deliberate broken-material look; textureless. master 'system'. New.",
+  "name": "IMRSV_MissingMaterial",
+  "path": "utility/virtual/IMRSV_MissingMaterial.mtlx",
+  "master": "system",
+  "domain": "utility",
+  "class": "virtual",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "base_color_const": "1.0, 0.0, 1.0",
+  "roughness_const": 0.4,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "emission_color": "1.0, 0.0, 1.0",
+  "emission_luminance": 2.0,
+  "lcd_ports": []
+}

@@ -92,11 +92,14 @@ class MaterialSpec:
 
     @staticmethod
     def from_dict(d: dict) -> "MaterialSpec":
-        overlays = [Overlay(**o) for o in d.get("overlays", [])]
-        kwargs = {k: v for k, v in d.items() if k not in ("overlays", "class")}
+        # Keep only known spec fields, so a recipe may carry harness hints (e.g. "path")
+        # and comment keys ("_comment") without breaking construction.
+        fields = {f.name for f in MaterialSpec.__dataclass_fields__.values()}
+        kwargs = {k: v for k, v in d.items()
+                  if k in fields and k not in ("overlays", "klass")}
         if "class" in d:
             kwargs["klass"] = d["class"]
-        kwargs["overlays"] = overlays
+        kwargs["overlays"] = [Overlay(**o) for o in d.get("overlays", [])]
         return MaterialSpec(**kwargs)
 
 

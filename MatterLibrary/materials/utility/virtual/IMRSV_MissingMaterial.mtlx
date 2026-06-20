@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_IMRSV_MissingMaterial">
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="1.0, 0.0, 1.0" />
+    </constant>
+    <output name="base_color_out" type="color3" nodename="base_color_const" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.4" />
+    </constant>
+    <output name="roughness_out" type="float" nodename="roughness_const" />
+  </nodegraph>
+  <open_pbr_surface name="SR_IMRSV_MissingMaterial" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_IMRSV_MissingMaterial" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_IMRSV_MissingMaterial" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="emission_luminance" type="float" value="2.0" />
+    <input name="emission_color" type="color3" value="1.0, 0.0, 1.0" />
+  </open_pbr_surface>
+  <surfacematerial name="IMRSV_MissingMaterial" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_IMRSV_MissingMaterial" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="system" uniform="true" />
+    <input name="scale_tag" type="string" value="sUKN" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.0" />
+    <input name="domain" type="string" value="utility" uniform="true" />
+    <input name="class" type="string" value="virtual" uniform="true" />
+  </nodedef>
+</materialx>

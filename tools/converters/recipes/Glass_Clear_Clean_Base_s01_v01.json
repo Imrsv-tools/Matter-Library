@@ -1,0 +1,15 @@
+{
+  "_comment": "Proof article 7 — glass. TranslucentThin master (the 2nd master) + the textureless/param-only path. Exercises base_color_tint. Overwrites the stale standard_surface seed (D6 REFINE).",
+  "name": "Glass_Clear_Clean_Base_s01_v01",
+  "path": "engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThin",
+  "domain": "engineered",
+  "class": "glass",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "1.0, 1.0, 1.0",
+  "roughness_const": 0.02,
+  "specular_ior": 1.5,
+  "transmission": 1.0,
+  "lcd_ports": ["base_color_tint"]
+}

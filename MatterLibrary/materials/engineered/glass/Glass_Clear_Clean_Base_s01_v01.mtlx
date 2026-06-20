@@ -1,31 +1,37 @@
 <?xml version="1.0"?>
-<materialx version="1.39">
-  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="utility">
-    <input name="master_material" type="string" />
-    <input name="scale_tag" type="string" />
-    <input name="meters_per_tile" type="float" />
-    <input name="domain" type="string" />
-    <input name="class" type="string" />
-  </nodedef>
-
-  <standard_surface name="SR_glass_clear" type="surfaceshader">
-    <input name="base" type="float" value="1.0" />
-    <input name="base_color" type="color3" value="1.0, 1.0, 1.0" />
-    <input name="metalness" type="float" value="0.0" />
-    <input name="specular_roughness" type="float" value="0.02" />
-    <input name="specular_IOR" type="float" value="1.5" />
-    <input name="transmission" type="float" value="1.0" />
-  </standard_surface>
-
-  <surfacematerial name="M_glass_clear" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="SR_glass_clear" />
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Glass_Clear_Clean_Base_s01_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="1.0, 1.0, 1.0" />
+    </constant>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_const" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.02" />
+    </constant>
+    <output name="roughness_out" type="float" nodename="roughness_const" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Glass_Clear_Clean_Base_s01_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Glass_Clear_Clean_Base_s01_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Glass_Clear_Clean_Base_s01_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="transmission_weight" type="float" value="1.0" />
+  </open_pbr_surface>
+  <surfacematerial name="Glass_Clear_Clean_Base_s01_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Glass_Clear_Clean_Base_s01_v01" />
   </surfacematerial>
-
-  <imrsv_metadata name="IMRSV_Metadata">
-    <input name="master_material" type="string" value="M_MasterMaterial_TranslucentThin" />
-    <input name="scale_tag" type="string" value="s01" />
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="TranslucentThin" uniform="true" />
+    <input name="scale_tag" type="string" value="s01" uniform="true" />
     <input name="meters_per_tile" type="float" value="0.1" />
-    <input name="domain" type="string" value="engineered" />
-    <input name="class" type="string" value="glass" />
-  </imrsv_metadata>
+    <input name="domain" type="string" value="engineered" uniform="true" />
+    <input name="class" type="string" value="glass" uniform="true" />
+  </nodedef>
 </materialx>

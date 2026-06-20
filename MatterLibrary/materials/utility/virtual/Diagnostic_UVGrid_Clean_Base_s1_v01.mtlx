@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Diagnostic_UVGrid_Clean_Base_s1_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
+    <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
+    <input name="uv_rotation" type="float" value="0.0" uiname="UV Rotation (deg)" unittype="angle" unit="degree" />
+    <texcoord name="geom_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <place2d name="uv_place" type="vector2">
+      <input name="texcoord" type="vector2" nodename="geom_uv" />
+      <input name="scale" type="vector2" interfacename="uv_scale" />
+      <input name="offset" type="vector2" interfacename="uv_offset" />
+      <input name="rotate" type="float" interfacename="uv_rotation" />
+    </place2d>
+    <image name="base_color_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/base/utility/virtual/UVGrid_basecolor_s1.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_tex" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.5" />
+    </constant>
+    <output name="roughness_out" type="float" nodename="roughness_const" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Diagnostic_UVGrid_Clean_Base_s1_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Diagnostic_UVGrid_Clean_Base_s1_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Diagnostic_UVGrid_Clean_Base_s1_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+  </open_pbr_surface>
+  <surfacematerial name="Diagnostic_UVGrid_Clean_Base_s1_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Diagnostic_UVGrid_Clean_Base_s1_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Opaque" uniform="true" />
+    <input name="scale_tag" type="string" value="s1" uniform="true" />
+    <input name="meters_per_tile" type="float" value="1.0" />
+    <input name="domain" type="string" value="utility" uniform="true" />
+    <input name="class" type="string" value="virtual" uniform="true" />
+  </nodedef>
+</materialx>
