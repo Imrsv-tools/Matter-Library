@@ -3,6 +3,8 @@
 
 *Single-source MaterialX pipeline for consistent, real-world elemental / “Matter” materials across real-time and offline rendering.*
 
+> **⚠ Superseded by the durable platform specs (2026-06-20, Phase 52).** The canonical Matter Library **spec** — ontology (taxonomy · identity grammar · master set), contract (OpenPBR template · manifest · LCD schema), catalog, and authoring golden path — now lives in **`IMRSV_Platform_Documentation/MatterLibrary/`**. This repo remains the standalone **source/payload + planning surface**; for the authoritative ontology/contract, defer to the durable specs (they promoted-and-corrected this readme — e.g. 7 masters not 5, `open_pbr_surface` not `standard_surface`, ≤63-char name budget).
+
 > **Status:** Research / aggregate / define phase. Much of what follows is **intended design**; sections are tagged **(exists)** or **(planned)** where the distinction matters. Nothing here is deleted just because it isn't built yet — see `.ai/conventions.md` §Don't Delete Spec Functionality.
 
 ---
