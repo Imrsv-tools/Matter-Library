@@ -58,9 +58,11 @@ def validate_manifest(path: Path, materials_root: Path) -> list:
         if status not in LIFECYCLE:
             errs.append(f"status {status!r} not in {sorted(LIFECYCLE)}")
         if mid and isinstance(ver, str):
-            mtlx = materials_root / f"{mid}_{ver}.mtlx"
-            if not mtlx.exists():
-                errs.append(f"does not resolve: {mtlx}")
+            # Standard: <id>_<version>.mtlx. Fallback: bare <id>.mtlx for off-grammar
+            # system materials (e.g. IMRSV_MissingMaterial) whose filename has no _vNN axis.
+            cand = materials_root / f"{mid}_{ver}.mtlx"
+            if not cand.exists() and not (materials_root / f"{mid}.mtlx").exists():
+                errs.append(f"does not resolve: {cand} (nor bare {mid}.mtlx)")
         results.append((f"{tag} {mid}", not errs, "ok" if not errs else "; ".join(errs)))
 
     return results

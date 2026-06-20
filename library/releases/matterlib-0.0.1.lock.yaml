@@ -1,0 +1,54 @@
+# Matter Library — matterlib-0.0.1 PILOT manifest (Phase 53)
+#
+# Proves the Contract/Manifest.md lockfile schema with a real artifact for Phase 56.
+# All 7 proof articles are pinned at status: draft — Phase 53 does only INFORMAL visual
+# parity; the formal ΔE bar (and promotion to candidate/approved) is Phase 56/60. NEVER
+# approved here. This is NOT the live runtime catalog (the flat-scan -> manifest cutover is
+# Phase 56).
+#
+# Pilot conventions (flagged for Phase 56, which owns the manifest cutover):
+#   * `id` = Domain/Class path + the qualified name INCLUDING the scale tag, so `id`+`version`
+#     resolves to a file (<id>_<version>.mtlx). Manifest.md's example drops the sNN tag from
+#     `id`, which is underspecified for file resolution — the pilot keeps it.
+#   * IMRSV_MissingMaterial is the off-grammar system material (no _vNN in its filename); it
+#     resolves by bare <id>.mtlx and carries a nominal version: v01.
+release: 0.0.1
+
+materials:
+  - id: synthetic/plastic/ABS_Matte_Clean_Base_s01
+    version: v01
+    status: draft
+  - id: natural/stone/Limestone_Veined_Clean_Base_s01
+    version: v01
+    status: draft
+  - id: engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1
+    version: v01
+    status: draft
+  - id: engineered/metal/Copper_Verdigris_Aged_Base_s01
+    version: v01
+    status: draft
+  - id: utility/virtual/Diagnostic_UVGrid_Clean_Base_s1
+    version: v01
+    status: draft
+  - id: utility/virtual/IMRSV_MissingMaterial   # system material, off-grammar (bare-id resolve)
+    version: v01
+    status: draft
+  - id: engineered/glass/Glass_Clear_Clean_Base_s01
+    version: v01
+    status: draft
+
+textures:
+  - id: base/natural/stone/Limestone_Veined
+    version: v01
+  - id: base/engineered/cementitious/Concrete_Smooth_Worn
+    version: v01
+  - id: base/engineered/metal/Copper_Verdigris
+    version: v01
+  - id: base/utility/virtual/UVGrid
+    version: v01
+  - id: shared/overlays/Dust01
+    version: v01
+  - id: shared/overlays/Scratches01
+    version: v01
+  - id: shared/masks/Verdigris01
+    version: v01
