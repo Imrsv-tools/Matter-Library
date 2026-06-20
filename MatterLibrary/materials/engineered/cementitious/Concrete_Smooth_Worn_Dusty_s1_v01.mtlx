@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Concrete_Smooth_Worn_Dusty_s1_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
+    <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
+    <input name="uv_rotation" type="float" value="0.0" uiname="UV Rotation (deg)" unittype="angle" unit="degree" />
+    <input name="overlay1_density" type="float" value="0.0" uiname="Overlay 1 Density" />
+    <input name="overlay2_density" type="float" value="0.0" uiname="Overlay 2 Density" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <texcoord name="geom_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <place2d name="uv_place" type="vector2">
+      <input name="texcoord" type="vector2" nodename="geom_uv" />
+      <input name="scale" type="vector2" interfacename="uv_scale" />
+      <input name="offset" type="vector2" interfacename="uv_offset" />
+      <input name="rotate" type="float" interfacename="uv_rotation" />
+    </place2d>
+    <image name="base_color_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/base/engineered/cementitious/Concrete_Smooth_Worn_basecolor_s1.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_tex" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <image name="overlay1_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Dust01_basecolor_s001.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <mix name="base_color_overlay1" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" nodename="overlay1_tex" />
+      <input name="mix" type="float" interfacename="overlay1_density" />
+    </mix>
+    <image name="overlay2_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Scratches01_basecolor_s001.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <mix name="base_color_overlay2" type="color3">
+      <input name="bg" type="color3" nodename="base_color_overlay1" />
+      <input name="fg" type="color3" nodename="overlay2_tex" />
+      <input name="mix" type="float" interfacename="overlay2_density" />
+    </mix>
+    <output name="base_color_out" type="color3" nodename="base_color_overlay2" />
+    <image name="roughness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/engineered/cementitious/Concrete_Smooth_Worn_roughness_s1.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_tex" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <image name="normal_tex" type="vector3">
+      <input name="file" type="filename" value="../../../textures/base/engineered/cementitious/Concrete_Smooth_Worn_normal_s1.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <normalmap name="surface_normal" type="vector3">
+      <input name="in" type="vector3" nodename="normal_tex" />
+    </normalmap>
+    <output name="normal_out" type="vector3" nodename="surface_normal" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Concrete_Smooth_Worn_Dusty_s1_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Concrete_Smooth_Worn_Dusty_s1_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Concrete_Smooth_Worn_Dusty_s1_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="geometry_normal" type="vector3" nodegraph="NG_Concrete_Smooth_Worn_Dusty_s1_v01" output="normal_out" />
+  </open_pbr_surface>
+  <surfacematerial name="Concrete_Smooth_Worn_Dusty_s1_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Concrete_Smooth_Worn_Dusty_s1_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Opaque" uniform="true" />
+    <input name="scale_tag" type="string" value="s1" uniform="true" />
+    <input name="meters_per_tile" type="float" value="1.0" />
+    <input name="domain" type="string" value="engineered" uniform="true" />
+    <input name="class" type="string" value="cementitious" uniform="true" />
+  </nodedef>
+</materialx>

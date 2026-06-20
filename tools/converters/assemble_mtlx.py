@@ -88,6 +88,8 @@ class MaterialSpec:
     maskset_tex: Optional[str] = None             # <=1 maskset (drives maskset_blend)
     # which LCD ports to expose as interface inputs (subset of LCD_PORTS keys, in order)
     lcd_ports: list = field(default_factory=list)
+    # per-material authored starting values for exposed LCD ports (else the schema default)
+    lcd_defaults: dict = field(default_factory=dict)
     include_metadata: bool = True
 
     @staticmethod
@@ -142,9 +144,10 @@ def assemble(spec: MaterialSpec) -> str:
     # --- LCD interface inputs (fixed order = the order requested) ---
     for port in spec.lcd_ports:
         typ, default, uiname, extra = LCD_PORTS[port]
+        value = spec.lcd_defaults.get(port, default)   # per-material authored start, else schema default
         attrs = {"uiname": uiname}
         attrs.update(extra)
-        _add_input(ng, port, typ, value=default, attrs=attrs)
+        _add_input(ng, port, typ, value=value, attrs=attrs)
 
     uses_uv = any([spec.base_color_tex, spec.roughness_tex, spec.normal_tex,
                    spec.metalness_tex] + [o.texture for o in spec.overlays]

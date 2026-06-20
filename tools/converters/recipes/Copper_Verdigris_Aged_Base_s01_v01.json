@@ -1,0 +1,18 @@
+{
+  "_comment": "Proof article 4 — aged copper (the hard case). Opaque master + maskset (procedural verdigris patina). ambientCG CC0 (Metal047B) metallic base, copper-toned via the authored base_color_tint default. Exercises maskset_blend + tint + UV + roughness_bias. New.",
+  "name": "Copper_Verdigris_Aged_Base_s01_v01",
+  "path": "engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_roughness_s01.png",
+  "metalness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_metallic_s01.png",
+  "normal_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_normal_s01.png",
+  "maskset_tex": "../../../textures/shared/masks/Verdigris01_s01.png",
+  "specular_ior": 1.5,
+  "lcd_defaults": {"base_color_tint": "0.95, 0.64, 0.54", "maskset_blend": "0.35"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend", "roughness_bias"]
+}
