@@ -1,0 +1,8 @@
+# Negative fixture (Phase 56) — a lockfile whose material id does NOT resolve to a payload.
+# The projector (project_runtime_catalog.py) MUST reject it (validation fails -> non-zero / raise).
+# Driven by run_all.py :: run_catalog_validation. Not a release artifact.
+release: 9.9.9
+materials:
+  - id: natural/stone/Does_Not_Exist_s01
+    version: v01
+    status: draft

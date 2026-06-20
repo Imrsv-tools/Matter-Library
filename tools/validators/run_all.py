@@ -121,6 +121,25 @@ def run_catalog_freshness(root: Path) -> bool:
     return ok
 
 
+def run_catalog_validation(root: Path) -> bool:
+    """Phase 56: the projector REJECTS a malformed / dangling-id manifest (validation, not a
+    silent empty projection). Drives the negative fixture through project_to_string and asserts
+    it raises."""
+    fixture = HERE / "fixtures" / "dangling_manifest.lock.yaml"
+    if not fixture.exists():
+        print("== catalog validation == (skip: no dangling_manifest fixture)")
+        return True
+    print("== catalog validation ==")
+    materials_root = root / "MatterLibrary" / "materials"
+    try:
+        prc.project_to_string(fixture, materials_root)
+        print(f"  [FAIL] {fixture.name}: WRONGLY ACCEPTED a dangling id")
+        return False
+    except Exception:  # noqa: BLE001
+        print(f"  [PASS] {fixture.name}: rejected (dangling id)")
+        return True
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -133,6 +152,7 @@ def main(argv=None) -> int:
         "manifest": run_manifest(root),
         "determinism": run_determinism(root),
         "catalog_freshness": run_catalog_freshness(root),
+        "catalog_validation": run_catalog_validation(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
