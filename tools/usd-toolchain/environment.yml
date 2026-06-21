@@ -1,0 +1,39 @@
+# Host build/runtime env for the IMRSV USD validation/authoring toolchain.
+#
+# Creates the conda env that BUILDS OpenUSD v26.03 + MaterialX 1.39.5 and then
+# HOSTS usdview / usdrecord / usdcat / usdchecker / PyMaterialX. The env exists to
+# insulate the build from a box's system Python / cmake / gcc (the Fedora box this
+# was authored on ships Python 3.14 + cmake 4.3 + gcc 16, which the OpenUSD deps
+# reject). It uses the SYSTEM compiler + system GL/X dev libs, not conda's.
+#
+#   conda env create -f environment.yml          # -> env 'imrsv-usd-tools'
+#   conda activate imrsv-usd-tools
+#   bash run-all.sh                               # build (~30-50 min, idempotent)
+#
+# System prerequisites (NOT conda — install with the OS package manager):
+#   Fedora/Linux:  sudo dnf install gcc-c++ libXt-devel libXrandr-devel \
+#                       libXinerama-devel libXcursor-devel libXi-devel mesa-libGL-devel
+#   macOS:         Xcode command-line tools (clang); GL/X dev libs N/A (Storm uses Metal).
+#
+# Version pins MUST track Stage's OpenUSD pin (IMRSV_Stage/cmake/ExternalUSD.cmake,
+# GIT_TAG v26.03) and the vendored MaterialX (IMRSV_Stage/third_party/MaterialX = 1.39.5)
+# so usdview renders .mtlx the way Stage reads it. See USDValidationToolchain.md.
+name: imrsv-usd-tools
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - cmake=3.28
+  - ninja
+  - git
+  - pyside6
+  - pyopengl
+  - numpy
+  - pyyaml
+  - jinja2
+  - pip
+  - pip:
+      # Standalone PyMaterialX module — build_usd.py --materialx builds only USD's
+      # MaterialX C++ libs, NOT the importable `MaterialX` Python module the Phase-53
+      # authoring harness needs. Pin to the SAME minor as the build (faithful).
+      - MaterialX==1.39.5
