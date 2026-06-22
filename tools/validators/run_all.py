@@ -27,6 +27,7 @@ import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
 from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
 import project_runtime_catalog as prc  # noqa: E402
+import check_fixture_sync as cfs       # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -140,6 +141,13 @@ def run_catalog_validation(root: Path) -> bool:
         return True
 
 
+def run_fixture_sync(root: Path) -> bool:
+    """Phase 58.5: the Stage fixture copy of the runtime catalog (+ payloads) is byte-current
+    with the Matter-Library projected catalog — the cross-repo half Phase 56 left open
+    (`run_catalog_freshness` covers only lockfile -> projected, within this repo)."""
+    return cfs.check_fixture_sync(root, cfs.default_fixture_root(root))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -153,6 +161,7 @@ def main(argv=None) -> int:
         "determinism": run_determinism(root),
         "catalog_freshness": run_catalog_freshness(root),
         "catalog_validation": run_catalog_validation(root),
+        "fixture_sync": run_fixture_sync(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
