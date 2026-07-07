@@ -63,9 +63,8 @@ schema change (parking-lot item).
 ## Other decisions (2026-05-30)
 
 - **UE cook project** lives **in-repo** at `bridges/unreal/` (`MatterLibraryUE.uproject`).
-- **Target versions**: Unreal **5.7+** forward target; Linux dev pinned to UE **5.6.1**
-  (platform CLAUDE.md). Blender **4.x** (latest stable). Corrects the README's prior
-  "Blender 5.1" (nonexistent) and mixed 5.6/5.7 statements.
+- **Target versions**: Unreal **5.8** (the forward line, all platforms). Blender **4.x**
+  (latest stable). Corrects the README's prior "Blender 5.1" (nonexistent).
 - **Doc posture**: research/define — ADD/REFINE, never DELETE intended design to match disk.
 
 ## Resolved

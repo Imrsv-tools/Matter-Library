@@ -27,8 +27,8 @@ Navigation hub for the Matter Library. Keep lean; details live in the docs this 
 - **Textures via Git LFS** (large, lower-churn; many materials share one texture set).
 - **LCD parity** across MaterialX / Unreal / Blender; master materials bridge the gap.
 - **UE cook project** lives in-repo at `bridges/unreal/`.
-- **Target versions**: Unreal **5.7+** (Linux dev currently pinned to UE **5.6.1** per
-  platform CLAUDE.md); Blender **4.x** (latest stable).
+- **Target versions**: Unreal **5.8+** (the platform forward line since 2026-07-06; the old
+  Linux 5.6.1 pin is retired); Blender **4.x** (latest stable).
 
 See `Readme.md` for the full model and `.ai/research/Library_Architecture_Research.md` for
 the decision record.

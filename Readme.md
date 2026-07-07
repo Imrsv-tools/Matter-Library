@@ -1,5 +1,5 @@
 # 🧱 Matter Library Project
-### Unified Physically-Based Material Library and Toolset for Unreal Engine 5.7+ (Substrate) and Blender 4.x+ — others TBD
+### Unified Physically-Based Material Library and Toolset for Unreal Engine 5.8+ (Substrate) and Blender 4.x+ — others TBD
 
 *Single-source MaterialX pipeline for consistent, real-world elemental / “Matter” materials across real-time and offline rendering.*
 
@@ -24,7 +24,7 @@ It is a component of the broader **IMRSV Platform** (see `IMRSV_Platform_Documen
 
 - **MaterialX as the single source of truth** for all materials.
 - **Physically correct scale** and tiling (meters-per-tile defined per material).
-- **Visual parity across engines** — Unreal 5.7+ (Substrate + Lumen) and Blender 4.x (Principled BSDF). Others TBD.
+- **Visual parity across engines** — Unreal 5.8+ (Substrate + Lumen) and Blender 4.x (Principled BSDF). Others TBD.
 - **Least Common Denominator (LCD)** parameter discipline — only expose what all targets can honor.
 - **A volatile, community-friendly source collection** paired with a **controlled, curated, versioned library**.
 - **Open and extensible** — a foundation others can build upon.
@@ -235,7 +235,7 @@ Glass_Clear_Clean_Base_s01_v01.mtlx
 
 1. Author in **MaterialX Viewer**.
 2. Validate in **Blender 4.x**.
-3. Verify in **Unreal 5.7+ (Lumen)** — Linux dev currently pinned to UE 5.6.1 (see platform notes).
+3. Verify in **Unreal 5.8+ (Lumen)** — the platform forward line (see platform notes).
 4. Compare output (target ΔE < 2) under standardized HDR lighting.
 
 ---

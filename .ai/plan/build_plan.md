@@ -51,7 +51,7 @@ layered result across MaterialX / UE / Blender. Master materials gain overlay su
 - `PhaseTBD_Overlays`
 
 ### Cook the Unreal Library
-**Goal:** The standalone UE cook project (`bridges/unreal/`, UE 5.7+ / Linux 5.6.1) packages
+**Goal:** The standalone UE cook project (`bridges/unreal/`, UE 5.8+) packages
 the ~10 materials into a cooked, referenceable Substrate library.
 - `PhaseTBD_CookUnrealLibrary`
 
