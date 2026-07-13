@@ -16,6 +16,10 @@
       <input name="offset" type="vector2" interfacename="uv_offset" />
       <input name="rotate" type="float" interfacename="uv_rotation" />
     </place2d>
+    <image name="maskset_tex" type="color3" colorspace="lin_rec709">
+      <input name="file" type="filename" value="../../../textures/shared/masks/Verdigris01_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
     <image name="base_color_tex" type="color3" colorspace="srgb_texture">
       <input name="file" type="filename" value="../../../textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
@@ -24,16 +28,7 @@
       <input name="in1" type="color3" nodename="base_color_tex" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <image name="maskset_tex" type="color3" colorspace="srgb_texture">
-      <input name="file" type="filename" value="../../../textures/shared/masks/Verdigris01_s01.png" />
-      <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
-    <mix name="base_color_masked" type="color3">
-      <input name="bg" type="color3" nodename="base_color_tinted" />
-      <input name="fg" type="color3" nodename="maskset_tex" />
-      <input name="mix" type="float" interfacename="maskset_blend" />
-    </mix>
-    <output name="base_color_out" type="color3" nodename="base_color_masked" />
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
     <image name="roughness_tex" type="float">
       <input name="file" type="filename" value="../../../textures/base/engineered/metal/Copper_Verdigris_roughness_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
