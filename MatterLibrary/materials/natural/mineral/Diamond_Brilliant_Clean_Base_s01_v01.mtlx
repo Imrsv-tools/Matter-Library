@@ -27,7 +27,7 @@
     <input name="specular_roughness" type="float" nodegraph="NG_Diamond_Brilliant_Clean_Base_s01_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="2.417" />
     <input name="geometry_thin_walled" type="boolean" value="false" />
-    <input name="transmission_weight" type="float" value="0.95" />
+    <input name="transmission_weight" type="float" value="1.0" />
     <input name="transmission_color" type="color3" value="0.75, 0.90, 1.0" />
     <input name="transmission_depth" type="float" value="0.02" />
   </open_pbr_surface>
