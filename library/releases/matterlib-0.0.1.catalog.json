@@ -31,6 +31,26 @@
       "version": "v01"
     },
     {
+      "display_name": "Rust_OnSteel_Flaking_Base",
+      "domain": "engineered",
+      "id": "engineered/metal/Rust_OnSteel_Flaking_Base_s01",
+      "material_class": "metal",
+      "payload_path": "materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "draft",
+      "version": "v01"
+    },
+    {
+      "display_name": "Diamond_Brilliant_Clean_Base",
+      "domain": "natural",
+      "id": "natural/mineral/Diamond_Brilliant_Clean_Base_s01",
+      "material_class": "mineral",
+      "payload_path": "materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "draft",
+      "version": "v01"
+    },
+    {
       "display_name": "Limestone_Veined_Clean_Base",
       "domain": "natural",
       "id": "natural/stone/Limestone_Veined_Clean_Base_s01",
@@ -41,11 +61,41 @@
       "version": "v01"
     },
     {
+      "display_name": "Marble_Veined_Polished_Base",
+      "domain": "natural",
+      "id": "natural/stone/Marble_Veined_Polished_Base_s01",
+      "material_class": "stone",
+      "payload_path": "materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "draft",
+      "version": "v01"
+    },
+    {
       "display_name": "ABS_Matte_Clean_Base",
       "domain": "synthetic",
       "id": "synthetic/plastic/ABS_Matte_Clean_Base_s01",
       "material_class": "plastic",
       "payload_path": "materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "draft",
+      "version": "v01"
+    },
+    {
+      "display_name": "Lace_Floral_Clean_Base",
+      "domain": "synthetic",
+      "id": "synthetic/textile/Lace_Floral_Clean_Base_s01",
+      "material_class": "textile",
+      "payload_path": "materials/synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "draft",
+      "version": "v01"
+    },
+    {
+      "display_name": "Neon_Signage_Clean_Base",
+      "domain": "utility",
+      "id": "utility/emissive/Neon_Signage_Clean_Base_s01",
+      "material_class": "emissive",
+      "payload_path": "materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
       "status": "draft",
       "version": "v01"

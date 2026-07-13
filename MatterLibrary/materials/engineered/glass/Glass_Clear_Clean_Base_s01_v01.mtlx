@@ -2,6 +2,76 @@
 <materialx version="1.39" colorspace="lin_rec709">
   <nodegraph name="NG_Glass_Clear_Clean_Base_s01_v01">
     <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
+    <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
+    <input name="uv_rotation" type="float" value="0.0" uiname="UV Rotation (deg)" unittype="angle" unit="degree" />
+    <input name="overlay1_density" type="float" value="0.25" uiname="Overlay 1 Density" />
+    <input name="overlay2_density" type="float" value="0.35" uiname="Overlay 2 Density" />
+    <input name="maskset_blend" type="float" value="0.6" uiname="Maskset Blend" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <texcoord name="geom_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <place2d name="uv_place" type="vector2">
+      <input name="texcoord" type="vector2" nodename="geom_uv" />
+      <input name="scale" type="vector2" interfacename="uv_scale" />
+      <input name="offset" type="vector2" interfacename="uv_offset" />
+      <input name="rotate" type="float" interfacename="uv_rotation" />
+    </place2d>
+    <image name="maskset_tex" type="color3" colorspace="lin_rec709">
+      <input name="file" type="filename" value="../../../textures/shared/masks/Grime01_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <image name="overlay1_tex" type="color4" colorspace="lin_rec709">
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Dust01_overlay_s001.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <image name="overlay2_tex" type="color4" colorspace="lin_rec709">
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Scratches01_overlay_s001.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <extract name="maskset_gate1" type="float">
+      <input name="in" type="color3" nodename="maskset_tex" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <mix name="overlay1_gate" type="float">
+      <input name="bg" type="float" value="1.0" />
+      <input name="fg" type="float" nodename="maskset_gate1" />
+      <input name="mix" type="float" interfacename="maskset_blend" />
+    </mix>
+    <extract name="overlay1_density_mask" type="float">
+      <input name="in" type="color4" nodename="overlay1_tex" />
+      <input name="index" type="integer" value="3" />
+    </extract>
+    <multiply name="overlay1_effect_raw" type="float">
+      <input name="in1" type="float" interfacename="overlay1_density" />
+      <input name="in2" type="float" nodename="overlay1_density_mask" />
+    </multiply>
+    <multiply name="overlay1_effect" type="float">
+      <input name="in1" type="float" nodename="overlay1_effect_raw" />
+      <input name="in2" type="float" nodename="overlay1_gate" />
+    </multiply>
+    <extract name="maskset_gate2" type="float">
+      <input name="in" type="color3" nodename="maskset_tex" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <mix name="overlay2_gate" type="float">
+      <input name="bg" type="float" value="1.0" />
+      <input name="fg" type="float" nodename="maskset_gate2" />
+      <input name="mix" type="float" interfacename="maskset_blend" />
+    </mix>
+    <extract name="overlay2_density_mask" type="float">
+      <input name="in" type="color4" nodename="overlay2_tex" />
+      <input name="index" type="integer" value="3" />
+    </extract>
+    <multiply name="overlay2_effect_raw" type="float">
+      <input name="in1" type="float" interfacename="overlay2_density" />
+      <input name="in2" type="float" nodename="overlay2_density_mask" />
+    </multiply>
+    <multiply name="overlay2_effect" type="float">
+      <input name="in1" type="float" nodename="overlay2_effect_raw" />
+      <input name="in2" type="float" nodename="overlay2_gate" />
+    </multiply>
     <constant name="base_color_const" type="color3">
       <input name="value" type="color3" value="1.0, 1.0, 1.0" />
     </constant>
@@ -13,15 +83,127 @@
     <constant name="roughness_const" type="float">
       <input name="value" type="float" value="0.02" />
     </constant>
-    <output name="roughness_out" type="float" nodename="roughness_const" />
+    <extract name="overlay1_roughness_bias" type="float">
+      <input name="in" type="color4" nodename="overlay1_tex" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <multiply name="overlay1_roughness_delta" type="float">
+      <input name="in1" type="float" nodename="overlay1_roughness_bias" />
+      <input name="in2" type="float" nodename="overlay1_effect" />
+    </multiply>
+    <add name="roughness_overlay1" type="float">
+      <input name="in1" type="float" nodename="roughness_const" />
+      <input name="in2" type="float" nodename="overlay1_roughness_delta" />
+    </add>
+    <extract name="overlay2_roughness_bias" type="float">
+      <input name="in" type="color4" nodename="overlay2_tex" />
+      <input name="index" type="integer" value="2" />
+    </extract>
+    <multiply name="overlay2_roughness_delta" type="float">
+      <input name="in1" type="float" nodename="overlay2_roughness_bias" />
+      <input name="in2" type="float" nodename="overlay2_effect" />
+    </multiply>
+    <add name="roughness_overlay2" type="float">
+      <input name="in1" type="float" nodename="roughness_overlay1" />
+      <input name="in2" type="float" nodename="overlay2_roughness_delta" />
+    </add>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_overlay2" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <constant name="surface_normal_flat" type="vector3">
+      <input name="value" type="vector3" value="0.0, 0.0, 1.0" />
+    </constant>
+    <extract name="overlay1_nx_raw" type="float">
+      <input name="in" type="color4" nodename="overlay1_tex" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <multiply name="overlay1_nx_scaled" type="float">
+      <input name="in1" type="float" nodename="overlay1_nx_raw" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="overlay1_nx" type="float">
+      <input name="in1" type="float" nodename="overlay1_nx_scaled" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
+    <extract name="overlay1_ny_raw" type="float">
+      <input name="in" type="color4" nodename="overlay1_tex" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <multiply name="overlay1_ny_scaled" type="float">
+      <input name="in1" type="float" nodename="overlay1_ny_raw" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="overlay1_ny" type="float">
+      <input name="in1" type="float" nodename="overlay1_ny_scaled" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
+    <combine3 name="overlay1_normal_delta" type="vector3">
+      <input name="in1" type="float" nodename="overlay1_nx" />
+      <input name="in2" type="float" nodename="overlay1_ny" />
+      <input name="in3" type="float" value="0.0" />
+    </combine3>
+    <multiply name="overlay1_normal_scaled" type="vector3">
+      <input name="in1" type="vector3" nodename="overlay1_normal_delta" />
+      <input name="in2" type="float" nodename="overlay1_effect" />
+    </multiply>
+    <add name="normal_overlay1" type="vector3">
+      <input name="in1" type="vector3" nodename="surface_normal_flat" />
+      <input name="in2" type="vector3" nodename="overlay1_normal_scaled" />
+    </add>
+    <extract name="overlay2_nx_raw" type="float">
+      <input name="in" type="color4" nodename="overlay2_tex" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <multiply name="overlay2_nx_scaled" type="float">
+      <input name="in1" type="float" nodename="overlay2_nx_raw" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="overlay2_nx" type="float">
+      <input name="in1" type="float" nodename="overlay2_nx_scaled" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
+    <extract name="overlay2_ny_raw" type="float">
+      <input name="in" type="color4" nodename="overlay2_tex" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <multiply name="overlay2_ny_scaled" type="float">
+      <input name="in1" type="float" nodename="overlay2_ny_raw" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="overlay2_ny" type="float">
+      <input name="in1" type="float" nodename="overlay2_ny_scaled" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
+    <combine3 name="overlay2_normal_delta" type="vector3">
+      <input name="in1" type="float" nodename="overlay2_nx" />
+      <input name="in2" type="float" nodename="overlay2_ny" />
+      <input name="in3" type="float" value="0.0" />
+    </combine3>
+    <multiply name="overlay2_normal_scaled" type="vector3">
+      <input name="in1" type="vector3" nodename="overlay2_normal_delta" />
+      <input name="in2" type="float" nodename="overlay2_effect" />
+    </multiply>
+    <add name="normal_overlay2" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_overlay1" />
+      <input name="in2" type="vector3" nodename="overlay2_normal_scaled" />
+    </add>
+    <normalize name="normal_out_unit" type="vector3">
+      <input name="in" type="vector3" nodename="normal_overlay2" />
+    </normalize>
+    <output name="normal_out" type="vector3" nodename="normal_out_unit" />
   </nodegraph>
   <open_pbr_surface name="SR_Glass_Clear_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
     <input name="base_color" type="color3" nodegraph="NG_Glass_Clear_Clean_Base_s01_v01" output="base_color_out" />
     <input name="base_metalness" type="float" value="0.0" />
     <input name="specular_roughness" type="float" nodegraph="NG_Glass_Clear_Clean_Base_s01_v01" output="roughness_out" />
-    <input name="specular_ior" type="float" value="1.5" />
-    <input name="transmission_weight" type="float" value="1.0" />
+    <input name="specular_ior" type="float" value="1.52" />
+    <input name="geometry_normal" type="vector3" nodegraph="NG_Glass_Clear_Clean_Base_s01_v01" output="normal_out" />
+    <input name="geometry_thin_walled" type="boolean" value="true" />
+    <input name="transmission_weight" type="float" value="0.95" />
+    <input name="transmission_color" type="color3" value="0.82, 0.95, 0.88" />
   </open_pbr_surface>
   <surfacematerial name="Glass_Clear_Clean_Base_s01_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_Glass_Clear_Clean_Base_s01_v01" />

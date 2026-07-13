@@ -18,11 +18,11 @@
       <input name="rotate" type="float" interfacename="uv_rotation" />
     </place2d>
     <image name="overlay1_tex" type="color4" colorspace="lin_rec709">
-      <input name="file" type="filename" value="../../../textures/shared/overlays/Dust01_basecolor_s001.png" />
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Dust01_overlay_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
     <image name="overlay2_tex" type="color4" colorspace="lin_rec709">
-      <input name="file" type="filename" value="../../../textures/shared/overlays/Scratches01_basecolor_s001.png" />
+      <input name="file" type="filename" value="../../../textures/shared/overlays/Scratches01_overlay_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
     <extract name="overlay1_density_mask" type="float">

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Neon_Signage_Clean_Base_s01_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="0.05, 0.02, 0.05" />
+    </constant>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_const" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.25" />
+    </constant>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_const" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <output name="roughness_out" type="float" nodename="roughness_biased" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Neon_Signage_Clean_Base_s01_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Neon_Signage_Clean_Base_s01_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Neon_Signage_Clean_Base_s01_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="emission_luminance" type="float" value="12.0" />
+    <input name="emission_color" type="color3" value="1.0, 0.15, 0.75" />
+  </open_pbr_surface>
+  <surfacematerial name="Neon_Signage_Clean_Base_s01_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Neon_Signage_Clean_Base_s01_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Emissive" uniform="true" />
+    <input name="scale_tag" type="string" value="s01" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.1" />
+    <input name="domain" type="string" value="utility" uniform="true" />
+    <input name="class" type="string" value="emissive" uniform="true" />
+  </nodedef>
+</materialx>

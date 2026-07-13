@@ -1,0 +1,17 @@
+{
+  "_comment": "Phase 71 example article — EMISSIVE. The defining observable is simply THAT IT GLOWS. Param-only. `emission_luminance` must be > 0 or it would not glow (71.7's master-conformance makes that a build failure rather than a dark sign). Deliberately a saturated magenta at high luminance — unmistakable at the smoke, and distinct from the IMRSV_MissingMaterial sentinel's magenta by being a REAL article on the Emissive master rather than the broken-material fallback. Routes by class emissive.",
+  "name": "Neon_Signage_Clean_Base_s01_v01",
+  "path": "utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
+  "master": "Emissive",
+  "domain": "utility",
+  "class": "emissive",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.05, 0.02, 0.05",
+  "roughness_const": 0.25,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "emission_color": "1.0, 0.15, 0.75",
+  "emission_luminance": 12.0,
+  "lcd_ports": ["base_color_tint", "roughness_bias"]
+}

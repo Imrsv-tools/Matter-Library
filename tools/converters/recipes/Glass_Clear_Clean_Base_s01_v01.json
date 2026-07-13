@@ -1,5 +1,5 @@
 {
-  "_comment": "Proof article 7 — glass. TranslucentThin master (the 2nd master) + the textureless/param-only path. Exercises base_color_tint. Overwrites the stale standard_surface seed (D6 REFINE).",
+  "_comment": "Proof article 7 — glass. TranslucentThin master + the textureless/param-only base path. Overwrites the stale standard_surface seed (D6 REFINE). ⭐ Phase 71 (71.11) — WIDENED 1 -> 8 ports. Two things had to change. (a) The AUTHOR TIER: it gains `transmission_color` (the tint you see THROUGH it) and `thin_walled: true` — THE OpenPBR thin-vs-thick discriminator, without which Thin and Thick are the same material described twice (71.7's master-conformance now makes that a build failure). (b) The CREATOR ports: an interface input that nothing drives is a DEAD port, and the corrected channel contract means a maskset only has a job if there is something for it to gate. So the 8 ports are only honest if the article really carries the layers — hence a dusty, scratched, grimy pane. That is a natural window, it is the layered-materials marquee, and it is the ONLY article that exercises overlays on a TRANSLUCENT master.",
   "name": "Glass_Clear_Clean_Base_s01_v01",
   "path": "engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThin",
@@ -9,7 +9,16 @@
   "meters_per_tile": 0.1,
   "base_color_const": "1.0, 1.0, 1.0",
   "roughness_const": 0.02,
-  "specular_ior": 1.5,
-  "transmission": 1.0,
-  "lcd_ports": ["base_color_tint"]
+  "metalness_const": 0.0,
+  "specular_ior": 1.52,
+  "transmission": 0.95,
+  "transmission_color": "0.82, 0.95, 0.88",
+  "thin_walled": true,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
+  ],
+  "lcd_defaults": {"maskset_blend": "0.6", "overlay1_density": "0.25", "overlay2_density": "0.35"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"]
 }

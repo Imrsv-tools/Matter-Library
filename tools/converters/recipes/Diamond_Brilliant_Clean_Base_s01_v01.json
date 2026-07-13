@@ -1,0 +1,19 @@
+{
+  "_comment": "Phase 71 example article — TRANSLUCENTTHICK. The defining observable is ABSORPTION WITH DEPTH: the colour deepens through the body, and the high IOR bends what you see through it. Param-only (no maps — a gemstone has no albedo texture). `thin_walled: false` is THE OpenPBR discriminator that makes this Thick and not Thin. Routes by the `diamond` leaf-stem name exception (class mineral -> Opaque otherwise).",
+  "name": "Diamond_Brilliant_Clean_Base_s01_v01",
+  "path": "natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThick",
+  "domain": "natural",
+  "class": "mineral",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "1.0, 1.0, 1.0",
+  "roughness_const": 0.01,
+  "metalness_const": 0.0,
+  "specular_ior": 2.417,
+  "transmission": 1.0,
+  "transmission_color": "0.75, 0.90, 1.0",
+  "transmission_depth": 0.02,
+  "thin_walled": false,
+  "lcd_ports": ["base_color_tint", "roughness_bias"]
+}

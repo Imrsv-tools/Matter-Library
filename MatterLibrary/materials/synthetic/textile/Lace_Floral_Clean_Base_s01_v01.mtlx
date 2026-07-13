@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Lace_Floral_Clean_Base_s01_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
+    <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
+    <input name="uv_rotation" type="float" value="0.0" uiname="UV Rotation (deg)" unittype="angle" unit="degree" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="opacity_cutoff" type="float" value="0.5" uiname="Opacity Cutoff" />
+    <texcoord name="geom_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <place2d name="uv_place" type="vector2">
+      <input name="texcoord" type="vector2" nodename="geom_uv" />
+      <input name="scale" type="vector2" interfacename="uv_scale" />
+      <input name="offset" type="vector2" interfacename="uv_offset" />
+      <input name="rotate" type="float" interfacename="uv_rotation" />
+    </place2d>
+    <image name="base_color_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/base/synthetic/textile/Lace_Floral_basecolor_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_tex" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <image name="roughness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/synthetic/textile/Lace_Floral_roughness_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_tex" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <image name="opacity_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/synthetic/textile/Lace_Floral_opacity_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <ifgreatereq name="opacity_thresholded" type="float">
+      <input name="value1" type="float" nodename="opacity_tex" />
+      <input name="value2" type="float" interfacename="opacity_cutoff" />
+      <input name="in1" type="float" value="1.0" />
+      <input name="in2" type="float" value="0.0" />
+    </ifgreatereq>
+    <output name="opacity_out" type="float" nodename="opacity_thresholded" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Lace_Floral_Clean_Base_s01_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Lace_Floral_Clean_Base_s01_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Lace_Floral_Clean_Base_s01_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="geometry_opacity" type="float" nodegraph="NG_Lace_Floral_Clean_Base_s01_v01" output="opacity_out" />
+  </open_pbr_surface>
+  <surfacematerial name="Lace_Floral_Clean_Base_s01_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Lace_Floral_Clean_Base_s01_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Masked" uniform="true" />
+    <input name="scale_tag" type="string" value="s01" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.25" />
+    <input name="domain" type="string" value="synthetic" uniform="true" />
+    <input name="class" type="string" value="textile" uniform="true" />
+  </nodedef>
+</materialx>

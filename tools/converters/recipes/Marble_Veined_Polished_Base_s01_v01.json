@@ -1,0 +1,20 @@
+{
+  "_comment": "Phase 71 example article — SUBSURFACE. The defining observable is LIGHT BLEEDING THROUGH: the stone glows softly where it is thin. Maps stay pale and low-contrast so the SCATTER is what you see, not the albedo. `subsurface_weight` must be nonzero — the master multiplies the scatter colour by it (default 0 = plain opaque stone). `subsurface_radius` is the length scale in cm; `_radius_scale` is the per-channel MFP (red travels furthest in stone, hence the warm falloff). Routes by the `marble` leaf-stem name exception (class stone -> Opaque otherwise).",
+  "name": "Marble_Veined_Polished_Base_s01_v01",
+  "path": "natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.5,
+  "base_color_tex": "../../../textures/base/natural/stone/Marble_Veined_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Marble_Veined_roughness_s01.png",
+  "normal_tex": "../../../textures/base/natural/stone/Marble_Veined_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.486,
+  "subsurface_weight": 0.85,
+  "subsurface_color": "0.92, 0.88, 0.84",
+  "subsurface_radius": 0.6,
+  "subsurface_radius_scale": "1.0, 0.62, 0.44",
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "roughness_bias"]
+}

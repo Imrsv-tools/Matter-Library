@@ -1,0 +1,17 @@
+{
+  "_comment": "Phase 71 example article — MASKED. The defining observable is HOLES: you see the background THROUGH it. `opacity_tex` is the geometry_opacity source the master thresholds against `opacity_cutoff` (a cutoff with nothing to threshold makes no holes — 71.7's master-conformance enforces the connected source). Routes by class textile -> Masked.",
+  "name": "Lace_Floral_Clean_Base_s01_v01",
+  "path": "synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
+  "master": "Masked",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.25,
+  "base_color_tex": "../../../textures/base/synthetic/textile/Lace_Floral_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/synthetic/textile/Lace_Floral_roughness_s01.png",
+  "opacity_tex": "../../../textures/base/synthetic/textile/Lace_Floral_opacity_s01.png",
+  "opacity_cutoff": 0.5,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "roughness_bias"]
+}

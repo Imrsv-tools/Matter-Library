@@ -1,5 +1,5 @@
 {
-  "_comment": "Proof article 4 — aged copper (the hard case). Opaque master + maskset (procedural verdigris patina). ambientCG CC0 (Metal047B) metallic base, copper-toned via the authored base_color_tint default. Exercises maskset_blend + tint + UV + roughness_bias. New.",
+  "_comment": "Proof article 4 — aged copper (the hard case). Opaque master + maskset (procedural verdigris patina). ambientCG CC0 (Metal047B) metallic base, copper-toned via the authored base_color_tint default. ⭐ Phase 71 (71.11) — WIDENED 6 -> 8 ports, and it GAINS OVERLAYS. This is §9.P5: under the corrected channel contract a maskset is a MODULATOR (R = layer-2 coverage, G/B = overlay gates), so on an article with no overlays and no layer 2 it would do NOTHING and its `maskset_blend` would be a dead control. Giving Copper the shared dust + scratches overlays gives its maskset something to GATE — and `maskset_blend` is live and semantically correct again. The verdigris bitmap stops being painted on as albedo (a deliberate, lead-accepted appearance change) and becomes what it always claimed to be: a mask.",
   "name": "Copper_Verdigris_Aged_Base_s01_v01",
   "path": "engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
   "master": "Opaque",
@@ -12,7 +12,11 @@
   "metalness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_metallic_s01.png",
   "normal_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_normal_s01.png",
   "maskset_tex": "../../../textures/shared/masks/Verdigris01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
+  ],
   "specular_ior": 1.5,
-  "lcd_defaults": {"base_color_tint": "0.95, 0.64, 0.54", "maskset_blend": "0.35"},
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend", "roughness_bias"]
+  "lcd_defaults": {"base_color_tint": "0.95, 0.64, 0.54", "maskset_blend": "0.35", "overlay1_density": "0.45", "overlay2_density": "0.30"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"]
 }

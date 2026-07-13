@@ -1,0 +1,28 @@
+{
+  "_comment": "Phase 71 example article — TWOLAYER, and the article that finally makes the master REACHABLE (the `rust -> TwoLayer` name exception; class metal -> Opaque otherwise, so nothing could ever bind it). The defining observable is TWO LAYERS THAT ARE VISIBLY TWO: bright polished metallic steel under dark orange non-metallic flaking rust, with the maskset saying where the rust sits. Each layer carries its OWN base colour / roughness / metalness / normal. ⚠ `maskset_blend` MUST be nonzero — the blend is t = k * maskset_blend, so at the schema default of 0 layer 2 is invisible however well it is authored (71.7 enforces this).",
+  "name": "Rust_OnSteel_Flaking_Base_s01_v01",
+  "path": "engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
+  "master": "TwoLayer",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.5,
+
+  "base_color_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.png",
+  "metalness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png",
+
+  "layer2_base_color_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.png",
+  "layer2_roughness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.png",
+  "layer2_metalness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.png",
+  "layer2_normal_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png",
+
+  "maskset_tex": "../../../textures/shared/masks/RustBloom01_s01.png",
+  "layer_blend_balance": 0.5,
+  "layer_blend_contrast": 0.35,
+
+  "specular_ior": 1.5,
+  "lcd_defaults": {"maskset_blend": "0.85"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend", "roughness_bias"]
+}

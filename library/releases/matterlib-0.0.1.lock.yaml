@@ -36,6 +36,21 @@ materials:
   - id: engineered/glass/Glass_Clear_Clean_Base_s01
     version: v01
     status: draft
+  - id: synthetic/textile/Lace_Floral_Clean_Base_s01          # Phase 71 — Masked
+    version: v01
+    status: draft
+  - id: natural/mineral/Diamond_Brilliant_Clean_Base_s01      # Phase 71 — TranslucentThick
+    version: v01
+    status: draft
+  - id: natural/stone/Marble_Veined_Polished_Base_s01         # Phase 71 — Subsurface
+    version: v01
+    status: draft
+  - id: utility/emissive/Neon_Signage_Clean_Base_s01          # Phase 71 — Emissive
+    version: v01
+    status: draft
+  - id: engineered/metal/Rust_OnSteel_Flaking_Base_s01        # Phase 71 — TwoLayer
+    version: v01
+    status: draft
 
 textures:
   - id: base/natural/stone/Limestone_Veined
@@ -46,9 +61,19 @@ textures:
     version: v01
   - id: base/utility/virtual/UVGrid
     version: v01
-  - id: shared/overlays/Dust01
+  - id: base/synthetic/textile/Lace_Floral        # Phase 71 — Masked (opacity source)
     version: v01
-  - id: shared/overlays/Scratches01
+  - id: base/natural/stone/Marble_Veined         # Phase 71 — Subsurface
+    version: v01
+  - id: base/engineered/metal/Rust_OnSteel       # Phase 71 — TwoLayer (both layers)
+    version: v01
+  - id: shared/overlays/Dust01                   # Phase 71 — regenerated as PACKED DATA
+    version: v01
+  - id: shared/overlays/Scratches01              # Phase 71 — regenerated as PACKED DATA
     version: v01
   - id: shared/masks/Verdigris01
+    version: v01
+  - id: shared/masks/RustBloom01                 # Phase 71 — TwoLayer layer-2 coverage
+    version: v01
+  - id: shared/masks/Grime01                     # Phase 71 — gates Glass's overlays
     version: v01

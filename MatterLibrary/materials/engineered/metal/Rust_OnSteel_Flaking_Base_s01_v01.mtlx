@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Rust_OnSteel_Flaking_Base_s01_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
+    <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
+    <input name="uv_rotation" type="float" value="0.0" uiname="UV Rotation (deg)" unittype="angle" unit="degree" />
+    <input name="maskset_blend" type="float" value="0.85" uiname="Maskset Blend" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="layer_blend_balance" type="float" value="0.5" uiname="Layer Blend Balance" />
+    <input name="layer_blend_contrast" type="float" value="0.35" uiname="Layer Blend Contrast" />
+    <texcoord name="geom_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <place2d name="uv_place" type="vector2">
+      <input name="texcoord" type="vector2" nodename="geom_uv" />
+      <input name="scale" type="vector2" interfacename="uv_scale" />
+      <input name="offset" type="vector2" interfacename="uv_offset" />
+      <input name="rotate" type="float" interfacename="uv_rotation" />
+    </place2d>
+    <image name="maskset_tex" type="color3" colorspace="lin_rec709">
+      <input name="file" type="filename" value="../../../textures/shared/masks/RustBloom01_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <extract name="maskset_r" type="float">
+      <input name="in" type="color3" nodename="maskset_tex" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <subtract name="layer_blend_contrast_inv" type="float">
+      <input name="in1" type="float" value="1.0" />
+      <input name="in2" type="float" interfacename="layer_blend_contrast" />
+    </subtract>
+    <max name="layer_blend_contrast_safe" type="float">
+      <input name="in1" type="float" nodename="layer_blend_contrast_inv" />
+      <input name="in2" type="float" value="0.0001" />
+    </max>
+    <divide name="layer_blend_gain" type="float">
+      <input name="in1" type="float" value="1.0" />
+      <input name="in2" type="float" nodename="layer_blend_contrast_safe" />
+    </divide>
+    <subtract name="layer_blend_centered" type="float">
+      <input name="in1" type="float" nodename="maskset_r" />
+      <input name="in2" type="float" interfacename="layer_blend_balance" />
+    </subtract>
+    <multiply name="layer_blend_scaled" type="float">
+      <input name="in1" type="float" nodename="layer_blend_centered" />
+      <input name="in2" type="float" nodename="layer_blend_gain" />
+    </multiply>
+    <add name="layer_blend_offset" type="float">
+      <input name="in1" type="float" nodename="layer_blend_scaled" />
+      <input name="in2" type="float" value="0.5" />
+    </add>
+    <clamp name="layer_blend_k" type="float">
+      <input name="in" type="float" nodename="layer_blend_offset" />
+      <input name="low" type="float" value="0.0" />
+      <input name="high" type="float" value="1.0" />
+    </clamp>
+    <multiply name="layer_blend_t" type="float">
+      <input name="in1" type="float" nodename="layer_blend_k" />
+      <input name="in2" type="float" interfacename="maskset_blend" />
+    </multiply>
+    <image name="base_color_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <image name="layer2_base_color_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <mix name="base_color_layered" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tex" />
+      <input name="fg" type="color3" nodename="layer2_base_color_tex" />
+      <input name="mix" type="float" nodename="layer_blend_t" />
+    </mix>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_layered" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <image name="roughness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <image name="layer2_roughness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <mix name="roughness_layered" type="float">
+      <input name="bg" type="float" nodename="roughness_tex" />
+      <input name="fg" type="float" nodename="layer2_roughness_tex" />
+      <input name="mix" type="float" nodename="layer_blend_t" />
+    </mix>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_layered" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <image name="metalness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <image name="layer2_metalness_tex" type="float">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <mix name="metalness_layered" type="float">
+      <input name="bg" type="float" nodename="metalness_tex" />
+      <input name="fg" type="float" nodename="layer2_metalness_tex" />
+      <input name="mix" type="float" nodename="layer_blend_t" />
+    </mix>
+    <output name="metalness_out" type="float" nodename="metalness_layered" />
+    <image name="normal_tex" type="vector3">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <normalmap name="surface_normal" type="vector3">
+      <input name="in" type="vector3" nodename="normal_tex" />
+    </normalmap>
+    <image name="layer2_normal_tex" type="vector3">
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png" />
+      <input name="texcoord" type="vector2" nodename="uv_place" />
+    </image>
+    <normalmap name="layer2_normal" type="vector3">
+      <input name="in" type="vector3" nodename="layer2_normal_tex" />
+    </normalmap>
+    <mix name="normal_layered" type="vector3">
+      <input name="bg" type="vector3" nodename="surface_normal" />
+      <input name="fg" type="vector3" nodename="layer2_normal" />
+      <input name="mix" type="float" nodename="layer_blend_t" />
+    </mix>
+    <normalize name="normal_layered_unit" type="vector3">
+      <input name="in" type="vector3" nodename="normal_layered" />
+    </normalize>
+    <output name="normal_out" type="vector3" nodename="normal_layered_unit" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Rust_OnSteel_Flaking_Base_s01_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Rust_OnSteel_Flaking_Base_s01_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" nodegraph="NG_Rust_OnSteel_Flaking_Base_s01_v01" output="metalness_out" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Rust_OnSteel_Flaking_Base_s01_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="geometry_normal" type="vector3" nodegraph="NG_Rust_OnSteel_Flaking_Base_s01_v01" output="normal_out" />
+  </open_pbr_surface>
+  <surfacematerial name="Rust_OnSteel_Flaking_Base_s01_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Rust_OnSteel_Flaking_Base_s01_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="TwoLayer" uniform="true" />
+    <input name="scale_tag" type="string" value="s01" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.5" />
+    <input name="domain" type="string" value="engineered" uniform="true" />
+    <input name="class" type="string" value="metal" uniform="true" />
+  </nodedef>
+</materialx>

@@ -1,5 +1,5 @@
 {
-  "_comment": "Proof article 3 — layered/overlay. Opaque master + 2 overlays (shared dust + scratches). ambientCG CC0 (Concrete034) base. Exercises overlay1/2_density + tint/UV/roughness_bias. New (engineered/cementitious per Taxonomy.md).",
+  "_comment": "Proof article 3 — layered/overlay. Opaque master + 2 overlays (shared dust + scratches). ambientCG CC0 (Concrete034) base. Exercises overlay1/2_density + tint/UV/roughness_bias. New (engineered/cementitious per Taxonomy.md). Phase 71 (71.11): repointed at the regenerated PACKED-DATA overlays (R/G = normal XY, B = roughness bias, A = mask density) — they were albedo bitmaps, and the `_basecolor_` in their old filenames was the tell.",
   "name": "Concrete_Smooth_Worn_Dusty_s1_v01",
   "path": "engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
   "master": "Opaque",
@@ -13,8 +13,8 @@
   "metalness_const": 0.0,
   "specular_ior": 1.5,
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Dust01_basecolor_s001.png", "density_port": "overlay1_density"},
-    {"texture": "../../../textures/shared/overlays/Scratches01_basecolor_s001.png", "density_port": "overlay2_density"}
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
   ],
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "roughness_bias"]
 }
