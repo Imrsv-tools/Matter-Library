@@ -51,7 +51,7 @@
     <input name="geometry_normal" type="vector3" nodegraph="NG_Marble_Veined_Polished_Base_s01_v01" output="normal_out" />
     <input name="subsurface_weight" type="float" value="0.85" />
     <input name="subsurface_color" type="color3" value="0.92, 0.88, 0.84" />
-    <input name="subsurface_radius" type="float" value="0.6" />
+    <input name="subsurface_radius" type="float" value="1.5" />
     <input name="subsurface_radius_scale" type="color3" value="1.0, 0.62, 0.44" />
   </open_pbr_surface>
   <surfacematerial name="Marble_Veined_Polished_Base_s01_v01" type="material">

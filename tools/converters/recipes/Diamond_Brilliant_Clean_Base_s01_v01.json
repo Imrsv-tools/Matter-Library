@@ -1,5 +1,5 @@
 {
-  "_comment": "Phase 71 example article — TRANSLUCENTTHICK. The defining observable is ABSORPTION WITH DEPTH: the colour deepens through the body, and the high IOR bends what you see through it. Param-only (no maps — a gemstone has no albedo texture). `thin_walled: false` is THE OpenPBR discriminator that makes this Thick and not Thin. Routes by the `diamond` leaf-stem name exception (class mineral -> Opaque otherwise).",
+  "_comment": "Phase 71 example article — TRANSLUCENTTHICK. The defining observable is ABSORPTION WITH DEPTH: the colour deepens through the body, and the high IOR bends what you see through it. Param-only (no maps — a gemstone has no albedo texture). `thin_walled: false` is THE OpenPBR discriminator that makes this Thick and not Thin. Routes by the `diamond` leaf-stem name exception (class mineral -> Opaque otherwise). ** transmission MUST NOT be 1.0 (71.12 smoke): the master computes `opacity = Opacity * (1 - Transmission)`, so a physically-honest transmission of exactly 1.0 drives opacity to ZERO -- the body vanishes and the gem renders as a view-dependent Fresnel mirror ('clear mirror at some angles, clear plane at others'), with roughness inert because there is no lit body left to roughen. 0.95 is the same value Glass carries for the same reason. The underlying smell -- an article must UNDER-STATE physical transmission to survive the master's opacity formula -- is a MASTER-side defect, raised for a design pass; do not 'correct' this back to 1.0 until that lands. **",
   "name": "Diamond_Brilliant_Clean_Base_s01_v01",
   "path": "natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThick",
@@ -11,7 +11,7 @@
   "roughness_const": 0.01,
   "metalness_const": 0.0,
   "specular_ior": 2.417,
-  "transmission": 1.0,
+  "transmission": 0.95,
   "transmission_color": "0.75, 0.90, 1.0",
   "transmission_depth": 0.02,
   "thin_walled": false,
