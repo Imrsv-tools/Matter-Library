@@ -13,60 +13,61 @@ active.
 
 ---
 
+> **⚠ Re-based 2026-07-14.** This plan was written before the **platform** Materials wave
+> (Phases 52–71) executed. That wave built most of what was listed below as "Upcoming" —
+> **driving this repo directly, through platform phases rather than Matter-Library-numbered
+> ones.** The delivered work is recorded under **## Delivered** so this plan stops describing
+> a greenfield that no longer exists. Nothing intended has been deleted; what genuinely remains
+> is still in **## Upcoming** / **## Parking Lot**.
+
 ## Active
 
-### Phase 01 — Foundations: Folder Structure, Taxonomy & Naming — PLANNING
-**Goal:** Lay out the full folder structure and taxonomy, lock the filename grammar, and fix
-the **portable `.mtlx` metadata contract** (identity + scale live in the file; version + status
-live in the manifest later). The contract layer everything else builds on. No master
-materials, textures, or manifest tooling this phase.
-- `.ai/plan/Phase01_Foundations.md`
+**None — this repo has no independently-active phase line right now.** It is currently driven
+by the **platform** wave: the live owner is **platform Phase 60** (production + full
+experience — article **promotion**, texture **provenance**/licensing, **parity** baselines).
+Track it at `IMRSV_Platform_Documentation/Planning/Phases/Phase52_60_Wave_Materials_Sequencer.md`.
+
+---
+
+## Delivered (by the platform Materials wave, 2026-06 → 2026-07)
+
+Each of these was an "Upcoming" phase here; each shipped **into this repo** via a platform phase.
+
+| Was planned as | State | Delivered by |
+|---|---|---|
+| **Phase 01 — Foundations** (folder structure, taxonomy, filename grammar ≤63, portable `.mtlx` metadata contract) | ✅ **DONE** | Platform **Phase 52** (`Complete/Phase52_MatterLibraryFoundation.md`) |
+| **Material Catalog** (the gut-check listing) | ✅ **DONE** — and went further: the authored `matterlib-X.Y.lock.yaml` manifest is **projected** to `matterlib-X.Y.catalog.json`, the runtime catalog Stage reads | Platform **Phase 56** |
+| **Five Materials, No Textures + LCD Set** | ✅ **DONE** — the deterministic MaterialX-SDK assembler (`assemble_mtlx.py`) + the **LCD parameter set**, frozen | Platform **Phase 53** |
+| **Five Materials, With Textures + Texture Pipeline (LFS)** | ✅ **DONE** — `MatterLibrary/textures/{base,shared}` under Git LFS; procedural generators in `tools/converters/` | Platform **Phase 53** |
+| **Overlays on the Ten** (dust / scratch) | ✅ **DONE** — overlay + maskset layers authored and consumed. ⚠ Both are **packed DATA textures, never albedo bitmaps** (a semantic defect Phase 71 found and fixed) | Platform **Phases 69 + 71** |
+| **Cook the Unreal Library** | ✅ **DONE, but NOT via `bridges/unreal/`** — the 7 masters are cooked **in the Plugin repo** (`IMRSVStagePlugin`, baked by `bake_master_authortier.py`). The standalone cook project was not needed. *(If a standalone cooked library is ever wanted, that is still greenfield.)* | Platform **Phases 55 + 71** |
+| **Consume in IMRSV Studio** | ✅ **DONE** — the full chain runs: article → producer → validators → Stage extractor → wire → Plugin DTO → MID → master, with save/reload and broken-material remap | Platform **Phases 54–58, 69** |
+| **Validators / CI** *(was Parking Lot)* | ✅ **BUILT** — `tools/validators/run_all.py` over material / manifest / determinism / fixture-sync checks. **CI wiring** is still open | Platform **Phases 53 + 71** |
+| **⭐ The two-tier LCD contract** *(never planned here — the wave discovered it was missing)* | ✅ **DONE** — the **Creator tier** (8 adjustable ports) was frozen at 53; the **author tier** (each master's *defining* property: cutoff · IOR · absorption · SSS · two-layer blend · emission) **had never been authored at all**, leaving 6 of 7 masters inert. Phase 71 built it end-to-end and gave **every one of the 7 masters a real example article** (library now at **12**) | Platform **Phase 71** |
 
 ---
 
 ## Upcoming (not yet sequenced — rough working order)
 
-### Material Catalog (gut-check)
-**Goal:** A chart/listing of all the materials we want to start with — Domain/Class, filename,
-assigned master material, scale tag, and whether it needs textures/overlays. The artifact that
-gut-checks the taxonomy, naming, and scale model before we author anything.
-- `PhaseTBD_MaterialCatalog` (doc created when it becomes active)
-
-### Five Materials, No Textures + LCD Set
-**Goal:** Author ~5 textureless materials spanning different master-material types; define the
-**LCD parameter set** and a minimal master-material representation; validate
-MaterialX → UE (Substrate) → Blender (Principled BSDF) **visual parity** (manual conversion is
-fine at this stage). First real tracer bullet.
-- `PhaseTBD_FiveMaterialsNoTextures`
-
-### Five Materials, With Textures + Texture Pipeline (LFS)
-**Goal:** Stand up `textures/{base,shared}` under Git LFS; texture-set naming/versioning, scale
-tagging, material→texture reference + path-remap contract; author ~5 textured materials and
-re-run the cross-engine parity test.
-- `PhaseTBD_FiveMaterialsTextured`
-
-### Overlays on the Ten (dust / scratch)
-**Goal:** Add overlay/maskset layers (dust, scratches) to the ~10 materials and validate the
-layered result across MaterialX / UE / Blender. Master materials gain overlay support.
-- `PhaseTBD_Overlays`
-
-### Cook the Unreal Library
-**Goal:** The standalone UE cook project (`bridges/unreal/`, UE 5.8+) packages
-the ~10 materials into a cooked, referenceable Substrate library.
-- `PhaseTBD_CookUnrealLibrary`
-
-### Consume in IMRSV Studio
-**Goal:** Make the cooked library usable inside IMRSV Studio. This is the cross-repo handoff —
-it kicks off a series of **Studio-side** phases (platform-numbered, tracked in the platform
-build plan: `Service_MaterialX`, `Service_MaterialManager`, the material panels/modals).
-- `PhaseTBD_StudioConsumption` (Matter-Library side); Studio side lives in platform plan.
-
-### Version Management
-**Goal:** Build the source→approved→release machinery: the **manifest/release schema**
-(`library/releases/matterlib-X.Y.lock.yaml`), semver rules, status lifecycle, immutability,
-CODEOWNERS-gated promotion, and the first curated release (`matterlib-1.0`). Detailed design
-already drafted at `.ai/phases/future/PhaseTBD_VersionManagement.md`.
+### Version Management — *partially delivered; the promotion machinery is what's left*
+**Goal:** the source→approved→release machinery. **Already built:** the manifest/release schema
+(`library/releases/matterlib-0.0.1.lock.yaml`), its projected runtime catalog, and the two
+version axes (per-material `vNN` vs library semver). **Still open:** the **status lifecycle**
+(all 12 articles are still `status: draft`), **immutability-after-promotion**, **CODEOWNERS-gated
+promotion**, and the first curated release (`matterlib-1.0`). Promotion is now owned by
+platform **Phase 60**.
 - `.ai/phases/future/PhaseTBD_VersionManagement.md`
+
+### Blender bridge — material library + export-preset extension
+**Goal:** `bridges/blender` — the material-library `.blend` (Principled-BSDF node groups named
+with exact qualified Matter names) + the **material-side** extension of the USD export preset
+(the existing preset is mesh-side only). Greenfield. Owned by platform **Phase 60**, Lane 3.
+- `PhaseTBD_BlenderBridge`
+
+### Parity baselines
+**Goal:** `usdrecord` previews + per-class ΔE parity bars across MaterialX / UE / Blender.
+Spec text only today; no parity scene or ΔE tooling exists. Owned by platform **Phase 60**, Lane 4.
+- `PhaseTBD_ParityBaselines`
 
 ---
 
@@ -75,7 +76,7 @@ already drafted at `.ai/phases/future/PhaseTBD_VersionManagement.md`.
 - **Matter Manager** tooling (`tools/matter_manager` — import, promotion, subset/export, path remap).
 - **Automated transformer hardening** (`bridges/blender`, `bridges/unreal` converters — after manual parity is proven).
 - **Parity-gate automation** (standardized HDR-lit ΔE comparison wired as a promotion CI check).
-- **Validators / CI** (`tools/validators` — schema/naming/scale/reference checks).
+- ~~**Validators / CI**~~ — ✅ **validators BUILT** (`tools/validators`, see ## Delivered). **CI wiring still open.**
 - **Realm super-level** (Matter vs Buildings vs …) — only if a non-matter compound library lands.
 - **Texture storage migration** to DAM / content-addressed pointers (manifest already allows it).
 - **Additional engine targets** (others TBD).

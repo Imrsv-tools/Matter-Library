@@ -35,12 +35,41 @@ the decision record.
 
 ## What exists vs planned
 
-- **Exists**: `Readme.md`, `FolderStructure.txt`, 4 seeded `.mtlx` samples under
-  `MatterLibrary/materials/{engineered/glass, engineered/metal, natural/stone,
-  synthetic/plastic}`, this `.ai/` surface.
-- **Planned**: `library/` manifests, `bridges/` (UE cook project, Blender), `tools/`
-  (matter_manager, validators/CI, converters, preview_generators), `textures/` (LFS),
-  master materials, transformers, parity gate.
+*(Refreshed 2026-07-14 — the platform Materials wave (Phases 52–71) built most of what this
+section used to list as "planned". Verified against the live tree, not asserted.)*
+
+- **Exists — the authoring + curation spine is BUILT and in production use:**
+  - **12 articles** under `MatterLibrary/materials/{engineered, natural, synthetic, utility}/`
+    — single-file OpenPBR (`open_pbr_surface`, MaterialX 1.39). **Every one of the 7 masters
+    has a real, Creator-selectable example article** (Phase 71); the set covers
+    Opaque · Masked · TranslucentThin · TranslucentThick · Subsurface · TwoLayer · Emissive,
+    plus the `IMRSV_MissingMaterial` system material and the UV-grid diagnostic.
+  - **`tools/converters/`** — `assemble_mtlx.py` (the deterministic MaterialX-SDK assembler),
+    `build_proof_subset.py`, `project_runtime_catalog.py`, the procedural texture generators
+    (`gen_article_textures.py` / `gen_shared_textures.py` / `gen_uvgrid.py`), and one
+    **recipe per article** under `recipes/`.
+  - **`tools/validators/`** — `run_all.py` over `validate_material.py`, `validate_manifest.py`,
+    `check_determinism.py`, `check_fixture_sync.py`. This is the producer-side structural gate.
+  - **`tools/preview_generators/`**, **`tools/usd-toolchain/`**.
+  - **`library/releases/`** — `matterlib-0.0.1.lock.yaml` (the authored manifest) **and**
+    `matterlib-0.0.1.catalog.json` (the projected runtime catalog Stage reads).
+  - **`MatterLibrary/textures/{base,shared}`** under Git LFS.
+  - **The two-tier LCD contract is frozen and live**: the **Creator tier** (8 adjustable ports)
+    and the **author tier** (each master's defining property — cutoff · IOR · absorption ·
+    SSS · two-layer blend · emission). Both are authored here, enforced by the validators, and
+    consumed end-to-end by the platform. See `Docs/MatterLibrary/Contract/LCDSchema.md`.
+  - **Master materials exist as 7 cooked UE masters** — but they live in the **Plugin** repo
+    (`IMRSVStagePlugin`), baked by its `bake_master_authortier.py`, **not** in this repo's
+    `bridges/unreal/`. That is the shipped arrangement, not a gap.
+- **Still planned** *(unchanged intent — see `.ai/conventions.md` §Don't Delete Spec
+  Functionality)*: **`bridges/`** — the standalone UE cook project and the Blender material
+  library + export-preset extension; **`tools/matter_manager`** (import · promotion ·
+  subset/export · path remap); **automated transformers** (MaterialX → UE / Blender);
+  the **parity gate** (standardized ΔE comparison as a promotion CI check); CI wiring.
+  The **production texture delivery (BCn)** and **`usdrecord` parity baselines** are owned by
+  platform **Phase 60**.
+- **Article status**: all articles are still `status: draft` in the lockfile. Promotion
+  (`draft → approved`) + the clean-provenance production tool-stack decision are **Phase 60**.
 
 ## Active Phase
 
