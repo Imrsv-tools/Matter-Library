@@ -1,0 +1,33 @@
+2026-07-13 22:11:14.579 [INFO ] [main] [SRV:ServiceStartup::Initialize] ===========================================
+2026-07-13 22:11:14.579 [INFO ] [main] [SRV:ServiceStartup::Initialize] IMRSV Stage starting
+2026-07-13 22:11:14.579 [INFO ] [main] [SRV:ServiceStartup::Initialize] Build: Jun 20 2026 16:00:12
+2026-07-13 22:11:14.579 [INFO ] [main] [SRV:ServiceStartup::Initialize] ===========================================
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV] UsdUndoManager initialized with max depth: 100
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:CompositionLifecycle] CompositionLifecycleManager initialized with undo tracking enabled
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:StageValidation] Initialized with default config
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:CompositionCoordinator] CompositionCoordinator initialized with specialized managers
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:MetricsExporter::Start] Metrics exporter started: /home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/IMRSV_Studio/Plugins/IMRSVStagePlugin/Services/IMRSV_Stage/_build/debug/logs/metrics.prom (interval: 5s)
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:StageApi::constructor] API initialized with USD Manager dependency injection
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:Iceoryx2Server::Constructor] iceoryx2 server created (C API)
+2026-07-13 22:11:14.580 [INFO ] [main] [SRV:Iceoryx2Server::registerMethodHandlers] Registered 11 method handlers
+2026-07-13 22:11:14.580 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::ServerLoop] runtime loop starting
+2026-07-13 22:11:14.581 [INFO ] [T0] [SRV:Iceoryx2PingService::Constructor] iceoryx2 ping service ready on imrsv/stage/ping/test/205458_68c33f17
+2026-07-13 22:11:14.584 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::initService] Service initialized: imrsv/stage/service/test/205458_68c33f17
+2026-07-13 22:11:14.585 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::initNotificationPublisher] Notification publisher initialized on imrsv/stage/notifications
+2026-07-13 22:11:14.585 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::initReadyEventService] Ready event service initialized on imrsv/stage/ready/test/205458_68c33f17
+2026-07-13 22:11:14.585 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::ServerLoop] iceoryx2 runtime services ready: service + notifications + ready-event
+2026-07-13 22:11:14.585 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::fireReadyNotification] Ready notification sent (listeners=0)
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:Iceoryx2TransportRuntime::Constructor] Runtime ready and processing requests
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:WebSocketServer::bringUp] Change-listener callback registered
+2026-07-13 22:11:14.585 [INFO ] [T1] [SRV:WebSocketServer::runServer] Listening on 0.0.0.0:8081
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:ServiceStartup::Initialize] USD version 1.0.0
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:Iceoryx2Server::SetupChangeNotifications] Change notification callback configured
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:ServiceStartup::Initialize] Stage ready — press Ctrl+C to stop
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:Iceoryx2Server::Stop] Stopping iceoryx2 server
+2026-07-13 22:11:14.585 [INFO ] [T0] [SRV:Iceoryx2TransportRuntime::ServerLoop] iceoryx2 runtime loop exiting
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:Iceoryx2Server::Stop] iceoryx2 server thread joined
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:WebSocketServer::tearDown] Stopping in-process WS server
+2026-07-13 22:11:14.585 [INFO ] [main] [SRV:WebSocketServer::tearDown] In-process WS server stopped
+2026-07-13 22:11:14.586 [INFO ] [main] [SRV:MetricsExporter::Stop] Metrics exporter stopped
+2026-07-13 22:11:14.586 [INFO ] [main] [SRV:CompositionLifecycle] CompositionLifecycleManager shutting down
+2026-07-13 22:11:14.586 [INFO ] [main] [SRV:ServiceShutdown::Exit] Stage exited cleanly
