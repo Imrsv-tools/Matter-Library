@@ -1,0 +1,139 @@
+# Matter Library — matterlib-0.1.0 OFFICIAL release manifest (Phase 60)
+#
+# The first officially-promoted release. The 0.0.1 pilot (Phase 53) is retained as history and
+# was NEVER approved; this file is the promotion target. Phase 60.5 records auditable pixel
+# provenance for every texture and flips the full set draft -> candidate. The candidate -> approved
+# flip + the release tag are the terminal Phase-60.10 step, gated on parity (60.6) + regression
+# tests (60.7) + the deployed-path delivery gate (60.8) — nothing reaches approved before then.
+#
+# Provenance (RD-Provenance, vendor-neutral auditable policy; Adobe excluded): every texture is
+# clean — ambientCG CC0 or IMRSV procedural (deterministic value-noise). Full record + evidence:
+# library/provenance/matterlib-0.1.0-textures.md.
+#
+# `id` = Domain/Class path + qualified name incl. the sNN scale tag, so `id`+`version` resolves to
+# <id>_<version>.mtlx. IMRSV_MissingMaterial is off-grammar (bare <id>.mtlx), nominal version v01.
+release: 0.1.0
+
+materials:
+  - id: synthetic/plastic/ABS_Matte_Clean_Base_s01
+    version: v01
+    status: candidate
+  - id: natural/stone/Limestone_Veined_Clean_Base_s01
+    version: v01
+    status: candidate
+  - id: engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1
+    version: v01
+    status: candidate
+  - id: engineered/metal/Copper_Verdigris_Aged_Base_s01
+    version: v01
+    status: candidate
+  - id: utility/virtual/Diagnostic_UVGrid_Clean_Base_s1
+    version: v01
+    status: candidate
+  - id: utility/virtual/IMRSV_MissingMaterial   # system material, off-grammar (bare-id resolve)
+    version: v01
+    status: candidate
+  - id: engineered/glass/Glass_Clear_Clean_Base_s01
+    version: v01
+    status: candidate
+  - id: synthetic/textile/Lace_Floral_Clean_Base_s01          # Masked
+    version: v01
+    status: candidate
+  - id: natural/mineral/Diamond_Brilliant_Clean_Base_s01      # TranslucentThick
+    version: v01
+    status: candidate
+  - id: natural/stone/Marble_Veined_Polished_Base_s01         # Subsurface
+    version: v01
+    status: candidate
+  - id: utility/emissive/Neon_Signage_Clean_Base_s01          # Emissive
+    version: v01
+    status: candidate
+  - id: engineered/metal/Rust_OnSteel_Flaking_Base_s01        # TwoLayer
+    version: v01
+    status: candidate
+
+textures:
+  - id: base/natural/stone/Limestone_Veined
+    version: v01
+    status: candidate
+    provenance:
+      source: ambientCG
+      license: CC0-1.0
+      evidence: library/provenance/matterlib-0.1.0-textures.md
+  - id: base/engineered/cementitious/Concrete_Smooth_Worn
+    version: v01
+    status: candidate
+    provenance:
+      source: ambientCG
+      license: CC0-1.0
+      evidence: library/provenance/matterlib-0.1.0-textures.md
+  - id: base/engineered/metal/Copper_Verdigris
+    version: v01
+    status: candidate
+    provenance:
+      source: ambientCG
+      license: CC0-1.0
+      evidence: library/provenance/matterlib-0.1.0-textures.md
+  - id: base/utility/virtual/UVGrid
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_uvgrid.py
+  - id: base/synthetic/textile/Lace_Floral        # Masked (opacity source)
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_article_textures.py
+  - id: base/natural/stone/Marble_Veined         # Subsurface
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_article_textures.py
+  - id: base/engineered/metal/Rust_OnSteel       # TwoLayer (both layers)
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_article_textures.py
+  - id: shared/overlays/Dust01                   # PACKED DATA (normal/roughness/density)
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
+  - id: shared/overlays/Scratches01              # PACKED DATA
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
+  - id: shared/masks/Verdigris01
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
+  - id: shared/masks/RustBloom01                 # TwoLayer layer-2 coverage
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_article_textures.py
+  - id: shared/masks/Grime01                     # gates Glass's overlays
+    version: v01
+    status: candidate
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py

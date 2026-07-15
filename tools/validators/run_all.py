@@ -165,6 +165,35 @@ def run_provenance_gate(root: Path) -> bool:
     return ok
 
 
+def run_no_projection_guard(root: Path) -> bool:
+    """Phase 60: provenance/license/evidence and per-texture status are authoring/promotion
+    metadata and must NEVER reach the runtime catalog (RuntimeCatalog 'not v1'; no runtime
+    consumer). Projects every lockfile and asserts none of those tokens appear in the JSON.
+    A regression that starts projecting provenance fails here."""
+    releases = root / "library" / "releases"
+    locks = sorted(releases.glob("*.lock.yaml")) if releases.exists() else []
+    if not locks:
+        print("== no-projection guard == (skip: no lockfiles)")
+        return True
+    print("== no-projection guard ==")
+    materials_root = root / "MatterLibrary" / "materials"
+    banned = ("provenance", "evidence", "license")
+    ok = True
+    for lock in locks:
+        try:
+            projected = prc.project_to_string(lock, materials_root)
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [FAIL] {lock.name}: projection error: {exc}")
+            ok = False
+            continue
+        leaked = [tok for tok in banned if tok in projected]
+        good = not leaked
+        print(f"  [{'PASS' if good else 'FAIL'}] {lock.name}: "
+              f"{'no promotion metadata projected' if good else 'LEAKED ' + ', '.join(leaked)}")
+        ok = ok and good
+    return ok
+
+
 def run_fixture_sync(root: Path) -> bool:
     """Phase 58.5: the Stage fixture copy of the runtime catalog (+ payloads) is byte-current
     with the Matter-Library projected catalog — the cross-repo half Phase 56 left open
@@ -186,6 +215,7 @@ def main(argv=None) -> int:
         "catalog_freshness": run_catalog_freshness(root),
         "catalog_validation": run_catalog_validation(root),
         "provenance_gate": run_provenance_gate(root),
+        "no_projection_guard": run_no_projection_guard(root),
         "fixture_sync": run_fixture_sync(root),
     }
     print("\n=== SUMMARY ===")

@@ -1,0 +1,126 @@
+{
+  "materials": [
+    {
+      "display_name": "Concrete_Smooth_Worn_Dusty",
+      "domain": "engineered",
+      "id": "engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1",
+      "material_class": "cementitious",
+      "payload_path": "materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
+      "scale": "s1",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Glass_Clear_Clean_Base",
+      "domain": "engineered",
+      "id": "engineered/glass/Glass_Clear_Clean_Base_s01",
+      "material_class": "glass",
+      "payload_path": "materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Copper_Verdigris_Aged_Base",
+      "domain": "engineered",
+      "id": "engineered/metal/Copper_Verdigris_Aged_Base_s01",
+      "material_class": "metal",
+      "payload_path": "materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Rust_OnSteel_Flaking_Base",
+      "domain": "engineered",
+      "id": "engineered/metal/Rust_OnSteel_Flaking_Base_s01",
+      "material_class": "metal",
+      "payload_path": "materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Diamond_Brilliant_Clean_Base",
+      "domain": "natural",
+      "id": "natural/mineral/Diamond_Brilliant_Clean_Base_s01",
+      "material_class": "mineral",
+      "payload_path": "materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Limestone_Veined_Clean_Base",
+      "domain": "natural",
+      "id": "natural/stone/Limestone_Veined_Clean_Base_s01",
+      "material_class": "stone",
+      "payload_path": "materials/natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Marble_Veined_Polished_Base",
+      "domain": "natural",
+      "id": "natural/stone/Marble_Veined_Polished_Base_s01",
+      "material_class": "stone",
+      "payload_path": "materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "ABS_Matte_Clean_Base",
+      "domain": "synthetic",
+      "id": "synthetic/plastic/ABS_Matte_Clean_Base_s01",
+      "material_class": "plastic",
+      "payload_path": "materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Lace_Floral_Clean_Base",
+      "domain": "synthetic",
+      "id": "synthetic/textile/Lace_Floral_Clean_Base_s01",
+      "material_class": "textile",
+      "payload_path": "materials/synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Neon_Signage_Clean_Base",
+      "domain": "utility",
+      "id": "utility/emissive/Neon_Signage_Clean_Base_s01",
+      "material_class": "emissive",
+      "payload_path": "materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
+      "scale": "s01",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "Diagnostic_UVGrid_Clean_Base",
+      "domain": "utility",
+      "id": "utility/virtual/Diagnostic_UVGrid_Clean_Base_s1",
+      "material_class": "virtual",
+      "payload_path": "materials/utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
+      "scale": "s1",
+      "status": "candidate",
+      "version": "v01"
+    },
+    {
+      "display_name": "IMRSV_MissingMaterial",
+      "domain": "utility",
+      "id": "utility/virtual/IMRSV_MissingMaterial",
+      "material_class": "virtual",
+      "payload_path": "materials/utility/virtual/IMRSV_MissingMaterial.mtlx",
+      "scale": "",
+      "status": "candidate",
+      "version": "v01"
+    }
+  ],
+  "release": "0.1.0",
+  "schema_version": 1
+}
