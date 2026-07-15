@@ -1,3 +1,6 @@
 # Python bytecode / caches from the tools harness
 __pycache__/
 *.py[cod]
+
+# Blender auto-save backups
+*.blend[0-9]
