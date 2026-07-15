@@ -1,0 +1,12 @@
+# RED-demo fixture (Phase 60) — a PROMOTED texture with NO provenance record.
+# The shipped-pixel no-ship gate MUST reject this: a candidate/approved texture without
+# auditable provenance {source, license, evidence} cannot ship. validate_manifest.py must FAIL.
+release: 0.1.0
+materials:
+  - id: engineered/glass/Glass_Clear_Clean_Base_s01
+    version: v01
+    status: draft
+textures:
+  - id: shared/overlays/Dust01
+    version: v01
+    status: approved        # promoted, but provenance is absent -> must FAIL

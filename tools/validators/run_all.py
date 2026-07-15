@@ -141,6 +141,30 @@ def run_catalog_validation(root: Path) -> bool:
         return True
 
 
+def run_provenance_gate(root: Path) -> bool:
+    """Phase 60: the shipped-pixel no-ship gate REJECTS a promoted texture without provenance
+    and a promoted material binding an under-promoted texture (validation, not silent pass).
+    Drives the RED fixtures through validate_manifest and asserts each FAILS for its reason."""
+    fixtures = [
+        ("provenance_missing.lock.yaml", "promoted texture missing provenance"),
+        ("coverage_underpromoted.lock.yaml", "promoted material binds under-promoted texture"),
+    ]
+    materials_root = root / "MatterLibrary" / "materials"
+    present = [(HERE / "fixtures" / f, why) for f, why in fixtures if (HERE / "fixtures" / f).exists()]
+    if not present:
+        print("== provenance gate == (skip: no provenance RED fixtures)")
+        return True
+    print("== provenance gate ==")
+    ok = True
+    for fixture, why in present:
+        results = vman.validate_manifest(fixture, materials_root)
+        rejected = any(not good for _, good, _ in results)
+        print(f"  [{'PASS' if rejected else 'FAIL'}] {fixture.name}: "
+              f"{'rejected (' + why + ')' if rejected else 'WRONGLY ACCEPTED — gate is tautological'}")
+        ok = ok and rejected
+    return ok
+
+
 def run_fixture_sync(root: Path) -> bool:
     """Phase 58.5: the Stage fixture copy of the runtime catalog (+ payloads) is byte-current
     with the Matter-Library projected catalog — the cross-repo half Phase 56 left open
@@ -161,6 +185,7 @@ def main(argv=None) -> int:
         "determinism": run_determinism(root),
         "catalog_freshness": run_catalog_freshness(root),
         "catalog_validation": run_catalog_validation(root),
+        "provenance_gate": run_provenance_gate(root),
         "fixture_sync": run_fixture_sync(root),
     }
     print("\n=== SUMMARY ===")

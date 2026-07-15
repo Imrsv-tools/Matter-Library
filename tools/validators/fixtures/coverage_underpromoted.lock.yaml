@@ -1,0 +1,34 @@
+# RED-demo fixture (Phase 60) — a PROMOTED material binding an UNDER-PROMOTED texture.
+# Copper (approved) binds its base texture at draft: a material's bound textures must all be
+# at least as promoted as the material (a shipped material can't reference an unshipped pixel).
+# The material->texture coverage gate MUST reject this. validate_manifest.py must FAIL.
+release: 0.1.0
+materials:
+  - id: engineered/metal/Copper_Verdigris_Aged_Base_s01
+    version: v01
+    status: approved                # promoted material...
+textures:
+  - id: base/engineered/metal/Copper_Verdigris
+    version: v01
+    status: draft                   # ...binds THIS draft base texture -> coverage FAIL
+  - id: shared/masks/Verdigris01
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
+  - id: shared/overlays/Dust01
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
+  - id: shared/overlays/Scratches01
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/gen_shared_textures.py
