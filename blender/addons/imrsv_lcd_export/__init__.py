@@ -10,26 +10,26 @@ Per Phase 60 §11 the add-on instead does ONE export action with two internal st
      or explicit material custom properties) into ID custom properties, then run the
      stock `wm.usd_export` with custom-property export ON -> the values ride out as
      `userProperties:<port>` attrs on each Material prim.
-  2. Invoke `lcd_usd_edit.py` under a USD-capable Python to rewrite those into
-     standard `inputs:<port>` UsdShade overrides and strip the `userProperties`
-     bridge (Discovery 9: standard `inputs:` is the sole carrier; no `imrsv:`).
+  2. Call `lcd_usd_edit.transform_file` IN-PROCESS (Blender's own Python) to rewrite
+     those into standard `inputs:<port>` UsdShade overrides and strip the
+     `userProperties` bridge (Discovery 9: standard `inputs:` is the sole carrier).
 
-The USD-capable Python is located via the `IMRSV_USD_PYTHON` environment variable
-(a path to a python whose `pxr`/usd-core imports), falling back to `python3` on
-PATH. A real Creator deployment must provide one; this is Phase 60's open
-deployment question, surfaced to the lead.
+Phase 60 §11 round-3: the USD-edit is a pxr-free, syntax-aware ASCII-`.usda` transform
+(`lcd_usd_edit.py`), so it runs directly under Blender's Python with NO external
+USD-capable interpreter and NO subprocess — closing the "harden-later" deployment gap.
+Its semantic equivalence to the pxr path is proven by opening the result with `pxr` in
+the tests.
 
 LCD travel set (LCDSchema.md, Phase 53 D3): base_color_tint (color3), and the
 floats overlay1_density, overlay2_density, maskset_blend, roughness_bias. UV
 placement (uv_scale/uv_offset/uv_rotation) is Studio-side only (S3) and NOT exported.
 """
-import os
-import subprocess
-
 import bpy
 from bpy.props import StringProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
+
+from . import lcd_usd_edit
 
 bl_info = {
     "name": "IMRSV LCD Export",
@@ -50,8 +50,6 @@ LCD_TRAVEL_PORTS = (
     "roughness_bias",    # float
 )
 _COLOR3_PORTS = {"base_color_tint"}
-
-_EDIT_SCRIPT = os.path.join(os.path.dirname(__file__), "lcd_usd_edit.py")
 
 
 def _lcd_value_from_material(mat):
@@ -93,25 +91,8 @@ def sync_lcd_custom_props(materials=None):
     return n
 
 
-def _find_usd_python():
-    cand = os.environ.get("IMRSV_USD_PYTHON")
-    if cand:
-        return cand
-    return "python3"
-
-
-def run_lcd_usd_edit(usd_path):
-    """Run the internal USD-edit step. Returns (returncode, stdout, stderr)."""
-    py = _find_usd_python()
-    proc = subprocess.run(
-        [py, _EDIT_SCRIPT, usd_path],
-        capture_output=True, text=True,
-    )
-    return proc.returncode, proc.stdout.strip(), proc.stderr.strip()
-
-
 def export_lcd_usd(filepath):
-    """Full one-action export: bridge LCD edits -> stock export -> internal USD-edit.
+    """Full one-action export: bridge LCD edits -> stock export -> in-process USD-edit.
     Returns (ok: bool, message: str)."""
     sync_lcd_custom_props()
     bpy.ops.wm.usd_export(
@@ -120,12 +101,13 @@ def export_lcd_usd(filepath):
         generate_preview_surface=True,
         export_custom_properties=True,
     )
-    rc, out, err = run_lcd_usd_edit(filepath)
-    if rc == 2:
-        return False, "IMRSV LCD export REJECTED (out-of-range/malformed): " + (err or out)
-    if rc != 0:
-        return False, "IMRSV LCD USD-edit failed (rc=%d): %s" % (rc, err or out)
-    return True, out
+    try:
+        converted = lcd_usd_edit.transform_file(filepath)
+    except lcd_usd_edit.LcdRejected as e:
+        return False, "IMRSV LCD export REJECTED (out-of-range/malformed): %s" % e
+    except lcd_usd_edit.LcdError as e:
+        return False, "IMRSV LCD USD-edit failed: %s" % e
+    return True, "converted %d LCD override(s)" % len(converted)
 
 
 class WM_OT_imrsv_lcd_usd_export(Operator, ExportHelper):
