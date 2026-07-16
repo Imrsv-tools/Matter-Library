@@ -1,0 +1,6 @@
+# The complete-portable package is a deterministic BUILD OUTPUT of build_portable.py
+# (it duplicates the Matter .mtlx + textures). Rebuilt by check_conformance.sh; not
+# checked in, to avoid duplicating binary texture payload into the repo.
+golden/creator_table_portable/
+__pycache__/
+*.py[cod]

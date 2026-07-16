@@ -1,0 +1,87 @@
+#usda 1.0
+(
+    # Creator Asset Profile — LIGHTWEIGHT golden (Phase 60sq1, Step 1).
+    # The minimal, independently-intelligible exemplar of an Open Matter Creator
+    # asset in its lightweight (library-linked) form. See
+    # IMRSV_Platform_Documentation/MatterLibrary/Contract/CreatorAssetProfile.md.
+    #
+    # CONFORMS TO (asserted by tools/conformance/check_conformance.sh):
+    #   - every material-addressable region is a SEPARATE Mesh (v1)         [Top, Leg]
+    #   - each mesh carries geometry-authored UVs as texCoord2f primvars:st  [distinct fits]
+    #   - each mesh binds ONE Matter material via MaterialBindingAPI
+    #   - the bound material prim references the Matter article by BARE
+    #     @Name.mtlx@ filename (library-resolved; no localized .mtlx/textures)
+    #   - exact Matter identity carried on assetInfo:identifier (not the prim name)
+    #   - the composition's ONE required Matter release recorded in
+    #     customLayerData imrsv:matterlibRelease
+    #   - two meshes may share ONE Matter identity as INDEPENDENT instances
+    #     (separate material prims -> per-mesh refinement stays independent)
+    #
+    # FORBIDDEN (asserted absent): UsdPreviewSurface, DomeLight/any Light, Camera,
+    #   absolute author-machine paths, any localized Matter .mtlx or texture file.
+    defaultPrim = "Creator_Table"
+    metersPerUnit = 0.01
+    upAxis = "Y"
+    customLayerData = {
+        string "imrsv:matterlibRelease" = "matterlib-0.1.0"
+    }
+)
+
+def Xform "Creator_Table" (
+    kind = "component"
+)
+{
+    # Region 1 — table top. UV fit A (1x): unwrap spans [0,1].
+    def Mesh "Table_Top" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform bool doubleSided = 1
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
+        point3f[] points = [(-0.6, 0.38, -0.4), (0.6, 0.38, -0.4), (0.6, 0.42, -0.4), (-0.6, 0.42, -0.4), (-0.6, 0.38, 0.4), (0.6, 0.38, 0.4), (0.6, 0.42, 0.4), (-0.6, 0.42, 0.4)]
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        rel material:binding = </Creator_Table/Materials/Copper_Instance_Top>
+    }
+
+    # Region 2 — table leg. Same Matter identity as the top, but UV fit B (3x tiling):
+    # unwrap spans [0,3] -> proves distinct per-mesh UV fit + independent instances.
+    def Mesh "Table_Leg" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform bool doubleSided = 1
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
+        point3f[] points = [(-0.04, 0, -0.04), (0.04, 0, -0.04), (0.04, 0.38, -0.04), (-0.04, 0.38, -0.04), (-0.04, 0, 0.04), (0.04, 0, 0.04), (0.04, 0.38, 0.04), (-0.04, 0.38, 0.04)]
+        texCoord2f[] primvars:st = [(0, 0), (3, 0), (3, 3), (0, 3), (0, 0), (3, 0), (3, 3), (0, 3), (0, 0), (3, 0), (3, 3), (0, 3), (0, 0), (3, 0), (3, 3), (0, 3), (0, 0), (3, 0), (3, 3), (0, 3), (0, 0), (3, 0), (3, 3), (0, 3)] (
+            interpolation = "faceVarying"
+        )
+        rel material:binding = </Creator_Table/Materials/Copper_Instance_Leg>
+    }
+
+    def Scope "Materials"
+    {
+        # Independent instance A — bound by Table_Top.
+        def "Copper_Instance_Top" (
+            prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>
+            assetInfo = {
+                string identifier = "Copper_Verdigris_Aged_Base_s01_v01"
+            }
+        )
+        {
+        }
+
+        # Independent instance B — bound by Table_Leg. Same identity, separate prim.
+        def "Copper_Instance_Leg" (
+            prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>
+            assetInfo = {
+                string identifier = "Copper_Verdigris_Aged_Base_s01_v01"
+            }
+        )
+        {
+        }
+    }
+}
