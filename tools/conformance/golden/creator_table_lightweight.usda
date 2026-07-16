@@ -20,7 +20,7 @@
     # FORBIDDEN (asserted absent): UsdPreviewSurface, DomeLight/any Light, Camera,
     #   absolute author-machine paths, any localized Matter .mtlx or texture file.
     defaultPrim = "Creator_Table"
-    metersPerUnit = 0.01
+    metersPerUnit = 1
     upAxis = "Y"
     customLayerData = {
         string "imrsv:matterlibRelease" = "matterlib-0.1.0"
@@ -37,6 +37,7 @@ def Xform "Creator_Table" (
     )
     {
         uniform bool doubleSided = 1
+        uniform token subdivisionScheme = "none"
         int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
         point3f[] points = [(-0.6, 0.38, -0.4), (0.6, 0.38, -0.4), (0.6, 0.42, -0.4), (-0.6, 0.42, -0.4), (-0.6, 0.38, 0.4), (0.6, 0.38, 0.4), (0.6, 0.42, 0.4), (-0.6, 0.42, 0.4)]
@@ -53,6 +54,7 @@ def Xform "Creator_Table" (
     )
     {
         uniform bool doubleSided = 1
+        uniform token subdivisionScheme = "none"
         int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
         point3f[] points = [(-0.04, 0, -0.04), (0.04, 0, -0.04), (0.04, 0.38, -0.04), (-0.04, 0.38, -0.04), (-0.04, 0, 0.04), (0.04, 0, 0.04), (0.04, 0.38, 0.04), (-0.04, 0.38, 0.04)]

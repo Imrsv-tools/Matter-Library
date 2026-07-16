@@ -67,6 +67,11 @@ def main() -> int:
     check(n_st == n_mesh and n_st >= 2, "each Mesh has texCoord2f[] primvars:st",
           f"{n_st} st-primvars vs {n_mesh} meshes")
 
+    # 3b. every mesh declares subdivisionScheme="none" (polygon, not a catmullClark cage).
+    n_subdiv = len(re.findall(r'uniform token subdivisionScheme = "none"', text))
+    check(n_subdiv == n_mesh, 'each Mesh declares subdivisionScheme = "none"',
+          f"{n_subdiv} of {n_mesh} meshes")
+
     # 4. exact Matter identity carried on assetInfo:identifier (not the prim name).
     ids = re.findall(r'string\s+identifier\s*=\s*"([^"]+)"', text)
     id_ok = len(ids) == n_bind and all(NAME_RE.match(i) for i in ids)
