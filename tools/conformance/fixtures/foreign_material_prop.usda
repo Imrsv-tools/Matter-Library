@@ -1,0 +1,71 @@
+#usda 1.0
+(
+    # Phase 60sq1 Step-3 SMOKE FIXTURE — "resolving-foreign" material.
+    #
+    # This is the input for the Missing-Material Add-trigger smoke (Scope B / C2).
+    # It deliberately does NOT conform to the Creator Asset Profile: it carries a
+    # foreign UsdPreviewSurface material (the raw shape a Blender USD export emits
+    # today, before the Step-7 producer rebuild), NOT a library-linked Matter
+    # instance. It is NOT validated by check_conformance.sh — it is the negative
+    # article that must visibly enter Missing Material.
+    #
+    # WHY IT TRIGGERS ResolvedButUnrecognized (MaterialXOps.cpp ClassifyDirectBinding):
+    #   - the bound material prim path is /Creator_Chair/Materials/Wood — it carries
+    #     NO "_Instance" token, so RecoverInstanceBaseFromPath() returns EMPTY
+    #     (base.empty() == true — it is not an IMRSV Matter instance binding), AND
+    #   - /Creator_Chair/Materials/Wood RESOLVES to a UsdShadeMaterial (targetIsMaterial
+    #     == true), so it is not BindingTargetMissing.
+    #   => the base.empty() && targetIsMaterial branch fires => cause
+    #      ResolvedButUnrecognized, missing_identity = "Wood" (the relink handle).
+    #
+    # Contrast the golden (creator_table_lightweight.usda): its material prims are
+    # named "Copper_Instance_Top/Leg" (the "_Instance" token) => base = "Copper"
+    # (non-empty) => it takes the recognized/keep-set path, NOT this foreign branch.
+    #
+    # SMOKE EXPECTATION: Add this prop -> the Missing-Material modal pops on Add with
+    # cause "Material not recognized" (EBrokenMaterialCauseUI::ResolvedButUnrecognized),
+    # binding preserved, relink handle "Wood".
+    defaultPrim = "Creator_Chair"
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def Xform "Creator_Chair" (
+    kind = "component"
+)
+{
+    # One material-addressable region => one separate Mesh (v1 product model).
+    def Mesh "Chair_Seat" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform bool doubleSided = 1
+        uniform token subdivisionScheme = "none"
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
+        point3f[] points = [(-0.22, 0.44, -0.22), (0.22, 0.44, -0.22), (0.22, 0.48, -0.22), (-0.22, 0.48, -0.22), (-0.22, 0.44, 0.22), (0.22, 0.44, 0.22), (0.22, 0.48, 0.22), (-0.22, 0.48, 0.22)]
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        rel material:binding = </Creator_Chair/Materials/Wood>
+    }
+
+    def Scope "Materials"
+    {
+        # Foreign material: a plain UsdPreviewSurface with a non-Matter, non-"_Instance"
+        # name. Resolves (it IS a UsdShadeMaterial) but is unrecognized by the library.
+        def Material "Wood"
+        {
+            token outputs:surface.connect = </Creator_Chair/Materials/Wood/PreviewSurface.outputs:surface>
+
+            def Shader "PreviewSurface"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor = (0.36, 0.24, 0.12)
+                float inputs:roughness = 0.7
+                float inputs:metallic = 0
+                token outputs:surface
+            }
+        }
+    }
+}
