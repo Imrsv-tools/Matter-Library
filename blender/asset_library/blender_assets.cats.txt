@@ -1,0 +1,6 @@
+# Anonymous file for the IMRSV Matter Asset-Browser library.
+# Catalog paths mirror each article's domain/material_class.
+
+VERSION 1
+
+1d4eba5e-8429-54a4-811a-42e7056b20ee:engineered/metal:engineered-metal
