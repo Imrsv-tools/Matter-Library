@@ -99,5 +99,16 @@ run_scenario shared
 run_scenario renamed
 
 echo ""
+echo "======== SELECTION-CONTEXT REGRESSION (E9 §15d) ========"
+echo "### §2 split must fire even when context.selected_objects is incomplete (File-browser bug)"
+if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
+        blender --background --factory-startup --python "$CONF/test_export_selection.py" \
+        -- "$OUT/creator_selection_regression.usda" > "$OUT/selection_reg.log" 2>&1; then
+  grep -E "^REG:" "$OUT/selection_reg.log"
+else
+  echo "  selection regression FAIL"; grep -E "^REG:" "$OUT/selection_reg.log" || tail -10 "$OUT/selection_reg.log"; rc=1
+fi
+
+echo ""
 echo "### REAL-EXPORTER GATE $([ $rc -eq 0 ] && echo PASS || echo FAIL) (rc=$rc)"
 exit $rc

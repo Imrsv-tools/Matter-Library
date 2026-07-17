@@ -136,8 +136,18 @@ class LcdContractError(Exception):
 
 
 def _selected_mesh_objects():
-    """The mesh objects the selected-only export will emit (Phase 60sq1 Step 1 output boundary)."""
-    return [o for o in bpy.context.selected_objects if o.type == 'MESH']
+    """The mesh objects the selected-only export will emit (Phase 60sq1 Step 1 output boundary).
+
+    Reads the view-layer SELECT FLAGS (`o.select_get()`) — the SAME source
+    `wm.usd_export(selected_objects_only=True)` uses — NOT `bpy.context.selected_objects`.
+    `context.selected_objects` is a context member that returns only the active object (or empty)
+    when the export operator's `execute` runs in the File-browser context (after File > Export
+    opens the file dialog). The E9 §6 Creator slice caught this live: the GUI export emitted ONE
+    shared material prim for two meshes because the per-mesh split (§2) saw an incomplete selection
+    while `wm.usd_export` exported both — rule-6 independence silently lost. The select flags are
+    context-independent, so the split, the v1-contract validate, and the actual export now agree."""
+    vl = bpy.context.view_layer
+    return [o for o in vl.objects if o.type == 'MESH' and o.select_get()]
 
 
 def validate_v1_contract(objects):
