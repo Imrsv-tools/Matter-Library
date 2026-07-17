@@ -1,5 +1,16 @@
-"""Phase 60sq1 E9 §15d regression — the export must read the view-layer SELECT FLAGS, not
-`bpy.context.selected_objects`, so §2's per-mesh split fires even in the File-browser execute
+"""Phase 60sq1 E9 §15d regression — PARTIAL guard (see the ⚠ below).
+
+⚠ FALSE-GREEN CAVEAT (E9, discovered by the real re-export): this test passes with BOTH the buggy
+and an INSUFFICIENT fix relative to the REAL bug. It fakes only `context.selected_objects` via
+`temp_override`, so `o.select_get()` still reads the true flags and returns 2. But the REAL
+File-browser `execute` context (after File > Export) defeats the view-layer read TOO — the manual
+re-export still produced ONE shared prim even with the `select_get()` fix loaded. The real fix is
+to capture the selection in the operator's `invoke()` (viewport context) and thread it into the
+export; the gate of record is the MANUAL File > Export re-smoke, NOT this override. Left as a
+partial guard; make it faithful (or drive the real operator invoke->execute path) when the real
+fix lands.
+
+The export must read the selection so §2's per-mesh split fires even in the File-browser execute
 context (where `context.selected_objects` returns only the active object).
 
 Reproduces the §6-slice bug headlessly: build 2 meshes sharing ONE datablock, select both, then
