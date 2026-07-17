@@ -8,7 +8,6 @@
 # The browse/assign UX itself is the §6 human sitting; this gate proves the STRUCTURE is right.
 set -uo pipefail
 REPO=/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library
-BLEND="$REPO/blender/MatterMaterials.blend"
 GEN="$REPO/tools/generators/gen_asset_library.py"
 VERIFY="$REPO/tools/conformance/verify_asset_library.py"
 OUT="${1:-$(mktemp -d)/asset_library}"
@@ -18,8 +17,8 @@ rc=0
 # Blender uses its OWN bundled USD — run with a clean env (see check_exporter.sh).
 CLEAN="env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH"
 
-echo "### 1. Generate the Asset-Browser library (blender --background -> gen_asset_library.py)"
-if $CLEAN blender --background "$BLEND" --python "$GEN" -- "$OUT" > "$OUT/gen.log" 2>&1 \
+echo "### 1. Generate the Asset-Browser library (blender --background --factory-startup -> gen_asset_library.py, all 11 articles)"
+if $CLEAN blender --background --factory-startup --python "$GEN" -- "$OUT" > "$OUT/gen.log" 2>&1 \
         && grep -q ASSET_LIB_OK "$OUT/gen.log"; then
   echo "  generate: OK"; grep ASSET_LIB_OK "$OUT/gen.log"
 else
