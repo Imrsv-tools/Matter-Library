@@ -30,10 +30,13 @@ except Exception:
     HAVE_PXR = False
 
 # Mirrors the Blender 5.1.1 export syntax (Phase 60sq1 Step-1 probe): LCD edits ride out as
-# `custom double3/double userProperties:<port>` at the Material's direct body level; an unknown
+# `custom double3/double userProperties:<port>` at the Material's direct body level; the durable
+# canonical-identity carrier rides as `custom string userProperties:imrsv_matter_identity`
+# (E8 correction §1) — PRESERVED across datablock duplication; an unknown
 # `userProperties:blender:data_name` (string) sits beside them; a customData dictionary lives in
 # the root prim's `( )` metadata; a Shader network is nested inside each Material. The 2nd Copper
-# is a datablock COPY (`..._v01_001`) -> the producer must collapse it to the same identity.
+# is a datablock COPY (`..._v01_001`) that carries the SAME identity carrier -> the producer reads
+# the carrier (NOT the datablock display name) so both collapse to one identity.
 FIXTURE_MULTI = '''#usda 1.0
 (
     defaultPrim = "root"
@@ -54,6 +57,7 @@ def Xform "root" (
         {
             custom double3 userProperties:base_color_tint = (0.2, 0.8, 0.4)
             custom string userProperties:blender:data_name = "Copper_Verdigris_Aged_Base_s01_v01"
+            custom string userProperties:imrsv_matter_identity = "Copper_Verdigris_Aged_Base_s01_v01"
             custom double userProperties:roughness_bias = 0.1
             token outputs:surface.connect = </root/_materials/Copper_Verdigris_Aged_Base_s01_v01/Principled_BSDF.outputs:surface>
 
@@ -67,6 +71,7 @@ def Xform "root" (
         def Material "Copper_Verdigris_Aged_Base_s01_v01_001"
         {
             custom string userProperties:blender:data_name = "Copper_Verdigris_Aged_Base_s01_v01.001"
+            custom string userProperties:imrsv_matter_identity = "Copper_Verdigris_Aged_Base_s01_v01"
 
             def Shader "Principled_BSDF"
             {
@@ -77,7 +82,43 @@ def Xform "root" (
         def Material "Marble_Veined_Polished_Base_s01_v01"
         {
             custom double userProperties:overlay1_density = 0.5
+            custom string userProperties:imrsv_matter_identity = "Marble_Veined_Polished_Base_s01_v01"
 
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+            }
+        }
+    }
+}
+'''
+
+# E8 correction §1 discriminator: a material whose Blender DISPLAY NAME does NOT match its Matter
+# identity (a Creator renamed the datablock), carrying the durable identity carrier. The reshape
+# MUST author the carrier's identity, NEVER the `_NNN`-stripped display name. Also covers the
+# transitional FALLBACK material (no carrier -> name-strip heuristic).
+FIXTURE_IDENTITY = '''#usda 1.0
+(
+    defaultPrim = "root"
+)
+
+def Xform "root"
+{
+    def Scope "_materials"
+    {
+        def Material "MyRenamedCopper_042"
+        {
+            custom string userProperties:imrsv_matter_identity = "Copper_Verdigris_Aged_Base_s01_v01"
+            token outputs:surface.connect = </root/_materials/MyRenamedCopper_042/Principled_BSDF.outputs:surface>
+
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+            }
+        }
+
+        def Material "Marble_Veined_Polished_Base_s01_v01_001"
+        {
             def Shader "Principled_BSDF"
             {
                 uniform token info:id = "UsdPreviewSurface"
@@ -122,6 +163,8 @@ def test_transform_text():
           "every Material is retyped to a typeless `def` (referenced type wins)")
     check("userProperties:blender:data_name" not in new_text,
           "the blender:data_name bridge is consumed + stripped (was previously left untouched)")
+    check("userProperties:imrsv_matter_identity" not in new_text,
+          "the durable identity carrier is consumed into assetInfo + stripped from the body (§1)")
     check("Principled_BSDF" not in new_text and "UsdPreviewSurface" not in new_text
           and "outputs:surface" not in new_text,
           "the exporter's shader network + surface plug are stripped (material IS the .mtlx)")
@@ -153,6 +196,26 @@ def test_idempotent():
     once, _ = L.transform_text(FIXTURE_MULTI)
     twice, conv2 = L.transform_text(once)
     check(conv2 == [] and twice == once, "a 2nd pass is a no-op (idempotent)")
+
+
+def test_identity_from_property():
+    """§1 core proof: identity comes from the durable `imrsv_matter_identity` carrier, NOT the
+    datablock display name — even when the name would strip to something ELSE."""
+    new_text, _ = L.transform_text(FIXTURE_IDENTITY)
+    # the renamed material keeps its DISTINCT prim name, but its assetInfo identity + .mtlx ref
+    # come from the carrier (name-strip would have (wrongly) yielded "MyRenamedCopper").
+    check('def "MyRenamedCopper_042"' in new_text,
+          "the renamed material keeps its distinct prim name (bindings resolve)")
+    check('string identifier = "Copper_Verdigris_Aged_Base_s01_v01"' in new_text,
+          "identity is read from the durable carrier, NOT the display name (§1)")
+    check('prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@'
+          '</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>' in new_text,
+          "the .mtlx reference targets the carrier identity, not the display name (§1)")
+    check('identifier = "MyRenamedCopper' not in new_text,
+          "the datablock display name is NEVER used as identity when a carrier is present (§1)")
+    # transitional FALLBACK: a material with NO carrier still normalizes via the `_NNN` strip.
+    check('string identifier = "Marble_Veined_Polished_Base_s01_v01"' in new_text,
+          "a carrier-less material falls back to the _NNN-strip heuristic (interim)")
 
 
 def test_canonical_identity():
@@ -229,6 +292,8 @@ def test_semantic_equivalence():
     up = [a.GetName() for a in copper.GetAttributes()
           if a.GetName().startswith("userProperties:") and a.GetName().split(":")[-1] in L.LCD_PORTS]
     check(up == [], "no LCD userProperties remain on the Material after transform")
+    idp = [a.GetName() for a in copper.GetAttributes() if a.GetName() == L.IDENTITY_USERPROP]
+    check(idp == [], "no imrsv_matter_identity carrier remains on the Material after transform (§1)")
 
     # release stamp is on the root layer's customLayerData
     cld = stage.GetRootLayer().customLayerData
@@ -241,6 +306,7 @@ def main():
     print("=== Phase 60sq1 Step-1 LCD transform / Creator-reshape tests (pxr=%s) ===" % HAVE_PXR)
     test_transform_text()
     test_idempotent()
+    test_identity_from_property()
     test_canonical_identity()
     test_reject_transactional()
     test_usda_only_guard()

@@ -142,15 +142,16 @@ def _selected_mesh_objects():
 
 def validate_v1_contract(objects):
     """Pre-write guard for the Creator Asset Profile v1 producer path (CreatorAssetProfile.md
-    rules 1/2/3/6): the export is SELECTED-ONLY and each emitted mesh must carry exactly one
-    material instance and geometry-authored UVs, and no two meshes may share one material
-    datablock (independent per-mesh refinement needs separate material prims). Raises
+    rules 1/2/3): the export is SELECTED-ONLY and each emitted mesh must carry exactly one Matter
+    material and geometry-authored UVs. Two meshes MAY share one Blender material datablock (when
+    the Creator wants identical Blender-side settings) — the exporter emits one USD material-
+    instance prim PER MESH regardless (E8 correction §2 / `split_shared_materials`), so rule 6
+    independence is a producer responsibility, NOT a Creator-facing rejection. Raises
     LcdContractError with a clear, spec-referenced message; never clamps or silently repairs."""
     if not objects:
         raise LcdContractError(
             "no mesh objects selected — the Creator export is selected-only (profile Step 1). "
             "Select the prop meshes to export.")
-    seen = {}
     for ob in objects:
         mats = [s.material for s in ob.material_slots if s.material is not None]
         if len(mats) != 1:
@@ -162,49 +163,87 @@ def validate_v1_contract(objects):
             raise LcdContractError(
                 "mesh %r has no UV map — Blender-authored UVs are the primary UV and must "
                 "travel as texCoord2f primvars:st (profile rule 2)." % ob.name)
-        mat = mats[0]
-        if mat.name in seen:
-            raise LcdContractError(
-                "meshes %r and %r share material datablock %r — each Creator mesh needs its own "
-                "material instance for independent per-mesh refinement (profile rule 6). "
-                "Duplicate the material per mesh (the Asset-Browser assign does this)."
-                % (seen[mat.name], ob.name, mat.name))
-        seen[mat.name] = ob.name
+
+
+def split_shared_materials(objects):
+    """E8 correction §2 — per-mesh material-instance split. Ensure each selected mesh has its OWN
+    material datablock so the stock USD export emits a SEPARATE material-instance prim per mesh
+    (CreatorAssetProfile.md rule 6), EVEN WHEN the Creator bound one shared Blender datablock to
+    several meshes (identical Blender-side settings). Each copy PRESERVES the durable identity
+    custom property (`imrsv_matter_identity`) + the node-group edit state, so every per-mesh
+    instance carries the SAME Matter identity as an independent USD prim. Returns an undo record
+    for `restore_shared_materials` (transactional — the source `.blend` is unchanged after export).
+    Runs BEFORE `sync_lcd_custom_props` so a copy's LCD deltas still ride out."""
+    claimed = {}   # material datablock -> the first selected object that used it
+    undo = []      # (object, slot_index, original_material)
+    for ob in objects:
+        for si, slot in enumerate(ob.material_slots):
+            mat = slot.material
+            if mat is None:
+                continue
+            if mat in claimed and claimed[mat] is not ob:
+                copy = mat.copy()          # ID.copy() preserves custom props + node tree
+                undo.append((ob, si, mat))
+                slot.material = copy
+            elif mat not in claimed:
+                claimed[mat] = ob
+    return undo
+
+
+def restore_shared_materials(undo):
+    """Reverse `split_shared_materials`: reassign each slot's original datablock and purge the
+    now-unused per-mesh copies, so an export never mutates the source `.blend` (transactional,
+    mirrors `restore_lcd_custom_props`)."""
+    copies = []
+    for ob, si, original in reversed(undo):
+        copy = ob.material_slots[si].material
+        ob.material_slots[si].material = original
+        if copy is not None and copy is not original:
+            copies.append(copy)
+    for c in copies:
+        try:
+            bpy.data.materials.remove(c)
+        except Exception:
+            pass
 
 
 def export_lcd_usd(filepath):
     """Full one-action Creator export (Phase 60sq1 Step 1 output boundary): validate the v1
-    contract -> bridge the sparse LCD deltas -> SELECTED-ONLY, geometry+bindings-only stock
-    export (no preview surface / lights / camera / world, no texture duplication) -> in-process
-    pxr-free USD reshape into the Open Matter Creator lightweight form (bare @Name.mtlx@ refs +
-    assetInfo:identity + matterlibRelease stamp) -> restore the source material. Returns
-    (ok, message)."""
+    contract -> per-mesh material-instance split (§2) -> bridge the sparse LCD deltas -> SELECTED-
+    ONLY, geometry+bindings-only stock export (no preview surface / lights / camera / world, no
+    texture duplication) -> in-process pxr-free USD reshape into the Open Matter Creator lightweight
+    form (bare @Name.mtlx@ refs + assetInfo:identity + matterlibRelease stamp) -> restore the
+    source material assignments. Returns (ok, message)."""
     try:
         validate_v1_contract(_selected_mesh_objects())
     except LcdContractError as e:
         return False, "IMRSV LCD export REJECTED (v1 contract): %s" % e
-    undo = sync_lcd_custom_props()
+    split_undo = split_shared_materials(_selected_mesh_objects())  # §2: one USD instance per mesh
     try:
-        bpy.ops.wm.usd_export(
-            filepath=filepath,
-            selected_objects_only=True,      # Creator exports the selected props (Step 1)
-            export_materials=True,
-            generate_preview_surface=False,  # the material IS the referenced Matter .mtlx
-            convert_world_material=False,    # no generated world/env EXR (Discovery-2 Ref. A)
-            export_lights=False,
-            export_cameras=False,
-            export_uvmaps=True,              # geometry UVs travel as primvars:st (rule 2)
-            export_custom_properties=True,   # carries the LCD userProperties bridge
-            export_textures_mode='PRESERVE',  # no heavy-texture duplication (§9 piece 2a)
-        )
+        undo = sync_lcd_custom_props()
+        try:
+            bpy.ops.wm.usd_export(
+                filepath=filepath,
+                selected_objects_only=True,      # Creator exports the selected props (Step 1)
+                export_materials=True,
+                generate_preview_surface=False,  # the material IS the referenced Matter .mtlx
+                convert_world_material=False,    # no generated world/env EXR (Discovery-2 Ref. A)
+                export_lights=False,
+                export_cameras=False,
+                export_uvmaps=True,              # geometry UVs travel as primvars:st (rule 2)
+                export_custom_properties=True,   # carries the LCD + identity userProperties bridge
+                export_textures_mode='PRESERVE',  # no heavy-texture duplication (§9 piece 2a)
+            )
+        finally:
+            restore_lcd_custom_props(undo)  # transactional: source .blend material unchanged
+        try:
+            converted = lcd_usd_edit.transform_file(filepath)
+        except lcd_usd_edit.LcdRejected as e:
+            return False, "IMRSV LCD export REJECTED (out-of-range/malformed): %s" % e
+        except lcd_usd_edit.LcdError as e:
+            return False, "IMRSV LCD USD-edit failed: %s" % e
     finally:
-        restore_lcd_custom_props(undo)  # transactional: source .blend material unchanged
-    try:
-        converted = lcd_usd_edit.transform_file(filepath)
-    except lcd_usd_edit.LcdRejected as e:
-        return False, "IMRSV LCD export REJECTED (out-of-range/malformed): %s" % e
-    except lcd_usd_edit.LcdError as e:
-        return False, "IMRSV LCD USD-edit failed: %s" % e
+        restore_shared_materials(split_undo)  # transactional: source .blend assignments unchanged
     return True, "converted %d LCD override(s)" % len(converted)
 
 

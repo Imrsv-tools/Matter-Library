@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# Creator Asset Profile — REAL-EXPORTER conformance gate (Phase 60sq1, Step 1).
+# Creator Asset Profile — REAL-EXPORTER conformance gate (Phase 60sq1, Steps 1 + E8 §1/§2).
 #
 #   check_exporter.sh [OUT_DIR]
 #
 # Proves the SHIPPING Blender add-on (not the hand-authored golden) emits a conforming
-# lightweight Open Matter Creator asset, through its new selected-only / geometry+bindings-only
-# output boundary:
-#   1. blender --background -> export_copper_slice.py -> the real export_lcd_usd
-#   2. assert_profile.py lightweight — profile SHAPE + spec-derived NEGATIVE guards
-#   3. usdchecker Success + usdcat --flatten composes the material network (library-resolved)
+# lightweight Open Matter Creator asset, through its selected-only / geometry+bindings-only
+# output boundary, across THREE Creator scenarios:
+#   distinct — two separate datablocks, sparse per-instance tint (different-settings path)
+#   shared   — two meshes share ONE datablock -> exporter SPLITS to per-mesh instance prims (§2)
+#   renamed  — datablock renamed off its identity, durable property carries identity (§1)
+# Each scenario runs: real export -> assert_profile lightweight -> usdchecker + usdcat --flatten
+# -> pxr binding-resolution + instance-uniqueness + identity check.
 #
 # Exit 0 iff every check passes. Companion to check_conformance.sh (which validates the golden).
 set -uo pipefail
@@ -20,17 +22,9 @@ BLEND="$REPO/blender/MatterMaterials.blend"
 MATROOT="$REPO/MatterLibrary/materials"
 PY="$ENVP/bin/python"
 OUT="${1:-$(mktemp -d)}"
-USDA="$OUT/creator_copper_slice.usda"
+EXPECT_ID="Copper_Verdigris_Aged_Base_s01_v01"   # every scenario resolves to the ONE Copper identity
 mkdir -p "$OUT"
 rc=0
-
-echo "### 1. Real add-on export (blender --background -> export_lcd_usd)"
-if blender --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" \
-        > "$OUT/export.log" 2>&1 && grep -q SLICE_EXPORT_OK "$OUT/export.log"; then
-  echo "  export: OK -> $USDA"
-else
-  echo "  export: FAIL"; tail -15 "$OUT/export.log"; exit 1
-fi
 
 export PYTHONPATH="$INST/lib/python"
 export LD_LIBRARY_PATH="$INST/lib:$ENVP/lib"
@@ -39,29 +33,40 @@ export PATH="$INST/bin:$PATH"
 ROOTS=$(find "$MATROOT" -name '*.mtlx' -printf '%h\n' | sort -u | paste -sd: -)
 export PXR_AR_DEFAULT_SEARCH_PATH="$ROOTS"
 
-echo ""
-echo "### 2. Profile asserts (shape + spec-derived negative guards)"
-"$PY" "$CONF/assert_profile.py" lightweight "$USDA" || rc=1
+run_scenario() {
+  MODE="$1"
+  USDA="$OUT/creator_copper_${MODE}.usda"
+  echo ""
+  echo "======== SCENARIO: $MODE ========"
+  echo "### 1. Real add-on export (blender --background -> export_lcd_usd, mode=$MODE)"
+  # Blender uses its OWN bundled USD/MaterialX — strip the from-source USD-tools env (which the
+  # pxr checks below need) or Blender's libusd_ms.so crashes on a MaterialX symbol mismatch.
+  if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
+          blender --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode "$MODE" \
+          > "$OUT/export_${MODE}.log" 2>&1 && grep -q SLICE_EXPORT_OK "$OUT/export_${MODE}.log"; then
+    echo "  export: OK -> $USDA"
+  else
+    echo "  export: FAIL"; tail -15 "$OUT/export_${MODE}.log"; rc=1; return
+  fi
 
-echo ""
-echo "### 3. usdchecker + usdcat --flatten (composition proof, library-resolved)"
-usdchecker "$USDA" && echo "  usdchecker: Success" || { echo "  usdchecker: FAIL"; rc=1; }
-if usdcat --flatten "$USDA" -o "$OUT/slice_flat.usda" 2>"$OUT/slice.err"; then
-  echo "  usdcat --flatten: OK  shaders=$(grep -c 'def Shader' "$OUT/slice_flat.usda")"
-else
-  echo "  usdcat --flatten: FAIL"; cat "$OUT/slice.err"; rc=1
-fi
+  echo "### 2. Profile asserts (shape + spec-derived negative guards)"
+  "$PY" "$CONF/assert_profile.py" lightweight "$USDA" || rc=1
 
-echo ""
-echo "### 4. Binding resolution + material-instance uniqueness (pxr)"
-# Catches the duplicate-prim / dangling-binding class the text asserts CANNOT see: every mesh
-# binding must resolve to a VALID material prim, each mesh must bind a DISTINCT prim (profile
-# rule 6 independent instances), and each bound material must expose an mtlx surface source.
-"$PY" - "$USDA" <<'PYEOF' || rc=1
-import sys
+  echo "### 3. usdchecker + usdcat --flatten (composition proof, library-resolved)"
+  usdchecker "$USDA" && echo "  usdchecker: Success" || { echo "  usdchecker: FAIL"; rc=1; }
+  if usdcat --flatten "$USDA" -o "$OUT/flat_${MODE}.usda" 2>"$OUT/${MODE}.err"; then
+    echo "  usdcat --flatten: OK  shaders=$(grep -c 'def Shader' "$OUT/flat_${MODE}.usda")"
+  else
+    echo "  usdcat --flatten: FAIL"; cat "$OUT/${MODE}.err"; rc=1
+  fi
+
+  echo "### 4. Binding resolution + instance-uniqueness + identity (pxr)"
+  EXPECT_ID="$EXPECT_ID" "$PY" - "$USDA" <<'PYEOF' || rc=1
+import os, sys
 from pxr import Usd, UsdShade
 st = Usd.Stage.Open(sys.argv[1])
-bound, unresolved, nosurf = [], [], []
+want = os.environ["EXPECT_ID"]
+bound, unresolved, nosurf, badid = [], [], [], []
 for p in st.Traverse():
     if p.GetTypeName() != "Mesh":
         continue
@@ -71,17 +76,27 @@ for p in st.Traverse():
     bound.append(m.GetPath())
     if not m.ComputeSurfaceSource("mtlx")[0]:
         nosurf.append(p.GetName())
+    ident = m.GetPrim().GetAssetInfoByKey("identifier")
+    if ident != want:
+        badid.append("%s->%r" % (p.GetName(), ident))
 uniq = (len(set(bound)) == len(bound))
-ok = not unresolved and not nosurf and uniq and len(bound) >= 2
+ok = not unresolved and not nosurf and not badid and uniq and len(bound) >= 2
 print("  [%s] every mesh binding resolves to a valid material prim%s"
       % ("PASS" if not unresolved else "FAIL", "" if not unresolved else " — dangling: %s" % unresolved))
-print("  [%s] each mesh binds a DISTINCT material instance prim (rule 6)%s"
+print("  [%s] each mesh binds a DISTINCT material instance prim (rule 6 / §2 split)%s"
       % ("PASS" if uniq else "FAIL", "" if uniq else " — bound paths %s" % [str(b) for b in bound]))
 print("  [%s] each bound material exposes an mtlx surface source%s"
       % ("PASS" if not nosurf else "FAIL", "" if not nosurf else " — no surface: %s" % nosurf))
+print("  [%s] every instance carries assetInfo:identifier == %r (§1 durable carrier)%s"
+      % ("PASS" if not badid else "FAIL", want, "" if not badid else " — mismatched: %s" % badid))
 print("  => bindings: %s (%d meshes)" % ("OK" if ok else "VIOLATION", len(bound)))
 sys.exit(0 if ok else 1)
 PYEOF
+}
+
+run_scenario distinct
+run_scenario shared
+run_scenario renamed
 
 echo ""
 echo "### REAL-EXPORTER GATE $([ $rc -eq 0 ] && echo PASS || echo FAIL) (rc=$rc)"

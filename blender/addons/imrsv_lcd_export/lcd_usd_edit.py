@@ -20,11 +20,14 @@ pass over the ASCII `.usda`:
        * AUTHOR the bare library reference `@<id>.mtlx@</MaterialX/Materials/<id>>` and the
          exact-identity carrier `assetInfo:identifier = "<id>"` (profile rules 4/5). The
          material prim becomes a typeless `def "<name>"` whose type comes from the reference.
-       * IDENTITY `<id>` = the material prim name with Blender's duplicate-datablock suffix
-         (`_NNN`) removed — so two meshes bound to copies of one Matter datablock
-         (`Copper…_v01`, `Copper…_v01_001`) carry the SAME `assetInfo:identifier`
-         (`Copper…_v01`) as independent instances. This moves the `_001` normalization from
-         the Stage consumer (`StripBlenderDuplicateSuffix`) to the producer (profile rule 5).
+       * IDENTITY `<id>` = the durable `userProperties:imrsv_matter_identity` carrier on the
+         Material prim (E8 correction §1 / profile rule 5) — a Blender ID custom property the
+         Asset-Browser generator authors, PRESERVED across datablock duplication, so two meshes
+         bound to copies of one Matter datablock both carry the SAME `assetInfo:identifier` as
+         independent instances WITHOUT ever inferring identity from the datablock display name.
+         Falls back to the `_NNN`-strip heuristic (`canonical_identity`) only for a transitional
+         material that carries no such property. This retires reliance on the Stage consumer's
+         `StripBlenderDuplicateSuffix` (profile rule 5).
   3. Stamp the composition's ONE required Matter release into root-layer `customLayerData`
      under `imrsv:matterlibRelease` (profile rule 7 / Phase 60sq1 RD-2).
 
@@ -87,6 +90,17 @@ RELEASE_KEY = "imrsv:matterlibRelease"
 # Blender's duplicate-datablock suffix on the USD-sanitized prim name (`.001` -> `_001`).
 _DUP_SUFFIX_RE = re.compile(r"_\d{3}$")
 
+# Durable canonical-identity carrier (Phase 60sq1 E8 correction §1 / CreatorAssetProfile.md rule 5).
+# The Asset-Browser generator authors this as a Blender ID custom property on the material; it is
+# PRESERVED when the Creator duplicates the material, and rides out through the stock USD export
+# (`export_custom_properties=True`) as `userProperties:imrsv_matter_identity` on the Material prim.
+# The reshape reads it AUTHORITATIVELY — identity is NEVER inferred from the datablock display name
+# when this carrier is present (rule 5: "a producer never relies on Blender datablock display-name
+# collision suffixes (_001) as semantic identity"). The `_NNN`-strip below is interim scaffolding
+# for the transitional case where the carrier is absent (a hand-authored material without it).
+IDENTITY_PROP = "imrsv_matter_identity"
+IDENTITY_USERPROP = USERPROP_PREFIX + IDENTITY_PROP
+
 
 class LcdError(Exception):
     """Base for LCD transform failures; carries a CLI exit `code`."""
@@ -104,10 +118,55 @@ class LcdFormatError(LcdError):
 
 
 def canonical_identity(prim_name):
-    """The exact qualified Matter identity for a material prim: the prim name with Blender's
-    duplicate-datablock suffix (`_NNN`) removed. `Copper…_v01_001` -> `Copper…_v01`; a
-    non-duplicate name is returned unchanged."""
+    """INTERIM fallback identity for a material prim that carries NO durable `imrsv_matter_identity`
+    carrier (E8 correction §1): the prim name with Blender's duplicate-datablock suffix (`_NNN`)
+    removed. `Copper…_v01_001` -> `Copper…_v01`; a non-duplicate name is returned unchanged. The
+    AUTHORITATIVE path reads the durable carrier (see `_scan_identities`); this heuristic exists
+    only for a transitional material without it and retires when the generator authors the carrier
+    on every article."""
     return _DUP_SUFFIX_RE.sub("", prim_name)
+
+
+def _identity_userprop_value(stripped):
+    """If `stripped` is a Material-scoped `[custom] string userProperties:imrsv_matter_identity =
+    "<value>"` line, return the quoted `<value>` (the durable canonical-identity carrier). Return
+    None otherwise. This is the durable property that survives datablock duplication — read in a
+    pre-scan so the reshaped header can author `assetInfo:identifier` from it, never from the name."""
+    if "=" not in stripped:
+        return None
+    lhs, _, rhs = stripped.partition("=")
+    toks = lhs.split()
+    if not toks or toks[-1] != IDENTITY_USERPROP:
+        return None
+    rhs = rhs.strip()
+    if rhs.startswith('"'):
+        q2 = rhs.find('"', 1)
+        if q2 > 0:
+            return rhs[1:q2]
+    return None
+
+
+def _scan_identities(text):
+    """Pre-scan pass: walk the USD-ASCII structure once and record, per direct-child Material prim,
+    the durable identity carried on `userProperties:imrsv_matter_identity`. Returns {prim_name:
+    identity}. The reshape's header authoring reads this so identity comes from the durable carrier
+    (rule 5), not the datablock display name — needed because the carrier is a Material BODY line
+    (seen after the header in a single forward pass)."""
+    identities = {}
+    paren_depth = 0
+    in_string = False
+    scope_stack = []
+    pending = None
+    for raw_line in text.splitlines(keepends=True):
+        cur = scope_stack[-1] if scope_stack else None
+        if (cur is not None and cur[0] == "Material"
+                and paren_depth == 0 and not in_string):
+            val = _identity_userprop_value(raw_line.lstrip())
+            if val is not None:
+                identities[cur[1]] = val
+        paren_depth, in_string, scope_stack, pending = _advance(
+            raw_line, paren_depth, in_string, scope_stack, pending)
+    return identities
 
 
 def _fmt(v):
@@ -237,13 +296,15 @@ def _maybe_rewrite_userprop_line(line):
 
 
 def _is_material_junk(stripped):
-    """A Material-body line stripped by the reshape: the exporter's surface output plug and the
-    `userProperties:blender:*` bridge (data_name/etc.)."""
+    """A Material-body line stripped by the reshape: the exporter's surface output plug, the
+    `userProperties:blender:*` bridge (data_name/etc.), and the durable `imrsv_matter_identity`
+    carrier (consumed into `assetInfo:identifier` by the pre-scan — it is a bridge, not spec)."""
     if stripped.startswith("token outputs:surface"):
         return True
     if "=" in stripped:
         lhs = stripped.partition("=")[0].split()
-        if lhs and lhs[-1].startswith("userProperties:blender:"):
+        if lhs and (lhs[-1].startswith("userProperties:blender:")
+                    or lhs[-1] == IDENTITY_USERPROP):
             return True
     return False
 
@@ -268,6 +329,7 @@ def transform_text(text):
     is the LCD `inputs:` authored. Raises LcdRejected on an out-of-range/malformed LCD value
     (caller writes nothing). Idempotent."""
     lines = text.splitlines(keepends=True)
+    identities = _scan_identities(text)   # durable carrier per Material prim (rule 5); {} if none
     out_lines = []
     converted = []
     paren_depth = 0
@@ -332,7 +394,11 @@ def transform_text(text):
             dtype, name = _detect_def(stripped)
             if dtype == "Material":
                 indent = raw_line[: len(raw_line) - len(raw_line.lstrip())]
-                ident = canonical_identity(name)
+                # AUTHORITATIVE: the durable carrier (rule 5). Fall back to the `_NNN` strip only
+                # for a transitional material that carries no carrier (E8 correction §1).
+                ident = identities.get(name)
+                if ident is None:
+                    ident = canonical_identity(name)
                 out_lines.append(_material_metadata_block(indent, name, ident))
                 paren_depth, in_string, scope_stack, pending = _advance(
                     raw_line, paren_depth, in_string, scope_stack, pending)
