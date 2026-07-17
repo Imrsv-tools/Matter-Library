@@ -1,22 +1,50 @@
 #!/usr/bin/env python
-"""IMRSV LCD USD-edit — pxr-free, syntax-aware ASCII-.usda transform (Phase 60 §11 round-3).
+"""IMRSV LCD USD-edit — pxr-free, syntax-aware ASCII-.usda transform (Phase 60 §11 round-3;
+Phase 60sq1 Step 1 output-boundary rebuild).
 
-The internal step of the Blender LCD export add-on. The stock `wm.usd_export` carries each
-Creator LCD edit as a `userProperties:<port>` attribute on the exported Material prim; this
-module rewrites those into spec-clean, standard `inputs:<port>` UsdShade overrides and strips
-the off-spec `userProperties:` bridge (Discovery 9: standard `inputs:` is the sole carrier).
+The internal step of the Blender LCD export add-on. The stock `wm.usd_export` emits a
+whole-scene USD with a UsdPreviewSurface (or a minimal placeholder `previewShader`) per
+material, a `_materials` scope, and the Creator's LCD edits as `userProperties:<port>` attrs.
+This module rewrites that raw export into the **Open Matter Creator asset** shape pinned by
+`IMRSV_Platform_Documentation/MatterLibrary/Contract/CreatorAssetProfile.md`, in one pxr-free
+pass over the ASCII `.usda`:
+
+  1. Convert each Material-scoped LCD `userProperties:<port>` into a standard `inputs:<port>`
+     UsdShade override and strip the off-spec `userProperties:` bridge (Discovery 9: standard
+     `inputs:` is the sole carrier).
+  2. Reshape each `_materials` Material into the lightweight profile form (Phase 60sq1 Step 1):
+       * STRIP the exporter's shader network (`def Shader …` subtrees) and its
+         `token outputs:surface[.connect]` — the material IS the referenced Matter `.mtlx`,
+         not a preview/proxy network (profile "Forbidden: no UsdPreviewSurface").
+       * STRIP the `userProperties:blender:*` bridge (data_name/etc.).
+       * AUTHOR the bare library reference `@<id>.mtlx@</MaterialX/Materials/<id>>` and the
+         exact-identity carrier `assetInfo:identifier = "<id>"` (profile rules 4/5). The
+         material prim becomes a typeless `def "<name>"` whose type comes from the reference.
+       * IDENTITY `<id>` = the material prim name with Blender's duplicate-datablock suffix
+         (`_NNN`) removed — so two meshes bound to copies of one Matter datablock
+         (`Copper…_v01`, `Copper…_v01_001`) carry the SAME `assetInfo:identifier`
+         (`Copper…_v01`) as independent instances. This moves the `_001` normalization from
+         the Stage consumer (`StripBlenderDuplicateSuffix`) to the producer (profile rule 5).
+  3. Stamp the composition's ONE required Matter release into root-layer `customLayerData`
+     under `imrsv:matterlibRelease` (profile rule 7 / Phase 60sq1 RD-2).
 
 WHY pxr-free: Fedora's Blender ships USD as a C++-only monolith (no `pxr` Python module), so
-this must run *in Blender's own Python* — a bundled `usd-core`/pxr is not viable there. Rather
-than a naive `re.sub`, the transform is SYNTAX-AWARE: it tracks the USD-ASCII prim/scope
-structure (a `def <Type> "<name>"` header + its `{ }` body, ignoring braces inside strings,
-comments, and `( )` prim-metadata blocks where USD dictionaries live) so it converts ONLY the
-`userProperties:<lcd-port>` attributes that sit directly inside a `Material` prim — multiple
-materials and nested scopes are handled correctly. Acceptance is SEMANTIC equivalence to the
-pxr path (verified by opening the result with `pxr` in the tests), not byte-equality.
+this must run *in Blender's own Python*. Rather than a naive `re.sub`, the transform is
+SYNTAX-AWARE: it tracks the USD-ASCII prim/scope structure (a `def <Type> "<name>"` header +
+its `{ }` body, ignoring braces inside strings, comments, and `( )` prim-metadata blocks where
+USD dictionaries live) so it reshapes ONLY prims that are direct `Material` children. Multiple
+materials and nested scopes are handled correctly. Acceptance is SEMANTIC equivalence to a
+pxr-authored asset (verified by opening the result with `pxr` in the tests), not byte-equality.
 
-Bounded assumption: dictionaries appear only inside `( )` prim-metadata (true for Blender's
-USD export); attribute-level dictionary *defaults* are not supported.
+Idempotent by construction: a reshaped material is a typeless `def "<name>"` (no longer a
+`def Material`), so a 2nd pass does not re-match it; the release stamp is skipped when already
+present. Running the transform on its own output is a no-op.
+
+Bounded assumptions (true for Blender's USD export): dictionaries appear only inside `( )`
+prim-metadata; a `def Material` header carries no inline `( )` metadata block (Blender writes
+prim metadata on following lines, and materials get none); Matter identity names are
+`[A-Za-z0-9_]` so the `_NNN` duplicate-suffix strip never truncates a real name (they end
+`_v01`/`_s01`, never a bare `_NNN`).
 
 Contract (LCDSchema.md, Phase 53 D3 — the 5 travel scalars; UV placement is Studio-side, S3):
 
@@ -28,7 +56,7 @@ Contract (LCDSchema.md, Phase 53 D3 — the 5 travel scalars; UV placement is St
 
 Rules (Phase 60 §11):
   * REJECT — an out-of-range or malformed LCD value fails the whole export (never clamped).
-  * An unknown `userProperties:` attr (not an LCD port) is left untouched.
+  * An unknown `userProperties:` attr (not an LCD port, not the blender bridge) is left untouched.
   * `.usda` ASCII only — a `.usd`/`.usdc` crate path is rejected LOUDLY (never mangled).
   * Transactional (temp + atomic rename) and idempotent (a 2nd run is a no-op).
 
@@ -36,6 +64,7 @@ Exit codes (CLI, retained for tooling/back-compat): 0 = ok; 2 = REJECT (out-of-r
 malformed); 3 = not an ASCII .usda.
 """
 import os
+import re
 import sys
 import tempfile
 
@@ -51,6 +80,13 @@ LCD_PORTS = {
 USERPROP_PREFIX = "userProperties:"
 _DEF_KEYWORDS = ("def ", "over ", "class ")
 
+# Profile rule 7 (Phase 60sq1 RD-2) — the ONE required Matter release, stamped on the root layer.
+MATTERLIB_RELEASE = "matterlib-0.1.0"
+RELEASE_KEY = "imrsv:matterlibRelease"
+
+# Blender's duplicate-datablock suffix on the USD-sanitized prim name (`.001` -> `_001`).
+_DUP_SUFFIX_RE = re.compile(r"_\d{3}$")
+
 
 class LcdError(Exception):
     """Base for LCD transform failures; carries a CLI exit `code`."""
@@ -65,6 +101,13 @@ class LcdRejected(LcdError):
 class LcdFormatError(LcdError):
     """The target is not an ASCII `.usda` (a crate `.usd`/`.usdc` is refused loudly)."""
     code = 3
+
+
+def canonical_identity(prim_name):
+    """The exact qualified Matter identity for a material prim: the prim name with Blender's
+    duplicate-datablock suffix (`_NNN`) removed. `Copper…_v01_001` -> `Copper…_v01`; a
+    non-duplicate name is returned unchanged."""
+    return _DUP_SUFFIX_RE.sub("", prim_name)
 
 
 def _fmt(v):
@@ -180,7 +223,7 @@ def _maybe_rewrite_userprop_line(line):
         return None
     port = name[len(USERPROP_PREFIX):]
     if port not in LCD_PORTS:
-        return None  # unknown userProperty (e.g. blender:data_name) — leave it alone
+        return None  # unknown userProperty (e.g. blender:data_name) — handled elsewhere
     kind, vals = _validate(port, rhs)
     indent = body[: len(body) - len(body.lstrip())]
     if kind == "color3":
@@ -193,27 +236,119 @@ def _maybe_rewrite_userprop_line(line):
     return new_body + eol, (port, value)
 
 
+def _is_material_junk(stripped):
+    """A Material-body line stripped by the reshape: the exporter's surface output plug and the
+    `userProperties:blender:*` bridge (data_name/etc.)."""
+    if stripped.startswith("token outputs:surface"):
+        return True
+    if "=" in stripped:
+        lhs = stripped.partition("=")[0].split()
+        if lhs and lhs[-1].startswith("userProperties:blender:"):
+            return True
+    return False
+
+
+def _material_metadata_block(indent, name, ident):
+    """The reshaped material header: keep the ORIGINAL prim `name` (so `material:binding`
+    targets still resolve and the two same-identity instances stay distinct prims), and author
+    the bare library reference + exact-identity carrier from the canonical `ident` (rules 4/5)."""
+    return (
+        '%sdef "%s" (\n'
+        '%s    prepend references = @%s.mtlx@</MaterialX/Materials/%s>\n'
+        '%s    assetInfo = {\n'
+        '%s        string identifier = "%s"\n'
+        '%s    }\n'
+        '%s)\n'
+    ) % (indent, name, indent, ident, ident, indent, indent, ident, indent, indent)
+
+
 def transform_text(text):
-    """Convert every Material-scoped LCD `userProperties:<port>` into a standard
-    `inputs:<port>` and strip the bridge. Returns (new_text, [(prim_path, port, value)]).
-    Raises LcdRejected on an out-of-range/malformed value (caller writes nothing)."""
+    """Reshape a raw Blender USD export into the Open Matter Creator lightweight asset form
+    (Phase 60sq1 Step 1). Returns (new_text, [(prim_path, port, value)]) — the conversion list
+    is the LCD `inputs:` authored. Raises LcdRejected on an out-of-range/malformed LCD value
+    (caller writes nothing). Idempotent."""
     lines = text.splitlines(keepends=True)
     out_lines = []
     converted = []
     paren_depth = 0
     in_string = False
-    scope_stack = []      # (type, name) per open prim body
-    pending = None        # (type, name) awaiting its '{'
+    scope_stack = []          # (type, name) per open prim body
+    pending = None            # (type, name) awaiting its '{'
+    seen_prim = False         # first top-level prim seen -> layer metadata is closed
+    release_done = (RELEASE_KEY in text)   # idempotency: don't re-stamp
+    strip_base = None         # material-body depth while dropping a shader subtree
+    strip_armed = False       # waiting for the shader subtree's '{' to open
 
     for raw_line in lines:
+        stripped = raw_line.lstrip()
         cur = scope_stack[-1] if scope_stack else None
-        new_line = raw_line
-        if cur is not None and cur[0] == "Material" and paren_depth == 0 and not in_string:
+
+        # --- dropping a shader subtree inside a Material ---
+        if strip_base is not None:
+            paren_depth, in_string, scope_stack, pending = _advance(
+                raw_line, paren_depth, in_string, scope_stack, pending)
+            if strip_armed:
+                if len(scope_stack) > strip_base:
+                    strip_armed = False
+            elif len(scope_stack) <= strip_base:
+                strip_base = None
+            continue
+
+        in_material_body = (cur is not None and cur[0] == "Material"
+                            and paren_depth == 0 and not in_string)
+
+        # --- inside a Material body: strip network / bridge, convert LCD ---
+        if in_material_body:
+            hdr = _detect_def(stripped)
+            if hdr is not None:
+                # a child def (the shader network) -> drop its whole subtree
+                strip_base = len(scope_stack)
+                strip_armed = True
+                paren_depth, in_string, scope_stack, pending = _advance(
+                    raw_line, paren_depth, in_string, scope_stack, pending)
+                continue
+            if _is_material_junk(stripped):
+                paren_depth, in_string, scope_stack, pending = _advance(
+                    raw_line, paren_depth, in_string, scope_stack, pending)
+                continue
             rw = _maybe_rewrite_userprop_line(raw_line)
             if rw is not None:
                 new_line, (port, value) = rw
                 converted.append((cur[1], port, value))
-        out_lines.append(new_line)
+                out_lines.append(new_line)
+                paren_depth, in_string, scope_stack, pending = _advance(
+                    raw_line, paren_depth, in_string, scope_stack, pending)
+                continue
+            out_lines.append(raw_line)
+            paren_depth, in_string, scope_stack, pending = _advance(
+                raw_line, paren_depth, in_string, scope_stack, pending)
+            continue
+
+        top_level_header = (paren_depth == 0 and not in_string
+                            and _detect_def(stripped) is not None)
+
+        # --- Material HEADER: retype typeless + inject reference/assetInfo ---
+        if top_level_header:
+            dtype, name = _detect_def(stripped)
+            if dtype == "Material":
+                indent = raw_line[: len(raw_line) - len(raw_line.lstrip())]
+                ident = canonical_identity(name)
+                out_lines.append(_material_metadata_block(indent, name, ident))
+                paren_depth, in_string, scope_stack, pending = _advance(
+                    raw_line, paren_depth, in_string, scope_stack, pending)
+                seen_prim = True
+                continue
+            seen_prim = True
+
+        # --- layer-metadata release stamp (before the layer '( )' closes) ---
+        if (not seen_prim and not release_done and paren_depth == 1
+                and stripped.startswith(")")):
+            out_lines.append('    customLayerData = {\n')
+            out_lines.append('        string "%s" = "%s"\n' % (RELEASE_KEY, MATTERLIB_RELEASE))
+            out_lines.append('    }\n')
+            release_done = True
+
+        out_lines.append(raw_line)
         paren_depth, in_string, scope_stack, pending = _advance(
             raw_line, paren_depth, in_string, scope_stack, pending)
 
@@ -221,15 +356,15 @@ def transform_text(text):
 
 
 def transform_file(path):
-    """Transactionally convert a `.usda` in place. Returns the conversion list. Writes only
-    when there is something to convert (idempotent). Raises LcdFormatError on a non-.usda path
-    and LcdRejected on an out-of-range/malformed value (leaving the original untouched)."""
+    """Transactionally reshape a `.usda` in place. Returns the LCD conversion list. Raises
+    LcdFormatError on a non-.usda path and LcdRejected on an out-of-range/malformed value
+    (leaving the original untouched). Idempotent."""
     if not path.endswith(".usda"):
         raise LcdFormatError("only ASCII .usda is supported; refusing " + path)
     with open(path, "r", encoding="utf-8") as f:
         text = f.read()
     new_text, converted = transform_text(text)
-    if converted and new_text != text:
+    if new_text != text:
         d = os.path.dirname(os.path.abspath(path))
         fd, tmp = tempfile.mkstemp(dir=d, prefix=".lcd_", suffix=".usda.tmp")
         try:

@@ -130,16 +130,71 @@ def restore_lcd_custom_props(undo):
             pass
 
 
+class LcdContractError(Exception):
+    """The selected content violates the Creator Asset Profile v1 producer contract
+    (one material instance per mesh, geometry UVs). Raised BEFORE any file is written."""
+
+
+def _selected_mesh_objects():
+    """The mesh objects the selected-only export will emit (Phase 60sq1 Step 1 output boundary)."""
+    return [o for o in bpy.context.selected_objects if o.type == 'MESH']
+
+
+def validate_v1_contract(objects):
+    """Pre-write guard for the Creator Asset Profile v1 producer path (CreatorAssetProfile.md
+    rules 1/2/3/6): the export is SELECTED-ONLY and each emitted mesh must carry exactly one
+    material instance and geometry-authored UVs, and no two meshes may share one material
+    datablock (independent per-mesh refinement needs separate material prims). Raises
+    LcdContractError with a clear, spec-referenced message; never clamps or silently repairs."""
+    if not objects:
+        raise LcdContractError(
+            "no mesh objects selected — the Creator export is selected-only (profile Step 1). "
+            "Select the prop meshes to export.")
+    seen = {}
+    for ob in objects:
+        mats = [s.material for s in ob.material_slots if s.material is not None]
+        if len(mats) != 1:
+            raise LcdContractError(
+                "mesh %r has %d materials — v1 requires exactly ONE Matter material per mesh "
+                "(profile rule 3; GeomSubset multi-material is out of scope, Q-d)."
+                % (ob.name, len(mats)))
+        if not (ob.data.uv_layers and len(ob.data.uv_layers) >= 1):
+            raise LcdContractError(
+                "mesh %r has no UV map — Blender-authored UVs are the primary UV and must "
+                "travel as texCoord2f primvars:st (profile rule 2)." % ob.name)
+        mat = mats[0]
+        if mat.name in seen:
+            raise LcdContractError(
+                "meshes %r and %r share material datablock %r — each Creator mesh needs its own "
+                "material instance for independent per-mesh refinement (profile rule 6). "
+                "Duplicate the material per mesh (the Asset-Browser assign does this)."
+                % (seen[mat.name], ob.name, mat.name))
+        seen[mat.name] = ob.name
+
+
 def export_lcd_usd(filepath):
-    """Full one-action export: bridge the sparse LCD deltas -> stock export (no texture
-    duplication) -> in-process USD-edit -> restore the source material. Returns (ok, message)."""
+    """Full one-action Creator export (Phase 60sq1 Step 1 output boundary): validate the v1
+    contract -> bridge the sparse LCD deltas -> SELECTED-ONLY, geometry+bindings-only stock
+    export (no preview surface / lights / camera / world, no texture duplication) -> in-process
+    pxr-free USD reshape into the Open Matter Creator lightweight form (bare @Name.mtlx@ refs +
+    assetInfo:identity + matterlibRelease stamp) -> restore the source material. Returns
+    (ok, message)."""
+    try:
+        validate_v1_contract(_selected_mesh_objects())
+    except LcdContractError as e:
+        return False, "IMRSV LCD export REJECTED (v1 contract): %s" % e
     undo = sync_lcd_custom_props()
     try:
         bpy.ops.wm.usd_export(
             filepath=filepath,
+            selected_objects_only=True,      # Creator exports the selected props (Step 1)
             export_materials=True,
-            generate_preview_surface=True,
-            export_custom_properties=True,
+            generate_preview_surface=False,  # the material IS the referenced Matter .mtlx
+            convert_world_material=False,    # no generated world/env EXR (Discovery-2 Ref. A)
+            export_lights=False,
+            export_cameras=False,
+            export_uvmaps=True,              # geometry UVs travel as primvars:st (rule 2)
+            export_custom_properties=True,   # carries the LCD userProperties bridge
             export_textures_mode='PRESERVE',  # no heavy-texture duplication (§9 piece 2a)
         )
     finally:
