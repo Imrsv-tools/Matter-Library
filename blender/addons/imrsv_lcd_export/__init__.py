@@ -135,17 +135,27 @@ class LcdContractError(Exception):
     (one material instance per mesh, geometry UVs). Raised BEFORE any file is written."""
 
 
-def _selected_mesh_objects():
-    """The mesh objects the selected-only export will emit (Phase 60sq1 Step 1 output boundary).
+def _selected_meshes_from_context(context):
+    """The Creator's selected mesh objects, read from the GIVEN context. Called from the export
+    operator's `invoke()` — the VIEWPORT context, where the selection is intact.
 
-    Reads the view-layer SELECT FLAGS (`o.select_get()`) — the SAME source
-    `wm.usd_export(selected_objects_only=True)` uses — NOT `bpy.context.selected_objects`.
-    `context.selected_objects` is a context member that returns only the active object (or empty)
-    when the export operator's `execute` runs in the File-browser context (after File > Export
-    opens the file dialog). The E9 §6 Creator slice caught this live: the GUI export emitted ONE
-    shared material prim for two meshes because the per-mesh split (§2) saw an incomplete selection
-    while `wm.usd_export` exported both — rule-6 independence silently lost. The select flags are
-    context-independent, so the split, the v1-contract validate, and the actual export now agree."""
+    WHY capture at invoke() and thread it through (E9 §6 root cause): after File > Export opens the
+    file dialog, the operator's `execute` runs in the FILE-BROWSER context, where BOTH
+    `context.selected_objects` AND the view-layer select flags (`o.select_get()`) collapse to the
+    active object — while `wm.usd_export(selected_objects_only=True)` still reads the scene's real
+    selection and exports every mesh. That split starved the §2 per-mesh instance split: the GUI
+    export emitted ONE shared material prim for two meshes and rule-6 independence was silently lost.
+    Capturing the selection here (before the browser opens) and threading it into `export_lcd_usd`
+    keeps the split, the v1-contract validate, and the actual export in agreement."""
+    return [o for o in context.selected_objects if o.type == 'MESH']
+
+
+def _selected_mesh_objects():
+    """Fallback selection source for a programmatic/headless `export_lcd_usd()` with no explicit
+    object list (no operator `invoke()` ran to capture one). Reads the view-layer SELECT FLAGS
+    (`o.select_get()`) — the SAME source `wm.usd_export(selected_objects_only=True)` uses — which is
+    correct in a `--python`/script context where no File-browser layer intervenes. The GUI path never
+    relies on this: its selection is captured at `invoke()` (see `_selected_meshes_from_context`)."""
     vl = bpy.context.view_layer
     return [o for o in vl.objects if o.type == 'MESH' and o.select_get()]
 
@@ -217,18 +227,25 @@ def restore_shared_materials(undo):
             pass
 
 
-def export_lcd_usd(filepath):
+def export_lcd_usd(filepath, objects=None):
     """Full one-action Creator export (Phase 60sq1 Step 1 output boundary): validate the v1
     contract -> per-mesh material-instance split (§2) -> bridge the sparse LCD deltas -> SELECTED-
     ONLY, geometry+bindings-only stock export (no preview surface / lights / camera / world, no
     texture duplication) -> in-process pxr-free USD reshape into the Open Matter Creator lightweight
     form (bare @Name.mtlx@ refs + assetInfo:identity + matterlibRelease stamp) -> restore the
-    source material assignments. Returns (ok, message)."""
+    source material assignments. Returns (ok, message).
+
+    `objects` = the mesh objects to export, captured at the operator's `invoke()` (viewport context)
+    and threaded in so the §2 split and the v1 validate agree with `wm.usd_export` even in the
+    File-browser execute context (E9 §6). When None (programmatic/headless caller), falls back to the
+    current view-layer selection via `_selected_mesh_objects()`."""
+    if objects is None:
+        objects = _selected_mesh_objects()
     try:
-        validate_v1_contract(_selected_mesh_objects())
+        validate_v1_contract(objects)
     except LcdContractError as e:
         return False, "IMRSV LCD export REJECTED (v1 contract): %s" % e
-    split_undo = split_shared_materials(_selected_mesh_objects())  # §2: one USD instance per mesh
+    split_undo = split_shared_materials(objects)  # §2: one USD instance per mesh
     try:
         undo = sync_lcd_custom_props()
         try:
@@ -265,8 +282,22 @@ class WM_OT_imrsv_lcd_usd_export(Operator, ExportHelper):
     filename_ext = ".usda"
     filter_glob: StringProperty(default="*.usda;*.usd;*.usdc", options={'HIDDEN'})
 
+    # Selection captured at invoke() in the viewport context and threaded into the export at
+    # execute() time. Class-level default so a direct EXEC_DEFAULT call (no invoke) falls back to
+    # the current selection inside export_lcd_usd. (E9 §6: the File-browser execute context loses
+    # the multi-object selection, which starved the §2 per-mesh split.)
+    _invoke_meshes = None
+
+    def invoke(self, context, event):
+        # Capture the Creator's selection NOW — before File > Export opens the file browser and the
+        # execute() context collapses it to the active object.
+        self._invoke_meshes = _selected_meshes_from_context(context)
+        # Call ExportHelper.invoke EXPLICITLY: with MRO (Operator, ExportHelper), super().invoke
+        # would resolve to Operator (no file browser). ExportHelper.invoke opens the file dialog.
+        return ExportHelper.invoke(self, context, event)
+
     def execute(self, context):
-        ok, msg = export_lcd_usd(self.filepath)
+        ok, msg = export_lcd_usd(self.filepath, self._invoke_meshes)
         if not ok:
             self.report({'ERROR'}, msg)
             return {'CANCELLED'}
