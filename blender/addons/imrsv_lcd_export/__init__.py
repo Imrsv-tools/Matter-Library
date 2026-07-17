@@ -36,13 +36,16 @@ base_color_tint (color3), and the floats overlay1_density, overlay2_density,
 maskset_blend, roughness_bias. UV placement (uv_scale/uv_offset/uv_rotation) is
 Studio-side only (S3) and NOT exported.
 """
+from pathlib import Path
+
 import bpy
-from bpy.props import StringProperty
+from bpy.props import StringProperty, BoolProperty
 from bpy.types import Operator
 from bpy_extras.io_utils import ExportHelper
 
 from . import lcd_usd_edit
 from . import lcd_sparse
+from . import lcd_portable
 from .lcd_sparse import LCD_TRAVEL_PORTS, _COLOR3_PORTS
 
 bl_info = {
@@ -227,7 +230,18 @@ def restore_shared_materials(undo):
             pass
 
 
-def export_lcd_usd(filepath, objects=None):
+def _matterlib_paths():
+    """Discover the installed Matter-Library root + the current-release catalog from the add-on's
+    on-disk location (`.../Matter-Library/blender/addons/imrsv_lcd_export/` -> parents[3] = the
+    Matter-Library repo). Used by the complete-portable materialize; the headless gate can bypass
+    this and drive `lcd_portable.materialize_portable` with explicit paths."""
+    repo = Path(__file__).resolve().parents[3]
+    matterlib_root = repo / "MatterLibrary"
+    catalog = repo / "library" / "releases" / (lcd_usd_edit.MATTERLIB_RELEASE + ".catalog.json")
+    return matterlib_root, catalog
+
+
+def export_lcd_usd(filepath, objects=None, portable=False):
     """Full one-action Creator export (Phase 60sq1 Step 1 output boundary): validate the v1
     contract -> per-mesh material-instance split (§2) -> bridge the sparse LCD deltas -> SELECTED-
     ONLY, geometry+bindings-only stock export (no preview surface / lights / camera / world, no
@@ -238,7 +252,12 @@ def export_lcd_usd(filepath, objects=None):
     `objects` = the mesh objects to export, captured at the operator's `invoke()` (viewport context)
     and threaded in so the §2 split and the v1 validate agree with `wm.usd_export` even in the
     File-browser execute context (E9 §6). When None (programmatic/headless caller), falls back to the
-    current view-layer selection via `_selected_mesh_objects()`."""
+    current view-layer selection via `_selected_mesh_objects()`.
+
+    `portable` (Step 5 / RD-4) = emit the COMPLETE-PORTABLE second producer mode: after the
+    lightweight reshape, materialize each referenced Matter `.mtlx` + textures ONCE into the package
+    and rewrite refs portable-relative, so it opens/renders independently with NO Matter Library.
+    Default False = the lightweight, library-linked form."""
     if objects is None:
         objects = _selected_mesh_objects()
     try:
@@ -269,9 +288,16 @@ def export_lcd_usd(filepath, objects=None):
             return False, "IMRSV LCD export REJECTED (out-of-range/malformed): %s" % e
         except lcd_usd_edit.LcdError as e:
             return False, "IMRSV LCD USD-edit failed: %s" % e
+        if portable:
+            matterlib_root, catalog = _matterlib_paths()
+            try:
+                lcd_portable.materialize_portable(filepath, matterlib_root, catalog)
+            except lcd_portable.PortableError as e:
+                return False, "IMRSV LCD complete-portable materialize failed: %s" % e
     finally:
         restore_shared_materials(split_undo)  # transactional: source .blend assignments unchanged
-    return True, "converted %d LCD override(s)" % len(converted)
+    return True, "converted %d LCD override(s)%s" % (
+        len(converted), " + complete-portable package" if portable else "")
 
 
 class WM_OT_imrsv_lcd_usd_export(Operator, ExportHelper):
@@ -281,6 +307,16 @@ class WM_OT_imrsv_lcd_usd_export(Operator, ExportHelper):
 
     filename_ext = ".usda"
     filter_glob: StringProperty(default="*.usda;*.usd;*.usdc", options={'HIDDEN'})
+
+    # Step 5 / RD-4 — the complete-portable second producer mode (default off = lightweight,
+    # library-linked). The File > Export dialog exposes it as a checkbox; `⚠human-codev` UI, its
+    # eyes-on (independent usdview open with no search path) is the human smoke half.
+    portable: BoolProperty(
+        name="Complete-portable package",
+        description="Materialize each Matter .mtlx + textures into the package so it opens "
+                    "independently with NO Matter Library (RD-4). Off = lightweight library-linked.",
+        default=False,
+    )
 
     # Selection captured at invoke() in the viewport context and threaded into the export at
     # execute() time. Class-level default so a direct EXEC_DEFAULT call (no invoke) falls back to
@@ -297,7 +333,7 @@ class WM_OT_imrsv_lcd_usd_export(Operator, ExportHelper):
         return ExportHelper.invoke(self, context, event)
 
     def execute(self, context):
-        ok, msg = export_lcd_usd(self.filepath, self._invoke_meshes)
+        ok, msg = export_lcd_usd(self.filepath, self._invoke_meshes, self.portable)
         if not ok:
             self.report({'ERROR'}, msg)
             return {'CANCELLED'}

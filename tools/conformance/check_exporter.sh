@@ -94,9 +94,61 @@ sys.exit(0 if ok else 1)
 PYEOF
 }
 
+run_portable() {
+  # Step 5 / RD-4 — the complete-portable second producer mode: the real add-on materializes each
+  # Matter .mtlx + textures ONCE beside the .usda and rewrites refs portable-relative, so the
+  # package opens with NO Matter Library. Package lives in its OWN subdir so the lightweight
+  # scenarios' zero-payload negative guard is never polluted.
+  echo ""
+  echo "======== SCENARIO: portable (complete-portable / RD-4) ========"
+  POUT="$OUT/portable"
+  rm -rf "$POUT"; mkdir -p "$POUT"
+  USDA="$POUT/creator_copper_portable.usda"
+  echo "### 1. Real add-on export (blender --background -> export_lcd_usd portable=True)"
+  if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
+          blender --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode distinct --portable \
+          > "$OUT/export_portable.log" 2>&1 && grep -q SLICE_EXPORT_OK "$OUT/export_portable.log"; then
+    echo "  export: OK -> $USDA"
+  else
+    echo "  export: FAIL"; tail -15 "$OUT/export_portable.log"; rc=1; return
+  fi
+
+  echo "### 2. Profile asserts (portable mode — local @./refs + self-contained .mtlx + textures/)"
+  "$PY" "$CONF/assert_profile.py" portable "$USDA" || rc=1
+
+  echo "### 3. INDEPENDENT open — usdchecker + usdcat --flatten with NO Matter Library search path (RD-4)"
+  # Mirrors check_conformance.sh's golden-portable proof: unset the AR search path, cd INTO the
+  # package, resolve everything from the local relative refs. PXR_MTLX_STDLIB_SEARCH_PATHS (the
+  # MaterialX standard node library a reference app ships) stays — independence = no Matter Library.
+  ( unset PXR_AR_DEFAULT_SEARCH_PATH; cd "$POUT" && usdchecker creator_copper_portable.usda ) \
+    && echo "  usdchecker (no search path): Success" || { echo "  usdchecker: FAIL"; rc=1; }
+  if ( unset PXR_AR_DEFAULT_SEARCH_PATH; cd "$POUT" \
+         && usdcat --flatten creator_copper_portable.usda -o "$POUT/flat_portable.usda" 2>"$OUT/portable.err" ); then
+    echo "  usdcat --flatten (no search path): OK  shaders=$(grep -c 'def Shader' "$POUT/flat_portable.usda")"
+  else
+    echo "  usdcat --flatten: FAIL"; cat "$OUT/portable.err"; rc=1
+  fi
+
+  echo "### 4. Independence structure: every bare library ref rewritten local"
+  if grep -qE 'references = @[A-Za-z0-9_]+\.mtlx@' "$USDA"; then
+    echo "  [FAIL] a bare @Name.mtlx@ library ref survived in the portable .usda"; rc=1
+  else
+    echo "  [PASS] no bare library refs remain (all rewritten to @./Name.mtlx@)"
+  fi
+}
+
 run_scenario distinct
 run_scenario shared
 run_scenario renamed
+run_portable
+
+echo ""
+echo "======== UNIT: lcd_portable materializer (pxr-free) ========"
+if "$PY" "$REPO/blender/addons/imrsv_lcd_export/test_lcd_portable.py"; then
+  echo "  lcd_portable unit: PASS"
+else
+  echo "  lcd_portable unit: FAIL"; rc=1
+fi
 
 echo ""
 echo "======== SELECTION-CONTEXT REGRESSION (E9 §15d) ========"

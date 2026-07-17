@@ -32,6 +32,10 @@ out = post[0] if post else "/tmp/creator_copper_slice.usda"
 mode = "distinct"
 if "--mode" in post:
     mode = post[post.index("--mode") + 1]
+# Step 5 / RD-4: emit the complete-portable second producer mode instead of the lightweight form.
+# Orthogonal to --mode (the scene shape); the exporter materializes each .mtlx+textures beside the
+# .usda and rewrites refs portable-relative so it opens with no Matter Library.
+portable = "--portable" in post
 
 addons = os.path.join(os.path.dirname(bpy.data.filepath), "addons")
 sys.path.insert(0, addons)
@@ -90,6 +94,6 @@ a.select_set(True)
 b.select_set(True)
 bpy.context.view_layer.objects.active = a
 
-ok, msg = A.export_lcd_usd(out)
-print("export_lcd_usd mode=%s ok=%s msg=%r out=%r" % (mode, ok, msg, out))
+ok, msg = A.export_lcd_usd(out, portable=portable)
+print("export_lcd_usd mode=%s portable=%s ok=%s msg=%r out=%r" % (mode, portable, ok, msg, out))
 print("SLICE_EXPORT_OK" if ok else "SLICE_EXPORT_FAIL")
