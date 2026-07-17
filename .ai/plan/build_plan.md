@@ -55,18 +55,19 @@ Each of these was an "Upcoming" phase here; each shipped **into this repo** via 
 version axes (per-material `vNN` vs library semver). **Still open:** the **status lifecycle**
 (all 12 articles are still `status: draft`), **immutability-after-promotion**, **CODEOWNERS-gated
 promotion**, and the first curated release (`matterlib-1.0`). Promotion is now owned by
-platform **Phase 60**.
+platform **Phase 60sq2** (Matter Production Distribution — Phase 60 was carved 2026-07-16 into 60sq1/60sq2).
 - `.ai/phases/future/PhaseTBD_VersionManagement.md`
 
 ### Blender bridge — material library + export-preset extension
 **Goal:** `bridges/blender` — the material-library `.blend` (Principled-BSDF node groups named
 with exact qualified Matter names) + the **material-side** extension of the USD export preset
-(the existing preset is mesh-side only). Greenfield. Owned by platform **Phase 60**, Lane 3.
+(the existing preset is mesh-side only). Owned by platform **Phase 60sq1** (Open Matter Creator Pipeline).
 - `PhaseTBD_BlenderBridge`
+- **Shipped (Phase 60sq1, 2026-07-17):** the installed Blender **Asset-Browser library** (all 11 `creator_selectable` articles of `matterlib-0.1.0`, catalog-driven Principled-BSDF `MatterLCD_<id>` proxies via one generic recipe→proxy mapper) + the **IMRSV LCD USD exporter** (lightweight default + complete-portable), replacing the mesh-only preset. No longer greenfield.
 
 ### Parity baselines
 **Goal:** `usdrecord` previews + per-class ΔE parity bars across MaterialX / UE / Blender.
-Spec text only today; no parity scene or ΔE tooling exists. Owned by platform **Phase 60**, Lane 4.
+Spec text only today; no parity scene or ΔE tooling exists. Owned by platform **Phase 60sq2**, Lane 4.
 - `PhaseTBD_ParityBaselines`
 
 ---
