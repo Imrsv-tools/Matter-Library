@@ -53,5 +53,36 @@ else
 fi
 
 echo ""
+echo "### 4. Binding resolution + material-instance uniqueness (pxr)"
+# Catches the duplicate-prim / dangling-binding class the text asserts CANNOT see: every mesh
+# binding must resolve to a VALID material prim, each mesh must bind a DISTINCT prim (profile
+# rule 6 independent instances), and each bound material must expose an mtlx surface source.
+"$PY" - "$USDA" <<'PYEOF' || rc=1
+import sys
+from pxr import Usd, UsdShade
+st = Usd.Stage.Open(sys.argv[1])
+bound, unresolved, nosurf = [], [], []
+for p in st.Traverse():
+    if p.GetTypeName() != "Mesh":
+        continue
+    m = UsdShade.MaterialBindingAPI(p).GetDirectBinding().GetMaterial()
+    if not (m and m.GetPrim().IsValid()):
+        unresolved.append(p.GetName()); continue
+    bound.append(m.GetPath())
+    if not m.ComputeSurfaceSource("mtlx")[0]:
+        nosurf.append(p.GetName())
+uniq = (len(set(bound)) == len(bound))
+ok = not unresolved and not nosurf and uniq and len(bound) >= 2
+print("  [%s] every mesh binding resolves to a valid material prim%s"
+      % ("PASS" if not unresolved else "FAIL", "" if not unresolved else " — dangling: %s" % unresolved))
+print("  [%s] each mesh binds a DISTINCT material instance prim (rule 6)%s"
+      % ("PASS" if uniq else "FAIL", "" if uniq else " — bound paths %s" % [str(b) for b in bound]))
+print("  [%s] each bound material exposes an mtlx surface source%s"
+      % ("PASS" if not nosurf else "FAIL", "" if not nosurf else " — no surface: %s" % nosurf))
+print("  => bindings: %s (%d meshes)" % ("OK" if ok else "VIOLATION", len(bound)))
+sys.exit(0 if ok else 1)
+PYEOF
+
+echo ""
 echo "### REAL-EXPORTER GATE $([ $rc -eq 0 ] && echo PASS || echo FAIL) (rc=$rc)"
 exit $rc
