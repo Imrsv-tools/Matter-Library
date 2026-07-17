@@ -33,6 +33,8 @@ materials:
   - id: utility/virtual/IMRSV_MissingMaterial   # system material, off-grammar (bare-id resolve)
     version: v01
     status: draft
+    creator_selectable: false   # RD-5: system material — excluded from Creator browse/assign; still resolvable by identity
+
   - id: engineered/glass/Glass_Clear_Clean_Base_s01
     version: v01
     status: draft

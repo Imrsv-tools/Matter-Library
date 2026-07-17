@@ -9,7 +9,8 @@ contract (Decision D). Stage never sees YAML; it consumes this JSON via nlohmann
 
 Schema (Contract/RuntimeCatalog.md):
     {schema_version, release, materials[{id, display_name, domain, material_class,
-                                         scale, version, status, payload_path}]}
+                                         scale, version, status, payload_path,
+                                         creator_selectable}]}
 
 Each material field is derived from the qualified `id` + `version`:
   * id              — the qualified Matter identity (Domain/Class path + name incl. sNN); the resolution key
@@ -17,6 +18,11 @@ Each material field is derived from the qualified `id` + `version`:
   * domain/class    — the first two path segments of id
   * scale           — the sNN tag off the leaf (empty for an off-grammar system material)
   * payload_path    — `materials/<id>_<version>.mtlx` (bare `materials/<id>.mtlx` off-grammar), relative to the catalog file
+  * creator_selectable — whether the Blender Asset-Browser library + Stage's browsable-list op
+                    offer the article to a Creator (RD-5; default true, authored false on the
+                    system material IMRSV_MissingMaterial). Passed through from the lockfile; a
+                    row that omits it defaults to true. Exact system lookup (Stage GetInfo) is
+                    unaffected — a non-selectable article still resolves by identity.
 
 Validation reuses validate_manifest.py (well-formedness + every id resolves on disk).
 Deterministic: materials sorted by id, JSON keys sorted, trailing newline — a re-run is byte-identical.
@@ -38,7 +44,7 @@ import validate_manifest as vman  # noqa: E402
 
 import yaml  # noqa: E402
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 1->2 (Phase 60sq1 Step 4): adds the durable `creator_selectable` field (RD-5).
 SCALE_RE = re.compile(r"_(s\d+)$")
 
 
@@ -80,6 +86,10 @@ def derive_entry(material: dict) -> dict:
         "version": version,
         "status": status,
         "payload_path": f"materials/{filename}",
+        # RD-5: default true; a lockfile row authors `creator_selectable: false` on the system
+        # material (IMRSV_MissingMaterial) to keep it out of Creator browse/assign. Exact system
+        # lookup (Stage GetInfo) is unaffected.
+        "creator_selectable": bool(material.get("creator_selectable", True)),
     }
 
 
