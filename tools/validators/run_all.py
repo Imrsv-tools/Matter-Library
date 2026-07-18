@@ -16,6 +16,8 @@ Runs, skipping with a note any surface not yet present:
                                (encoder-gated: skips if compressonatorcli is absent)
  10. approval gate           — the external release-level approval artifact is well-formed +
                                references the frozen-payload hashes (positive + shallow-negative)
+ 11. freeze lock             — the complete-payload hash-lock is deterministic + tamper-detecting
+                               (RD-4: catalog/manifest/.mtlx/textures[/.dds])
 
 Exit 0 iff every present surface passes.
 """
@@ -40,6 +42,7 @@ import project_runtime_catalog as prc  # noqa: E402
 import check_fixture_sync as cfs       # noqa: E402
 import compress_textures as ct        # noqa: E402
 import validate_approval as va        # noqa: E402
+import freeze_release as fr           # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -326,6 +329,45 @@ def run_approval_gate(root: Path) -> bool:
     return ok
 
 
+def run_freeze_lock(root: Path) -> bool:
+    """Phase 60sq2.3.3 (RD-4): the complete-payload hash-lock is deterministic, self-consistent,
+    and verify() catches tampering.
+
+    Freezes the newest release, re-freezes (byte-identical payload_digest), self-verifies against
+    the on-disk payload, and flips one recorded hash to prove verify() REJECTS — the RED half that
+    keeps the hash-lock non-tautological (§14a). Skips if no release catalog is present."""
+    releases = root / "library" / "releases"
+    catalogs = sorted(releases.glob("matterlib-*.catalog.json"), key=lambda p: p.name)
+    if not catalogs:
+        print("== freeze lock == (skip: no release catalog)")
+        return True
+    version = catalogs[-1].name[len("matterlib-"):-len(".catalog.json")]  # newest, e.g. 0.1.0
+    print("== freeze lock ==")
+    try:
+        rec = fr.compute_freeze(root, version)
+        rec2 = fr.compute_freeze(root, version)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [FAIL] {version}: compute error: {exc}")
+        return False
+    ok = True
+    det = rec["payload_digest"] == rec2["payload_digest"]
+    print(f"  [{'PASS' if det else 'FAIL'}] {version} determinism: "
+          f"{'byte-identical payload_digest' if det else 'NON-DETERMINISTIC'}")
+    ok = ok and det
+    clean = fr.verify_freeze(root, rec)
+    print(f"  [{'PASS' if not clean else 'FAIL'}] {version} self-verify: "
+          f"{'matches on-disk payload' if not clean else '; '.join(clean)}")
+    ok = ok and not clean
+    import copy
+    tampered = copy.deepcopy(rec)
+    tampered["payload_sha256"]["catalog"] = "f" * 64  # not the real catalog hash
+    rejected = bool(fr.verify_freeze(root, tampered))
+    print(f"  [{'PASS' if rejected else 'FAIL'}] {version} tamper-detection: "
+          f"{'a mutated payload hash is rejected' if rejected else 'WRONGLY ACCEPTED — hash-lock is tautological'}")
+    ok = ok and rejected
+    return ok
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -345,6 +387,7 @@ def main(argv=None) -> int:
         "compression_negative": run_compression_negative(root),
         "compression": run_compression(root),
         "approval_gate": run_approval_gate(root),
+        "freeze_lock": run_freeze_lock(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
