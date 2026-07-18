@@ -35,6 +35,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import source_provenance as sp  # noqa: E402  (shipped-source-set digest verification)
+
 SEMVER_RE = re.compile(r"^\d+\.\d+\.\d+$")
 VERSION_RE = re.compile(r"^v\d+$")
 LIFECYCLE = {"draft", "candidate", "approved", "deprecated", "retired"}
@@ -181,6 +184,13 @@ def validate_manifest(path: Path, materials_root: Path) -> list:
         if status in PROMOTED:
             perrs = _validate_provenance(t.get("provenance"), repo_root, status)
             errs.extend(perrs)
+        # Phase 60sq2.9 — verify the shipped-source-set digest (a real hash-lock on the
+        # shipped source textures, not a decorative field): internal consistency always,
+        # plus pixel integrity for any map materialized on disk.
+        prov = t.get("provenance") if isinstance(t.get("provenance"), dict) else {}
+        ev = prov.get("evidence")
+        if isinstance(ev, dict) and ev.get("sha256_scope") == "shipped_source_set":
+            errs.extend(sp.verify_evidence(repo_root, ev))
         results.append((f"{tag} {tid}", not errs, "ok" if not errs else "; ".join(errs)))
 
     # ---- material -> texture coverage (Phase 60): a promoted material may not bind a

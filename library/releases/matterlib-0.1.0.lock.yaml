@@ -61,21 +61,59 @@ textures:
     provenance:
       source: ambientCG
       license: CC0-1.0
-      evidence: library/provenance/matterlib-0.1.0-textures.md
+      evidence:
+        url: https://ambientcg.com/view?id=Travertine009
+        sha256_scope: shipped_source_set
+        sha256: 8fff6714fdb1a8c282f05b7c81c0e6599781cc333796f22fed647c9e6030430a
+        note: >-
+          Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not an upstream-download checksum.
+        files:
+          - path: MatterLibrary/textures/base/natural/stone/Limestone_Veined_basecolor_s01.png
+            sha256: 1e09b950f30d8418fd758b04d4d4038a92327c53d2232967d2b1251639a825b9
+          - path: MatterLibrary/textures/base/natural/stone/Limestone_Veined_normal_s01.png
+            sha256: dc5ef7982f0fd3c61bff610e4e37368287df2966ccd41daf37ff32c78e25f44a
+          - path: MatterLibrary/textures/base/natural/stone/Limestone_Veined_roughness_s01.png
+            sha256: f57feb4d9e4d88808d700b3cfab0d3506ed43ddefaed572106c4ac275fada319
   - id: base/engineered/cementitious/Concrete_Smooth_Worn
     version: v01
     status: candidate
     provenance:
       source: ambientCG
       license: CC0-1.0
-      evidence: library/provenance/matterlib-0.1.0-textures.md
+      evidence:
+        url: https://ambientcg.com/view?id=Concrete034
+        sha256_scope: shipped_source_set
+        sha256: 9a25d8bc9faa365662274a4c604dcab888349e39998fe8c1c340ece298c70aab
+        note: >-
+          Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not an upstream-download checksum.
+        files:
+          - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_basecolor_s1.png
+            sha256: dffbbd0fd7249e938a30b650675262034fe0face516b0d036e9c34cae5a99190
+          - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_normal_s1.png
+            sha256: 7378313b5e38d138a2048d0a300194444ba7b205b062751a93a91bde8dfbccf9
+          - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_roughness_s1.png
+            sha256: b2f8b937d4c9d1d305fc30b915b28712d166939bba1c3823ad39767dd22e1f07
   - id: base/engineered/metal/Copper_Verdigris
     version: v01
     status: candidate
     provenance:
       source: ambientCG
       license: CC0-1.0
-      evidence: library/provenance/matterlib-0.1.0-textures.md
+      evidence:
+        url: https://ambientcg.com/view?id=Metal047B
+        sha256_scope: shipped_source_set
+        sha256: 98d50bdf304045b62349b0bea570cf16506875e2f01c6e14d77f69bbbdedfd5f
+        note: >-
+          Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not an upstream-download checksum.
+        files:
+          - path: MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.png
+            sha256: 0ab21773dd5fbf7ff2d6dd6db014a3a631ff9e763ea9d255656989507d2af512
+          - path: MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_metalness_s01.png
+            sha256: 3a18c81890065b54eb286bf836946bef4e422923f1f1eb246653dbc13097fb6e
+          - path: MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_normal_s01.png
+            sha256: c9f1a9e2d9738413f755f5c7dfe327452ad2e9ca1e1606a6d6036fb5f6d869f6
+          - path: MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_roughness_s01.png
+            sha256: 86f8c121025c0f97ee67e7f24b545c98c853cbf42dd95ec0afeeca628d7a63f7
   - id: base/utility/virtual/UVGrid
     version: v01
     status: candidate
