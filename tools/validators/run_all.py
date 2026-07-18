@@ -14,6 +14,8 @@ Runs, skipping with a note any surface not yet present:
   8. compression negative    — the compressed-output validator REJECTS corrupt/mismatched .dds
   9. compression             — source textures compress to deterministic, valid BCn .dds
                                (encoder-gated: skips if compressonatorcli is absent)
+ 10. approval gate           — the external release-level approval artifact is well-formed +
+                               references the frozen-payload hashes (positive + shallow-negative)
 
 Exit 0 iff every present surface passes.
 """
@@ -29,6 +31,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "converters"))
 sys.path.insert(0, str(HERE.parent / "compressors"))
+sys.path.insert(0, str(HERE.parent / "releases"))
 
 import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
@@ -36,6 +39,7 @@ from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
 import project_runtime_catalog as prc  # noqa: E402
 import check_fixture_sync as cfs       # noqa: E402
 import compress_textures as ct        # noqa: E402
+import validate_approval as va        # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -287,6 +291,41 @@ def run_compression(root: Path) -> bool:
         _sh.rmtree(b, ignore_errors=True)
 
 
+def run_approval_gate(root: Path) -> bool:
+    """Phase 60sq2.3.2 (RD-1): the external release-level approval artifact is well-formed and
+    references the frozen-payload hashes.
+
+    A validator only CHECKS; the artifact is CREATED by the terminal promotion (promote_release.py,
+    60sq2.12), so no real approval exists pre-promotion and the real-surface check skips-if-absent.
+    A POSITIVE fixture proves the validator ACCEPTS a well-formed approval; the SHALLOW negative
+    fixture (empty payload_sha256 — a promotion that never actually froze) proves it REJECTS, the
+    RED half that keeps the gate non-tautological (§14a)."""
+    fxdir = HERE.parent / "releases" / "fixtures"
+    releases = root / "library" / "releases"
+    real = sorted(releases.glob("*.approval.json")) if releases.exists() else []
+    valid_fx = fxdir / "approval_valid.approval.json"
+    shallow_fx = fxdir / "approval_shallow.approval.json"
+    if not real and not valid_fx.exists() and not shallow_fx.exists():
+        print("== approval gate == (skip: no approval artifacts or fixtures)")
+        return True
+    print("== approval gate ==")
+    ok = True
+    for ap in real:  # any real approval MUST validate clean
+        errs = [d for _, good, d in va.validate_approval(ap, releases) if not good]
+        print(f"  [{'PASS' if not errs else 'FAIL'}] {ap.name}: {'valid' if not errs else '; '.join(errs)}")
+        ok = ok and not errs
+    if valid_fx.exists():  # the positive fixture MUST validate clean
+        errs = [d for _, good, d in va.validate_approval(valid_fx, None) if not good]
+        print(f"  [{'PASS' if not errs else 'FAIL'}] {valid_fx.name}: {'valid' if not errs else '; '.join(errs)}")
+        ok = ok and not errs
+    if shallow_fx.exists():  # the negative fixture MUST be rejected (else the gate is tautological)
+        rejected = any(not good for _, good, _ in va.validate_approval(shallow_fx, None))
+        print(f"  [{'PASS' if rejected else 'FAIL'}] {shallow_fx.name}: "
+              f"{'rejected (shallow approval)' if rejected else 'WRONGLY ACCEPTED — gate is tautological'}")
+        ok = ok and rejected
+    return ok
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -305,6 +344,7 @@ def main(argv=None) -> int:
         "fixture_sync": run_fixture_sync(root),
         "compression_negative": run_compression_negative(root),
         "compression": run_compression(root),
+        "approval_gate": run_approval_gate(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
