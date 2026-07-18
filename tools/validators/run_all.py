@@ -156,6 +156,8 @@ def run_provenance_gate(root: Path) -> bool:
     fixtures = [
         ("provenance_missing.lock.yaml", "promoted texture missing provenance"),
         ("coverage_underpromoted.lock.yaml", "promoted material binds under-promoted texture"),
+        ("approved_rank_shallow_evidence.lock.yaml",
+         "approved ambientCG texture with shallow (doc-path) evidence, not {url, sha256}"),
     ]
     materials_root = root / "MatterLibrary" / "materials"
     present = [(HERE / "fixtures" / f, why) for f, why in fixtures if (HERE / "fixtures" / f).exists()]

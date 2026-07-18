@@ -17,6 +17,8 @@ Phase 60 — auditable-provenance no-ship gate (shipped-pixel rule, RD-Provenanc
   * every TEXTURE whose status is promoted (candidate/approved) carries a well-formed
     provenance {source, license, evidence}; evidence is a repo-relative path that resolves
     OR a {url, sha256} pair — provenance is NOT projected into the runtime catalog.
+  * Phase 60sq2.9 — release-grade DEPTH: at `approved` rank an ambientCG texture must carry
+    the {url, sha256} form (a doc-path string is insufficient once the release is approved).
   * material -> texture coverage: a promoted (candidate/approved) MATERIAL may not bind a
     texture of *lower* status, nor an uncovered/clouded texture — a material's bound textures
     must all be at least as promoted as the material. Binding is read from the material .mtlx.
@@ -81,8 +83,13 @@ def _bound_texture_refs(mtlx_path: Path) -> list:
     return out
 
 
-def _validate_provenance(prov, repo_root: Path) -> list:
-    """Return a list of error strings ([] == well-formed) for a texture's provenance record."""
+def _validate_provenance(prov, repo_root: Path, status: str = "candidate") -> list:
+    """Return a list of error strings ([] == well-formed) for a texture's provenance record.
+
+    Phase 60sq2.9 — release-grade evidence DEPTH: at `approved` rank an externally-sourced
+    (ambientCG) texture must carry the {url, sha256} form, not merely a resolving doc-path
+    string. Candidate rank still accepts either form (the doc-path pointer is adequate
+    pre-promotion; the depth is required only when the release is actually approved)."""
     if not isinstance(prov, dict):
         return ["provenance missing or not a mapping"]
     errs = []
@@ -100,6 +107,9 @@ def _validate_provenance(prov, repo_root: Path) -> list:
             errs.append(f"evidence path does not resolve: {ev}")
     elif ev not in (None, ""):
         errs.append("evidence must be a repo-relative path (str) or {url, sha256}")
+    if status == "approved" and prov.get("source") == "ambientCG" and not isinstance(ev, dict):
+        errs.append("approved ambientCG texture requires evidence:{url, sha256} "
+                    "(a doc-path string is insufficient at approved rank)")
     return errs
 
 
@@ -169,7 +179,7 @@ def validate_manifest(path: Path, materials_root: Path) -> list:
             errs.append(f"status {status!r} not in {sorted(LIFECYCLE)}")
         # Shipped-pixel rule: a promoted texture must carry auditable provenance.
         if status in PROMOTED:
-            perrs = _validate_provenance(t.get("provenance"), repo_root)
+            perrs = _validate_provenance(t.get("provenance"), repo_root, status)
             errs.extend(perrs)
         results.append((f"{tag} {tid}", not errs, "ok" if not errs else "; ".join(errs)))
 

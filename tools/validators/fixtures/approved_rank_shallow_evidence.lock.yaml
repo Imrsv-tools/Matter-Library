@@ -1,0 +1,18 @@
+# RED-demo fixture (Phase 60sq2.9) — an APPROVED ambientCG texture whose provenance
+# evidence is only a resolving doc-path STRING, not the release-grade {url, sha256} form.
+# The approved-rank depth rule MUST reject this: at approved rank an externally-sourced
+# (ambientCG) texture needs auditable {url, sha256} evidence, not merely a pointer doc.
+# The doc path DOES resolve, so the ONLY failure is the depth rule (fails for its reason).
+release: 0.1.0
+materials:
+  - id: engineered/glass/Glass_Clear_Clean_Base_s01
+    version: v01
+    status: draft
+textures:
+  - id: base/engineered/metal/Copper_Verdigris
+    version: v01
+    status: approved        # approved + ambientCG, but evidence is a shallow doc-path -> must FAIL
+    provenance:
+      source: ambientCG
+      license: CC0-1.0
+      evidence: library/provenance/matterlib-0.1.0-textures.md
