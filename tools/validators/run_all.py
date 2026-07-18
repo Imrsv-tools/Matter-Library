@@ -4,10 +4,16 @@
     run_all.py [--repo-root <dir>]
 
 Runs, skipping with a note any surface not yet present:
-  1. grammar fixtures   — fixtures/grammar_cases.json (must-pass / must-fail)
-  2. per-material        — validate_material.py over MatterLibrary/materials/**.mtlx
-  3. manifest            — validate_manifest.py over the newest library/releases/*.lock.yaml
-  4. determinism         — check_determinism.py over tools/converters/recipes/*.json
+  1. grammar fixtures        — fixtures/grammar_cases.json (must-pass / must-fail)
+  2. per-material            — validate_material.py over MatterLibrary/materials/**.mtlx
+  3. manifest                — validate_manifest.py over the newest library/releases/*.lock.yaml
+  4. determinism             — recipe .mtlx assembly byte-stability
+  5. catalog freshness/valid — projected runtime catalog is byte-current + rejects dangling ids
+  6. provenance / projection — promotion-metadata gates + no-runtime-projection guard
+  7. fixture sync            — Stage fixture catalog + payloads byte-current (cross-repo)
+  8. compression negative    — the compressed-output validator REJECTS corrupt/mismatched .dds
+  9. compression             — source textures compress to deterministic, valid BCn .dds
+                               (encoder-gated: skips if compressonatorcli is absent)
 
 Exit 0 iff every present surface passes.
 """
@@ -22,12 +28,14 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "converters"))
+sys.path.insert(0, str(HERE.parent / "compressors"))
 
 import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
 from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
 import project_runtime_catalog as prc  # noqa: E402
 import check_fixture_sync as cfs       # noqa: E402
+import compress_textures as ct        # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -201,6 +209,82 @@ def run_fixture_sync(root: Path) -> bool:
     return cfs.check_fixture_sync(root, cfs.default_fixture_root(root))
 
 
+def run_compression_negative(root: Path) -> bool:
+    """Phase 60sq2.4: the compressed-output validator REJECTS corrupt/mismatched .dds.
+
+    Drives the deliberately-corrupt negative fixtures through
+    compress_textures.read_dds_header / validate_output and asserts each is
+    rejected for its intended reason — the RED half of the compression validation
+    gate (§14a). Needs NO encoder, so it always runs."""
+    fxdir = Path(ct.__file__).resolve().parent / "fixtures"
+    structural = ["bad_magic.dds", "truncated_header.dds", "truncated_dx10.dds"]
+    present = [f for f in structural if (fxdir / f).exists()]
+    mismatch = fxdir / "format_mismatch.dds"
+    if not present and not mismatch.exists():
+        print("== compression negative == (skip: no negative .dds fixtures)")
+        return True
+    print("== compression negative ==")
+    ok = True
+    for name in present:
+        try:
+            ct.read_dds_header(fxdir / name)
+            print(f"  [FAIL] {name}: WRONGLY PARSED a corrupt .dds")
+            ok = False
+        except ValueError:
+            print(f"  [PASS] {name}: rejected (corrupt structure)")
+    if mismatch.exists():
+        # A structurally-valid BC4 (ATI1) .dds fails when the record expected BC7.
+        rec = {"dst": str(mismatch), "w": 4, "h": 4, "mips": 1, "bc": "BC7"}
+        good, detail = ct.validate_output(rec)
+        rejected = not good
+        print(f"  [{'PASS' if rejected else 'FAIL'}] format_mismatch.dds: "
+              f"{'rejected (' + detail + ')' if rejected else 'WRONGLY ACCEPTED a role<->format mismatch'}")
+        ok = ok and rejected
+    return ok
+
+
+def run_compression(root: Path) -> bool:
+    """Phase 60sq2.4: the source texture tree compresses to deterministic, structurally
+    valid, mip-complete BCn .dds. Compresses the tree TWICE, validates every output, and
+    sha256-compares the two runs (byte-identical determinism gate).
+
+    Encoder-gated: skips with a note when compressonatorcli is absent (CI without the
+    pinned encoder) — mirrors run_all's skip-if-surface-absent policy. On the dev box the
+    encoder is present so the full sweep (~12 s over 30 textures) runs."""
+    src_root = root / "MatterLibrary" / "textures"
+    if not src_root.exists():
+        print("== compression == (skip: no MatterLibrary/textures)")
+        return True
+    if not Path(ct.COMPRESSONATOR).exists() or not ct._check_encoder():
+        print(f"== compression == (skip: pinned encoder {ct.PINNED_VERSION} absent — "
+              f"run tools/compressors/compress_textures.py --determinism for the full sweep)")
+        return True
+    print("== compression ==")
+    import tempfile as _tf
+    a = Path(_tf.mkdtemp(prefix="mtc_run_a_"))
+    b = Path(_tf.mkdtemp(prefix="mtc_run_b_"))
+    try:
+        ok_a, recs = ct.compress_tree(src_root, a)
+        ok_b, _ = ct.compress_tree(src_root, b)
+        if not (ok_a and ok_b):
+            print("  [FAIL] compression errored (see above)")
+            return False
+        ok = True
+        for rec in recs:
+            good, detail = ct.validate_output(rec)
+            rel = Path(rec["dst"]).relative_to(a)
+            same = ct.sha256(a / rel) == ct.sha256(b / rel)
+            good_all = good and same
+            reason = detail if not good else ("byte-identical" if same else "NON-DETERMINISTIC")
+            print(f"  [{'PASS' if good_all else 'FAIL'}] {rel}: {reason}")
+            ok = ok and good_all
+        return ok
+    finally:
+        import shutil as _sh
+        _sh.rmtree(a, ignore_errors=True)
+        _sh.rmtree(b, ignore_errors=True)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -217,6 +301,8 @@ def main(argv=None) -> int:
         "provenance_gate": run_provenance_gate(root),
         "no_projection_guard": run_no_projection_guard(root),
         "fixture_sync": run_fixture_sync(root),
+        "compression_negative": run_compression_negative(root),
+        "compression": run_compression(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():

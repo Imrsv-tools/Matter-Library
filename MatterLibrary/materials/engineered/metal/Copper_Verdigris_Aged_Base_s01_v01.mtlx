@@ -115,7 +115,7 @@
     </add>
     <output name="roughness_out" type="float" nodename="roughness_biased" />
     <image name="metalness_tex" type="float">
-      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Copper_Verdigris_metallic_s01.png" />
+      <input name="file" type="filename" value="../../../textures/base/engineered/metal/Copper_Verdigris_metalness_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
     <output name="metalness_out" type="float" nodename="metalness_tex" />

@@ -9,7 +9,7 @@
   "meters_per_tile": 0.1,
   "base_color_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.png",
   "roughness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_roughness_s01.png",
-  "metalness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_metallic_s01.png",
+  "metalness_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_metalness_s01.png",
   "normal_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_normal_s01.png",
   "maskset_tex": "../../../textures/shared/masks/Verdigris01_s01.png",
   "overlays": [
