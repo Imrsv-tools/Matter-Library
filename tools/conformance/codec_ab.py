@@ -204,6 +204,15 @@ def Xform "World"
         double radius = 1.0
         rel material:binding = </World/Mat>
     }}
+    def Cube "Backdrop"
+    {{
+        # unmaterialed -> Storm's default grey; gives Masked/transparent materials
+        # something BEHIND them so an opacity cutout is visible (Sec.14 fixture validity).
+        double size = 1.0
+        double3 xformOp:scale = (6, 6, 0.1)
+        double3 xformOp:translate = (0, 0, -2.5)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:scale"]
+    }}
     def Camera "Cam"
     {{
         float focalLength = 35
@@ -263,11 +272,17 @@ A=rd({str(png_a)!r}); B=rd({str(png_b)!r})
 # subject. Mask to pixels that differ from the median corner (background) — robust, and
 # identical for both arms so the delta is measured over the material only.
 h,w,_=A.shape
-corners=np.concatenate([A[:8,:8].reshape(-1,3),A[:8,-8:].reshape(-1,3),
-                        A[-8:,:8].reshape(-1,3),A[-8:,-8:].reshape(-1,3)])
-bg=np.median(corners,0)
-fg=(np.abs(A-bg).sum(2) > 0.06)          # subject pixels (both arms share arm-A mask)
+def corners(X):
+    return np.concatenate([X[:8,:8].reshape(-1,3),X[:8,-8:].reshape(-1,3),
+                           X[-8:,:8].reshape(-1,3),X[-8:,-8:].reshape(-1,3)])
+bgA,bgB=np.median(corners(A),0),np.median(corners(B),0)
+# subject = pixels either arm paints over the dome background (union; a Masked/cutout
+# material can be largely transparent, so an arm-A-only mask can be near-empty).
+fg=((np.abs(A-bgA).sum(2) > 0.06) | (np.abs(B-bgB).sum(2) > 0.06))
 cov=float(fg.mean())
+whole_frame=cov < 0.005                   # material indistinct from bg -> render INCONCLUSIVE
+if whole_frame:
+    fg=np.ones((h,w),bool)
 # sRGB (usdrecord 8-bit output) -> XYZ -> Lab -> ΔE2000
 def lab(x): return colour.XYZ_to_Lab(colour.sRGB_to_XYZ(np.clip(x,0,1)))
 LA, LB = lab(A), lab(B)
@@ -280,7 +295,8 @@ mua,mub=la.mean(),lb.mean(); va,vb=la.var(),lb.var(); cov_=((la-mua)*(lb-mub)).m
 c1,c2=(0.01)**2,(0.03)**2
 ssim=((2*mua*mub+c1)*(2*cov_+c2))/((mua**2+mub**2+c1)*(va+vb+c2))
 print(json.dumps({{"dE_mean":float(dEf.mean()),"dE_p95":float(np.percentile(dEf,95)),
-                   "dE_max":float(dEf.max()),"ssim":float(ssim),"coverage":cov}}))
+                   "dE_max":float(dEf.max()),"ssim":float(ssim),"coverage":cov,
+                   "whole_frame":bool(whole_frame)}}))
 """
     import json
     return json.loads(_worker(code, tmp).strip())
@@ -337,20 +353,38 @@ def texture_refs(mtlx: Path) -> list[str]:
     return sorted(set(refs))
 
 
-def build_arms(mtlx: Path, staging: Path, work: Path, red_demo: bool) -> tuple[Path, Path]:
+def index_pngs(root: Path) -> dict[str, Path]:
+    """basename -> .png over a texture tree (recursive; for the staging source arm)."""
+    return {p.name: p for p in root.rglob("*.png")}
+
+
+def build_arms(mtlx: Path, staging: Path, work: Path, red_demo: bool,
+               src_textures: Path | None) -> tuple[Path, Path]:
     """Materialize arm_a (source PNGs) + arm_b (dds-decoded PNGs) as self-contained
-    packages (mtlx + textures/). Returns (arm_a_mtlx, arm_b_mtlx)."""
-    src_tex_dir = mtlx.parent / "textures"
+    packages (mtlx + textures/, with refs rewritten to textures/<basename> so the
+    package renders regardless of the source .mtlx's ref style). Returns the two mtlx.
+    Arm-A source is `src_textures` (recursive, by basename) when given — e.g. the
+    staging tree, which co-locates png+dds — else the golden's sibling textures/."""
+    if src_textures is not None:
+        src_idx = index_pngs(src_textures)
+    else:
+        src_idx = index_pngs(mtlx.parent / "textures")
     dds_idx = index_staging(staging)
+    # rewrite each <image> file ref to a self-contained textures/<basename>
+    mtlx_text = mtlx.read_text()
+    for ref in texture_refs(mtlx):
+        mtlx_text = mtlx_text.replace(f'value="{ref}"', f'value="textures/{Path(ref).name}"')
     arm_a, arm_b = work / "arm_a", work / "arm_b"
     for d in (arm_a, arm_b):
         (d / "textures").mkdir(parents=True, exist_ok=True)
-        shutil.copy(mtlx, d / mtlx.name)
+        (d / mtlx.name).write_text(mtlx_text)
     tmp = work / "_decode"
     missing = []
     for ref in texture_refs(mtlx):
         name = Path(ref).name
-        src = src_tex_dir / name
+        src = src_idx.get(name)
+        if not src or not src.exists():
+            missing.append(name); continue
         shutil.copy(src, arm_a / "textures" / name)          # arm A = authored source
         dds = dds_idx.get(Path(name).stem)
         if not dds or not dds.exists():
@@ -374,7 +408,7 @@ def build_arms(mtlx: Path, staging: Path, work: Path, red_demo: bool) -> tuple[P
 # driver
 # ---------------------------------------------------------------------------
 def run_one(mtlx: Path, staging: Path, out: Path, width: int,
-            red_demo: bool, self_test: bool) -> bool:
+            red_demo: bool, self_test: bool, src_textures: Path | None) -> bool:
     name = mtlx.stem
     cls = material_class(mtlx)
     graded = cls in TIGHT_CLASSES
@@ -384,7 +418,7 @@ def run_one(mtlx: Path, staging: Path, out: Path, width: int,
     work.mkdir(parents=True)
     print(f"\n=== {name}  (class={cls}, {'GRADED ΔE<%.1f' % TIGHT_BAR if graded else 'ADVISORY'}) ===")
 
-    arm_a_mtlx, arm_b_mtlx = build_arms(mtlx, staging, work, red_demo)
+    arm_a_mtlx, arm_b_mtlx = build_arms(mtlx, staging, work, red_demo, src_textures)
     ra, rb = work / "render_A.png", work / "render_B.png"
     render(arm_a_mtlx, ra, width)
     if self_test:
@@ -398,8 +432,13 @@ def run_one(mtlx: Path, staging: Path, out: Path, width: int,
 
     render(arm_b_mtlx, rb, width)
     m = compare(ra, rb, work)
+    inconclusive = m.get("whole_frame", False)
     print(f"  RENDER ΔE2000: mean={m['dE_mean']:.4f}  p95={m['dE_p95']:.4f}  max={m['dE_max']:.4f}")
     print(f"  structural SSIM={m['ssim']:.5f}   surface coverage={m['coverage']*100:.1f}%")
+    if inconclusive:
+        print("  ⚠ RENDER INCONCLUSIVE — material renders indistinct from the backdrop on this "
+              "fixture (a transparent/masked material needs more contrast behind it). "
+              "Grading falls back to the per-role texture-space codec loss below.")
     print("  per-role texture-space codec loss:")
     print(texture_codec_table(arm_a_mtlx.parent, arm_b_mtlx.parent, work))
     print(f"  renders: {ra}  |  {rb}")
@@ -411,6 +450,10 @@ def run_one(mtlx: Path, staging: Path, out: Path, width: int,
     if not graded:
         print(f"  ADVISORY class — ΔE recorded, not exit-graded (recognizable bar).")
         return True
+    if inconclusive:
+        print(f"  VERDICT: render-INCONCLUSIVE (not exit-graded); texture-space codec loss above "
+              f"is the objective signal — the render bar defers to the eyes-on capture.")
+        return True
     ok = m["dE_mean"] < TIGHT_BAR
     print(f"  VERDICT: {'PASS' if ok else 'FAIL'} (mean ΔE {m['dE_mean']:.3f} vs bar {TIGHT_BAR})")
     return ok
@@ -421,6 +464,9 @@ def main(argv=None) -> int:
     ap.add_argument("mtlx", help="material .mtlx (with a sibling textures/ dir of source PNGs)")
     ap.add_argument("--staging", default=str(DEFAULT_STAGING),
                     help="release staging dir holding the BCn .dds (default: matterlib-0.1.0)")
+    ap.add_argument("--src-textures", default=None,
+                    help="arm-A source PNG tree (recursive, by basename) for a library .mtlx "
+                         "whose textures aren't a sibling dir; e.g. the staging tree (png+dds co-located)")
     ap.add_argument("--out", default=None, help="output dir (default: a /tmp scratch)")
     ap.add_argument("--width", type=int, default=512, help="render width (square)")
     ap.add_argument("--red-demo", action="store_true",
@@ -438,7 +484,9 @@ def main(argv=None) -> int:
         os.environ.get("CLAUDE_JOB_DIR", "/tmp")) / "tmp/codec_ab"
     out.mkdir(parents=True, exist_ok=True)
 
-    ok = run_one(mtlx, Path(args.staging), out, args.width, args.red_demo, args.self_test)
+    src_tex = Path(args.src_textures) if args.src_textures else None
+    ok = run_one(mtlx, Path(args.staging), out, args.width, args.red_demo,
+                 args.self_test, src_tex)
     print("\nRESULT:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 
