@@ -524,6 +524,29 @@ def run_activation(root: Path) -> bool:
         print(f"  [{'PASS' if good2 else 'FAIL'}] atomicity: "
               f"{'corrupt install REFUSED; prior selector unchanged' if good2 else 'a corrupt install was NOT refused, or the selector was switched anyway'}")
         ok = ok and good2
+
+        # (3) break-glass separation (RD-5 pilot-recovery lane) — an installed but UN-APPROVED release:
+        #     normal `activate` REJECTS it; `recover-unapproved` requires --confirm; the audited
+        #     break-glass switch works offline. Proves the two paths are distinct + activate stays strict.
+        unver = "0.0.0-recovery-test"
+        uinst = rt / "releases" / f"matterlib-{unver}"
+        (uinst / "materials").mkdir(parents=True, exist_ok=True)
+        _sh.copy2(src_catalog, uinst / f"matterlib-{unver}.catalog.json")  # installed; NO approval exists for it
+        (rt / "active-release.json").write_text('{"active_release": "matterlib-PRIOR"}\n', encoding="utf-8")
+        act_refused = ar.activate(root, rt, unver, None, False) != 0          # no approval -> normal activate refuses
+        noconfirm_refused = ar.recover_unapproved(rt, unver, "test", False) != 0  # recover needs --confirm
+        sel_intact = ar._read_active(rt) == "matterlib-PRIOR"                 # neither rejection touched the selector
+        if ar._studio_running():
+            recovered, rnote = True, "recover-switch skipped (Studio running — offline guard active)"
+        else:
+            recovered = (ar.recover_unapproved(rt, unver, "pilot recovery regression test", True) == 0
+                         and ar._read_active(rt) == f"matterlib-{unver}"
+                         and (rt / "recovery-audit.jsonl").exists())
+            rnote = "un-approved release recovered via audited break-glass"
+        good3 = act_refused and noconfirm_refused and sel_intact and recovered
+        print(f"  [{'PASS' if good3 else 'FAIL'}] break-glass: "
+              f"{'normal activate REJECTS unapproved + recover needs --confirm; ' + rnote if good3 else 'the break-glass/normal-activate separation did NOT hold'}")
+        ok = ok and good3
         return ok
     finally:
         _sh.rmtree(rt, ignore_errors=True)

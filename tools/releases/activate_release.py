@@ -31,14 +31,24 @@ The frozen `dds_set` DIGEST folds in the staging paths, so it can't be recompute
     activate_release.py activate <version> --runtime-dir <MatterLibrary-root> [--repo-root <dir>]
                         [--approval <file>] [--no-dds-check]
     activate_release.py resolve-check --runtime-dir <MatterLibrary-root>   # post-activation verify
+    activate_release.py recover-unapproved <version> --runtime-dir <dir> --reason <text> --confirm
+
+`recover-unapproved` is a SEPARATE break-glass path (RD-5 pilot-recovery lane, lead-specified) for
+re-pointing the selector to a coexisting, INSTALLED but UN-APPROVED prior release (the 0.0.1 schema
+pilot, documented 'NEVER approved'). It is offline (B27), requires the exact release id + a --reason
++ --confirm, emits a loud warning, writes an audit record, and NEVER creates an approval or mutates
+the historical manifest. Normal `activate` continues to REJECT unapproved releases. Recover FORWARD
+to an approved release with `activate`.
 
 Exit 0 iff activation switched the selector (or resolve-check resolved the active release).
 """
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -182,6 +192,89 @@ def resolve_check(runtime_dir: Path) -> int:
     return 0 if good else 1
 
 
+def _studio_running() -> bool:
+    """Best-effort B27 guard: a live Studio holds the process-global texture cache, so recovery
+    must be OFFLINE. Returns True if an UnrealEditor process is detected (pgrep absent -> False)."""
+    try:
+        return subprocess.run(["pgrep", "-x", "UnrealEditor"],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+    except (OSError, FileNotFoundError):
+        return False
+
+
+def _install_present(runtime_dir: Path, version: str) -> bool:
+    inst = _install_dir(runtime_dir, version)
+    return inst.is_dir() and (inst / f"matterlib-{version}.catalog.json").exists()
+
+
+def recover_unapproved(runtime_dir: Path, version: str, reason: str, confirm: bool) -> int:
+    """BREAK-GLASS pilot recovery (RD-5, pilot-recovery lane) — re-point the selector to a
+    coexisting, INSTALLED but UN-APPROVED prior release (e.g. the 0.0.1 schema pilot, documented
+    'NEVER approved'). Deliberately SEPARATE from `activate` (which keeps rejecting unapproved
+    releases): recovery is an explicit, audited recovery op, not a promotion.
+
+    Guarantees (lead spec):
+      * OFFLINE — refuses while a Studio process is running (B27).
+      * the target must ALREADY exist as an immutable installed release (never deploys/mutates it).
+      * requires the exact release ID + a --reason + explicit --confirm.
+      * emits a prominent warning + writes an audit record (recovery-audit.jsonl).
+      * NEVER creates an approval artifact and NEVER mutates the historical manifest.
+    The switch itself is the same atomic temp-file + rename as `activate`; a failure before the
+    rename leaves the prior selector active. Recover FORWARD to an approved release with `activate`."""
+    runtime_dir = runtime_dir.resolve()
+    active_id = f"matterlib-{version}"
+    prior = _read_active(runtime_dir)
+    print(f"== recover-unapproved {active_id} — BREAK-GLASS pilot recovery (prior active: {prior or '<none>'}) ==")
+
+    if not runtime_dir.is_dir():
+        print(f"  [FAIL] runtime-dir does not exist: {runtime_dir}")
+        print("RECOVER: BLOCKED (no runtime install root)")
+        return 1
+    if _studio_running():
+        print("  [FAIL] a Studio (UnrealEditor) process is RUNNING — recovery must be OFFLINE (B27); stop Studio first")
+        print("RECOVER: BLOCKED (Studio not stopped)")
+        return 1
+    if not _install_present(runtime_dir, version):
+        print(f"  [FAIL] target is not an installed immutable release: {_install_dir(runtime_dir, version)} "
+              "(recovery re-points the selector; it never deploys/creates a release)")
+        print(f"RECOVER: BLOCKED (selector UNCHANGED; prior '{prior}' stays active)")
+        return 1
+    if not reason or not reason.strip():
+        print("  [FAIL] --reason is required (an audited recovery reason)")
+        print("RECOVER: BLOCKED")
+        return 1
+    if not confirm:
+        print(f"  [FAIL] --confirm is required to recover to the UN-APPROVED release {active_id}")
+        print("RECOVER: BLOCKED")
+        return 1
+
+    print("  " + "!" * 76)
+    print(f"  !! BREAK-GLASS: recovering to UN-APPROVED release {active_id}.")
+    print("  !! This release has NO approval artifact and has NOT passed the production release gates.")
+    print("  !! No approval is created; the historical manifest is NOT mutated. For recovery only.")
+    print("  " + "!" * 76)
+
+    # Audit record FIRST (so a switch is never unaudited), then the atomic selector switch.
+    audit = {
+        "timestamp": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "action": "recover-unapproved",
+        "release": active_id,
+        "prior_active": prior,
+        "reason": reason.strip(),
+        "note": "break-glass recovery to an un-approved installed release; no approval created; manifest untouched",
+    }
+    audit_path = runtime_dir / "recovery-audit.jsonl"
+    with open(audit_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(audit) + "\n")
+    print(f"  [audit] appended to {audit_path.name}: {audit['action']} {active_id} (reason: {audit['reason']})")
+
+    _atomic_write_selector(runtime_dir, active_id)
+    print(f"RECOVER: SWITCHED (break-glass) — active-release.json: '{prior or '<none>'}' -> '{active_id}' "
+          f"(offline; the next fresh Studio process serves it with an empty texture cache). "
+          f"Recover forward to an approved release with `activate`.")
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Offline release activation + rollback (RD-3/RD-5).")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -195,11 +288,20 @@ def main(argv=None) -> int:
                    help="skip the per-file .dds re-check (catalog re-check still runs)")
     r = sub.add_parser("resolve-check", help="post-activation: the active release resolves headless")
     r.add_argument("--runtime-dir", type=Path, required=True)
+    g = sub.add_parser("recover-unapproved",
+                       help="BREAK-GLASS: re-point the selector to an installed but UN-approved prior "
+                            "release (pilot recovery — audited, offline, no approval created)")
+    g.add_argument("version")
+    g.add_argument("--runtime-dir", type=Path, required=True)
+    g.add_argument("--reason", required=True, help="audited recovery reason")
+    g.add_argument("--confirm", action="store_true", help="explicit confirmation (required)")
     args = ap.parse_args(argv)
 
     if args.cmd == "activate":
         return activate(args.repo_root, args.runtime_dir, args.version,
                         args.approval, not args.no_dds_check)
+    if args.cmd == "recover-unapproved":
+        return recover_unapproved(args.runtime_dir, args.version, args.reason, args.confirm)
     return resolve_check(args.runtime_dir)
 
 
