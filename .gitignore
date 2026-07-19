@@ -4,3 +4,9 @@ __pycache__/
 
 # Blender auto-save backups
 *.blend[0-9]
+
+# Release-staging tree (Phase 60sq2.5) — a reproducible build artifact. The compressor is
+# deterministic at the pinned encoder+flags (compress_textures.py), the freeze hash-lock
+# (freeze_release.py) + the determinism gate guarantee integrity, so the (large) BCn .dds
+# derivatives are regenerated via `stage_release.py build`, never committed.
+library/staging/

@@ -14,6 +14,8 @@ Runs, skipping with a note any surface not yet present:
   8. compression negative    — the compressed-output validator REJECTS corrupt/mismatched .dds
   9. compression             — source textures compress to deterministic, valid BCn .dds
                                (encoder-gated: skips if compressonatorcli is absent)
+ 9b. staging                 — the release-staging producer assembles a complete, self-contained
+                               {png, dds} per-release snapshot (encoder-gated)
  10. approval gate           — the external release-level approval artifact is well-formed +
                                references the frozen-payload hashes (positive + shallow-negative)
  11. freeze lock             — the complete-payload hash-lock is deterministic + tamper-detecting
@@ -43,6 +45,7 @@ import check_fixture_sync as cfs       # noqa: E402
 import compress_textures as ct        # noqa: E402
 import validate_approval as va        # noqa: E402
 import freeze_release as fr           # noqa: E402
+import stage_release as sr           # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -294,6 +297,49 @@ def run_compression(root: Path) -> bool:
         _sh.rmtree(b, ignore_errors=True)
 
 
+def run_staging(root: Path) -> bool:
+    """Phase 60sq2.5: the release-staging producer assembles a COMPLETE, self-contained
+    {png, dds} snapshot for every shipped source texture, at the per-release staging layout.
+
+    Builds the newest release into a TEMP staging root, then verify()s completeness (every
+    source PNG present + a valid, role-correct, mip-complete .dds sibling). Distinct from the
+    `compression` lane: that proves the ENCODER is deterministic over the source tree; this
+    proves the PRODUCER assembles the full release snapshot at the right layout — it FAILs if
+    the producer drops a texture, misses a PNG, or emits a wrong-format/corrupt .dds (§14a).
+
+    Encoder-gated: skips with a note when compressonatorcli is absent (build needs it)."""
+    releases = root / "library" / "releases"
+    catalogs = sorted(releases.glob("matterlib-*.catalog.json"), key=lambda p: p.name) \
+        if releases.exists() else []
+    if not catalogs:
+        print("== staging == (skip: no release catalog)")
+        return True
+    version = catalogs[-1].name[len("matterlib-"):-len(".catalog.json")]  # newest, e.g. 0.1.0
+    if not Path(ct.COMPRESSONATOR).exists() or not ct._check_encoder():
+        print(f"== staging == (skip: pinned encoder {ct.PINNED_VERSION} absent — "
+              f"run tools/releases/stage_release.py build {version} for the full snapshot)")
+        return True
+    print("== staging ==")
+    import tempfile as _tf
+    staging_root = Path(_tf.mkdtemp(prefix="mtc_stage_"))
+    try:
+        ok, records = sr.build(root, version, staging_root)
+        if not ok:
+            print("  [FAIL] staging build errored (see above)")
+            return False
+        errs = sr.verify(root, version, staging_root)
+        for e in errs:
+            print(f"  [FAIL] {e}")
+        good = not errs
+        if good:
+            print(f"  [PASS] {version}: {len(records)} textures staged as a complete "
+                  f"{{png, dds}} snapshot")
+        return good
+    finally:
+        import shutil as _sh
+        _sh.rmtree(staging_root, ignore_errors=True)
+
+
 def run_approval_gate(root: Path) -> bool:
     """Phase 60sq2.3.2 (RD-1): the external release-level approval artifact is well-formed and
     references the frozen-payload hashes.
@@ -386,6 +432,7 @@ def main(argv=None) -> int:
         "fixture_sync": run_fixture_sync(root),
         "compression_negative": run_compression_negative(root),
         "compression": run_compression(root),
+        "staging": run_staging(root),
         "approval_gate": run_approval_gate(root),
         "freeze_lock": run_freeze_lock(root),
     }
