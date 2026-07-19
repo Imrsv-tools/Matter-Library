@@ -1,0 +1,319 @@
+{
+  "files": {
+    "catalog": [
+      {
+        "path": "library/releases/matterlib-0.1.0.catalog.json",
+        "sha256": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2"
+      }
+    ],
+    "dds": [
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/cementitious/Concrete_Smooth_Worn_basecolor_s1.dds",
+        "sha256": "97ebd01e5909e2e64473677933920e71924f7a2d3eb35d096c7cd62e9e177979"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/cementitious/Concrete_Smooth_Worn_normal_s1.dds",
+        "sha256": "7fa68bffb33ce8b2461bdbe90214734e36cb26e4e9f6459de7dce42f49cc1a94"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/cementitious/Concrete_Smooth_Worn_roughness_s1.dds",
+        "sha256": "a9b9cac0c2ae698949e1c15199453813eab2424df25510bd3fb39f517ff3ad18"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.dds",
+        "sha256": "d4996f02eaf4a93ade240c74e272b2049f9081cc4d02cc32a48221b428500452"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Copper_Verdigris_metalness_s01.dds",
+        "sha256": "5bdd08de81c40c16457323537ffa35219bacb4d7aa3a95f4f6f148056b68fc3f"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Copper_Verdigris_normal_s01.dds",
+        "sha256": "a8ad61bc23d6b9f6ac6051254e36cff00f719e370d0b1030cf39deebee730b7d"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Copper_Verdigris_roughness_s01.dds",
+        "sha256": "c19f8dc5b32959eec457a3768ff5a0e84e063c0c0d8df9f280430e7280a26e38"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.dds",
+        "sha256": "3605db37f5e96994873b93f659c4698db24f6b6f702bf5a997e2595b9e2afec1"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.dds",
+        "sha256": "f02ed857b8f5b189f3e1e56369c98a0221e09f874a24adc33e1fbfefc368cff3"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.dds",
+        "sha256": "88fab90e6e81cab3f68207f71f228e83afd998bad7ec3b909a7fb4e17825835b"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.dds",
+        "sha256": "c9836921d15fb6cbec85daed6302910fc7a37354d90e5acc447586e0cc8b66d2"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.dds",
+        "sha256": "4b0bf9908accf6e5fbc318dc817f31391720077120f6a3de228f9c04763a3c5f"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.dds",
+        "sha256": "3634181df6adf4701c123ce0db015ac0022482da0c2c2d0e85a846686fc683b6"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.dds",
+        "sha256": "675ed0e73a106b53f6e6c9c9bf0522a1e18e6dfc612a45d9e5c83abe28b6f935"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.dds",
+        "sha256": "2041927455bfc639721772886677ae66f4283ea4bdf87b709e57b928bef6c567"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Limestone_Veined_basecolor_s01.dds",
+        "sha256": "0ba6f81fec14ab9face7e12d56eccc7fa77484c371b6b276f8717d2d9082bcbc"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Limestone_Veined_normal_s01.dds",
+        "sha256": "306ba005996e4489e0eae8473b5aa783becf39629f0268903a726be8eb9c8d1b"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Limestone_Veined_roughness_s01.dds",
+        "sha256": "8c6fe4ea3628d1c8a6f5ed9af8c268337723471211b36f24ae69fcf4ada20864"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Marble_Veined_basecolor_s01.dds",
+        "sha256": "0c399e88760176b7feff158428128fb083dc25d1ff6afbadf1a5e8ff2e59ad9a"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Marble_Veined_normal_s01.dds",
+        "sha256": "3ce32b61f0dfcc22bc25644d6553e9e9318d9d428c63fd975999029a1c452b07"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/natural/stone/Marble_Veined_roughness_s01.dds",
+        "sha256": "177dc19c7b881d4b28863ab24e33f3327cc2f48703692f0a7d797c382b90d62d"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/synthetic/textile/Lace_Floral_basecolor_s01.dds",
+        "sha256": "0dec79c8c7cbb26f3102b49ca4e5f09e7eca64f660e76fb037bcc2d79968f40a"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/synthetic/textile/Lace_Floral_opacity_s01.dds",
+        "sha256": "7279323103874f45362583f2b2afc4ba89fb4f11dfa07bf05883c4bc1e662b0f"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/synthetic/textile/Lace_Floral_roughness_s01.dds",
+        "sha256": "b07724ef64343cf3f175164309c690c6a5d3c3bc3f8fb34e68ffac1fb7463f79"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/base/utility/virtual/UVGrid_basecolor_s1.dds",
+        "sha256": "d5271d3f2a9d1e99b864a7450d18da05d8a385bef6e34764903f6e2c77ab4ef4"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/shared/masks/Grime01_s01.dds",
+        "sha256": "ccc48aa48246b62f3caf4b31597a1d206b7b72196f4e13b17364780627406eb3"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/shared/masks/RustBloom01_s01.dds",
+        "sha256": "0c0a22eb4771dbfc91b06540dc2d4e42e1a5b5641c4a5528da07396d55bc8f0d"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/shared/masks/Verdigris01_s01.dds",
+        "sha256": "c9e193dc59ad679d2b9cf124c16e519190bd36139d10b43e762ab00e1bd7453a"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/shared/overlays/Dust01_overlay_s001.dds",
+        "sha256": "30b6360e8ead54bad3c4417c98e6a750b88b3e4088e1ff7ea2c2235b51853831"
+      },
+      {
+        "path": "library/staging/matterlib-0.1.0/textures/shared/overlays/Scratches01_overlay_s001.dds",
+        "sha256": "dd29a55eb1d5abd0427002695ff11ebfd722006a205e3a8509914388f952fa2c"
+      }
+    ],
+    "manifest": [
+      {
+        "path": "library/releases/matterlib-0.1.0.lock.yaml",
+        "sha256": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb"
+      }
+    ],
+    "mtlx": [
+      {
+        "path": "MatterLibrary/materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
+        "sha256": "49c6eb30eebe212f6b61b6856d35dc4984834a1112d766566fa1ff4f286991b6"
+      },
+      {
+        "path": "MatterLibrary/materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
+        "sha256": "4e998afa68bd1744e0cdce68b36bf1c2faf2aec3dd21cb00125a9f79a12c8d57"
+      },
+      {
+        "path": "MatterLibrary/materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
+        "sha256": "5420857e533d77b3fe05c72a99c80225bb07b18c9da31a51bc1140abfd79f83e"
+      },
+      {
+        "path": "MatterLibrary/materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
+        "sha256": "5a0fce669e1f5943848729074e639f1ea7590d3c433d851d9ba3a4d690fdc356"
+      },
+      {
+        "path": "MatterLibrary/materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
+        "sha256": "87ed5e6273ecba98f7ec5299760d482b1c829173bbc76ee26b185765f53cec9a"
+      },
+      {
+        "path": "MatterLibrary/materials/natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
+        "sha256": "dac4d441e2913e14bfe21a985e1d488dc48795b561bc61926821b7995f802525"
+      },
+      {
+        "path": "MatterLibrary/materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
+        "sha256": "5d103744686055ff9e173aa2a901daf1f2f30967de76dcec418e46c8f8751925"
+      },
+      {
+        "path": "MatterLibrary/materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
+        "sha256": "79f22189861a81c6ec8cd1058f214ebbbe64cc77567ee1c22f8ca732fb99a762"
+      },
+      {
+        "path": "MatterLibrary/materials/synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
+        "sha256": "e55a7df239eef6c25d612d2c1e74cf1cec4aa1ae4c19c1e8f6cea1a321701ff8"
+      },
+      {
+        "path": "MatterLibrary/materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
+        "sha256": "7fc4a5787355234a645299cc622f6fdef3d4990c032287702b8fe982896fd067"
+      },
+      {
+        "path": "MatterLibrary/materials/utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
+        "sha256": "70efb10de53727d6bf527074bbcded2e80729f6baa2967324568c22340f497f3"
+      },
+      {
+        "path": "MatterLibrary/materials/utility/virtual/IMRSV_MissingMaterial.mtlx",
+        "sha256": "b2a2ac625cb2c70c2bb9f6d813c0c188155fb425bc1facf29897203decbace47"
+      }
+    ],
+    "source_textures": [
+      {
+        "path": "MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_basecolor_s1.png",
+        "sha256": "dffbbd0fd7249e938a30b650675262034fe0face516b0d036e9c34cae5a99190"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_normal_s1.png",
+        "sha256": "7378313b5e38d138a2048d0a300194444ba7b205b062751a93a91bde8dfbccf9"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/cementitious/Concrete_Smooth_Worn_roughness_s1.png",
+        "sha256": "b2f8b937d4c9d1d305fc30b915b28712d166939bba1c3823ad39767dd22e1f07"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_basecolor_s01.png",
+        "sha256": "0ab21773dd5fbf7ff2d6dd6db014a3a631ff9e763ea9d255656989507d2af512"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_metalness_s01.png",
+        "sha256": "3a18c81890065b54eb286bf836946bef4e422923f1f1eb246653dbc13097fb6e"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_normal_s01.png",
+        "sha256": "c9f1a9e2d9738413f755f5c7dfe327452ad2e9ca1e1606a6d6036fb5f6d869f6"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Copper_Verdigris_roughness_s01.png",
+        "sha256": "86f8c121025c0f97ee67e7f24b545c98c853cbf42dd95ec0afeeca628d7a63f7"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.png",
+        "sha256": "5c45d352e9eb435a2f2615d0fd12b54bd3f5b2c15d89f999d7a60eb9a5ffaeae"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.png",
+        "sha256": "ed2595fcf3159455009cb594f8b5c649d891f97d4d24ce107a37daa64ce745ac"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png",
+        "sha256": "bca5922a0ddea0745d3c44161763c76fb9c177a5f117b2195b398cdbd951cc60"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.png",
+        "sha256": "4f4d23aec1a88ea25311c9386ad20c373d561d3128dfbdde9ea361702a78248f"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.png",
+        "sha256": "27a9b267aba93997533e11c724bfde4f8c1ff9b0ce473dc552f9f6f040bd738e"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.png",
+        "sha256": "1eb50a3ee3fcac0adc60c0e90baa6d051c642f3a930330ac9aec9dd92996f3f7"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png",
+        "sha256": "fb2d73a314bf7172d764a19d16430cb66d491bc7ef6b96ee76b6911c456e6baf"
+      },
+      {
+        "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.png",
+        "sha256": "bd52759581ea9ca3cb87c517f2727c566aadab32fb2e2186d4c12c49132a07f2"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Limestone_Veined_basecolor_s01.png",
+        "sha256": "1e09b950f30d8418fd758b04d4d4038a92327c53d2232967d2b1251639a825b9"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Limestone_Veined_normal_s01.png",
+        "sha256": "dc5ef7982f0fd3c61bff610e4e37368287df2966ccd41daf37ff32c78e25f44a"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Limestone_Veined_roughness_s01.png",
+        "sha256": "f57feb4d9e4d88808d700b3cfab0d3506ed43ddefaed572106c4ac275fada319"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Marble_Veined_basecolor_s01.png",
+        "sha256": "34cd89ddfae13187ff86e14debfecc0137ec4c0c62ec554dc4c06a6fa4383fde"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Marble_Veined_normal_s01.png",
+        "sha256": "ef2f10e64d7e52e8760cf6ce23d8dd0454c3938ecf8a80cb5832b089887f7253"
+      },
+      {
+        "path": "MatterLibrary/textures/base/natural/stone/Marble_Veined_roughness_s01.png",
+        "sha256": "21da2b6383c57de3e29c437b8e3af107734609b9089d499cc356fbebf78c3102"
+      },
+      {
+        "path": "MatterLibrary/textures/base/synthetic/textile/Lace_Floral_basecolor_s01.png",
+        "sha256": "e65518a5c43243e0eab377b470c3565c03e6845b14ed6d1ef11ed0bcc39ba390"
+      },
+      {
+        "path": "MatterLibrary/textures/base/synthetic/textile/Lace_Floral_opacity_s01.png",
+        "sha256": "a44ae30e152e89b8ed5043213001a29864df1368b32a58f10fd3ea6033b4a331"
+      },
+      {
+        "path": "MatterLibrary/textures/base/synthetic/textile/Lace_Floral_roughness_s01.png",
+        "sha256": "e29086570587a5d5d665ad41e193e409d1ca72c9a2c24a46e15819997c5034b1"
+      },
+      {
+        "path": "MatterLibrary/textures/base/utility/virtual/UVGrid_basecolor_s1.png",
+        "sha256": "f93a37a156be8d06332fa51764355fe6674aab2dbf60043bea9dd4d90a7c9510"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/masks/Grime01_s01.png",
+        "sha256": "fa24fc062cf9ee666ebafc2696fd516d12998095bc27621466245140c05dfd1b"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/masks/RustBloom01_s01.png",
+        "sha256": "bbca4701be99e4a6ee4953e32e8ca6bd0a48a5c82e203be599b0fed7d286eb30"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/masks/Verdigris01_s01.png",
+        "sha256": "c25c7bcf679b7cabe4f709bbffa6587266aa49b88d1c602eb3337bb512cc0e14"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/overlays/Dust01_overlay_s001.png",
+        "sha256": "e74555e2162154a925b851ef2d3d9ee2cb604f391ba35a143d2f425bd8e068a3"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/overlays/Scratches01_overlay_s001.png",
+        "sha256": "e3a3691f2b012cb4e2af9a1517909be97afaa247df2c679da1b718f7c1ac71e6"
+      }
+    ]
+  },
+  "payload_digest": "a58de5948eed80b23277bb2d6368afbbc98a8c2a985b32bdd63bb1939e6fb9de",
+  "payload_sha256": {
+    "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
+    "dds_set": "743656e794b85cea06c3f2cc505d95b07d903fc4bb07fea6db860e6f79336e4e",
+    "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
+    "mtlx_set": "7001355bae6c9518b67d905e3cad3ac95750dfb830ae1885a1fd40eecc861998",
+    "source_textures_set": "93d21f3e121fac95ff235c0ff9bc59f2ff500a222fc1c7443bb5608abd2612d3"
+  },
+  "release": "0.1.0"
+}
