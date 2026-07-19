@@ -20,6 +20,9 @@ Runs, skipping with a note any surface not yet present:
                                references the frozen-payload hashes (positive + shallow-negative)
  11. freeze lock             — the complete-payload hash-lock is deterministic + tamper-detecting
                                (RD-4: catalog/manifest/.mtlx/textures[/.dds])
+ 12. approval binds freeze   — a PROMOTED approval artifact references the release's ACTUAL frozen
+                               hashes (RD-1/RD-4: the approved release IS the frozen candidate);
+                               skips pre-promotion
 
 Exit 0 iff every present surface passes.
 """
@@ -414,6 +417,53 @@ def run_freeze_lock(root: Path) -> bool:
     return ok
 
 
+def run_approval_binds_freeze(root: Path) -> bool:
+    """Phase 60sq2.11 regression wall (RD-1/RD-4): a REAL (promoted) approval artifact must
+    reference the ACTUAL frozen payload — not merely a well-formed hash set.
+
+    validate_approval (the approval_gate lane) checks only the artifact's SHAPE (64-hex map);
+    it cannot see whether those hashes are the release's real frozen hashes. This lane pins the
+    audience-proof invariant 'the approved release IS the qualified candidate, byte-for-byte':
+      (1) approval.payload_sha256 + payload_digest EQUAL the release's committed freeze record
+          (a promotion that referenced the wrong / a shallow hash set fails — pure JSON, no encoder);
+      (2) that committed freeze STILL verifies against the on-disk complete payload incl. .dds
+          (when the staging tree is present — a post-approval payload mutation fails).
+    Skips if no real approval exists (pre-promotion). RED-demoable: mutate one approval hash -> FAIL."""
+    releases = root / "library" / "releases"
+    approvals = sorted(releases.glob("*.approval.json")) if releases.exists() else []
+    if not approvals:
+        print("== approval binds freeze == (skip: no promoted approval artifacts)")
+        return True
+    print("== approval binds freeze ==")
+    ok = True
+    for ap in approvals:
+        data = json.loads(ap.read_text(encoding="utf-8"))
+        version = data.get("release", "")
+        freeze = releases / f"matterlib-{version}.freeze.json"
+        if not freeze.exists():
+            print(f"  [FAIL] {ap.name}: references release {version!r} with NO freeze record")
+            ok = False
+            continue
+        rec = json.loads(freeze.read_text(encoding="utf-8"))
+        hashes_match = (data.get("payload_sha256") == rec.get("payload_sha256")
+                        and data.get("payload_digest") == rec.get("payload_digest"))
+        staging_dir = root / "library" / "staging" / f"matterlib-{version}"
+        if staging_dir.exists():
+            drift = fr.verify_freeze(root, rec, staging_dir)
+            ondisk = "freeze matches on-disk payload (incl .dds)" if not drift else "; ".join(drift[:2])
+        else:
+            drift = []  # no staging/encoder: the approval<->freeze hash-binding still pins the
+                        # reference; the on-disk .dds re-verify is covered by the staging/freeze_lock lanes.
+            ondisk = "on-disk re-verify skipped (no staging tree)"
+        good = hashes_match and not drift
+        detail = (f"references the frozen candidate byte-for-byte; {ondisk}" if good
+                  else ("approval hashes != freeze record (references a non-frozen payload)"
+                        if not hashes_match else ondisk))
+        print(f"  [{'PASS' if good else 'FAIL'}] {ap.name}: {detail}")
+        ok = ok and good
+    return ok
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -435,6 +485,7 @@ def main(argv=None) -> int:
         "staging": run_staging(root),
         "approval_gate": run_approval_gate(root),
         "freeze_lock": run_freeze_lock(root),
+        "approval_binds_freeze": run_approval_binds_freeze(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():

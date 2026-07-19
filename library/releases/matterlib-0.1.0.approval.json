@@ -1,0 +1,14 @@
+{
+  "approved_at": "2026-07-19T18:57:01Z",
+  "approver": "peter@imrsv.tools",
+  "freeze_record": "matterlib-0.1.0.freeze.json",
+  "payload_digest": "a58de5948eed80b23277bb2d6368afbbc98a8c2a985b32bdd63bb1939e6fb9de",
+  "payload_sha256": {
+    "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
+    "dds_set": "743656e794b85cea06c3f2cc505d95b07d903fc4bb07fea6db860e6f79336e4e",
+    "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
+    "mtlx_set": "7001355bae6c9518b67d905e3cad3ac95750dfb830ae1885a1fd40eecc861998",
+    "source_textures_set": "93d21f3e121fac95ff235c0ff9bc59f2ff500a222fc1c7443bb5608abd2612d3"
+  },
+  "release": "0.1.0"
+}
