@@ -8,7 +8,7 @@
       "material_class": "cementitious",
       "payload_path": "materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
       "scale": "s1",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -19,7 +19,7 @@
       "material_class": "glass",
       "payload_path": "materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -30,7 +30,7 @@
       "material_class": "metal",
       "payload_path": "materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -41,7 +41,7 @@
       "material_class": "metal",
       "payload_path": "materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -52,7 +52,7 @@
       "material_class": "mineral",
       "payload_path": "materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -63,7 +63,7 @@
       "material_class": "stone",
       "payload_path": "materials/natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -74,7 +74,7 @@
       "material_class": "stone",
       "payload_path": "materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -85,7 +85,7 @@
       "material_class": "plastic",
       "payload_path": "materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -96,7 +96,7 @@
       "material_class": "textile",
       "payload_path": "materials/synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -107,7 +107,7 @@
       "material_class": "emissive",
       "payload_path": "materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
       "scale": "s01",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -118,7 +118,7 @@
       "material_class": "virtual",
       "payload_path": "materials/utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
       "scale": "s1",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     },
     {
@@ -129,7 +129,7 @@
       "material_class": "virtual",
       "payload_path": "materials/utility/virtual/IMRSV_MissingMaterial.mtlx",
       "scale": "",
-      "status": "candidate",
+      "status": "approved",
       "version": "v01"
     }
   ],
