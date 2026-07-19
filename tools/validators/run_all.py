@@ -23,6 +23,9 @@ Runs, skipping with a note any surface not yet present:
  12. approval binds freeze   — a PROMOTED approval artifact references the release's ACTUAL frozen
                                hashes (RD-1/RD-4: the approved release IS the frozen candidate);
                                skips pre-promotion
+ 13. activation              — activate_release.py verifies install-readiness + switches the
+                               active-release selector ATOMICALLY (a failure leaves the prior
+                               release active — RD-3/RD-5); skips pre-promotion
 
 Exit 0 iff every present surface passes.
 """
@@ -49,6 +52,7 @@ import compress_textures as ct        # noqa: E402
 import validate_approval as va        # noqa: E402
 import freeze_release as fr           # noqa: E402
 import stage_release as sr           # noqa: E402
+import activate_release as ar        # noqa: E402
 
 
 def run_grammar_fixtures() -> bool:
@@ -464,6 +468,67 @@ def run_approval_binds_freeze(root: Path) -> bool:
     return ok
 
 
+def run_activation(root: Path) -> bool:
+    """Phase 60sq2.13 (RD-3/RD-5): activate_release.py verifies install-readiness and switches the
+    active-release selector ATOMICALLY — a failure before the switch leaves the prior release active.
+
+    Builds a SELF-CONTAINED synthetic runtime install root from the committed release artifacts (the
+    approved release's catalog + a materials/ payload dir + the staged .dds when present) and drives:
+      (1) positive  — a ready install activates (selector switches) + resolve-check resolves;
+      (2) atomicity — a corrupt installed catalog is REFUSED and the PRIOR selector is UNCHANGED,
+                      the RED half that proves the switch is guarded (§14a).
+    Needs a promoted approval; skips pre-promotion. The .dds re-check is encoder-gated (falls back to
+    catalog-only when the staging tree is absent — the catalog guard is still failable)."""
+    import tempfile as _tf
+    import shutil as _sh
+    releases = root / "library" / "releases"
+    approvals = sorted(releases.glob("*.approval.json")) if releases.exists() else []
+    if not approvals:
+        print("== activation == (skip: no promoted approval artifact)")
+        return True
+    version = json.loads(approvals[-1].read_text(encoding="utf-8")).get("release", "")
+    src_catalog = releases / f"matterlib-{version}.catalog.json"
+    if not src_catalog.exists():
+        print(f"== activation == (skip: no catalog for approved release {version})")
+        return True
+    print("== activation ==")
+    staging = root / "library" / "staging" / f"matterlib-{version}" / "textures"
+    rt = Path(_tf.mkdtemp(prefix="mtc_activate_"))
+    ok = True
+    try:
+        inst = rt / "releases" / f"matterlib-{version}"
+        (inst / "materials").mkdir(parents=True, exist_ok=True)
+        _sh.copy2(src_catalog, inst / f"matterlib-{version}.catalog.json")
+        check_dds = staging.is_dir()
+        if check_dds:
+            _sh.copytree(staging, inst / "textures")
+        # A prior selector must survive a BLOCKED activation.
+        (rt / "active-release.json").write_text('{"active_release": "matterlib-PRIOR"}\n', encoding="utf-8")
+
+        # (1) positive — a ready install activates + resolves.
+        pos = ar.activate(root, rt, version, None, check_dds) == 0
+        active = ar._read_active(rt)
+        resolves = ar.resolve_check(rt) == 0
+        good1 = pos and active == f"matterlib-{version}" and resolves
+        print(f"  [{'PASS' if good1 else 'FAIL'}] positive: "
+              f"{'ready install activated + resolves (.dds ' + ('re-checked' if check_dds else 'skipped — no staging') + ')' if good1 else 'a ready install did NOT activate/resolve'}")
+        ok = ok and good1
+
+        # (2) atomicity — corrupt the installed catalog; activation must REFUSE and NOT touch the selector.
+        (rt / "active-release.json").write_text('{"active_release": "matterlib-PRIOR"}\n', encoding="utf-8")
+        cat = inst / f"matterlib-{version}.catalog.json"
+        cat.write_bytes(cat.read_bytes() + b"\x00tamper")  # no longer the frozen catalog hash
+        refused = ar.activate(root, rt, version, None, check_dds) != 0
+        unchanged = ar._read_active(rt) == "matterlib-PRIOR"
+        good2 = refused and unchanged
+        print(f"  [{'PASS' if good2 else 'FAIL'}] atomicity: "
+              f"{'corrupt install REFUSED; prior selector unchanged' if good2 else 'a corrupt install was NOT refused, or the selector was switched anyway'}")
+        ok = ok and good2
+        return ok
+    finally:
+        _sh.rmtree(rt, ignore_errors=True)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -486,6 +551,7 @@ def main(argv=None) -> int:
         "approval_gate": run_approval_gate(root),
         "freeze_lock": run_freeze_lock(root),
         "approval_binds_freeze": run_approval_binds_freeze(root),
+        "activation": run_activation(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
