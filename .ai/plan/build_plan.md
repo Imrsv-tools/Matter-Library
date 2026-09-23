@@ -49,6 +49,10 @@ Each of these was an "Upcoming" phase here; each shipped **into this repo** via 
 
 ## Upcoming (not yet sequenced — rough working order)
 
+### Standalone Bootstrap — SEEDED *(2026-09-23)*
+**Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
+- `docs/Planning/Phases/Future/PhaseTBD_StandaloneBootstrap.md` · research: `docs/Planning/Research/260923_R_StandaloneSetup.md`
+
 ### Version Management — *partially delivered; the promotion machinery is what's left*
 **Goal:** the source→approved→release machinery. **Already built:** the manifest/release schema
 (`library/releases/matterlib-0.0.1.lock.yaml`), its projected runtime catalog, and the two
