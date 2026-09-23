@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 
+# The core-tier environment uv builds from uv.lock (pyproject.toml) — per machine, never shared
+.venv/
+
 # Blender auto-save backups
 *.blend[0-9]
 

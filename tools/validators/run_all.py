@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 """Validator orchestrator (Phase 53) — runs the full §6 automated gate set.
 
-    run_all.py [--repo-root <dir>]
+    uv run tools/validators/run_all.py [--strict] [--repo-root <dir>]
 
-Runs, skipping with a note any surface not yet present:
+Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the reason):
   1. grammar fixtures        — fixtures/grammar_cases.json (must-pass / must-fail)
   2. per-material            — validate_material.py over MatterLibrary/materials/**.mtlx
   3. manifest                — validate_manifest.py over the newest library/releases/*.lock.yaml
   4. determinism             — recipe .mtlx assembly byte-stability
   5. catalog freshness/valid — projected runtime catalog is byte-current + rejects dangling ids
   6. provenance / projection — promotion-metadata gates + no-runtime-projection guard
-  7. fixture sync            — Stage fixture catalog + payloads byte-current (cross-repo)
+  (7. fixture sync — REMOVED from the gate 2026-09-23: it read a consumer's checkout, and a
+      producer gate must not (R1). The check lives on as tools/validators/check_fixture_sync.py,
+      moving to the consumer side — docs/Planning/PlatformDependencies.md P8.)
   8. compression negative    — the compressed-output validator REJECTS corrupt/mismatched .dds
   9. compression             — source textures compress to deterministic, valid BCn .dds
                                (encoder-gated: skips if compressonatorcli is absent)
@@ -27,7 +29,7 @@ Runs, skipping with a note any surface not yet present:
                                active-release selector ATOMICALLY (a failure leaves the prior
                                release active — RD-3/RD-5); skips pre-promotion
 
-Exit 0 iff every present surface passes.
+Exit 0 iff no lane FAILs — and, with --strict, no lane SKIPs either (CI runs strict).
 """
 
 from __future__ import annotations
@@ -47,12 +49,20 @@ import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
 from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
 import project_runtime_catalog as prc  # noqa: E402
-import check_fixture_sync as cfs       # noqa: E402
 import compress_textures as ct        # noqa: E402
 import validate_approval as va        # noqa: E402
 import freeze_release as fr           # noqa: E402
 import stage_release as sr           # noqa: E402
 import activate_release as ar        # noqa: E402
+
+# A lane returns True (PASS), False (FAIL) or SKIP. A skip is NOT a pass: the summary names it,
+# and --strict (CI) fails on it. Before 2026-09-23 every skip returned True and read as PASS.
+SKIP = "SKIP"
+
+
+def encoder_absent() -> str:
+    return (f"pinned encoder compressonatorcli {ct.PINNED_VERSION} not found at {ct.COMPRESSONATOR}; "
+            f"set COMPRESSONATORCLI to run this lane")
 
 
 def run_grammar_fixtures() -> bool:
@@ -76,7 +86,7 @@ def run_materials(root: Path) -> bool:
     materials = sorted((root / "MatterLibrary" / "materials").rglob("*.mtlx"))
     if not materials:
         print("== per-material == (skip: no .mtlx under MatterLibrary/materials)")
-        return True
+        return SKIP
     print("== per-material ==")
     rc = vm.main([str(p) for p in materials])
     return rc == 0
@@ -87,7 +97,7 @@ def run_manifest(root: Path) -> bool:
         if (root / "library" / "releases").exists() else []
     if not releases:
         print("== manifest == (skip: no library/releases/*.lock.yaml)")
-        return True
+        return SKIP
     print("== manifest ==")
     rc = vman.main([str(releases[-1])])
     return rc == 0
@@ -98,7 +108,7 @@ def run_determinism(root: Path) -> bool:
         if (root / "tools" / "converters" / "recipes").exists() else []
     if not recipes:
         print("== determinism == (skip: no tools/converters/recipes/*.json)")
-        return True
+        return SKIP
     print("== determinism ==")
     ok = True
     for r in recipes:
@@ -118,7 +128,7 @@ def run_catalog_freshness(root: Path) -> bool:
     locks = sorted(releases.glob("*.lock.yaml")) if releases.exists() else []
     if not locks:
         print("== catalog freshness == (skip: no library/releases/*.lock.yaml)")
-        return True
+        return SKIP
     print("== catalog freshness ==")
     ok = True
     materials_root = root / "MatterLibrary" / "materials"
@@ -154,7 +164,7 @@ def run_catalog_validation(root: Path) -> bool:
     fixture = HERE / "fixtures" / "dangling_manifest.lock.yaml"
     if not fixture.exists():
         print("== catalog validation == (skip: no dangling_manifest fixture)")
-        return True
+        return SKIP
     print("== catalog validation ==")
     materials_root = root / "MatterLibrary" / "materials"
     try:
@@ -180,7 +190,7 @@ def run_provenance_gate(root: Path) -> bool:
     present = [(HERE / "fixtures" / f, why) for f, why in fixtures if (HERE / "fixtures" / f).exists()]
     if not present:
         print("== provenance gate == (skip: no provenance RED fixtures)")
-        return True
+        return SKIP
     print("== provenance gate ==")
     ok = True
     for fixture, why in present:
@@ -201,7 +211,7 @@ def run_no_projection_guard(root: Path) -> bool:
     locks = sorted(releases.glob("*.lock.yaml")) if releases.exists() else []
     if not locks:
         print("== no-projection guard == (skip: no lockfiles)")
-        return True
+        return SKIP
     print("== no-projection guard ==")
     materials_root = root / "MatterLibrary" / "materials"
     banned = ("provenance", "evidence", "license")
@@ -221,13 +231,6 @@ def run_no_projection_guard(root: Path) -> bool:
     return ok
 
 
-def run_fixture_sync(root: Path) -> bool:
-    """Phase 58.5: the Stage fixture copy of the runtime catalog (+ payloads) is byte-current
-    with the Matter-Library projected catalog — the cross-repo half Phase 56 left open
-    (`run_catalog_freshness` covers only lockfile -> projected, within this repo)."""
-    return cfs.check_fixture_sync(root, cfs.default_fixture_root(root))
-
-
 def run_compression_negative(root: Path) -> bool:
     """Phase 60sq2.4: the compressed-output validator REJECTS corrupt/mismatched .dds.
 
@@ -241,7 +244,7 @@ def run_compression_negative(root: Path) -> bool:
     mismatch = fxdir / "format_mismatch.dds"
     if not present and not mismatch.exists():
         print("== compression negative == (skip: no negative .dds fixtures)")
-        return True
+        return SKIP
     print("== compression negative ==")
     ok = True
     for name in present:
@@ -273,11 +276,10 @@ def run_compression(root: Path) -> bool:
     src_root = root / "MatterLibrary" / "textures"
     if not src_root.exists():
         print("== compression == (skip: no MatterLibrary/textures)")
-        return True
+        return SKIP
     if not Path(ct.COMPRESSONATOR).exists() or not ct._check_encoder():
-        print(f"== compression == (skip: pinned encoder {ct.PINNED_VERSION} absent — "
-              f"run tools/compressors/compress_textures.py --determinism for the full sweep)")
-        return True
+        print(f"== compression == (skip: {encoder_absent()})")
+        return SKIP
     print("== compression ==")
     import tempfile as _tf
     a = Path(_tf.mkdtemp(prefix="mtc_run_a_"))
@@ -320,12 +322,11 @@ def run_staging(root: Path) -> bool:
         if releases.exists() else []
     if not catalogs:
         print("== staging == (skip: no release catalog)")
-        return True
+        return SKIP
     version = catalogs[-1].name[len("matterlib-"):-len(".catalog.json")]  # newest, e.g. 0.1.0
     if not Path(ct.COMPRESSONATOR).exists() or not ct._check_encoder():
-        print(f"== staging == (skip: pinned encoder {ct.PINNED_VERSION} absent — "
-              f"run tools/releases/stage_release.py build {version} for the full snapshot)")
-        return True
+        print(f"== staging == (skip: {encoder_absent()})")
+        return SKIP
     print("== staging ==")
     import tempfile as _tf
     staging_root = Path(_tf.mkdtemp(prefix="mtc_stage_"))
@@ -363,7 +364,7 @@ def run_approval_gate(root: Path) -> bool:
     shallow_fx = fxdir / "approval_shallow.approval.json"
     if not real and not valid_fx.exists() and not shallow_fx.exists():
         print("== approval gate == (skip: no approval artifacts or fixtures)")
-        return True
+        return SKIP
     print("== approval gate ==")
     ok = True
     for ap in real:  # any real approval MUST validate clean
@@ -393,7 +394,7 @@ def run_freeze_lock(root: Path) -> bool:
     catalogs = sorted(releases.glob("matterlib-*.catalog.json"), key=lambda p: p.name)
     if not catalogs:
         print("== freeze lock == (skip: no release catalog)")
-        return True
+        return SKIP
     version = catalogs[-1].name[len("matterlib-"):-len(".catalog.json")]  # newest, e.g. 0.1.0
     print("== freeze lock ==")
     try:
@@ -437,7 +438,7 @@ def run_approval_binds_freeze(root: Path) -> bool:
     approvals = sorted(releases.glob("*.approval.json")) if releases.exists() else []
     if not approvals:
         print("== approval binds freeze == (skip: no promoted approval artifacts)")
-        return True
+        return SKIP
     print("== approval binds freeze ==")
     ok = True
     for ap in approvals:
@@ -485,12 +486,12 @@ def run_activation(root: Path) -> bool:
     approvals = sorted(releases.glob("*.approval.json")) if releases.exists() else []
     if not approvals:
         print("== activation == (skip: no promoted approval artifact)")
-        return True
+        return SKIP
     version = json.loads(approvals[-1].read_text(encoding="utf-8")).get("release", "")
     src_catalog = releases / f"matterlib-{version}.catalog.json"
     if not src_catalog.exists():
         print(f"== activation == (skip: no catalog for approved release {version})")
-        return True
+        return SKIP
     print("== activation ==")
     staging = root / "library" / "staging" / f"matterlib-{version}" / "textures"
     rt = Path(_tf.mkdtemp(prefix="mtc_activate_"))
@@ -555,6 +556,8 @@ def run_activation(root: Path) -> bool:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
+    ap.add_argument("--strict", action="store_true",
+                    help="treat a SKIPPED lane as a failure (CI runs this way: every lane must run)")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
 
@@ -567,7 +570,6 @@ def main(argv=None) -> int:
         "catalog_validation": run_catalog_validation(root),
         "provenance_gate": run_provenance_gate(root),
         "no_projection_guard": run_no_projection_guard(root),
-        "fixture_sync": run_fixture_sync(root),
         "compression_negative": run_compression_negative(root),
         "compression": run_compression(root),
         "staging": run_staging(root),
@@ -578,10 +580,22 @@ def main(argv=None) -> int:
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():
-        print(f"  {k}: {'PASS' if v else 'FAIL'}")
-    all_ok = all(results.values())
-    print("OVERALL:", "ALL PASS" if all_ok else "FAILURES")
-    return 0 if all_ok else 1
+        print(f"  {k}: {'SKIP' if v == SKIP else 'PASS' if v else 'FAIL'}")
+    passed = [k for k, v in results.items() if v is True]
+    skipped = [k for k, v in results.items() if v == SKIP]
+    failed = [k for k, v in results.items() if v is False]
+    print(f"{len(results)} lanes: {len(passed)} PASS, {len(skipped)} SKIP, {len(failed)} FAIL"
+          + (" (--strict: a SKIP fails the run)" if args.strict else ""))
+    ok = not failed and not (args.strict and skipped)
+    if failed:
+        print("OVERALL: FAIL —", ", ".join(failed))
+    elif skipped and args.strict:
+        print("OVERALL: FAIL (strict) — skipped:", ", ".join(skipped))
+    elif skipped:
+        print("OVERALL: PASS with skips — not checked:", ", ".join(skipped))
+    else:
+        print("OVERALL: ALL PASS — every lane ran")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # Phase02 — One-Command Check
 
-**Status:** ACTIVE — discovery Pass 1 complete (2026-09-23); **the Brief is complete; the three lead calls are resolved (§Lead calls, 2026-09-23)**. Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
+**Status:** IN EXECUTION (2026-09-23) — the Brief is complete and the three lead calls are resolved (§Lead calls). Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
 
 ## Outcome
 

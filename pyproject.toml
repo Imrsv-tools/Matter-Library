@@ -1,0 +1,28 @@
+# The core-tier Python environment for the Matter Library's tools.
+#
+# One command, from a fresh clone (creates .venv/ from uv.lock, then runs the gate):
+#
+#     uv run tools/validators/run_all.py
+#
+# Without uv:  python3.12 -m venv .venv && .venv/bin/pip install .  then run the same script.
+#
+# Scope: the structural gate and everything it imports (tools/validators, converters,
+# compressors, releases). The USD tier keeps its own conda recipe (tools/usd-toolchain/);
+# Blender brings its own Python. See docs/ToolingConventions.md §Entry points.
+
+[project]
+name = "matter-library-tools"
+version = "0.0.0"
+description = "Tooling for the Matter Library: authoring harness, structural gate, release lifecycle."
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = [
+    "MaterialX==1.39.5",  # pinned: the articles are MaterialX 1.39 and the assembler must be byte-deterministic
+    "PyYAML>=6",
+    "numpy>=1.26",
+    "Pillow>=10",
+]
+
+[tool.uv]
+# A tools tree, not an installable package: uv only builds the environment.
+package = false

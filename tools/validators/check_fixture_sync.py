@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Cross-repo catalog-equality gate (Phase 58.5 — closes the Phase-56 gap).
 
+NOT PART OF run_all.py SINCE 2026-09-23. This repo is a producer (R1) and its gate must not read a
+consumer's checkout; the check moves to the consumer side (docs/Planning/PlatformDependencies.md
+P8). It stays here as a standalone tool: run it with an explicit --fixture-root.
+
 The Stage runtime reads a *copy* of the projected runtime catalog (+ its material
 payloads) from its fixture tree:
 
