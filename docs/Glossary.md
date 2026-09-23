@@ -6,7 +6,7 @@
 >
 > **Source of truth.** Where this file and an authoritative spec disagree, **the spec wins and this file is the bug.**
 >
-> **Heritage.** Most Matter terms were first defined in the IMRSV platform's glossary. They are carried here with **the same words** (a carried term is never renamed) and re-glossed to stand alone. Terms marked **(consumer-side)** belong to a consuming application such as IMRSV; they appear only where this repo's contract touches them. *Pointers into `docs/specs/…` resolve once Phase01 step 1.3 brings the specs home (2026-09-23).*
+> **Heritage.** Most Matter terms were first defined in the IMRSV platform's glossary. They are carried here with **the same words** (a carried term is never renamed) and re-glossed to stand alone. Terms marked **(consumer-side)** belong to a consuming application such as IMRSV; they appear only where this repo's contract touches them. *The owning specs live under `docs/specs/` (brought home 2026-09-23, Phase01 step 1.3).*
 
 ---
 

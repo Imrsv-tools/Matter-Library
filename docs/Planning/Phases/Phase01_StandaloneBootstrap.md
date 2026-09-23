@@ -293,4 +293,19 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
     - the ≤63 / `[A-Za-z0-9_]` rule is in `validate_material.py`;
     - carriage lanes and the opacity floor were re-read from LCDSchema and MasterSet.
   - **Pointer check:** there are 0 external or private links. The 16 `docs/specs/…` owners are **pending 1.3**, and `CONTRIBUTING.md` / `LICENSE-CONTENT.md` are **pending 1.4**. That list is 1.3's link check.
-  - **Next:** the lead runs click 2 → then 1.3.
+  - **Lead verdict (click 2, 2026-09-23):** *"glossary looks right, continue with 1.3"*. ✅ **1.2 done** (landed at `9b38adb`).
+- **1.3 — Read the contract at home.** `docs/specs/` holds 20 files, 2,199 lines, measured 2026-09-23.
+  - **Who wrote what:** three parallel writers took Ontology · Contract · Authoring/Distribution/Tooling under one shared rulebook. The coordinator wrote `_Architecture` (merged with the 1.1 seed and adding a §Decisions of record: S1–S9 distilled, with S6 marked superseded by R15), `_Docs_Index`, `Catalog` (the real `matterlib-0.1.0` table generated from the catalog and the articles), `Experience_MatterLibrary` (re-framed per R1/R9) and a new `Consumers.md` (the boundary: 14 IMRSV-owned topics moved out, with no private symbols).
+  - **Annotations:** 24 `Drift`, 18 `Reevaluate` and 1 `Todo`, each dated. No contract text was changed silently.
+  - **Reference `.mtlx`:** the platform template taught the overlay defect. It is replaced by a verbatim copy of the live Copper article (`diff`-identical body, `xmllint` ok).
+  - **Consistency pass:**
+    - MasterSet's two token rules, written while bringing it home, are marked "proposed, not yet ruled".
+    - The historical keep-set examples are labelled as not in this library.
+    - A cross-note on the `_vNN`-in-identity ambiguity was added to Identity.
+  - **Gates (2026-09-23):**
+    - **Link check:** 470 references across 21 files; 0 broken relative links. The path misses are all intentional: `PlatformDependencies.md` lands in 1.5, `matterlib-X.Y.Z` is a pattern, `library/staging/` is gitignored, and one old path is quoted inside a correction note.
+    - **Publication check, both ways:** 22 hits over 6 raw platform sources, and 0 on the scrubbed tree.
+    - **Wider sweep** (platform phase ids, private symbols, the deploy script, email): 0.
+  - **What these checks never touch:** file *contents* outside `docs/`, meaning comments in `tools/` and the `.mtlx` files under `MatterLibrary/`. Those still carry old-layout paths (research Pass 6) and belong to the one-command-check phase.
+  - **Unverified:** the public Blender issue link (`projects.blender.org/…/124263`) returns 403 to `curl`, which is evidence about `curl`. The lead opens it at click 3. The OpenUSD issue links were checked with `gh`.
+  - **Next:** the lead runs click 3 → then 1.4.
