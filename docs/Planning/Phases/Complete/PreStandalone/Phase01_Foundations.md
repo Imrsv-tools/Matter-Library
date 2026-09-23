@@ -1,6 +1,6 @@
 # Phase 01 — Foundations: Folder Structure, Taxonomy & Naming
 
-> **ARCHIVED 2026-09-23 (Phase01 step 1.1). Delivered by IMRSV platform Phase 52, not by this repo's phase line.** This is the pre-standalone numbering, not this repo's current `Phase01` (`docs/Planning/Phases/Phase01_StandaloneBootstrap.md`). The `Status:` line below is historical.
+> **ARCHIVED 2026-09-23 (Phase01 step 1.1). Delivered by IMRSV platform Phase 52, not by this repo's phase line.** This is the pre-standalone numbering, not this repo's current `Phase01` (`docs/Planning/Phases/Complete/Phase01_StandaloneBootstrap.md`). The `Status:` line below is historical.
 
 **Status:** PLANNING — contract-layer only. No master materials, textures, transformers, or
 manifest tooling this phase.

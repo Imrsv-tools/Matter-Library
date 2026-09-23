@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase01 — Standalone Bootstrap — ACTIVE
-**Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
-- `docs/Planning/Phases/Phase01_StandaloneBootstrap.md`
+*None (2026-09-23). The next entry in `## Future` is where work starts when the lead numbers it.*
 
 ==================================================================================
 ## Future
@@ -76,3 +74,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Pre-standalone — built by IMRSV platform phases (2026-06 → 2026-07) — COMPLETE
 **Outcome:** the foundations, the authoring harness, the first 12 materials, the release machinery and the Blender library, all built into this repo by the IMRSV platform's Materials wave.
 - `docs/Planning/Phases/Complete/PreStandalone/` (`build_plan.md` §Delivered · `Phase01_Foundations.md` · `Readme_2026-07.md` · `FolderStructure.txt`)
+
+### Phase01 — Standalone Bootstrap — COMPLETE
+**Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
+- `docs/Planning/Phases/Complete/Phase01_StandaloneBootstrap.md`
+*Closed 2026-09-23.*

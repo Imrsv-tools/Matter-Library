@@ -8,7 +8,7 @@
 - this repo's tree and git history (83 commits, 2025-11-11 → 2026-07-19);
 - the platform documentation repo (`IMRSV_Platform_Documentation/`, private: `MatterLibrary/`, `Planning/`, `Methodology/`, the glossary and conventions);
 - the platform umbrella repo's `.ai/`;
-- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81` (re-baselined on 2026-09-23 to `b1f36c2`, then `9f52c7f`; see `docs/Planning/Phases/Phase01_StandaloneBootstrap.md` Passes 2–3);
+- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81` (re-baselined on 2026-09-23 to `b1f36c2`, then `9f52c7f`; see `docs/Planning/Phases/Complete/Phase01_StandaloneBootstrap.md` Passes 2–3);
 - the prior adopters BipZip, PitchBoard, 925Platform and USDLiveView.
 
 **The source of this file's first contents:** a 2026-09-23 research session, read-only against every repo. No code, spec or config was changed.

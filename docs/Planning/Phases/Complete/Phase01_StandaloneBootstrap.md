@@ -1,6 +1,6 @@
 # Phase01 — Standalone Bootstrap
 
-**Status:** ACTIVE — IN EXECUTION (started 2026-09-23). Lane: `build`. All lead calls are ruled (§Lead rulings). Numbered `Phase01` by the lead on 2026-09-23 — the first phase on this repo's own line.
+**Status:** 🎉 COMPLETE (closed 2026-09-23). Lane: `build`. Not CI-backed: this repo has no CI yet (2026-09-23), so there is no run to observe and the stamp is not provisional. The phase's gates are the doc checks recorded in the Execution Log. Numbered `Phase01` by the lead on 2026-09-23 — the first phase on this repo's own line.
 
 ## Outcome
 
@@ -350,3 +350,28 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
     - **Publication check:** 0 over every public-facing doc.
     - **Placeholder sweep:** 0 unfilled; the remaining hits are pattern examples.
   - **Lead verdict (click 5, 2026-09-23):** *"looks right, push it and close phase 1"*. ✅ **1.5 done** (landed at `0566b30`).
+- **Pushed (2026-09-23):** `8d6b63d..0fd23f8`, lead-directed ("push it"). GitHub now detects the repo licence as Apache-2.0.
+- **CLOSE — DONE (2026-09-23).**
+  - **Divergence check:** `git fetch` found 0 commits behind `origin/main`.
+  - **Acceptance, re-read verbatim:** *"Anyone, whether a contributor, a consumer or a fresh agent session, can understand, navigate and work on the Matter Library from this repository alone … with no need for the private IMRSV platform docs."* It holds against committed reality, and each clause was demonstrated by one lead click:
+    - **orient** (`/howdy`, click 1);
+    - **vocabulary** (Glossary, click 2);
+    - **contract** (`docs/specs/`: 0 broken links, 0 publication hits, click 3);
+    - **licence terms** (click 4);
+    - **plan** (Readme, Roadmap, PlatformDependencies, click 5).
+
+    "From this repository alone" is an absolute claim, so the deferral ledger below was checked against it. No item leaves a reader needing the private docs to understand or work on the library.
+  - **Deferral ledger:**
+
+    | Open thread | Disposition |
+    |---|---|
+    | Hardcoded retired paths in `tools/`; `run_all.py` fails at import; no pinned environment; no CI; skip-reports-green lanes | **ruled out (Brief §Not now: tool code)** → One-Command Check |
+    | The master token in the catalog, the release-bundle spec, the Substrate re-expression of master settings, the `_vNN`-in-identity question, role naming, the `imrsv:` pin tension, MasterSet's proposed token rules | **ruled out (Brief §Not now: any contract change)**; annotated in place → Release Bundle + Consumer Contract |
+    | Tags and re-versioning | **ruled out (Brief §Not now)** → Version Management / Release Bundle |
+    | Platform-side changes (P1–P10) | **ruled out (Brief §Not now: any edit in another repo)**; recorded in `PlatformDependencies.md` |
+    | `library/provenance/matterlib-0.1.0-textures.md` still cites platform phase ids (outside `docs/`, never touched by the publication check) | **deferred as an ADDITION**: a pre-existing record this phase did not author. It carries no private link or detail a reader needs → One-Command Check hygiene |
+    | The public Blender issue link was not confirmed by script (403 to `curl`) | **ALREADY ROUTED**: stated in the click-3 handback; the lead replied *"specs look right, continue with 1.4"* |
+    | Research questions Q5, Q7–Q10, Q12 | the lead's calls for later phases; recorded in the research doc, not this phase's |
+
+  - **Doc moves:** this doc moved `Phases/` → `Phases/Complete/`. Its inbound path references (the Roadmap, the research doc, two archived pre-standalone docs) were repointed and re-grepped. It has no relative links to re-base. The Roadmap entry moved to `## Complete`, and `## Active` now reads "none". The Roadmap stays an index; the findings are here.
+  - **Wave / issue coda:** not a Wave member; not issue-sourced.
