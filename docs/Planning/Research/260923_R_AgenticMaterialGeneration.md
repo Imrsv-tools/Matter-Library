@@ -18,7 +18,8 @@
 | # | Decision |
 |---|---|
 | D1 | **Matter only, never assemblies.** The library holds *substances*: fired clay (brick material), marble (tile material), wood species (floor material). It does **not** hold brick walls, tiled floors or plank floors. This closes O10. It matches `_Architecture.md` ("physically based 'matter' materials") and `Taxonomy.md` (brick wall, tile roof and cobblestone street are "non-matter"; the Realm stays *(planned)* and is untouched). Pass 9 was wrong to frame assemblies as a coverage candidate. |
-| D2 | **No new masters.** A master *is* the LCD and texture structure for a type of material. The 7 masters stand; coverage needs none added. This closes O8 as it was framed. The one real issue underneath it (Pass 10) is that `MasterSet.md` §Master resolution chooses the master **by taxonomy class**, and that is a doc conflict to discuss with the lead, not a design question. See Pass 12. |
+| D2 | **No new masters.** A master *is* the LCD and texture structure for a type of material. The 7 masters stand; coverage needs none added. This closes O8 as it was framed. The one real issue underneath it (Pass 10) is that `MasterSet.md` §Master resolution chooses the master **by taxonomy class**, and that is a doc conflict to discuss with the lead, not a design question. See Pass 12. **Doc fix landed** (the lead agreed): an article declares the master that fits the material, and its class gives only a typical default (`MasterSet.md` §Master resolution, quick fix `0770f38`). This closes O13. |
+| D3 | **Classes are added when the matter needs them:** "we have a universe to rebuild matter for". The 19 classes are a starting set, not a ceiling. Landed in `Taxonomy.md` §Growth model (quick fix `0770f38`). This unblocks O11: fired clay can get its own class. |
 
 ---
 
