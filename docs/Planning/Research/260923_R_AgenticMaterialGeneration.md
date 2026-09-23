@@ -20,6 +20,10 @@
 | D1 | **Matter only, never assemblies.** The library holds *substances*: fired clay (brick material), marble (tile material), wood species (floor material). It does **not** hold brick walls, tiled floors or plank floors. This closes O10. It matches `_Architecture.md` ("physically based 'matter' materials") and `Taxonomy.md` (brick wall, tile roof and cobblestone street are "non-matter"; the Realm stays *(planned)* and is untouched). Pass 9 was wrong to frame assemblies as a coverage candidate. |
 | D2 | **No new masters.** A master *is* the LCD and texture structure for a type of material. The 7 masters stand; coverage needs none added. This closes O8 as it was framed. The one real issue underneath it (Pass 10) is that `MasterSet.md` §Master resolution chooses the master **by taxonomy class**, and that is a doc conflict to discuss with the lead, not a design question. See Pass 12. **Doc fix landed** (the lead agreed): an article declares the master that fits the material, and its class gives only a typical default (`MasterSet.md` §Master resolution, quick fix `0770f38`). This closes O13. |
 | D3 | **Classes are added when the matter needs them:** "we have a universe to rebuild matter for". The 19 classes are a starting set, not a ceiling. Landed in `Taxonomy.md` §Growth model (quick fix `0770f38`). This unblocks O11: fired clay can get its own class. |
+| D4 | **Lanes (O1): yes.** Param-only (L1) and ambientCG curation (L3) first, agent-written procedural generators (L2) next, generative imagery (L4) parked behind R13. |
+| D5 | **Where it runs (O2): a Claude Code skill first.** The lead stays in the loop and the existing scripts are driven as they are. A batch agent and the Matter Manager come later. |
+| D6 | **The harness guards belong to this work (O3).** G1–G6 are built as part of agentic generation, not as part of *Author a Material End to End*. Human authors benefit anyway. |
+| D7 | **Add `ceramic` (O11).** Landed as `engineered/ceramic` (quick fix `f2cfa88`): fired-clay matter, meaning brick clay, terracotta, earthenware, stoneware and porcelain. The domain placement was the agent's; the lead named the class. |
 
 ---
 
@@ -91,7 +95,7 @@ The harness was built for a careful human author. An agent authoring at volume w
 |---|---|---|---|
 | G1 | **Unknown recipe keys are dropped silently** | `from_dict` "keep[s] only known spec fields" so `_comment`/`path` survive | A typo such as `roughnes_const` silently becomes the default 0.5 and still passes every gate. **The same silent-success class as `.claude/CLAUDE.md` §Editing.** An agent needs unknown-key rejection, or a published JSON Schema to author against. |
 | G2 | **No machine-readable recipe schema** | the dataclass is the only definition | Structured-output and tool-use authoring want a JSON Schema (types, enums for master, domain, class, LCD ports). |
-| G3 | **Taxonomy is not checked** | `domain`/`class` are free strings in the assembler; no validator greps them against the 19 classes | An agent could invent `natural/crystal`. `Taxonomy.md` says the 19 classes are closed per release. |
+| G3 | **Taxonomy is not checked** | `domain`/`class` are free strings in the assembler; no validator greps them against the 19 classes | An agent could invent `natural/crystal`. `Taxonomy.md` says the 19 classes are closed per release. *(2026-09-23: now 20 classes, and classes grow by lead decision (D3); the guard checks against the current list, so a new class is a deliberate, reviewed addition.)* |
 | G4 | **Class → master routing is not checked** | `_check_spec` checks only `master ∈ KNOWN_MASTERS`; routing (with the `marble`/`diamond`/`rust` name exceptions) is written in `MasterSet.md` and applied in consumer code (MasterSet *Drift 2026-09-23*) | An agent could declare `Subsurface` for a plastic and pass. The routing rule needs to exist as data or code before an agent can be held to it. This overlaps with R14 (master token as release data). *Refined by Pass 10 (2026-09-23): enforcing **today's** one-master-per-class table would block most of textile. What to check instead waits on the doc conflict in Pass 12.* |
 | G5 | **`path` vs `domain`/`class`/`name` are not cross-checked** | `build_proof_subset.py` writes to `d["path"]` verbatim | A recipe can declare one class and land in another folder. |
 | G6 | **No physical-plausibility lane** | `check_master_conformance` checks that the defining carriers are **present and wired**, not that values are sane; Opaque returns `[]` | Nothing flags an albedo of 1.0, a non-binary metalness on a clean metal, or an IOR of 4. This is exactly the "metallic correctness, roughness consistency" long pole of Pass 1. A cheap, automatic range check would take much of that load off the human. |
@@ -238,7 +242,8 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 | engineered/metal | 20 | L1 (PB 32 metals) + L3 (198) | F82 (C1); brushed → anisotropy (C3); perforated → Masked (O8) |
 | engineered/glass | 6 | L1 only | thick glass routing (O8) |
 | engineered/cementitious | 10 | L3 (153) | — |
-| engineered/composite | 8 | L3 (33) | the class's boundary is undefined (O11) |
+| engineered/ceramic *(added 2026-09-23, D7)* | 8 | L1 (PB `Brick`, `Terracotta`, `Porcelain`) + L3 (Porcelain, Glazed Terracotta) | glaze → clearcoat (C2) |
+| engineered/composite | 8 | L3 (33) | the class's boundary is undefined (O11); porcelain and terracotta have moved to ceramic |
 | synthetic/plastic | 10 | L1 (PB 7) + L3 (25) | clear plastics → Thin routing (O8) |
 | synthetic/polymer | 6 | L1 + L3 (13) | plastic vs polymer boundary (O11) |
 | synthetic/textile | 12 | L3 (189) | textile routing (O8); sheen (C2) |
@@ -249,7 +254,7 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 | utility/emissive | 6 | L1 | — |
 | utility/virtual | 5 | L1 (PB references) | — |
 | utility/energy | 3 | L1/L2 | animated "plasma" is out of scope (MasterSet) |
-| **Total** | **~160** | | plus **~8 overlays and ~8 masksets** (L2, or ambientCG imperfections converted) |
+| **Total** | **~160** (~170 with ceramic) | | plus **~8 overlays and ~8 masksets** (L2, or ambientCG imperfections converted) |
 
 **Scale of the ask:**
 - **~110 of ~160 are reachable with no contract change.** These are the rows marked "—", plus the unblocked majority of stone, wood, metal, plastic and coating. The remaining ~50 wait on routing (O8) or on the three OpenPBR carriers below. *Correction (D2): the "routing" blockers are a doc fix, not design work (Pass 12). Once the docs say the master follows the material, the real blockers are only carriers C1–C3 and the class boundaries (O11).*
@@ -304,9 +309,9 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 
 | # | Question | Why it matters |
 |---|---|---|
-| O1 | **Which lanes are in scope first?** The hypothesis is L1 + L3 now, L2 next, L4 parked. | Sets the first slice; L4 alone reopens R13. |
-| O2 | **Where does it run first:** a Claude Code skill (a), a batch agent (b), or wait for the Matter Manager (c)? | Option a needs no new infrastructure and could run as soon as Phase02 lands. |
-| O3 | **Do G1–G6 belong to this seed, or to *Author a Material End to End*?** They help human authors equally. | Avoids two phases building the same guards. |
+| ~~O1~~ | **Resolved: D4.** ~~Which lanes are in scope first?~~ The hypothesis is L1 + L3 now, L2 next, L4 parked. | Sets the first slice; L4 alone reopens R13. |
+| ~~O2~~ | **Resolved: D5 (skill first).** ~~Where does it run first:~~ a Claude Code skill (a), a batch agent (b), or wait for the Matter Manager (c)? | Option a needs no new infrastructure and could run as soon as Phase02 lands. |
+| ~~O3~~ | **Resolved: D6 (here).** ~~Do G1–G6 belong to this seed,~~ or to *Author a Material End to End*?** They help human authors equally. | Avoids two phases building the same guards. |
 | O4 | **What status does agent output land in:** `draft`, or `candidate` once parity is automated? | Keeps the status lifecycle honest (Glossary: `candidate` = passed CI including parity). |
 | O5 | **Metals:** does the assembler need an OpenPBR `specular_color`/F82 carrier to use measured metal data? *Narrowed by Pass 9: the data exists (PB carries F82 for 32 metals); what remains is carrier C1 in Pass 11.* | Metals are a large, common class; accurate metals need it. |
 | O6 | **Grounding citations:** should a recipe (or provenance) record *where its constants came from* (e.g. a Physically Based entry), not only its pixels? | Auditable physics, same spirit as the shipped-pixel rule. |
@@ -314,13 +319,21 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 | ~~O8~~ | ~~Master routing: one master per class, or an allowed set?~~ **Closed by D2: no new masters; the underlying doc conflict is O13.** | — |
 | O9 | **Skin, hair and cloth for characters (PlatformDependencies M1):** the taxonomy has no biological class. Physically Based has 6 skin types with subsurface data, but skin has nowhere to live. Hair is not a surface material in this model at all. | The platform's one live pull on the library. |
 | ~~O10~~ | ~~Assemblies in scope?~~ **Closed by D1: matter only; the substance (fired clay, marble, wood species) is in, the wall or floor is out.** | — |
-| O11 | **Class boundaries:** composite vs cementitious; plastic vs polymer; where snow and ice live (liquid is wrong); **where fired clay, terracotta and porcelain live** (there is no ceramic class; Pass 9 filed porcelain under composite by judgement). | An agent sorting ~160 articles needs written boundaries, or it will sort inconsistently. D1 makes fired clay a first-class substance. |
+| O11 | *Partly resolved by D7: `engineered/ceramic` added for fired clay.* **Remaining class boundaries:** composite vs cementitious; plastic vs polymer; where snow and ice live (liquid is wrong); **where fired clay, terracotta and porcelain live** (there is no ceramic class; Pass 9 filed porcelain under composite by judgement). | An agent sorting ~160 articles needs written boundaries, or it will sort inconsistently. D1 makes fired clay a first-class substance. |
 | ~~O13~~ | ~~The `MasterSet.md` routing conflict?~~ **Resolved: the doc fix landed (D2, `0770f38`).** G4 becomes "the declared master fits the material", which is a plausibility check, not a class lookup. | — |
 | O12 | **Budgets:** the LFS quota, the texture resolution (1K only, or a 2K option), and how much maintainer review time per batch. | Sets how many can realistically ship per release. |
 
 ## Status
 
 **Passes captured:** 12 (2026-09-23).
+
+**Update, 2026-09-23 (the direction is set: D4–D7):**
+- **Lanes:** L1 + L3 first, L2 next, L4 parked (D4).
+- **Where it runs:** a Claude Code skill first (D5).
+- **Guards G1–G6 are built here** (D6).
+- **`engineered/ceramic` added** (D7, quick fix `f2cfa88`; that commit also brought the Glossary's *Class routing* entry in line with `0770f38`).
+- **Remaining open:** O4–O7, O9, O11's leftover boundaries, O12. None blocks starting.
+- **The research has crossed the commitment line.** The next unit is `/discovery` for the *Agentic Material Generation* Roadmap entry. Its prerequisite is Phase02 (G8).
 
 **Update, 2026-09-23 (lead rulings landed):**
 - The master-resolution doc fix landed as a lead-directed `/quick-fix` (`0770f38`): articles declare their master, and the class is only a default (D2). O13 is closed.
@@ -356,6 +369,6 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 
 **Worth doing before or alongside:** harness guards G1–G6 (strict recipe parsing, a recipe schema, taxonomy and master-routing checks (routing only after O8), a path cross-check, a plausibility range lane). They are small and they help human authors too.
 
-**Open:** O1–O7, O9, O11, O12 (O8, O10 and O13 closed by D1–D3).
+**Open:** O4–O7, O9, O11 (remaining boundaries), O12. O1–O3, O8, O10 and O13 are closed by D1–D7.
 
-**Next step:** the lead answers O1–O3 (lanes, where it runs, who owns the guards) and O11 (which new classes, e.g. ceramic for fired clay, terracotta and porcelain). If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
+**Next step:** when the lead chooses, `/discovery` for *Agentic Material Generation*, seeded from D1–D7 and Passes 2–12. It should sequence after Phase02, whose working gate is the prerequisite. Its first stage is likely the skill plus guards G1–G3, G5 and G6, then a three-brief probe (one each for L1, L3 and L2) that also measures review time. If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
