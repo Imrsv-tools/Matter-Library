@@ -1,6 +1,6 @@
 # PhaseTBD — Standalone Bootstrap
 
-**Status:** SEED (phase doc written 2026-09-23; discovery opening in the same session, by lead invocation).
+**Status:** DISCOVERY. The Brief is written (2026-09-23), with three lead calls open (§Your call). The lane is `build`.
 
 ## Outcome
 
@@ -9,61 +9,235 @@
 Concretely, at close this repo has:
 - the Agentic Engineering method vendored in;
 - the old `.ai/` scaffold folded into the standard shape;
-- the Matter-owned specs brought home and scrubbed for a public repo;
-- a Glossary on day one;
-- Apache-2.0 (code) and CC0-1.0 (content) licences plus a CONTRIBUTING guide;
+- the Matter-owned specs brought home under `docs/`, rewritten for a public repo, with every conflict against the lead's rulings *annotated in place*;
+- a Glossary;
+- Apache-2.0 (code) and CC0-1.0 (content) licence files plus CONTRIBUTING and CREDITS;
 - an identity-only README;
 - a Roadmap seeded for what comes next;
 - a list of the asks this repo has of its consumers.
 
 ## Why this is a phase
 
-It is one user-facing result: *the repo stands on its own*. Nothing in it builds or changes the library's tools or payload. It is also the first phase of this repo's own phase line, so every later phase depends on the vocabulary, spec layout and roadmap it sets.
+It is one user-facing result, *the repo stands on its own*, demonstrated by one path: open the repo, orient, look up a term, read the contract, see the terms and the plan. Nothing in it changes the library's tools, payload or contract.
 
 The expensive-to-unwind choices are:
-- **where the specs live** (every consumer's pointers will target it);
-- **glossary terms** (Conway's Variant: names propagate into the system);
-- **what goes public** (a public commit cannot be taken back).
+- where the specs live (every consumer's pointers will target it);
+- glossary terms (names propagate into the system);
+- what goes public (a public push cannot be taken back).
 
-## Scope
+---
 
-**In:**
-- Vendor the method from `PeteSmalls/agentic-engineering`: `.ai/`, `.claude/`, commands, Methodology, templates, the provenance stamp, `LOCAL_DELTAS.md`, and `.claude/settings.json`.
-- Fold in the existing `AGENTS.md`, `.claude/CLAUDE.md`, `.ai/{context,conventions}.md`, `.ai/commands/{howdy,housekeeping}.md`, `.ai/plan/*`, `.ai/phases/*`, `.ai/research/*`, `Readme.md` and `FolderStructure.txt`, moving them with history and without dropping intent.
-- Bring home the Matter-owned specs from the platform's `MatterLibrary/` tree, rewritten for a public repo (no private links, issue numbers, names, paths or ABI internals).
-- `docs/Glossary.md` + `docs/NamingConventions.md`, reusing IMRSV wording where it applies (R16).
-- LICENSE (Apache-2.0, code), a CC0-1.0 content dedication, CONTRIBUTING (CC0 affirmation + credit norm), and a credits record.
-- `docs/Planning/Roadmap.md` seeded from the research's candidate list (audited against §What counts as ONE phase).
-- `docs/Planning/PlatformDependencies.md`: the asks of Stage/Plugin/Studio/USDLiveView and the platform docs.
-- Small hygiene: the tracked `stage.log`, the `.gitignore` gaps.
+## The Brief
+
+### Outcome
+See above.
+
+### First human test
+Run it at the repo root after execute; the clicks follow the step order.
+
+1. **(Step 1)** `cd /home/peter/Documents/_GIT_IMRSV/Matter-Library && claude` → type `/howdy`. It answers with what the Matter Library is, that it stands alone, that the Active phase is *Standalone Bootstrap*, and what's next. `/research`, `/discovery`, `/execute`, `/quick-fix` and `/retro` all exist as commands.
+2. **(Step 2)** Open `docs/Glossary.md` and find **article**, **master**, **LCD schema**, **Creator tier**, **author tier**, **release bundle**, **scale tag** and **shipped-pixel rule**. Each is a one-line definition plus a pointer, and none of them links outside this repo.
+3. **(Step 3)** Open `docs/specs/_Architecture.md`, follow every link into Ontology → Contract → Distribution, and every link resolves inside this repo. Then run the publication check (build map §Gates); it prints **0 hits**.
+4. **(Step 4)** Open `LICENSE` (Apache-2.0), `LICENSE-CONTENT.md` (CC0-1.0 for `MatterLibrary/` materials and textures), `CONTRIBUTING.md` (the CC0 dedication affirmation plus the "credit is asked, not required" norm) and `CREDITS.md`. After the lead pushes, the GitHub repo page shows the Apache-2.0 badge.
+5. **(Step 5)** Open `Readme.md`: it says what the project *is*, with no status banner. Open `docs/Planning/Roadmap.md`: Active is this phase, and Future lists the next phases, each with a one-line Outcome. Open `docs/Planning/PlatformDependencies.md`: it lists each ask of Stage, Plugin, Studio, USDLiveView and the platform docs.
+
+*Reconciled:* each click lands in the step that produces it. Click 1 needs a Roadmap to exist, so step 1 carries the *structural* move of `build_plan.md` → `Roadmap.md`. The Roadmap *re-think* is step 5.
+
+### In now / not now
+
+**In now:**
+- **Vendor the method** from upstream `PeteSmalls/agentic-engineering` @ `a6e7e81`, including the provenance stamp, `LOCAL_DELTAS.md` and `.claude/settings.json`.
+- **Fold in the existing scaffold with `git mv`**, dropping no intent.
+- **Bring home 18 platform `MatterLibrary/` docs** (~1,580 lines) into `docs/specs/`. Rewrite each for a public repo, and **annotate each conflict with R1–R16 in place** (`Drift (2026-09-23): … → see <phase>`), never silently rewriting the contract.
+- **Glossary and NamingConventions** (R16).
+- **Licence and contribution files:** LICENSE, LICENSE-CONTENT, CONTRIBUTING, CREDITS.
+- **README and roadmap:** an identity-only README, the re-thought Roadmap, and `PlatformDependencies.md`.
+- **Hygiene:** remove the tracked `stage.log`; gitignore `.claude/scheduled_tasks.lock`; absorb `FolderStructure.txt`.
+- **Fix the public reference `.mtlx`.** It teaches a defect the contract has since forbidden. Replace it with a live assembled article.
 
 **Not now:**
-- Fixing tool code: hardcoded paths, the pinned environment, CI (the one-command-check phase).
-- The release bundle and consumer contract build (a later phase).
-- Any edit in another repo. The platform-side pointer changes are *listed* in `PlatformDependencies.md`, not made.
-- Tagging or re-versioning releases (research Q5).
+- **Any contract change.** The master token in the catalog (`schema_version` 3), the release-bundle spec, and re-expressing the master settings for Substrate belong to the release-bundle / consumer-contract phase. This phase only *marks* them.
+- **Tool code:** hardcoded paths, the pinned environment and CI belong to the one-command-check phase.
+- **Tags and re-versioning** (research Q5).
+- **Any edit in another repo.** The platform side is *listed* in `PlatformDependencies.md`, not done.
+- **Renaming IMRSV-branded identifiers** (`imrsv_metadata`, `imrsv:matterlibRelease`, `IMRSV_MissingMaterial`, `imrsv_lcd_export`). R16 keeps carried words; they are glossed as historical names, and the one principle tension is noted for the contract phase.
+- **Scrubbing already-committed artifacts.** The approval JSON's approver field is a frozen, hash-locked record, so it is left as is (research Pass 6).
 
-## Seed questions (tested at authoring)
+### Reuse check
+*What does the chosen stack already provide, and which standards are touched?*
 
-1. **Spec layout:** `docs/specs/{Ontology,Contract,Catalog,Authoring,Distribution,Tooling,Experience}` mirroring the platform tree, or flatter? (research Q1)
-2. **Platform research docs** (MaterialChain, MaterialsBuildGrounding, OpenMatterCreatorPipeline): migrate them, or distil their settled decisions into the specs and cite them as platform history?
-3. **Phase numbering:** does this phase get a number, and does this repo's line restart at `Phase01`? (research Q6; the lead's call)
+- **The method's `templates/` + `commands/` + `Methodology/`** provide the whole agent surface. Nothing is invented. The only local layer is `LOCAL_DELTAS.md`, which is the method's own override point.
+- **The platform `MatterLibrary/` specs** are the contract text. They are *moved and scrubbed*, not rewritten from scratch, and the subfolder names are kept (R16 / Conway).
+- **The platform glossary §MATTER LIBRARY** provides 22 terms that are carried with the same words. About 60 further terms used in the specs are missing from it; the set is inventoried in Pass 1.
+- **`git mv`** keeps history across the folding-in, which satisfies the don't-delete rule without any extra machinery.
+- **Standards actually touched:**
+  - the method's §Setup Checklist;
+  - `AI_WorkingAgreement` §Documentation Shapes Architecture;
+  - this repo's §Don't Delete Spec Functionality: mark `Drift`/`Reevaluate` with a date, never delete.
 
-## Sources
+### Decisions that bind
+- **R1–R16** in `docs/Planning/Research/260923_R_StandaloneSetup.md` §Resolved. That is the one authoritative copy; this doc does not restate it.
+- **From the method:**
+  - vendor, don't submodule;
+  - the stack-tier stubs ship empty *unless triggered*. NamingConventions is triggered (the filename grammar and scale tags exist). ToolingConventions is triggered (the `tools/` taxonomy exists). `docs/architecture/` is answered by `docs/specs/_Architecture.md`. CodingStandards stays a stub.
+  - no AI co-author trailer (the template HARD RULE, and R8).
+- **From this repo:** ADD/REFINE, don't delete. It is carried as a project HARD RULE in `.claude/CLAUDE.md` and as a practice in `AI_WorkingAgreement`.
 
-- Research + lead rulings R1–R16: `docs/Planning/Research/260923_R_StandaloneSetup.md`, the one authoritative copy.
-- Method upstream: `PeteSmalls/agentic-engineering` @ `a6e7e81` (`ADOPTING.md`, `Methodology/AgenticEngineering_ProjectFolders.md` §Setup Checklist).
+### Risk lane — `build`
+- **Checked against the high-rigor triggers** (`plan.md`: authorization · secrets · destructive migrations · data loss · the public edge).
+  - No auth or secrets are touched.
+  - Nothing is destroyed: moves are `git mv`, and the only removal is the tracked `stage.log`, which is noise.
+- **The one irreversible act is publication.** The repo is public (verified with `gh repo view`), so a push exposes whatever it carries. That control is **the lead-gated push**; execute never pushes. It is backed by a **publication check that is demonstrated both ways**: run against the raw platform text it must hit, and against the scrubbed tree it must print 0.
+- That is a gate on content, not an amendment to an edge control, so it does not need the `/plan` lane.
+
+### Step list
+Numbering is pending the lead (§Your call 3). The steps are written as `B.n` placeholders until a number is assigned; ids formed from them are claimed at execution, not now.
+
+1. **Orient from the repo.**
+   - Vendor the method.
+   - `git mv` the old `.ai/` files to their new homes (build map).
+   - Write `AGENTS.md`, `.claude/CLAUDE.md`, `AI_Orientation`, `AI_WorkingAgreement` and `LOCAL_DELTAS`.
+   - Add `.claude/commands/*`, `.claude/settings.json` and `.gitignore`.
+   - Move `build_plan.md` → `Roadmap.md` structurally, with this phase ACTIVE.
+   - → *`/howdy` works* (test click 1).
+2. **Look up any term.** `docs/Glossary.md` (the platform §MATTER LIBRARY terms re-glossed, the missing Matter terms, method terms, Retired identifiers) + `docs/NamingConventions.md` (filename grammar pointer, MaterialX casing, scale tags). → click 2.
+3. **Read the contract at home.**
+   - The 18 docs are moved to `docs/specs/` (per Q1), scrubbed, and conflicts annotated.
+   - Add `docs/specs/Consumers.md` (the boundary: which consumer docs stay in the platform).
+   - Fix the reference `.mtlx`.
+   - Record the platform research's settled decisions (S1–S9, with S6 superseded by R15) per Q2.
+   - → click 3, with the publication check at 0.
+4. **Know the terms.** LICENSE, LICENSE-CONTENT, CONTRIBUTING, CREDITS. → click 4.
+5. **See what's next.**
+   - The README becomes identity-only; its `(planned)` intent moves into the Roadmap and phase docs first.
+   - The Roadmap is re-thought from research Pass 8 per R11: bootstrap → one-command check → release bundle + consumer contract → IMRSV consumes the bundle → the rest as TBD.
+   - The old phase docs go to `Phases/Complete/` (delivered by platform phases, marked as such) or to `Phases/Future/`, trimmed to what is really open.
+   - `docs/Planning/PlatformDependencies.md`, `FolderStructure.txt` → `docs/ToolingConventions.md`, `stage.log` removed.
+   - → click 5.
+
+**Split signal:** step 3 is the heavy one (about 1,580 lines rewritten with care), but it serves the same single journey. Time to the first click (step 1) is well under 60–90 minutes. No split.
+
+### Compact build map
+
+**Upstream copy** (@ `a6e7e81`, per `ADOPTING.md` §2):
+
+| From | To |
+|---|---|
+| `commands/*.md` (14) | `.ai/commands/` |
+| `templates/.ai/*` | `.ai/` |
+| `templates/.claude/*` | `.claude/` |
+| `templates/AGENTS.md` | `AGENTS.md` |
+| `templates/docs/*` | `docs/` |
+| `Methodology/AgenticEngineering_{Workflow,DocumentationMap,ProjectFolders}.md` | `Methodology/` |
+
+**Folding in (all `git mv`, then edit):**
+
+| Existing | → |
+|---|---|
+| `.ai/context.md` | `.ai/AI_Orientation.md`. Fix the local root and Blender 5.1+. "Architecture (decided)" → `docs/specs/_Architecture.md`. |
+| `.ai/conventions.md` | `.ai/AI_WorkingAgreement.md` §Project practices. Naming → `docs/NamingConventions.md`. |
+| `.ai/commands/howdy.md` | Replaced by upstream. |
+| `.ai/commands/housekeeping.md` | A `LOCAL_DELTAS` row plus a `ToolingConventions` check. |
+| `.ai/plan/build_plan.md` | `docs/Planning/Roadmap.md` |
+| `.ai/plan/Phase01_Foundations.md` | `docs/Planning/Phases/Complete/` (marked "delivered by platform Phase 52") |
+| `.ai/phases/future/PhaseTBD_VersionManagement.md` | `docs/Planning/Phases/Future/` (trimmed to the open remainder) |
+| `.ai/phases/ignore/` | `docs/Planning/Phases/Complete/ignore/` |
+| `.ai/research/Library_Architecture_Research.md` | `docs/Planning/Research/260530_R_LibraryArchitecture.md` |
+| `FolderStructure.txt` | `docs/ToolingConventions.md` |
+
+**Specs:** platform `MatterLibrary/<X>` → `docs/specs/<X>` (Q1).
+- **SPLIT docs** (MasterSet, LCDSchema, Manifest, ReleaseModel, Experience, CompressedDistribution, `_Architecture`): only the Matter-owned sections come home. The consumer-side sections (UE pins, MID naming, wire and role numbers, deploy script, install discovery, Studio/Theater journey steps) become one-line pointers in `docs/specs/Consumers.md` and entries in `PlatformDependencies.md`.
+- **Rename** `Experience_Matter Library.md` → `Experience_MatterLibrary.md` (no space).
+- **Merge** `Catalog/Catalog.md`'s fictional chart into a real 0.1.0 article table.
+
+**`LOCAL_DELTAS` rows this project needs:**
+- **Separation model (R1):** this repo is a producer. There is no SHA bump here; the platform still pinning this repo is the platform's business during the transition.
+- **Tracker:** `issue-create` → `Imrsv-tools/Matter-Library`. The existing platform-tracker Matter issues stay there (R4).
+- **Where discovery Pass 1 reads:** it becomes `docs/specs/`.
+- **How the project is run:** `python tools/validators/run_all.py`. It fails today until the toolchain phase, and this is recorded.
+- **"The artifact a person can reach":** the installed Blender add-on and Asset Browser, a release bundle, a usdview preview.
+- **Namespaces:** release ids `matterlib-X.Y.Z`, material `vNN`, scale tags.
+- **Methodology path:** it is `Methodology/`, not `docs/Methodology/`. Adapt locally and file it upstream via `/retro`.
+- **Weighting:** still building (R7), so bias toward the smallest unit that fits.
+
+**Gates:**
+- **Placeholder sweep:** `grep -rnE '<(PROJECT|DATE|SHA|owner>/<repo|one-line|ProductDefinition|absolute path|private\|public|Domain|Name)' --exclude-dir=.git .` → 0. The Workflow/illustrative `<n>`, `<sha>` and similar in the commands are excluded.
+- **Publication check (both ways):**
+  ```
+  grep -rnE 'IMRSV_Platform_Documentation|\.\./(\.\./)?(Stage|Plugin|Studio|Planning|Learnings|Tests|3rdPartyGuides)/|/home/peter|~/\.config/imrsv|IoxMaterialInfo|MaterialXOps\.cpp|ExternalUSD\.cmake|GH ?#[0-9]+|#(35|47|64|78|79|80|81|82|350)\b|Tobias|project_no_legacy' docs/specs docs/Glossary.md docs/NamingConventions.md Readme.md CONTRIBUTING.md
+  ```
+  It must **hit** on the raw platform text and print **0** on the scrubbed tree. Allowlisted hits (with a reason) are recorded in the Execution Log.
+- **Link check:** every relative link under `docs/` resolves to a file in this repo.
+
+---
 
 ## Discovery Log
 
-_(passes accrue here)_
+### Pass 1 — the platform-docs review (2026-09-23)
+
+**Examined:**
+- all 18 platform `MatterLibrary/` docs (~1,580 lines);
+- the platform glossary §MATTER LIBRARY + NamingConventions §MaterialX;
+- this repo's tree;
+- the method templates @ `a6e7e81`;
+- the USDLiveView adoption (the closest precedent: an IMRSV standalone that absorbed an old flat scaffold);
+- the research doc R1–R16.
+
+The platform-docs survey was done by an agent reading the docs through `gh api` and is summarised here. The two load-bearing claims were re-verified by hand: the reference `.mtlx` defect and the absence of a catalog master field.
+
+**Findings (distilled):**
+1. **The specs are solid and mostly Matter-owned.**
+   - **MOVE:** Taxonomy, Identity, MaterialXTemplate, RuntimeCatalog, CreatorAssetProfile, AuthoringGoldenPath, AuthoringHarness, USDValidationToolchain, `_Docs_Index`.
+   - **SPLIT** (the consumer-side sections stay in the platform): `_Architecture`, Experience, MasterSet, Manifest, LCDSchema, ReleaseModel, CompressedDistribution.
+   - **MERGE:** Catalog.
+2. **Scrub load, per the build-map check:**
+   - about 25 links into Stage/Studio/Planning/Tests;
+   - about 180 platform phase ids;
+   - GitHub ids #35≡#47, #81, #350;
+   - private code cites (`MaterialXOps.cpp`, `ExternalUSD.cmake`, `IoxMaterialInfo`, protocol versions);
+   - local paths (`~/usd-tools`, `~/.config/imrsv`);
+   - a person's name;
+   - a private memory name.
+
+   Only a few phase-history facts are load-bearing: TwoLayer retained, the Phase-71 overlay/colour-space correction, the 60sq1 Blender ship, and the 60sq2 release model. They condense into one dated history note per doc.
+3. **Conflicts with the rulings.** These are annotated in place, not resolved here:
+   - **R14:** there is no master token in the catalog or manifest ✔. MaterialXTemplate even calls the manifest "authoritative for master mapping". The token lives only in the `imrsv_metadata` hint, and the `system` token (MissingMaterial ✔) is undefined.
+   - **R15:** MasterSet says "legacy model, not Substrate, for v1", and its settings table is written in legacy shading-model terms.
+   - **R1:** ReleaseModel's deploy step and its promote gate depend on Stage's fixture mirror. USDValidationToolchain slaves the toolchain pins to Stage's. No spec names a "release bundle".
+   - **R9/R13:** AuthoringGoldenPath frames provenance around "sells the pixels" and favours indemnified licensed-data vendors. The live policy (ambientCG CC0 + procedural, no generative vendor) is not written into the spec.
+4. **The reference `.mtlx` teaches a forbidden defect ✔.** It uses `overlay1_dust_tex`, loaded as `srgb_texture`, and mixes the overlay over base colour. The live articles use `overlay1_tex` in `lin_rec709`, applied as a modulator. Publishing it as-is would ship the bug as the reference. (In scope: replace it.)
+5. **The authority is inverted in the text.** Four specs call this repo "stale … the source, not the authority". Moving home flips that.
+6. **Stale against the live repo:**
+   - Catalog's chart names articles that don't exist, and puts Diamond under utility.
+   - `_Docs_Index` omits CreatorAssetProfile.
+   - The Manifest YAML example is invalid.
+   - CODEOWNERS and tags are claimed but absent.
+   - AuthoringHarness's tool list is incomplete.
+7. **Glossary.**
+   - 22 platform terms: about 15 are Matter-owned; the rest are consumer-side (`M_MasterMaterial_<Token>`, rewrite-on-import, `category`, ReleaseConflict, the MID) and are kept only as boundary notes.
+   - **"Name-keyed master resolution" conflicts with R14.** It is re-glossed as token-from-data plus the consumer's own token→asset map.
+   - About 60 further terms are used but not glossed: article, source collection, author/Creator tier, render-role texture, freeze, staging, selector, recipe, shipped-pixel rule, lightweight/complete-portable, release bundle, and others.
+8. **IMRSV-branded identifiers in a community contract** (`imrsv_metadata`, `imrsv:matterlibRelease`, `IMRSV_MissingMaterial`, `imrsv_lcd_export`). Fork test 1 answers this: **R16 + "never rename a carried term"** means they are kept and glossed as historical names. It is not a lead fork. The one real tension, `imrsv:matterlibRelease` against the specs' own "no `imrsv:` attributes" principle, is recorded for the contract phase.
+9. **Learnings:** this repo has no `docs/Learnings/`. The platform learnings that mention Matter (build-deploy B23/B26, headless-Blender exit-0, the UE sampler/sRGB fallback) concern tool and deploy behaviour this phase does not touch. **This is a discharged read.** They are candidates for the toolchain and release-bundle phases.
+10. **The phase name in the tree** exists only in the research doc and this seed; no prior phase built or deferred it.
+
+**Decision:** Brief written (above). Scope line: **bring home + scrub + annotate; no contract change.** Every contract change the rulings imply goes to the release-bundle / consumer-contract phase.
+
+## Your call (open; the Brief is complete apart from these)
+
+1. **Spec layout.** *Recommend* `docs/specs/` with the platform's subfolder names kept (`Ontology/`, `Contract/`, `Catalog/`, `Authoring/`, `Distribution/`, `Tooling/`, `Experience/`). The same words keep consumer pointer rewrites mechanical (`MatterLibrary/X` → `docs/specs/X`).
+2. **Platform research docs** (MaterialChain, MaterialsBuildGrounding, OpenMatterCreatorPipeline). *Recommend* **distil, don't migrate**: record the settled decisions (S1–S9, with S6 marked superseded by R15) as a dated "Decisions of record" section in `docs/specs/_Architecture.md`, and cite the originals as platform history. They are about 1,000+ lines dense with private detail, and the specs already carry their outcomes.
+3. **Numbering.** Does this phase get a number, and does this repo's line start at `Phase01`? The old `Phase01_Foundations` was delivered by platform Phase 52 and goes to `Complete/` under its old name. *Recommend* **`Phase01`**: it is this repo's first phase on its own line, and the old doc keeps its historical name in `Complete/`.
 
 ## Discovery Status
 
-- **Passes captured:** —
-- **Current working direction:** —
-- **Open decisions:** seed questions 1–3
-- **Checks to carry forward:** —
+- **Passes captured:** 1.
+- **Current working direction:** bring home + scrub + annotate, in five vertical steps; lane `build`.
+- **Open decisions:** Your call 1–3.
+- **Checks to carry forward:**
+  - re-verify the upstream SHA before vendoring (upstream may have moved);
+  - run the publication check both ways;
+  - the push stays with the lead.
 
 ## Execution Log
 

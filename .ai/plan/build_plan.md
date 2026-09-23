@@ -49,7 +49,7 @@ Each of these was an "Upcoming" phase here; each shipped **into this repo** via 
 
 ## Upcoming (not yet sequenced — rough working order)
 
-### Standalone Bootstrap — SEEDED *(2026-09-23)*
+### Standalone Bootstrap — SEEDED *(2026-09-23; discovery Brief written)*
 **Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
 - `docs/Planning/Phases/Future/PhaseTBD_StandaloneBootstrap.md` · research: `docs/Planning/Research/260923_R_StandaloneSetup.md`
 
