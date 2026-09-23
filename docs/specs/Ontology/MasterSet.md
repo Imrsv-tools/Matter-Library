@@ -4,13 +4,13 @@
 
 The **master set** defines **what a Matter material can BE**. Under runtime-instanced masters, a Matter material is not arbitrary MaterialX node soup — it is a **template instance**: *"master X + these textures + these LCD parameter values."* The master set is therefore the **authoring contract**: a community contribution must "conform to a Matter template," caught at authoring/CI time, never discovered at runtime.
 
-This spec is the **producer side** of the master contract: the masters, their tokens, class routing, the overlay/maskset model, the blend formula and each master's settings intent. How a given consumer implements a master (its asset names, material settings enums, instance model, wire format) is consumer-side and lives in [Consumers](../Consumers.md).
+This spec is the **producer side** of the master contract: the masters, their tokens, how an article's master is chosen, the overlay/maskset model, the blend formula and each master's settings intent. How a given consumer implements a master (its asset names, material settings enums, instance model, wire format) is consumer-side and lives in [Consumers](../Consumers.md).
 
 > **Governing insight:** only **a renderer that partitions shader space forces the split.** Blender Principled BSDF and MaterialX `open_pbr_surface` are each one über-shader; with only those targets ONE master would suffice. Masters exist because **Unreal partitions shader space by blend mode / domain** (opaque vs masked vs translucent are different compiled graphs). So the set is *"how such a renderer forces us to partition OpenPBR space"* — every master is a **window onto the same canonical OpenPBR model**, which is what keeps cross-renderer [parity](../../Glossary.md) honest.
 
 ## v1 baseline = 7 masters + 1 system material
 
-| Master (identity token) | Covers (taxonomy classes) | Key extra params | Notes |
+| Master (identity token) | Typical materials, by class (examples, not a routing rule; see [§Master resolution](#master-resolution--the-article-declares-its-master)) | Key extra params | Notes |
 |-------------------------|---------------------------|------------------|-------|
 | **Opaque** | stone, wood, soil, most mineral, metal, cementitious, composite, plastic, polymer, coating, sand — **the ~85% workhorse** | anisotropy, sheen, clearcoat as optional Substrate slab features | brushed metal / velvet / glaze are *params*, not masters |
 | **Masked** | textile (lace), perforated metal¹, vegetation | opacity cutoff; possible foliage variant (two-sided + thin transmission) | foliage variant open *(planned)* |
@@ -57,23 +57,39 @@ The **canonical master token** used in the manifest / `imrsv_metadata` / name-ke
 
 *Consumer-side (IMRSV): token → Unreal asset naming pin (`M_MasterMaterial_<Token>`) — see [Consumers](../Consumers.md).*
 
-### Master resolution — class routing, with name exceptions
+### Master resolution — the article declares its master
 
-A material identity resolves to a master by its **taxonomy class**, with **leaf-stem name exceptions** where a single material name is what justifies a whole master. The exceptions are not ad-hoc: the table above already argues masters *by material name* — *"`Marble` alone justifies it"*, *"`Diamond` … is exactly what justifies TranslucentThick"*. Those two are the precedent; the third follows it.
+**Rule (lead, 2026-09-23):** a master is the LCD and texture structure for a **type of material**, not for a taxonomy class.
+- **Every article declares the master that fits what the material physically is**, from the closed master set. Today it is carried as `imrsv_metadata.master_material` in the article's `.mtlx`. Under R14 it is also the per-article master token in release data.
+- **The class gives only a typical default** (the "Typical materials" column above). It never overrides the article's declaration.
+- **A consumer resolves an article's master from the article's own token, never from its class** (consumer side: [PlatformDependencies](../../Planning/PlatformDependencies.md) P4).
+- **No new masters are needed for coverage.** Covering new matter means an article choosing one of the existing masters.
 
-| Exception (leaf stem) | Master | Why the class route is insufficient |
+Examples where the material, not its class's typical master, decides: lace (textile) is **Masked**, while cotton and denim (textile) are **Opaque**; sapphire (mineral) is **TranslucentThick**; acrylic (plastic) is **TranslucentThin**; grass ground cover (vegetation) is **Opaque**, while a leaf card is **Masked**.
+
+> **Superseded (2026-09-23), kept for history:** "A material identity resolves to a master by its **taxonomy class**, with **leaf-stem name exceptions** where a single material name is what justifies a whole master. The exceptions are not ad-hoc: the table above already argues masters *by material name* — *"`Marble` alone justifies it"*, *"`Diamond` … is exactly what justifies TranslucentThick"*. Those two are the precedent; the third follows it."
+>
+> Taken literally, class routing made every textile and vegetation article Masked, which the Masked conformance check would then fail for lacking a cut-out opacity source. Reaching real coverage would have needed dozens of name exceptions. The three exceptions below are kept as the original cases in which the material decided; under the rule above, each is simply an article declaring its master. (Evidence: `docs/Planning/Research/260923_R_AgenticMaterialGeneration.md` Passes 10 and 12.)
+
+| Original exception (leaf stem) | Master | Why the class route was insufficient |
 |---|---|---|
 | `marble` | **Subsurface** | class `stone → Opaque`; marble is the material that justifies SSS |
 | `diamond` | **TranslucentThick** | class `mineral → Opaque`; diamond is the material that justifies absorption+IOR |
 | **`rust`** | **TwoLayer** | class `metal → Opaque`. **TwoLayer's own use case in this spec is rust-on-metal** (row 6) — yet without this exception no class and no exception routed to it, so the master was **unreachable**: it existed and nothing could ever bind it. A `rust`-stemmed identity in `engineered/metal` is exactly the article the master exists to serve. |
 
-⚠ **Adding a taxonomy *class* to serve one article is the wrong lever** — [Taxonomy](Taxonomy.md) is a closed 19-class ontology, and inventing a class so the code can find a master inverts the ontology to serve the implementation. The name-exception is the sanctioned mechanism, and it is why the existing ones exist.
+⚠ **Never add a taxonomy class to reach a master.** The article declares its master, so no class is ever needed for that. Classes are added when the *matter* needs them ([Taxonomy §Growth model](Taxonomy.md#growth-model)).
+
+> **Superseded (2026-09-23), kept for history:** "**Adding a taxonomy *class* to serve one article is the wrong lever** — [Taxonomy](Taxonomy.md) is a closed 19-class ontology, and inventing a class so the code can find a master inverts the ontology to serve the implementation. The name-exception is the sanctioned mechanism, and it is why the existing ones exist."
 
 *(Updated 2026-09-23, measured: the routing agrees with the articles — `Marble_Veined_Polished` (natural/stone) declares `Subsurface`, `Diamond_Brilliant` (natural/mineral) `TranslucentThick`, `Rust_OnSteel_Flaking` (engineered/metal) `TwoLayer`, while `Copper_Verdigris_Aged` in the same class declares `Opaque`.)*
 
-> **Drift (2026-09-23):** class routing is written here as a rule but is applied in consumer code today; R14 moves it into release data (each article's resolved master token ships in the release, so no consumer hardcodes the routing table) — owned by the release-bundle / consumer-contract phase (R14).
+> **Drift (2026-09-23):** the IMRSV consumer still routes by a class → master table compiled into its plugin, and ignores each article's declared token. R14 moves the per-article token into release data, and the consumer switches to it ([PlatformDependencies](../../Planning/PlatformDependencies.md) P4). Owned by the release-bundle / consumer-contract phase (R14).
+>
+> **Todo (2026-09-23):** nothing in this repo checks that an article's declared master fits its material. `tools/validators/validate_material.py` checks only that the declared master's defining carriers are present and wired. A plausibility check belongs to the authoring-harness work (research: `260923_R_AgenticMaterialGeneration.md` gap G4).
 
-¹ **`perforated metal` has no resolution route today** — class `metal → Opaque`, and no `Masked` name-exception serves it. No such article exists yet, so this is a **later addition** *(planned)*, not a correction: when a perforated-metal article is authored it needs a name-exception (the mechanism above), not a taxonomy change. Recorded so the gap is known rather than discovered.
+¹ **Perforated metal** declares **Masked** (it cuts holes), even though metal's typical master is Opaque. No such article exists yet *(planned)*.
+
+> **Superseded (2026-09-23), kept for history:** "**`perforated metal` has no resolution route today** — class `metal → Opaque`, and no `Masked` name-exception serves it. … when a perforated-metal article is authored it needs a name-exception (the mechanism above), not a taxonomy change."
 
 ## TwoLayer — RESOLVED: retained
 
@@ -208,7 +224,7 @@ A translucent master that derives coverage as `Opacity = Opacity × (1 − Trans
 1. **TwoLayer = two real layers**, not a clearcoat — and the layer-2 maps + blend scalars are part of the contract.
 2. **The MaskSet channel contract** (R = layer-2 coverage · G/B = overlay gates · A reserved).
 3. **Overlays and masksets are MODULATORS, never albedo**, and load **linear**, never sRGB.
-4. **The `rust → TwoLayer` name exception**, without which the TwoLayer master is unreachable.
+4. **The `rust → TwoLayer` name exception**, without which the TwoLayer master is unreachable. *(Superseded 2026-09-23: articles declare their master, so a rust-on-metal article declares TwoLayer and no exception is needed; see §Master resolution.)*
 5. **The material-settings intent** per master (coverage · shading model · two-sided · refraction).
 6. **The opacity floor** (`MIN_TRANSMISSIVE_OPACITY = 0.05`) as a normative part of the translucent contract.
 
@@ -225,3 +241,4 @@ The per-master **author-tier** carriers (the values that make each master *be* t
 - 2026-07 — no spec owned the masters' material settings. A refractive master shipped with refraction off, and the Masked master shipped one-sided; the one-sided master was caught by eye after every headless gate had passed. The settings table was written so the settings have something to be held against.
 - 2026-07 — Diamond, authored with an honest `transmission = 1.0`, rendered as a black/clear mirror with dead roughness because opacity went to zero. The opacity floor was added to the translucent masters, not to the article.
 - 2026-07 — all seven masters were shown rendering their defining behaviour in a consumer, each with a real Creator-selectable example article.
+- 2026-09-23 — master resolution changed from class routing with name exceptions to "the article declares its master; the class is a typical default" (lead). A master is the structure for a type of material. Class routing would have made ordinary fabrics Masked, and full coverage would have needed dozens of exceptions. No master was added or changed.

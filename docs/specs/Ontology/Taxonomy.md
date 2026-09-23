@@ -38,7 +38,9 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 
 - **Classes** can be added under an existing Domain as the library grows (additive — a library semver-**minor**).
 - **A Realm above Domain** *(planned)* is an escape hatch: if the library ever spans beyond elemental matter (e.g. composite "non-matter" like *brick wall*, *tile roof*, *cobblestone street*), a **Realm** level sits above Domain — "Matter" is one Realm; "Buildings" would be another with its own taxonomy. Not built; recorded so the query-vector design (`Realm / Domain / Class / Material / Variant / Condition / Detail`) is anticipated, not retrofitted.
-- **Never add a Class to serve one article.** The 19-class ontology is closed per release; when a single article needs a different master than its Class routes to, the sanctioned mechanism is a name exception in [MasterSet §Master resolution](MasterSet.md#master-resolution--class-routing-with-name-exceptions), not a new Class.
+- **Add a Class whenever the matter needs one** (lead, 2026-09-23: "we can add classes if we need to — we have a universe to rebuild matter for"). The class set is fixed *within* a release; adding one is additive (semver-minor). A Class is never added to reach a master: every article declares its own master ([MasterSet §Master resolution](MasterSet.md#master-resolution--the-article-declares-its-master)).
+
+  > **Superseded (2026-09-23), kept for history:** "**Never add a Class to serve one article.** The 19-class ontology is closed per release; when a single article needs a different master than its Class routes to, the sanctioned mechanism is a name exception in MasterSet §Master resolution, not a new Class."
 
 ## Status
 
@@ -52,3 +54,4 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 
 - The 5-Domain / 19-Class taxonomy was first written in the library's original README and carried unchanged into the platform specs.
 - 2026-06 — `atmospheric` was named explicitly out of master-set scope (volume materials are not prop-applied matter); this was the one change to the original ontology.
+- 2026-09-23 — the "closed ontology, never add a Class" rule was relaxed (lead): Classes are added when the matter needs them, and masters no longer route by Class.

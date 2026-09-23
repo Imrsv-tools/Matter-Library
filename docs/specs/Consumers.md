@@ -32,7 +32,7 @@ IMRSV is the first and largest consumer. The following topics were **moved out o
 
 | Topic | Owner inside IMRSV | Which Matter contract it implements |
 |---|---|---|
-| **Token → Unreal asset** (`M_MasterMaterial_<Token>`) and resolving an article to its master at render time | UE plugin | [MasterSet](Ontology/MasterSet.md) tokens and class routing |
+| **Token → Unreal asset** (`M_MasterMaterial_<Token>`) and resolving an article to its master at render time | UE plugin | [MasterSet](Ontology/MasterSet.md) tokens; the article's own declared token, never its class (§Master resolution, 2026-09-23; [PlatformDependencies](../Planning/PlatformDependencies.md) P4) |
 | **Unreal material settings per master** (blend mode, shading model, two-sided, refraction) and how the masters are built | UE plugin | MasterSet's renderer-neutral settings. Target **Unreal 5.8+ with Substrate** (R15). |
 | **TwoLayer rendering**: rebuilding the layer blend in an engine that doesn't evaluate the MaterialX graph | UE plugin + Stage | MasterSet's TwoLayer blend formula |
 | **Parameter naming on the engine side** (how LCD and author-tier names map to engine material parameters) | Stage + UE plugin | [LCDSchema](Contract/LCDSchema.md). Keeping Creator ports distinct from author-tier values is part of the consumer's contract. |

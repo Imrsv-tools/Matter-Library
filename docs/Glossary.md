@@ -126,7 +126,7 @@
 | Term | Definition |
 |---|---|
 | **`M_MasterMaterial_<Token>`** (consumer-side) | IMRSV's cooked Unreal asset implementing a master token (e.g. `Opaque` → `M_MasterMaterial_Opaque`). Token ≠ asset: the library pins the token, the consumer owns the asset. |
-| **Name-keyed master resolution** (consumer-side) | How a consumer maps an article to its master at render time. *Drift (2026-09-23): IMRSV does this with a compiled table today; under R14 it reads the master token from release data instead.* |
+| **Name-keyed master resolution** (consumer-side) | How a consumer maps an article to its master at render time: from the article's own declared master token, never from its class (`docs/specs/Ontology/MasterSet.md` §Master resolution, 2026-09-23). *Drift (2026-09-23): IMRSV does this with a compiled class table today; under R14 it reads the master token from release data instead.* |
 | **MID** (consumer-side) | Unreal's runtime material instance, created per use from a master and set from the article's values. |
 | **Material `category`** (consumer-side) | IMRSV's picker filter key; it is the article's Class. |
 | **ReleaseConflict** (consumer-side) | IMRSV's fail-loud state when a composition's release pin doesn't match the active release. |
