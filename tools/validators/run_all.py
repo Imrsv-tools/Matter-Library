@@ -32,7 +32,7 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
                                active-release selector ATOMICALLY (a failure leaves the prior
                                release active — RD-3/RD-5); skips pre-promotion
 
-Exit 0 iff no lane FAILs — and, with --strict, no lane SKIPs either (CI runs strict).
+Exit 0 iff no lane FAILs — and, with --strict, no lane SKIPs either (the full check before merging).
 """
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ import stage_release as sr           # noqa: E402
 import activate_release as ar        # noqa: E402
 
 # A lane returns True (PASS), False (FAIL) or SKIP. A skip is NOT a pass: the summary names it,
-# and --strict (CI) fails on it. Before 2026-09-23 every skip returned True and read as PASS.
+# and --strict (the full check before merging) fails on it. Before 2026-09-23 every skip returned True and read as PASS.
 SKIP = "SKIP"
 
 
@@ -649,7 +649,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
     ap.add_argument("--strict", action="store_true",
-                    help="treat a SKIPPED lane as a failure (CI runs this way: every lane must run)")
+                    help="treat a SKIPPED lane as a failure: every lane must run (the full check before merging)")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
 

@@ -1,6 +1,6 @@
 # Phase02 — One-Command Check
 
-**Status:** 🎉 COMPLETE (closed 2026-09-23) — **with the pull-request check wired but not yet running**: the organisation's GitHub Actions policy is "disabled for all repositories", so the workflow has never run. Closed that way at the lead's direction (§Execution Log, CLOSE). **Owed:** set the org policy to allow this repository, then append `✅ CI OBSERVED <date> — <run URL>` here. Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
+**Status:** 🎉 COMPLETE (closed 2026-09-23). **Automatic pull-request checks are PARKED by the lead** (*"that is really advanced and I don't want it"*), so the close is no longer provisional on CI. The Outcome's last clause is carried to the Contribution Path phase, and the dormant workflow is kept for it (§Execution Log, CLOSE). Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
 
 ## Outcome
 
@@ -29,7 +29,7 @@ Each click is reachable by the step its note names. Step 2.1's test is clicks 1�
 - **Tri-state lane reporting.** Today every skip path does `return True`, so a skip reports `PASS` (read in `run_all.py`, 2026-09-23). A local run may skip, and the report says so. CI runs **strict**, where any `SKIP` is a failure. That is how the gate is demonstrated both ways.
 - **`fixture_sync` leaves the gate.** It reads a consumer's tree outside this repo (it probed `../IMRSV_Studio/…` from a `/tmp` clone). Ruled by R1, and `PlatformDependencies.md` P8 names "this repo (removes it)". **Don't Delete:** `check_fixture_sync.py` stays as a standalone tool the consumer can run with `--fixture-root`. The lane's intent is recorded in `AuthoringHarness.md` as moved to the consumer side (P8).
 - **A release-verify lane** (Lead call 3, the mechanism only): each committed `*.freeze.json` re-verifies against the tree. The encoder-built `dds_set` is included when staging exists, and otherwise names what it could not check.
-- **CI on GitHub**, running the gate strictly on every pull request and every push to `main`, with the pinned encoder installed. Locally the encoder stays optional: its lanes `SKIP` and name `COMPRESSONATORCLI` (Lead call 2).
+- *(Parked by the lead at close, 2026-09-23 — see Status.)* **CI on GitHub**, running the gate strictly on every pull request and every push to `main`, with the pinned encoder installed. Locally the encoder stays optional: its lanes `SKIP` and name `COMPRESSONATORCLI` (Lead call 2).
 - **Routed hygiene**, each discharging a dated marker:
   - Every hardcoded home path in `tools/conformance/` (9 files) and `tools/generators/gen_asset_library.py` goes. They point at a **retired** platform checkout (`…/IMRSV_GITrepos/IMRSV_Platform/…`), so they are broken on the lead's box too. The repo root derives from `__file__`; the USD install and conda env come from environment variables with documented defaults.
   - `library/provenance/matterlib-0.1.0-textures.md` platform phase ids (Phase01 §Deferral ledger).
@@ -73,7 +73,7 @@ Each click is reachable by the step its note names. Step 2.1's test is clicks 1�
 
 1. **2.1 — One command, truthful report.** Pinned env; `run_all.py` reports `PASS`/`SKIP`/`FAIL` with counts and a `--strict` mode where `SKIP` fails; `fixture_sync` out of the gate. *First clickable result:* clicks 1–2.
 2. **2.2 — The release validates.** The release-verify lane re-verifies every committed freeze record. It must demonstrably fail on a changed texture and on a pointer-only (no-LFS) checkout. *First clickable result:* click 3.
-3. **2.3 — Checked on every pull request.** The Actions workflow runs strict, with LFS and the checksummed encoder, both cached. Lead push. *First clickable result:* click 4.
+3. *(Parked by the lead at close, 2026-09-23 — built, never run.)* **2.3 — Checked on every pull request.** The Actions workflow runs strict, with LFS and the checksummed encoder, both cached. Lead push. *First clickable result:* click 4.
 4. **2.4 — The other tiers run from any clone.** The hardcoded-path removal and the rest of the routed hygiene, plus the docs flips. *First clickable result:* `tools/conformance/check_asset_library.sh` from `/tmp/ml` finds its repo without an edit (Blender 5.1 present).
 
 No split signal: one journey (the same gate, at a desk and on a PR). Step 2.1 is small.
@@ -126,7 +126,7 @@ The lead, verbatim: *"go with the recommendations"*. Each call below records the
 
 | Open thread | Disposition |
 |---|---|
-| First CI run (the org Actions policy) | **ALREADY ROUTED**: lead "2". Owed: the lead sets the org policy to selected repositories + Matter-Library, then a run is observed and recorded in `Status:`. |
+| Automatic PR checks (CI) | ~~ALREADY ROUTED: lead "2"; owed a first run.~~ **Superseded the same day, PARKED by the lead**, verbatim: *"so hold on... close is blocked becuase of this git check thing? that is really advanced and I don't want it"*. Intent kept (Don't Delete): `.github/workflows/gate.yml` stays, dormant (the org Actions policy disables all repositories). Whether to turn it on belongs to the Contribution Path phase, whose Outcome already promises "an automatic verdict". |
 | `promote_release.py` still runs the consumer fixture-sync check | **deferred as an ADDITION**: a pre-existing dependency of promotion, not a surface this phase authored (the Brief scoped `fixture_sync` out of the **gate**). Recorded as a narrowed Drift in `AuthoringHarness.md` → Release Bundle and Consumer Contract. |
 | Stage adopting the fixture-sync check (P8) | platform-side; `PlatformDependencies.md` P8 reads "half done". |
 | `.ai/AI_Orientation.md` and `.ai/commands/LOCAL_DELTAS.md` still say "16 lanes / fails at import" | **Refiner's lane** → `/retro`. |

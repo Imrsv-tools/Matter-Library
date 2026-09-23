@@ -2,7 +2,7 @@
 
 Thank you for helping build the Matter Library, a community material library that anyone can use. This page covers **what you agree to when you contribute**, **what we can and cannot accept**, and **how a material gets in**.
 
-> **Status (2026-09-23):** the project is still being built, not in production. The contribution path works: the validation gate is one command (see §Checks), and the same gate runs automatically on pull requests. Expect a maintainer to help you through your first contribution.
+> **Status (2026-09-23):** the project is still being built, not in production. The contribution path works: the validation gate is one command (see §Checks), which a maintainer also runs on your pull request. Expect a maintainer to help you through your first contribution.
 
 ## 1. What you agree to
 
@@ -56,7 +56,7 @@ uv run tools/validators/run_all.py
 
 This is the structural gate: name, schema, the OpenPBR template, the parameter contract, determinism, and release records. On the first run, [uv](https://docs.astral.sh/uv/) builds the pinned environment (Python 3.12, MaterialX 1.39.5) from `pyproject.toml` and `uv.lock`. You need `git-lfs` installed so the textures are real images; without it the `release_verify` lane fails.
 
-Every lane reports **PASS**, **FAIL** or **SKIP**. Locally, the `compression` and `staging` lanes **SKIP** unless you install the pinned texture encoder (AMD `compressonatorcli` V4.5.52) and point `COMPRESSONATORCLI` at it. That's fine: your pull request is checked by the same gate in **strict** mode, where every lane must run (`.github/workflows/gate.yml`).
+Every lane reports **PASS**, **FAIL** or **SKIP**. Locally, the `compression` and `staging` lanes **SKIP** unless you install the pinned texture encoder (AMD `compressonatorcli` V4.5.52) and point `COMPRESSONATORCLI` at it. That's fine: a maintainer runs the full gate, with the encoder, before merging.
 
 ## 5. From contribution to release
 

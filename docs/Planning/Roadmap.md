@@ -79,4 +79,4 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Phase02 — One-Command Check — COMPLETE
 **Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
 - `docs/Planning/Phases/Complete/Phase02_OneCommandCheck.md`
-*Closed 2026-09-23; the pull-request check is wired but waits on the organisation's Actions policy.*
+*Closed 2026-09-23; automatic pull-request checks parked by the lead (→ Contribution Path).*

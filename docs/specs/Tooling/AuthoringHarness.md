@@ -45,7 +45,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `fixtures/grammar_cases.json` | identity-grammar regression fixture (must-pass / must-fail) |
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
 
-**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (CI) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
+**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
 
 | Lane | Checks |
 |---|---|
