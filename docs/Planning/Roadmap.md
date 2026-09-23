@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase02 — One-Command Check — ACTIVE
-**Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
-- `docs/Planning/Phases/Phase02_OneCommandCheck.md`
+*None (2026-09-23). The next entry in `## Future` is where work starts when the lead numbers it.*
 
 ==================================================================================
 ## Future
@@ -77,3 +75,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
 - `docs/Planning/Phases/Complete/Phase01_StandaloneBootstrap.md`
 *Closed 2026-09-23.*
+
+### Phase02 — One-Command Check — COMPLETE
+**Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
+- `docs/Planning/Phases/Complete/Phase02_OneCommandCheck.md`
+*Closed 2026-09-23; the pull-request check is wired but waits on the organisation's Actions policy.*

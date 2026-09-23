@@ -1,6 +1,6 @@
 # Phase02 — One-Command Check
 
-**Status:** IN EXECUTION (2026-09-23) — the Brief is complete and the three lead calls are resolved (§Lead calls). Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
+**Status:** 🎉 COMPLETE (closed 2026-09-23) — **with the pull-request check wired but not yet running**: the organisation's GitHub Actions policy is "disabled for all repositories", so the workflow has never run. Closed that way at the lead's direction (§Execution Log, CLOSE). **Owed:** set the org policy to allow this repository, then append `✅ CI OBSERVED <date> — <run URL>` here. Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
 
 ## Outcome
 
@@ -112,3 +112,22 @@ The lead, verbatim: *"go with the recommendations"*. Each call below records the
 | 2.3 | the 2.3 commit | `.github/workflows/gate.yml`: `pull_request` + `push: main`, `contents: read`, no secrets, actions pinned by SHA (checkout v7.0.1, cache v6.1.0, setup-uv v10.2.0), LFS cached by object set, encoder download cached and sha256-checked every run, `uv run --locked … --strict`. Pre-push: the pinned encoder encodes and reports `V4.5.52` in a stock `ubuntu:24.04` container. ▶ SCAFFOLD COMPLETE — the first CI run is owed (needs the lead's push). | lead push → CI run |
 | 2.3 push | — | Lead: *"go for it"*. Pushed `b30efc4..b96cf9d`. The workflow registered ("Structural gate", active), but **no run started: GitHub Actions is disabled on the repository** (`actions/permissions` → `enabled: false`). ▶ still owed: enable Actions, then the first run. | lead: enable Actions |
 | 2.4 | `02df570` | No absolute path to the retired checkout remains in `tools/` or `blender/` (`git grep` → 0). **Click, from a fresh clone at another path:** `check_asset_library.sh` (Blender 5.1.0, 11 articles) and `check_conformance.sh` (USD 26.03) → exit 0, 110 PASS / 0 FAIL, clone left clean. Add-on declares `(5, 1, 0)`, measured enabling on 5.1.0. Docs flipped. Promotion's own fixture-sync dependency kept as a narrowed Drift (release-bundle phase). `.ai/AI_Orientation.md` and `LOCAL_DELTAS.md` still say "16 lanes / fails at import" → **`/retro` item at close** (Refiner's lane). ✅ | close, after the first CI run |
+| 2.3 Actions | — | The lead enabled Actions for the repo. The repo still read `enabled: false`: the **org** policy was `enabled_repositories: none` (read with the lead's `admin:org` login). A dispatched run (`35902233653`) sat queued with no job and was closed by GitHub. Changing the org policy from this session was refused by the auto-mode classifier (org permission grant), which is correct. ▶ SCAFFOLD COMPLETE — first run owed. | lead ruling |
+
+### CLOSE — DONE (2026-09-23)
+
+**The lead's ruling, verbatim.** Offered *"1. Turn the switch on … 2. Skip it for now and get back to the library. Close Phase 2 with the automatic GitHub check marked 'ready, waiting for the switch'"*, the lead replied: **"2"**.
+
+**Acceptance, against the Outcome sentence:** *"Anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request."*
+- **Clone, one command, every material and release validates:** met. Fresh clone → `uv run tools/validators/run_all.py` → 16 lanes, 14 PASS / 2 SKIP, exit 0 (re-run at close, after a sibling session's commits). The two skips are the encoder lanes, named as such. With the pinned encoder: 16 PASS, including the full `.dds` release payload.
+- **Checked automatically on every pull request: NOT met.** The workflow exists and is correct as far as anything short of a run can show, but it has never run: the org policy disables Actions. **Disposition: `ALREADY ROUTED`** (the lead ruled "2" with this gap stated in the message). The `🎉` headline says so.
+
+**Deferral ledger:**
+
+| Open thread | Disposition |
+|---|---|
+| First CI run (the org Actions policy) | **ALREADY ROUTED**: lead "2". Owed: the lead sets the org policy to selected repositories + Matter-Library, then a run is observed and recorded in `Status:`. |
+| `promote_release.py` still runs the consumer fixture-sync check | **deferred as an ADDITION**: a pre-existing dependency of promotion, not a surface this phase authored (the Brief scoped `fixture_sync` out of the **gate**). Recorded as a narrowed Drift in `AuthoringHarness.md` → Release Bundle and Consumer Contract. |
+| Stage adopting the fixture-sync check (P8) | platform-side; `PlatformDependencies.md` P8 reads "half done". |
+| `.ai/AI_Orientation.md` and `.ai/commands/LOCAL_DELTAS.md` still say "16 lanes / fails at import" | **Refiner's lane** → `/retro`. |
+| A sibling session's research commit (`6834943`) rode this phase's push | disclosed to the lead in the same turn; scanned, no private detail → `/retro` ("list the outgoing commits before every push"). |

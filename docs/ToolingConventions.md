@@ -55,7 +55,7 @@ Every script finds the repo from its own location; none assumes a checkout path.
 
 - **The gate of record** is `tools/validators/run_all.py`. Each lane reports **PASS**, **FAIL** or **SKIP** with the reason, and the summary counts all three. A SKIP is never reported as a pass. Exit 0 means no FAIL; with `--strict`, it also means no SKIP.
 - **`fixture_sync` is no longer a lane** (Phase02, 2026-09-23). It read a consumer's checkout, which a producer gate must not do (R1). `tools/validators/check_fixture_sync.py` stays as a standalone tool, moving to the consumer side (`docs/Planning/PlatformDependencies.md` P8).
-- **CI:** `.github/workflows/gate.yml` runs the one command **strict** on every pull request and every push to `main`, with the pinned encoder installed, so all 16 lanes must run. Read-only token, no secrets, actions pinned by SHA. *(Todo, 2026-09-23: GitHub Actions is disabled on the repository, so the workflow is registered but has not run yet.)*
+- **CI:** `.github/workflows/gate.yml` runs the one command **strict** on every pull request and every push to `main`, with the pinned encoder installed, so all 16 lanes must run. Read-only token, no secrets, actions pinned by SHA. *(Todo, 2026-09-23: the Imrsv-tools organisation's Actions policy is "disabled for all repositories", so the workflow is registered but has never run. To fix it, set the org policy to "selected repositories" and add Matter-Library.)*
 - **No gate-id registry** exists; gates are named by file.
 
 ## Planned roots *(carried from `FolderStructure.txt`; not built)*

@@ -112,7 +112,7 @@ The **LCD discipline** is two-tier ([LCDSchema](Contract/LCDSchema.md)). The **a
 - Tracked with **Git LFS**. Stored once under `MatterLibrary/textures/base` (by the matter hierarchy) and `MatterLibrary/textures/shared` (overlays, masks), and referenced by many articles.
 
 ### Governance
-- Source PRs are open but **CI-gated**: schema valid, naming/taxonomy valid, scale tag present, referenced textures exist, eventually an automated parity render. *(Phase02, 2026-09-23: `tools/validators/run_all.py` runs strict on every pull request via `.github/workflows/gate.yml`; the parity render is still (planned). Todo, 2026-09-23: GitHub Actions is disabled on the repository, so no run has happened yet. What makes a PR's material a `candidate` is the contribution-path phase's.)*
+- Source PRs are open but **CI-gated**: schema valid, naming/taxonomy valid, scale tag present, referenced textures exist, eventually an automated parity render. *(Phase02, 2026-09-23: `tools/validators/run_all.py` runs strict on every pull request via `.github/workflows/gate.yml`; the parity render is still (planned). Todo, 2026-09-23: the organisation's GitHub Actions policy disables all repositories, so no run has happened yet. What makes a PR's material a `candidate` is the contribution-path phase's.)*
 - The release manifests under `library/releases/` are **maintainer-gated**: only maintainers promote.
 - **Contributions are CC0-1.0 and must be CC0-dedicable**; contributors are credited, and consumers are asked (not required) to credit the Matter Library (R13). Code is Apache-2.0 (R10).
 
