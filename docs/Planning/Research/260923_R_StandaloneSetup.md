@@ -323,7 +323,7 @@ The toolchain pin and CI (seed 2) are best as the first *real* phase after the b
 | Q7 | **Toolchain form:** extend the conda env (it already hosts the USD build) vs a separate `pyproject` + venv for the core tier (lighter, CI-friendly) — or both? | This is seed 2's main fork. |
 | Q8 | **Committed generated artifacts:** keep committing `MatterLibrary.blend` and `*.catalog.json`, or build them into the bundle only? | Churn vs "a clone just works". |
 | Q9 | **The platform's Appearance dependency** (skin/cloth/hair masters): do we plan for it here, or leave it to the platform to ask through `PlatformDependencies.md`? | It is the only live external pull. |
-| Q10 | **Agentic generation scope:** a pipeline agent vs a judging agent; paid clean-provenance vs open stack; is it a near-term seed or parked? | It shapes seed 11. |
+| Q10 | **Agentic generation scope:** a pipeline agent vs a judging agent; paid clean-provenance vs open stack; is it a near-term seed or parked? *Narrowed 2026-09-23 in `260923_R_AgenticMaterialGeneration.md`: the agent authors recipes and drives the pipeline, and a maintainer still judges; the paid-vs-open fork is only the parked generative-imagery lane. Still open there as O1–O7.* | It shapes seed 11. |
 
 ---
 
