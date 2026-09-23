@@ -8,7 +8,7 @@
 - this repo's tree and git history (83 commits, 2025-11-11 → 2026-07-19);
 - the platform documentation repo (`IMRSV_Platform_Documentation/`, private: `MatterLibrary/`, `Planning/`, `Methodology/`, the glossary and conventions);
 - the platform umbrella repo's `.ai/`;
-- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81` (re-baselined to `b1f36c2` on 2026-09-23; see the phase doc Pass 2);
+- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81` (re-baselined on 2026-09-23 to `b1f36c2`, then `9f52c7f`; see `docs/Planning/Phases/Phase01_StandaloneBootstrap.md` Passes 2–3);
 - the prior adopters BipZip, PitchBoard, 925Platform and USDLiveView.
 
 **The source of this file's first contents:** a 2026-09-23 research session, read-only against every repo. No code, spec or config was changed.
@@ -312,14 +312,14 @@ The toolchain pin and CI (seed 2) are best as the first *real* phase after the b
 
 | # | Question | Why it matters |
 |---|---|---|
-| Q1 | **Spec layout:** `docs/specs/{Ontology,Contract,…}` mirroring the platform tree, or flatter? | It sets every pointer the platform will repoint to. |
+| ~~Q1~~ | ~~Spec layout?~~ **Resolved 2026-09-23 (Phase01 ruling 1): `docs/specs/`, keeping the platform subfolder names.** | — |
 | ~~Q2~~ | ~~Open vs commercial?~~ **Resolved by R9: a community resource.** | — |
 | ~~Q3~~ | ~~Content licence?~~ **Resolved by R13: CC0-1.0, with attribution requested.** | — |
 | ~~Q4~~ | ~~UE solution?~~ **Resolved by R14: A now + B later.** | — |
 | ~~Q11~~ | ~~Master material model?~~ **Resolved by R15: Substrate.** Follow-on work: the 7 masters are legacy-authored and run today only through UE's automatic legacy→Substrate conversion (Studio `r.Substrate=True`; platform Phase 70 D11 confirmed that Substrate blend modes are live). Re-authoring them natively on Substrate is a **platform dependency** (the Plugin owns them) until B moves them here. The parity baselines must measure the Substrate result. | — |
 | Q12 | **Credits mechanics:** a per-material `contributors` field in the lock/provenance (and projected into the catalog?) vs a repo-level CREDITS file. Is contributor identity in a CC0 dedication just a name, or a name plus a link? | Part of the contribution-path seed; it shapes the manifest schema. |
 | Q5 | **Versioning while unreleased:** keep `0.1.0` as the pilot tag and continue 0.x? Does immutability-after-promotion apply only from 1.0? Tag scheme `matterlib-X.Y.Z`? | R8 allows it; the rules need writing down. |
-| Q6 | **Phase line:** start at `Phase01` fresh (the old `Phase01_Foundations` was delivered by platform Phase 52), or continue from `Phase02`? | Numbering is the lead's; the method numbers only on commitment. |
+| ~~Q6~~ | ~~Phase line?~~ **Resolved 2026-09-23 (Phase01 ruling 3): the standalone bootstrap is `Phase01`; the old `Phase01_Foundations` goes to `Phases/Complete/PreStandalone/`.** | — |
 | Q7 | **Toolchain form:** extend the conda env (it already hosts the USD build) vs a separate `pyproject` + venv for the core tier (lighter, CI-friendly) — or both? | This is seed 2's main fork. |
 | Q8 | **Committed generated artifacts:** keep committing `MatterLibrary.blend` and `*.catalog.json`, or build them into the bundle only? | Churn vs "a clone just works". |
 | Q9 | **The platform's Appearance dependency** (skin/cloth/hair masters): do we plan for it here, or leave it to the platform to ask through `PlatformDependencies.md`? | It is the only live external pull. |
