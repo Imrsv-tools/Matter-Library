@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*None (2026-09-23). The next entry in `## Future` is where work starts when the lead numbers it.*
+### Phase03 — Agentic Material Generation — SEEDED *(discovery opened 2026-09-23)*
+**Outcome:** a maintainer can ask an agent for new materials and receive validated candidates, with recorded provenance, ready for human judgement.
+- `docs/Planning/Phases/Phase03_AgenticMaterialGeneration.md` · `docs/Planning/Research/260923_R_AgenticMaterialGeneration.md`
 
 ==================================================================================
 ## Future
@@ -51,10 +53,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Library Coverage — RESEARCH
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`
-
-### Agentic Material Generation — RESEARCH
-**Outcome:** a maintainer can ask an agent for new materials and receive validated candidates, with recorded provenance, ready for human judgement.
-- `docs/Planning/Research/260923_R_AgenticMaterialGeneration.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 11, Q10) · `docs/specs/Authoring/AuthoringGoldenPath.md`
 
 ### Unreal Reference Masters — RESEARCH
 **Outcome:** an Unreal user outside IMRSV can drop in a package of the Matter masters and render library materials from a release.
