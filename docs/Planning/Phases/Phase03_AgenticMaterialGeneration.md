@@ -20,7 +20,9 @@ There is no running service. The surface is **Claude Code at the repo root**, pl
    - The skill states its plan: taxonomy slot `engineered/glass`, declared master `TranslucentThin` and why, a grammar-valid name, a scale tag, lane L1, and the Physically Based entries it will use (`Glass (Soda-lime)`, IOR 1.52).
    - It writes the recipe, assembles the `.mtlx`, and runs `uv run tools/validators/run_all.py`, which shows every lane PASS or SKIP, 0 FAIL.
    - It renders the article and shows the render with a short critique note. *(step 3.1)*
-2. **The lead judges.** Keep it (`git add` the named paths and commit) or discard it (`git restore` / `git clean` on the named paths). The skill never commits.
+2. **The lead judges.**
+   - Look at the render. For a closer look, run the command the skill prints to open the draft's preview scene in **USDLiveView** (`usdliveview <Stem>_preview.usda`) and fly or orbit around it. That is the same OpenUSD 26.03 + MaterialX 1.39.5 Storm stack, with no Stage and no release needed (Pass 2).
+   - Keep it (`git add` the named paths and commit) or discard it (`git restore` / `git clean` on the named paths). The skill never commits.
    - **Time the review.** That is the phase's one measurement (research Pass 11 estimated 5–10 minutes per article, unmeasured).
 3. Edit the new recipe so one key is misspelled (e.g. `roughnes_const`), and run the one command → the **recipe** lane FAILs and names the unknown key. Put a class that isn't in the taxonomy → FAIL. Put an albedo above 1 → FAIL. Undo the edits → green again. *(step 3.2)*
 4. `/matter-generate worn oak planks` → the skill picks an ambientCG set and shows its id and page. It fetches the set and writes 1K textures (NormalGL) under `MatterLibrary/textures/base/natural/wood/`. It records provenance **(where: Q2)** with the sha256 evidence, adds a `CREDITS.md` row, then assembles, gates, renders and critiques. *(step 3.3)*
@@ -61,6 +63,7 @@ There is no running service. The surface is **Claude Code at the repo root**, pl
 | Validate a draft | `run_all.py`: the `materials` lane covers every `.mtlx` and the `determinism` lane every recipe, so **drafts are gated automatically** (read 2026-09-23) | **One new lane, `recipe`** (G1/G2/G3/G5/G6). No lane checks recipes today. |
 | Render for review | `usdrecord` (OpenUSD 26.03 on the lead's box) + `make_preview.py` | **A repair, not a new tool.** The wrapper has three defects (P3). |
 | Judge the render | **The Claude Code session itself reads the PNG.** No model API, no keys. | None |
+| The lead's close look | **USDLiveView** (a consumer viewer, working on the lead's box 2026-09-23) opens a `.usd`/`.usda` scene directly, with no Stage connection, on the same render stack | **None.** The skill writes the preview scene anyway (for the PNG) and prints the command to open it. It never launches a window itself. |
 | Physical values | Physically Based API `api.physicallybased.info/v2/materials`: 116 records, CC0 | A small lookup script, so the grounding is repeatable and cited |
 | Textures | ambientCG `…/get?file=<Id>_1K-PNG.zip`: maps named `_Color`, `_Roughness`, `_NormalGL`, `_Metalness`, `_Opacity` | An importer (fetch, map, place, evidence). ambientCG's own bundled `.mtlx` is **not** reusable: it is a flat OpenPBR graph with no LCD interface inputs (read in the zip, P2). |
 | Provenance evidence | `tools/validators/source_provenance.py compute <texture-id> <url>` prints the `{url, sha256_scope, sha256, files}` block | None for the evidence. **Where it is stored is Q2.** |
@@ -110,6 +113,7 @@ Close acceptance: three real briefs (L1, L3, L2), each kept or discarded by the 
   - repair `preview_wrapper.usda` and `make_preview.py`: reference `</MaterialX>`, apply `MaterialBindingAPI`, use a UV-mapped mesh, add a camera;
   - add a render-to-PNG option via `usdrecord`, run inside the USD toolchain env (`USD_TOOLS_ROOT`, `USD_TOOLS_ENV`, `activate-usd-tools.sh`);
   - the working recipe is in §Pass 1, P3.
+  - **Keep the preview `.usda` beside the PNG** (in a gitignored or temp location, not committed) so the lead can open it in USDLiveView. Its location is a per-box pointer with no default, the same pattern as `USD_TOOLS_ROOT`. The skill prints the command when the pointer is set, and prints just the scene path when it isn't.
   - Metals render dark under a textureless dome: a lighting rig with an environment is an execute-level improvement. A CC0 HDRI would itself be a third-party input under R13.
 - **Doc sync at close:**
   - `AuthoringHarness.md` (tools, lanes, the preview repair; stages A→B partly in-repo);
@@ -207,9 +211,21 @@ st.Save()
 The render opens no window that was observed. It uses Qt xcb on `DISPLAY` (the toolchain's documented GL fix), so **isolation from the lead's desktop is not verified**. Check at step 3.1.
 </details>
 
+### Pass 2 (2026-09-23): the review surface. The lead: "USDLiveView is working now."
+
+**Examined:** USDLiveView's public-facing surfaces on the lead's box (its setup guide, orientation, launcher help text, its completed Apply-Materials phase). **Recorded here: only the consumer-side facts this phase needs.** USDLiveView is a private repo, and nothing of its internals is copied into this one.
+
+**Findings:**
+- **It opens a plain `.usd`/`.usda` file,** not only an IMRSV composition. Without a Stage connection it simply views the file. It renders on the same OpenUSD 26.03 + MaterialX 1.39.5 Storm stack as `usdrecord` (P3), so what the lead sees agrees with what the agent critiqued.
+- **Its material *picker* lists a release catalog served by Stage.** A draft, which is in no release, never appears there. **So a draft is reviewed by opening its preview scene, not through the picker.** No platform dependency arises.
+- **Its Matter root may be a Matter-Library checkout.** A composition that references a draft by name would also resolve. That is not needed for this phase's review, so it is not used.
+
+**Decision (within the Brief, not a lead fork):** USDLiveView is the lead's **optional close-look surface** at click 2. The skill writes the preview scene it already needs for the PNG, keeps it, and prints the command to open it. It never launches the GUI itself: no surprise windows, and the agent never blocks on an interactive app. **Unverified until step 3.1:** opening a repaired preview scene in USDLiveView shows the draft textured. The first click proves it.
+
 ## Discovery Status
 
-- **Passes captured:** 1 (2026-09-23).
+- **Passes captured:** 2 (2026-09-23).
+- **Pass 2:** USDLiveView added as the lead's interactive review surface. It is already built and needs no Stage; it only needs the preview scene that step 3.1 writes anyway. The steps, lane and Q2 are unchanged.
 - **Current working direction:** the Brief above, with 4 vertical steps, `build` lane, and first click at step 3.1.
 - **Open decisions:** Q2 (lead call; affects step 3.3 only, so step 3.1 can start before it is answered).
 - **Checks to carry forward:**
