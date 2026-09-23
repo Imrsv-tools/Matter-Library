@@ -314,12 +314,17 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 | O9 | **Skin, hair and cloth for characters (PlatformDependencies M1):** the taxonomy has no biological class. Physically Based has 6 skin types with subsurface data, but skin has nowhere to live. Hair is not a surface material in this model at all. | The platform's one live pull on the library. |
 | ~~O10~~ | ~~Assemblies in scope?~~ **Closed by D1: matter only; the substance (fired clay, marble, wood species) is in, the wall or floor is out.** | — |
 | O11 | **Class boundaries:** composite vs cementitious; plastic vs polymer; where snow and ice live (liquid is wrong); **where fired clay, terracotta and porcelain live** (there is no ceramic class; Pass 9 filed porcelain under composite by judgement). | An agent sorting ~160 articles needs written boundaries, or it will sort inconsistently. D1 makes fired clay a first-class substance. |
-| O13 | **The `MasterSet.md` routing conflict (Pass 12):** rewrite §Master resolution so the article declares the master that fits the material, with class as a typical default; and make the "Covers" column examples rather than a rule? | For the lead to discuss before any spec is touched. It unblocks G4 and the "routing" rows of Pass 11. |
+| ~~O13~~ | ~~The `MasterSet.md` routing conflict?~~ **Resolved: the doc fix landed (D2, `0770f38`).** G4 becomes "the declared master fits the material", which is a plausibility check, not a class lookup. | — |
 | O12 | **Budgets:** the LFS quota, the texture resolution (1K only, or a 2K option), and how much maintainer review time per batch. | Sets how many can realistically ship per release. |
 
 ## Status
 
 **Passes captured:** 12 (2026-09-23).
+
+**Update, 2026-09-23 (lead rulings landed):**
+- The master-resolution doc fix landed as a lead-directed `/quick-fix` (`0770f38`): articles declare their master, and the class is only a default (D2). O13 is closed.
+- **D3:** classes are added when the matter needs them.
+- Pass 11's routing-blocked rows are now **unblocked in the docs**. What remains for full coverage is carriers C1–C3, the harness guards and the class boundaries (O11). D3 turns O11 into "which classes to add" rather than "where to squeeze things in".
 
 **Update, 2026-09-23 (Pass 12, after the lead's correction):**
 - **D1:** matter only; walls and floors are out, and their substances are in.
@@ -350,6 +355,6 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 
 **Worth doing before or alongside:** harness guards G1–G6 (strict recipe parsing, a recipe schema, taxonomy and master-routing checks (routing only after O8), a path cross-check, a plausibility range lane). They are small and they help human authors too.
 
-**Open:** O1–O7, O9, O11–O13 (O8 and O10 closed by D1/D2).
+**Open:** O1–O7, O9, O11, O12 (O8, O10 and O13 closed by D1–D3).
 
-**Next step:** a conversation with the lead on O13 (the `MasterSet.md` routing wording) and O11 (class boundaries, including fired clay). Then O1–O3. If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
+**Next step:** the lead answers O1–O3 (lanes, where it runs, who owns the guards) and O11 (which new classes, e.g. ceramic for fired clay, terracotta and porcelain). If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
