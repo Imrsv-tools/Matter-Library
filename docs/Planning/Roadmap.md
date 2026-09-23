@@ -11,14 +11,12 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*None (2026-09-23). The next entry in `## Future` is where work starts when the lead numbers it.*
+### Phase02 — One-Command Check — ACTIVE
+**Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
+- `docs/Planning/Phases/Phase02_OneCommandCheck.md`
 
 ==================================================================================
 ## Future
-
-### Phase02 — One-Command Check — SEEDED
-**Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
-- `docs/Planning/Phases/Phase02_OneCommandCheck.md`
 
 ### Release Bundle and Consumer Contract — RESEARCH
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
