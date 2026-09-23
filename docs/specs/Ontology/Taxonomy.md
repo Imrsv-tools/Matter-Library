@@ -1,30 +1,36 @@
-# Matter Taxonomy — 5 Domains / 19 Classes
+# Matter Taxonomy — 5 Domains / 20 Classes
 
 > **Brought home 2026-09-23** (Phase01 step 1.3) from the IMRSV platform docs. **This repo is now the authority** for this spec; consumers point here.
 
-The Matter Library organizes materials into a tight, deep taxonomy: **5 Domains**, each holding **Classes** (19 today; the taxonomy is designed to grow). **Domain and Class are expressed in the folder structure only** — never in the filename (see [Identity](Identity.md)) — so a material can be recategorized later without a rename.
+The Matter Library organizes materials into a tight, deep taxonomy: **5 Domains**, each holding **Classes** (20 today; the taxonomy is designed to grow). **Domain and Class are expressed in the folder structure only** — never in the filename (see [Identity](Identity.md)) — so a material can be recategorized later without a rename.
 
-## The 5 Domains and 19 Classes
+## The 5 Domains and 20 Classes
 
 | Domain | Classes | Count |
 |--------|---------|-------|
 | 🪨 **Natural** | stone · wood · soil · mineral | 4 |
-| ⚙️ **Engineered** | metal · glass · cementitious · composite | 4 |
+| ⚙️ **Engineered** | metal · glass · ceramic · cementitious · composite | 5 |
 | 🧪 **Synthetic** | plastic · polymer · textile · coating | 4 |
 | 🌫️ **Environmental** | sand · vegetation · liquid · ~~atmospheric~~ | 4 |
 | 💡 **Utility** | emissive · virtual · energy | 3 |
-| | **Total** | **19** |
+| | **Total** | **20** |
+
+**`ceramic`** *(added 2026-09-23, lead)* is **fired-clay matter**: brick clay, terracotta, earthenware, stoneware and porcelain, glazed or unglazed. The boundaries:
+- **Unfired clay** stays in `natural/soil`.
+- **Cement, concrete and plaster**, which set rather than fire, stay in `cementitious`.
+- **A brick wall or a tiled floor is not matter** (see §Growth model). The ceramic *substance* they are made of is what lives here.
+- Its typical master is Opaque. A glaze wants a clear-coat, which the assembler does not carry yet *(planned)*.
 
 ### Coverage against the master set
 
-The v1 [master set](MasterSet.md) covers **18 of 19 classes**. The one exception is **`atmospheric`** (volume materials — fog, mist, gas): it is **out of scope for prop-applied matter** and owned by a future Volumes/Effector domain *(planned)*, not the Matter master set. Every other class maps to a master (coverage table in [MasterSet.md](MasterSet.md)).
+The v1 [master set](MasterSet.md) covers **19 of 20 classes**. The one exception is **`atmospheric`** (volume materials — fog, mist, gas): it is **out of scope for prop-applied matter** and owned by a future Volumes/Effector domain *(planned)*, not the Matter master set. Every other class maps to a master (coverage table in [MasterSet.md](MasterSet.md)).
 
 ## Folder structure (Domain/Class only)
 
 ```
 materials/
 ├── natural/        {stone, wood, soil, mineral}
-├── engineered/     {metal, glass, cementitious, composite}
+├── engineered/     {metal, glass, ceramic, cementitious, composite}
 ├── synthetic/      {plastic, polymer, textile, coating}
 ├── environmental/  {sand, vegetation, liquid, atmospheric}
 └── utility/        {emissive, virtual, energy}
@@ -44,7 +50,7 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 
 ## Status
 
-**Solid.** The 5-Domain / 19-Class structure has held since the library's original design. It is the target-state ontology; the source collection populates it incrementally.
+**Solid.** The 5-Domain structure has held since the library's original design. Its original 19 Classes are now 20, with `ceramic` added 2026-09-23. It is the target-state ontology; the source collection populates it incrementally.
 
 *(Updated 2026-09-23, measured: `MatterLibrary/materials/` in this repo is already laid out in the Domain/Class tree, and the `matterlib-0.1.0` runtime catalog carries `domain` and `material_class` per article.)* How a consumer lays out an installed release is consumer-side.
 
@@ -55,3 +61,4 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 - The 5-Domain / 19-Class taxonomy was first written in the library's original README and carried unchanged into the platform specs.
 - 2026-06 — `atmospheric` was named explicitly out of master-set scope (volume materials are not prop-applied matter); this was the one change to the original ontology.
 - 2026-09-23 — the "closed ontology, never add a Class" rule was relaxed (lead): Classes are added when the matter needs them, and masters no longer route by Class.
+- 2026-09-23 — `engineered/ceramic` added (lead) for fired-clay matter. It is the first Class added since the original design (19 → 20).

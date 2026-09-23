@@ -29,7 +29,7 @@
 | Term | Definition |
 |---|---|
 | **Domain** | The top taxonomy level (natural · engineered · synthetic · environmental · utility). Carried in the folder path only, never in a filename. → `docs/specs/Ontology/Taxonomy.md` |
-| **Class** | The second taxonomy level inside a Domain (stone, metal, glass, …; 19 defined). Folder-only. → `docs/specs/Ontology/Taxonomy.md` |
+| **Class** | The second taxonomy level inside a Domain (stone, metal, glass, …; 20 defined, `ceramic` added 2026-09-23; added as the matter needs them). Folder-only. → `docs/specs/Ontology/Taxonomy.md` |
 | **Matter filename grammar** (Material · Variant · Condition · Detail) | `Material_Variant_Condition_Detail_sNN_vNN.mtlx`; `Condition` defaults to `Clean`, `Detail` to `Base`. → `docs/specs/Ontology/Identity.md` |
 | **Qualified Matter name** (Matter identity) | An article's filename stem. It *is* the material's identity: compositions carry the name and consumers resolve it. → `docs/specs/Ontology/Identity.md` |
 | **Name budget** | A filename stem is ≤63 characters of `[A-Za-z0-9_]`, so the name survives Blender's USD export unchanged. → `docs/specs/Ontology/Identity.md` |
@@ -46,7 +46,7 @@
 | **Matter master** | The rendering class every article declares (Opaque, Masked, TranslucentThin, TranslucentThick, Subsurface, TwoLayer, Emissive). A renderer that partitions shader space (e.g. Unreal) implements one template per master. → `docs/specs/Ontology/MasterSet.md` |
 | **Master set** | The versioned collection of masters. It defines what an article can *be*: a template instance, not arbitrary node soup. → `docs/specs/Ontology/MasterSet.md` |
 | **Master token** | The master's name as data (`Opaque`, …, plus `system` for the missing-material fallback). The library pins the token; each consumer maps it to its own asset. → `docs/specs/Ontology/MasterSet.md` |
-| **Class routing** | The rule assigning each Class a default master, with named exceptions (e.g. marble → Subsurface). *Drift (2026-09-23): consumers hold this in code today; R14 moves it into release data.* → `docs/specs/Ontology/MasterSet.md` |
+| **Class routing** | A Class's *typical* master (e.g. stone → Opaque). Since 2026-09-23 it is a default only: every article declares the master that fits its material (e.g. marble → Subsurface, lace → Masked), and consumers resolve from that declared token, never from the Class. *Drift (2026-09-23): IMRSV still routes by Class in code; R14 moves the per-article token into release data.* → `docs/specs/Ontology/MasterSet.md` |
 | **`IMRSV_MissingMaterial`** | The library's system fallback material: the deliberate "broken material" look rendered when an identity cannot resolve. Its token is `system`. The historical name is kept. → `docs/specs/Ontology/MasterSet.md` |
 | **LCD** (Least Common Denominator) | The discipline of exposing only parameters that every target renderer can honour, so an article looks close to the same everywhere. → `docs/specs/Contract/LCDSchema.md` |
 | **LCD schema** | The two-tier parameter set, OpenPBR-named: the **author tier** plus the **Creator tier**. → `docs/specs/Contract/LCDSchema.md` |
