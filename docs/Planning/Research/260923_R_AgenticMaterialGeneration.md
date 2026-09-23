@@ -13,6 +13,15 @@
 
 ---
 
+## Resolved — lead decisions (2026-09-23)
+
+| # | Decision |
+|---|---|
+| D1 | **Matter only, never assemblies.** The library holds *substances*: fired clay (brick material), marble (tile material), wood species (floor material). It does **not** hold brick walls, tiled floors or plank floors. This closes O10. It matches `_Architecture.md` ("physically based 'matter' materials") and `Taxonomy.md` (brick wall, tile roof and cobblestone street are "non-matter"; the Realm stays *(planned)* and is untouched). Pass 9 was wrong to frame assemblies as a coverage candidate. |
+| D2 | **No new masters.** A master *is* the LCD and texture structure for a type of material. The 7 masters stand; coverage needs none added. This closes O8 as it was framed. The one real issue underneath it (Pass 10) is that `MasterSet.md` §Master resolution chooses the master **by taxonomy class**, and that is a doc conflict to discuss with the lead, not a design question. See Pass 12. |
+
+---
+
 ## Pass 1 — What is already decided (prior art, re-read)
 
 **Examined:** StandaloneSetup Pass 8 seed 11 and Q10, AuthoringGoldenPath in full, the R13 shipped-pixel rule.
@@ -82,7 +91,7 @@ The harness was built for a careful human author. An agent authoring at volume w
 | G1 | **Unknown recipe keys are dropped silently** | `from_dict` "keep[s] only known spec fields" so `_comment`/`path` survive | A typo such as `roughnes_const` silently becomes the default 0.5 and still passes every gate. **The same silent-success class as `.claude/CLAUDE.md` §Editing.** An agent needs unknown-key rejection, or a published JSON Schema to author against. |
 | G2 | **No machine-readable recipe schema** | the dataclass is the only definition | Structured-output and tool-use authoring want a JSON Schema (types, enums for master, domain, class, LCD ports). |
 | G3 | **Taxonomy is not checked** | `domain`/`class` are free strings in the assembler; no validator greps them against the 19 classes | An agent could invent `natural/crystal`. `Taxonomy.md` says the 19 classes are closed per release. |
-| G4 | **Class → master routing is not checked** | `_check_spec` checks only `master ∈ KNOWN_MASTERS`; routing (with the `marble`/`diamond`/`rust` name exceptions) is written in `MasterSet.md` and applied in consumer code (MasterSet *Drift 2026-09-23*) | An agent could declare `Subsurface` for a plastic and pass. The routing rule needs to exist as data or code before an agent can be held to it. This overlaps with R14 (master token as release data). *Refined by Pass 10 (2026-09-23): enforcing **today's** one-master-per-class table would block most of textile; enforce an allowed-set per class instead (O8).* |
+| G4 | **Class → master routing is not checked** | `_check_spec` checks only `master ∈ KNOWN_MASTERS`; routing (with the `marble`/`diamond`/`rust` name exceptions) is written in `MasterSet.md` and applied in consumer code (MasterSet *Drift 2026-09-23*) | An agent could declare `Subsurface` for a plastic and pass. The routing rule needs to exist as data or code before an agent can be held to it. This overlaps with R14 (master token as release data). *Refined by Pass 10 (2026-09-23): enforcing **today's** one-master-per-class table would block most of textile. What to check instead waits on the doc conflict in Pass 12.* |
 | G5 | **`path` vs `domain`/`class`/`name` are not cross-checked** | `build_proof_subset.py` writes to `d["path"]` verbatim | A recipe can declare one class and land in another folder. |
 | G6 | **No physical-plausibility lane** | `check_master_conformance` checks that the defining carriers are **present and wired**, not that values are sane; Opaque returns `[]` | Nothing flags an albedo of 1.0, a non-binary metalness on a clean metal, or an IOR of 4. This is exactly the "metallic correctness, roughness consistency" long pole of Pass 1. A cheap, automatic range check would take much of that load off the human. |
 | G7 | **Adding to a manifest is manual** | no tool; the lock is hand-authored YAML | This is the Matter Manager's job (Roadmap: *Author a Material End to End*). |
@@ -172,7 +181,7 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 
 **Findings:**
 - **About 1,235 ambientCG materials land in a matter class. That is far more than an initial library needs, so photoreal supply is not the limit.** Supply is thin in exactly the classes where ambientCG is structurally weak: glass (0), mineral (5), polymer (13), plastic (25), liquid (27, and those are snow and ice), and all of utility (0).
-- **A third of ambientCG (659) is assemblies** such as bricks, tiles, paving and floors. `Taxonomy.md` names exactly these ("*brick wall*, *tile roof*, *cobblestone street*") as the future **Realm** above Domain *(planned)*. They are among the most-downloaded assets and what users will ask for first, but they are **not matter** under today's ontology. *(Open question O10.)*
+- **A third of ambientCG (659) is assemblies** such as bricks, tiles, paving and floors. `Taxonomy.md` names exactly these ("*brick wall*, *tile roof*, *cobblestone street*") as the future **Realm** above Domain *(planned)*. They are among the most-downloaded assets and what users will ask for first, but they are **not matter** under today's ontology. *(Open question O10.)* **Correction (lead, D1, 2026-09-23): out of scope, and not a question.** The library is substances. The substance behind an assembly (fired clay, marble, a wood species) is in scope; it comes from the matter categories above or from Physically Based (`Brick`, `Terracotta`, `Clay`, `Porcelain`, `Marble`), not from a patterned wall or floor texture.
 - **The 52 imperfection sources map onto our overlays and masksets**, but not directly: an overlay is **packed data** (R/G normal XY · B roughness bias · A density; `LCDSchema.md`), so each needs converting. The library has 2 overlays and 3 masksets today.
 - **Creation method:** 1,408 `PBRProcedural`, 355 photogrammetry, 201 approximated, 36 multi-angle. All are CC0 under the licence read in Pass 3.
 - **Scale tags:** only **512 of 2,000** records carry physical dimensions (`dimensionX`/`dimensionY`; e.g. `Bricks105` 240 × 120). For the rest, the scale tag has to be estimated by the agent, which is human-checkable, or recorded as `sUKN`.
@@ -213,6 +222,8 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 - This is a `MasterSet.md` contract change, so it belongs to the release-bundle / consumer-contract phase that owns R14.
 - It is recorded here because **it gates coverage in 8 of 18 in-scope classes.** *(Open question O8.)*
 
+**Correction (lead, D2, 2026-09-23):** the framing above treated this as a master-design question. It is not one: no masters are added, and the table above does not ask for any. Every "needs" entry is one of the existing 7. What the table actually shows is that **the docs choose the master by class**, while a master is the structure for a *type of material*. Pass 12 locates exactly where the docs say this.
+
 ## Pass 11 — What "excellent initial coverage" would take
 
 **A target, not a plan.** The library's design argues for **depth per matter, not volume**: one article plus the Creator-tier tint, UV and roughness controls and its overlays and maskset already spans many conditions (Copper's patina, dust and scratches are all one article). So the target is **distinct matters**, roughly 5–15 per class weighted by how often a scene needs them, not ambientCG's 1,235.
@@ -240,14 +251,14 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 | **Total** | **~160** | | plus **~8 overlays and ~8 masksets** (L2, or ambientCG imperfections converted) |
 
 **Scale of the ask:**
-- **~110 of ~160 are reachable with no contract change.** These are the rows marked "—", plus the unblocked majority of stone, wood, metal, plastic and coating. The remaining ~50 wait on routing (O8) or on the three OpenPBR carriers below.
+- **~110 of ~160 are reachable with no contract change.** These are the rows marked "—", plus the unblocked majority of stone, wood, metal, plastic and coating. The remaining ~50 wait on routing (O8) or on the three OpenPBR carriers below. *Correction (D2): the "routing" blockers are a doc fix, not design work (Pass 12). Once the docs say the master follows the material, the real blockers are only carriers C1–C3 and the class boundaries (O11).*
 - **Texture storage:** today's textured articles take 4.3 MB (Limestone) to 7.7 MB (Copper) of 1K PNG in Git LFS (measured). ~110 textured articles is roughly **0.5–1 GB of LFS** before any 2K option. *Unverified:* the GitHub LFS storage and bandwidth quota for this org. Every clone and CI run pulls it.
 - **Review is the throughput limit, not generation.** Authoring a recipe is minutes of agent time. The human gate is the cost. At an *estimated, unmeasured* 5–10 minutes per article with a render and critique note attached, ~160 articles is **roughly 15–25 maintainer hours**. The first probe (Status → Next) should measure this.
 
 **What it would take, in dependency order:**
 1. **The gate runs:** Phase02 (G8).
 2. **Harness guards:** G1–G3, G5, G6 (G6 with clamping for PB values above 1.0). Also G4, but only after O8.
-3. **Routing reform (O8):** class → allowed masters. This is a contract change owned by the R14 phase.
+3. ~~**Routing reform (O8):** class → allowed masters. This is a contract change owned by the R14 phase.~~ *Superseded by D2: fix the docs so the master follows the material (Pass 12).*
 4. **Three author-tier carriers the assembler lacks**, all real OpenPBR inputs (carriage lane A), so no Creator-tier change:
    - **C1** `specular_color` / F82 for metals (data from PB);
    - **C2** `fuzz_*` (sheen) for cloth and `coat_*` for varnish, paint and glaze;
@@ -266,6 +277,26 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 8. **Batch manifest entry (G7)**, which the Matter Manager owns.
 9. **Taxonomy rulings (O9–O11).**
 
+## Pass 12 — Reread after the lead's correction: where the docs stand
+
+**Examined (2026-09-23):** `_Architecture.md` (matter definition, master section); `MasterSet.md` (intro, v1 table, §Master resolution); `Taxonomy.md` §Growth model; `Identity.md` scale table; `docs/Glossary.md`. I also grepped `docs/specs`, `Readme.md` and the Glossary for brick / wall / floor / tile / Realm / assembly.
+
+**Matter vs assemblies: the docs agree with D1.** No spec describes a wall or floor as in scope.
+- `_Architecture.md`: "a community, CC0 library of physically based 'matter' materials (Limestone, Copper, Glass, …)".
+- `Taxonomy.md`: brick wall, tile roof and cobblestone street are "non-matter", reachable only through a *(planned)* Realm.
+
+The conflation was this research's alone: it took ambientCG's catalogue as the frame.
+- *Minor, lead's call:* `Identity.md`'s scale-tag table gives "small tiles", "flooring" and "wall panels" as scale examples. Read quickly, these name assemblies. A wording touch-up could name the substance at that scale instead.
+
+**How a master is chosen: the docs conflict with D2.**
+- `MasterSet.md` intro and `_Architecture.md` agree with the lead. A master is "a template instance: master X + these textures + these LCD parameter values", and it defines "what a Matter material can BE".
+- But `MasterSet.md` **§Master resolution** says "a material identity resolves to a master **by its taxonomy class**, with leaf-stem name exceptions". Its v1 table's "Covers" column assigns classes to masters, which puts all of textile and vegetation under **Masked**.
+- **Taken literally, that makes a cotton or denim article Masked.** The Masked conformance check would then demand a cut-out opacity map (Pass 10).
+- **Where the class rule came from** (StandaloneSetup Pass 9, verified there): IMRSV's plugin routes by class in C++, because the per-article token in each `.mtlx` "is read by nobody". R14 already moves the per-article master token into release data. After that, **no consumer needs class routing**, and the article's own declared master, chosen for what the material is, is the only rule needed.
+- The class rule also appears in the Glossary ("Name-keyed master resolution", consumer-side) and in `_Architecture.md`'s R14 Drift note ("a consumer never hard-codes class → master routing").
+
+**Not decided here (a spec edit is outside `/research`):** whether §Master resolution is rewritten as "an article declares the master that fits the material; class gives a typical default", and whether the "Covers" column becomes typical examples rather than a routing rule. **The lead asked for a conversation before fixing the docs.** This pass is the input to it. *(Open question O13.)*
+
 ---
 
 ## Open questions
@@ -279,21 +310,30 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 | O5 | **Metals:** does the assembler need an OpenPBR `specular_color`/F82 carrier to use measured metal data? *Narrowed by Pass 9: the data exists (PB carries F82 for 32 metals); what remains is carrier C1 in Pass 11.* | Metals are a large, common class; accurate metals need it. |
 | O6 | **Grounding citations:** should a recipe (or provenance) record *where its constants came from* (e.g. a Physically Based entry), not only its pixels? | Auditable physics, same spirit as the shipped-pixel rule. |
 | O7 | **Credits (StandaloneSetup Q12):** how is an agent-authored article credited? Per R8 the committing person is the author. | Touches the credits schema. |
-| O8 | **Master routing:** keep one master per class plus name exceptions, or move to class → an allowed set of masters (Pass 10)? | Gates coverage in 8 of 18 in-scope classes; it is a `MasterSet.md` contract change. |
+| ~~O8~~ | ~~Master routing: one master per class, or an allowed set?~~ **Closed by D2: no new masters; the underlying doc conflict is O13.** | — |
 | O9 | **Skin, hair and cloth for characters (PlatformDependencies M1):** the taxonomy has no biological class. Physically Based has 6 skin types with subsurface data, but skin has nowhere to live. Hair is not a surface material in this model at all. | The platform's one live pull on the library. |
-| O10 | **Assemblies (bricks, tiles, paving, floors):** are they in the initial coverage, which pulls the *(planned)* Realm forward, or out? | A third of ambientCG, and the most-asked-for surfaces. |
-| O11 | **Class boundaries:** composite vs cementitious; plastic vs polymer; where snow and ice live (liquid is wrong). | An agent sorting ~160 articles needs written boundaries, or it will sort inconsistently. |
+| ~~O10~~ | ~~Assemblies in scope?~~ **Closed by D1: matter only; the substance (fired clay, marble, wood species) is in, the wall or floor is out.** | — |
+| O11 | **Class boundaries:** composite vs cementitious; plastic vs polymer; where snow and ice live (liquid is wrong); **where fired clay, terracotta and porcelain live** (there is no ceramic class; Pass 9 filed porcelain under composite by judgement). | An agent sorting ~160 articles needs written boundaries, or it will sort inconsistently. D1 makes fired clay a first-class substance. |
+| O13 | **The `MasterSet.md` routing conflict (Pass 12):** rewrite §Master resolution so the article declares the master that fits the material, with class as a typical default; and make the "Covers" column examples rather than a rule? | For the lead to discuss before any spec is touched. It unblocks G4 and the "routing" rows of Pass 11. |
 | O12 | **Budgets:** the LFS quota, the texture resolution (1K only, or a 2K option), and how much maintainer review time per batch. | Sets how many can realistically ship per release. |
 
 ## Status
 
-**Passes captured:** 11 (2026-09-23).
+**Passes captured:** 12 (2026-09-23).
+
+**Update, 2026-09-23 (Pass 12, after the lead's correction):**
+- **D1:** matter only; walls and floors are out, and their substances are in.
+- **D2:** no new masters.
+- O8 and O10 are closed.
+- A reread found **no doc** putting assemblies in scope; that conflation was this research's own.
+- It found **one real doc conflict**: `MasterSet.md` §Master resolution picks the master by taxonomy class, which would make ordinary fabrics Masked. It is recorded as **O13**, for discussion with the lead before any spec edit.
+- With that fixed, the ~50 "blocked" articles of Pass 11 wait only on carriers C1–C3 and the class boundaries (O11, which now includes where fired clay lives).
 
 **Update, 2026-09-23 (Passes 9–11, the lead asked "how many, and what for excellent coverage?"):**
 - **Supply is not the limit.** ambientCG maps about 1,235 materials onto matter classes, and Physically Based adds 116 measured records that carry most masters' defining values (F82, IOR, absorption, subsurface).
 - **A proposed target is ~160 distinct articles plus ~8 overlays and ~8 masksets**, weighted per class. About **110** are reachable without any contract change.
 - **The limits are:**
-  - **master routing** (one master per class breaks coverage in 8 classes, O8);
+  - **master routing** (one master per class breaks coverage in 8 classes; *superseded: a doc conflict, O13*);
   - **three missing OpenPBR carriers** (F82, sheen/coat, anisotropy);
   - **taxonomy rulings** (O9–O11);
   - **maintainer review time**, estimated at 15–25 hours for ~160 articles (unmeasured).
@@ -310,6 +350,6 @@ Today: 12 articles; 9 of 19 classes populated; the environmental domain is empty
 
 **Worth doing before or alongside:** harness guards G1–G6 (strict recipe parsing, a recipe schema, taxonomy and master-routing checks (routing only after O8), a path cross-check, a plausibility range lane). They are small and they help human authors too.
 
-**Open:** O1–O12.
+**Open:** O1–O7, O9, O11–O13 (O8 and O10 closed by D1/D2).
 
-**Next step:** the lead answers O1–O3, then O8 and O10. They decide how much of the ~160 is reachable, and whether assemblies count. If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
+**Next step:** a conversation with the lead on O13 (the `MasterSet.md` routing wording) and O11 (class boundaries, including fired clay). Then O1–O3. If the direction holds, the Roadmap entry *Agentic Material Generation* can be seeded as a phase stub via a later `/discovery`. A cheap first probe (after Phase02) is a disposable run of option a over 3 briefs, one per lane L1–L3, to see where the loop actually breaks **and to measure the maintainer review time per article** (Pass 11's estimate). Nothing has been built; this doc is the only artifact.
