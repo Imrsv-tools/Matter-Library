@@ -100,7 +100,7 @@ The harness was built for a careful human author. An agent authoring at volume w
 | G5 | **`path` vs `domain`/`class`/`name` are not cross-checked** | `build_proof_subset.py` writes to `d["path"]` verbatim | A recipe can declare one class and land in another folder. |
 | G6 | **No physical-plausibility lane** | `check_master_conformance` checks that the defining carriers are **present and wired**, not that values are sane; Opaque returns `[]` | Nothing flags an albedo of 1.0, a non-binary metalness on a clean metal, or an IOR of 4. This is exactly the "metallic correctness, roughness consistency" long pole of Pass 1. A cheap, automatic range check would take much of that load off the human. |
 | G7 | **Adding to a manifest is manual** | no tool; the lock is hand-authored YAML | This is the Matter Manager's job (Roadmap: *Author a Material End to End*). |
-| G8 | **The gate does not run on the lead's box** | `run_all.py` fails at import: no MaterialX Python module (AuthoringHarness *Todo 2026-09-23*) | **Hard prerequisite.** Phase02 (One-Command Check, ACTIVE) owns it. An agent loop cannot use a gate that cannot run. |
+| G8 | **The gate does not run on the lead's box** | `run_all.py` fails at import: no MaterialX Python module (AuthoringHarness *Todo 2026-09-23*) | **Hard prerequisite.** Phase02 (One-Command Check, ACTIVE) owns it. An agent loop cannot use a gate that cannot run. **Met 2026-09-23** (Phase02 COMPLETE; measured: `uv run tools/validators/run_all.py` → 16 lanes, 14 PASS / 2 SKIP (`compression`, `staging`: encoder absent), 0 FAIL on the lead's box). |
 | G9 | **Visual check needs the USD toolchain** | `make_preview.py` + usdview/usdrecord; it degrades to `parity-not-evaluated` without `pxr` | An agent that critiques its own render (Pass 6) needs `usdrecord` headless. It is built on the lead's box (StandaloneSetup Pass 7), but not in CI. |
 
 **Finding:** G1–G6 are small and mostly additive (a schema, a routing table, a range table, strict parsing). They also **benefit human authors**, which is why they belong in *Author a Material End to End* as much as here.
@@ -333,7 +333,7 @@ The conflation was this research's alone: it took ambientCG's catalogue as the f
 - **Guards G1–G6 are built here** (D6).
 - **`engineered/ceramic` added** (D7, quick fix `f2cfa88`; that commit also brought the Glossary's *Class routing* entry in line with `0770f38`).
 - **Remaining open:** O4–O7, O9, O11's leftover boundaries, O12. None blocks starting.
-- **The research has crossed the commitment line.** The next unit is `/discovery` for the *Agentic Material Generation* Roadmap entry. Its prerequisite is Phase02 (G8).
+- **The research has crossed the commitment line.** The next unit is `/discovery` for the *Agentic Material Generation* Roadmap entry. Its prerequisite, Phase02 (G8), is **met**: Phase02 is COMPLETE, and the gate runs via `uv run tools/validators/run_all.py` (14 PASS / 2 SKIP / 0 FAIL, measured 2026-09-23).
 
 **Update, 2026-09-23 (lead rulings landed):**
 - The master-resolution doc fix landed as a lead-directed `/quick-fix` (`0770f38`): articles declare their master, and the class is only a default (D2). O13 is closed.
