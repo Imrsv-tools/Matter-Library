@@ -308,4 +308,14 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
     - **Wider sweep** (platform phase ids, private symbols, the deploy script, email): 0.
   - **What these checks never touch:** file *contents* outside `docs/`, meaning comments in `tools/` and the `.mtlx` files under `MatterLibrary/`. Those still carry old-layout paths (research Pass 6) and belong to the one-command-check phase.
   - **Unverified:** the public Blender issue link (`projects.blender.org/…/124263`) returns 403 to `curl`, which is evidence about `curl`. The lead opens it at click 3. The OpenUSD issue links were checked with `gh`.
-  - **Next:** the lead runs click 3 → then 1.4.
+  - **Lead verdict (click 3, 2026-09-23):** *"specs look right, continue with 1.4"*. ✅ **1.3 done** (landed at `f3cbad2`).
+- **1.4 — Know the terms.**
+  - **`LICENSE`:** the canonical Apache-2.0 text, written byte for byte from GitHub's licence API (11,357 bytes + newline), so GitHub detects it.
+  - **`LICENSE-CONTENT.md`:** a scope table, the "credit is asked, not required" norm, and the canonical CC0-1.0 legal code appended verbatim and fenced.
+  - **`CONTRIBUTING.md`:** a CC0 + Apache affirmation line for PRs; a table of accepted and rejected sources under the shipped-pixel rule (CC-BY and "royalty-free" are rejected; AI output is case-by-case); the recipe → `build_proof_subset.py` authoring path; LFS; provenance; immutability; merge ≠ release. The `run_all.py` gap is stated in dated form.
+  - **`CREDITS.md`:** the founding maintainer; the three ambientCG CC0 sources, mapped to their articles and verified against the 0.1.0 lock (Travertine009 → Limestone, Concrete034 → Concrete, Metal047B → Copper); the tools the library is built on.
+  - **Content scope, as written (see the handback for the lead's call):**
+    - **CC0:** `MatterLibrary/materials` + `textures` (per R13), plus `tools/converters/recipes/`, `library/releases` + `provenance`, `blender/asset_library/`, and the examples copy.
+    - **Apache-2.0:** code and docs.
+  - **Checks:** 0 broken links in the new files (the glossary's two pending pointers now resolve) and 0 publication-check hits.
+  - **Next:** the lead runs click 4 → then 1.5.
