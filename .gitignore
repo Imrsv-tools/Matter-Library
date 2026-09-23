@@ -10,3 +10,7 @@ __pycache__/
 # (freeze_release.py) + the determinism gate guarantee integrity, so the (large) BCn .dds
 # derivatives are regenerated via `stage_release.py build`, never committed.
 library/staging/
+
+# Claude Code harness runtime state (per-machine, never shared)
+.claude/scheduled_tasks.lock
+.claude/settings.local.json

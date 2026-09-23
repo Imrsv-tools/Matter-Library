@@ -1,5 +1,7 @@
 # Matter Library — Build Plan
 
+> **ARCHIVED 2026-09-23 (Phase01 step 1.1).** This is the pre-adoption roadmap, kept verbatim for its history and intent. Its live successor is `docs/Planning/Roadmap.md`. Paths below (`.ai/…`) are as they were before the move.
+
 Lightweight phase guide for the Matter Library. This is a **standalone** project; its phase
 line is independent of the IMRSV Platform's Studio/Plugin/Stage numbering and is referenced
 from the platform plan as an external track.

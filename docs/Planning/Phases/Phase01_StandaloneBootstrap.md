@@ -1,6 +1,6 @@
 # Phase01 — Standalone Bootstrap
 
-**Status:** SEEDED, Brief complete (2026-09-23). All lead calls are ruled (§Lead rulings). Lane: `build`. **Next: `/execute`.** Numbered `Phase01` by the lead on 2026-09-23 — the first phase on this repo's own line.
+**Status:** ACTIVE — IN EXECUTION (started 2026-09-23). Lane: `build`. All lead calls are ruled (§Lead rulings). Numbered `Phase01` by the lead on 2026-09-23 — the first phase on this repo's own line.
 
 ## Outcome
 
@@ -273,4 +273,10 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
 
 ## Execution Log
 
-_(populated during execution)_
+*Ledger: step · result · next.*
+
+- **Start (2026-09-23).** Tree: `main`, clean, 4 ahead of `origin/main`; no other session live. Upstream re-checked: `9f52c7f` = `origin/main`, clean.
+- **1.1 — Orient from the repo.** Vendored `9f52c7f` (14 commands, 3 Methodology docs, `.claude/commands/` ×10, `settings.json`, `docs/` stubs and templates). Folded in with `git mv`: `context.md` → `AI_Orientation.md`, `conventions.md` → `AI_WorkingAgreement.md`, research → `260530_R_LibraryArchitecture.md`, VersionManagement → `Phases/Future/`, `ignore/` → `Complete/ignore/`. `housekeeping.md` retired into a `LOCAL_DELTAS` section. Carried content: the decided architecture and conventions principles → a seed `docs/specs/_Architecture.md` (merged in 1.3); naming → `NamingConventions.md`; the don't-delete rule → a `.claude/CLAUDE.md` HARD RULE + `AI_WorkingAgreement` §Settled practices. Roadmap in template form with Phase01 ACTIVE.
+  - **Divergence from the build map (small, noted):** `build_plan.md` was **archived verbatim** to `Complete/PreStandalone/build_plan.md` and a fresh `Roadmap.md` was written. It was *not* `git mv`'d into `Roadmap.md`, because the Roadmap format forbids its technical content; archiving keeps every word, and 1.5 re-homes the intent. `context.md`'s "exists vs planned" block is likewise not carried into the orientation (upstream no-transcription rule); it survives in `git show 957069e:.ai/context.md` and in the archived `build_plan.md` §Delivered, for 1.5.
+  - **Test-click refinement:** upstream `/howdy` prints a ≤2-line orientation (branch · clean · last closed · active), not an identity paragraph. Click 1 therefore checks that `/howdy` runs and names **Phase01** as active. Identity is in `.ai/AI_Orientation.md`.
+  - **Next:** the lead runs click 1 → then 1.2.

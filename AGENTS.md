@@ -1,32 +1,30 @@
 # Matter Library — Agents Entry Point
 
-Start here. This is a **standalone** IMRSV project: it owns its full planning surface in `.ai/` (it is also a git submodule of `Imrsv-tools/IMRSV_Platform`).
+Pointer-first onboarding for AI agents (Claude, Codex, others). The Matter Library is **a community, single-source MaterialX material library and its toolset: materials are authored once and published as versioned releases that Blender, Unreal-based apps (such as IMRSV), USD viewers and others consume.** **⛔ Root the session at the repo root before anything else.** `.claude/commands/` only loads from there, so a session started one level up sees a perfectly normal repo, reads these docs correctly, and **has no verbs at all**: `/research`, `/quick-fix`, `/discovery` and `/howdy` simply do not exist. The failure is silent. The likely outcome is an agent hand-emulating each command by reading its file as a document, never learning that the real thing was sitting right there. If you cannot invoke `/howdy`, check this first.
 
-## Read First
+Read in this order:
 
-1. `.ai/context.md` — identity, what's built vs planned, active phase.
-2. `.ai/conventions.md` — rules & boundaries for this repo.
-3. `.ai/plan/build_plan.md` — phase guide; find the Active phase.
-4. `.ai/commands/howdy.md` — onboarding behavior.
+1. `.ai/AI_Orientation.md` — identity, repo map, build/test entry points.
+1b. `docs/specs/_Architecture.md` — **the canonical product contract** (what the library is, and the rules it keeps). Read before proposing architecture.
+2. `.ai/AI_WorkingAgreement.md` — the engineering agreements.
+3. `docs/Planning/Roadmap.md` — the phase registry.
+4. `Methodology/AgenticEngineering_Workflow.md` §How we work — how work runs here.
+5. `.ai/commands/howdy.md` — onboarding command behavior.
 
-## What This Repo Is
+## Howdy Shortcut
 
-The **Matter Library**: a MaterialX single-source material library with a two-tier model —
-a **volatile source collection** (community-contributable, under a matter taxonomy) and a
-**controlled, curated, versioned library** (manifest + git tags). Materials are transformed
-into Unreal (Substrate) and Blender (Principled BSDF) targets that look as close as possible
-across engines (LCD approach).
+When the user types `howdy` or `/howdy` in this repo, follow `.ai/commands/howdy.md`.
 
-## Golden Rules
+## Structural model (the one fact to internalize)
 
-- Read context before acting.
-- **ADD or REFINE, don't DELETE** intended design just because it isn't built yet (see conventions §Don't Delete Spec Functionality). This repo is in research/define phase.
-- MaterialX is the single source of truth; LCD parity across targets.
-- Source = volatile/open; the versioned library (manifest) = controlled.
-- Keep planning in `.ai/`; keep this repo's docs consistent.
+`.ai/` owns **agent operation** and stays **thin**. The full **`Planning/` surface** lives at **`docs/Planning/`**, alongside the durable **product** specs in `docs/specs/` (both in `docs/`, never in `.ai/`). The carried methodology blueprint lives in `Methodology/`.
 
-## Platform Context
+**One repo, no submodules of its own.** Every commit is a single-repo commit. This repo is a **producer**: other projects consume its published releases, not its checkout. The IMRSV platform still registers it as a submodule during the transition; that is the platform's business, not a step here (`.ai/commands/LOCAL_DELTAS.md`). Full model: `Methodology/AgenticEngineering_DocumentationMap.md`.
 
-Cross-project platform planning lives at the **platform** repo (`IMRSV_Platform/.ai/`). This
-repo is referenced there as an **external track**. Durable platform specs live in
-`IMRSV_Platform_Documentation/`.
+## Codebase search (zero permission prompts)
+
+Prefer the session's own **Grep / Glob / Read** tools; they never prompt. For big sweeps, fan out **in parallel** with Bash-less search agents (prompt them "use ONLY Read/Grep/Glob/LS"). **Never use a search agent that has the Bash tool**: it shells out and prompts on every call. The full rule is in `.claude/CLAUDE.md`.
+
+## Heritage
+
+Methodology carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering) on 2026-09-23 (upstream `9f52c7f`). Local divergences are recorded in `.ai/commands/LOCAL_DELTAS.md`. Frictions with the *portable methodology itself* are filed upstream; project-internal retros stay in `docs/Planning/Support/WorkflowFeedback/`.

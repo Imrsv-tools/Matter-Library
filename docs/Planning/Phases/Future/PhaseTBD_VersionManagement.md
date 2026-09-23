@@ -1,5 +1,7 @@
 # PhaseTBD — Version Management (Manifest / Releases / Promotion)
 
+> **Moved 2026-09-23 (Phase01 step 1.1)** from `.ai/phases/future/`. **Drift (2026-09-23):** much of this was built by IMRSV platform phases 60sq2.x (the release lifecycle, the freeze, approval and activation). Phase01 step 1.5 trims it to what is genuinely still open, marking the rest rather than deleting it.
+
 **Status:** FUTURE — not sequenced. The last chunk in the rough working order. Detail captured
 now so the design (drafted 2026-05-30) isn't lost; refine when it becomes active.
 
