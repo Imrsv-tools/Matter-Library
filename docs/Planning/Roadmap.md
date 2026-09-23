@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase03 — Agentic Material Generation — SEEDED *(discovery opened 2026-09-23)*
+### Phase03 — Agentic Material Generation — ACTIVE *(discovery)*
 **Outcome:** a maintainer can ask an agent for new materials and receive validated candidates, with recorded provenance, ready for human judgement.
 - `docs/Planning/Phases/Phase03_AgenticMaterialGeneration.md` · `docs/Planning/Research/260923_R_AgenticMaterialGeneration.md`
 
