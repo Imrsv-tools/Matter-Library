@@ -1,0 +1,79 @@
+# The structural gate, on every pull request and every push to main.
+#
+# Runs the same one command a person runs locally (docs/ToolingConventions.md §Entry points),
+# but STRICT: every lane must run, so a skipped lane fails the check. That is why the pinned
+# texture encoder is installed here, while it stays optional on a laptop (Phase02, Lead call 2).
+#
+# Security (Phase02 §Risk lane): `pull_request`, never `pull_request_target`; a read-only
+# token; no secrets. A fork's pull request therefore runs in GitHub's sandbox with nothing
+# to steal and nothing it can write. Asking this workflow for a secret or a write permission
+# is a high-rigor change. Third-party actions are pinned by commit SHA; the encoder download
+# is pinned by URL and checked against its sha256 on every run.
+
+name: Structural gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ENCODER_URL: https://github.com/GPUOpen-Tools/compressonator/releases/download/V4.5.52/compressonatorcli-4.5.52-Linux.tar.gz
+  ENCODER_SHA256: 70c9cdb27a19875df03766f349864951a749a44c0f5c001c33903944465f6b97
+
+jobs:
+  gate:
+    name: Structural gate (strict)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out (textures come from the LFS cache below)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          lfs: false
+
+      - name: Key the LFS cache on the set of texture objects
+        id: lfs
+        run: echo "key=lfs-$(git lfs ls-files --long | sort | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore LFS objects
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .git/lfs
+          key: ${{ steps.lfs.outputs.key }}
+
+      - name: Fetch the real textures (a pointer-only checkout fails release_verify)
+        run: git lfs pull
+
+      - name: Restore the encoder download
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/encoder/compressonatorcli.tar.gz
+          key: compressonatorcli-${{ env.ENCODER_SHA256 }}
+
+      - name: Install the pinned encoder (checksum verified every run)
+        run: |
+          mkdir -p ~/encoder
+          if [ ! -f ~/encoder/compressonatorcli.tar.gz ]; then
+            curl -fsSL "$ENCODER_URL" -o ~/encoder/compressonatorcli.tar.gz
+          fi
+          echo "$ENCODER_SHA256  $HOME/encoder/compressonatorcli.tar.gz" | sha256sum -c -
+          tar -xzf ~/encoder/compressonatorcli.tar.gz -C ~/encoder
+          echo "COMPRESSONATORCLI=$HOME/encoder/compressonatorcli-4.5.52-Linux/compressonatorcli" >> "$GITHUB_ENV"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          enable-cache: true
+
+      - name: Run the structural gate — strict (a SKIP fails)
+        run: uv run --locked tools/validators/run_all.py --strict
