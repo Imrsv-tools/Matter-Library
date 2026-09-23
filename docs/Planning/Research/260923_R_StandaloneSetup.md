@@ -8,7 +8,7 @@
 - this repo's tree and git history (83 commits, 2025-11-11 → 2026-07-19);
 - the platform documentation repo (`IMRSV_Platform_Documentation/`, private: `MatterLibrary/`, `Planning/`, `Methodology/`, the glossary and conventions);
 - the platform umbrella repo's `.ai/`;
-- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81`;
+- the upstream method `PeteSmalls/agentic-engineering` @ `a6e7e81` (re-baselined to `b1f36c2` on 2026-09-23; see the phase doc Pass 2);
 - the prior adopters BipZip, PitchBoard, 925Platform and USDLiveView.
 
 **The source of this file's first contents:** a 2026-09-23 research session, read-only against every repo. No code, spec or config was changed.
@@ -164,7 +164,7 @@ This is an editorial pass, not a copy.
 - The `docs/Methodology/**` vs `Methodology/**` path mismatch (PitchBoard already flagged it).
 - Dead `_ProvenanceAppendix` / `(WS-nn)` citations in `execute_test`, `execute_repair` and `execute_close`.
 - "C++ style" and "platform" wording in DocumentationMap/ProjectFolders.
-- `plan.md`'s `<ENGINE_SOURCE_ROOT>` placeholder. Here it maps to the MaterialX/USD/Blender install roots.
+- ~~`plan.md`'s `<ENGINE_SOURCE_ROOT>` placeholder.~~ *Gone upstream at `252cbae` (plan.md streamlining); re-baselined 2026-09-23, see the phase doc's Pass 2.*
 
 **Commands:** all upstream verbs fit. `execute_test`'s examples lean toward web/containers, so `LOCAL_DELTAS` must name this project's "artifact a person can reach":
 - the installed Blender add-on and Asset Browser;

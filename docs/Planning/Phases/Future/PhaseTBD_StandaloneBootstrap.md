@@ -1,6 +1,6 @@
 # PhaseTBD — Standalone Bootstrap
 
-**Status:** DISCOVERY. The Brief is written (2026-09-23), with three lead calls open (§Your call). The lane is `build`.
+**Status:** DISCOVERY. The Brief is written (2026-09-23), with four lead calls open (§Your call). The lane is `build`.
 
 ## Outcome
 
@@ -46,7 +46,7 @@ Run it at the repo root after execute; the clicks follow the step order.
 ### In now / not now
 
 **In now:**
-- **Vendor the method** from upstream `PeteSmalls/agentic-engineering` @ `a6e7e81`, including the provenance stamp, `LOCAL_DELTAS.md` and `.claude/settings.json`.
+- **Vendor the method** from upstream `PeteSmalls/agentic-engineering` @ `b1f36c2` (measured 2026-09-23; re-check at execution start, see §Your call 4), including the provenance stamp, `LOCAL_DELTAS.md` and `.claude/settings.json`.
 - **Fold in the existing scaffold with `git mv`**, dropping no intent.
 - **Bring home 18 platform `MatterLibrary/` docs** (~1,580 lines) into `docs/specs/`. Rewrite each for a public repo, and **annotate each conflict with R1–R16 in place** (`Drift (2026-09-23): … → see <phase>`), never silently rewriting the contract.
 - **Glossary and NamingConventions** (R16).
@@ -119,7 +119,7 @@ Numbering is pending the lead (§Your call 3). The steps are written as `B.n` pl
 
 ### Compact build map
 
-**Upstream copy** (@ `a6e7e81`, per `ADOPTING.md` §2):
+**Upstream copy** (@ `b1f36c2`, per `ADOPTING.md` §2):
 
 | From | To |
 |---|---|
@@ -134,7 +134,7 @@ Numbering is pending the lead (§Your call 3). The steps are written as `B.n` pl
 
 | Existing | → |
 |---|---|
-| `.ai/context.md` | `.ai/AI_Orientation.md`. Fix the local root and Blender 5.1+. "Architecture (decided)" → `docs/specs/_Architecture.md`. |
+| `.ai/context.md` | `.ai/AI_Orientation.md`. Fix the local root and Blender 5.1+. "Architecture (decided)" → `docs/specs/_Architecture.md`. ⛔ **Do not transcribe its "What exists vs planned" or "Active Phase" blocks** into the orientation, AGENTS or CLAUDE.md. Those docs *point* at `Roadmap.md` and leave one line saying the summary is deliberately absent (upstream DocumentationMap §No-Duplication, added at `b1f36c2`). The exists/planned content moves to the Roadmap and phase docs in step 5. |
 | `.ai/conventions.md` | `.ai/AI_WorkingAgreement.md` §Project practices. Naming → `docs/NamingConventions.md`. |
 | `.ai/commands/howdy.md` | Replaced by upstream. |
 | `.ai/commands/housekeeping.md` | A `LOCAL_DELTAS` row plus a `ToolingConventions` check. |
@@ -154,7 +154,7 @@ Numbering is pending the lead (§Your call 3). The steps are written as `B.n` pl
 - **Separation model (R1):** this repo is a producer. There is no SHA bump here; the platform still pinning this repo is the platform's business during the transition.
 - **Tracker:** `issue-create` → `Imrsv-tools/Matter-Library`. The existing platform-tracker Matter issues stay there (R4).
 - **Where discovery Pass 1 reads:** it becomes `docs/specs/`.
-- **How the project is run:** `python tools/validators/run_all.py`. It fails today until the toolchain phase, and this is recorded.
+- **How the project is run:** `python tools/validators/run_all.py`. Write the state in dated form: *"fails at import (no MaterialX Python) — measured 2026-09-23; owned by the one-command-check phase"*, never as a settled property (upstream §A claim carries its measurement).
 - **"The artifact a person can reach":** the installed Blender add-on and Asset Browser, a release bundle, a usdview preview.
 - **Namespaces:** release ids `matterlib-X.Y.Z`, material `vNN`, scale tags.
 - **Methodology path:** it is `Methodology/`, not `docs/Methodology/`. Adapt locally and file it upstream via `/retro`.
@@ -179,7 +179,7 @@ Numbering is pending the lead (§Your call 3). The steps are written as `B.n` pl
 - all 18 platform `MatterLibrary/` docs (~1,580 lines);
 - the platform glossary §MATTER LIBRARY + NamingConventions §MaterialX;
 - this repo's tree;
-- the method templates @ `a6e7e81`;
+- the method templates @ `a6e7e81` (re-baselined to `b1f36c2` in Pass 2);
 - the USDLiveView adoption (the closest precedent: an IMRSV standalone that absorbed an old flat scaffold);
 - the research doc R1–R16.
 
@@ -221,19 +221,39 @@ The platform-docs survey was done by an agent reading the docs through `gh api` 
 9. **Learnings:** this repo has no `docs/Learnings/`. The platform learnings that mention Matter (build-deploy B23/B26, headless-Blender exit-0, the UE sampler/sRGB fallback) concern tool and deploy behaviour this phase does not touch. **This is a discharged read.** They are candidates for the toolchain and release-bundle phases.
 10. **The phase name in the tree** exists only in the research doc and this seed; no prior phase built or deferred it.
 
+### Pass 2 — upstream re-baseline (2026-09-23)
+
+**Examined:** `PeteSmalls/agentic-engineering`, after the lead found the local copy was out of date.
+- The local copy had **already been pulled** to `b1f36c2` (2026-09-23), which equals `origin/main` (fetched 2026-09-23).
+- It carries two commits after the `a6e7e81` that Pass 1 read: `252cbae` (`plan.md` streamlining + the template's §Git rules for a shared index) and `b1f36c2` (eight portable lessons).
+- The local AE working tree also holds **uncommitted edits by someone else**: `README.md`, `execute_close.md`, `execute_repair.md` and `execute_test.md` drop the dead `_ProvenanceAppendix` / `(WS-nn)` references. These were not touched here.
+
+**What changes for this phase (folded into the Brief above):**
+- **Vendor from `b1f36c2`**, re-checked at execution start (§Your call 4).
+- `plan.md`'s `<ENGINE_SOURCE_ROOT>` placeholder **no longer exists**, so there is one placeholder fewer (grep, 2026-09-23).
+- **New DocumentationMap rule:** briefing docs point at the registry and never restate it. This shapes how `context.md` is folded in (build map).
+- **New Workflow tenets:**
+  - *A claim carries its measurement:* state claims in `LOCAL_DELTAS` and orientation are written in dated form.
+  - *Reading a green result:* the publication and link checks also get the set-level question *"what do all these checks never touch?"*. The known answer: neither reads **file contents outside `docs/` and the README**, e.g. comments in `tools/` or the `.mtlx` files. Those stay out of scope here and are named in the Execution Log rather than implied clean.
+  - *The human's waiting time is a budget:* this confirms small vertical steps.
+- **Template `.claude/CLAUDE.md` §Git** gains the shared-index rules and "multi-line commit messages go through `-F`". These arrive with the template, and nothing needs adapting.
+- **Still unfixed upstream (grep, 2026-09-23):** the `docs/Methodology/**` references in `quick-fix`, `discovery`, `retro`, `execute` and the template `CLAUDE.md` §Lanes, against the root `Methodology/` that `ADOPTING.md` specifies. The local adaptation stands, plus a `/retro` item upstream.
+
 **Decision:** Brief written (above). Scope line: **bring home + scrub + annotate; no contract change.** Every contract change the rulings imply goes to the release-bundle / consumer-contract phase.
 
-## Your call (open; the Brief is complete apart from these)
+## Your call (open; the Brief is complete apart from these four)
 
 1. **Spec layout.** *Recommend* `docs/specs/` with the platform's subfolder names kept (`Ontology/`, `Contract/`, `Catalog/`, `Authoring/`, `Distribution/`, `Tooling/`, `Experience/`). The same words keep consumer pointer rewrites mechanical (`MatterLibrary/X` → `docs/specs/X`).
 2. **Platform research docs** (MaterialChain, MaterialsBuildGrounding, OpenMatterCreatorPipeline). *Recommend* **distil, don't migrate**: record the settled decisions (S1–S9, with S6 marked superseded by R15) as a dated "Decisions of record" section in `docs/specs/_Architecture.md`, and cite the originals as platform history. They are about 1,000+ lines dense with private detail, and the specs already carry their outcomes.
 3. **Numbering.** Does this phase get a number, and does this repo's line start at `Phase01`? The old `Phase01_Foundations` was delivered by platform Phase 52 and goes to `Complete/` under its old name. *Recommend* **`Phase01`**: it is this repo's first phase on its own line, and the old doc keeps its historical name in `Complete/`.
 
+4. **Upstream SHA to vendor.** `b1f36c2` is the latest pushed commit (2026-09-23), but the local AE clone has an in-flight, uncommitted cleanup of dead references (`_ProvenanceAppendix` / `(WS-nn)` in three `execute_*` docs and the README). *Recommend* **vendor at whatever is pushed when execute starts**: if that cleanup has been committed and pushed by then, pin that SHA. If not, pin `b1f36c2` and carry the three dead references as known upstream defects (not patched locally).
+
 ## Discovery Status
 
-- **Passes captured:** 1.
+- **Passes captured:** 2.
 - **Current working direction:** bring home + scrub + annotate, in five vertical steps; lane `build`.
-- **Open decisions:** Your call 1–3.
+- **Open decisions:** Your call 1–4.
 - **Checks to carry forward:**
   - re-verify the upstream SHA before vendoring (upstream may have moved);
   - run the publication check both ways;
