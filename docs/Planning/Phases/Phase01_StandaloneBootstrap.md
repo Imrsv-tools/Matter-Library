@@ -279,4 +279,18 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
 - **1.1 — Orient from the repo.** Vendored `9f52c7f` (14 commands, 3 Methodology docs, `.claude/commands/` ×10, `settings.json`, `docs/` stubs and templates). Folded in with `git mv`: `context.md` → `AI_Orientation.md`, `conventions.md` → `AI_WorkingAgreement.md`, research → `260530_R_LibraryArchitecture.md`, VersionManagement → `Phases/Future/`, `ignore/` → `Complete/ignore/`. `housekeeping.md` retired into a `LOCAL_DELTAS` section. Carried content: the decided architecture and conventions principles → a seed `docs/specs/_Architecture.md` (merged in 1.3); naming → `NamingConventions.md`; the don't-delete rule → a `.claude/CLAUDE.md` HARD RULE + `AI_WorkingAgreement` §Settled practices. Roadmap in template form with Phase01 ACTIVE.
   - **Divergence from the build map (small, noted):** `build_plan.md` was **archived verbatim** to `Complete/PreStandalone/build_plan.md` and a fresh `Roadmap.md` was written. It was *not* `git mv`'d into `Roadmap.md`, because the Roadmap format forbids its technical content; archiving keeps every word, and 1.5 re-homes the intent. `context.md`'s "exists vs planned" block is likewise not carried into the orientation (upstream no-transcription rule); it survives in `git show 957069e:.ai/context.md` and in the archived `build_plan.md` §Delivered, for 1.5.
   - **Test-click refinement:** upstream `/howdy` prints a ≤2-line orientation (branch · clean · last closed · active), not an identity paragraph. Click 1 therefore checks that `/howdy` runs and names **Phase01** as active. Identity is in `.ai/AI_Orientation.md`.
-  - **Next:** the lead runs click 1 → then 1.2.
+  - **Lead verdict (click 1, 2026-09-23):** *"howdy works, continue with 1.2"*. ✅ **1.1 done** (landed at `0faabed`).
+- **1.2 — Look up any term.**
+  - `docs/Glossary.md` covers:
+    - the 22 platform §MATTER LIBRARY terms, same words and re-glossed standalone; 6 of them are marked consumer-side;
+    - about 60 Matter terms that were used but never glossed, grouped as library · identity · masters/LCD · releases · authoring/provenance · Creator/Blender · validation/compression;
+    - the method terms, plus the project markers (`Drift`/`Reevaluate`…, Pre-standalone);
+    - Retired identifiers.
+  - `docs/NamingConventions.md` owns the casing matrix, the MaterialX alias, the id series with who assigns them, and the historical IMRSV-branded names kept on purpose. It points at `docs/specs/Ontology/Identity.md` for the grammar.
+  - **Corrections made while glossing, each re-measured against the live tree (2026-09-23):**
+    - the render-role textures are **linear** (`lin_rec709`, 3/3/3 articles), not "overlay = sRGB" as the platform glossary said;
+    - master tokens in use: 7 masters + `system` (12 articles);
+    - the ≤63 / `[A-Za-z0-9_]` rule is in `validate_material.py`;
+    - carriage lanes and the opacity floor were re-read from LCDSchema and MasterSet.
+  - **Pointer check:** there are 0 external or private links. The 16 `docs/specs/…` owners are **pending 1.3**, and `CONTRIBUTING.md` / `LICENSE-CONTENT.md` are **pending 1.4**. That list is 1.3's link check.
+  - **Next:** the lead runs click 2 → then 1.3.
