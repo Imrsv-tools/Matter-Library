@@ -2,11 +2,12 @@
 
 The **recipe** that builds a faithful, from-source OpenUSD **v26.03** + MaterialX **1.39.5**
 install with `usdview` / `usdrecord` / `usdcat` / `usdchecker` / PyMaterialX — the dev tools
-Stage strips out of its lean runtime. It reads/renders `.mtlx` the same way Stage does, so it
-backs the Phase-53 authoring harness's QC parity gate and Phase-60 `usdrecord` ΔE baselines.
+a lean runtime strips out. These pins are the library's USD baseline, chosen to match the IMRSV
+Stage consumer's build, so it reads/renders `.mtlx` the way that consumer does. It backs the
+authoring harness's QC parity gate and the `usdrecord` ΔE baselines.
 
 **The "why", the version-pin contract, and the full GL-render gotcha are the durable doc:**
-[`IMRSV_Platform_Documentation/MatterLibrary/Tooling/USDValidationToolchain.md`](../../../IMRSV_Platform_Documentation/MatterLibrary/Tooling/USDValidationToolchain.md).
+[`docs/specs/Tooling/USDValidationToolchain.md`](../../docs/specs/Tooling/USDValidationToolchain.md).
 This folder is just the runnable recipe.
 
 ## Build

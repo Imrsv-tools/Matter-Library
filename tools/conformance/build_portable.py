@@ -19,9 +19,9 @@ import re
 import shutil
 from pathlib import Path
 
-REPO = Path("/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform")
-MATLIB = REPO / "Matter-Library" / "MatterLibrary"
-CONF = REPO / "Matter-Library" / "tools" / "conformance"
+REPO = Path(__file__).resolve().parents[2]  # this repo, from the script's own location
+MATLIB = REPO / "MatterLibrary"
+CONF = REPO / "tools" / "conformance"
 GOLDEN = CONF / "golden"
 
 MATERIAL_STEM = "Copper_Verdigris_Aged_Base_s01_v01"

@@ -12,12 +12,13 @@
 #
 # Exit 0 iff every check passes. See Contract/CreatorAssetProfile.md.
 set -uo pipefail
-INST=/home/peter/usd-tools/inst/usd-26.03
-ENVP=/home/peter/.conda/envs/imrsv-usd-tools
-CONF=/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library/tools/conformance
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+INST="${USD_TOOLS_ROOT:-$HOME/usd-tools}/inst/usd-26.03"
+ENVP="${USD_TOOLS_ENV:-$HOME/.conda/envs/imrsv-usd-tools}"
+CONF="$REPO/tools/conformance"
 GOLDEN="$CONF/golden"
-MATROOT=/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library/MatterLibrary/materials
-OUT="${1:-/home/peter/.claude/jobs/71b4820d/tmp/p60_conformance}"
+MATROOT="$REPO/MatterLibrary/materials"
+OUT="${1:-$(mktemp -d)}"
 PY="$ENVP/bin/python"
 mkdir -p "$OUT"
 rc=0

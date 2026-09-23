@@ -7,7 +7,7 @@
 # browse/assign: gen_asset_library.py (on the scaffold) -> verify_asset_library.py (structure).
 # The browse/assign UX itself is the §6 human sitting; this gate proves the STRUCTURE is right.
 set -uo pipefail
-REPO=/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 GEN="$REPO/tools/generators/gen_asset_library.py"
 VERIFY="$REPO/tools/conformance/verify_asset_library.py"
 OUT="${1:-$(mktemp -d)/asset_library}"

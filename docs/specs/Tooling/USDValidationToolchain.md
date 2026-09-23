@@ -40,7 +40,7 @@ Original text (kept, annotated):
 
 > **Drift (2026-09-23):** "track Stage's pins in lockstep" makes a consumer the authority over the producer's baseline; under R1 the Matter Library declares its baseline and each consumer states whether it matches — owned by the release-bundle / consumer-contract phase (R1).
 
-> **Drift (2026-09-23):** the recipe's comments (`build-usd-tools.sh`, `environment.yml`, `README.md`) still describe the pins as tracking a consumer's build — owned by the one-command-check phase (R1).
+> **Done (Phase02, 2026-09-23):** the recipe's comments (`build-usd-tools.sh`, `environment.yml`, `README.md`) now state the pins as the library's baseline, chosen to match the IMRSV Stage consumer's build, and point at the Drift above for who follows whom. The README's link now resolves in this repo. The conformance scripts read the install location from `USD_TOOLS_ROOT` (the recipe's own variable) and the conda env from `USD_TOOLS_ENV`.
 
 ## Home — this repo's `tools/usd-toolchain/`
 

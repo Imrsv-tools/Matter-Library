@@ -18,12 +18,15 @@ the Step-2 ⚠human premise-proof smoke. A Storm PASS isolates any Studio miss t
 """
 import subprocess
 import sys
+import os
+import tempfile
 from pathlib import Path
 
-INST = "/home/peter/usd-tools/inst/usd-26.03"
-ENVP = "/home/peter/.conda/envs/imrsv-usd-tools"
-GOLDEN = "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library/tools/conformance/golden/creator_table_lightweight.usda"
-MATROOT = "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library/MatterLibrary/materials"
+REPO = Path(__file__).resolve().parents[2]
+INST = str(Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03")
+ENVP = str(Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools")))
+GOLDEN = str(REPO / "tools/conformance/golden/creator_table_lightweight.usda")
+MATROOT = str(REPO / "MatterLibrary/materials")
 INSTANCES = ("Copper_Instance_Top", "Copper_Instance_Leg")
 # The LCD interface inputs live on the nodegraph prim (NG_<material-stem>) inside each
 # instance — NOT on the material prim — so an override must target the nodegraph.
@@ -76,7 +79,7 @@ def variant_layer(override: str | None) -> str:
 
 def main() -> int:
     out = Path(sys.argv[1] if len(sys.argv) > 1 else
-               "/home/peter/.claude/jobs/71b4820d/tmp/p60_conformance/renderleg")
+               Path(tempfile.gettempdir()) / "matter_conformance" / "renderleg")
     out.mkdir(parents=True, exist_ok=True)
     e = env()
     pngs: dict[str, Path] = {}

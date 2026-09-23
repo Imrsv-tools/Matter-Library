@@ -39,13 +39,13 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `validate_material.py` | the **per-`.mtlx`** conformance checks (below) |
 | `validate_manifest.py` | the **library-level** lockfile check, incl. the provenance gate |
 | `check_determinism.py` | byte-stable re-assembly check (and optional regen-matches-committed) |
-| `check_fixture_sync.py` | cross-repo check that a consumer's fixture copy of the runtime catalog + payloads is byte-current (see Drift below) |
+| `check_fixture_sync.py` | cross-repo check that a consumer's fixture copy of the runtime catalog + payloads is byte-current. **Not a `run_all.py` lane since 2026-09-23** (see below); a standalone tool, run with `--fixture-root` |
 | `source_provenance.py` | computes the shipped-source-set sha256 used as `evidence.sha256` for third-party (ambientCG) textures |
 | `run_all.py` | orchestrator — the **[structural gate](../../Glossary.md)**; lanes listed below |
 | `fixtures/grammar_cases.json` | identity-grammar regression fixture (must-pass / must-fail) |
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
 
-**`run_all.py` lanes** (in run order; each skips with a note when its surface is absent):
+**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (CI) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
 
 | Lane | Checks |
 |---|---|
@@ -57,18 +57,19 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `catalog_validation` | the projector rejects a manifest with dangling ids |
 | `provenance_gate` | promotion-metadata RED fixtures are rejected (missing provenance, under-promoted coverage, shallow evidence) |
 | `no_projection_guard` | provenance / evidence / licence data never leaks into the runtime catalog |
-| `fixture_sync` | a consumer's fixture catalog + payloads are byte-current (cross-repo) |
+| ~~`fixture_sync`~~ | *Removed from the gate 2026-09-23 (Phase02).* A consumer's fixture catalog + payloads are byte-current (cross-repo). The intent is kept: the check moves to the consumer side (`PlatformDependencies.md` P8), and `check_fixture_sync.py` remains as its tool. |
 | `compression_negative` | the compressed-output validator rejects corrupt / mismatched `.dds` fixtures |
 | `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated) |
 | `staging` | the release-staging producer assembles a complete `{png, dds}` snapshot (encoder-gated) |
 | `approval_gate` | approval artifacts are well-formed (positive + shallow-negative fixtures) |
 | `freeze_lock` | the complete-payload hash-lock is deterministic + tamper-detecting |
 | `approval_binds_freeze` | a promoted approval references the release's actual frozen hashes |
+| `release_verify` | every **committed** freeze record (`library/releases/*.freeze.json`) still reproduces from the tree, naming any changed, missing or added file. A shipped file edited in place, or LFS pointer files in place of textures, fail here. The `.dds` set is included when the encoder or a staging tree is present. This is the hash mechanism only; the `vNN` immutability rule belongs to Version Management. |
 | `activation` | `activate_release.py` verifies install-readiness and switches the selector atomically |
 
-> **Drift (2026-09-23):** the `fixture_sync` lane (and promotion, via it) reads a consumer's (IMRSV Stage's) fixture mirror, so this repo's gate depends on a consumer checkout — owned by the release-bundle / consumer-contract phase (R1).
+> **Drift (2026-09-23), narrowed by Phase02:** the **gate** no longer reads a consumer's checkout (`fixture_sync` left `run_all.py`). **Promotion still does:** `promote_release.py` runs `check_fixture_sync` against IMRSV Stage's fixture mirror as one of its preconditions — owned by the release-bundle / consumer-contract phase (R1; `PlatformDependencies.md` P8).
 
-> **Todo (2026-09-23):** `run_all.py` fails at import on the lead's box as of 2026-09-23 — `validate_material.py` does `import MaterialX` and no MaterialX Python module is installed, so no lane runs — owned by the one-command-check phase. *(Measured: `python3 tools/validators/run_all.py` → `ModuleNotFoundError: No module named 'MaterialX'`.)*
+> **Done (Phase02, 2026-09-23):** `run_all.py` used to fail at import (no MaterialX Python module on the lead's box). It now runs from a fresh clone with `uv run tools/validators/run_all.py`, which builds the pinned environment from `pyproject.toml` + `uv.lock`. *(Measured: fresh clone → 16 lanes, 14 PASS / 2 SKIP without the encoder; `--strict` with the pinned encoder → 16 PASS.)*
 
 ### `tools/releases/` — the release lifecycle ([ReleaseModel](../Distribution/ReleaseModel.md))
 

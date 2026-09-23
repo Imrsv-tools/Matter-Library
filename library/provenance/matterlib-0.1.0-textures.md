@@ -1,5 +1,10 @@
 # matterlib-0.1.0 — texture provenance record
 
+*Reading note (2026-09-23): the phase numbers in this record (53, 60, 60.5 …) are the IMRSV
+platform's pre-standalone phases (2026-06 → 07), which built this library before it became its
+own project — not this repo's phase line. See `docs/Planning/Phases/Complete/PreStandalone/`.
+The record itself is unchanged.*
+
 Auditable pixel provenance for every shipped texture in the `matterlib-0.1.0` release
 (Phase 60, RD-Provenance policy). **Every entry is clean-provenance** — the audit (Phase 60.5)
 found no clouded / unlicensed AI-bootstrap pixels: the earlier ComfyUI-SDXL bootstrap concern

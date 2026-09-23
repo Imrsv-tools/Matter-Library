@@ -35,7 +35,7 @@ The release machinery exists and has cut one pilot (`matterlib-0.1.0`). What has
 - Which statuses are valid inside a release manifest. — **Delivered** (the manifest validator).
 
 ### Governance
-- Source PRs open but **CI-gated** → `candidate`. — **Moved** to the contribution-path phase (CI is not wired; see the one-command-check phase).
+- Source PRs open but **CI-gated** → `candidate`. — **Moved** to the contribution-path phase (since Phase02, 2026-09-23, CI runs the structural gate on every PR; the source → `candidate` step itself is still the contribution path's).
 - `library/releases/` **CODEOWNERS-gated**, so only maintainers promote. — **Moved** to the contribution-path phase. The approval artifact (`promote_release.py --approver`) exists today (**delivered**).
 - The manifest file set is the single control point. — **Delivered.**
 

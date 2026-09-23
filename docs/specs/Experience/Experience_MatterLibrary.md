@@ -119,7 +119,7 @@ The Blender half of the Creator Golden Path is real (2026-07-17):
   Both conform to [CreatorAssetProfile](../Contract/CreatorAssetProfile.md).
 - **The exact Matter identity travels on `assetInfo:identifier`**, independent of Blender's display name, which removes the old `_001` suffix heuristic.
 
-> **Reevaluate (2026-09-23):** targets are now **Blender 5.1+** (R6). The add-on declares 5.1.1; confirm against the 5.1.0 installed on the lead's box in the one-command-check phase.
+> **Resolved (Phase02, 2026-09-23):** targets are **Blender 5.1+** (R6). The add-on declared 5.1.1; it enables and registers its exporter on the lead's Blender 5.1.0 (measured headless), so it now declares `(5, 1, 0)`.
 
 ## Future Layers *(planned)*
 

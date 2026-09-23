@@ -13,7 +13,7 @@ Run:
 """
 import bpy, os, sys, json
 
-REPO = "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library"
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # this repo
 CATALOG = os.path.join(REPO, "library/releases/matterlib-0.1.0.catalog.json")
 RECIPES = os.path.join(REPO, "tools/converters/recipes")
 IDENTITY_PROP = "imrsv_matter_identity"

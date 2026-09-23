@@ -51,14 +51,12 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # ---- toolchain pins (shared with render_leg_probe.py / check_conformance.sh) ----
-INST = Path("/home/peter/usd-tools/inst/usd-26.03")
-ENVP = Path("/home/peter/.conda/envs/imrsv-usd-tools")
+INST = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
+ENVP = Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools"))
 HDRI = INST / "resources/Lights/san_giuseppe_bridge.hdr"
 COMPRESSONATOR = os.environ.get(
     "COMPRESSONATORCLI", str(Path.home() / ".local/bin/compressonatorcli"))
-DEFAULT_STAGING = Path(
-    "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library/"
-    "library/staging/matterlib-0.1.0")
+DEFAULT_STAGING = Path(__file__).resolve().parents[2] / "library/staging/matterlib-0.1.0"
 
 # Per-class parity bar (Experience_Materials.md — ΔE2000 under standardized lighting).
 TIGHT_BAR = 2.0

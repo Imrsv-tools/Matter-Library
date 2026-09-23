@@ -23,7 +23,7 @@ Run: blender --background --factory-startup --python <this> -- [out_dir]
 Exit 0 = PASS; non-zero = the split mechanism regressed.
 """
 import bpy, sys, os
-REPO = "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library"
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # this repo
 sys.path.insert(0, os.path.join(REPO, "blender/addons"))
 import imrsv_lcd_export as A  # noqa: E402
 

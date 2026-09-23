@@ -14,9 +14,9 @@
 #
 # Exit 0 iff every check passes. Companion to check_conformance.sh (which validates the golden).
 set -uo pipefail
-INST=/home/peter/usd-tools/inst/usd-26.03
-ENVP=/home/peter/.conda/envs/imrsv-usd-tools
-REPO=/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library
+INST="${USD_TOOLS_ROOT:-$HOME/usd-tools}/inst/usd-26.03"
+ENVP="${USD_TOOLS_ENV:-$HOME/.conda/envs/imrsv-usd-tools}"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONF="$REPO/tools/conformance"
 BLEND="$REPO/blender/MatterMaterials.blend"
 MATROOT="$REPO/MatterLibrary/materials"

@@ -14,7 +14,7 @@ Run:
 """
 import bpy, sys, os
 
-REPO = "/home/peter/Documents/IMRSV_GITrepos/IMRSV_Platform/Matter-Library"
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # this repo
 LIB = os.path.join(REPO, "blender/asset_library/MatterLibrary.blend")
 MID = "Copper_Verdigris_Aged_Base_s01_v01"
 

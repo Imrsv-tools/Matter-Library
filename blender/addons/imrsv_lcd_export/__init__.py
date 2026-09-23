@@ -52,7 +52,7 @@ bl_info = {
     "name": "IMRSV LCD Export",
     "author": "IMRSV",
     "version": (1, 0, 0),
-    "blender": (5, 1, 1),
+    "blender": (5, 1, 0),  # the target is Blender 5.1+ (R6); enabled + exporter registered on 5.1.0, 2026-09-23
     "location": "File > Export > IMRSV LCD USD (.usda)",
     "description": "Export USD with Creator LCD material refinements as spec-clean inputs: overrides",
     "category": "Import-Export",

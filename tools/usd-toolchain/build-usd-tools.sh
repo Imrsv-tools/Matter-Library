@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-# build-usd-tools.sh — IMRSV canonical USD validation/authoring toolchain.
+# build-usd-tools.sh — the Matter Library's USD validation/authoring toolchain.
 #
-# Builds OpenUSD v26.03 (Stage's exact pin, IMRSV_Stage/cmake/ExternalUSD.cmake GIT_TAG)
-# with the dev/tool capabilities Stage deliberately strips out flipped ON:
+# Builds OpenUSD v26.03 — the library's USD baseline — with the dev/tool capabilities a lean
+# runtime strips out flipped ON:
 #   --python --usd-imaging --usdview --tools --materialx
-# MaterialX rides USD's own 1.39.5 (same minor as Stage's vendored third_party/MaterialX
-# 1.39.5 — OpenPBR-1.39 nodedefs identical). For BYTE-exact MaterialX, see NOTE below.
+# MaterialX rides USD's own 1.39.5 (the library's MaterialX baseline; OpenPBR-1.39 nodedefs).
+# For BYTE-exact MaterialX against a particular consumer's vendored build, see NOTE below.
 #
-# Faithful-to-Stage rationale: usdview must render .mtlx the way Stage READS it. Same USD
-# version + same MaterialX minor => trustworthy parity proof.
+# Why these pins: usdview must render .mtlx the way a consumer READS it, so parity proofs need
+# the same USD version and MaterialX minor. They were chosen (2026-06) to match the IMRSV Stage
+# consumer's build. Whether the library's baseline leads and consumers declare a match, or the
+# reverse, is open: docs/specs/Tooling/USDValidationToolchain.md (Drift, 2026-09-23).
 #
 # Run from INSIDE the host conda env (see environment.yml):
 #   conda activate imrsv-usd-tools && bash build-usd-tools.sh
@@ -93,6 +95,6 @@ echo "[usd-tools] activate with: source $(dirname "$0")/activate-usd-tools.sh"
 echo "[usd-tools] verify: usdview --help ; usdrecord --help ; python -c 'import MaterialX,pxr.UsdMtlx;print(MaterialX.__version__)'"
 
 # NOTE (byte-exact MaterialX, if ever needed): instead of --materialx, pre-build the
-# vendored tree (IMRSV_Stage/third_party/MaterialX, MATERIALX_BUILD_PYTHON=ON) and pass
+# consumer's vendored MaterialX tree (MATERIALX_BUILD_PYTHON=ON) and pass
 # --build-args USD,"-DMaterialX_DIR=<prefix>/lib/cmake/MaterialX -DPXR_ENABLE_MATERIALX_SUPPORT=TRUE".
 # Same-minor (1.39.x) is parity-faithful for OpenPBR rendering, so default uses USD's.
