@@ -14,3 +14,8 @@ library/staging/
 # Claude Code harness runtime state (per-machine, never shared)
 .claude/scheduled_tasks.lock
 .claude/settings.local.json
+
+# Editor swap / backup files
+*.kate-swp
+*.swp
+*~

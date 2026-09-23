@@ -318,4 +318,35 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
     - **CC0:** `MatterLibrary/materials` + `textures` (per R13), plus `tools/converters/recipes/`, `library/releases` + `provenance`, `blender/asset_library/`, and the examples copy.
     - **Apache-2.0:** code and docs.
   - **Checks:** 0 broken links in the new files (the glossary's two pending pointers now resolve) and 0 publication-check hits.
-  - **Next:** the lead runs click 4 → then 1.5.
+  - **Lead verdict (click 4, 2026-09-23):** *"1 and 2 as recomended"*: the CC0 scope stays as written (recipes, `library/` records and the Blender asset library are CC0 alongside materials and textures; code and docs are Apache-2.0), and the credit name is @PeteSmalls. ✅ **1.4 done** (landed at `4ab9fd4`).
+- **1.5 — See what's next.**
+  - **Archived verbatim with banners** under `Complete/PreStandalone/`, the same pattern as `build_plan.md` in 1.1: the old `Readme.md` (as `Readme_2026-07.md`) and `FolderStructure.txt`.
+  - **New `Readme.md`:** identity only. It covers what the library is, how it's organised, how it's used (Blender / USD / Unreal), contributing, licence and credit, and where things are, with no status. The first draft said "install the add-on"; corrected, because the add-on still resolves its data through the repo (the Blender-from-a-release phase fixes that).
+  - **`docs/Planning/Roadmap.md`, re-thought per R5/R11.** The Active entry is Phase01. The Future order is:
+    1. One-Command Check
+    2. Release Bundle + Consumer Contract
+    3. IMRSV Consumes Releases (integration, on the platform's line)
+    4. Blender from a Release
+    5. See the Library
+    6. Version Management (SEEDED)
+    7. Author a Material End to End
+    8. Contribution Path
+    9. Parity Baselines
+    10. Library Coverage
+    11. Agentic Material Generation
+    12. Unreal Reference Masters
+    13. Parking lot
+
+    Every planned item in the archived build_plan, Readme and FolderStructure is carried as an entry, in the Parking lot, or in ToolingConventions §Planned roots.
+  - **`docs/Planning/PlatformDependencies.md`:** 10 asks of IMRSV/USDLiveView (P1–P10: install a bundle, deploy from a bundle, packaged builds, master routing from data, native Substrate masters, the taxonomy-driven picker, the selector in USDLiveView, `fixture_sync` to the consumer side, platform docs to pointers, retiring the submodule), plus 2 inbound (M1 the Appearance masters; M2 the open platform-tracker issues). No private identifiers.
+  - **`docs/ToolingConventions.md` is active:** the measured artifact taxonomy with licence per root, naming, entry points, the gates/CI state in dated form, and the planned roots from FolderStructure. Test-docs placement is recorded as observed practice, not a ruling.
+  - **`PhaseTBD_VersionManagement.md`:** trimmed to one open Outcome (a second release carries the first forward). Each part of the 2026-05-30 draft is marked delivered, moved or open; nothing is deleted.
+  - **Hygiene:**
+    - `stage.log` removed.
+    - `.gitignore` covers editor swap files.
+    - `AI_Orientation` and `LOCAL_DELTAS` rows that described 1.5 outputs as future were updated now that they exist. `LOCAL_DELTAS` is the Refiner's lane, but this is the adoption step's own row (the file's rule: update a not-yet-existing-artifact row when the artifact comes to exist).
+  - **Gates (2026-09-23):**
+    - **Links:** 631 references across 32 docs, 0 broken relative links. The path misses are intentional: `docs/architecture/` is the method's term, mapped to `docs/specs/`; two planned roots; one quoted old path.
+    - **Publication check:** 0 over every public-facing doc.
+    - **Placeholder sweep:** 0 unfilled; the remaining hits are pattern examples.
+  - **Next:** the lead runs click 5. Then the close is the lead's to start (`execute_close.md`).

@@ -6,35 +6,73 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 >
 > **Status vocabulary:** `RESEARCH` (no phase doc yet — the pointers are the raw material) → `SEEDED` (phase doc written) → `ACTIVE` (being worked) → `COMPLETE`. A `TBD` entry is simply one the lead has not numbered — it may hold a perfectly settled position, since **order is position in the list, never an ordinal**. Numbering is the lead's call: sometimes one as work starts, sometimes a whole span when committing to a Wave (Workflow §Phase Numbering).
 
-> **Structural cut (Phase01 step 1.1, 2026-09-23).** This registry replaced the pre-adoption `.ai/plan/build_plan.md`, which is archived verbatim at `docs/Planning/Phases/Complete/PreStandalone/build_plan.md`. Its Upcoming and Parking Lot entries are carried below as-is, pending the **re-think in Phase01 step 1.5** (lead ruling R5/R11: the roadmap is rebuilt around the library and its tools; the first phases are standing alone, being versioned, and being consumed by IMRSV).
+> **Re-thought 2026-09-23 (Phase01 step 1.5)** around the library and the tools that make it usable, grow it and generate it (lead rulings R5/R11, `docs/Planning/Research/260923_R_StandaloneSetup.md`). The first phases make the library stand alone, be versioned and published, and be consumed by IMRSV. The pre-standalone plan is archived at `docs/Planning/Phases/Complete/PreStandalone/build_plan.md`; every planned idea in it is carried below or in the Parking lot.
 
 ==================================================================================
 ## Active
 
 ### Phase01 — Standalone Bootstrap — ACTIVE
 **Outcome:** anyone can understand, navigate and work on the Matter Library from this repository alone.
-- `docs/Planning/Phases/Phase01_StandaloneBootstrap.md` · research: `docs/Planning/Research/260923_R_StandaloneSetup.md`
+- `docs/Planning/Phases/Phase01_StandaloneBootstrap.md`
 
 ==================================================================================
 ## Future
 
-*Carried from `build_plan.md` pending the step-1.5 re-think.*
+### One-Command Check — RESEARCH
+**Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 7, seed 2) · `docs/ToolingConventions.md` §Entry points
 
-### Version Management — TBD
-**Outcome:** a maintainer can promote, deprecate and retire materials across library releases, with each release reproducible forever.
+### Release Bundle and Consumer Contract — RESEARCH
+**Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Passes 4 and 9, seed 3) · `docs/specs/Consumers.md` · `docs/Planning/PlatformDependencies.md`
+
+### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
+**Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
+- `docs/Planning/PlatformDependencies.md` (P1–P4, P10)
+
+### Blender from a Release — RESEARCH
+**Outcome:** a Blender user installs the Matter add-on and library from a release and uses Matter materials without cloning this repository.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 4) · `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped
+
+### See the Library — RESEARCH
+**Outcome:** anyone can browse what is in a release, with a preview image of every material.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails
+
+### Version Management — SEEDED
+**Outcome:** a maintainer can cut the next release from the last one — keeping, adding, deprecating and retiring materials — and every earlier release stays exactly reproducible.
 - `docs/Planning/Phases/Future/PhaseTBD_VersionManagement.md`
 
+### Author a Material End to End — RESEARCH
+**Outcome:** a contributor can go from an idea to a validated material in the library in minutes, using one tool (the first cut of the Matter Manager).
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 7)
+
+### Contribution Path — RESEARCH
+**Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md`
+
 ### Parity Baselines — RESEARCH
-**Outcome:** anyone can see, per material class, how closely MaterialX, Blender and Unreal renders of a material match.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 8, seed 10)
+**Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md`
+
+### Library Coverage — RESEARCH
+**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`
+
+### Agentic Material Generation — RESEARCH
+**Outcome:** a maintainer can ask an agent for new materials and receive validated candidates, with recorded provenance, ready for human judgement.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 11, Q10) · `docs/specs/Authoring/AuthoringGoldenPath.md`
+
+### Unreal Reference Masters — RESEARCH
+**Outcome:** an Unreal user outside IMRSV can drop in a package of the Matter masters and render library materials from a release.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later")
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
-- `docs/Planning/Phases/Complete/PreStandalone/build_plan.md` §Parking Lot · `docs/Planning/Research/260923_R_StandaloneSetup.md` Pass 8
+- Automated transformers (MaterialX → Blender / Unreal), after manual parity is proven. Parity-gate automation in CI. A Realm level above Domain. Texture storage beyond Git LFS (asset management, content-addressed pointers). Further engine targets. Personal saved variants, community scoring and contributor reputation (`docs/specs/Experience/Experience_MatterLibrary.md` §Future Layers). The planned roots in `docs/ToolingConventions.md` §Planned roots.
 
 ==================================================================================
 ## Complete
 
-### Pre-standalone — delivered by IMRSV platform phases (2026-06 → 2026-07) — COMPLETE
+### Pre-standalone — built by IMRSV platform phases (2026-06 → 2026-07) — COMPLETE
 **Outcome:** the foundations, the authoring harness, the first 12 materials, the release machinery and the Blender library, all built into this repo by the IMRSV platform's Materials wave.
-- `docs/Planning/Phases/Complete/PreStandalone/build_plan.md` §Delivered · `docs/Planning/Phases/Complete/PreStandalone/Phase01_Foundations.md`
+- `docs/Planning/Phases/Complete/PreStandalone/` (`build_plan.md` §Delivered · `Phase01_Foundations.md` · `Readme_2026-07.md` · `FolderStructure.txt`)

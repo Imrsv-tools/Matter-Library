@@ -19,7 +19,7 @@ The Matter Library is **a community-driven, single-source material library and t
 
 ### Relationship to other projects
 - **This repo is a producer.** Consumers take its **published release bundles**, never its working tree. They are the IMRSV platform (Stage runtime · UE plugin · Studio), Blender users, and USD viewers such as USDLiveView.
-- The asks this repo has of consumers are listed in `docs/Planning/PlatformDependencies.md` once step 1.5 lands.
+- The asks between this repo and its consumers are listed in `docs/Planning/PlatformDependencies.md`.
 - Consumer-side behaviour (how IMRSV loads and renders a material) is specified in the consumer's own docs, not here.
 
 ## Working Mode
