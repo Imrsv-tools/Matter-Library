@@ -349,4 +349,4 @@ The lead, verbatim: *"go with your recommendations... review again as the other 
     - **Links:** 631 references across 32 docs, 0 broken relative links. The path misses are intentional: `docs/architecture/` is the method's term, mapped to `docs/specs/`; two planned roots; one quoted old path.
     - **Publication check:** 0 over every public-facing doc.
     - **Placeholder sweep:** 0 unfilled; the remaining hits are pattern examples.
-  - **Next:** the lead runs click 5. Then the close is the lead's to start (`execute_close.md`).
+  - **Lead verdict (click 5, 2026-09-23):** *"looks right, push it and close phase 1"*. ✅ **1.5 done** (landed at `0566b30`).
