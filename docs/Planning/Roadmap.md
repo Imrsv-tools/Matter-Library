@@ -16,9 +16,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Future
 
-### One-Command Check — RESEARCH
+### Phase02 — One-Command Check — SEEDED
 **Outcome:** anyone can clone the library on a fresh machine, run one command, and see every material and release validate, with the result also checked automatically on every pull request.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 7, seed 2) · `docs/ToolingConventions.md` §Entry points
+- `docs/Planning/Phases/Phase02_OneCommandCheck.md`
 
 ### Release Bundle and Consumer Contract — RESEARCH
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
