@@ -25,7 +25,10 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
  12. approval binds freeze   — a PROMOTED approval artifact references the release's ACTUAL frozen
                                hashes (RD-1/RD-4: the approved release IS the frozen candidate);
                                skips pre-promotion
- 13. activation              — activate_release.py verifies install-readiness + switches the
+ 12b. release verify        — every COMMITTED freeze record still reproduces from the tree (a
+                               shipped file edited in place, or LFS pointer files, fail here);
+                               the .dds set is re-verified when the encoder or staging is present
+ 13. activation             — activate_release.py verifies install-readiness + switches the
                                active-release selector ATOMICALLY (a failure leaves the prior
                                release active — RD-3/RD-5); skips pre-promotion
 
@@ -469,6 +472,95 @@ def run_approval_binds_freeze(root: Path) -> bool:
     return ok
 
 
+def run_release_verify(root: Path):
+    """Phase02 2.2: every SHIPPED release still reproduces, byte for byte, from this tree.
+
+    Re-verifies each COMMITTED freeze record (library/releases/*.freeze.json) against the files
+    on disk — unlike `freeze_lock`, which checks only a record it has just computed itself, and
+    `approval_binds_freeze`, which compares JSON to JSON. This is the lane that fails when a
+    shipped texture or .mtlx is edited in place, or when the textures are Git LFS pointer files
+    rather than the real pixels (a clone without git-lfs).
+
+    The encoder-built `.dds` set is re-verified when a staging tree exists or the pinned encoder
+    can build one (into a temp dir); otherwise the lane checks every other part and names the
+    `.dds` set as not re-verified. This is the hash MECHANISM only: the vNN immutability rule
+    is Version Management's."""
+    releases = root / "library" / "releases"
+    records = sorted(releases.glob("*.freeze.json")) if releases.exists() else []
+    if not records:
+        print("== release verify == (skip: no committed library/releases/*.freeze.json)")
+        return SKIP
+    print("== release verify ==")
+    import shutil as _sh
+    encoder = Path(ct.COMPRESSONATOR).exists() and ct._check_encoder()
+    ok = True
+    for path in records:
+        rec = json.loads(path.read_text(encoding="utf-8"))
+        version = rec.get("release", "")
+        # The freeze record hashes .dds PATHS as well as bytes, relative to the repo root, so the
+        # set can only be re-verified at its canonical place: library/staging/matterlib-<V>/
+        # (gitignored; where `stage_release.py build` writes). Build it there only if absent, and
+        # remove only what this lane created.
+        created = None
+        staging_root = sr.default_staging_root(root)
+        staging = staging_root / f"matterlib-{version}"
+        if not staging.is_dir() and "dds_set" in rec.get("payload_sha256", {}) and encoder:
+            created = staging
+            built, _ = sr.build(root, version, staging_root)
+            if not built:
+                print(f"  [FAIL] matterlib-{version}: staging build for the .dds re-verify errored")
+                ok = False
+                _sh.rmtree(created, ignore_errors=True)
+                continue
+        fresh = None
+        full = staging.is_dir()  # fixed now: a staging dir this lane built is removed below
+        try:
+            if full:  # the complete payload, .dds included
+                errs = fr.verify_freeze(root, rec, staging)
+                note = "complete payload incl. .dds"
+                if errs:
+                    fresh = fr.compute_freeze(root, version, staging)
+            else:  # every part but the encoder-built .dds set, key by key
+                try:
+                    fresh = fr.compute_freeze(root, version, None)
+                    ps = fresh["payload_sha256"]
+                    errs = [f"payload_sha256[{k}] mismatch: recorded {v[:12]}… != on-disk {str(ps.get(k))[:12]}…"
+                            for k, v in rec.get("payload_sha256", {}).items()
+                            if k != "dds_set" and ps.get(k) != v]
+                except FileNotFoundError as exc:
+                    errs = [f"cannot recompute: {exc}"]
+                note = ("every part except the .dds set (not re-verified: "
+                        + encoder_absent() + ")") if "dds_set" in rec.get("payload_sha256", {}) \
+                    else "complete payload"
+        finally:
+            if created is not None:
+                _sh.rmtree(created, ignore_errors=True)
+                try:
+                    staging_root.rmdir()  # only if now empty — never another release's staging
+                except OSError:
+                    pass
+        for e in errs:
+            print(f"  [FAIL] matterlib-{version}: {e}")
+        if errs and fresh is not None:  # name the files, not just the set
+            def _by_path(files):
+                return {e["path"]: e["sha256"] for group in files.values() for e in group}
+            was, now = _by_path(rec.get("files", {})), _by_path(fresh.get("files", {}))
+            if not full:
+                was ={p: h for p, h in was.items() if not p.endswith(".dds")}
+            changed = sorted(p for p in was if p in now and was[p] != now[p])
+            missing = sorted(p for p in was if p not in now)
+            added = sorted(p for p in now if p not in was)
+            for label, paths in (("changed", changed), ("missing", missing), ("added", added)):
+                for p in paths[:5]:
+                    print(f"         {label}: {p}")
+                if len(paths) > 5:
+                    print(f"         … and {len(paths) - 5} more {label}")
+        if not errs:
+            print(f"  [PASS] matterlib-{version}: reproduces from the tree — {note}")
+        ok = ok and not errs
+    return ok
+
+
 def run_activation(root: Path) -> bool:
     """Phase 60sq2.13 (RD-3/RD-5): activate_release.py verifies install-readiness and switches the
     active-release selector ATOMICALLY — a failure before the switch leaves the prior release active.
@@ -576,6 +668,7 @@ def main(argv=None) -> int:
         "approval_gate": run_approval_gate(root),
         "freeze_lock": run_freeze_lock(root),
         "approval_binds_freeze": run_approval_binds_freeze(root),
+        "release_verify": run_release_verify(root),
         "activation": run_activation(root),
     }
     print("\n=== SUMMARY ===")

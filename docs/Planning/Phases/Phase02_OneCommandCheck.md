@@ -104,4 +104,7 @@ The lead, verbatim: *"go with the recommendations"*. Each call below records the
 
 ## Execution Log
 
-_(populated during execution)_
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 2.1 | `6625731` | Fresh clone: 15 lanes, 13 PASS / 2 SKIP, exit 0; `--strict` exit 1 without the encoder, 15 PASS / 0 SKIP with it. **Lead sitting (clicks 1–2), verbatim: *"mark a good and continue"*.** ✅ | 2.2 |
+| 2.2 | the 2.2 commit | `release_verify` (16 lanes). Three throwaway-clone arms, predicted and observed: one byte appended to `Dust01_overlay_s001.png` → the **only** red lane, naming that file · a pointer-only (no-LFS) clone → **only** red lane, 30 files changed · pinned encoder, `--strict` → 16 PASS / 0 SKIP, the **complete payload incl. `.dds`**, no staging left behind. Finding while building: the freeze record hashes `.dds` **paths**, so the set can only be re-verified at `library/staging/matterlib-<V>/`; the lane builds there only when absent, and removes only what it built. | lead click 3, then 2.3 |
