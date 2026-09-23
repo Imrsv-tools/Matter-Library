@@ -1,6 +1,6 @@
 # Phase02 — One-Command Check
 
-**Status:** ACTIVE — discovery Pass 1 complete (2026-09-23); **the Brief is written, pending three lead calls (§Lead calls)**. Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
+**Status:** ACTIVE — discovery Pass 1 complete (2026-09-23); **the Brief is complete; the three lead calls are resolved (§Lead calls, 2026-09-23)**. Numbered by the lead (`/discovery Phase 2`, 2026-09-23): the entry at the head of the Roadmap's `## Future`. **Lane: `build`.**
 
 ## Outcome
 
@@ -14,7 +14,7 @@
 
 ### First human test
 
-There is no running service. The surfaces are a terminal and the repo's GitHub pull-request page. Prerequisites: `git`, `git-lfs`, and `uv` (or whatever Lead call 1 settles).
+There is no running service. The surfaces are a terminal and the repo's GitHub pull-request page. Prerequisites: `git`, `git-lfs`, and `uv` (Lead call 1).
 
 1. `git clone https://github.com/Imrsv-tools/Matter-Library /tmp/ml && cd /tmp/ml`
 2. `uv run tools/validators/run_all.py` → the summary lists **every lane as `PASS`, `SKIP (<why>)` or `FAIL`**, with counts. On a box without the encoder, `compression` and `staging` read `SKIP (pinned encoder V4.5.52 absent)`. The exit code is 0. *(step 2.1)*
@@ -25,11 +25,11 @@ Each click is reachable by the step its note names. Step 2.1's test is clicks 1�
 
 ### In now
 
-- **A pinned core environment** a newcomer gets in one step (form: Lead call 1).
+- **A pinned core environment** a newcomer gets in one step (`pyproject.toml` + `uv.lock`, Lead call 1).
 - **Tri-state lane reporting.** Today every skip path does `return True`, so a skip reports `PASS` (read in `run_all.py`, 2026-09-23). A local run may skip, and the report says so. CI runs **strict**, where any `SKIP` is a failure. That is how the gate is demonstrated both ways.
 - **`fixture_sync` leaves the gate.** It reads a consumer's tree outside this repo (it probed `../IMRSV_Studio/…` from a `/tmp` clone). Ruled by R1, and `PlatformDependencies.md` P8 names "this repo (removes it)". **Don't Delete:** `check_fixture_sync.py` stays as a standalone tool the consumer can run with `--fixture-root`. The lane's intent is recorded in `AuthoringHarness.md` as moved to the consumer side (P8).
-- **A release-verify lane** (Lead call 3): each committed `*.freeze.json` re-verifies against the tree. The encoder-built `dds_set` is included when staging exists, and otherwise names what it could not check.
-- **CI on GitHub**, running the gate strictly on every pull request and every push to `main`, with the pinned encoder installed (Lead call 2).
+- **A release-verify lane** (Lead call 3, the mechanism only): each committed `*.freeze.json` re-verifies against the tree. The encoder-built `dds_set` is included when staging exists, and otherwise names what it could not check.
+- **CI on GitHub**, running the gate strictly on every pull request and every push to `main`, with the pinned encoder installed. Locally the encoder stays optional: its lanes `SKIP` and name `COMPRESSONATORCLI` (Lead call 2).
 - **Routed hygiene**, each discharging a dated marker:
   - Every hardcoded home path in `tools/conformance/` (9 files) and `tools/generators/gen_asset_library.py` goes. They point at a **retired** platform checkout (`…/IMRSV_GITrepos/IMRSV_Platform/…`), so they are broken on the lead's box too. The repo root derives from `__file__`; the USD install and conda env come from environment variables with documented defaults.
   - `library/provenance/matterlib-0.1.0-textures.md` platform phase ids (Phase01 §Deferral ledger).
@@ -49,7 +49,7 @@ Each click is reachable by the step its note names. Step 2.1's test is clicks 1�
 | Need | Native answer | Custom layer? |
 |---|---|---|
 | MaterialX in Python | PyPI `MaterialX==1.39.5`: wheels for CPython **3.9–3.14** on Linux x86_64, macOS arm64 and Windows. **No macOS Intel wheel.** (PyPI JSON, 2026-09-23.) | none |
-| Pinned env + lock | `pyproject.toml` (PEP 621) + a lockfile | none (Lead call 1 picks the tool) |
+| Pinned env + lock | `pyproject.toml` (PEP 621) + a lockfile | none (`uv`, Lead call 1) |
 | The encoder | AMD's own `compressonatorcli-4.5.52-Linux.tar.gz` release asset, sha256 `70c9cdb27a19875df03766f349864951a749a44c0f5c001c33903944465f6b97`. `compress_textures.py` already reads `$COMPRESSONATORCLI`. | a download + checksum step, nothing else |
 | CI | GitHub Actions, `actions/checkout` with `lfs: true`, `actions/cache` for the LFS objects and the encoder | none |
 | Freeze re-verify | `freeze_release.verify_freeze(root, rec[, staging])` already exists. The gate calls it only on a freshly computed record, never on the committed one. | a lane calling it, no new logic |
@@ -84,19 +84,22 @@ No split signal: one journey (the same gate, at a desk and on a PR). Step 2.1 is
 - **`tools/validators/run_all.py`:** lane functions return a result enum or tuple instead of `bool`; summary and exit logic; `--strict`; drop the `fixture_sync` entry; add `release_verify`. `approval_binds_freeze` already has the staging-present branch. Keep the two lanes distinct.
 - **`tools/validators/check_fixture_sync.py`:** stays; module docstring points to P8.
 - **`tools/conformance/*`, `tools/generators/gen_asset_library.py`:** replace the absolute constants. `render_leg_probe.py` and `check_conformance.sh` also default their output to a dead `~/.claude/jobs/…` path.
-- **Docs flipped at close:** `docs/ToolingConventions.md` (§Entry points, §Gates and CI), `docs/specs/Tooling/AuthoringHarness.md` (Todo, lane table, fixture-sync Drift), `docs/specs/_Architecture.md` §Governance Drift, `CONTRIBUTING.md` (the dated `run_all` gap), `USDValidationToolchain.md` Drift, `Experience_MatterLibrary.md` Reevaluate, `PlatformDependencies.md` P8 status. **The lane count becomes 16 − 1 (+ 1 if Lead call 3 is yes).** `.ai/AI_Orientation.md` and `.ai/commands/LOCAL_DELTAS.md` carry the same stale claims but are the Refiner's lane → **`/retro` item at close**, not an execute edit.
+- **Docs flipped at close:** `docs/ToolingConventions.md` (§Entry points, §Gates and CI), `docs/specs/Tooling/AuthoringHarness.md` (Todo, lane table, fixture-sync Drift), `docs/specs/_Architecture.md` §Governance Drift, `CONTRIBUTING.md` (the dated `run_all` gap), `USDValidationToolchain.md` Drift, `Experience_MatterLibrary.md` Reevaluate, `PlatformDependencies.md` P8 status. **The lane count stays 16: `fixture_sync` out, `release_verify` in (Lead call 3).** `.ai/AI_Orientation.md` and `.ai/commands/LOCAL_DELTAS.md` carry the same stale claims but are the Refiner's lane → **`/retro` item at close**, not an execute edit.
 - **Measured baseline** for the executor (2026-09-23, fresh clone, throwaway 3.12 venv with the four deps): exit 0, 13 lanes ran, 3 skipped (`fixture_sync`, `compression`, `staging`). With `COMPRESSONATORCLI` pointed at the unpacked asset: all encoder lanes ran, exit 0, **~80 s wall / ~14 min CPU** on the lead's box. A GitHub runner has fewer cores, so expect minutes. `stage_release.py build 0.1.0` followed by `verify_freeze` against the **committed** freeze gave **zero drift, `.dds` included**: the pinned encoder reproduces the shipped release byte for byte. Without staging, the committed freeze drifts only on `dds_set` (+ digest). Pointer-only, it also drifts on `source_textures_set`.
 
 ---
 
-## Lead calls
+## Lead calls — RESOLVED (2026-09-23)
 
-1. **Environment form.** *(Research Q7; the expensive-to-unwind one.)* **Recommend `pyproject.toml` + `uv.lock` for the core tier, with the one command `uv run tools/validators/run_all.py`**, which creates the env and runs in one step. Plain `pip install` from the same `pyproject` stays possible. The conda `environment.yml` stays exactly as it is, for the USD build only. Alternatives: extend the conda env (heavy for CI, and couples the core to the ~40-min USD tier), or `requirements.txt` + venv (two commands, no lock).
-2. **Where the encoder lanes run.** **Recommend: always in CI (strict, checksummed download, cached); optional locally, where the run says `SKIP` and names the one env var to set.** Alternative: auto-fetch the encoder locally too. That makes "fresh machine" fully literal, at the cost of a ~20 MB download on first run and tool-fetching code in the gate.
-3. **A release-verify lane in this phase?** It is what makes "every **release** validates" true: today nothing re-checks a shipped release against the tree, and a pointer-only clone passes. It overlaps Version Management's immutability gate. **Recommend yes, as the mechanism only** (hash re-verify of committed freezes); the `vNN` immutability rule and the `0.x` question stay in Version Management.
+The lead, verbatim: *"go with the recommendations"*. Each call below records the recommendation that was accepted.
+
+1. **Environment form (research Q7) → `pyproject.toml` + `uv.lock` for the core tier; the one command is `uv run tools/validators/run_all.py`.** Plain `pip install` from the same `pyproject` stays possible. The conda `environment.yml` is unchanged and serves the USD build only. *(Rejected: extending the conda env, which is heavy for CI and couples the core to the USD tier; `requirements.txt` + venv, which is two commands with no lock.)*
+2. **Encoder lanes → always in CI (strict, checksummed download, cached); optional locally, where they `SKIP` and name `COMPRESSONATORCLI`.** *(Rejected: auto-fetching the encoder locally.)* Asked in the same exchange whether any of this should be hosted, the answer was no: CI runs on GitHub's throwaway runners, not a self-hosted one. The one hosting dependency is AMD's release asset. It is pinned and cached, and if it disappears the fallback is a copy attached to one of this repo's own releases (MIT).
+3. **Release-verify lane → in this phase, as the mechanism only** (hash re-verify of committed freeze records). The `vNN` immutability rule and the `0.x` question stay in Version Management.
 
 ## Discovery Log
 
+- **Lead ruling (2026-09-23):** *"go with the recommendations"* → §Lead calls. The Brief is complete.
 - **Pass 1 (2026-09-23) — specs top-down + capability probes.** Read `_Architecture.md` → `AuthoringHarness.md` → `run_all.py` in full, plus the research doc (Pass 7, seed 2, Q7), `ToolingConventions.md` and `PlatformDependencies.md`. Probed against **this project's artifacts**, all in `/tmp`, repo untouched: a 3.12 venv + four deps runs the gate green; the public GitHub clone delivers all 30 LFS textures (~35 MB); the pinned Linux encoder runs every lane and reproduces the committed 0.1.0 freeze exactly. **Seed corrections:** "16 vs 13 + 9b lanes" was a false alarm (the docstring groups lanes; `main()` has 16 `results` keys). Seed Q3 ("how far does fresh machine reach") failed test 1: the import graph answers it for the one command, and Phase01's ledger had already routed the path fixes here. It is now scope, not a question. Seed Q2 passed test 3 once the asset was downloaded and run. **Learnings:** `docs/Learnings/` holds no domain yet, so there was nothing to read. That is a discharged read, not a skipped one.
 
 ## Execution Log
