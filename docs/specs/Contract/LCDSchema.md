@@ -17,9 +17,9 @@ Conflating these is how parameter surfaces bloat. Same named OpenPBR inputs; two
 | Tier | Who sets it | What | When |
 |------|-------------|------|------|
 | **Author tier (full LCD)** | a material *author* | maps + base values: base color, metallic, roughness, IOR, normal, SSS color/radius, emissive, … — **baked into the `.mtlx` values** | authoring time |
-| **Creator subset (adjustable)** | a *[Creator](../../Glossary.md)* in a consuming application (Blender, IMRSV Studio, …) | the "fun things" a consumer exposes + the composition overrides via standard `inputs:` opinions | composition time, round-trips |
+| **Creator subset (adjustable)** | a *[Creator](../../Glossary.md)* in a consuming application (Blender, IMRSV Studio, …) | the "fun things" a consumer exposes + the composition overrides via standard, **connected** `inputs:` opinions ([§Carrier rule](#carrier-rule-no-imrsv-attrs)) | composition time, round-trips |
 
-The **author tier** is the master's full param schema ([MasterSet](../Ontology/MasterSet.md)). The **Creator subset** ([Creator tier](../../Glossary.md)) is the chain's adjustment contract ([Identity](../Ontology/Identity.md)) — and a Creator tweak is a plain USD `inputs:` override on the bound material prim, never a new material.
+The **author tier** is the master's full param schema ([MasterSet](../Ontology/MasterSet.md)). The **Creator subset** ([Creator tier](../../Glossary.md)) is the chain's adjustment contract ([Identity](../Ontology/Identity.md)) — and a Creator tweak is a value on the bound material prim's `inputs:<port>`, **connected from the article's nodegraph** so that any USD tool resolves it ([§Carrier rule](#carrier-rule-no-imrsv-attrs)), never a new material.
 
 ## Author tier — the carrier contract
 
@@ -71,8 +71,12 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 *(Updated 2026-09-23, measured: `LCD_PORTS` in `tools/converters/assemble_mtlx.py` carries exactly these 8 names, types and defaults.)*
 
+**What the ports mean is what MaterialX computes** *(stated 2026-09-24; lead ruling: "the number we see in [a consuming application] is the number we see in a stock USD viewer")*. The article is the reference implementation, and a consumer that renders these ports conforms to it; none may reinterpret them.
+- **UV placement is MaterialX `place2d`** (`ND_place2d_vector2`: pivot at the UV origin, scale → rotate → offset). `uv_scale` **divides** the texture coordinate, so `2` makes the texture **twice as large** (fewer repeats) and `0.5` repeats it twice. `uv_rotation` turns the texture **counter-clockwise** by that many degrees about the UV origin (the texture's bottom-left in USD `st` space). `uv_offset` is **subtracted** from the coordinate after the rotation. *(This corrects nothing in the table: `place2d.scale` was always the target. It rules out the other USD 2D convention, UsdPreviewSurface's `UsdTransform2d`, which multiplies by scale and adds the translation, and renders the same saved value as the opposite picture.)*
+- **`roughness_bias` is added, then the total is clamped to [0, 1]** (the article's `roughness_biased_clamped` node, since 2026-09-24). OpenPBR does not clamp `specular_roughness`, so without it a negative total renders rough in a stock viewer and glossy in a consumer that clamps. The op stays `add`; the clamp is the article's, and every consumer matches it.
+
 **Notes:**
-- **UV placement has two layers — only the numeric one is consumer-side.** The **mesh UV unwrap / layout authored in Blender is the PRIMARY placement**, and it travels with the geometry as USD **primvars** (it is geometry, not a material param — **Blender is the authoritative UV-authoring environment**). The numeric **`place2d` transform** (`uv_scale`/`uv_offset`/`uv_rotation`) rides the `place2d` nodegraph, not a prim attr; Blender mapping-node edits do NOT export, so **that numeric transform is a last-mile NUDGE only** (e.g. in IMRSV Studio) — never a replacement for the Blender-authored UV set.
+- **UV placement has two layers — only the numeric one is consumer-side.** The **mesh UV unwrap / layout authored in Blender is the PRIMARY placement**, and it travels with the geometry as USD **primvars** (it is geometry, not a material param — **Blender is the authoritative UV-authoring environment**). The numeric **`place2d` transform** (`uv_scale`/`uv_offset`/`uv_rotation`) lands on the article's `place2d` node, reached through the nodegraph interface like every other Creator port ([§Carrier rule](#carrier-rule-no-imrsv-attrs)), never a custom prim attr; Blender mapping-node edits do NOT export, so **that numeric transform is a last-mile NUDGE only** (e.g. in IMRSV Studio) — never a replacement for the Blender-authored UV set.
 - **Overlay intensity** ×≤2 (`overlay1_density`/`overlay2_density`) is the **layered-materials marquee** (dust, scratches).
 - **`maskset_blend`** supersedes the earlier `mask_*` placeholder — named for the **maskset concept** (not the v1 single-channel limit) so multi-channel masks don't force a cross-consumer rename.
 - **Names use OpenPBR-aligned terms** so the same word means the same thing in MaterialX, the Unreal instance param, and the Blender node-group input.
@@ -81,7 +85,33 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 ## Carrier rule (no `imrsv:` attrs)
 
-Every adjustable is a **standard `inputs:` override** on the bound material prim (or a `place2d` nodegraph input for UV) — standard `UsdShade`, readable by any tool. **No `imrsv:` custom attrs.** Per-object adjustment requires **per-object material instances** (separate material prims per object, e.g. `<name>_Instance_<N>`) since input overrides on a shared material affect every prim bound to it.
+Every adjustable — **all 8 Creator ports, UV placement included** — is a **standard `inputs:<port>` value on the bound material prim, connected from the article's nodegraph interface input**:
+
+```usda
+def "Copper_Verdigris_Aged_Base_s01_v01_Instance_1" (
+    prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>
+)
+{
+    color3f inputs:base_color_tint = (1, 0, 0)          # the Creator's value
+    over "NG_Copper_Verdigris_Aged_Base_s01_v01"
+    {
+        color3f inputs:base_color_tint.connect = </…/Copper_Verdigris_Aged_Base_s01_v01_Instance_1.inputs:base_color_tint>
+    }
+}
+```
+
+This is UsdShade's documented pattern for exposing a parameter on a Material (`usdShade/overview.dox` §Exposing parameters on containers) — standard `UsdShade`, readable by any tool. **No `imrsv:` custom attrs.** The rules:
+
+- **Why the connection is required.** When USD reads a `.mtlx`, usdMtlx exposes only the **surface shader's** inputs on the Material; the article's Creator ports stay on its nodegraph `NG_<id>` (a child of the Material once the reference composes). An **unconnected** Material input is in no connection chain, so it drives nothing: **an override without the connection is inert in every stock USD tool** (usdview, `usdrecord`, any Hydra delegate). It is not *invalid*, so no stock USD validator flags it. The article cannot fix this itself, because MaterialX forbids extra inputs on the fixed `<surfacematerial>` nodedef ([§Render-role texture nodes](#render-role-texture-nodes--assembler-owned-node-name-contract)).
+- **Resolution is USD's, for every consumer.** The effective value of a port is `UsdShadeInput(NG_<id>.inputs:<port>).GetValueProducingAttributes()`: the outermost authored value in the chain wins. A value on the Material input overrides the article; a connected Material input **with no value** lets the article's start value flow through unchanged, so a writer may author the connection up front. No consumer applies a resolution rule of its own.
+- **Only a port the article declares.** An article declares the Creator ports it uses (the UV grid declares 4 of the 8). An override on a port its nodegraph does not declare has nothing to connect to and is inert, so **a writer refuses it** rather than authoring it.
+- **Typed from the nodegraph input.** The Material input takes the article's declared type: `base_color_tint` is `color3f`, never `float3`; the UV ports are `float2`/`float`.
+- **Every writer authors the connection with the value:** the Blender exporter (`blender/addons/imrsv_lcd_export`, since 2026-09-24) and every consuming application that writes overrides. The `NG_<id>` name is deterministic ([MaterialXTemplate](MaterialXTemplate.md): the full stem, including `_vNN`) and the connection is path-based, so it is authored even when the `.mtlx` reference does not resolve at write time.
+- **Checked by** `tools/conformance/check_lcd_carrier.py` ([USDValidationToolchain](../Tooling/USDValidationToolchain.md) §Checks), which fails any Material-level Creator input that is unconnected, undeclared or mistyped.
+
+Per-object adjustment requires **per-object material instances** (separate material prims per object, e.g. `<name>_Instance_<N>`) since input overrides on a shared material affect every prim bound to it.
+
+*(Corrected 2026-09-24, Matter-Library#1. This rule used to read "a standard `inputs:` override on the bound material prim (or a `place2d` nodegraph input for UV)". It named the carrier but not the connection that makes it resolve, so every Creator tuning was invisible outside the one consumer that read the Material input with its own rule. Measured on OpenUSD 26.03 + MaterialX 1.39.5 with `usdrecord`: the unconnected override renders byte-identical to no override; connected with no value, byte-identical to no override; connected with a value, identical to setting the nodegraph input directly. No port name, type, op or range changed.)*
 
 ## Render-role texture nodes — assembler-owned node-name contract
 
@@ -109,7 +139,7 @@ The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_
 
 ## Status
 
-**Creator subset: FROZEN — names/types/ops + ranges/defaults.** The interface-input port vocabulary **and** its value ranges/defaults are frozen as the cross-consumer contract, confirmed empirically by authoring the 7-article proof subset. No wire/ABI contract is frozen here.
+**Creator subset: FROZEN — names/types/ops + ranges/defaults.** The interface-input port vocabulary **and** its value ranges/defaults are frozen as the cross-consumer contract, confirmed empirically by authoring the 7-article proof subset. No wire/ABI contract is frozen here. The **carrier** (how an override is authored so it resolves) was corrected on 2026-09-24 without reopening the vocabulary: see [§Carrier rule](#carrier-rule-no-imrsv-attrs).
 
 **Author tier: SPECIFIED and SHIPPED.** §Author tier above is the contract (carriage lanes and per-master producer carriers). **The Creator subset was NOT reopened** — no port name, type, op or range moved. The one edit inside the frozen region is a **colour-space correction** on the render-role texture table (overlays are data, not albedo), which fixes an annotation that contradicted [MasterSet](../Ontology/MasterSet.md). All seven masters have been shown carrying and rendering their defining behaviour end to end in a consumer.
 
@@ -126,3 +156,4 @@ The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_
 - 2026-07-14: the author tier was specified and shipped after six of the seven masters were found unable to carry their defining property; the lane-B split of the validator vocabulary dates from then.
 - 2026-07-14: the render-role overlay rows were corrected from sRGB albedo to linear data, after the assembler had mixed overlay bitmaps over base colour because of the wrong annotation.
 - 2026-07-14: emissive colour as a Creator control was raised as a product question and left open rather than reopening the frozen vocabulary.
+- 2026-09-24: the Carrier rule was corrected to require the connection from the article's nodegraph (Matter-Library#1), after a generic USD viewer showed every Creator tuning was inert outside the one consumer that read the Material input directly. In the same change, the UV ports were stated as MaterialX `place2d` semantics and the articles began clamping the biased roughness to [0, 1], both on lead rulings that the article's MaterialX meaning is the contract every consumer matches. No port name, type, op or range changed.

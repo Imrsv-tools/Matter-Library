@@ -128,6 +128,38 @@ def Xform "root"
 }
 '''
 
+# Blender 5.2 opens the Material's `( )` metadata block ON THE HEADER LINE (ColorSpaceAPI). The
+# reshape must author its reference + assetInfo inside that block, not open a second one
+# (before the fix every real 5.2 export failed to open: "Expected } at 'def ...'").
+FIXTURE_B52 = '''#usda 1.0
+(
+    defaultPrim = "root"
+)
+
+def Xform "root"
+{
+    def Scope "_materials"
+    {
+        def Material "Copper_Verdigris_Aged_Base_s01_v01" (
+            prepend apiSchemas = ["ColorSpaceAPI"]
+        )
+        {
+            uniform token colorSpace:name = "lin_rec709_scene"
+            custom double3 userProperties:base_color_tint = (0.2, 0.8, 0.4)
+            custom string userProperties:imrsv_matter_identity = "Copper_Verdigris_Aged_Base_s01_v01"
+            token outputs:surface.connect = </root/_materials/Copper_Verdigris_Aged_Base_s01_v01/Principled_BSDF.outputs:surface>
+
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+            }
+        }
+    }
+}
+'''
+
+_COPPER = "/root/_materials/Copper_Verdigris_Aged_Base_s01_v01"
+
 _fails = []
 
 
@@ -153,6 +185,19 @@ def test_transform_text():
           "base_color_tint -> color3f inputs:")
     check("float inputs:roughness_bias = 0.1" in new_text, "roughness_bias -> float inputs:")
     check("float inputs:overlay1_density = 0.5" in new_text, "overlay1_density -> float inputs:")
+    # --- the Carrier rule (LCDSchema.md, Matter-Library#1): each override is CONNECTED from
+    # the article's nodegraph, typed as the override; an untouched material gets no `over` ---
+    check('over "NG_Copper_Verdigris_Aged_Base_s01_v01"' in new_text,
+          "an `over \"NG_<id>\"` is authored in the tinted Copper")
+    check("color3f inputs:base_color_tint.connect = <%s.inputs:base_color_tint>" % _COPPER in new_text,
+          "NG_<id>.inputs:base_color_tint connects to the Material's color3f input")
+    check("float inputs:roughness_bias.connect = <%s.inputs:roughness_bias>" % _COPPER in new_text,
+          "NG_<id>.inputs:roughness_bias connects to the Material's float input")
+    check("float inputs:overlay1_density.connect = "
+          "</root/_materials/Marble_Veined_Polished_Base_s01_v01.inputs:overlay1_density>" in new_text,
+          "the 2nd material (Marble) gets its own connection")
+    check(new_text.count('over "NG_') == 2,
+          "exactly 2 connection blocks: the untouched _001 duplicate gets none (sparse)")
     check("userProperties:base_color_tint" not in new_text
           and "userProperties:roughness_bias" not in new_text
           and "userProperties:overlay1_density" not in new_text,
@@ -190,6 +235,19 @@ def test_transform_text():
     # customData dict braces must not corrupt scope tracking (Marble still converts)
     check(any(p == "overlay1_density" for (_, p, _) in converted),
           "customData { } in ( ) metadata does not break scope tracking")
+
+
+def test_blender52_header():
+    new_text, converted = L.transform_text(FIXTURE_B52)
+    check([p for (_, p, _) in converted] == ["base_color_tint"], "5.2 form: the tint converts")
+    head = new_text.split('def "Copper_Verdigris_Aged_Base_s01_v01" (')[1].split("uniform token")[0]
+    check(head.count("\n        )") == 1 and "ColorSpaceAPI" in head and "prepend references" in head,
+          "5.2 form: reference + assetInfo land INSIDE the one existing ( ) block")
+    check("color3f inputs:base_color_tint.connect = <%s.inputs:base_color_tint>" % _COPPER in new_text,
+          "5.2 form: the override is connected")
+    if HAVE_PXR:
+        layer = Sdf.Layer.CreateAnonymous(".usda")
+        check(layer.ImportFromString(new_text), "5.2 form: the reshaped text parses as USD")
 
 
 def test_idempotent():
@@ -288,6 +346,16 @@ def test_semantic_equivalence():
     check(dup.GetAssetInfoByKey("identifier") == "Copper_Verdigris_Aged_Base_s01_v01",
           "the _001 duplicate carries the SAME identity (independent instance, one identity)")
 
+    # the Carrier rule: the article's nodegraph input is connected to the Material input
+    ng_in = UsdShade.NodeGraph(copper.GetChild("NG_Copper_Verdigris_Aged_Base_s01_v01")) \
+        .GetInput("base_color_tint")
+    srcs = ng_in.GetConnectedSources()[0] if ng_in else []
+    check(len(srcs) == 1 and srcs[0].source.GetPath() == copper.GetPath()
+          and srcs[0].sourceName == "base_color_tint",
+          "pxr: NG_<id>.inputs:base_color_tint is connected to the Material's input")
+    check(ng_in and ng_in.GetTypeName() == Sdf.ValueTypeNames.Color3f,
+          "pxr: the connection is typed color3f, never float3")
+
     # the bridge is gone
     up = [a.GetName() for a in copper.GetAttributes()
           if a.GetName().startswith("userProperties:") and a.GetName().split(":")[-1] in L.LCD_PORTS]
@@ -307,6 +375,7 @@ def main():
     test_transform_text()
     test_idempotent()
     test_identity_from_property()
+    test_blender52_header()
     test_canonical_identity()
     test_reject_transactional()
     test_usda_only_guard()

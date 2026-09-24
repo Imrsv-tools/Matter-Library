@@ -32,7 +32,12 @@
       <input name="in1" type="float" nodename="roughness_tex" />
       <input name="in2" type="float" interfacename="roughness_bias" />
     </add>
-    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <clamp name="roughness_biased_clamped" type="float">
+      <input name="in" type="float" nodename="roughness_biased" />
+      <input name="low" type="float" value="0.0" />
+      <input name="high" type="float" value="1.0" />
+    </clamp>
+    <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
     <image name="normal_tex" type="vector3">
       <input name="file" type="filename" value="../../../textures/base/natural/stone/Limestone_Veined_normal_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
