@@ -16,9 +16,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Future
 
-### Wear Layers at Their Own Scale — RESEARCH
+### Phase04 — Wear Layers at Their Own Scale — SEEDED
 **Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
-- `docs/Planning/Phases/Complete/Phase03_AgenticMaterialGeneration.md` §Execution Log, step 3.4 (the finding) · `docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model · `docs/specs/Contract/LCDSchema.md`
+- `docs/Planning/Phases/Future/Phase04_WearLayersAtTheirOwnScale.md`
 
 ### Library Coverage — RESEARCH
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
