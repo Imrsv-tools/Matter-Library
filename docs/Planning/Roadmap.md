@@ -16,9 +16,17 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Future
 
-### Phase04 — Release Bundle and Consumer Contract — SEEDED
+### Wear Layers at Their Own Scale — RESEARCH
+**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
+- `docs/Planning/Phases/Complete/Phase03_AgenticMaterialGeneration.md` §Execution Log, step 3.4 (the finding) · `docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model · `docs/specs/Contract/LCDSchema.md`
+
+### Library Coverage — RESEARCH
+**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+- `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md` (the draft list) · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`
+
+### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
-- `docs/Planning/Phases/Future/Phase04_ReleaseBundleConsumerContract.md`
+- `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`
 
 ### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
 **Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
@@ -47,14 +55,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Parity Baselines — RESEARCH
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md`
-
-### Wear Layers at Their Own Scale — RESEARCH
-**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
-- `docs/Planning/Phases/Complete/Phase03_AgenticMaterialGeneration.md` §Execution Log, step 3.4 (the finding) · `docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model · `docs/specs/Contract/LCDSchema.md`
-
-### Library Coverage — RESEARCH
-**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`
 
 ### Unreal Reference Masters — RESEARCH
 **Outcome:** an Unreal user outside IMRSV can drop in a package of the Matter masters and render library materials from a release.

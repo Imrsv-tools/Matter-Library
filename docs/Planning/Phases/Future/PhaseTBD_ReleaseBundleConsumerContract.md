@@ -1,6 +1,6 @@
-# Phase04 — Release Bundle and Consumer Contract
+# PhaseTBD — Release Bundle and Consumer Contract
 
-**Status:** DISCOVERY — Pass 1 done 2026-09-25, **held on a sequencing fork** (§Lead calls, L1). Seeded 2026-09-25 when the lead's `/discovery P4` numbered the head of the Roadmap's `## Future`.
+**Status:** SEEDED — not numbered. Discovery Pass 1 is done (2026-09-25) and kept; **resumes after the material-building phases** (L1, ruled). History: seeded as Phase04 on 2026-09-25 when the lead's `/discovery P4` numbered the head of `## Future`, then un-numbered the same day when the lead re-sequenced (L1 (b)). The Phase04 number went to the material work.
 
 ## Outcome
 
@@ -18,7 +18,7 @@ The release machinery exists and has cut a pilot (`matterlib-0.1.0`: lock → ca
 
 ## Lead calls
 
-**L1 — Is this still the next phase? (open; NOT resolved by discovery. Two lead positions disagree.)**
+**L1 — Is this still the next phase? RESOLVED 2026-09-25 — the lead, verbatim: "b".** That is, re-sequence: the material work goes first, and this doc returns to `PhaseTBD` with Pass 1 kept. The positions and options it chose between are kept below as the record.
 
 - **The Roadmap order** (re-thought 2026-09-23, rulings R5/R11): *"The first phases make the library stand alone, be versioned and published, and be consumed by IMRSV."* This entry heads `## Future`, and `/discovery P4` numbered it.
 - **The lead, 2026-09-25** (`260925_R_DraftsInUSDLiveView.md` Pass 5, verbatim): *"Why so much overhead? Make a material, serve it to stage. no versioning, no faffing around. we are VERY pre release right now ... we have 200 materials to build and test before we have our first versionable library ... nobody is using it, just us."* And: *"I mean moving forward with this project."* The dev loop that ruling asked for is already built (`tools/releases/serve_to_stage.py`, `9dabea1`), so no consumer is waiting on a bundle to see new materials.
@@ -30,9 +30,9 @@ The options, independent of each other:
 
 *Discovery's read:* (b) matches the 2026-09-25 words most literally, and F4 means a (a) pilot bundle would first need the DDS encoder reinstalled. But the choice is the lead's.
 
-**L2 — The first release for users: its version and contents.** Version Management hands this to this phase. **It is folded into L1:** under (a) or (c) it is a later publish decision, and under (b) it moves with this doc. *(At seed time discovery recommended "publish today's articles as `0.2.0`". That recommendation is **withdrawn**: it contradicts the 2026-09-25 ruling above.)*
+**L2 — The first release for users: its version and contents.** Version Management hands this to this phase. **Open, and it moves with this doc** (L1 (b)). It is asked again when discovery resumes, against the library as it then stands. *(At seed time discovery recommended "publish today's articles as `0.2.0`". That recommendation is **withdrawn**: it contradicts the 2026-09-25 ruling above.)*
 
-## Scope (provisional — subject to L1)
+## Scope (as of Pass 1; re-check when discovery resumes)
 
 **In (the specs assign these to this phase, dated 2026-09-23 unless noted):**
 - **Publish:** the bundle's format and packaging (`ReleaseModel.md` step 6 `(planned)`; no spec names the format).
@@ -72,7 +72,7 @@ The options, independent of each other:
 - **F5 — `promote_release.py` still gates on a consumer checkout:** `check_fixture_sync.default_fixture_root` = `<repo parent>/<Stage fixture>` (P8, confirmed).
 - **F6 — Size (measured):** `MatterLibrary/textures/` is 46 MB today (40 LFS files; the `0.1.0` freeze names 30 PNG and 30 DDS). *Unverified extrapolation:* around 170 articles lands in the low GB with DDS included. That matters for the host's per-asset limit, which is an external fact to confirm before offering a host choice.
 - **F7 — The spec markers owned here** are listed in §Scope · In. There are more than the seed listed: token-rule ratification, the `imrsv:` pin tension, and CODEOWNERS (routed out, see §Not now).
-- **F8 — Lane (provisional, controls read):** the controls are `promote_release.py` (the sole approval flip), `freeze_release.py` (the hash-lock) and `activate_release.py` `check_install_ready` (the refuse-if-tampered gate). Packaging, tags and the token-in-catalog bump are **`build`**. Re-homing `check_install_ready`'s trust anchor (F3) amends an integrity control on a public artifact, so it is **`high-rigor` for that step**. The final lane is ruled in the Brief, after L1.
+- **F8 — Lane (provisional, controls read):** the controls are `promote_release.py` (the sole approval flip), `freeze_release.py` (the hash-lock) and `activate_release.py` `check_install_ready` (the refuse-if-tampered gate). Packaging, tags and the token-in-catalog bump are **`build`**. Re-homing `check_install_ready`'s trust anchor (F3) amends an integrity control on a public artifact, so it is **`high-rigor` for that step**. The final lane is ruled in the Brief, when discovery resumes.
 - **F9 — The 2026-09-25 ruling bears on this phase's premise** → L1.
 
 **Superseded seed questions** (compressed from the seed): Q1 host → F1 and F6 (the layout is settled; the host is still open behind a size check). Q2 DDS → F2 and F4. Q3 first-test consumer → still a hypothesis (stock `usdview` with the search path pointed at an install), but F2 means activation must first stop needing the repo. Q4 → L2. Q5 (committed generated artifacts) → still open, and most likely Blender from a Release's for the `.blend`. Q6 → F8. Q7 (Creator ports) → P12's third overlay has landed; re-check `LCDSchema.md` against the Coverage thread at Pass 2.
@@ -80,8 +80,8 @@ The options, independent of each other:
 ## Discovery Status
 
 - **Passes captured:** 1.
-- **Current working direction:** held on L1. If (a) or (c): Pass 2 settles the trust anchor (F3) and the first human test, then the Brief.
-- **Open decisions:** L1 (sequencing; L2 folds into it).
+- **Current working direction:** parked by L1 (b). When discovery resumes, Pass 2 re-verifies Pass 1's findings against the tree (they are dated 2026-09-25), then settles the trust anchor (F3) and the first human test, then writes the Brief.
+- **Open decisions:** L2 (the first release for users).
 - **Checks to carry forward:** F4 (encoder on this box) before any `.dds`-bearing step; the host's per-asset limit (F6); the `LCDSchema.md` vs Coverage `## Resolved` check (Q7).
 
 ## Execution Log
