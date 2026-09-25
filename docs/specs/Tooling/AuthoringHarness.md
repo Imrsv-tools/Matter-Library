@@ -26,7 +26,13 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 |---|---|
 | `assemble_mtlx.py` | the **[Assembler](../../Glossary.md)** — a `MaterialSpec` → OpenPBR 1.39 single-file `.mtlx` (MaterialX Python SDK), deterministic |
 | `build_proof_subset.py` | driver: assembles every recipe in `recipes/` to its `.mtlx` under `MatterLibrary/materials/` |
-| `recipes/*.json` | the **reproducible per-article inputs** (one recipe per article; 12 files) |
+| `recipes/*.json` | the **reproducible per-article inputs** (one recipe per article), authored against `recipe.schema.json` |
+| `recipe.schema.json` | the recipe contract (JSON Schema): every allowed key, its type and enums (Phase03) |
+| `lookup_physically_based.py` | grounds recipe constants in the CC0 Physically Based database and prints the recipe's `sources` record (Phase03) |
+| `import_ambientcg.py` | imports one ambientCG (CC0) material as a base texture set, with its provenance record and CREDITS row (Phase03) |
+| `tileable.py` | seamless noise, wrap-around normals and overlay/mask packing for procedural textures (Phase03) |
+| `layers/gen_<layer>.py` | one generator per shared wear layer (`Fingerprints01`, `Scuffs01`, `EdgeWear01`, `Crevice01`) (Phase03) |
+| `base/gen_<set>.py` | one generator per generated base texture set (`Earthenware_Natural`) (Phase03) |
 | `gen_uvgrid.py` | deterministic procedural UV/grid diagnostic base-colour texture |
 | `gen_article_textures.py` | deterministic procedural base textures for the example articles of the masters that had none (Lace, Marble, Rust …) |
 | `gen_shared_textures.py` | deterministic procedural shared overlay / maskset **data** textures (not albedo) |
@@ -40,10 +46,12 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `validate_manifest.py` | the **library-level** lockfile check, incl. the provenance gate |
 | `check_determinism.py` | byte-stable re-assembly check (and optional regen-matches-committed) |
 | `check_fixture_sync.py` | cross-repo check that a consumer's fixture copy of the runtime catalog + payloads is byte-current. **Not a `run_all.py` lane since 2026-09-23** (see below); a standalone tool, run with `--fixture-root` |
-| `source_provenance.py` | computes the shipped-source-set sha256 used as `evidence.sha256` for third-party (ambientCG) textures |
+| `source_provenance.py` | computes the shipped-source-set sha256 used as `evidence.sha256` for third-party (ambientCG) textures; `release_textures()` names the texture files a release's lock covers |
+| `validate_recipe.py` | the **recipe** guards: G1 unknown keys, G2 schema, G3 taxonomy, G5 path agreement, G6 physical plausibility, G7 layer assignment (Phase03) |
 | `run_all.py` | orchestrator — the **[structural gate](../../Glossary.md)**; lanes listed below |
 | `fixtures/grammar_cases.json` | identity-grammar regression fixture (must-pass / must-fail) |
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
+| `fixtures/recipes/*.json` | RED recipe fixtures, each rejected by one named guard |
 
 **`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
 
@@ -53,6 +61,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `materials` | `validate_material.py` over every `MatterLibrary/materials/**.mtlx` |
 | `manifest` | `validate_manifest.py` over the newest `library/releases/*.lock.yaml` |
 | `determinism` | every recipe assembles byte-identically twice |
+| `recipe` | `validate_recipe.py` over every recipe (G1–G3, G5–G7), and every RED recipe fixture rejected by its own guard (Phase03) |
 | `catalog_freshness` | each committed `*.catalog.json` is byte-current with, and deterministic from, its lockfile |
 | `catalog_validation` | the projector rejects a manifest with dangling ids |
 | `provenance_gate` | promotion-metadata RED fixtures are rejected (missing provenance, under-promoted coverage, shallow evidence) |
@@ -64,7 +73,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `approval_gate` | approval artifacts are well-formed (positive + shallow-negative fixtures) |
 | `freeze_lock` | the complete-payload hash-lock is deterministic + tamper-detecting |
 | `approval_binds_freeze` | a promoted approval references the release's actual frozen hashes |
-| `release_verify` | every **committed** freeze record (`library/releases/*.freeze.json`) still reproduces from the tree, naming any changed, missing or added file. A shipped file edited in place, or LFS pointer files in place of textures, fail here. The `.dds` set is included when the encoder or a staging tree is present. This is the hash mechanism only; the `vNN` immutability rule belongs to Version Management. |
+| `release_verify` | *(Since Phase03, a release's source textures are the ones its lock names, not every PNG on disk.)* Every **committed** freeze record (`library/releases/*.freeze.json`) still reproduces from the tree, naming any changed, missing or added file. A shipped file edited in place, or LFS pointer files in place of textures, fail here. The `.dds` set is included when the encoder or a staging tree is present. This is the hash mechanism only; the `vNN` immutability rule belongs to Version Management. |
 | `activation` | `activate_release.py` verifies install-readiness and switches the selector atomically |
 
 > **Drift (2026-09-23), narrowed by Phase02:** the **gate** no longer reads a consumer's checkout (`fixture_sync` left `run_all.py`). **Promotion still does:** `promote_release.py` runs `check_fixture_sync` against IMRSV Stage's fixture mirror as one of its preconditions — owned by the release-bundle / consumer-contract phase (R1; `PlatformDependencies.md` P8).
@@ -118,9 +127,9 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 
 | Path | Role |
 |---|---|
-| `make_preview.py` | emits a standalone preview `.usda` (sphere + dome light, article bound) and optionally opens usdview |
+| `make_preview.py` | writes a standalone preview scene (UV sphere, dome + key light, camera, article bound); `--render` renders it headless with `usdrecord`; `--set` moves a Creator slider through the carrier rule (Phase03) |
 | `preview_wrapper.usda` | the preview template |
-| `README.md` | usage + the `parity-not-evaluated` fallback |
+| `README.md` | usage, the three render fixes, and the toolchain it needs |
 
 ### `tools/usd-toolchain/` — [USD Validation Toolchain](USDValidationToolchain.md)
 
@@ -166,14 +175,19 @@ Where usdview / the `pxr` Python module is unavailable, the parity gate
 (an honest non-claim that keeps the manifest `draft` status honest) — see
 `tools/preview_generators/README.md`.
 
+*Shipped (Phase03, 2026-09-25):* the preview renders real articles headless (`usdrecord`), and a maintainer reviews drafts in USDLiveView. **Limits recorded, not fixed:** the preview renderer (Storm) shows no transmission colour and renders `transmission = 1.0` black, and light intensity barely changes its output (owned by *Parity Baselines*).
+
 ## Status
 
 **Authoring harness + QC gate set stood up** and proven by authoring the range-covering
 proof subset through it. The **production tool-stack** (Matter Manager, a generator for stages A→B whose output satisfies the shipped-pixel rule, automated de-light/tileability/parity as CI gates) remains *(planned)*
 (`tools/` continues to grow). No wire/ABI contract frozen here.
 
+*Shipped (Phase03, 2026-09-25):* a first cut of stages A→B inside this repo, driven by the `/matter-generate` skill: constants from Physically Based (L1), ambientCG scans (L3), generated base textures and wear layers (L2), each with provenance. The Matter Manager and CI gates are still *(planned)*.
+
 ## History
 
 - 2026-06: the harness (assembler, per-material and manifest validators, determinism check, `run_all.py`) was stood up inside the IMRSV platform and used to author the proof subset.
 - 2026-07: the gate grew lanes for the runtime catalog, provenance, compression, staging, freeze, approval and activation, plus the conformance and Blender-generator tools.
 - 2026-09-23: brought home; tool list refreshed against the live tree.
+- 2026-09-25 (Phase03): the recipe lane (17 lanes), the recipe schema, the Physically Based lookup, the ambientCG importer, layer and base-set generators, the working headless preview; freeze and staging scoped to each release's lock.

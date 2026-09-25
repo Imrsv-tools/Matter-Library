@@ -9,8 +9,7 @@ provenance:
     url: https://ambientcg.com/view?id=Wood049
     sha256_scope: shipped_source_set
     sha256: 3024150e495479ec9fddaa40e1d1f06033ddf69b4c064a56a68d56fd41eb71fc
-    note: Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not
-      an upstream-download checksum.
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Wood049_1K-PNG download. sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/natural/wood/Oak_Natural_basecolor_s1.png
       sha256: 2590dd053fb000d395259d645ec62ee08706fe991202390c3e43791295e3ea3c

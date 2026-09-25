@@ -41,8 +41,9 @@ Every article follows the same contract. **Read these first:**
 
 1. **Name it.** Use `Material_Variant_Condition_Detail_sNN_vNN`: ≤63 characters of `[A-Za-z0-9_]`, with a real-world scale tag. A new article starts at `v01`.
 2. **Place it.** It goes under `MatterLibrary/materials/<domain>/<class>/`; its textures go under `MatterLibrary/textures/base/<domain>/<class>/…`, or `shared/` for overlays and masks. **Textures are tracked with Git LFS**, so install `git lfs` before you commit them.
-3. **Write a recipe, not a `.mtlx`.** Articles are *generated*: add `tools/converters/recipes/<Stem>.json` (copy the closest existing recipe), then run `python tools/converters/build_proof_subset.py tools/converters/recipes/<Stem>.json` to assemble the article deterministically. Don't hand-edit the generated `.mtlx`.
-4. **Record provenance** for every new texture: source, licence (`CC0-1.0`), and evidence (a URL and a hash, or the generator script). See `library/provenance/`.
+3. **Write a recipe, not a `.mtlx`.** Articles are *generated*: add `tools/converters/recipes/<Stem>.json` (copy the closest existing recipe), then run `python tools/converters/build_proof_subset.py tools/converters/recipes/<Stem>.json` to assemble the article deterministically. Don't hand-edit the generated `.mtlx`. The recipe's keys and types are in `tools/converters/recipe.schema.json`.
+   *Or ask an agent:* in Claude Code at the repo root, `/matter-generate <what you want>` follows these same steps and leaves an uncommitted draft for you to keep or discard.
+4. **Record provenance** for every new texture: source, licence (`CC0-1.0`), and evidence (a URL and a hash, or the generator script). Before a release pins it, a texture set's record lives at `library/provenance/sources/<texture-id>.yaml`. See `library/provenance/`.
 5. **Run the checks** (§Checks) and include the output in your pull request.
 6. **Open a pull request.** Include the affirmation line from §1, a render or screenshot of the material, and the check output.
 

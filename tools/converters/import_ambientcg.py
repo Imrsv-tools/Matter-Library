@@ -108,7 +108,7 @@ def cmd_import(asset_id: str, set_name: str, slot: str, scale: str, article: str
         raise SystemExit(f"refusing to overwrite: {set_name} already exists in {tex_dir} or {prov}")
 
     data = _get(f"{HOST}/get?file={asset_id}_1K-PNG.zip")
-    written, skipped = [], []
+    written, skipped, verbatim = [], [], True
     with tempfile.TemporaryDirectory() as tmp, zipfile.ZipFile(io.BytesIO(data)) as zf:
         zf.extractall(tmp)
         for src in sorted(Path(tmp).glob("*.png")):
@@ -128,6 +128,7 @@ def cmd_import(asset_id: str, set_name: str, slot: str, scale: str, article: str
                 else:
                     im.convert(mode).resize((SIZE, SIZE), Image.LANCZOS).save(dst, "PNG", optimize=True)
                     how = f"converted from {im.size[0]}x{im.size[1]} {im.mode}"
+                    verbatim = False
             written.append(dst)
             print(f"  {suffix:<10} -> {dst.relative_to(ROOT)}  ({how})")
     if not written:
@@ -137,6 +138,9 @@ def cmd_import(asset_id: str, set_name: str, slot: str, scale: str, article: str
 
     tex_id = f"base/{slot}/{set_name}"
     ev = sp.compute_evidence(ROOT, tex_id, f"{HOST}/view?id={asset_id}")
+    if verbatim:  # compute_evidence's generic note says "NOT byte-identical"; here that is false
+        ev["note"] = (f"Shipped source textures are byte-identical copies of the maps in the ambientCG "
+                      f"{asset_id}_1K-PNG download. sha256 attests the shipped release-source set.")
     prov.parent.mkdir(parents=True, exist_ok=True)
     prov.write_text(
         "# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).\n"

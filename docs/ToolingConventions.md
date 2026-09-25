@@ -9,23 +9,24 @@
 | Root | What lives there | Licence |
 |---|---|---|
 | `MatterLibrary/materials/<domain>/<class>/` | the articles (`.mtlx`), **generated** from recipes, never hand-edited | CC0 |
-| `MatterLibrary/textures/base/<domain>/<class>/<Set>/` · `textures/shared/{overlays,masks}/` | textures (Git LFS; `.gitattributes`) | CC0 |
+| `MatterLibrary/textures/base/<domain>/<class>/` (flat: `<Set>_<channel>_<sNN>.png`) · `textures/shared/{overlays,masks}/` | textures (Git LFS; `.gitattributes`). *(Corrected 2026-09-25, Phase03: this row said a `<Set>/` subfolder; every shipped set sits flat in its class folder.)* | CC0 |
 | `library/releases/` | per-release records: `matterlib-X.Y.Z.lock.yaml` (authored) · `.catalog.json` (projected) · `.freeze.json` · `.approval.json` | CC0 |
-| `library/provenance/` | per-release texture provenance records | CC0 |
+| `library/provenance/` | per-release texture provenance records · `sources/<texture-id>.yaml`: a texture set's provenance before any release pins it (Phase03, lead ruling Q2) | CC0 |
 | `library/staging/` | the staged release tree (PNG + compressed DDS). **Gitignored, rebuildable** | — |
-| `tools/converters/` | authoring: `assemble_mtlx.py` (the assembler), `build_proof_subset.py` (recipes → articles), `project_runtime_catalog.py` (lock → catalog), `gen_*.py` (procedural textures) | Apache-2.0 |
+| `tools/converters/` | authoring: `assemble_mtlx.py` (the assembler), `build_proof_subset.py` (recipes → articles), `project_runtime_catalog.py` (lock → catalog), `gen_*.py` (procedural textures), `tileable.py` (seamless noise/normal/packing helpers), `layers/gen_<layer>.py` (one generator per shared wear layer), `base/gen_<set>.py` (one generator per generated base set), `import_ambientcg.py` (the ambientCG importer), `lookup_physically_based.py` (Physically Based grounding), `recipe.schema.json` (the recipe contract) | Apache-2.0 |
 | `tools/converters/recipes/` | one JSON recipe per article, `<Stem>_vNN.json` | CC0 |
-| `tools/validators/` | the structural gate `run_all.py` and its checks (`validate_material.py`, `validate_manifest.py`, `check_determinism.py`, `check_fixture_sync.py`, `source_provenance.py`) + `fixtures/` | Apache-2.0 |
+| `tools/validators/` | the structural gate `run_all.py` and its checks (`validate_material.py`, `validate_manifest.py`, `check_determinism.py`, `check_fixture_sync.py`, `source_provenance.py`, `validate_recipe.py`) + `fixtures/` (incl. `fixtures/recipes/`, the RED recipes) | Apache-2.0 |
 | `tools/releases/` | the release lifecycle: `stage_release.py` → `freeze_release.py` → `promote_release.py` (+ `validate_approval.py`) → `activate_release.py` | Apache-2.0 |
 | `tools/compressors/` | BCn compression (`compress_textures.py`) + negative fixtures | Apache-2.0 |
 | `tools/conformance/` | Creator-asset and parity checks: `assert_profile.py`, `check_lcd_carrier.py` (+ `test_check_lcd_carrier.py`), the `check_*.sh` wrappers, `codec_ab.py`, `build_ocio_parity_config.py`, the Blender slice exporters, `golden/`, `fixtures/` | Apache-2.0 |
 | `tools/generators/` | the Blender Asset-Browser library generator (`gen_asset_library.py`, `matter_proxy.py`) | Apache-2.0 |
-| `tools/preview_generators/` | usdview/usdrecord preview wrapper | Apache-2.0 |
+| `tools/preview_generators/` | the preview scene for one article, rendered headless with `usdrecord` (`--render`); `--set` previews a moved Creator slider | Apache-2.0 |
 | `tools/usd-toolchain/` | the pinned OpenUSD + MaterialX build recipe (`environment.yml`, `build-usd-tools.sh`, `run-all.sh`) | Apache-2.0 |
 | `blender/addons/imrsv_lcd_export/` | the Matter exporter add-on + its `test_lcd_*.py` | Apache-2.0 |
 | `blender/asset_library/` | the **generated** Asset-Browser library (`MatterLibrary.blend`, `blender_assets.cats.txt`) | CC0 |
 | `blender/MatterMaterials.blend` | the scaffold scene the conformance slices export from | Apache-2.0 |
 | `docs/` · `Methodology/` · `.ai/` · `.claude/` | specs, planning, method, agent surface | Apache-2.0 |
+| `.claude/skills/matter-generate/` | the `/matter-generate` skill: a draft material from a brief (Phase03). A product surface, not methodology | Apache-2.0 |
 
 ## Naming
 
@@ -38,7 +39,7 @@
 
 | To… | Run |
 |---|---|
-| validate everything structural — **the one command** | `uv run tools/validators/run_all.py` (16 lanes, listed in [AuthoringHarness](specs/Tooling/AuthoringHarness.md)). From a fresh clone, uv builds `.venv/` from `pyproject.toml` + `uv.lock` (Python 3.12, MaterialX 1.39.5) first. Add `--strict` to fail on any skipped lane. Without uv: `python3.12 -m venv .venv && .venv/bin/pip install .`, then run the script with `.venv/bin/python`. |
+| validate everything structural — **the one command** | `uv run tools/validators/run_all.py` (17 lanes, listed in [AuthoringHarness](specs/Tooling/AuthoringHarness.md)). From a fresh clone, uv builds `.venv/` from `pyproject.toml` + `uv.lock` (Python 3.12, MaterialX 1.39.5) first. Add `--strict` to fail on any skipped lane. Without uv: `python3.12 -m venv .venv && .venv/bin/pip install .`, then run the script with `.venv/bin/python`. |
 | (re)generate articles from recipes | `python tools/converters/build_proof_subset.py [<recipe.json> …]` |
 | re-project a catalog from its lockfile | `python tools/converters/project_runtime_catalog.py` |
 | stage / freeze / promote / activate a release | the scripts in `tools/releases/` ([ReleaseModel](specs/Distribution/ReleaseModel.md)) |
@@ -48,6 +49,7 @@
 - `COMPRESSONATORCLI` — the pinned texture encoder, AMD `compressonatorcli` **V4.5.52** (default `~/.local/bin/compressonatorcli`). Without it the `compression` and `staging` lanes **SKIP** and say so, and `release_verify` checks everything except the `.dds` set.
 - `USD_TOOLS_ROOT` — the USD toolchain root (default `~/usd-tools`; the install is `$USD_TOOLS_ROOT/inst/usd-26.03`).
 - `USD_TOOLS_ENV` — the toolchain's conda env (default `~/.conda/envs/imrsv-usd-tools`).
+- `MATTER_PREVIEW_DIR` — where `make_preview.py` writes preview scenes and renders (default `<tmp>/matter-preview/`; never the repo).
 
 Every script finds the repo from its own location; none assumes a checkout path. *(Phase02, 2026-09-23. Before it, `run_all.py` failed at import for want of MaterialX, several tools hardcoded a retired checkout path, and there was no pinned environment and no CI.)*
 

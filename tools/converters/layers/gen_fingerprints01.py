@@ -29,7 +29,10 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from gen_shared_textures import SIZE, SHARED, _gradients, _pack, _value_noise  # noqa: E402
+import tileable as tl  # noqa: E402
+from gen_shared_textures import SIZE, SHARED  # noqa: E402
+# Seamless since the Phase03 close: noise and gradients come from tileable.py (the older
+# _value_noise / _gradients helpers do not wrap, and left a faint seam at the tile edge).
 
 NAME = "Fingerprints01_overlay_s01.png"
 SEED = 101
@@ -42,7 +45,7 @@ def fingerprints() -> np.ndarray:
     y, x = np.mgrid[0:SIZE, 0:SIZE].astype(np.float64)
     film = np.zeros((SIZE, SIZE))
     ridges_all = np.zeros((SIZE, SIZE))
-    warp = _value_noise(SIZE, 32, seed=SEED + 1) - 0.5          # bends ridges into whorls
+    warp = tl.noise(32, SEED + 1) - 0.5                          # bends ridges into whorls
     for _ in range(PRINTS):
         cx, cy = rng.rand(2) * SIZE
         a = 70 + rng.rand() * 30                                 # semi-major radius, px
@@ -55,7 +58,7 @@ def fingerprints() -> np.ndarray:
         r = np.sqrt((u / a) ** 2 + (v / b) ** 2)
         envelope = np.clip(1.0 - r ** 2, 0, 1) ** 0.7
         # a partial, pressed print: some of each ellipse never touched the surface
-        envelope *= np.clip((_value_noise(SIZE, 24, seed=int(rng.randint(1, 10**6))) - 0.25) * 2.5, 0, 1)
+        envelope *= np.clip((tl.noise(24, int(rng.randint(1, 10**6))) - 0.25) * 2.5, 0, 1)
         ridges = 0.5 + 0.5 * np.cos(2 * np.pi * (r * a + warp * 18) / RIDGE_PERIOD_PX)
         film = np.maximum(film, envelope)
         ridges_all = np.where(envelope >= film, ridges, ridges_all)
@@ -73,10 +76,9 @@ def main(argv=None) -> int:
         return 1
     film, ridges = fingerprints()
     height = film * (0.6 + 0.4 * ridges)
-    nx, ny = _gradients(height, strength=2.0)                   # an oil film barely bends light
-    img = _pack(nx=nx, ny=ny,
-                rough_bias=film * (0.30 + 0.40 * ridges),        # the smudge hazes the surface
-                density=np.clip(film * (0.55 + 0.45 * ridges) * 1.3, 0, 1))
+    img = tl.pack_overlay(height, strength=2.0,                  # an oil film barely bends light
+                          rough_bias=film * (0.30 + 0.40 * ridges),   # the smudge hazes the surface
+                          density=np.clip(film * (0.55 + 0.45 * ridges) * 1.3, 0, 1))
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, "PNG", optimize=True)
     print(f"wrote {out}")

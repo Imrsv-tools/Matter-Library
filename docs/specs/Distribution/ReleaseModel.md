@@ -56,7 +56,8 @@ status-unread.)
    source of truth AND the fail-loud fixture for the uncompressed path by construction.
    *(Updated 2026-09-23, measured: `stage_release.py` subcommands are `build` and `verify`; `.gitignore` ignores `library/staging/`.)*
 3. **Freeze** (`tools/releases/freeze_release.py compute <ver> --staging <dir>`) — sha256 the COMPLETE payload
-   (catalog + manifest + every `.mtlx` + source textures + `.dds`) into `*.freeze.json`:
+   (catalog + manifest + every `.mtlx` + the source textures the lock names + `.dds`) into `*.freeze.json`:
+   *(Corrected 2026-09-25, Phase03: freeze and staging took EVERY PNG under `MatterLibrary/textures/`, so one draft texture broke every frozen release; they now take the lock's textures, which reproduces `matterlib-0.1.0`'s recorded digest exactly.)*
    `payload_sha256{catalog, manifest, mtlx_set, source_textures_set, dds_set}` + a single binding
    `payload_digest`. CI re-verifies the frozen payload matches on later builds (`freeze_release.py verify <record>`).
 4. **Qualify** — run the full validator/build/test wall against the frozen candidate in an **isolated

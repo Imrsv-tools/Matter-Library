@@ -27,7 +27,10 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from gen_shared_textures import SIZE, SHARED, _gradients, _pack, _value_noise  # noqa: E402
+import tileable as tl  # noqa: E402
+from gen_shared_textures import SIZE, SHARED  # noqa: E402
+# Seamless since the Phase03 close: noise and gradients come from tileable.py (the older
+# _value_noise / _gradients helpers do not wrap, and left a faint seam at the tile edge).
 
 NAME = "Scuffs01_overlay_s01.png"
 SEED = 211
@@ -39,7 +42,7 @@ def scuffs() -> tuple:
     y, x = np.mgrid[0:SIZE, 0:SIZE].astype(np.float64)
     band = np.zeros((SIZE, SIZE))
     lines = np.zeros((SIZE, SIZE))
-    ragged = _value_noise(SIZE, 110, seed=SEED + 1)             # fine break-up, not blobs
+    ragged = tl.noise(110, SEED + 1)                             # fine break-up, not blobs
     for _ in range(STROKES):
         cx, cy = rng.rand(2) * SIZE
         length = 300 + rng.rand() * 500                          # px along the drag
@@ -70,10 +73,9 @@ def main(argv=None) -> int:
         return 1
     band, lines = scuffs()
     height = band * (0.7 + 0.3 * lines)
-    nx, ny = _gradients(height, strength=4.0)                    # shallow: a rub, not a gouge
-    img = _pack(nx=nx, ny=ny,
-                rough_bias=band * (0.35 + 0.25 * lines),         # the rubbed band goes dull
-                density=np.clip(band * 1.2, 0, 1))
+    img = tl.pack_overlay(height, strength=4.0,                  # shallow: a rub, not a gouge
+                          rough_bias=band * (0.35 + 0.25 * lines),    # the rubbed band goes dull
+                          density=np.clip(band * 1.2, 0, 1))
     out.parent.mkdir(parents=True, exist_ok=True)
     img.save(out, "PNG", optimize=True)
     print(f"wrote {out}")

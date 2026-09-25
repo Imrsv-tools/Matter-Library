@@ -73,6 +73,8 @@ This is compatible with R13 as it stands; the R13 consequences not yet built (a 
 
 Parts of this pipeline may later be **built into the Matter Library toolset** (the Matter Manager / `tools/`) to support material creation in-house: a batch generate→decompose→assemble→QC harness, provenance tagging, the tileability/de-light checks as automated gates. **This is where future "agentic generation" work starts** — any such generator must emit provenance records that satisfy the shipped-pixel rule by construction. Recorded so the toolchain is anticipated, not retrofitted. Stage C (+ the structural QC gates) exists today: see [AuthoringHarness](../Tooling/AuthoringHarness.md).
 
+*Shipped (Phase03, 2026-09-25): the first cut of agentic generation.* The `/matter-generate` skill (`.claude/skills/matter-generate/`) turns a brief into a draft article: Physically Based constants, an ambientCG scan or generated textures, every relevant wear layer, a recipe checked by the `recipe` lane, a render, and provenance for every new texture under `library/provenance/sources/`. The batch harness, the decomposer and the automated tileability/de-light gates above remain *(planned)*.
+
 ## Provenance source citations
 
 So the provenance rule is **auditable against links, not memory** (web research, 2026-06-20). Statements are the sources' own claims, recorded neutrally; none of them establishes CC0-dedicability by itself.
