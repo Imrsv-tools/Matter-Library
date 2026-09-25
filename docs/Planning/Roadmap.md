@@ -50,6 +50,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md`
 
+### Wear Layers at Their Own Scale — RESEARCH
+**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
+- `docs/Planning/Phases/Phase03_AgenticMaterialGeneration.md` §Execution Log, step 3.4 (the finding) · `docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model · `docs/specs/Contract/LCDSchema.md`
+
 ### Library Coverage — RESEARCH
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`

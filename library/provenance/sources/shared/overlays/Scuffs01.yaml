@@ -1,0 +1,11 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A, 2026-09-25).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: shared/overlays/Scuffs01                # PACKED DATA (normal/roughness/density)
+version: v01
+files:
+  - MatterLibrary/textures/shared/overlays/Scuffs01_overlay_s01.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/layers/gen_scuffs01.py

@@ -1,0 +1,20 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/wood/Oak_Natural
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Wood049
+    sha256_scope: shipped_source_set
+    sha256: 3024150e495479ec9fddaa40e1d1f06033ddf69b4c064a56a68d56fd41eb71fc
+    note: Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not
+      an upstream-download checksum.
+    files:
+    - path: MatterLibrary/textures/base/natural/wood/Oak_Natural_basecolor_s1.png
+      sha256: 2590dd053fb000d395259d645ec62ee08706fe991202390c3e43791295e3ea3c
+    - path: MatterLibrary/textures/base/natural/wood/Oak_Natural_normal_s1.png
+      sha256: 29ef4e4195aa10372cdf9278d2ec81e5c6a6fbc03ed45ae5bf2b55987aa37b42
+    - path: MatterLibrary/textures/base/natural/wood/Oak_Natural_roughness_s1.png
+      sha256: f0b52bcc9ebea6d50eb194039c14e23915bad809dd7b1b34f3d13395d17d3ec9

@@ -1,0 +1,26 @@
+{
+  "_comment": "Natural oak: plain, smooth, unfinished oak boards (ambientCG Wood049, CC0; photogrammetry, an 80 x 80 cm sample). Opaque: a solid, diffuse-dominant dielectric. Named Oak, not WhiteOak: the source says oak and not which species. Carries every relevant wear layer at 0 (C1): scuffs (overlay 1, damage), scratches, dust, gated by the Grime mask (dirt settles in low areas).",
+  "name": "Oak_Natural_Clean_Base_s1_v01",
+  "path": "natural/wood/Oak_Natural_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "wood",
+  "scale_tag": "s1",
+  "meters_per_tile": 0.8,
+  "base_color_tex": "../../../textures/base/natural/wood/Oak_Natural_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/wood/Oak_Natural_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/wood/Oak_Natural_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Wood049", "url": "https://ambientcg.com/view?id=Wood049", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/wood/Oak_Natural.yaml"},
+    {"kind": "judgement", "why": "specular_ior 1.5, a generic dielectric: Physically Based has no wood entry."}
+  ]
+}
