@@ -53,8 +53,19 @@ Every article carries **all the wear layers relevant to its matter**, up to the 
 - **Overlay 1 is the damage layer** (scratches, scuffs, cracks, pitting, edge wear). Overlays 2–3 are the rest (dust, fingerprints, water spots, a second damage layer).
 - **One mask** gates where the overlays may appear (`G`/`B`/`A` gate overlays 1/2/3). A mask on an article with no overlays and no second layer does nothing: don't add one.
 - **Reference articles in `utility/virtual` carry none.** A calibration target stays pure.
-- **Available layers** are the files in `MatterLibrary/textures/shared/overlays/` and `MatterLibrary/textures/shared/masks/`. If a relevant layer is not there, **stop and name it**: generating a missing layer arrives in Phase03 step 3.3.
+- **Available layers** are the files in `MatterLibrary/textures/shared/overlays/` and `MatterLibrary/textures/shared/masks/`. If a relevant layer is not there, **make it** (§3a) before writing the recipe.
 - In the recipe: `overlays: [{"texture": "../../../textures/shared/overlays/<File>", "density_port": "overlayN_density"}, …]`, `maskset_tex`, and add every `overlayN_density` you use plus `maskset_blend` (if a mask) to `lcd_ports`. Their schema default is already 0, so add no `lcd_defaults` for them. **TwoLayer** is the one exception: its `maskset_blend` must be non-zero, because layer 2 *is* the material.
+
+## 3a. Make a missing wear layer
+
+A layer is shared by many articles, so it is made once, carefully, and judged on its own.
+
+1. **Write one generator script per layer**: `tools/converters/layers/gen_<name><nn>.py` (e.g. `gen_scuffs01.py`). Copy the shape of `gen_fingerprints01.py`: reuse `_value_noise`, `_gradients` and `_pack` from `gen_shared_textures.py`; a fixed seed; no network; a seamless tile (wrap positions toroidally); refuse to overwrite an existing file; `--out DIR` to write elsewhere.
+2. **Honour the frozen channel contract** (`docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model). An **overlay** is `R/G` normal XY (0.5 = flat) · `B` roughness bias, which can only ROUGHEN · `A` density (where it appears). A **mask** is `R` layer-2 coverage · `G`/`B`/`A` the gates for overlays 1/2/3. Both are data, never colour.
+3. **Pick the scale tag for the feature's real size**: `s0001` (1 mm tile) for pores and micro-scratches, `s001` (1 cm) for dust and fine scratches, `s01` (10 cm) for fingerprints, scuffs and chips. File names: `<Name><NN>_overlay_<sNN>.png` for overlays, `<Name><NN>_<sNN>.png` for masks.
+4. **Generate to `/tmp` first and look:** save the `A` (and `B`) channel as greyscale PNGs and Read them. Does it read as the feature? Is it sparse where it should be? Then run the script for real, and check that a second run into `/tmp` is byte-identical (`cmp`).
+5. **Record provenance** (lead ruling Q2 = A): `library/provenance/sources/shared/<overlays|masks>/<Name><NN>.yaml`, holding `id`, `version: v01`, `files`, and `provenance: {source: procedural, license: CC0-1.0, evidence: <the script>}`. Copy `Fingerprints01.yaml`.
+6. **Show the layer dialled up** when you render the article (§6), so the maintainer judges the layer and not just an article where it sits at 0.
 
 ## 4. Write the recipe
 
@@ -81,19 +92,20 @@ The gate must show **0 FAIL** (SKIPs are fine and are reported). Its `recipe` la
 uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>/<class>/<Stem>.mtlx --render
 ```
 
-Then **Read the PNG it prints and look at it.** Write a short critique (4–8 lines):
+`--set <port>=<value>` renders a second image with a Creator slider moved (e.g. `--set overlay3_density=1`); use it to show every layer you made, and any layer worth seeing. Then **Read each PNG it prints and look at it.** Write a short critique (4–8 lines):
 
 - does it read as the matter in the brief — colour, gloss, translucency?
 - the grounded values, and any clamp or `not_carried` value;
 - the layers it carries (all at 0, so invisible in this render) or why it carries none;
 - what the library cannot express yet for this matter (e.g. "metal: no F82 edge tint", "satin: no sheen", "brushed: no anisotropy");
+- **see-through matter** (any `transmission` > 0 — glass, gems, liquids, clear plastics): say plainly that **the preview cannot show it**. The only renderer here (Storm, via `usdrecord`) ignores `transmission_color` and renders `transmission = 1.0` black (it has no opacity floor; the engine masters do — MasterSet.md §Opacity floor). Never fudge the recipe to make the preview look right. The colour is judged in an engine, later (*Parity Baselines* owns a proper preview);
 - anything the maintainer should look at closely.
 
 ## 7. Hand back
 
 End with exactly this:
 
-- **Files written** — the recipe, the `.mtlx` (and any others), as repo-relative paths.
+- **Files written** — the recipe, the `.mtlx`, and any layer you made (its script, its PNG, its provenance record), as repo-relative paths.
 - **Render** — the PNG path (and show it if your surface can).
 - **Closer look** — the `.usda` scene path `make_preview.py` printed; it opens in USDLiveView or usdview.
 - **Keep:** `git add <paths>` then commit. **Discard:** `git restore`/`rm` those paths. It is the maintainer's call; you do neither.

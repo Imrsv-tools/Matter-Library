@@ -2,6 +2,7 @@
 """Preview one Matter article: write a standalone scene, and render it headless to a PNG.
 
     make_preview.py <article.mtlx> [--out-dir DIR] [--render] [--width 512] [--view]
+                    [--set PORT=VALUE ...]
 
 Writes ``<Stem>_preview.usda`` (a UV sphere with the article bound, dome + key light and a
 camera; shape in ``preview_wrapper.usda``). With ``--render`` it also runs ``usdrecord`` to
@@ -15,6 +16,12 @@ render runs ``usdrecord`` from the USD toolchain, found the way ``docs/ToolingCo
 names it: ``$USD_TOOLS_ROOT`` (default ``~/usd-tools``) -> ``inst/usd-26.03``. The toolchain's
 environment is set for the child process only, as ``tools/usd-toolchain/activate-usd-tools.sh``
 sets it for a shell.
+
+``--set overlay3_density=0.8`` previews the article with a Creator slider moved (float
+ports: the densities, ``maskset_blend``, ``roughness_bias``). It writes a second scene,
+``<Stem>_preview_<port>-<value>.usda``, that sublayers the first and applies the override
+the way every writer must (LCDSchema.md §Carrier rule): a value on the bound Material's
+``inputs:<port>``, with the article's ``NG_<Stem>.inputs:<port>`` connected to it.
 
 A missing toolchain is reported, never passed silently: the scene is still written and the
 script exits 2 with the reason.
@@ -69,6 +76,26 @@ def write_scene(mtlx: Path, out: Path) -> None:
     out.write_text(text, encoding="utf-8")
 
 
+FLOAT_PORTS = {"overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend",
+               "roughness_bias"}
+
+
+def write_override(base: Path, name: str, sets: list[tuple[str, float]]) -> Path:
+    """A scene that sublayers `base` and moves Creator sliders through the carrier rule."""
+    tag = "_".join(f"{k}-{v:g}" for k, v in sets)
+    out = base.with_name(f"{base.stem}_{tag}.usda")
+    mat = f"/World/Library/Materials/{name}"
+    vals = "".join(f"                float inputs:{k} = {v:g}\n" for k, v in sets)
+    cons = "".join(f"                    float inputs:{k}.connect = <{mat}.inputs:{k}>\n" for k, _ in sets)
+    out.write_text(
+        "#usda 1.0\n(\n    subLayers = [@./" + base.name + "@]\n)\n\n"
+        'over "World"\n{\n    over "Library"\n    {\n        over "Materials"\n        {\n'
+        f'            over "{name}"\n            {{\n{vals}'
+        f'                over "NG_{name}"\n                {{\n{cons}                }}\n'
+        "            }\n        }\n    }\n}\n", encoding="utf-8")
+    return out
+
+
 def usd_install() -> Path:
     root = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")).expanduser()
     return root / "inst" / USD_VERSION_DIR
@@ -113,6 +140,8 @@ def main(argv=None) -> int:
     ap.add_argument("--render", action="store_true", help="render <Stem>_preview.png with usdrecord")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--view", action="store_true", help="open the scene in usdview")
+    ap.add_argument("--set", action="append", default=[], metavar="PORT=VALUE",
+                    help="preview with a Creator slider moved (float ports; repeatable)")
     args = ap.parse_args(argv)
 
     mtlx = Path(args.mtlx)
@@ -124,6 +153,15 @@ def main(argv=None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     scene = out_dir / f"{mtlx.stem}_preview.usda"
     write_scene(mtlx, scene)
+    if args.set:
+        sets = []
+        for item in args.set:
+            k, _, v = item.partition("=")
+            if k not in FLOAT_PORTS:
+                print(f"--set {item!r}: port must be one of {sorted(FLOAT_PORTS)}", file=sys.stderr)
+                return 1
+            sets.append((k, float(v)))
+        scene = write_override(scene, mtlx.stem, sets)
     print(f"scene  {scene}")
 
     rc = 0
