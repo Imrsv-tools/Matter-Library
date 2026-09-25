@@ -1,6 +1,6 @@
 # Phase03 — Agentic Material Generation
 
-**Status:** ACTIVE: discovery. Pass 3 is done (2026-09-25): the Brief is re-cut for the lead's *smart, not lean* ruling (research D8 / C1), and **it is complete** (Q2 ruled A by the lead, 2026-09-25). **Ready for `/execute`.** Numbered by the lead ("yes, start discovery as Phase03"), naming the Roadmap's *Agentic Material Generation* entry. **Lane: `build`** (verified: §Risk lane).
+**Status:** IN EXECUTION (2026-09-25). Discovery closed at Pass 3: the Brief was re-cut for the lead's *smart, not lean* ruling (research D8 / C1), and Q2 was ruled A by the lead (2026-09-25). Numbered by the lead ("yes, start discovery as Phase03"), naming the Roadmap's *Agentic Material Generation* entry. **Lane: `build`** (verified: §Risk lane).
 
 ## Outcome
 

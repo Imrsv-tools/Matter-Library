@@ -1,27 +1,36 @@
-# Preview generators — usdview parity fixture (Phase 53)
+# Preview generators
 
-Renders ONE Matter material `.mtlx` on a standard sphere under a dome light, standalone —
-no live Stage→Plugin chain (which doesn't exist until Phases 54/55/57). The render is the
-**mandatory-manual** parity artifact (informal visual parity, *not* the formal ΔE bar — that
-is Phase 60). These wrappers also **seed Phase 60's `usdrecord` ΔE baselines**.
+Renders ONE Matter article on a UV sphere, standalone, with no Stage and no release. The render is review material: `/matter-generate` shows it with its critique, and a maintainer eyeballs it before keeping a draft. It is informal visual parity, not the formal ΔE bar (that is *Parity Baselines*).
+
+## Use
+
+```sh
+uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>/<class>/<Stem>.mtlx --render
+```
+
+- Writes `<Stem>_preview.usda` and, with `--render`, `<Stem>_preview.png`.
+- Output goes to `--out-dir`, else `$MATTER_PREVIEW_DIR`, else `<tmp>/matter-preview/`. **Nothing is written into the repo.**
+- The `.usda` is plain USD: open it in USDLiveView or usdview for a closer look (`--view` opens usdview).
 
 ## Files
-- `preview_wrapper.usda` — the documented wrapper shape (template, `<REL_MTLX>`/`<NAME>` slots).
-- `make_preview.py` — given a `.mtlx`, writes `<name>_preview.usda` and (if `usdview` is on
-  PATH) offers to view it.
 
-## Path resolution (unambiguous — peer-review B3)
-- The `.mtlx` is referenced by **relative filesystem path**, resolved by USD's
-  **`ArDefaultResolver`** — *not* the `@MatterLib/...@` package search-path (that portable
-  resolver is a Phase-54 Distribution concern).
-- Texture `<image>` paths are **relative inside the `.mtlx`**, resolved by MaterialX relative
-  to the `.mtlx` document — no env var owns texture lookup.
-- **`PXR_MTLX_STDLIB_SEARCH_PATHS`** owns **only** the MaterialX stdlib nodedefs
-  (`open_pbr_surface` etc.), the S7 deployment gotcha — not asset/texture resolution.
+- `preview_wrapper.usda` — the scene template: a UV-sphere mesh with the article bound, a dome plus a key light, and a camera. Slots are listed in its header.
+- `make_preview.py` — fills the template and runs `usdrecord`.
 
-## Degraded path (this box, Phase 53)
-`usdview` / the `pxr` Python module is **not installed here**, so the parity gate **degrades**
-to SDK-validate + a structural review of the `.mtlx`. The artifact is then an explicit
-**`parity-not-evaluated`** note (an honest non-claim that keeps the manifest `draft` status and
-the deferred formal parity honest), plus the structural-review log — never a silent pass.
-Render these wrappers on a USD-equipped box, or defer to Phase 60.
+## What makes a real article render
+
+Repaired in Phase03 step 3.1 (found in discovery, P3). Before it, the wrapper rendered solid white:
+
+- the article layer has no `defaultPrim`, so the reference names its root (`</MaterialX>`);
+- USD 26.03 ignores `material:binding` without `MaterialBindingAPI`;
+- an implicit `Sphere` has no UVs, so a textured article rendered one flat colour. The sphere is now a mesh with an `st` primvar and vertex normals.
+
+## Toolchain
+
+Writing the scene needs only the repo's core environment. Rendering needs the USD toolchain (`tools/usd-toolchain/`), found at `$USD_TOOLS_ROOT/inst/usd-26.03` (default `~/usd-tools`). `make_preview.py` sets the toolchain's environment for the `usdrecord` child process only, the same way `activate-usd-tools.sh` does for a shell: `PATH`, `PYTHONPATH`, `LD_LIBRARY_PATH`, `PXR_MTLX_STDLIB_SEARCH_PATHS`, and on Linux Qt on xcb + GLX. If the toolchain is missing, the scene is still written and the script exits 2, saying why.
+
+## Path resolution
+
+- The `.mtlx` is referenced by **absolute** filesystem path, because the scene lives outside the repo.
+- Texture `<image>` paths are relative inside the `.mtlx` and resolve against it.
+- `PXR_MTLX_STDLIB_SEARCH_PATHS` owns only the MaterialX stdlib nodedefs (`open_pbr_surface`), not asset or texture lookup.

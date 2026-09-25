@@ -1,58 +1,145 @@
 #!/usr/bin/env python3
-"""usdview parity-preview generator (Phase 53 fixture; seeds Phase-60 usdrecord baselines).
+"""Preview one Matter article: write a standalone scene, and render it headless to a PNG.
 
-Given a Matter material .mtlx, emit a standalone preview .usda (sphere + dome light, the
-material bound) per preview_wrapper.usda, then -- if usdview is available -- offer to view it.
+    make_preview.py <article.mtlx> [--out-dir DIR] [--render] [--width 512] [--view]
 
-    make_preview.py <material.mtlx> [-o <out.usda>] [--view]
+Writes ``<Stem>_preview.usda`` (a UV sphere with the article bound, dome + key light and a
+camera; shape in ``preview_wrapper.usda``). With ``--render`` it also runs ``usdrecord`` to
+write ``<Stem>_preview.png``. Both go to ``--out-dir``, else ``$MATTER_PREVIEW_DIR``, else
+``<tmp>/matter-preview/``. Nothing is written into the repo: previews are review material,
+not library content.
 
-Parity is mandatory-MANUAL (the author eyeballs the render vs the intent reference). If usdview
-/ pxr is unavailable on this box (the Phase-53 gate-readiness reality), the gate DEGRADES to
-SDK-validate + structural review and the artifact is an explicit `parity-not-evaluated` note --
-an honest non-claim, not a silent pass (§6 degraded path). The .usda still gets written so a
-USD-equipped box (or Phase 60) can render it.
+The scene is plain USD, so the same file opens in usdview or USDLiveView for a closer look.
+This script runs in the repo's core environment (no ``pxr`` needed to WRITE the scene). The
+render runs ``usdrecord`` from the USD toolchain, found the way ``docs/ToolingConventions.md``
+names it: ``$USD_TOOLS_ROOT`` (default ``~/usd-tools``) -> ``inst/usd-26.03``. The toolchain's
+environment is set for the child process only, as ``tools/usd-toolchain/activate-usd-tools.sh``
+sets it for a shell.
+
+A missing toolchain is reported, never passed silently: the scene is still written and the
+script exits 2 with the reason.
 """
 
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import shutil
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
-TEMPLATE = (Path(__file__).resolve().parent / "preview_wrapper.usda").read_text(encoding="utf-8")
+HERE = Path(__file__).resolve().parent
+TEMPLATE = (HERE / "preview_wrapper.usda").read_text(encoding="utf-8")
+USD_VERSION_DIR = "usd-26.03"
+
+# UV sphere resolution. The seam column is duplicated so U wraps 0 -> 1 cleanly.
+SEG_U, SEG_V = 64, 32
+UV_REPEAT = 2.0          # the texture tiles twice around the equator, once pole to pole
 
 
-def write_wrapper(mtlx: Path, out: Path) -> None:
-    rel = os.path.relpath(mtlx.resolve(), out.resolve().parent)
-    name = mtlx.stem
-    text = TEMPLATE.replace("<REL_MTLX>", rel).replace("<NAME>", name)
+def _sphere() -> tuple[str, str, str, str]:
+    """Deterministic UV-sphere arrays, formatted for the usda template."""
+    pts, uvs, idx = [], [], []
+    for j in range(SEG_V + 1):
+        for i in range(SEG_U + 1):
+            u, v = i / SEG_U, j / SEG_V
+            th, ph = u * 2 * math.pi, v * math.pi
+            pts.append((math.sin(ph) * math.cos(th), math.cos(ph), math.sin(ph) * math.sin(th)))
+            uvs.append((u * UV_REPEAT, 1 - v))
+    for j in range(SEG_V):
+        for i in range(SEG_U):
+            a = j * (SEG_U + 1) + i
+            b = a + SEG_U + 1
+            idx += [a, a + 1, b + 1, b]
+    f3 = ", ".join(f"({x:.5f}, {y:.5f}, {z:.5f})" for x, y, z in pts)
+    f2 = ", ".join(f"({s:.5f}, {t:.5f})" for s, t in uvs)
+    counts = ", ".join(["4"] * (SEG_U * SEG_V))
+    return f3, counts, ", ".join(map(str, idx)), f2
+
+
+def write_scene(mtlx: Path, out: Path) -> None:
+    points, counts, indices, uvs = _sphere()
+    text = (TEMPLATE.replace("<MTLX>", mtlx.resolve().as_posix())
+            .replace("<NAME>", mtlx.stem)
+            .replace("<POINTS>", points).replace("<COUNTS>", counts)
+            .replace("<INDICES>", indices).replace("<UVS>", uvs))
     out.write_text(text, encoding="utf-8")
 
 
+def usd_install() -> Path:
+    root = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")).expanduser()
+    return root / "inst" / USD_VERSION_DIR
+
+
+def usd_env(inst: Path) -> dict:
+    """The toolchain environment for a child process (mirrors activate-usd-tools.sh)."""
+    env = dict(os.environ)
+    env["PATH"] = f"{inst / 'bin'}{os.pathsep}{env.get('PATH', '')}"
+    env["PYTHONPATH"] = f"{inst / 'lib' / 'python'}{os.pathsep}{env.get('PYTHONPATH', '')}"
+    env["LD_LIBRARY_PATH"] = str(inst / "lib")
+    env["PXR_MTLX_STDLIB_SEARCH_PATHS"] = str(inst / "libraries")
+    if sys.platform.startswith("linux"):
+        # The build's Garch is GLX-only: Qt must use xcb + GLX (see activate-usd-tools.sh).
+        env.setdefault("QT_QPA_PLATFORM", "xcb")
+        env.setdefault("QT_XCB_GL_INTEGRATION", "glx")
+        env.setdefault("DISPLAY", ":0")
+    return env
+
+
+def render(scene: Path, png: Path, width: int) -> int:
+    inst = usd_install()
+    usdrecord = inst / "bin" / "usdrecord"
+    if not usdrecord.exists():
+        print(f"NOT RENDERED: usdrecord not found at {usdrecord} "
+              "(set USD_TOOLS_ROOT, or build it: tools/usd-toolchain/run-all.sh)", file=sys.stderr)
+        return 2
+    cmd = [str(usdrecord), "--camera", "/World/Cam", "--imageWidth", str(width), str(scene), str(png)]
+    proc = subprocess.run(cmd, env=usd_env(inst), capture_output=True, text=True)
+    if proc.returncode != 0 or not png.exists():
+        print(f"NOT RENDERED: usdrecord exited {proc.returncode}\n{proc.stdout}{proc.stderr}",
+              file=sys.stderr)
+        return 2
+    return 0
+
+
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="Generate a standalone usdview parity wrapper for a .mtlx.")
+    ap = argparse.ArgumentParser(description="Write (and optionally render) a preview scene for one article.")
     ap.add_argument("mtlx")
-    ap.add_argument("-o", "--out", default=None, help="default: <name>_preview.usda next to the .mtlx")
-    ap.add_argument("--view", action="store_true", help="launch usdview if available")
+    ap.add_argument("--out-dir", default=None,
+                    help="default: $MATTER_PREVIEW_DIR, else <tmp>/matter-preview")
+    ap.add_argument("--render", action="store_true", help="render <Stem>_preview.png with usdrecord")
+    ap.add_argument("--width", type=int, default=512)
+    ap.add_argument("--view", action="store_true", help="open the scene in usdview")
     args = ap.parse_args(argv)
 
     mtlx = Path(args.mtlx)
-    out = Path(args.out) if args.out else mtlx.with_name(f"{mtlx.stem}_preview.usda")
-    write_wrapper(mtlx, out)
-    print(f"wrote {out}")
+    if not mtlx.is_file():
+        print(f"no such article: {mtlx}", file=sys.stderr)
+        return 1
+    out_dir = Path(args.out_dir or os.environ.get("MATTER_PREVIEW_DIR")
+                   or Path(tempfile.gettempdir()) / "matter-preview").expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    scene = out_dir / f"{mtlx.stem}_preview.usda"
+    write_scene(mtlx, scene)
+    print(f"scene  {scene}")
 
-    usdview = shutil.which("usdview")
-    if not usdview:
-        print(f"DEGRADED: usdview unavailable -- parity-not-evaluated for {mtlx.stem}. "
-              f"Render {out.name} on a USD-equipped box (PXR_MTLX_STDLIB_SEARCH_PATHS set) "
-              f"or defer to Phase 60.")
-        return 0
+    rc = 0
+    if args.render:
+        png = scene.with_suffix(".png")
+        rc = render(scene, png, args.width)
+        if rc == 0:
+            print(f"render {png}")
+
+    liveview = shutil.which("usdliveview")
+    print(f"open   {'usdliveview ' + str(scene) if liveview else scene}  (USDLiveView or usdview)")
+
     if args.view:
-        os.execvp(usdview, [usdview, str(out)])
-    print(f"usdview available at {usdview}; re-run with --view to render {out.name}.")
-    return 0
+        inst = usd_install()
+        os.execvpe(str(inst / "bin" / "usdview"), ["usdview", str(scene)], usd_env(inst))
+    return rc
 
 
 if __name__ == "__main__":
