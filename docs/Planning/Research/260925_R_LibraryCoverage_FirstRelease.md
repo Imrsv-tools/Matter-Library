@@ -17,6 +17,7 @@
 | C1 | **Every article carries all of its relevant overlays and masks: "smart, not lean"** (lead, 2026-09-25). "We are building and testing complex materials, not just a bunch of wood textures." The layers ship in every article with their sliders defaulted to **0**, so the article reads as its name says (`Clean`) and the app dials the wear up. **Names do not change.** Leaving out a relevant layer is not an option. An article carries no layer only where none is relevant (the `utility/virtual` references). *Blast radius: Phase03's skill and recipe schema must author these layers, and every shipped article without them needs a new version. See Pass 4.* |
 | C2 | **Raise the overlay cap from 2 to 3** (lead, 2026-09-25; answers L6). *Blast radius: a contract change to `MasterSet.md` §Overlay/MaskSet model and `LCDSchema.md` (a new Creator port, presumably `overlay3_density`, 0–1 / `0`; a third gate, presumably the maskset's reserved A channel). It also touches the assembler, the validators, the Blender add-on and every consumer master. The spec is not edited from research; see Pass 5.* |
 | C3 | **One matter may have several articles with different overlay sets** (lead, 2026-09-25): e.g. an `Oak` article per Condition/Detail, each carrying the layers that fit it. That is how a fourth or fifth relevant layer is covered, not by a larger cap. |
+| C4 | **The filename has exactly six tokens — five underscores — so it can be parsed** (lead, 2026-09-25, restating the original grammar). Layer information goes *inside* `Condition` / `Detail` (e.g. `Distressed_Dusty`), never in added tokens. See Pass 6. |
 
 ---
 
@@ -456,6 +457,53 @@ On top of those, the author tier carries every OpenPBR input per master (Lane A)
 - The **shader-cost measurement** (`MasterSet.md`, `Reevaluate`) becomes more pressing: every article now carries up to 3 layers at strength 0.
 - Probably a library **semver-minor**: an additive port.
 
+## Pass 6 — Does the filename capture the layers? (worked examples)
+
+**Examined (2026-09-25):** `tools/converters/recipes/Concrete_Smooth_Worn_Dusty_s1_v01.json`; `library/releases/matterlib-0.1.0.lock.yaml` (article and texture entries); `matterlib-0.1.0.catalog.json` (the Concrete entry). The lead asked: "do we have a way to capture everything in the filename layout?"
+
+**No, and by design it shouldn't.** Each fact has its own home:
+
+| What | Where it lives | Example (Concrete, shipped) |
+|---|---|---|
+| **Which look** this article is | the **filename** | `Concrete_Smooth_Worn_Dusty_s1_v01.mtlx` |
+| **Which base pixels** | the **base texture set**, named independently and shared across articles (the original design: "Steel clean, Steel dusty, Steel brushed could all use base set `CleanSteel01`"; the shipped sets happen to reuse the first three tokens; texture-set naming was deferred and is unsettled) | `textures/base/engineered/cementitious/Concrete_Smooth_Worn_{basecolor,normal,roughness}_s1.png` |
+| **Which layers**, and their default strengths | the **recipe** (`overlays[]`, `maskset_tex`, `lcd_defaults`), assembled into the `.mtlx` (`overlay1_tex`, `overlay2_tex`, `maskset_tex`) | Dust01 → `overlay1_density`, Scratches01 → `overlay2_density`, both at the default 0 |
+| **That the layer textures are pinned** | the release **lock**: one texture entry per shared layer | `shared/overlays/Dust01`, `shared/overlays/Scratches01` |
+| **What an app's picker sees** | the release **catalog** | `id`, `domain`, `material_class`, `scale`, `version`, `payload_path`: **no layers, no master** |
+
+**The grammar has a fixed six-token shape, so a name can be parsed back into its parts** (lead, 2026-09-25; ruling C4): `Material _ Variant _ Condition _ Detail _ sNN _ vNN`, exactly five underscores. **Layer information goes *inside* the fixed slots, never in extra ones.** `Condition` carries the state of the base matter (`Distressed`, `Weathered`, `Worn`), and `Detail` carries the dialled-in layers as **one PascalCase token** (`Dusty`, `Scratched`, `ScuffedDusty`).
+
+The original library README's own examples show exactly this. They were deliberately over the top, to show how much a single token can hold (`Identity.md`, kept as grammar fixtures):
+- `Limestone_Veined_Distressed_Dusty_s01_v01`: the canonical example. Distressed = the base state, Dusty = the dust layer dialled in.
+- `Limestone26b_Veinish_VeryDistressed12_ScratchedButNotVeryDusty_s01_v32`: 70 chars, the **must-fail** case (over budget, but still six tokens). Its `Detail` packs two layers and their strengths into one token.
+- `Limestone26b_Veinish_VeryDistressed_Scratched_s01_v32`: 53 chars, the **must-pass** worst case.
+
+So a layered sibling is named inside the six slots:
+- `Oak_White_Worn_ScuffedDusty_s01_v01`: 35 chars
+- `Glass_Clear_Clean_Fingerprinted_s01_v01`: 39
+- `StainlessSteel_Brushed_Clean_ScratchedSmudged_s001_v01`: 54
+
+**What the name does NOT carry** is the *inventory* of layers an article holds at 0 (C1). That lives in the recipe and the `.mtlx`; the name says only what is dialled in.
+
+⚠ *An earlier draft of this pass (never committed) illustrated "layers in the name" by appending one extra token per layer (nine tokens in all). That broke the fixed shape, and was withdrawn at the lead's correction.*
+
+**Worked examples: how C1 (all layers, at 0) and C3 (sibling articles) read in names:**
+
+| Article | Base set it uses | Layers (defaults) | Reads as |
+|---|---|---|---|
+| `Oak_White_Clean_Base_s01_v01` | `Oak_White_Clean` | Scuffs01 · Scratches01 · Dust01 · Grime01 (all 0) | new oak; the app dials wear up |
+| `Oak_White_Clean_Scuffed_s01_v01` *(C3 sibling)* | `Oak_White_Clean` (the **same pixels**) | same layers; Scuffs01 at e.g. 0.6 | a *preset*: same material, wear pre-dialled |
+| `Oak_White_Weathered_Base_s01_v01` | `Oak_White_Weathered` (**different pixels**: a weathered scan) | Dust01 · Cracks01 · — · Crevice01 (0) | a different matter state, so a different base set |
+| `Concrete_Smooth_Worn_Dusty_s1_v01` ✅ | `Concrete_Smooth_Worn` | Dust01 · Scratches01 (0) · no mask | *shipped:* named Dusty, but dust defaults to 0 |
+| `Glass_Clear_Clean_Base_s01_v01` ✅ | *(param-only)* | Dust01 · Scratches01 · Grime01 (**0.25 / 0.35 / 0.6**) | *shipped:* named Clean, but wear is pre-dialled |
+| `Rust_OnSteel_Flaking_Base_s01_v01` ✅ | `Rust_OnSteel_Flaking` + layer 2 | mask RustBloom01 at **0.85**, no overlays | TwoLayer: the mask *is* the material, so it can't default to 0 |
+
+**Findings:**
+- **The grammar holds, with six fixed tokens.** The name carries the *look* (`Condition` = the base state, `Detail` = the dialled-in layers as one PascalCase token), the base set carries the *pixels*, and the recipe/`.mtlx` carries the *layer inventory*. C3 siblings fall out naturally: **same base set, different `Detail`** (`Clean_Base` → `Clean_Dusty`). A different `Condition` usually means different pixels.
+- **The validator does not enforce six tokens.** `check_grammar` in `tools/validators/validate_material.py` requires only **≥ 4** tokens, plus a valid scale tag and version in the last two. So a nine-token name within 63 chars passes today. Enforcing exactly six (with the one system exemption) is a small guard for Phase03's harness, where an agent authors names. *(New question L10.)*
+- **The two shipped precedents contradict each other on what `Clean`/`Detail` mean.** `Glass_Clear_Clean_Base` ships with wear pre-dialled; `Concrete_…_Dusty` ships with dust at 0. Under C1 the consistent rule would be: **`Clean_Base` ⇒ all layer defaults 0; a `Detail` word ⇒ that layer's default is dialled up.** Both shipped articles break it, in opposite directions. *(New question N8; fixing either one means a new version, which ties to L8.)*
+- **Apps can't see an article's layers without opening the `.mtlx`.** The catalog carries no layer list (nor the master). A picker that wants to show "this oak has scuffs, scratches and dust" can't. A `layers` field is a catalog `schema_version` change, and belongs to *Release Bundle and Consumer Contract* / *See the Library*. *(New question L9.)*
+
 ## Gut-check questions — for the lead
 
 Naming (each has a recommendation; this draft already follows it):
@@ -469,6 +517,7 @@ Naming (each has a recommendation; this draft already follows it):
 | N5 | A colour word in `Variant` only when the colour *is* the matter (`Sapphire_Blue`, `Glass_Green`), never for paint or plastic, where colour is the Creator tint? | yes | — |
 | N6 | Param-only (L1) articles carry `s01`, as the shipped ones do? | yes | `sUKN` (more honest: there is no texture to scale) |
 | N7 | Layered articles use `<Top>_On<Substrate>` (`Paint_OnWood`, after `Rust_OnSteel`)? | yes | — |
+| N8 | `Clean_Base` ⇒ every layer default is 0; a `Detail` word (`Dusty`, `Scuffed`) ⇒ that layer is pre-dialled, and the sibling shares the base set (Pass 6)? | yes | keep the shipped mix (Glass is `Clean` but pre-dialled; Concrete is `Dusty` at 0) |
 
 Structure (O11 rulings this list needs; no recommendation forced):
 
@@ -485,7 +534,7 @@ Structure (O11 rulings this list needs; no recommendation forced):
 
 | # | Question | Why it matters |
 |---|---|---|
-| L1 | Naming rulings N1–N7 | Names are permanent once released (immutability). |
+| L1 | Naming rulings N1–N8 | Names are permanent once released (immutability). |
 | L2 | Structure rulings S1–S6 (the rest of O11) | 22 rows have a provisional class. |
 | L3 | Is **thin film** a fourth carrier (C4)? | Nacre, and later soap bubble and oil sheen. |
 | L4 | Ship the 8 C1 metals approximated in the first release, or hold them for F82? | Metals are the class users reach for first. |
@@ -493,10 +542,14 @@ Structure (O11 rulings this list needs; no recommendation forced):
 | ~~L6~~ | ~~Raise the overlay cap?~~ **Resolved by C2: raise to 3.** Landing the contract change is open (which unit: a `/quick-fix` on the specs plus the assembler, or a step in Phase03). | — |
 | L7 | *Narrowed in Pass 5.* **Localised colour or gloss** (moss only in crevices, wet only in patches): is it wanted, and when? Uniform colour and gloss already exist (`base_color_tint`, `roughness_bias`). | A refinement, not a gap. It does not block the list. |
 | L8 | Do the 7 shipped articles without overlays get `v02`, or the in-place `v01` precedent? | Version Management owns it. |
+| L9 | Should the release catalog list each article's layers (and master), so an app can show them without opening the `.mtlx`? | A catalog `schema_version` bump, owned by *Release Bundle and Consumer Contract*. |
+| L10 | Enforce **exactly six tokens** in `check_grammar` (today ≥ 4)? | An agent authoring names needs the guard. A small harness fix (Phase03 G-series or a `/quick-fix`). |
 
 ## Status
 
-**Passes captured:** 5 (2026-09-25).
+**Passes captured:** 6 (2026-09-25).
+
+- **Pass 6: the filename grammar holds with layers, in six fixed tokens (C4).** The name = the look (`Condition` = base state, `Detail` = dialled-in layers as one token, e.g. `Distressed_Dusty`); the base set = the pixels; the recipe/`.mtlx` = the layer inventory. The validator checks only ≥ 4 tokens (L10). Two new items: **N8** (make `Clean_Base` mean all layers at 0, and `Detail` mean a pre-dialled preset; the two shipped precedents disagree) and **L9** (the catalog doesn't list layers).
 
 - **Lead rulings:** C1 *smart, not lean* (all relevant layers, at strength 0, names unchanged) · C2 *overlay cap raised to 3* · C3 *several articles per matter may carry different overlay sets*.
 - **Draft v1 of the list is complete:** 173 named articles (11 shipped, 162 new) across all 20 classes, including 2 unplaced (snow, ice). Every row has a full stem, a folder, a declared master, a lane, a scale tag, a status and **its wear layers**: 96 carry 3 overlays + mask, 72 carry 2 + mask, and the 5 virtual references carry none. The shared layer library grows from 5 to 22.
@@ -504,5 +557,5 @@ Structure (O11 rulings this list needs; no recommendation forced):
 - **C2 is a contract change still to land** (`MasterSet.md`, `LCDSchema.md`, assembler, validators, Blender, consumers). Pass 5 lists what it touches.
 - **140 new articles are buildable with the Phase03 tools alone** (20 of them in a provisional class). The rest wait on carriers C2 (10), C3 (3), optionally C1 (8), or a class ruling (snow, ice).
 - **Direction:** nothing is committed. This is input for the lead's gut check, and later for the *Library Coverage* phase.
-- **Open:** L1–L8. None blocks Phase03's first step, but C1 widens Phase03's scope: the skill must author the layers, and 17 layer textures must be produced. `/discovery Phase03` should pick that up.
+- **Open:** L1–L10. None blocks Phase03's first step, but C1 widens Phase03's scope: the skill must author the layers, and 17 layer textures must be produced. `/discovery Phase03` should pick that up.
 - **Next step:** the lead marks up the list (rename, cut, add, move), and rules N1–N7 and S1–S6 where they have a view. The naming rulings then land in `NamingConventions.md` / `Identity.md` through a `/quick-fix`, and the class rulings in `Taxonomy.md`. A later pass here re-issues the list as v2.
