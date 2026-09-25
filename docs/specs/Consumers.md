@@ -11,7 +11,7 @@ Whatever the consumer, the contract it reads from this repo is the same:
 | the **identity**: the qualified Matter name, Domain/Class, scale tag, `vNN` | [Identity](Ontology/Identity.md) · [Taxonomy](Ontology/Taxonomy.md) |
 | the **master set** and each article's **master token** | [MasterSet](Ontology/MasterSet.md) |
 | the **article format**: single-file `open_pbr_surface` `.mtlx`, render-role texture nodes | [MaterialXTemplate](Contract/MaterialXTemplate.md) · [LCDSchema](Contract/LCDSchema.md) |
-| the **parameters**: the author tier and the frozen 8-port Creator tier | [LCDSchema](Contract/LCDSchema.md) |
+| the **parameters**: the author tier and the Creator tier (9 ports since 2026-09-25) | [LCDSchema](Contract/LCDSchema.md) |
 | the **release**: runtime catalog, install-root layout, active-release selector | [RuntimeCatalog](Contract/RuntimeCatalog.md) · [ReleaseModel](Distribution/ReleaseModel.md) |
 | **compressed textures**: role → BC format and colour space | [CompressedDistribution](Tooling/CompressedDistribution.md) |
 | **Creator assets** exported from Blender | [CreatorAssetProfile](Contract/CreatorAssetProfile.md) |

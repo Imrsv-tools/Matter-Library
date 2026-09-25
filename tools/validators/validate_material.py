@@ -48,7 +48,7 @@ VERSION_RE = re.compile(r"^v\d+$")
 
 # The render-role DATA textures (LCDSchema.md §Render-role texture nodes). Packed data —
 # an sRGB transfer curve corrupts every channel they carry.
-DATA_TEXTURE_NODES = ("overlay1_tex", "overlay2_tex", "maskset_tex")
+DATA_TEXTURE_NODES = ("overlay1_tex", "overlay2_tex", "overlay3_tex", "maskset_tex")
 
 _STDLIB = None
 

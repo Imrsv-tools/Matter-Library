@@ -53,11 +53,12 @@ authors its reference + assetInfo inside that block); Matter identity names are
 `[A-Za-z0-9_]` so the `_NNN` duplicate-suffix strip never truncates a real name (they end
 `_v01`/`_s01`, never a bare `_NNN`).
 
-Contract (LCDSchema.md, Phase 53 D3 — the 5 travel scalars; UV placement is Studio-side, S3):
+Contract (LCDSchema.md, Phase 53 D3 — the travel scalars (6 since 2026-09-25); UV placement is Studio-side, S3):
 
     base_color_tint    color3   range [0,1]^3        -> color3f inputs:base_color_tint
     overlay1_density    float   range [0,1]          -> float   inputs:overlay1_density
     overlay2_density    float   range [0,1]          -> float   inputs:overlay2_density
+    overlay3_density    float   range [0,1]          -> float   inputs:overlay3_density   (added 2026-09-25)
     maskset_blend       float   range [0,1]          -> float   inputs:maskset_blend
     roughness_bias      float   range [-0.5,+0.5]    -> float   inputs:roughness_bias
 
@@ -80,6 +81,7 @@ LCD_PORTS = {
     "base_color_tint": ("color3", 0.0, 1.0),
     "overlay1_density": ("float", 0.0, 1.0),
     "overlay2_density": ("float", 0.0, 1.0),
+    "overlay3_density": ("float", 0.0, 1.0),
     "maskset_blend": ("float", 0.0, 1.0),
     "roughness_bias": ("float", -0.5, 0.5),
 }

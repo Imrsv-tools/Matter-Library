@@ -15,7 +15,7 @@ closest reasonable proxy + a documented limitation (see LIMITATIONS below).
 Generic mapping:
   * base color / roughness / metalness / normal <- the recipe's `*_tex` image when present,
     else its `*_const` scalar (else a neutral default);
-  * LCD travel-port sockets (base_color_tint, overlay1_density, overlay2_density, maskset_blend,
+  * LCD travel-port sockets (base_color_tint, overlay1_density, overlay2_density, overlay3_density, maskset_blend,
     roughness_bias) — the article's `lcd_ports` subset — exposed as node-group interface INPUTS
     with their canonical `.mtlx` nodegraph defaults, so an untouched Creator export stays sparse
     (0 deltas). base_color_tint multiplies base colour; roughness_bias adds to roughness.
@@ -29,7 +29,7 @@ Generic mapping:
       TwoLayer          -> base (layer-1) textures only  [LIMITATION, see below]
 
 LIMITATIONS (documented, by design — the proxy is recognizable, not faithful):
-  * overlay1_density / overlay2_density / maskset_blend sockets are EXPOSED (so they travel on
+  * overlay1_density / overlay2_density / overlay3_density / maskset_blend sockets are EXPOSED (so they travel on
     export) but NOT visually wired — the proxy does not recreate the MaterialX overlay/maskset
     modulator network.
   * TwoLayer (Rust) shows the base layer only; the layer-2 blend + maskset are not composited.
@@ -41,7 +41,7 @@ import xml.etree.ElementTree as ET
 
 # The 5 appearance scalars that travel Blender->USD via `inputs:` (Stage kLcdTravelPorts).
 # uv_scale/uv_offset/uv_rotation are NOT node-group sockets (they travel as primvars / place2d).
-LCD_TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density",
+LCD_TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
                     "maskset_blend", "roughness_bias")
 _COLOR_PORTS = ("base_color_tint",)
 
@@ -244,7 +244,7 @@ def build_matter_proxy(identity, recipe, mtlx_path):
     elif master == "TwoLayer":
         notes.append("TwoLayer: base (layer-1) only; layer-2 blend + maskset not composited")
 
-    if ports & {"overlay1_density", "overlay2_density", "maskset_blend"}:
+    if ports & {"overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend"}:
         notes.append("overlay/maskset sockets exposed for export travel but not visually wired")
 
     return mat, sorted(set(notes))

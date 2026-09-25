@@ -22,6 +22,7 @@ LCD_TRAVEL_PORTS = (
     "base_color_tint",   # color3
     "overlay1_density",  # float
     "overlay2_density",  # float
+    "overlay3_density",  # float (added 2026-09-25)
     "maskset_blend",     # float
     "roughness_bias",    # float
 )

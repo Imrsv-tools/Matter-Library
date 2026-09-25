@@ -58,6 +58,7 @@ LCD_PORTS = {
                     {"unittype": "angle", "unit": "degree"}),
     "overlay1_density": ("float", "0.0", "Overlay 1 Density", {}),
     "overlay2_density": ("float", "0.0", "Overlay 2 Density", {}),
+    "overlay3_density": ("float", "0.0", "Overlay 3 Density", {}),   # added 2026-09-25 (cap 2 -> 3)
     "maskset_blend": ("float", "0.0", "Maskset Blend", {}),
     "roughness_bias": ("float", "0.0", "Roughness Bias", {}),
 }
@@ -82,7 +83,7 @@ KNOWN_MASTERS = {
     "Subsurface", "TwoLayer", "Emissive", "system",
 }
 
-MAX_OVERLAYS = 2   # MasterSet.md: <=2 overlay layers, <=1 maskset
+MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
 
 @dataclass
@@ -92,7 +93,7 @@ class Overlay:
     Perturbs normal + roughness only — an overlay never tints (MasterSet.md).
     """
     texture: str            # relative path to the packed overlay data texture (RGBA)
-    density_port: str       # which LCD port drives the effect (overlay1_density / overlay2_density)
+    density_port: str       # which LCD port drives the effect (overlay1_density / overlay2_density / overlay3_density)
 
 
 @dataclass
@@ -141,7 +142,7 @@ class MaterialSpec:
     layer2_metalness: Optional[float] = None      # const (used when no layer2_metalness_tex)
 
     # layering
-    overlays: list = field(default_factory=list)  # list[Overlay], <= 2
+    overlays: list = field(default_factory=list)  # list[Overlay], <= 3
     maskset_tex: Optional[str] = None             # <=1 maskset (R = layer-2 coverage, G/B = overlay gates)
     # which LCD ports to expose as interface inputs (subset of LCD_PORTS keys, in order)
     lcd_ports: list = field(default_factory=list)
@@ -316,8 +317,11 @@ def assemble(spec: MaterialSpec) -> str:
     # --- Render-role DATA textures: the maskset + the overlays. MODULATORS, never albedo.
     # Node names are the frozen render-role contract (LCDSchema.md) — the Stage extractor
     # reads each node's `file` into the matching wire field.
+    # The maskset loads color3 (R/G/B) unless a third overlay needs its A channel as a gate:
+    # only then color4, so an article with <= 2 overlays assembles byte-identically to before.
+    mask_type = "color4" if len(spec.overlays) >= 3 else "color3"
     if spec.maskset_tex:
-        _image("maskset_tex", "color3", spec.maskset_tex, colorspace=DATA_COLORSPACE)
+        _image("maskset_tex", mask_type, spec.maskset_tex, colorspace=DATA_COLORSPACE)
     for i, ov in enumerate(spec.overlays, start=1):
         # color4 — the alpha (mask density) is load-bearing.
         _image(f"overlay{i}_tex", "color4", ov.texture, colorspace=DATA_COLORSPACE)
@@ -330,7 +334,7 @@ def assemble(spec: MaterialSpec) -> str:
     t_src = None
     if has_layer2:
         _node("extract", "maskset_r", "float",
-              **{"in": ("color3", "nodename", "maskset_tex"),
+              **{"in": (mask_type, "nodename", "maskset_tex"),
                  "index": ("integer", "value", 0)})
         _node("subtract", "layer_blend_contrast_inv", "float",
               in1=("float", "value", 1.0),
@@ -360,14 +364,14 @@ def assemble(spec: MaterialSpec) -> str:
 
     # --- Overlay effect strength (MasterSet.md):
     #     effect_N = overlayN_density * overlayN.A * lerp(1, maskset.<G|B>, maskset_blend)
-    # maskset G gates overlay 1, B gates overlay 2 (the channel contract).
+    # maskset G gates overlay 1, B gates overlay 2, A gates overlay 3 (the channel contract).
     ov_effect = []
     for i, ov in enumerate(spec.overlays, start=1):
         gate_src = None
         if spec.maskset_tex:
             _node("extract", f"maskset_gate{i}", "float",
-                  **{"in": ("color3", "nodename", "maskset_tex"),
-                     "index": ("integer", "value", i)})     # overlay1 -> G(1), overlay2 -> B(2)
+                  **{"in": (mask_type, "nodename", "maskset_tex"),
+                     "index": ("integer", "value", i)})     # overlay1 -> G(1), overlay2 -> B(2), overlay3 -> A(3)
             gate_src = _node("mix", f"overlay{i}_gate", "float",
                              bg=("float", "value", 1.0),
                              fg=("float", "nodename", f"maskset_gate{i}"),

@@ -111,14 +111,14 @@ Examples where the material, not its class's typical master, decides: lace (text
 
 ## Overlay / MaskSet model
 
-Layered surface effects without redundant textures. Each material may reference **≤1 mask layer** and **≤2 overlay layers** (the layered-materials marquee capability — e.g. a plastic with a dust layer + scratches).
+Layered surface effects without redundant textures. Each material may reference **≤1 mask layer** and **≤3 overlay layers** *(raised from 2 on 2026-09-25, lead: "smart, not lean" materials carry all relevant layers; `260925_R_LibraryCoverage_FirstRelease.md` C1/C2)* (the layered-materials marquee capability — e.g. a plastic with a dust layer + scratches).
 
 | Type | Description | RGBA Layout |
 |------|-------------|-------------|
 | **Overlays** | tiling surface effects (dust, scratches, fingerprints) | R/G = Normal XY · B = Roughness bias · A = Mask density |
 | **MaskSets** | multi-mask texture packs for blending (paint, rust, dust) | R/G/B/A = 4 material masks — **see the channel contract below** |
 
-Overlay/mask **intensities are Creator-adjustable** — surfaced as the layered-material controls in the [LCD schema](../Contract/LCDSchema.md)'s Creator tier (`overlay1_density`, `overlay2_density`, `maskset_blend`). Always-carried sampling has a shader cost even at intensity 0 — a cost measurement on the VR budget picks the strategy (accept / variants / dynamic branching).
+Overlay/mask **intensities are Creator-adjustable** — surfaced as the layered-material controls in the [LCD schema](../Contract/LCDSchema.md)'s Creator tier (`overlay1_density`, `overlay2_density`, `overlay3_density`, `maskset_blend`). Always-carried sampling has a shader cost even at intensity 0 — a cost measurement on the VR budget picks the strategy (accept / variants / dynamic branching).
 
 > **Reevaluate (2026-09-23):** whether that cost measurement was ever run and which strategy it picked is not recorded in this repo; re-measure against the Substrate masters (R15) before relying on "accept".
 
@@ -133,14 +133,14 @@ Both overlays and masksets are **data textures**: they may bend a normal, bias a
 | **R** | **layer-2 coverage** — drives the TwoLayer blend |
 | **G** | **overlay-1 coverage gate** — *where* overlay 1 may appear |
 | **B** | **overlay-2 coverage gate** — *where* overlay 2 may appear |
-| **A** | reserved (unused in v1) |
+| **A** | **overlay-3 coverage gate** — *where* overlay 3 may appear *(since 2026-09-25; was "reserved (unused in v1)")*. The maskset loads as `color4` only on an article with 3 overlays, so ≤2-overlay articles are unchanged. |
 
 `maskset_blend` (a frozen Creator port) is the **master strength** of the maskset's whole effect: `0` → the maskset does nothing; `1` → full effect. This gives the maskset a real, correct job on **every** master — not only TwoLayer — which is what makes the port live and semantically correct on an Opaque article that authors it (e.g. `Copper_Verdigris_Aged`).
 
 **Overlay semantic (v1).** An overlay's own channels are already defined above (R/G = normal XY · B = roughness bias · A = mask density). Applied:
 
 ```
-effect_N   = overlayN_density * overlayN_tex.A * lerp(1, maskset.<G|B>, maskset_blend)
+effect_N   = overlayN_density * overlayN_tex.A * lerp(1, maskset.<G|B|A>, maskset_blend)
 normal    += (overlayN_tex.RG * 2 - 1) * effect_N        # then renormalize
 roughness += overlayN_tex.B_bias       * effect_N
 base_color: UNTOUCHED                                     # an overlay never tints

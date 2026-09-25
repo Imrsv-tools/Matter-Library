@@ -48,6 +48,7 @@ Keyed by role **name**. All roles use full mip chains. `specular` is a scalar (n
 | `ambient_occlusion_texture` | **BC4** | linear |
 | `overlay1_texture` | **BC7** | linear |
 | `overlay2_texture` | **BC7** | linear |
+| `overlay3_texture` *(consumer wire field, added 2026-09-25; see PlatformDependencies P12)* | **BC7** | linear |
 | `maskset_texture` | **BC7** | linear |
 | `layer2_base_color_texture` | **BC7** | sRGB |
 | `layer2_roughness_texture` | **BC4** | linear |

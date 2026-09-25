@@ -52,7 +52,7 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 ⭐ **`geometry_thin_walled` is the OpenPBR thin-vs-thick discriminator** — it is what makes TranslucentThick *not* TranslucentThin **at the producer**. Without it the two masters are the same material described twice.
 
-*Consumer-side (IMRSV): the Unreal material-instance naming rule (snake_case reserved for the 8 Creator ports, PascalCase for every author-tier parameter — the tier boundary made visible) — see [Consumers](../Consumers.md).*
+*Consumer-side (IMRSV): the Unreal material-instance naming rule (snake_case reserved for the Creator ports, PascalCase for every author-tier parameter — the tier boundary made visible) — see [Consumers](../Consumers.md).*
 
 ## Creator-adjustable subset — FROZEN interface-input vocabulary
 
@@ -66,10 +66,13 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 | `uv_rotation` | float (deg) | `place2d.rotate` | set | 0–360 / `0` |
 | `overlay1_density` | float | overlay-1 mix | set | 0–1 / `0` |
 | `overlay2_density` | float | overlay-2 mix | set | 0–1 / `0` |
+| `overlay3_density` | float | overlay-3 mix | set | 0–1 / `0` *(added 2026-09-25)* |
 | `maskset_blend` (×≤1) | float | maskset blend | set | 0–1 / `0` |
 | `roughness_bias` | float | `specular_roughness` | add | −0.5…+0.5 / `0` |
 
 *(Updated 2026-09-23, measured: `LCD_PORTS` in `tools/converters/assemble_mtlx.py` carries exactly these 8 names, types and defaults.)*
+
+*(Updated 2026-09-25: **`overlay3_density` added**, the first evolution of this vocabulary. The overlay cap rose from 2 to 3 (lead; [MasterSet](../Ontology/MasterSet.md) §Overlay/MaskSet model). The change is additive: no existing name, type, op or range moved, an article declares the port only when it carries a third overlay, and every shipped article assembles byte-identically (the `determinism` lane). `LCD_PORTS` now carries 9. A consumer that does not yet know the port does not render overlay 3 until it adds it: `PlatformDependencies.md` P12.)*
 
 **What the ports mean is what MaterialX computes** *(stated 2026-09-24; lead ruling: "the number we see in [a consuming application] is the number we see in a stock USD viewer")*. The article is the reference implementation, and a consumer that renders these ports conforms to it; none may reinterpret them.
 - **UV placement is MaterialX `place2d`** (`ND_place2d_vector2`: pivot at the UV origin, scale → rotate → offset). `uv_scale` **divides** the texture coordinate, so `2` makes the texture **twice as large** (fewer repeats) and `0.5` repeats it twice. `uv_rotation` turns the texture **counter-clockwise** by that many degrees about the UV origin (the texture's bottom-left in USD `st` space). `uv_offset` is **subtracted** from the coordinate after the rotation. *(This corrects nothing in the table: `place2d.scale` was always the target. It rules out the other USD 2D convention, UsdPreviewSurface's `UsdTransform2d`, which multiplies by scale and adds the translation, and renders the same saved value as the opposite picture.)*
@@ -77,7 +80,7 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 **Notes:**
 - **UV placement has two layers — only the numeric one is consumer-side.** The **mesh UV unwrap / layout authored in Blender is the PRIMARY placement**, and it travels with the geometry as USD **primvars** (it is geometry, not a material param — **Blender is the authoritative UV-authoring environment**). The numeric **`place2d` transform** (`uv_scale`/`uv_offset`/`uv_rotation`) lands on the article's `place2d` node, reached through the nodegraph interface like every other Creator port ([§Carrier rule](#carrier-rule-no-imrsv-attrs)), never a custom prim attr; Blender mapping-node edits do NOT export, so **that numeric transform is a last-mile NUDGE only** (e.g. in IMRSV Studio) — never a replacement for the Blender-authored UV set.
-- **Overlay intensity** ×≤2 (`overlay1_density`/`overlay2_density`) is the **layered-materials marquee** (dust, scratches).
+- **Overlay intensity** ×≤3 (`overlay1_density`/`overlay2_density`/`overlay3_density`; the third added 2026-09-25, an additive change — library semver-minor) is the **layered-materials marquee** (dust, scratches).
 - **`maskset_blend`** supersedes the earlier `mask_*` placeholder — named for the **maskset concept** (not the v1 single-channel limit) so multi-channel masks don't force a cross-consumer rename.
 - **Names use OpenPBR-aligned terms** so the same word means the same thing in MaterialX, the Unreal instance param, and the Blender node-group input.
 
@@ -85,7 +88,7 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 ## Carrier rule (no `imrsv:` attrs)
 
-Every adjustable — **all 8 Creator ports, UV placement included** — is a **standard `inputs:<port>` value on the bound material prim, connected from the article's nodegraph interface input**:
+Every adjustable — **all 9 Creator ports, UV placement included** — is a **standard `inputs:<port>` value on the bound material prim, connected from the article's nodegraph interface input**:
 
 ```usda
 def "Copper_Verdigris_Aged_Base_s01_v01_Instance_1" (
@@ -115,12 +118,13 @@ Per-object adjustment requires **per-object material instances** (separate mater
 
 ## Render-role texture nodes — assembler-owned node-name contract
 
-The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_density`/`overlay2_density`/`maskset_blend` *scalars* above) are **fixed per article** — only the blend amount is Creator-adjustable, the bitmap is not. They therefore are **NOT** material-level `inputs:` and are **NOT** in the Creator subset. MaterialX rejects extra inputs on the fixed `<surfacematerial>` nodedef (`sdk-validate` "Node interface error"), so a fixed texture path can only live **inside the nodegraph**, on an `<image>` node's `file` input. So that a consumer can find those paths, the producer (the [assembler](../Tooling/AuthoringHarness.md)) and every consumer agree on a **fixed render-role node name** per role:
+The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_density`/`overlay2_density`/`overlay3_density`/`maskset_blend` *scalars* above) are **fixed per article** — only the blend amount is Creator-adjustable, the bitmap is not. They therefore are **NOT** material-level `inputs:` and are **NOT** in the Creator subset. MaterialX rejects extra inputs on the fixed `<surfacematerial>` nodedef (`sdk-validate` "Node interface error"), so a fixed texture path can only live **inside the nodegraph**, on an `<image>` node's `file` input. So that a consumer can find those paths, the producer (the [assembler](../Tooling/AuthoringHarness.md)) and every consumer agree on a **fixed render-role node name** per role:
 
 | Render role | Nodegraph `<image>` node name (FROZEN) | Color space |
 |---|---|---|
 | Overlay 1 | `overlay1_tex` | **linear** (packed data) ⚠ *corrected* |
 | Overlay 2 | `overlay2_tex` | **linear** (packed data) ⚠ *corrected* |
+| Overlay 3 | `overlay3_tex` | **linear** (packed data) *(added 2026-09-25)* |
 | Maskset | `maskset_tex` | linear (coverage mask) |
 
 ⚠ **Colour-space correction.** The overlay rows previously said **"sRGB (albedo)"**. That was wrong, and it contradicted the owning ontology: [MasterSet](../Ontology/MasterSet.md) defines an [overlay](../../Glossary.md) as a **packed data texture** (R/G = normal XY · B = roughness bias · A = mask density). Annotated as sRGB albedo, the assembler duly **mixed the overlay bitmap over base colour** — painting packed normal/roughness data on as if it were paint, and corrupting every channel through the sRGB transfer curve on the way in. **All three render-role textures are data and load `lin_rec709`.** Neither an overlay nor a [maskset](../../Glossary.md) may ever contribute colour — both are **modulators** ([MasterSet §Overlay/MaskSet model](../Ontology/MasterSet.md)).

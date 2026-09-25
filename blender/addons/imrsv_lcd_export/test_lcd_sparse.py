@@ -44,6 +44,7 @@ _BASE = {
     "base_color_tint": (0.5, 0.5, 0.5, 1.0),
     "overlay1_density": 0.0,
     "overlay2_density": 0.0,
+    "overlay3_density": 0.0,
     "maskset_blend": 0.0,
     "roughness_bias": 0.0,
 }
@@ -149,11 +150,11 @@ def test_bpy_end_to_end():
     img.file_format = "PNG"
     img.save()
 
-    # thin Matter node-group: 5 LCD interface sockets with canonical (baseline) defaults
+    # thin Matter node-group: 6 LCD interface sockets with canonical (baseline) defaults
     ng = bpy.data.node_groups.new("MatterCtl", "ShaderNodeTree")
     ct = ng.interface.new_socket("base_color_tint", in_out="INPUT", socket_type="NodeSocketColor")
     ct.default_value = (0.5, 0.5, 0.5, 1.0)
-    for fp in ("overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"):
+    for fp in ("overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"):
         it = ng.interface.new_socket(fp, in_out="INPUT", socket_type="NodeSocketFloat")
         it.default_value = 0.0
 

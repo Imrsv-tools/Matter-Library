@@ -32,7 +32,7 @@ Phase 60 §9 piece 2 (60.3.3) — the export is SPARSE and non-duplicating:
     `finally`, so the source `.blend` material is byte-unchanged after an export.
 
 LCD travel set (LCDSchema.md, Phase 53 D3 — current/evolving, not frozen):
-base_color_tint (color3), and the floats overlay1_density, overlay2_density,
+base_color_tint (color3), and the floats overlay1_density, overlay2_density, overlay3_density,
 maskset_blend, roughness_bias. UV placement (uv_scale/uv_offset/uv_rotation) is
 Studio-side only (S3) and NOT exported.
 """

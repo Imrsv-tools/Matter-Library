@@ -31,7 +31,7 @@ Its **role is downgraded** to an optional hint: the [manifest](Manifest.md) is t
 
 ```
 <materialx version="1.39">
-  <nodegraph name="NG_<material>">           ← base PBR + place2d UV + ≤2 overlays + ≤1 mask
+  <nodegraph name="NG_<material>">           ← base PBR + place2d UV + ≤3 overlays + ≤1 mask
     <input> ports …                            ← the LCD interface inputs (Creator-adjustable subset)
     <place2d> … </place2d>                     ← UV scale/offset/rotation (NOT a prim attr)
     <image>/<tiledimage> … texture reads       ← base color, roughness, normal, …
