@@ -74,8 +74,9 @@ def _payload_files(repo_root: Path, version: str, staging: Path | None) -> dict:
             raise FileNotFoundError(f"missing .mtlx payload for {m.get('id', '?')}: {p}")
         mtlx.append(p)
 
-    # source textures: the whole shipped source texture set (PNG-only by construction).
-    textures = sorted((repo_root / _MATTERLIB / "textures").rglob("*.png"))
+    # source textures: exactly the texture sets the lock names (Phase03; was every PNG on
+    # disk, which let a draft texture break the frozen hash of every earlier release).
+    textures = sp.release_textures(repo_root, version)
 
     # .dds compressed outputs: only exist post-60sq2.5, in the staging tree — include IF present.
     dds: list[Path] = []

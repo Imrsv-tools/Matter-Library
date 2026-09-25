@@ -72,6 +72,33 @@ def discover_source_maps(repo_root: Path, texture_id: str) -> list[Path]:
     return sorted(p for p in tex_dir.glob(f"{base}_*.png") if p.is_file())
 
 
+def release_textures(repo_root: Path, version: str) -> list[Path]:
+    """The source PNGs a release ships: the files of every texture id its lock names.
+
+    Phase03 (lead, 2026-09-25): a release's textures are the ones its LOCK names, as its
+    .mtlx are the ones its catalog names. Before this, the freeze and staging took every PNG
+    under MatterLibrary/textures/, so a draft texture added for the next release broke the
+    frozen hash of every earlier one (and would have been staged into it). Selecting by the
+    lock reproduces matterlib-0.1.0's recorded source_textures_set exactly.
+
+    A lock texture with no file on disk is an error, as a missing .mtlx payload is.
+    Hazard, inherited from discover_source_maps: set names are matched as `<name>_*.png`,
+    so a set named as a prefix of another set in the same folder would claim its files.
+    """
+    import yaml  # local: the rest of this module needs no YAML
+    lock = repo_root / "library" / "releases" / f"matterlib-{version}.lock.yaml"
+    if not lock.exists():
+        raise FileNotFoundError(f"no manifest for release {version}: {lock}")
+    ids = [t["id"] for t in (yaml.safe_load(lock.read_text(encoding="utf-8")) or {}).get("textures", [])]
+    out: set = set()
+    for tid in ids:
+        maps = discover_source_maps(repo_root, tid)
+        if not maps:
+            raise FileNotFoundError(f"release {version}: texture {tid} has no source PNG on disk")
+        out.update(maps)
+    return sorted(out)
+
+
 def compute_evidence(repo_root: Path, texture_id: str, url: str) -> dict:
     maps = discover_source_maps(repo_root, texture_id)
     if not maps:

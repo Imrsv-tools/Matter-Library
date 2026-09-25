@@ -178,11 +178,13 @@ def compress_one(src: Path, dst: Path, bc: str, miplevels: int, dry_run: bool = 
 
 
 def compress_tree(src_root: Path, out_root: Path, only: str | None = None,
-                  dry_run: bool = False) -> tuple[bool, list[dict]]:
-    """Compress every source texture; return (ok, [record...])."""
+                  dry_run: bool = False, sources: list[Path] | None = None) -> tuple[bool, list[dict]]:
+    """Compress every source texture (or exactly `sources`, e.g. one release's); return (ok, [record...])."""
     records: list[dict] = []
     ok = True
-    for src in discover(src_root, only):
+    picked = discover(src_root, only) if sources is None else \
+        [p for p in sources if not only or only.lower() in str(p).lower()]
+    for src in picked:
         try:
             role, bc = classify(src, src_root)
         except ClassifyError as e:

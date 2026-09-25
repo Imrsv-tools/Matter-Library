@@ -45,7 +45,9 @@ from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE.parent / "compressors"))
+sys.path.insert(0, str(_HERE.parent / "validators"))
 import compress_textures as ct  # noqa: E402
+import source_provenance as sp  # noqa: E402
 
 _MATTERLIB = "MatterLibrary"
 
@@ -81,7 +83,9 @@ def build(repo_root: Path, version: str, staging_root: Path | None = None,
     dst.mkdir(parents=True, exist_ok=True)
 
     # .dds derivatives (mirrors src subtree, .png -> .dds).
-    ok, records = ct.compress_tree(src_root, dst, only=only)
+    # Exactly the textures this release's lock names (Phase03), never every PNG on disk.
+    ok, records = ct.compress_tree(src_root, dst, only=only,
+                                   sources=sp.release_textures(repo_root, version))
 
     # PNG siblings — self-contained snapshot (copied verbatim from the shipped source).
     for rec in records:
@@ -110,7 +114,8 @@ def verify(repo_root: Path, version: str, staging_root: Path | None = None,
         return [f"staging tree absent for release {version}: {dst} (run `stage_release.py build {version}`)"]
 
     errs: list[str] = []
-    sources = ct.discover(src_root, only)
+    sources = [p for p in sp.release_textures(repo_root, version)
+               if not only or only.lower() in str(p).lower()]
     if not sources:
         return [f"no source textures discovered under {src_root}"]
     for src in sources:

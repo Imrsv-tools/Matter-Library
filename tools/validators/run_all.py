@@ -517,6 +517,8 @@ def run_approval_binds_freeze(root: Path) -> bool:
     return ok
 
 
+# CAUGHT: 2026-09-25 — freeze/staging hashed EVERY PNG on disk, so one new draft texture broke the frozen
+#   hash of matterlib-0.1.0; the selector now reads the lock (Phase03 3.3, the release-scope commit).
 def run_release_verify(root: Path):
     """Phase02 2.2: every SHIPPED release still reproduces, byte for byte, from this tree.
 
