@@ -1,5 +1,5 @@
 {
-  "_comment": "Identity-grammar regression fixture (Phase 53, Identity.md). The 7 proof names + the worst-case conforming name must PASS; the source repo's own 70-char example and assorted charset/structure violations must FAIL.",
+  "_comment": "Identity-grammar regression fixture (Phase 53, Identity.md). The 7 proof names + the worst-case conforming name must PASS; the source repo's own 70-char example and assorted charset/structure violations must FAIL. Since 2026-09-25 a name must have exactly six tokens: a five-token and an eight-token name are must-fail cases, and two axis-structured names (C5) are must-pass.",
   "must_pass": [
     "ABS_Matte_Clean_Base_s01_v01",
     "Limestone_Veined_Clean_Base_s01_v01",
@@ -8,12 +8,16 @@
     "Diagnostic_UVGrid_Clean_Base_s1_v01",
     "IMRSV_MissingMaterial",
     "Glass_Clear_Clean_Base_s01_v01",
-    "Limestone26b_Veinish_VeryDistressed_Scratched_s01_v32"
+    "Limestone26b_Veinish_VeryDistressed_Scratched_s01_v32",
+    "WhiteOak_Natural_Clean_Base_s01_v01",
+    "WhiteOak_Blue_VeryDistressed12_Dusty_s01_v01"
   ],
   "must_fail": [
     "Limestone26b_Veinish_VeryDistressed12_ScratchedButNotVeryDusty_s01_v32",
     "Limestone_Veined_Clean_Base_s01_v01.extra-hyphen",
     "Limestone_Veined_Clean_Base_sZZ_v01",
-    "Limestone_Veined_Clean_Base_s01_x01"
+    "Limestone_Veined_Clean_Base_s01_x01",
+    "Limestone_Veined_Clean_s01_v01",
+    "Oak_White_Clean_Base_Scuffs_Dust_s01_v01"
   ]
 }

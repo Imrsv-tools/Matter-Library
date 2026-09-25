@@ -12,18 +12,24 @@ Limestone_Veined_Distressed_Dusty_s01_v01.mtlx
 Glass_Clear_Clean_Base_s01_v01.mtlx
 ```
 
-| Token | Meaning | Default |
-|-------|---------|---------|
-| **Material** | the base matter (Limestone, Glass, Steel) | required |
-| **Variant** | a named variation (Veined, Clear, Brushed) | required (use `Base` if none) |
-| **Condition** | surface condition (Distressed, Weathered) | **`Clean`** |
-| **Detail** | extra qualifier (Dusty, Scratched) | **`Base`** |
-| **sNN** | [scale tag](#scale-tags) — meters per UV tile | required (`sUKN` if unknown) |
-| **vNN** | [material version](#two-version-axes-dont-conflate) (this asset's own version axis) | `v01` |
+**Exactly six tokens, five underscores, so a name always parses back into its axes.** Each token is a **fixed axis**, the same across the whole library. The words inside a token are free (PascalCase, digits allowed), so a name can be made by a Creator from where they left the sliders (e.g. a save counter, `VeryDistressed12`). The exact values always live in the file; the name is the readable, parseable handle.
+
+| Token | Axis | Examples | Default |
+|-------|------|----------|---------|
+| **Material** | **the matter**, down to species or alloy (optionally with a base-set id, as in `Limestone26b`) | `Limestone`, `WhiteOak`, `MildSteel`, `StainlessSteel` | required |
+| **Variant** | **the look**: the base-texture choice plus tint and the other [LCD](../Contract/LCDSchema.md) settings | `Natural`, `Veined`, `Polished`, `Brushed`, `Weathered`, `Blue` | **`Natural`** (untinted) |
+| **Condition** | **damage**, driven by overlay 1 (+ the maskset) | `Clean` → `Worn` → `Distressed` → `VeryDistressed12` | **`Clean`** (slider at 0) |
+| **Detail** | **everything else**, driven by overlays 2–3: usually deposits, sometimes a second damage layer | `Base` → `Dusty` → `Smudged` → `ScratchedButNotVeryDusty` | **`Base`** (sliders at 0) |
+| **sNN** | [scale tag](#scale-tags) — meters per UV tile | `s01`, `s1` | required (`sUKN` if unknown) |
+| **vNN** | [material version](#two-version-axes-dont-conflate) (this asset's own version axis) | `v01` | `v01` |
 
 - **Domain and Class are NOT in the filename** — they live in the folder structure only ([Taxonomy](Taxonomy.md)), so a material can be recategorized without a rename.
-- **`Condition` defaults to `Clean`, `Detail` defaults to `Base`** when nothing special applies.
+- **Layer information goes *inside* `Condition` / `Detail`, never in extra tokens.** Which layers an article *carries* (its overlay and maskset textures) is recorded in its recipe and `.mtlx`, not the name. The name says only what is dialled up.
+- **A see-through colour is its own authored article** (`Glass_Green`, not a tinted `Glass_Clear`): `base_color_tint` multiplies the surface colour only and does not reach `transmission_color`.
+- **On TwoLayer articles** the maskset-driven second layer *is* the material, so `Condition` names the layer-2 state even at the library default (`Rust_OnSteel_Flaking_Base`).
 - There is room for free variation while staying roughly readable — but always inside the charset/length budget below.
+
+*(Updated 2026-09-25, lead rulings C4/C5/E1/E2/E5 in `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md`. Superseded, kept for history: Variant "a named variation (Veined, Clear, Brushed) — use `Base` if none"; Condition "surface condition (Distressed, Weathered)"; Detail "extra qualifier (Dusty, Scratched)". Shipped names predating the axes keep their names; `Marble_Veined_Polished_Base` and `Copper_Verdigris_Aged_Base` put a look word in the Condition slot.)*
 - **Off-grammar articles.** A system material is exempt from the token grammar (but not from the length/charset budget). Today there is exactly one: **`IMRSV_MissingMaterial`** (master token `system`, see [MasterSet](MasterSet.md)); its historical name is kept. *(Updated 2026-09-23, measured: `tools/validators/validate_material.py` exempts `IMRSV_MissingMaterial` from the token-shape check and still applies length + charset to it.)* The manifest side of the exemption is owned by [Manifest](../Contract/Manifest.md).
 
 ## Name budget — ≤63 chars, `[A-Za-z0-9_]` (HARD CONSTRAINT, CI-checkable)
@@ -90,3 +96,4 @@ The `vNN` in the filename pins the material; the **library release** (a [manifes
 
 - The filename grammar, the `Clean` / `Base` defaults and the scale-tag table come from the library's original README, carried unchanged.
 - 2026-06 — the name budget was added after measuring two Blender USD-export facts: material names truncate at 63 bytes, and spaces / dots / hyphens sanitize to `_`, so distinct names can collide. The original README's own 70-character example name was over budget; it is kept as the must-fail regression case.
+- 2026-09-25 — each token became a fixed axis (Material = matter/species · Variant = the look · Condition = damage · Detail = the other layers), the default Variant became `Natural`, and exactly six tokens became a validator rule (it previously accepted ≥ 4). All shipped names already had six. (Lead rulings, `260925_R_LibraryCoverage_FirstRelease.md`.)

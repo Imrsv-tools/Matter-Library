@@ -73,8 +73,9 @@ def check_grammar(stem: str) -> list:
     if stem in SYSTEM_EXEMPT:
         return errors                       # system material: length + charset only
     toks = stem.split("_")
-    if len(toks) < 4:
-        errors.append(f"too few tokens ({len(toks)}); expected Material_Variant_..._sNN_vNN")
+    # Exactly six tokens, so a name parses back into its axes (Identity.md §Filename grammar).
+    if len(toks) != 6:
+        errors.append(f"{len(toks)} tokens; expected exactly 6: Material_Variant_Condition_Detail_sNN_vNN")
         return errors
     if toks[-2] not in SCALE_TAGS:
         errors.append(f"scale tag {toks[-2]!r} not in {sorted(SCALE_TAGS)}")

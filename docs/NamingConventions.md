@@ -10,7 +10,7 @@
 
 ## Matter asset names (summary; owner: Identity.md)
 
-- **Filename:** `Material_Variant_Condition_Detail_sNN_vNN.mtlx`. `Condition` defaults to `Clean` and `Detail` to `Base` when nothing special applies.
+- **Filename:** `Material_Variant_Condition_Detail_sNN_vNN.mtlx`, **exactly six tokens**. Each token is a fixed axis: Material = the matter/species · Variant = the look (texture + tint + settings; default `Natural`) · Condition = damage (overlay 1; default `Clean`) · Detail = the other layers (overlays 2–3; default `Base`). *(Axes and the six-token rule: 2026-09-25.)*
 - **Domain / Class live in the folder path only** (`MatterLibrary/materials/<domain>/<class>/`), so an article can be recategorised without a rename.
 - **Name budget:** the stem is **≤63 characters** of **`[A-Za-z0-9_]`** only. It must survive Blender's USD export unchanged. `tools/validators/validate_material.py` enforces it (the `materials` lane of `run_all.py`, exercised against fixtures by the `grammar` lane).
 - **Scale tags:** `s0001` · `s001` · `s01` · `s1` · `s10` · `s100` · `sUKN` (a closed set).
