@@ -15,6 +15,8 @@
 | # | Decision |
 |---|---|
 | C1 | **Every article carries all of its relevant overlays and masks: "smart, not lean"** (lead, 2026-09-25). "We are building and testing complex materials, not just a bunch of wood textures." The layers ship in every article with their sliders defaulted to **0**, so the article reads as its name says (`Clean`) and the app dials the wear up. **Names do not change.** Leaving out a relevant layer is not an option. An article carries no layer only where none is relevant (the `utility/virtual` references). *Blast radius: Phase03's skill and recipe schema must author these layers, and every shipped article without them needs a new version. See Pass 4.* |
+| C2 | **Raise the overlay cap from 2 to 3** (lead, 2026-09-25; answers L6). *Blast radius: a contract change to `MasterSet.md` §Overlay/MaskSet model and `LCDSchema.md` (a new Creator port, presumably `overlay3_density`, 0–1 / `0`; a third gate, presumably the maskset's reserved A channel). It also touches the assembler, the validators, the Blender add-on and every consumer master. The spec is not edited from research; see Pass 5.* |
+| C3 | **One matter may have several articles with different overlay sets** (lead, 2026-09-25): e.g. an `Oak` article per Condition/Detail, each carrying the layers that fit it. That is how a fourth or fifth relevant layer is covered, not by a larger cap. |
 
 ---
 
@@ -49,7 +51,9 @@
 - **O11** — class boundary undecided; the row's home is provisional
 - **D1?** — may be an assembly rather than matter; lead's call
 
-**Wear layers (added in Pass 4, ruling C1):** `Overlay 1 · Overlay 2 · Mask` = the shared layers the article carries, all at default strength 0. The mask gates *where* each overlay may appear (G/B channels) and, on TwoLayer, where layer 2 sits (R). **Also wanted** = relevant layers the article cannot carry today: **`+X`** is a third overlay the 2-overlay cap leaves out; **`~X`** is an effect overlays cannot express, because an overlay may only bend the normal and *roughen* (never smooth, never colour).
+**Wear layers (Pass 4, ruling C1; third overlay added in Pass 5, ruling C2):** `Overlays 1 · 2 · 3 · Mask` = the shared layers the article carries, all at default strength 0. The mask gates *where* each overlay may appear (G/B, and presumably A for overlay 3) and, on TwoLayer, where layer 2 sits (R). **Also wanted:**
+- **`+X`** is a fourth relevant overlay. Per C3 it is covered by a sibling article, not a bigger cap.
+- **`~X`** is a colour or gloss change. **Uniformly across the article it is already available** through the Creator ports `base_color_tint` (colour multiply) and `roughness_bias` (−0.5…+0.5). What no layer can do today is apply it *locally*, e.g. moss only in crevices or wet only in patches (Pass 5, L7).
 
 *Physically Based record names are unverified per row; Pass 9 of the prior thread confirmed the category counts (Metal 32, Crystal 10, Liquid 19, Manmade 22, Plastic 7), not each entry. ambientCG availability per row is by category (Pass 9), not by named set.*
 
@@ -57,71 +61,71 @@
 
 **natural/stone** — 15
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Limestone_Veined_Clean_Base_s01` | Opaque | L3 | s01 | ✅ | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 2 | `Marble_Veined_Polished_Base_s01` | Subsurface | L3 | s01 | ✅ | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 3 | `Marble_Carrara_Honed_Base_s1` | Subsurface | L3 | s1 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 4 | `Granite_Speckled_Polished_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 5 | `Granite_Grey_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 6 | `Sandstone_Layered_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 7 | `Slate_Cleft_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 8 | `Basalt_Dark_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 9 | `Travertine_Pitted_Honed_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 10 | `Quartzite_White_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 11 | `Lava_Porous_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 12 | `Limestone_Cliff_Weathered_Base_s10` | Opaque | L3 | s10 | Now | Dust01 · EdgeWear01 · Crevice01 | ~Wet · ~Moss |
-| 13 | `Onyx_Banded_Polished_Base_s01` | Subsurface | L3 | s01 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 14 | `Jade_Nephrite_Polished_Base_s01` | Subsurface | L2 | s01 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
-| 15 | `Obsidian_Black_Polished_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · Crevice01 | ~Wet · +WaterSpots01 |
+| 1 | `Limestone_Veined_Clean_Base_s01` | Opaque | L3 | s01 | ✅ | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 2 | `Marble_Veined_Polished_Base_s01` | Subsurface | L3 | s01 | ✅ | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 3 | `Marble_Carrara_Honed_Base_s1` | Subsurface | L3 | s1 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 4 | `Granite_Speckled_Polished_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 5 | `Granite_Grey_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 6 | `Sandstone_Layered_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 7 | `Slate_Cleft_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 8 | `Basalt_Dark_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 9 | `Travertine_Pitted_Honed_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 10 | `Quartzite_White_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 11 | `Lava_Porous_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 12 | `Limestone_Cliff_Weathered_Base_s10` | Opaque | L3 | s10 | Now | Dust01 · EdgeWear01 · — · Crevice01 | ~Wet · ~Moss |
+| 13 | `Onyx_Banded_Polished_Base_s01` | Subsurface | L3 | s01 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 14 | `Jade_Nephrite_Polished_Base_s01` | Subsurface | L2 | s01 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
+| 15 | `Obsidian_Black_Polished_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · WaterSpots01 · Crevice01 | ~Wet |
 
 **natural/wood** — 15
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Oak_White_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 2 | `Oak_White_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · Crevice01 | ~Wet · ~Moss |
-| 3 | `Oak_White_Varnished_Base_s01` | Opaque | L3 | s01 | C2 | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 4 | `Walnut_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 5 | `Maple_Hard_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 6 | `Pine_Knotty_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 7 | `Birch_Plain_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 8 | `Cherry_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 9 | `Teak_Plain_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 10 | `Ash_White_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 11 | `Cedar_Red_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · Crevice01 | ~Wet · ~Moss |
-| 12 | `Driftwood_Bleached_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · Crevice01 | ~Wet · ~Moss |
-| 13 | `Bamboo_Natural_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
-| 14 | `Bark_Pine_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · Crevice01 | ~Wet · ~Moss |
-| 15 | `Cork_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Scuffs01 · Scratches01 · Grime01 | +Dust01 · ~Wet · ~WaterStain |
+| 1 | `Oak_White_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 2 | `Oak_White_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · — · Crevice01 | ~Wet · ~Moss |
+| 3 | `Oak_White_Varnished_Base_s01` | Opaque | L3 | s01 | C2 | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 4 | `Walnut_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 5 | `Maple_Hard_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 6 | `Pine_Knotty_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 7 | `Birch_Plain_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 8 | `Cherry_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 9 | `Teak_Plain_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 10 | `Ash_White_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 11 | `Cedar_Red_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · — · Crevice01 | ~Wet · ~Moss |
+| 12 | `Driftwood_Bleached_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · — · Crevice01 | ~Wet · ~Moss |
+| 13 | `Bamboo_Natural_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
+| 14 | `Bark_Pine_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Cracks01 · — · Crevice01 | ~Wet · ~Moss |
+| 15 | `Cork_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Scuffs01 · Scratches01 · Dust01 · Grime01 | ~Wet · ~WaterStain |
 
 **natural/soil** — 10
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Loam_Dark_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 2 | `Loam_Dark_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 3 | `Topsoil_Forest_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 4 | `Clay_Red_Dry_Cracked_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 5 | `Clay_Grey_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 6 | `Mud_Brown_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 7 | `Peat_Fibrous_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 8 | `Laterite_Red_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 9 | `Silt_River_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
-| 10 | `Loess_Pale_Dry_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · Patches01 | ~Wet (the wet rows are authored wet) |
+| 1 | `Loam_Dark_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 2 | `Loam_Dark_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 3 | `Topsoil_Forest_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 4 | `Clay_Red_Dry_Cracked_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 5 | `Clay_Grey_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 6 | `Mud_Brown_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 7 | `Peat_Fibrous_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 8 | `Laterite_Red_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 9 | `Silt_River_Wet_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 10 | `Loess_Pale_Dry_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 
 **natural/mineral** — 8
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Diamond_Brilliant_Clean_Base_s01` | TranslucentThick | L1 | s01 | ✅ | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 2 | `Sapphire_Blue_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 3 | `Ruby_Deep_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 4 | `Emerald_Green_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 5 | `Amethyst_Purple_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 6 | `Quartz_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 7 | `Nacre_Iridescent_Polished_Base_s01` | Opaque | L3 | s01 | Now † | Scratches01 · Fingerprints01 · Grime01 | ~Yellowing |
-| 8 | `Ivory_Aged_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Grime01 | ~Yellowing |
+| 1 | `Diamond_Brilliant_Clean_Base_s01` | TranslucentThick | L1 | s01 | ✅ | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 2 | `Sapphire_Blue_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 3 | `Ruby_Deep_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 4 | `Emerald_Green_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 5 | `Amethyst_Purple_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 6 | `Quartz_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 7 | `Nacre_Iridescent_Polished_Base_s01` | Opaque | L3 | s01 | Now † | Scratches01 · Fingerprints01 · — · Grime01 | ~Yellowing |
+| 8 | `Ivory_Aged_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scratches01 · Fingerprints01 · — · Grime01 | ~Yellowing |
 
 † Iridescence needs a thin-film carrier, which is **not** one of C1–C3. Without it, nacre renders as pearl-white and the critique must say so. *(New finding: a fourth carrier candidate, thin film; Physically Based carries `thinFilmIor`/`thinFilmThickness`.)*
 
@@ -129,218 +133,218 @@
 
 **engineered/metal** — 20
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Copper_Verdigris_Aged_Base_s01` | Opaque | L3 | s01 | ✅ | Dust01 · Scratches01 · Verdigris01 | (shipped) |
-| 2 | `Rust_OnSteel_Flaking_Base_s01` | TwoLayer | L3 | s01 | ✅ | Dust01 · Pitting01 · RustBloom01 | — (layer 2 is the rust) |
-| 3 | `Gold_Pure_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 4 | `Silver_Sterling_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 5 | `Copper_Pure_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 6 | `Brass_Yellow_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 7 | `Bronze_Cast_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
-| 8 | `Aluminium_Raw_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 9 | `Aluminium_Brushed_Clean_Base_s001` | Opaque | L2 | s001 | C3 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 10 | `StainlessSteel_Polished_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 11 | `StainlessSteel_Brushed_Clean_Base_s001` | Opaque | L2 | s001 | C3 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 12 | `Chrome_Mirror_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 13 | `Titanium_Raw_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Edges01 | +Dust01 · ~Tarnish colour |
-| 14 | `Steel_Mild_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
-| 15 | `Steel_Galvanised_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
-| 16 | `Steel_Corten_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Pitting01 · RustBloom01 | ~Streaking colour |
-| 17 | `Steel_Perforated_Clean_Base_s01` | Masked | L3 | s01 | Now · D1? | Scratches01 · Dust01 · Edges01 |  |
-| 18 | `Iron_Cast_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
-| 19 | `Iron_Wrought_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
-| 20 | `Lead_Grey_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Grime01 | +Pitting01 · ~Oxide colour |
+| 1 | `Copper_Verdigris_Aged_Base_s01` | Opaque | L3 | s01 | ✅ | Dust01 · Scratches01 · — · Verdigris01 | (shipped) |
+| 2 | `Rust_OnSteel_Flaking_Base_s01` | TwoLayer | L3 | s01 | ✅ | Dust01 · Pitting01 · — · RustBloom01 | — (layer 2 is the rust) |
+| 3 | `Gold_Pure_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 4 | `Silver_Sterling_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 5 | `Copper_Pure_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 6 | `Brass_Yellow_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 7 | `Bronze_Cast_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
+| 8 | `Aluminium_Raw_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 9 | `Aluminium_Brushed_Clean_Base_s001` | Opaque | L2 | s001 | C3 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 10 | `StainlessSteel_Polished_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 11 | `StainlessSteel_Brushed_Clean_Base_s001` | Opaque | L2 | s001 | C3 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 12 | `Chrome_Mirror_Polished_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 13 | `Titanium_Raw_Clean_Base_s01` | Opaque | L1 | s01 | Now·C1 | HairlineScratches01 · Fingerprints01 · Dust01 · Edges01 | ~Tarnish colour |
+| 14 | `Steel_Mild_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
+| 15 | `Steel_Galvanised_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
+| 16 | `Steel_Corten_Weathered_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Pitting01 · — · RustBloom01 | ~Streaking colour |
+| 17 | `Steel_Perforated_Clean_Base_s01` | Masked | L3 | s01 | Now · D1? | Scratches01 · Dust01 · — · Edges01 |  |
+| 18 | `Iron_Cast_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
+| 19 | `Iron_Wrought_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
+| 20 | `Lead_Grey_Aged_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Dust01 · Pitting01 · Grime01 | ~Oxide colour |
 
 **engineered/glass** — 6
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Glass_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | ✅ | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
-| 2 | `Glass_Frosted_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
-| 3 | `Glass_Green_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
-| 4 | `Glass_Amber_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
-| 5 | `Glass_Reeded_Clean_Base_s001` | TranslucentThin | L2 | s001 | Now | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
-| 6 | `Glass_LeadCrystal_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Dust01 · Scratches01 · Grime01 | +Fingerprints01 · +WaterSpots01 |
+| 1 | `Glass_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | ✅ | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
+| 2 | `Glass_Frosted_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
+| 3 | `Glass_Green_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
+| 4 | `Glass_Amber_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
+| 5 | `Glass_Reeded_Clean_Base_s001` | TranslucentThin | L2 | s001 | Now | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
+| 6 | `Glass_LeadCrystal_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Dust01 · Scratches01 · Fingerprints01 · Grime01 | +WaterSpots01 |
 
 **engineered/cementitious** — 10
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Concrete_Smooth_Worn_Dusty_s1` | Opaque | L3 | s1 | ✅ | Dust01 · Scratches01 · Grime01 | (shipped) · +Cracks01 |
-| 2 | `Concrete_BoardFormed_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Grime01 | +Scratches01 · ~Wet · ~Efflorescence colour |
-| 3 | `Concrete_Grey_Polished_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Scuffs01 · Grime01 | +Dust01 |
-| 4 | `Concrete_Aggregate_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Grime01 | +Scratches01 · ~Wet · ~Efflorescence colour |
-| 5 | `Concrete_Smooth_Weathered_Stained_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Grime01 | +Scratches01 · ~Wet · ~Efflorescence colour |
-| 6 | `Plaster_Smooth_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Dust01 · Drip01 | ~Water stain colour |
-| 7 | `Stucco_Rough_Clean_Base_s01` | Opaque | L3 | s01 | Now | Cracks01 · Dust01 · Drip01 | ~Water stain colour |
-| 8 | `Terrazzo_Chipped_Polished_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Scuffs01 · Grime01 | +Dust01 |
-| 9 | `Asphalt_Fresh_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Cracks01 · Scuffs01 · Patches01 | ~Wet · ~Oil stain colour |
-| 10 | `Asphalt_Aged_Worn_Cracked_s1` | Opaque | L3 | s1 | Now · O11 | Cracks01 · Scuffs01 · Patches01 | ~Wet · ~Oil stain colour |
+| 1 | `Concrete_Smooth_Worn_Dusty_s1` | Opaque | L3 | s1 | ✅ | Dust01 · Scratches01 · Cracks01 · Grime01 | (shipped) |
+| 2 | `Concrete_BoardFormed_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Scratches01 · Grime01 | ~Wet · ~Efflorescence colour |
+| 3 | `Concrete_Grey_Polished_Base_s1` | Opaque | L3 | s1 | Now | Scratches01 · Scuffs01 · Dust01 · Grime01 |  |
+| 4 | `Concrete_Aggregate_Weathered_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Scratches01 · Grime01 | ~Wet · ~Efflorescence colour |
+| 5 | `Concrete_Smooth_Weathered_Stained_s1` | Opaque | L3 | s1 | Now | Dust01 · Cracks01 · Scratches01 · Grime01 | ~Wet · ~Efflorescence colour |
+| 6 | `Plaster_Smooth_Clean_Base_s1` | Opaque | L3 | s1 | Now | Cracks01 · Dust01 · — · Drip01 | ~Water stain colour |
+| 7 | `Stucco_Rough_Clean_Base_s01` | Opaque | L3 | s01 | Now | Cracks01 · Dust01 · — · Drip01 | ~Water stain colour |
+| 8 | `Terrazzo_Chipped_Polished_Base_s01` | Opaque | L3 | s01 | Now | Scratches01 · Scuffs01 · Dust01 · Grime01 |  |
+| 9 | `Asphalt_Fresh_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Cracks01 · Scuffs01 · — · Patches01 | ~Wet · ~Oil stain colour |
+| 10 | `Asphalt_Aged_Worn_Cracked_s1` | Opaque | L3 | s1 | Now · O11 | Cracks01 · Scuffs01 · — · Patches01 | ~Wet · ~Oil stain colour |
 
 **engineered/ceramic** — 8
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Terracotta_Unglazed_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · Crevice01 | ~Efflorescence colour |
-| 2 | `Terracotta_Glazed_Clean_Base_s01` | Opaque | L3 | s01 | C2 | Crazing01 · Scratches01 · Grime01 | +Fingerprints01 |
-| 3 | `BrickClay_Red_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · Crevice01 | ~Efflorescence colour |
-| 4 | `Fireclay_Buff_Clean_Base_s01` | Opaque | L2 | s01 | Now | EdgeWear01 · Dust01 · Crevice01 | ~Efflorescence colour |
-| 5 | `Earthenware_Red_Clean_Base_s01` | Opaque | L2 | s01 | Now | EdgeWear01 · Dust01 · Crevice01 | ~Efflorescence colour |
-| 6 | `Stoneware_SpeckledGlaze_Clean_Base_s01` | Opaque | L2 | s01 | C2 | Crazing01 · Scratches01 · Grime01 | +Fingerprints01 |
-| 7 | `Porcelain_Bisque_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · Crevice01 | ~Efflorescence colour |
-| 8 | `Porcelain_Glazed_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Crazing01 · Scratches01 · Grime01 | +Fingerprints01 |
+| 1 | `Terracotta_Unglazed_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · — · Crevice01 | ~Efflorescence colour |
+| 2 | `Terracotta_Glazed_Clean_Base_s01` | Opaque | L3 | s01 | C2 | Crazing01 · Scratches01 · Fingerprints01 · Grime01 |  |
+| 3 | `BrickClay_Red_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · — · Crevice01 | ~Efflorescence colour |
+| 4 | `Fireclay_Buff_Clean_Base_s01` | Opaque | L2 | s01 | Now | EdgeWear01 · Dust01 · — · Crevice01 | ~Efflorescence colour |
+| 5 | `Earthenware_Red_Clean_Base_s01` | Opaque | L2 | s01 | Now | EdgeWear01 · Dust01 · — · Crevice01 | ~Efflorescence colour |
+| 6 | `Stoneware_SpeckledGlaze_Clean_Base_s01` | Opaque | L2 | s01 | C2 | Crazing01 · Scratches01 · Fingerprints01 · Grime01 |  |
+| 7 | `Porcelain_Bisque_Clean_Base_s01` | Opaque | L1 | s01 | Now | EdgeWear01 · Dust01 · — · Crevice01 | ~Efflorescence colour |
+| 8 | `Porcelain_Glazed_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Crazing01 · Scratches01 · Fingerprints01 · Grime01 |  |
 
 **engineered/composite** — 8 *(the whole class is O11: its boundary is not written)*
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Plywood_Birch_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Edges01 | +Dust01 |
-| 2 | `MDF_Raw_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Edges01 | +Dust01 |
-| 3 | `Chipboard_Raw_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Edges01 | +Dust01 |
-| 4 | `Cardboard_Kraft_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Creases01 · Dust01 · Patches01 | ~Water stain colour |
-| 5 | `Paper_White_Clean_Base_s001` | Opaque | L3 | s001 | Now · O11 | Creases01 · Dust01 · Patches01 | ~Water stain colour |
-| 6 | `CarbonFibre_Twill_Clean_Base_s001` | Opaque | L2 | s001 | Now · O11 | Scratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 7 | `Fibreglass_Chopped_Clean_Base_s01` | Opaque | L2 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Edges01 | +Dust01 |
-| 8 | `Laminate_Matte_Clean_Base_s01` | Opaque | L2 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Edges01 | +Dust01 |
+| 1 | `Plywood_Birch_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Dust01 · Edges01 |  |
+| 2 | `MDF_Raw_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Dust01 · Edges01 |  |
+| 3 | `Chipboard_Raw_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Scuffs01 · EdgeWear01 · Dust01 · Edges01 |  |
+| 4 | `Cardboard_Kraft_Clean_Base_s01` | Opaque | L3 | s01 | Now · O11 | Creases01 · Dust01 · — · Patches01 | ~Water stain colour |
+| 5 | `Paper_White_Clean_Base_s001` | Opaque | L3 | s001 | Now · O11 | Creases01 · Dust01 · — · Patches01 | ~Water stain colour |
+| 6 | `CarbonFibre_Twill_Clean_Base_s001` | Opaque | L2 | s001 | Now · O11 | Scratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 7 | `Fibreglass_Chopped_Clean_Base_s01` | Opaque | L2 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Dust01 · Edges01 |  |
+| 8 | `Laminate_Matte_Clean_Base_s01` | Opaque | L2 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Dust01 · Edges01 |  |
 
 ### 🧪 synthetic
 
 **synthetic/plastic** — 10
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `ABS_Matte_Clean_Base_s01` | Opaque | L1 | s01 | ✅ | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 2 | `ABS_Glossy_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 3 | `Polypropylene_White_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 4 | `PVC_Grey_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 5 | `HDPE_Natural_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 6 | `Polystyrene_HighImpact_Clean_Base_s01` | Opaque | L1 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 7 | `Bakelite_Brown_Polished_Base_s01` | Opaque | L1 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Grime01 | +Dust01 · ~UV fading |
-| 8 | `Acrylic_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Grime01 | +Dust01 · ~Yellowing |
-| 9 | `Polycarbonate_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Grime01 | +Dust01 · ~Yellowing |
-| 10 | `PET_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Grime01 | +Dust01 · ~Yellowing |
+| 1 | `ABS_Matte_Clean_Base_s01` | Opaque | L1 | s01 | ✅ | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 2 | `ABS_Glossy_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 3 | `Polypropylene_White_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 4 | `PVC_Grey_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 5 | `HDPE_Natural_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 6 | `Polystyrene_HighImpact_Clean_Base_s01` | Opaque | L1 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 7 | `Bakelite_Brown_Polished_Base_s01` | Opaque | L1 | s01 | Now · O11 | Scratches01 · Fingerprints01 · Dust01 · Grime01 | ~UV fading |
+| 8 | `Acrylic_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Grime01 | ~Yellowing |
+| 9 | `Polycarbonate_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Grime01 | ~Yellowing |
+| 10 | `PET_Clear_Clean_Base_s01` | TranslucentThin | L1 | s01 | Now | HairlineScratches01 · Fingerprints01 · Dust01 · Grime01 | ~Yellowing |
 
 **synthetic/polymer** — 7 *(plastic vs polymer is O11; the working split used here is "rigid → plastic; elastic, foamed, cast or waxy → polymer")*
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Rubber_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Dust01 · Grime01 | +Cracks01 |
-| 2 | `Neoprene_Black_Clean_Base_s001` | Opaque | L3 | s001 | Now | Scuffs01 · Dust01 · Grime01 | +Cracks01 |
-| 3 | `Silicone_Translucent_Clean_Base_s01` | Subsurface | L1 | s01 | Now | Fingerprints01 · Dust01 · Grime01 | +Scratches01 |
-| 4 | `Polyurethane_Foam_Clean_Base_s001` | Opaque | L3 | s001 | Now | Dust01 · Pitting01 · Grime01 | ~Yellowing |
-| 5 | `Polystyrene_Expanded_Clean_Base_s001` | Opaque | L3 | s001 | Now · O11 | Dust01 · Pitting01 · Grime01 | ~Yellowing |
-| 6 | `Epoxy_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Fingerprints01 · Dust01 · Grime01 | +Scratches01 |
-| 7 | `Wax_Paraffin_Clean_Base_s01` | Subsurface | L1 | s01 | Now · O11 | Fingerprints01 · Dust01 · Grime01 | +Scratches01 |
+| 1 | `Rubber_Black_Clean_Base_s01` | Opaque | L3 | s01 | Now | Scuffs01 · Dust01 · Cracks01 · Grime01 |  |
+| 2 | `Neoprene_Black_Clean_Base_s001` | Opaque | L3 | s001 | Now | Scuffs01 · Dust01 · Cracks01 · Grime01 |  |
+| 3 | `Silicone_Translucent_Clean_Base_s01` | Subsurface | L1 | s01 | Now | Fingerprints01 · Dust01 · Scratches01 · Grime01 |  |
+| 4 | `Polyurethane_Foam_Clean_Base_s001` | Opaque | L3 | s001 | Now | Dust01 · Pitting01 · — · Grime01 | ~Yellowing |
+| 5 | `Polystyrene_Expanded_Clean_Base_s001` | Opaque | L3 | s001 | Now · O11 | Dust01 · Pitting01 · — · Grime01 | ~Yellowing |
+| 6 | `Epoxy_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Fingerprints01 · Dust01 · Scratches01 · Grime01 |  |
+| 7 | `Wax_Paraffin_Clean_Base_s01` | Subsurface | L1 | s01 | Now · O11 | Fingerprints01 · Dust01 · Scratches01 · Grime01 |  |
 
 **synthetic/textile** — 12 *(cloth without sheen reads acceptably; velvet, satin and suede do not)*
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Lace_Floral_Clean_Base_s01` | Masked | L3 | s01 | ✅ | Dust01 · Pilling01 · Grime01 |  |
-| 2 | `Canvas_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 3 | `Denim_Indigo_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 4 | `Linen_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 5 | `Tweed_Grey_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 6 | `Burlap_Jute_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 7 | `Felt_Grey_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 8 | `Nylon_Ripstop_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 9 | `Leather_Brown_Clean_Base_s01` | Opaque | L3 | s01 | Now · O9? | Scuffs01 · Creases01 · Edges01 | ~Darkening at wear |
-| 10 | `Suede_Tan_Clean_Base_s001` | Opaque | L3 | s001 | C2 | Scuffs01 · Creases01 · Edges01 | ~Darkening at wear |
-| 11 | `Velvet_Crimson_Clean_Base_s001` | Opaque | L3 | s001 | C2 | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
-| 12 | `Satin_Ivory_Clean_Base_s001` | Opaque | L2 | s001 | C2 + C3 | Pilling01 · Dust01 · Grime01 | +Creases01 · ~Fading · ~Stain colour |
+| 1 | `Lace_Floral_Clean_Base_s01` | Masked | L3 | s01 | ✅ | Dust01 · Pilling01 · — · Grime01 |  |
+| 2 | `Canvas_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 3 | `Denim_Indigo_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 4 | `Linen_Natural_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 5 | `Tweed_Grey_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 6 | `Burlap_Jute_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 7 | `Felt_Grey_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 8 | `Nylon_Ripstop_Clean_Base_s001` | Opaque | L3 | s001 | Now | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 9 | `Leather_Brown_Clean_Base_s01` | Opaque | L3 | s01 | Now · O9? | Scuffs01 · Creases01 · — · Edges01 | ~Darkening at wear |
+| 10 | `Suede_Tan_Clean_Base_s001` | Opaque | L3 | s001 | C2 | Scuffs01 · Creases01 · — · Edges01 | ~Darkening at wear |
+| 11 | `Velvet_Crimson_Clean_Base_s001` | Opaque | L3 | s001 | C2 | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
+| 12 | `Satin_Ivory_Clean_Base_s001` | Opaque | L2 | s001 | C2 + C3 | Pilling01 · Dust01 · Creases01 · Grime01 | ~Fading · ~Stain colour |
 
 **synthetic/coating** — 8
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Paint_Matte_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · Edges01 | +Fingerprints01 · ~Chalking colour |
-| 2 | `Paint_Satin_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · Edges01 | +Fingerprints01 · ~Chalking colour |
-| 3 | `Paint_Gloss_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Scratches01 · Dust01 · Edges01 | +Fingerprints01 · ~Chalking colour |
-| 4 | `Paint_OnWood_Peeling_Base_s01` | TwoLayer | L3 | s01 | Now | Dust01 · Cracks01 · PaintPeel01 | — (layer 2 is the substrate) |
-| 5 | `Paint_OnMetal_Chipped_Base_s01` | TwoLayer | L3 | s01 | Now | Dust01 · Scratches01 · PaintChip01 | — (layer 2 is the substrate) |
-| 6 | `PowderCoat_Textured_Clean_Base_s001` | Opaque | L2 | s001 | Now | Scratches01 · Dust01 · Edges01 | +Fingerprints01 · ~Chalking colour |
-| 7 | `Enamel_Gloss_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Scratches01 · Dust01 · Edges01 | +Fingerprints01 · ~Chalking colour |
-| 8 | `CarPaint_Metallic_Clean_Base_s001` | Opaque | L2 | s001 | C1 + C2 | HairlineScratches01 · WaterSpots01 · Grime01 | +Dust01 |
+| 1 | `Paint_Matte_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · Fingerprints01 · Edges01 | ~Chalking colour |
+| 2 | `Paint_Satin_Clean_Base_s01` | Opaque | L1 | s01 | Now | Scratches01 · Dust01 · Fingerprints01 · Edges01 | ~Chalking colour |
+| 3 | `Paint_Gloss_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Scratches01 · Dust01 · Fingerprints01 · Edges01 | ~Chalking colour |
+| 4 | `Paint_OnWood_Peeling_Base_s01` | TwoLayer | L3 | s01 | Now | Dust01 · Cracks01 · — · PaintPeel01 | — (layer 2 is the substrate) |
+| 5 | `Paint_OnMetal_Chipped_Base_s01` | TwoLayer | L3 | s01 | Now | Dust01 · Scratches01 · — · PaintChip01 | — (layer 2 is the substrate) |
+| 6 | `PowderCoat_Textured_Clean_Base_s001` | Opaque | L2 | s001 | Now | Scratches01 · Dust01 · Fingerprints01 · Edges01 | ~Chalking colour |
+| 7 | `Enamel_Gloss_Clean_Base_s01` | Opaque | L1 | s01 | C2 | Scratches01 · Dust01 · Fingerprints01 · Edges01 | ~Chalking colour |
+| 8 | `CarPaint_Metallic_Clean_Base_s001` | Opaque | L2 | s001 | C1 + C2 | HairlineScratches01 · WaterSpots01 · Dust01 · Grime01 |  |
 
 ### 🌫️ environmental
 
 **environmental/sand** — 6
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Sand_Beach_Dry_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · Patches01 | ~Wet |
-| 2 | `Sand_Beach_Wet_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · Patches01 | ~Wet |
-| 3 | `Sand_Desert_Rippled_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · Patches01 | ~Wet |
-| 4 | `Sand_Volcanic_Clean_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · Patches01 | ~Wet |
-| 5 | `Gravel_Pea_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · Patches01 | ~Wet |
-| 6 | `Gravel_Crushed_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · Patches01 | ~Wet |
+| 1 | `Sand_Beach_Dry_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · — · Patches01 | ~Wet |
+| 2 | `Sand_Beach_Wet_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · — · Patches01 | ~Wet |
+| 3 | `Sand_Desert_Rippled_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · — · Patches01 | ~Wet |
+| 4 | `Sand_Volcanic_Clean_Base_s1` | Opaque | L3 | s1 | Now | Pitting01 · Dust01 · — · Patches01 | ~Wet |
+| 5 | `Gravel_Pea_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · — · Patches01 | ~Wet |
+| 6 | `Gravel_Crushed_Clean_Base_s1` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · — · Patches01 | ~Wet |
 
 **environmental/vegetation** — 6
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Grass_Lawn_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Creases01 · Patches01 | ~Wet · ~Dry-out colour |
-| 2 | `Moss_Green_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Creases01 · Patches01 | ~Wet · ~Dry-out colour |
-| 3 | `Lichen_Crustose_Clean_Base_s01` | Opaque | L2 | s01 | Now | Dust01 · Creases01 · Patches01 | ~Wet · ~Dry-out colour |
-| 4 | `LeafLitter_Autumn_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Creases01 · Patches01 | ~Wet · ~Dry-out colour |
-| 5 | `Straw_Dry_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Creases01 · Patches01 | ~Wet · ~Dry-out colour |
-| 6 | `Leaf_Oak_Clean_Base_s01` | Masked | L3 | s01 | Now ‡ | Dust01 · Pitting01 · Patches01 | ~Wet · ~Autumn colour |
+| 1 | `Grass_Lawn_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Creases01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 2 | `Moss_Green_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Creases01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 3 | `Lichen_Crustose_Clean_Base_s01` | Opaque | L2 | s01 | Now | Dust01 · Creases01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 4 | `LeafLitter_Autumn_Clean_Base_s1` | Opaque | L3 | s1 | Now | Dust01 · Creases01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 5 | `Straw_Dry_Clean_Base_s01` | Opaque | L3 | s01 | Now | Dust01 · Creases01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 6 | `Leaf_Oak_Clean_Base_s01` | Masked | L3 | s01 | Now ‡ | Dust01 · Pitting01 · — · Patches01 | ~Wet · ~Autumn colour |
 
 ‡ A leaf card is Masked today; the two-sided thin-transmission *foliage variant* is `(planned)` in `MasterSet.md`.
 
 **environmental/liquid** — 8
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Water_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 |  |
-| 2 | `Water_Sea_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 |  |
-| 3 | `Water_Murky_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 |  |
-| 4 | `Honey_Amber_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 | ~Skin/film colour |
-| 5 | `Wine_Red_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 | ~Skin/film colour |
-| 6 | `Oil_Motor_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 | ~Skin/film colour |
-| 7 | `Milk_Whole_Clean_Base_s01` | Subsurface | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 | ~Skin/film colour |
-| 8 | `Coffee_Black_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · Patches01 | ~Skin/film colour |
+| 1 | `Water_Clear_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 |  |
+| 2 | `Water_Sea_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 |  |
+| 3 | `Water_Murky_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 |  |
+| 4 | `Honey_Amber_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 | ~Skin/film colour |
+| 5 | `Wine_Red_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 | ~Skin/film colour |
+| 6 | `Oil_Motor_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 | ~Skin/film colour |
+| 7 | `Milk_Whole_Clean_Base_s01` | Subsurface | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 | ~Skin/film colour |
+| 8 | `Coffee_Black_Clean_Base_s01` | TranslucentThick | L1 | s01 | Now | Ripples01 · Dust01 · — · Patches01 | ~Skin/film colour |
 
 **Frozen water — home undecided (O11), 2 articles not counted in any class above:**
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Snow_Fresh_Clean_Base_s1` | Subsurface | L3 | s1 | O11 | Pitting01 · Dust01 · Patches01 | ~Dirty-snow colour |
-| 2 | `Ice_Clear_Clean_Base_s01` | TranslucentThick | L3 | s01 | O11 | Scratches01 · Cracks01 · Patches01 | ~Frost colour |
+| 1 | `Snow_Fresh_Clean_Base_s1` | Subsurface | L3 | s1 | O11 | Pitting01 · Dust01 · — · Patches01 | ~Dirty-snow colour |
+| 2 | `Ice_Clear_Clean_Base_s01` | TranslucentThick | L3 | s01 | O11 | Scratches01 · Cracks01 · — · Patches01 | ~Frost colour |
 
 ### 💡 utility
 
 **utility/emissive** — 6
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Neon_Signage_Clean_Base_s01` | Emissive | L1 | s01 | ✅ | Dust01 · Fingerprints01 · Grime01 | +Scratches01 |
-| 2 | `LED_WarmWhite_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Grime01 | +Scratches01 |
-| 3 | `LED_CoolWhite_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Grime01 | +Scratches01 |
-| 4 | `Tungsten_Filament_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Grime01 | +Scratches01 |
-| 5 | `Phosphor_Green_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Grime01 | +Scratches01 |
-| 6 | `Lava_Molten_Clean_Base_s1` | Emissive | L2 | s1 | Now · O11 | Cracks01 · Pitting01 · Patches01 | ~Crust colour |
+| 1 | `Neon_Signage_Clean_Base_s01` | Emissive | L1 | s01 | ✅ | Dust01 · Fingerprints01 · Scratches01 · Grime01 |  |
+| 2 | `LED_WarmWhite_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Scratches01 · Grime01 |  |
+| 3 | `LED_CoolWhite_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Scratches01 · Grime01 |  |
+| 4 | `Tungsten_Filament_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Scratches01 · Grime01 |  |
+| 5 | `Phosphor_Green_Clean_Base_s01` | Emissive | L1 | s01 | Now | Dust01 · Fingerprints01 · Scratches01 · Grime01 |  |
+| 6 | `Lava_Molten_Clean_Base_s1` | Emissive | L2 | s1 | Now · O11 | Cracks01 · Pitting01 · — · Patches01 | ~Crust colour |
 
 **utility/virtual** — 5 *(plus the system article `IMRSV_MissingMaterial`, which is outside the grammar and not counted)*
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Diagnostic_UVGrid_Clean_Base_s1` | Opaque | L2 | s1 | ✅ | — · — · — | none by design: reference articles stay pure |
-| 2 | `Diagnostic_Checker_Clean_Base_s1` | Opaque | L2 | s1 | Now | — · — · — | none by design: reference articles stay pure |
-| 3 | `GreyCard_Neutral18_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — | none by design: reference articles stay pure |
-| 4 | `Spectralon_White_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — | none by design: reference articles stay pure |
-| 5 | `MusouBlack_Matte_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — | none by design: reference articles stay pure |
+| 1 | `Diagnostic_UVGrid_Clean_Base_s1` | Opaque | L2 | s1 | ✅ | — · — · — · — | none by design: reference articles stay pure |
+| 2 | `Diagnostic_Checker_Clean_Base_s1` | Opaque | L2 | s1 | Now | — · — · — · — | none by design: reference articles stay pure |
+| 3 | `GreyCard_Neutral18_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — · — | none by design: reference articles stay pure |
+| 4 | `Spectralon_White_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — · — | none by design: reference articles stay pure |
+| 5 | `MusouBlack_Matte_Clean_Base_s01` | Opaque | L1 | s01 | Now | — · — · — · — | none by design: reference articles stay pure |
 
 *Rows 3–5 are the Physically Based calibration references (Pass 9 of the prior thread) — the natural anchors for the **Parity Baselines** Roadmap entry.*
 
 **utility/energy** — 3 *(animated plasma is out of scope; these are static, pre-authored looks)*
 
-| # | Stem | Master | Lane | Scale | Status | Overlay 1 · Overlay 2 · Mask | Also wanted |
+| # | Stem | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Plasma_Blue_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · Patches01 | (treated as a surface; S6 may remove) |
-| 2 | `Hologram_Cyan_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · Patches01 | (treated as a surface; S6 may remove) |
-| 3 | `Forcefield_Hex_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · Patches01 | (treated as a surface; S6 may remove) |
+| 1 | `Plasma_Blue_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · — · Patches01 | (treated as a surface; S6 may remove) |
+| 2 | `Hologram_Cyan_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · — · Patches01 | (treated as a surface; S6 may remove) |
+| 3 | `Forcefield_Hex_Clean_Base_s01` | Emissive | L2 | s01 | Now | Ripples01 · Scratches01 · — · Patches01 | (treated as a surface; S6 may remove) |
 
 ### Not in the list: biological matter (O9)
 
@@ -352,21 +356,21 @@ Names follow the shipped forms `<Name><NN>_overlay_sNN.png` (overlays) and `<Nam
 
 **Overlays** (`MatterLibrary/textures/shared/overlays/`): 13, of which 2 shipped. Each one only bends the normal and/or roughens.
 
-| Overlay | What it does | Used by | |
+| Overlay | What it does | Used by (after C2) | |
 |---|---|---|---|
-| `Dust01` | fine roughening film | 98 | ✅ |
-| `Scratches01` | directional scratches (normal + roughness) | 60 | ✅ |
-| `Fingerprints01` | oily smudge prints (roughness) | 39 | new |
-| `Cracks01` | hairline cracks (normal) | 24 | new |
-| `Pitting01` | pits and pores (normal) | 23 | new |
+| `Dust01` | fine roughening film | 144 | ✅ |
+| `Scratches01` | directional scratches (normal + roughness) | 71 | ✅ |
+| `Fingerprints01` | oily smudge prints (roughness) | 53 | new |
+| `Cracks01` | hairline cracks (normal) | 27 | new |
+| `Pitting01` | pits and pores (normal) | 29 | new |
 | `Scuffs01` | broad rubbed scuff marks | 22 | new |
 | `HairlineScratches01` | micro-scratches for polished and clear surfaces | 20 | new |
 | `EdgeWear01` | chipped, rounded wear (normal) | 16 | new |
 | `Ripples01` | surface ripples (normal only) | 11 | new |
 | `Pilling01` | fibre pilling and fuzz (normal + roughness) | 10 | new |
-| `Creases01` | folds and creases (normal) | 9 | new |
+| `Creases01` | folds and creases (normal) | 18 | new |
 | `Crazing01` | glaze craze network (normal) | 3 | new |
-| `WaterSpots01` | dried mineral spots (roughness) | 1 | new |
+| `WaterSpots01` | dried mineral spots (roughness) | 8 | new |
 
 **Masks** (`MatterLibrary/textures/shared/masks/`): 9, of which 3 shipped. Each one only gates layers.
 
@@ -421,15 +425,35 @@ Names follow the shipped forms `<Name><NN>_overlay_sNN.png` (overlays) and `<Nam
 **Findings:**
 - **168 of 173 articles carry 2 overlays and 1 mask.** The 5 `utility/virtual` references carry none by design, because a calibration target must stay pure.
 - **The layer library grows from 5 to 22:** 11 new overlays and 6 new masks. These are packed data textures, produced by L2 (procedural, deterministic) or converted from ambientCG's 52 imperfection sets (prior thread, Pass 9). **They are a deliverable in their own right**, and every article depends on them.
-- **The cap collides with the ruling.** **96 of 173 rows** have a third relevant overlay that doesn't fit (most often `Dust01` on scratched surfaces, `Fingerprints01` and `WaterSpots01` on glass). The ruling says all relevant layers; the contract says two. *(Open question L6.)*
-- **The modulator rule collides with "smart" more deeply.** **121 rows** want an effect that overlays cannot express at all:
-  - **wet** (57 rows) needs smoothing and darkening;
-  - **moss, stains, tarnish, fading, yellowing and efflorescence** need colour.
-
-  Today the only way to put colour on an article is **TwoLayer** (a whole second material under a mask), and each article has one master. *(Open question L7.)*
+- **The cap collides with the ruling.** **96 of 173 rows** have a third relevant overlay that doesn't fit (most often `Dust01` on scratched surfaces, `Fingerprints01` and `WaterSpots01` on glass). The ruling says all relevant layers; the contract says two. *(Open question L6. **Resolved by C2: cap raised to 3.** See Pass 5.)*
+- ~~**The modulator rule collides with "smart" more deeply.** 121 rows want an effect that overlays cannot express at all (wet; moss, stains, tarnish, fading, yellowing, efflorescence).~~ **Overstated. Corrected in Pass 5:** it missed the Creator's `base_color_tint` and `roughness_bias`, which already give uniform colour and gloss changes. The real gap is *localised* colour or gloss only. *(Open question L7, narrowed.)*
 - **7 shipped articles carry no overlays:** Limestone, Marble, Rust (mask only), Diamond, ABS, Lace, Neon. Under C1 each needs a new version. **Immutability** says that is `v02`, but the repo also has a recorded in-place `v01` precedent (the Version Management seed, from Issue #1). That call belongs to Version Management, not here. *(Open question L8.)*
 - **Cost:** `MasterSet.md` notes that always-carried layers cost shader time even at strength 0. The VR-budget measurement that picks the strategy is marked `Reevaluate` (never recorded here). C1 makes that measurement load-bearing: every article now pays the cost.
 - **Phase03 impact:** the `/matter-generate` skill, the recipe schema (G2) and the plausibility guard must author and check the layer assignment per article, and 17 new layer textures need producing. The Phase03 Brief doesn't include either yet. *(Recorded for `/discovery Phase03`; research does not edit the phase doc.)*
+
+## Pass 5 — Correction after reading `LCDSchema.md` in full; the third overlay (C2, C3)
+
+**Examined (2026-09-25):** `docs/specs/Contract/LCDSchema.md` in full (Pass 4 had grepped it for "overlay" only; that was the miss). The lead asked directly: "did you read the docs, or are we missing core functionality?"
+
+**Answer: the docs are not missing core functionality. Pass 4 was.** The Creator subset is 8 frozen ports:
+- `base_color_tint` (color3, multiply, 0–1 per channel);
+- `roughness_bias` (float, add, −0.5…+0.5, total clamped to [0, 1]);
+- `uv_scale` / `uv_offset` / `uv_rotation`;
+- `overlay1_density` / `overlay2_density` / `maskset_blend`.
+
+On top of those, the author tier carries every OpenPBR input per master (Lane A) and the TwoLayer set (Lane B). So:
+- **Uniform wet** (darker and glossier) = `base_color_tint` down + `roughness_bias` negative. **Available today.** The same goes for uniform fading, yellowing and tarnish (tint) and for gloss changes (bias).
+- **What is genuinely absent** is only the *localised* form: a colour or gloss change gated by a mask (moss in crevices, wet patches, rust streaks). Overlays roughen and bend normals only (the modulator rule; the assembler's B channel is [0, 1]), and a mask gates only overlays and the TwoLayer layer. The only localised colour today is **TwoLayer**. That is a refinement for later, not a hole in the contract. *(L7, narrowed.)*
+- `LCDSchema.md` itself expects evolution: "frozen" means version-stable, and "new dimensions may be added over time as we see opportunity". **C2 is exactly such an addition.**
+
+**Applied C2 to the list** (a script over the tables): each row's first `+X` became **overlay 3**. **96 rows now carry 3 overlays and 72 carry 2** (no third was relevant). The 5 virtual references carry none. **7 rows still want a fourth** (mostly glass wanting `WaterSpots01`); per **C3**, a sibling article covers that (e.g. `Glass_Clear_Weathered_Base` with water spots), not the cap.
+
+**What C2 needs, for whichever unit lands it** (it is a contract change, and research does not edit specs):
+- `MasterSet.md`: the cap `≤2` becomes `≤3`, and the channel contract gives **A = overlay-3 gate** (A is "reserved (unused in v1)").
+- `LCDSchema.md`: a 9th Creator port, `overlay3_density`, and a third render-role node `overlay3_tex`. *(Names are proposed by pattern; not yet ruled.)*
+- The assembler (`LCD_PORTS`), the validators, the Blender add-on and every consumer master (the IMRSV/Unreal side goes in `PlatformDependencies.md`).
+- The **shader-cost measurement** (`MasterSet.md`, `Reevaluate`) becomes more pressing: every article now carries up to 3 layers at strength 0.
+- Probably a library **semver-minor**: an additive port.
 
 ## Gut-check questions — for the lead
 
@@ -465,17 +489,18 @@ Structure (O11 rulings this list needs; no recommendation forced):
 | L3 | Is **thin film** a fourth carrier (C4)? | Nacre, and later soap bubble and oil sheen. |
 | L4 | Ship the 8 C1 metals approximated in the first release, or hold them for F82? | Metals are the class users reach for first. |
 | L5 | Is this the **first release**, or the eventual coverage target? At 5–10 min review each (unmeasured), 162 new articles is roughly 15–25 hours. | Decides whether to cut a smaller first tranche. |
-| L6 | **Raise the cap of 2 overlays per article (e.g. to 3 or 4), or accept picking the top 2?** This is a `MasterSet.md` / `LCDSchema.md` contract change: new Creator ports, and a new gate channel (the mask's A channel is reserved and free). | 96 rows want a third overlay. Ruling C1 says all relevant layers. |
-| L7 | **How does a "smart" article get colour and wet?** Options: (a) signed roughness bias in overlays (enables wet sheen, but not darkening); (b) a colour-carrying layer kind, which reverses the normative modulator rule; (c) TwoLayer for colour wear, which spends the article's one master on it. | 121 rows want wet, moss, stains, tarnish or fading. |
+| ~~L6~~ | ~~Raise the overlay cap?~~ **Resolved by C2: raise to 3.** Landing the contract change is open (which unit: a `/quick-fix` on the specs plus the assembler, or a step in Phase03). | — |
+| L7 | *Narrowed in Pass 5.* **Localised colour or gloss** (moss only in crevices, wet only in patches): is it wanted, and when? Uniform colour and gloss already exist (`base_color_tint`, `roughness_bias`). | A refinement, not a gap. It does not block the list. |
 | L8 | Do the 7 shipped articles without overlays get `v02`, or the in-place `v01` precedent? | Version Management owns it. |
 
 ## Status
 
-**Passes captured:** 4 (2026-09-25).
+**Passes captured:** 5 (2026-09-25).
 
-- **Ruling C1 (lead): smart, not lean.** Every article carries all its relevant overlays and masks at strength 0. Names are unchanged.
-- **Draft v1 of the list is complete:** 173 named articles (11 shipped, 162 new) across all 20 classes, including 2 unplaced (snow, ice). Every row has a full stem, a folder, a declared master, a lane, a scale tag, a status and **its wear layers** (168 carry 2 overlays + 1 mask; the 5 virtual references carry none). The shared layer library grows from 5 to 22.
-- **C1 collides with two contract limits:** the 2-overlay cap (96 rows want more; L6) and the modulator rule (121 rows want wet or colour wear; L7). Both are lead calls on `MasterSet.md`, and neither is decided here.
+- **Lead rulings:** C1 *smart, not lean* (all relevant layers, at strength 0, names unchanged) · C2 *overlay cap raised to 3* · C3 *several articles per matter may carry different overlay sets*.
+- **Draft v1 of the list is complete:** 173 named articles (11 shipped, 162 new) across all 20 classes, including 2 unplaced (snow, ice). Every row has a full stem, a folder, a declared master, a lane, a scale tag, a status and **its wear layers**: 96 carry 3 overlays + mask, 72 carry 2 + mask, and the 5 virtual references carry none. The shared layer library grows from 5 to 22.
+- **Pass 4 overstated a gap and Pass 5 corrects it:** uniform colour and gloss (wet, fading, tarnish) are already Creator controls (`base_color_tint`, `roughness_bias`). Only *localised* colour or gloss is absent (L7, a refinement).
+- **C2 is a contract change still to land** (`MasterSet.md`, `LCDSchema.md`, assembler, validators, Blender, consumers). Pass 5 lists what it touches.
 - **140 new articles are buildable with the Phase03 tools alone** (20 of them in a provisional class). The rest wait on carriers C2 (10), C3 (3), optionally C1 (8), or a class ruling (snow, ice).
 - **Direction:** nothing is committed. This is input for the lead's gut check, and later for the *Library Coverage* phase.
 - **Open:** L1–L8. None blocks Phase03's first step, but C1 widens Phase03's scope: the skill must author the layers, and 17 layer textures must be produced. `/discovery Phase03` should pick that up.
