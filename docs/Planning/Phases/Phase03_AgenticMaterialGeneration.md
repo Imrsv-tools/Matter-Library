@@ -1,6 +1,6 @@
 # Phase03 — Agentic Material Generation
 
-**Status:** ACTIVE: discovery. Pass 1 is done (2026-09-23), and **the Brief is complete except for one lead call (Q2).** Numbered by the lead ("yes, start discovery as Phase03"), naming the Roadmap's *Agentic Material Generation* entry. **Lane: `build`** (verified: §Risk lane).
+**Status:** ACTIVE: discovery. Pass 3 is done (2026-09-25): the Brief is re-cut for the lead's *smart, not lean* ruling (research D8 / C1), and **it is complete except for one lead call (Q2).** Numbered by the lead ("yes, start discovery as Phase03"), naming the Roadmap's *Agentic Material Generation* entry. **Lane: `build`** (verified: §Risk lane).
 
 ## Outcome
 
@@ -16,23 +16,26 @@
 
 There is no running service. The surface is **Claude Code at the repo root**, plus the files a run leaves in the working tree.
 
-1. `/matter-generate soda-lime window glass`
-   - The skill states its plan: taxonomy slot `engineered/glass`, declared master `TranslucentThin` and why, a grammar-valid name, a scale tag, lane L1, and the Physically Based entries it will use (`Glass (Soda-lime)`, IOR 1.52).
+1. `/matter-generate an 18% grey card`
+   - The skill states its plan: taxonomy slot `utility/virtual`, declared master `Opaque` and why, the name `GreyCard_Neutral18_Clean_Base_s01_v01` (six tokens, one per axis), lane L1, the Physically Based entry it will use (`Gray Card`), and **no wear layers, because a reference article stays pure** (the one exemption in C1).
    - It writes the recipe, assembles the `.mtlx`, and runs `uv run tools/validators/run_all.py`, which shows every lane PASS or SKIP, 0 FAIL.
    - It renders the article and shows the render with a short critique note. *(step 3.1)*
 2. **The lead judges.**
    - Look at the render. For a closer look, run the command the skill prints to open the draft's preview scene in **USDLiveView** (`usdliveview <Stem>_preview.usda`) and fly or orbit around it. That is the same OpenUSD 26.03 + MaterialX 1.39.5 Storm stack, with no Stage and no release needed (Pass 2).
    - Keep it (`git add` the named paths and commit) or discard it (`git restore` / `git clean` on the named paths). The skill never commits.
    - **Time the review.** That is the phase's one measurement (research Pass 11 estimated 5–10 minutes per article, unmeasured).
-3. Edit the new recipe so one key is misspelled (e.g. `roughnes_const`), and run the one command → the **recipe** lane FAILs and names the unknown key. Put a class that isn't in the taxonomy → FAIL. Put an albedo above 1 → FAIL. Undo the edits → green again. *(step 3.2)*
-4. `/matter-generate worn oak planks` → the skill picks an ambientCG set and shows its id and page. It fetches the set and writes 1K textures (NormalGL) under `MatterLibrary/textures/base/natural/wood/`. It records provenance **(where: Q2)** with the sha256 evidence, adds a `CREDITS.md` row, then assembles, gates, renders and critiques. *(step 3.3)*
-5. *(If step 3.4 lands)* `/matter-generate hand-made terracotta` → the skill writes a fixed-seed texture generator script, runs it, and records provenance as `procedural` with the script as evidence. The rest is as in click 1. *(step 3.4)*
+3. Edit the new recipe so one key is misspelled (e.g. `roughnes_const`), and run the one command → the **recipe** lane FAILs and names the unknown key. Put a class that isn't in the taxonomy → FAIL. Put an albedo above 1 → FAIL. Point an overlay at a texture that doesn't exist → FAIL. Undo the edits → green again. *(step 3.2)*
+4. `/matter-generate green bottle glass` → `Glass_Green_Clean_Base_s01_v01` (`TranslucentThin`, L1, `Glass (Soda-lime)`, IOR 1.52, with an authored green `transmission_color`, since a see-through colour is its own article, E2). The skill states the wear layers it will carry: overlays `Scratches01 · Dust01 · Fingerprints01`, mask `Grime01`, every slider at 0. It finds **`Fingerprints01` missing from the shared library**. So it writes a fixed-seed generator for that one packed-data overlay, runs it, and records provenance as `procedural` with the script as evidence **(where: Q2)**. It then assembles the glass with all four layers, gates, renders and critiques. **Also look at the layer itself:** the critique shows the glass with the new overlay dialled up, so the lead judges the layer as well as the article. *(step 3.3)*
+5. `/matter-generate white oak` → `WhiteOak_Natural_Clean_Base_s01_v01`. The skill picks an ambientCG set and shows its id and page. It fetches the set and writes 1K textures (NormalGL) under `MatterLibrary/textures/base/natural/wood/`. It records provenance with the sha256 evidence **(where: Q2)** and adds a `CREDITS.md` row. Its overlay 1, `Scuffs01`, is missing, so step 3.3's layer path makes it first. Then it assembles, gates, renders and critiques. *(step 3.4)*
+6. *(If step 3.5 lands)* `/matter-generate earthenware` → `Earthenware_Natural_Clean_Base_s01_v01`. The skill writes a fixed-seed generator for the **base** texture set (colour, roughness, normal), runs it, and records provenance as `procedural`. Any missing layers (`EdgeWear01`, `Crevice01`) come from 3.3's path. The rest is as in click 1. *(step 3.5)*
 
-**Reconciled click by click:** click 1 needs the skill, the Physically Based lookup, the assembler (existing), the gate (existing) and a working render, so the preview repair is **inside 3.1**, not after it. Click 2 needs nothing new. Click 3 is step 3.2's guards. Click 4 is step 3.3's importer. Click 5 is step 3.4.
+**Reconciled click by click:** click 1 needs the skill, the Physically Based lookup, the assembler (existing), the gate (existing) and a working render, so the preview repair is **inside 3.1**, not after it. Click 1 is deliberately a reference article: **every other article in the draft list needs at least one wear layer that isn't in the library yet** (measured below, Pass 3). A glass first click would make step 3.1 carry layer generation too, and C1 rules out leaving the layer off. So the test got smaller, not step 3.1 bigger. Click 2 needs nothing new. Click 3 is step 3.2's guards. Click 4 is step 3.3: layer generation, plus the third overlay slot that C2 already landed (§Decisions). Click 5 is step 3.4's importer, and it consumes 3.3's layer path. Click 6 is step 3.5.
 
 ### In now
 
-- **The skill** `/matter-generate`. It follows the human path in `CONTRIBUTING.md` step for step (name → place → recipe → assemble → gate): plan → ground → recipe → assemble → gate → render → self-critique → a `draft` left in the tree.
+- **The skill** `/matter-generate`. It follows the human path in `CONTRIBUTING.md` step for step (name → place → recipe → assemble → gate): plan → ground → **assign layers** → recipe → assemble → gate → render → self-critique → a `draft` left in the tree.
+- **A layer assignment for every article (D8 / C1).** The skill carries every wear layer relevant to the matter, up to the cap: overlay 1 is the damage layer and overlays 2–3 are the rest (C5, E1). It adds one gating mask and sets every slider to 0. It states the choice and its reason in the plan. The draft list in `260925_R_LibraryCoverage_FirstRelease.md` is a **reference, not an authority**: it is research, and "nothing is committed".
+- **Generating a missing wear layer (step 3.3).** When a relevant layer isn't in `MatterLibrary/textures/shared/`, the skill makes it: a fixed-seed packed-data generator, one script per layer, on the `gen_shared_textures.py` pattern. Only the layers this phase's briefs need are made (§Not now).
 - **Physically Based grounding** (CC0, licence verified in the repo's `LICENSE`). The recipe records which entries its constants came from (research O6).
 - **A working preview render**: repair `tools/preview_generators/` so it renders a real article headless to a PNG (§Pass 1, P3).
 - **Harness guards:**
@@ -40,15 +43,20 @@ There is no running service. The surface is **Claude Code at the repo root**, pl
   - G2: a recipe schema the agent authors against;
   - G3: the class is in the taxonomy;
   - G5: the recipe's `path` agrees with its domain, class and name;
-  - G6: physical plausibility.
+  - G6: physical plausibility;
+  - G7: the layer assignment is well-formed. Every overlay and mask path resolves to a file under `textures/shared/`, the overlay count is within the assembler's cap, a mask is present only where overlays or a second layer exist (otherwise it is a dead control), and a `utility/virtual` article carries none.
 
-  They run in a new **recipe** lane. G4 is dropped as a gate (§Decisions).
+  They run in a new **recipe** lane. G4 is dropped as a gate (§Decisions). **Whether a layer is *relevant* is judgement, not a gate:** it is the skill's stated rationale plus the lead's review, the same split as for the declared master.
 - **ambientCG import (L3)**: fetch, channel map, resize to 1K, provenance evidence, a `CREDITS.md` row.
-- **Agent-written procedural generators (L2)** as step 3.4. This is the step to cut if time runs short (D4 says "next").
+- **Agent-written procedural base textures (L2)** as step 3.5. This is the step to cut if time runs short (D4 says "next"). The layer generators in 3.3 are the same technique applied to data textures, and they **can't** be cut, because C1 makes every non-reference article need them.
 
 ### Not now
 
-- **Filling the library.** The ~170-article coverage push belongs to *Library Coverage*. It **consumes from this phase:** the `/matter-generate` skill, the recipe schema and the recipe lane, the ambientCG importer, and the preview render.
+- **Filling the library.** The ~170-article coverage push belongs to *Library Coverage*. It **consumes from this phase:** the `/matter-generate` skill, the recipe schema and the recipe lane (with G7), the layer-generation path, the ambientCG importer, and the preview render.
+- **Producing the whole wear-layer library.** It grows from 5 to 22 layers in the research draft. That run is *Library Coverage*, which uses 3.3's layer path. This phase makes only the layers its own briefs need (`Fingerprints01`, `Scuffs01`, plus `EdgeWear01` and `Crevice01` if 3.5 lands).
+- **Landing the third overlay (C2).** Done separately in `001a857` (§Decisions); this phase consumes the cap and never hard-codes it.
+- **Re-versioning shipped articles that lack layers** (research L8, E3) and **what `Clean`/`Detail` mean for slider defaults on shipped articles** (research N8). Those belong to *Version Management* and *Library Coverage*. New drafts follow C1: `…_Clean_Base`, every slider at 0.
+- **Localised colour or gloss** (moss only in crevices; research L7): a refinement, not a gap.
 - **Generative imagery (L4)**: parked (R13, D4).
 - **A batch agent and the Matter Manager** (D5).
 - **OpenPBR carriers C1–C3** (metal F82, sheen/coat, anisotropy). The Outcome asks for *candidates ready for judgement*, not full fidelity for every class. The skill **says so** in its critique when a material wants a carrier it can't express (for example "brushed: no anisotropy").
@@ -66,12 +74,15 @@ There is no running service. The surface is **Claude Code at the repo root**, pl
 | The lead's close look | **USDLiveView** (a consumer viewer, working on the lead's box 2026-09-23) opens a `.usd`/`.usda` scene directly, with no Stage connection, on the same render stack | **None.** The skill writes the preview scene anyway (for the PNG) and prints the command to open it. It never launches a window itself. |
 | Physical values | Physically Based API `api.physicallybased.info/v2/materials`: 116 records, CC0 | A small lookup script, so the grounding is repeatable and cited |
 | Textures | ambientCG `…/get?file=<Id>_1K-PNG.zip`: maps named `_Color`, `_Roughness`, `_NormalGL`, `_Metalness`, `_Opacity` | An importer (fetch, map, place, evidence). ambientCG's own bundled `.mtlx` is **not** reusable: it is a flat OpenPBR graph with no LCD interface inputs (read in the zip, P2). |
+| Wear layers | `tools/converters/gen_shared_textures.py`: fixed-seed value noise packed to the frozen channel contract (R/G normal XY · B roughness bias · A density). The shipped `Dust01`/`Scratches01` come from it and are recorded `source: procedural`, `evidence: <script>` in the lock | **The same pattern, one script per new layer.** Re-running the shared script would regenerate the shipped layers (§Build Safety). |
 | Provenance evidence | `tools/validators/source_provenance.py compute <texture-id> <url>` prints the `{url, sha256_scope, sha256, files}` block | None for the evidence. **Where it is stored is Q2.** |
 | Run a guided procedure | a Claude Code **project skill** (`.claude/skills/<name>/SKILL.md`) | The skill is thin: every deterministic step is a script in `tools/`, so a human, a later batch agent (D5) and the Matter Manager reuse the same tools. |
 
 ### Decisions that bind
 
-- **Research D1–D7** (`docs/Planning/Research/260923_R_AgenticMaterialGeneration.md` §Resolved). This is the authoritative copy of them; they are not repeated here.
+- **Research D1–D8** (`docs/Planning/Research/260923_R_AgenticMaterialGeneration.md` §Resolved). This is the authoritative copy of them; they are not repeated here. **D8 in the lead's words:** "We are building and testing complex materials, not just a bunch of wood textures" (ruling C1, `260925_R_LibraryCoverage_FirstRelease.md`). Every article carries all its relevant layers, sliders at 0, and names don't change. "Leaving out a relevant layer is not an option."
+- **Names are six fixed axes** (C4/C5, landed in `Identity.md`; the `materials` lane enforces exactly six tokens since quick fix `2b292be`): Material = the matter or species, Variant = the look (default `Natural`), Condition = damage (overlay 1), Detail = the rest (overlays 2–3). **Research L10 (enforce six tokens) is therefore done, and it is not a Phase03 guard.**
+- **The third overlay (C2) is consumed, not built here. It landed in quick fix `001a857` (2026-09-25, lead-directed)**: `MAX_OVERLAYS = 3`, the Creator port `overlay3_density`, the `overlay3_tex` node, and the maskset's A channel as the overlay-3 gate. The maskset loads `color4` only on a 3-overlay article, so articles with ≤ 2 overlays assemble byte-identically. G7 reads the cap from the assembler and never hard-codes it. Click 4 uses the third slot (`Fingerprints01` on the glass). The consumer side is `PlatformDependencies.md` P12, not this phase.
 - **The recipe is the only thing the agent authors** (research Pass 2). No hand-written `.mtlx`, as `CONTRIBUTING.md` step 3 says for humans too.
 - **Normal maps come from ambientCG's `NormalGL`** (P1: the shipped Limestone normal is **byte-identical** to `Travertine009_1K-PNG_NormalGL.png`; the green channel correlates +1.0 with GL and −1.0 with DX).
 - **Textures ship at 1K**, as all existing textures do (measured 1024²). They sit **flat in the class folder** as `<Set>_<channel>_<sNN>.png` (measured). `ToolingConventions.md`'s `…/<class>/<Set>/` is a doc drift; fix it at doc sync.
@@ -89,25 +100,28 @@ The one control this phase goes near is the **shipped-pixel rule**, enforced by 
 
 | Step | What a person can do at the end | Intent |
 |---|---|---|
-| **3.1** | Ask for a **param-only** material and get a validated, rendered draft (click 1–2) | The skill; the Physically Based lookup; recipe `sources`; the preview repaired to render a PNG headless; the critique note |
-| **3.2** | See a bad recipe **refused** by the one command (click 3) | The `recipe` lane: G1 strict keys (also in `MaterialSpec.from_dict`), G2 schema, G3 taxonomy, G5 path agreement, G6 plausibility, with RED fixtures so the lane is shown both ways; the skill authors against the schema |
-| **3.3** | Ask for a **textured** material and get it from a CC0 scan (click 4) | The ambientCG importer; provenance recorded (Q2); a `CREDITS.md` row |
-| **3.4** | Ask for a material the scans don't cover and get **generated** textures (click 5) | Agent-written fixed-seed generator scripts (L2); `procedural` provenance. **The cut line** if the phase runs long |
+| **3.1** | Ask for a **param-only reference** material and get a validated, rendered draft (clicks 1–2) | The skill, including its layer-assignment step (which rightly assigns none here); the Physically Based lookup; recipe `sources`; the preview repaired to render a PNG headless; the critique note |
+| **3.2** | See a bad recipe **refused** by the one command (click 3) | The `recipe` lane: G1 strict keys (also in `MaterialSpec.from_dict`), G2 schema (layer fields included), G3 taxonomy, G5 path agreement, G6 plausibility, G7 layer assignment, with RED fixtures so the lane is shown both ways; the skill authors against the schema |
+| **3.3** | Ask for a **layered** material whose wear layer doesn't exist yet, and get the layer **and** the article (click 4) | A fixed-seed packed-data generator per missing layer; `procedural` provenance (Q2); a render with the layer dialled up; the article with its full layer set, using the third overlay slot (C2, landed) |
+| **3.4** | Ask for a **textured** material and get it from a CC0 scan (click 5) | The ambientCG importer; provenance recorded (Q2); a `CREDITS.md` row; its missing overlay 1 made through 3.3's path |
+| **3.5** | Ask for a material the scans don't cover and get **generated** base textures (click 6) | Agent-written fixed-seed base-texture generators (L2); `procedural` provenance. **The cut line** if the phase runs long |
 
-Close acceptance: three real briefs (L1, L3, L2), each kept or discarded by the lead, with the **review minutes recorded** in §Execution Log.
+Close acceptance: four real briefs, the reference (3.1), the layered glass (3.3), the scanned oak (3.4) and, if it lands, the generated earthenware (3.5). Each is kept or discarded by the lead, with the **review minutes recorded** in §Execution Log. A generated layer is judged along with the first article that carries it.
 
 ### Compact build map
 
 - `.claude/skills/matter-generate/SKILL.md`: **new root.** Add it to `ToolingConventions.md` (the `.claude/` row says "agent surface"; the lanes rule makes only `.claude/CLAUDE.md` read-only to working verbs, and the skill is this phase's *product*, not methodology).
 - `tools/converters/`:
   - a Physically Based lookup script;
-  - the ambientCG importer (3.3);
+  - the ambientCG importer (3.4);
+  - the layer generators (3.3): one fixed-seed script per new layer, writing only its own `MatterLibrary/textures/shared/{overlays,masks}/` file, so the provenance evidence names exactly one script. Its home is ruled at 3.3 against `ToolingConventions.md`. It must not be `tools/generators/`, which is the Blender asset-library generator;
   - `recipes/<Stem>_vNN.json` (the existing home, per `ToolingConventions.md`, and globbed by `build_proof_subset.py` and the determinism lane);
   - the recipe JSON Schema (G2).
 - `tools/converters/assemble_mtlx.py` `MaterialSpec.from_dict`: G1 rejects unknown keys, with an explicit allow-list for metadata keys (`_comment`, `path`, `sources`). **The 12 existing recipes must still assemble byte-identically** (determinism lane).
 - `tools/validators/`: the new `recipe` lane in `run_all.py` (17 lanes) plus `fixtures/` RED recipes.
   - G3's class list mirrors `Taxonomy.md`, the same pattern as `LCD_PORTS` mirroring `LCDSchema.md`.
   - G6 exempts `utility/virtual` and the `system` master (the UV grid and magenta are deliberately unphysical).
+  - G7 must stay green on the 12 shipped recipes. **It does not gate slider defaults.** The shipped Glass ships with its wear dialled up (0.25 / 0.35 / 0.6) while Concrete ships at 0, and which is right is research N8, still open. The skill authors 0 (C1); the lane doesn't enforce it.
   - Physically Based linear colours above 1.0 (e.g. Gold `1.059`) are **clamped at lookup**, not accepted by the lane.
 - `tools/preview_generators/`:
   - repair `preview_wrapper.usda` and `make_preview.py`: reference `</MaterialX>`, apply `MaterialBindingAPI`, use a UV-mapped mesh, add a camera;
@@ -118,7 +132,7 @@ Close acceptance: three real briefs (L1, L3, L2), each kept or discarded by the 
 - **Doc sync at close:**
   - `AuthoringHarness.md` (tools, lanes, the preview repair; stages A→B partly in-repo);
   - `AuthoringGoldenPath.md` §Future-toolchain note;
-  - `ToolingConventions.md` (skill root, texture layout drift, the 17th lane);
+  - `ToolingConventions.md` (skill root, the layer-generator home, texture layout drift, the 17th lane);
   - `tools/preview_generators/README.md`;
   - `CONTRIBUTING.md` (point at the skill as an option).
 
@@ -128,7 +142,7 @@ Close acceptance: three real briefs (L1, L3, L2), each kept or discarded by the 
 
 | # | Call | Recommendation |
 |---|---|---|
-| **Q2** | **Where does a draft texture set's provenance live before a release pins it?** The release lock is where provenance is enforced, but it only exists at promotion. A working next-release lock would drag in the catalog, freeze and staging lanes, which run on the newest release (read in `run_all.py`): that is *Version Management*'s territory. Options: **A** a per-texture-set record `library/provenance/sources/<domain>/<class>/<Set>.yaml`, holding exactly the `provenance:` block the lock will later carry (from `source_provenance.py compute`, or `procedural` + script path); **B** a `provenance` block inside the recipe. | **A.** Provenance belongs to the *texture*, which is versioned and shared independently of any one article (the manifest has separate texture entries, and overlays and masks are shared by several articles). `library/provenance/` is already the home for provenance records. A cannot sit beside the PNGs, because `.gitattributes` puts everything under `MatterLibrary/textures/**` in LFS. |
+| **Q2** | **Where does a draft texture set's provenance live before a release pins it?** The release lock is where provenance is enforced, but it only exists at promotion. A working next-release lock would drag in the catalog, freeze and staging lanes, which run on the newest release (read in `run_all.py`): that is *Version Management*'s territory. Options: **A** a per-texture-set record `library/provenance/sources/<domain>/<class>/<Set>.yaml`, holding exactly the `provenance:` block the lock will later carry (from `source_provenance.py compute`, or `procedural` + script path); **B** a `provenance` block inside the recipe. *(Pass 3: it now also covers a **generated wear layer**, e.g. `library/provenance/sources/shared/overlays/Fingerprints01.yaml`. A layer is shared by many articles, so it has no single recipe to live in under B. It is first needed at step 3.3; 3.1–3.2 can run without it.)* | **A.** Provenance belongs to the *texture*, which is versioned and shared independently of any one article (the manifest has separate texture entries, and overlays and masks are shared by several articles). `library/provenance/` is already the home for provenance records. A cannot sit beside the PNGs, because `.gitattributes` puts everything under `MatterLibrary/textures/**` in LFS. |
 
 ---
 
@@ -222,14 +236,42 @@ The render opens no window that was observed. It uses Qt xcb on `DISPLAY` (the t
 
 **Decision (within the Brief, not a lead fork):** USDLiveView is the lead's **optional close-look surface** at click 2. The skill writes the preview scene it already needs for the PNG, keeps it, and prints the command to open it. It never launches the GUI itself: no surprise windows, and the agent never blocks on an interactive app. **Unverified until step 3.1:** opening a repaired preview scene in USDLiveView shows the draft textured. The first click proves it.
 
+### Pass 3 (2026-09-25): what landed since, and "smart, not lean"
+
+**Examined:** every commit since Pass 2 (`679cc72..2b292be`). That includes:
+- the Library Coverage research in full where it touches this phase: rulings C1–C6, E1/E2/E5, Passes 4–7, L6–L10, and the per-class tables for glass, wood, ceramic and utility;
+- the `Identity.md`, `NamingConventions.md`, `MaterialXTemplate.md` and `MasterSet.md` diffs;
+- research D8;
+- `assemble_mtlx.py` (the roughness clamp, `MAX_OVERLAYS`, maskset `color4`);
+- `gen_shared_textures.py`, and the lock's provenance for `Dust01`;
+- the Physically Based API (116 records; `Gray Card`, `Glass (Soda-lime)`, `Terracotta`, `Spectralon`, `Musou Black` present).
+
+**Findings:**
+- **P6: D8 / C1 widens the phase, as the research flagged ("`/discovery Phase03` should pick that up").** The skill must author a layer assignment; G2 must cover it, and a new G7 checks its structure.
+- **P7: no ordinary brief can be built from today's layers.** Of 173 draft-list rows, the only ones whose relevant layers all exist are the shipped `Copper_Verdigris` and the 5 layer-free `utility/virtual` references (measured with a script over the tables). So layer generation can't stay behind the cut line. It moved from old step 3.4 to a new step 3.3, and click 1 became a reference article (§Reconciled).
+- **P8: C2 (third overlay) was landed by a sibling unit during this pass** (quick fix `001a857`; it was seen live and uncommitted first, then re-checked at commit). No fork: this phase consumes the cap. Its verification recorded `run_all` at 14 PASS / 2 SKIP / 0 FAIL.
+- **P9: the six-token guard (L10) landed in `2b292be`.** The first human test's names were rewritten to the C5 axes. "worn oak planks" became "white oak": "planks" is an assembly (D1), and "worn" would pre-dial a slider, which is N8's open question.
+- **P10: the roughness clamp (Issue #1) changed the assembler's output for 10 articles**, which were regenerated in place. The "12 recipes assemble byte-identically after G1" check now means byte-identical to **today's** committed `.mtlx`, not to the Pass 1 bytes.
+
+**Seed questions from this pass, four-tested:**
+
+| Question | Verdict |
+|---|---|
+| Which unit lands C2? (research L6) | **Fails test 2 (not necessary):** a sibling landed it (P8). |
+| Does Phase03 make all 17 new layers? | **Answered** (test 1) by the structurally identical Pass 1 ruling that filling the library is *Library Coverage*'s job. This phase makes only its briefs' layers. |
+| Should G7 gate slider defaults at 0? | **Fails test 3 (not deliverable)** without breaking shipped Glass/Copper, and the rule itself is open research N8. The skill authors 0; nothing gates it. |
+| Is the draft list the authority for layer choice? | **Answered** (test 1): the research says "nothing is committed". It is a reference, and the skill's rationale plus the lead decide. |
+
 ## Discovery Status
 
-- **Passes captured:** 2 (2026-09-23).
-- **Pass 2:** USDLiveView added as the lead's interactive review surface. It is already built and needs no Stage; it only needs the preview scene that step 3.1 writes anyway. The steps, lane and Q2 are unchanged.
-- **Current working direction:** the Brief above, with 4 vertical steps, `build` lane, and first click at step 3.1.
-- **Open decisions:** Q2 (lead call; affects step 3.3 only, so step 3.1 can start before it is answered).
+- **Passes captured:** 3 (2026-09-23 → 2026-09-25).
+- **Pass 3:** the Brief was re-cut for D8 / C1. There are now 5 vertical steps: the reference article → guards (with G7) → layer generation plus the layered glass → the ambientCG oak → L2 base textures, the cut line. Lane unchanged (`build`: nothing new touches a control). Q2 now also covers generated layers.
+- **Current working direction:** the Brief above, with its first click at step 3.1.
+- **Open decisions:** Q2 (lead call; first needed at step 3.3, so 3.1 and 3.2 can start before it is answered).
+- **Dependencies:** none open. C2 landed in `001a857`.
 - **Checks to carry forward:**
-  - re-verify that the 12 existing recipes assemble byte-identically after G1;
+  - re-verify that the 12 existing recipes assemble byte-identically **to today's committed `.mtlx`** after G1 and G7 (P10);
+  - Pass 2's "USDLiveView shows the draft textured" is now proved at **click 4 or 5**, not click 1, because the grey card has no texture. Click 1 proves only that the scene opens;
   - confirm the skill loads from `.claude/skills/` (the first click proves it);
   - confirm the headless render opens no desktop window;
   - fix `ToolingConventions.md`'s texture-layout drift at doc sync.
