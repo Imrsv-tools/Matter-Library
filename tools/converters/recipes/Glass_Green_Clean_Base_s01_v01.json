@@ -1,0 +1,30 @@
+{
+  "_comment": "Green bottle glass: soda-lime glass tinted green by iron and chromium oxides. TranslucentThin: a bottle wall is a thin shell seen through, the same master as Glass_Clear. The green is transmission_color, authored here, because the Creator tint does not reach what is seen through glass (E2), so a see-through colour is its own article. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust, fingerprints, gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article.",
+  "name": "Glass_Green_Clean_Base_s01_v01",
+  "path": "engineered/glass/Glass_Green_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThin",
+  "domain": "engineered",
+  "class": "glass",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.984, 0.995, 0.995",
+  "roughness_const": 0,
+  "metalness_const": 0,
+  "specular_ior": 1.52,
+  "transmission": 1,
+  "transmission_color": "0.35, 0.70, 0.30",
+  "thin_walled": true,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Glass (Soda-lime)", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.984, 0.995, 0.995", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.52, "transmission": 1},
+     "not_carried": ["transmissionDispersion", "volumeCoefficients"]},
+    {"kind": "judgement", "why": "transmission_color 0.35, 0.70, 0.30: a typical green beverage-bottle tint; Physically Based lists only clear soda-lime."}
+  ]
+}

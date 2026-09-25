@@ -1,0 +1,24 @@
+{
+  "_comment": "Glossy ABS plastic: the moulded, high-gloss finish of appliance and toy housings. Opaque: a solid dielectric. The glossy sibling of the shipped ABS_Matte (same off-white base; colour is the Creator's tint, N5). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints and dust, gated by the Grime mask. Gloss is what makes fingerprints and fine scratches show, so this is the article that judges Fingerprints01.",
+  "name": "ABS_Glossy_Clean_Base_s01_v01",
+  "path": "synthetic/plastic/ABS_Glossy_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "plastic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.85, 0.84, 0.82",
+  "roughness_const": 0.15,
+  "metalness_const": 0.0,
+  "specular_ior": 1.54,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "judgement", "why": "Physically Based has no ABS entry. Base colour follows the shipped ABS_Matte; roughness 0.15 for a moulded gloss finish; IOR 1.54, the literature value for ABS (ABS_Matte authors 1.46)."}
+  ]
+}
