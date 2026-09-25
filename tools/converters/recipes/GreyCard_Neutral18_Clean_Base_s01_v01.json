@@ -1,0 +1,31 @@
+{
+  "_comment": "Calibration reference — the 18% neutral grey card (middle grey). Opaque master: a rough diffuse dielectric with nothing to layer. A utility/virtual reference stays pure: no overlays, no mask, and no Creator controls, so no app can move it off 18% reflectance. Values from Physically Based 'Gray Card'.",
+  "name": "GreyCard_Neutral18_Clean_Base_s01_v01",
+  "path": "utility/virtual/GreyCard_Neutral18_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "utility",
+  "class": "virtual",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.18, 0.18, 0.18",
+  "roughness_const": 0.9,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "lcd_ports": [],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Gray Card",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.18, 0.18, 0.18",
+        "metalness_const": 0,
+        "roughness_const": 0.9,
+        "specular_ior": 1.5
+      }
+    }
+  ]
+}

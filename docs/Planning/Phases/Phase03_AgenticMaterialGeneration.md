@@ -278,4 +278,7 @@ The render opens no window that was observed. It uses Qt xcb on `DISPLAY` (the t
 
 ## Execution Log
 
-_(populated during execution)_
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 3.1 | `68372b2` (tools) · the grey-card commit | ✅ **Lead sitting, 2026-09-25: "kept it, no window, about 3 minutes."** `GreyCard_Neutral18_Clean_Base_s01_v01` kept; the headless render opened no desktop window (carry-forward closed); **review time 3 min** (1st measurement). The run chose `lcd_ports: []` for a calibration reference (no Creator control can move it off 18%); accepted with the keep. | 3.2 |
+| — | — | Open: how the lead launches USDLiveView (`usdliveview` is not on PATH), so the skill prints the scene path only. | ask at 3.3 |
