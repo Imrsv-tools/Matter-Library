@@ -586,7 +586,7 @@ Structure (O11 rulings this list needs; no recommendation forced):
 | L7 | *Narrowed in Pass 5.* **Localised colour or gloss** (moss only in crevices, wet only in patches): is it wanted, and when? Uniform colour and gloss already exist (`base_color_tint`, `roughness_bias`). | A refinement, not a gap. It does not block the list. |
 | L8 | Do the 7 shipped articles without overlays get `v02`, or the in-place `v01` precedent? | Version Management owns it. |
 | L9 | Should the release catalog list each article's layers (and master), so an app can show them without opening the `.mtlx`? | A catalog `schema_version` bump, owned by *Release Bundle and Consumer Contract*. |
-| L10 | Enforce **exactly six tokens** in `check_grammar` (today ≥ 4)? | An agent authoring names needs the guard. A small harness fix (Phase03 G-series or a `/quick-fix`). |
+| ~~L10~~ | **Resolved: landed in `2b292be`.** ~~Enforce **exactly six tokens** in `check_grammar` (today ≥ 4)?~~ | An agent authoring names needs the guard. A small harness fix (Phase03 G-series or a `/quick-fix`). |
 
 ## Status
 
@@ -606,7 +606,7 @@ Structure (O11 rulings this list needs; no recommendation forced):
 - **Lead rulings:** C1 *smart, not lean* (all relevant layers, at strength 0, names unchanged) · C2 *overlay cap raised to 3* · C3 *several articles per matter may carry different overlay sets*.
 - **Draft v1 of the list is complete:** 173 named articles (11 shipped, 162 new) across all 20 classes, including 2 unplaced (snow, ice). Every row has a full stem, a folder, a declared master, a lane, a scale tag, a status and **its wear layers**: 96 carry 3 overlays + mask, 72 carry 2 + mask, and the 5 virtual references carry none. The shared layer library grows from 5 to 22.
 - **Pass 4 overstated a gap and Pass 5 corrects it:** uniform colour and gloss (wet, fading, tarnish) are already Creator controls (`base_color_tint`, `roughness_bias`). Only *localised* colour or gloss is absent (L7, a refinement).
-- **C2 is a contract change still to land** (`MasterSet.md`, `LCDSchema.md`, assembler, validators, Blender, consumers). Pass 5 lists what it touches.
+- **C2 landed** (quick fix `001a857`, 2026-09-25): overlay cap 3, Creator port `overlay3_density`, and the maskset's A channel gates overlay 3. Shipped articles are byte-identical. The consumer side (Stage, UE masters) is `PlatformDependencies.md` P12. **The naming rules (C4/C5/E5) and the six-token check (L10) landed** in quick fix `2b292be`.
 - **140 new articles are buildable with the Phase03 tools alone** (20 of them in a provisional class). The rest wait on carriers C2 (10), C3 (3), optionally C1 (8), or a class ruling (snow, ice).
 - **Direction:** nothing is committed. This is input for the lead's gut check, and later for the *Library Coverage* phase.
 - **Open:** L1–L10. None blocks Phase03's first step, but C1 widens Phase03's scope: the skill must author the layers, and 17 layer textures must be produced. `/discovery Phase03` should pick that up.
