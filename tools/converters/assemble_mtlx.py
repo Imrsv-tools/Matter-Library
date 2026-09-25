@@ -85,6 +85,9 @@ KNOWN_MASTERS = {
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
+# Recipe keys that are not spec fields: harness metadata, not material data (Phase03 G1).
+RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources"}
+
 
 @dataclass
 class Overlay:
@@ -152,9 +155,13 @@ class MaterialSpec:
 
     @staticmethod
     def from_dict(d: dict) -> "MaterialSpec":
-        # Keep only known spec fields, so a recipe may carry harness hints (e.g. "path")
-        # and comment keys ("_comment") without breaking construction.
+        # G1 (Phase03): an unknown key is an ERROR, never silently dropped. A misspelled key
+        # (`roughnes_const`) used to vanish and leave the default in its place. The metadata
+        # keys a recipe may carry are named; everything else must be a spec field.
         fields = {f.name for f in MaterialSpec.__dataclass_fields__.values()}
+        unknown = sorted(set(d) - (fields - {"klass"}) - RECIPE_METADATA_KEYS)
+        if unknown:
+            raise ValueError(f"unknown recipe key(s) {unknown} (tools/converters/recipe.schema.json)")
         kwargs = {k: v for k, v in d.items()
                   if k in fields and k not in ("overlays", "klass")}
         if "class" in d:

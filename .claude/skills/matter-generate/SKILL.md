@@ -58,7 +58,7 @@ Every article carries **all the wear layers relevant to its matter**, up to the 
 
 ## 4. Write the recipe
 
-`tools/converters/recipes/<Stem>.json`. Copy the shape of the nearest existing recipe for the same master (e.g. `ABS_Matte_Clean_Base_s01_v01.json` for a param-only Opaque). Keys:
+`tools/converters/recipes/<Stem>.json`. **Author it against `tools/converters/recipe.schema.json`**: every allowed key, its type and its enums are there, and any other key is refused. Copy the shape of the nearest existing recipe for the same master (e.g. `ABS_Matte_Clean_Base_s01_v01.json` for a param-only Opaque). Keys:
 
 - `_comment` — why this master, and what the article is for (a sentence or two);
 - `name` (= the stem), `path` (`<domain>/<class>/<Stem>.mtlx`), `master`, `domain`, `class`, `scale_tag`, `meters_per_tile`;
@@ -73,7 +73,7 @@ uv run tools/converters/build_proof_subset.py tools/converters/recipes/<Stem>.js
 uv run tools/validators/run_all.py
 ```
 
-The gate must show **0 FAIL** (SKIPs are fine and are reported). On a FAIL: read it, fix the **recipe**, re-assemble, re-run. After three failed attempts, stop and report what fails.
+The gate must show **0 FAIL** (SKIPs are fine and are reported). Its `recipe` lane checks your recipe directly: G1 unknown key, G2 schema, G3 taxonomy, G5 path, G6 physical plausibility, G7 layer assignment. For a quick check of one recipe: `uv run tools/validators/validate_recipe.py tools/converters/recipes/<Stem>.json`. On a FAIL: read it, fix the **recipe**, re-assemble, re-run. After three failed attempts, stop and report what fails.
 
 ## 6. Render and critique
 

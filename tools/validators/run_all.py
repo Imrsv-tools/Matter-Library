@@ -8,6 +8,9 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
   2. per-material            — validate_material.py over MatterLibrary/materials/**.mtlx
   3. manifest                — validate_manifest.py over the newest library/releases/*.lock.yaml
   4. determinism             — recipe .mtlx assembly byte-stability
+  4b. recipe                 — validate_recipe.py over every recipe (G1 keys, G2 schema,
+                               G3 taxonomy, G5 path, G6 plausibility, G7 layers) + the RED
+                               fixtures/recipes/*.json, each rejected by its own guard
   5. catalog freshness/valid — projected runtime catalog is byte-current + rejects dangling ids
   6. provenance / projection — promotion-metadata gates + no-runtime-projection guard
   (7. fixture sync — REMOVED from the gate 2026-09-23: it read a consumer's checkout, and a
@@ -50,6 +53,7 @@ sys.path.insert(0, str(HERE.parent / "releases"))
 
 import validate_material as vm        # noqa: E402
 import validate_manifest as vman      # noqa: E402
+import validate_recipe as vr          # noqa: E402
 from assemble_mtlx import assemble, MaterialSpec  # noqa: E402
 import project_runtime_catalog as prc  # noqa: E402
 import compress_textures as ct        # noqa: E402
@@ -119,6 +123,47 @@ def run_determinism(root: Path) -> bool:
         stable = assemble(spec) == assemble(spec)
         print(f"  [{'PASS' if stable else 'FAIL'}] {spec.name}: {'byte-stable' if stable else 'NON-DETERMINISTIC'}")
         ok = ok and stable
+    return ok
+
+
+# Each RED recipe fixture and the guard that must reject it (fixtures/recipes/).
+RECIPE_FIXTURES = {
+    "unknown_key.json": "G1",
+    "wrong_type.json": "G2",
+    "class_not_in_taxonomy.json": "G3",
+    "path_disagrees.json": "G5",
+    "albedo_above_one.json": "G6",
+    "ior_implausible.json": "G6",
+    "overlay_missing_texture.json": "G7",
+    "too_many_overlays.json": "G7",
+    "dead_mask.json": "G7",
+    "virtual_with_layers.json": "G7",
+}
+
+
+def run_recipe(root: Path) -> bool:
+    """Phase03 3.2: every real recipe passes the recipe guards, and every RED fixture is
+    rejected FOR ITS REASON (the named guard), so the lane is shown working both ways."""
+    recipes = sorted((root / "tools" / "converters" / "recipes").glob("*.json"))
+    if not recipes:
+        print("== recipe == (skip: no tools/converters/recipes/*.json)")
+        return SKIP
+    print("== recipe ==")
+    schema = vr.load_schema()
+    ok = vr.main([str(r) for r in recipes]) == 0
+    fxdir = HERE / "fixtures" / "recipes"
+    found = {p.name for p in fxdir.glob("*.json")}
+    for name in sorted(set(RECIPE_FIXTURES) | found):
+        guard = RECIPE_FIXTURES.get(name)
+        if guard is None or name not in found:
+            print(f"  [FAIL] fixture {name}: {'not registered in RECIPE_FIXTURES' if guard is None else 'missing'}")
+            ok = False
+            continue
+        errs = vr.check_recipe(json.loads((fxdir / name).read_text(encoding="utf-8")), schema)
+        hit = any(e.startswith(guard + " ") for e in errs)
+        print(f"  [{'PASS' if hit else 'FAIL'}] RED {name}: "
+              + (f"rejected by {guard}" if hit else f"NOT rejected by {guard} (got {errs or 'no error'})"))
+        ok = ok and hit
     return ok
 
 
@@ -658,6 +703,7 @@ def main(argv=None) -> int:
         "materials": run_materials(root),
         "manifest": run_manifest(root),
         "determinism": run_determinism(root),
+        "recipe": run_recipe(root),
         "catalog_freshness": run_catalog_freshness(root),
         "catalog_validation": run_catalog_validation(root),
         "provenance_gate": run_provenance_gate(root),

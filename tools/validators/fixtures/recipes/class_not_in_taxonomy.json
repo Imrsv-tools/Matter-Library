@@ -1,0 +1,18 @@
+{
+  "_comment": "RED fixture (Phase03 3.2): class rubber is not in Taxonomy.md. Must be REJECTED by the recipe lane.",
+  "name": "ABS_Matte_Clean_Base_s01_v01",
+  "path": "synthetic/rubber/ABS_Matte_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "rubber",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.85, 0.84, 0.82",
+  "roughness_const": 0.55,
+  "metalness_const": 0.0,
+  "specular_ior": 1.46,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ]
+}

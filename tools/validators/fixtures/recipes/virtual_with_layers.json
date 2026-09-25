@@ -1,0 +1,27 @@
+{
+  "_comment": "RED fixture (Phase03 3.2): a calibration reference carrying a wear layer. Must be REJECTED by the recipe lane.",
+  "name": "Diagnostic_UVGrid_Clean_Base_s1_v01",
+  "path": "utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "utility",
+  "class": "virtual",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/utility/virtual/UVGrid_basecolor_s1.png",
+  "roughness_const": 0.5,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density"
+  ],
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Imrsv-tools/Matter-Library/tools/converters/recipe.schema.json",
+  "title": "Matter Library article recipe",
+  "description": "One JSON recipe per article (tools/converters/recipes/<Stem>.json). The assembler (assemble_mtlx.py) turns it into the .mtlx; nobody hand-writes MaterialX. Checked by the `recipe` lane of run_all.py (validate_recipe.py), which also checks what a schema cannot: the taxonomy (G3), path agreement (G5), physical plausibility (G6) and the layer assignment (G7). Every property here must be a MaterialSpec field or one of the metadata keys (_comment, path, class, sources); the lane checks that too, so this file cannot drift from the assembler.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "path", "master", "domain", "class", "scale_tag", "meters_per_tile", "lcd_ports"],
+  "properties": {
+    "_comment": {"type": "string", "description": "Why this master, what the article is for."},
+    "name": {"type": "string", "pattern": "^[A-Za-z0-9_]{1,63}$", "description": "The stem: Material_Variant_Condition_Detail_sNN_vNN (Identity.md)."},
+    "path": {"type": "string", "pattern": "^[a-z]+/[a-z]+/[A-Za-z0-9_]+\\.mtlx$", "description": "<domain>/<class>/<name>.mtlx under MatterLibrary/materials/."},
+    "master": {"type": "string", "enum": ["Opaque", "Masked", "TranslucentThin", "TranslucentThick", "Subsurface", "TwoLayer", "Emissive", "system"]},
+    "domain": {"type": "string", "enum": ["natural", "engineered", "synthetic", "environmental", "utility"]},
+    "class": {"type": "string", "description": "A class of the domain in Taxonomy.md (checked by G3)."},
+    "scale_tag": {"type": "string", "enum": ["s0001", "s001", "s01", "s1", "s10", "s100", "sUKN"]},
+    "meters_per_tile": {"type": "number", "minimum": 0},
+
+    "base_color_tex": {"type": "string"},
+    "roughness_tex": {"type": "string"},
+    "normal_tex": {"type": "string"},
+    "metalness_tex": {"type": "string"},
+    "base_color_const": {"$ref": "#/$defs/color3"},
+    "roughness_const": {"type": "number"},
+    "metalness_const": {"type": "number"},
+    "specular_ior": {"type": "number"},
+    "transmission": {"type": "number"},
+    "emission_color": {"$ref": "#/$defs/color3"},
+    "emission_luminance": {"type": "number", "minimum": 0},
+
+    "opacity_tex": {"type": "string"},
+    "transmission_color": {"$ref": "#/$defs/color3"},
+    "transmission_depth": {"type": "number", "minimum": 0},
+    "thin_walled": {"type": "boolean"},
+    "subsurface_weight": {"type": "number"},
+    "subsurface_color": {"$ref": "#/$defs/color3"},
+    "subsurface_radius": {"type": "number", "minimum": 0},
+    "subsurface_radius_scale": {"$ref": "#/$defs/color3"},
+
+    "opacity_cutoff": {"type": "number"},
+    "layer_blend_balance": {"type": "number"},
+    "layer_blend_contrast": {"type": "number"},
+    "layer2_base_color_tex": {"type": "string"},
+    "layer2_roughness_tex": {"type": "string"},
+    "layer2_metalness_tex": {"type": "string"},
+    "layer2_normal_tex": {"type": "string"},
+    "layer2_base_color": {"$ref": "#/$defs/color3"},
+    "layer2_roughness": {"type": "number"},
+    "layer2_metalness": {"type": "number"},
+
+    "overlays": {
+      "type": "array",
+      "description": "Shared wear layers, overlay 1 first (overlay 1 = the damage layer). The cap is MAX_OVERLAYS in assemble_mtlx.py (checked by G7, never written here).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["texture", "density_port"],
+        "properties": {
+          "texture": {"type": "string"},
+          "density_port": {"type": "string", "enum": ["overlay1_density", "overlay2_density", "overlay3_density"]}
+        }
+      }
+    },
+    "maskset_tex": {"type": "string"},
+    "lcd_ports": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"]}
+    },
+    "lcd_defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "base_color_tint": {"$ref": "#/$defs/color3"},
+        "uv_scale": {"type": "string"},
+        "uv_offset": {"type": "string"},
+        "uv_rotation": {"type": "string"},
+        "overlay1_density": {"type": "string"},
+        "overlay2_density": {"type": "string"},
+        "overlay3_density": {"type": "string"},
+        "maskset_blend": {"type": "string"},
+        "roughness_bias": {"type": "string"}
+      }
+    },
+    "include_metadata": {"type": "boolean"},
+
+    "sources": {
+      "type": "array",
+      "description": "Where the grounded values came from (research O6): a Physically Based record from lookup_physically_based.py, or {kind: judgement, why}.",
+      "items": {
+        "type": "object",
+        "required": ["kind"],
+        "properties": {"kind": {"type": "string", "enum": ["physicallybased", "judgement", "ambientcg", "procedural"]}}
+      }
+    }
+  },
+  "$defs": {
+    "color3": {"type": "string", "pattern": "^\\s*-?[0-9.]+(e-?[0-9]+)?\\s*,\\s*-?[0-9.]+(e-?[0-9]+)?\\s*,\\s*-?[0-9.]+(e-?[0-9]+)?\\s*$", "description": "\"r, g, b\" in linear sRGB (lin_rec709)."}
+  }
+}
