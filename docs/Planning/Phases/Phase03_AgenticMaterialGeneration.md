@@ -290,3 +290,27 @@ The render opens no window that was observed. It uses Qt xcb on `DISPLAY` (the t
 | 3.4 | `c342503` (tooling) · the keep commit | ✅ **Lead, in USDLiveView: "Looks great!"**, then "Yep... OK! carry on" (2026-09-25): `Scuffs01` and `Oak_Natural` kept; the layer-scale fix goes on the Roadmap before *Library Coverage*. The lead could not tune the layers: USDLiveView has no LCD controls yet (its own Phase 04, parked on IMRSV_Stage#169), so dialled-up layers are opened as their own scenes. `import_ambientcg.py` (one allowlisted CC0 host; maps copied verbatim at 1K; provenance + CREDITS row + `meters_per_tile` from the asset's real size). `Scuffs01` generated through the skill's §3a (iterated once: the first cut read as tape strips). `Oak_Natural_Clean_Base_s1_v01` from ambientCG Wood049 (named Oak: the source gives no species). Gate green. **Finding (not fixed; library-wide):** overlays and the mask share the article's UV placement, so a layer's own scale tag has no effect: `Scuffs01` (0.1 m) is stretched 8x on the oak, and the shipped `Dust01` (0.01 m) 100x on the 1 m Concrete. A contract change (assembler graph + every consumer master), for the lead to place. Also: the evidence note inherited from `compute_evidence` says "NOT byte-identical to the upstream download", which is false for these verbatim copies. | 3.5 |
 | 3.5 | `ecfbdb7` (tooling) · the keep commit | ✅ **Lead, in USDLiveView: "Yep! They looked ok"** (2026-09-25): `Earthenware_Natural`, `EdgeWear01`, `Crevice01` kept; review time not stated. Agent's own render (wear at full) read as matte, pitted, chipped earthenware. `tileable.py` (seamless noise, wrap-around gradients: the older helpers do not tile); `Earthenware_Natural` base set (mean linear albedo anchored exactly to Physically Based `Terracotta`; wrap edges measured seamless); `EdgeWear01` (overlay, chips thinned once, 14% → 9% coverage) and `Crevice01` (mask). Gate 15 PASS / 2 SKIP / 0 FAIL. | close |
 | — | — | ~~Open: how the lead launches USDLiveView~~ Closed at 3.4: the agent launches it (`USDLiveView/usdliveview <scene>`, `IMRSV_MATTER_SOURCE` set). | — |
+
+## Resume — the close is IN PROGRESS, stopped by the lead's `/retro` (2026-09-25)
+
+All five steps are ✅ and the lead said "close". The close ran rows A⁻ and A0 and stopped partway through row A. **Nothing of the close is committed.**
+
+- **Row A⁻:** `origin/main` is not ahead; 15 commits were unpushed at the time (none of this phase is pushed).
+- **Row A0:** not armed. The Outcome has no absolute quantifier.
+- **Row A, in flight: the uncommitted state in the tree.**
+  - `gen_fingerprints01.py` and `gen_scuffs01.py` now use `tileable.py` (a correction: both claimed "seamless" and measured a faint seam — Fingerprints01 y-edge 3.6 vs 1.5 neighbour; Scuffs01 2.0 vs 0.4).
+  - **Texture state is ANOMALOUS, do not commit it blind:** `Fingerprints01_overlay_s01.png` was regenerated (seamless: y 1.27 vs 1.25) but shows in `git status` as **staged** (`MM`), which this run never did. `Scuffs01_overlay_s01.png` was deleted, yet the generator then refused because the file existed again, and it still measures the old seam. Resolve before the close commit: check for another session, then remove and regenerate `Scuffs01`, re-measure both, and re-open both in USDLiveView for the lead (the pixels change slightly).
+- **Row A, still to do (the deferral ledger):**
+
+| Item | Disposition |
+|---|---|
+| Fingerprints01 / Scuffs01 seams | **fix** (in flight, above) |
+| `import_ambientcg.py` records the inherited `compute_evidence` note "NOT byte-identical to the upstream download", false when every map was copied verbatim (`Oak_Natural.yaml`) | **fix**: write an accurate note when all maps are verbatim; correct `Oak_Natural.yaml` |
+| Doc sync from the Brief: `AuthoringHarness.md`, `AuthoringGoldenPath.md` §Future-toolchain, `ToolingConventions.md` (the skill root; `tools/converters/{layers,base}/`, `tileable.py`, `import_ambientcg.py`, `lookup_physically_based.py`, `recipe.schema.json`; the 17th `recipe` lane; the flat texture layout drift), `CONTRIBUTING.md` (point at the skill), `docs/specs/Distribution/ReleaseModel.md` if it says a freeze covers every PNG (now: the lock's textures) | **fix** |
+| Shipped `Dust01` (and probably the other pre-Phase03 layers) do not tile: wrap edge 66 vs 4 | **deferred as an ADDITION** (a pre-existing defect found here); recommend it joins *Wear Layers at Their Own Scale*, which regenerates the layers anyway |
+| Overlay/mask scale ignored (every layer tiles with the article) | deferred ADDITION → Roadmap *Wear Layers at Their Own Scale* (lead-agreed) |
+| Preview cannot show see-through matter; `usdrecord` lighting barely responds | deferred ADDITION → *Parity Baselines* (lead-agreed) |
+| USDLiveView LCD sliders | other project (its Phase 04; parked on IMRSV_Stage#169) |
+| Review time measured once only (3 min, grey card) | recorded; the lead did not give the others |
+
+- **Then rows B (move the doc, Roadmap entry to `## Complete`, finalize the Status), D (the `🎉` commit) and E (the push, which is the lead's).**
