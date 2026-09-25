@@ -29,7 +29,7 @@ Read what you need, then tell the maintainer your plan in a short block and cont
 | **Name** `Material_Variant_Condition_Detail_sNN_vNN` — exactly six tokens | `docs/specs/Ontology/Identity.md`. Material = the matter/species · Variant = the look (default `Natural`) · Condition = damage (overlay 1; `Clean` for a new draft) · Detail = other layers (overlays 2–3; `Base` for a new draft). ≤63 chars, `[A-Za-z0-9_]`. A see-through colour is its own article (`Glass_Green`). |
 | **Scale tag** | the closed set in `docs/NamingConventions.md`; param-only articles use `s01` |
 | **Version** `vNN` | the next free integer for that stem: look in `tools/converters/recipes/` and `MatterLibrary/materials/` |
-| **Lane** | **L1 param-only** (constants from Physically Based) — available now. L3 (an ambientCG scan) and L2 (generated textures) arrive in later steps of Phase03: if the brief needs one, say so and stop. |
+| **Lane** | **L1 param-only** (constants from Physically Based) or **L3 an ambientCG scan** (§2a) — both available. L2 (generated base textures) arrives in a later step of Phase03: if the brief needs it, say so and stop. |
 | **Wear layers** | §3 below |
 
 `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md` has a draft list of ~170 articles with a master, lane and layer set per row. **Use it as a reference, not an authority** — it is research, and nothing in it is committed. If your plan differs from its row, say why.
@@ -44,6 +44,18 @@ uv run tools/converters/lookup_physically_based.py show "<Exact Name>"
 `show` prints the recipe constants the entry implies (`used`) and a ready-made `source` record. Copy the constants into the recipe and put the `source` record in the recipe's `sources` list, unchanged. A clamp (a linear colour above 1.0) is recorded in the record; mention it in the critique. `not_carried` lists values the library has no carrier for yet (e.g. a metal's F82 `specularColor`); name them in the critique.
 
 No matching entry? Choose the values yourself, add a `sources` record `{"kind": "judgement", "why": "<one sentence>"}`, and say so in the plan.
+
+## 2a. A scanned material (L3): import an ambientCG set
+
+```sh
+uv run tools/converters/import_ambientcg.py search <word>
+uv run tools/converters/import_ambientcg.py info <AssetId>
+uv run tools/converters/import_ambientcg.py import <AssetId> --set <Material>_<Variant> --slot <domain>/<class> --scale <sNN> --article <Stem>
+```
+
+- **Pick by the tags and the physical size**, and say which asset and why in the plan. Name only what the source states: "oak", not "white oak", unless it says the species.
+- `import` writes the maps (`basecolor`, `roughness`, `normal` as NormalGL, `metalness`, `opacity`) flat into the class folder, records provenance under `library/provenance/sources/`, adds the CREDITS.md row, and prints `meters_per_tile` from the asset's real size. Use that value, and the nearest scale tag.
+- It fetches only from ambientCG (CC0) and refuses to overwrite. Physically Based rarely has an entry for a scanned matter; record any constant you add (e.g. `specular_ior`) as judgement.
 
 ## 3. Assign the wear layers (lead ruling C1, "smart, not lean")
 
@@ -97,6 +109,7 @@ uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>
 - does it read as the matter in the brief — colour, gloss, translucency?
 - the grounded values, and any clamp or `not_carried` value;
 - the layers it carries (all at 0, so invisible in this render) or why it carries none;
+- **layer scale**: every overlay and the mask tile with the article's UVs, so a layer's own scale tag has no effect. A 10 cm layer on a 0.8 m article is stretched 8x (a library-wide limitation, recorded in Phase03). Say so when the scales differ a lot;
 - what the library cannot express yet for this matter (e.g. "metal: no F82 edge tint", "satin: no sheen", "brushed: no anisotropy");
 - **see-through matter** (any `transmission` > 0 — glass, gems, liquids, clear plastics): say plainly that **the preview cannot show it**. The only renderer here (Storm, via `usdrecord`) ignores `transmission_color` and renders `transmission = 1.0` black (it has no opacity floor; the engine masters do — MasterSet.md §Opacity floor). Never fudge the recipe to make the preview look right. The colour is judged in an engine, later (*Parity Baselines* owns a proper preview);
 - anything the maintainer should look at closely.
