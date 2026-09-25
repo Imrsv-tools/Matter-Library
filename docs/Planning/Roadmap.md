@@ -20,9 +20,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
 - `docs/Planning/Phases/Future/Phase04_WearLayersAtTheirOwnScale.md`
 
-### Library Coverage — RESEARCH
+### Phase05 — Library Coverage — SEEDED
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md` (the draft list) · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 9) · `docs/Planning/PlatformDependencies.md` (M1) · `docs/specs/Ontology/Taxonomy.md`
+- `docs/Planning/Phases/Future/Phase05_LibraryCoverage.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
