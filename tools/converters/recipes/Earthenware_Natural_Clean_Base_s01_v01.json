@@ -1,0 +1,27 @@
+{
+  "_comment": "Unglazed earthenware: low-fired, porous, matte clay (flowerpots, terracotta ware). Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_earthenware_natural.py) with their MEAN albedo anchored to Physically Based `Terracotta` (terracotta is unglazed earthenware). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust (overlay 2), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant.",
+  "name": "Earthenware_Natural_Clean_Base_s01_v01",
+  "path": "engineered/ceramic/Earthenware_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "ceramic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/ceramic/Earthenware_Natural_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/ceramic/Earthenware_Natural_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/ceramic/Earthenware_Natural_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Terracotta", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.555, 0.212, 0.11", "metalness_const": 0, "roughness_const": 1.0, "specular_ior": 1.5},
+     "note": "base_color_const is the MEAN of the generated basecolor texture (linear); roughness 1.0 is its ceiling"},
+    {"kind": "procedural", "script": "tools/converters/base/gen_earthenware_natural.py", "provenance": "library/provenance/sources/base/engineered/ceramic/Earthenware_Natural.yaml"}
+  ]
+}

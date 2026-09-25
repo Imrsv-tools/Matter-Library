@@ -1,0 +1,11 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A, 2026-09-25).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: shared/masks/Crevice01    # MASK (R layer-2 · G/B/A overlay gates)
+version: v01
+files:
+  - MatterLibrary/textures/shared/masks/Crevice01_s01.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/layers/gen_crevice01.py
