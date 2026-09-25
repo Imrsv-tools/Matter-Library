@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
@@ -84,6 +85,23 @@ KNOWN_MASTERS = {
 }
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
+
+# Scale tag -> metres per UV tile (Identity.md §Scale tags). A SHARED layer (overlay or
+# maskset) is sampled at its own size (Phase04): its tag IS its size, so `sUKN` is refused.
+SCALE_TAG_METRES = {
+    "s0001": 0.001, "s001": 0.01, "s01": 0.1, "s1": 1.0, "s10": 10.0, "s100": 100.0,
+}
+_LAYER_TAG_RE = re.compile(r"_(s\d+|sUKN)\.png$")
+
+
+def layer_size_m(path: str) -> float:
+    """A shared layer's real-world size, read off its filename scale tag (Identity.md)."""
+    m = _LAYER_TAG_RE.search(path)
+    if not m or m.group(1) not in SCALE_TAG_METRES:
+        raise ValueError(
+            f"shared layer {path!r} has no sized scale tag — a layer is sampled at its own "
+            f"size, so its tag must be one of {sorted(SCALE_TAG_METRES)} (not sUKN)")
+    return SCALE_TAG_METRES[m.group(1)]
 
 # Recipe keys that are not spec fields: harness metadata, not material data (Phase03 G1).
 RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources"}
@@ -229,6 +247,13 @@ def _check_spec(spec: MaterialSpec) -> None:
         raise ValueError(
             "opacity_cutoff needs an opacity source to threshold — a cutoff with nothing to "
             "threshold makes no holes.")
+    layers = [o.texture for o in spec.overlays] + ([spec.maskset_tex] if spec.maskset_tex else [])
+    if layers and not spec.meters_per_tile > 0:
+        raise ValueError(
+            "an article carrying layers needs meters_per_tile > 0: each layer is sampled at "
+            "its own size RELATIVE to the article's tile (Phase04)")
+    for path in layers:
+        layer_size_m(path)   # raises on an unsized (sUKN / untagged) layer
 
 
 def assemble(spec: MaterialSpec) -> str:
@@ -326,12 +351,27 @@ def assemble(spec: MaterialSpec) -> str:
     # reads each node's `file` into the matching wire field.
     # The maskset loads color3 (R/G/B) unless a third overlay needs its A channel as a gate:
     # only then color4, so an article with <= 2 overlays assembles byte-identically to before.
+    # Phase04: a SHARED layer is sampled at its OWN real-world size. The render-role node is
+    # a MaterialX `tiledimage` whose stdlib graph computes uv / realworldimagesize *
+    # realworldtilesize, fed from `uv_place`, so the Creator's UV controls still move the
+    # whole material together. Both sizes are fixed author data on the render-role node,
+    # beside its `file` (LCDSchema.md §Render-role texture nodes).
+    def _layer_image(node_name, typ, path):
+        n = ng.addNode("tiledimage", node_name, typ)
+        n.setColorSpace(DATA_COLORSPACE)
+        _add_input(n, "file", "filename", value=path)
+        _add_input(n, "texcoord", "vector2", nodename="uv_place")
+        img_m, tile_m = layer_size_m(path), spec.meters_per_tile
+        _add_input(n, "realworldimagesize", "vector2", value=f"{img_m:g}, {img_m:g}")
+        _add_input(n, "realworldtilesize", "vector2", value=f"{tile_m:g}, {tile_m:g}")
+        return n
+
     mask_type = "color4" if len(spec.overlays) >= 3 else "color3"
     if spec.maskset_tex:
-        _image("maskset_tex", mask_type, spec.maskset_tex, colorspace=DATA_COLORSPACE)
+        _layer_image("maskset_tex", mask_type, spec.maskset_tex)
     for i, ov in enumerate(spec.overlays, start=1):
         # color4 — the alpha (mask density) is load-bearing.
-        _image(f"overlay{i}_tex", "color4", ov.texture, colorspace=DATA_COLORSPACE)
+        _layer_image(f"overlay{i}_tex", "color4", ov.texture)
 
     # --- TwoLayer blend factor `t` (MasterSet.md, frozen — the producer and the UE master
     # are two implementations of ONE formula):

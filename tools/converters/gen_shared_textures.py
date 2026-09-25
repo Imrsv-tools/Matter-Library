@@ -29,8 +29,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import sys
+
 import numpy as np
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import tileable  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 SHARED = ROOT / "MatterLibrary" / "textures" / "shared"
@@ -39,20 +44,21 @@ SIZE = 1024
 
 
 def _value_noise(size: int, scale: int, seed: int) -> np.ndarray:
-    """Smooth value noise in [0,1] from a fixed seed (deterministic)."""
-    rng = np.random.RandomState(seed)
-    low = rng.rand(scale, scale).astype(np.float64)
-    img = Image.fromarray((low * 255).astype(np.uint8)).resize((size, size), Image.BICUBIC)
-    return np.asarray(img, dtype=np.float64) / 255.0
+    """Smooth PERIODIC value noise in [0,1] from a fixed seed (deterministic, seamless).
+
+    Phase04 4.1: was a bicubic resize of a random grid, which does not wrap, so every layer
+    showed a seam once per tile (measured: Dust01 wrap edge 66 vs 19 interior). Seeds and
+    grid scales are unchanged, so each layer keeps its structure."""
+    return tileable.noise(scale, seed, size)
 
 
 def _gradients(height: np.ndarray, strength: float) -> tuple:
     """Tangent-space normal XY from a height field, encoded to [0,1] (0.5 = flat).
 
     A packed overlay carries the PERTURBATION, so the encoding matches the master's decode:
-    `normal_xy = tex.RG * 2 - 1`. Wrapped gradients keep the tile seamless.
+    `normal_xy = tex.RG * 2 - 1`. Wrap-around gradients keep the tile seamless.
     """
-    dy, dx = np.gradient(height)
+    dx, dy = tileable.grad(height)
     return (np.clip(-dx * strength * 0.5 + 0.5, 0, 1),
             np.clip(-dy * strength * 0.5 + 0.5, 0, 1))
 

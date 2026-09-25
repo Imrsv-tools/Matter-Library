@@ -24,8 +24,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import sys
+
 import numpy as np
 from PIL import Image
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import tileable  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 BASE = ROOT / "MatterLibrary" / "textures" / "base"
@@ -151,13 +156,16 @@ def gen_rust() -> None:
     # high-contrast edge so the boundary between steel and rust is unmistakable at the smoke
     # (and so layer_blend_balance/contrast visibly MOVE that boundary, which is what the two
     # blend controls exist to prove).
-    bloom = _value_noise(SIZE, 20, seed=321)
-    creep = _value_noise(SIZE, 72, seed=323)
+    # Phase04 4.1: the maskset is a SHARED layer sampled at its own size, so it must tile;
+    # periodic noise (tileable.py), same seeds and scales. The per-article textures above
+    # are unchanged.
+    bloom = tileable.noise(20, 321, SIZE)
+    creep = tileable.noise(72, 323, SIZE)
     coverage = np.clip((bloom * 0.75 + creep * 0.25 - 0.30) * 2.6, 0, 1)
     rgba = np.stack([
         coverage,                                 # R: layer-2 (rust) coverage
-        _value_noise(SIZE, 40, seed=325),         # G: overlay-1 gate
-        _value_noise(SIZE, 88, seed=327),         # B: overlay-2 gate
+        tileable.noise(40, 325, SIZE),            # G: overlay-1 gate
+        tileable.noise(88, 327, SIZE),            # B: overlay-2 gate
         np.ones((SIZE, SIZE)),                    # A: reserved (v1)
     ], axis=-1)
     _save(Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), "RGBA"),

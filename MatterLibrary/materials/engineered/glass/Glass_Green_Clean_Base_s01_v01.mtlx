@@ -19,22 +19,30 @@
       <input name="offset" type="vector2" interfacename="uv_offset" />
       <input name="rotate" type="float" interfacename="uv_rotation" />
     </place2d>
-    <image name="maskset_tex" type="color4" colorspace="lin_rec709">
+    <tiledimage name="maskset_tex" type="color4" colorspace="lin_rec709">
       <input name="file" type="filename" value="../../../textures/shared/masks/Grime01_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
-    <image name="overlay1_tex" type="color4" colorspace="lin_rec709">
+      <input name="realworldimagesize" type="vector2" value="0.1, 0.1" />
+      <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
+    </tiledimage>
+    <tiledimage name="overlay1_tex" type="color4" colorspace="lin_rec709">
       <input name="file" type="filename" value="../../../textures/shared/overlays/Scratches01_overlay_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
-    <image name="overlay2_tex" type="color4" colorspace="lin_rec709">
+      <input name="realworldimagesize" type="vector2" value="0.01, 0.01" />
+      <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
+    </tiledimage>
+    <tiledimage name="overlay2_tex" type="color4" colorspace="lin_rec709">
       <input name="file" type="filename" value="../../../textures/shared/overlays/Dust01_overlay_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
-    <image name="overlay3_tex" type="color4" colorspace="lin_rec709">
+      <input name="realworldimagesize" type="vector2" value="0.01, 0.01" />
+      <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
+    </tiledimage>
+    <tiledimage name="overlay3_tex" type="color4" colorspace="lin_rec709">
       <input name="file" type="filename" value="../../../textures/shared/overlays/Fingerprints01_overlay_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
+      <input name="realworldimagesize" type="vector2" value="0.1, 0.1" />
+      <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
+    </tiledimage>
     <extract name="maskset_gate1" type="float">
       <input name="in" type="color4" nodename="maskset_tex" />
       <input name="index" type="integer" value="1" />

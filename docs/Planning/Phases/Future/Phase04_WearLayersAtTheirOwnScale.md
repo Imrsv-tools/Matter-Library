@@ -1,6 +1,6 @@
 # Phase04 — Wear Layers at Their Own Scale
 
-**Status:** BRIEF COMPLETE (discovery Pass 1, 2026-09-25) → ready for `/execute`, with one lead call open (§Lead calls, L1; it gates only the last task of 4.1). **Lane: `build`** (verified: §Risk lane). Numbered by the lead, 2026-09-25, verbatim: *"i and then seed phase 5 and that will be building materials"*. That carries out the Phase03 step 3.4 agreement that "the layer-scale fix goes on the Roadmap before *Library Coverage*".
+**Status:** IN EXECUTION (2026-09-25). Step 4.1 is built and awaiting the lead's sitting; L1 is still open (it gates only the pilot re-freeze). Brief completed at discovery Pass 1. **Lane: `build`** (verified: §Risk lane). Numbered by the lead, 2026-09-25, verbatim: *"i and then seed phase 5 and that will be building materials"*. That carries out the Phase03 step 3.4 agreement that "the layer-scale fix goes on the Roadmap before *Library Coverage*".
 
 ## Outcome
 
@@ -135,4 +135,7 @@ The controls, read: `promote_release.py` (the sole approval flip), `freeze_relea
 
 ## Execution Log
 
-_(populated during execution)_
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 4.1 build | the "Phase04 4.1 WIP" commit | The 5 layers are regenerated seamless (every wrap diff ≤ interior; per-article textures byte-identical). The assembler emits `tiledimage` layer nodes and refuses an unsized layer or `meters_per_tile ≤ 0`. The 8 layered articles are re-assembled; the other 9 are byte-identical. Gate: 14 PASS / 2 SKIP (encoder) / **1 FAIL `release_verify`**, as expected: the pilot's payload moved, and that clears at the re-freeze (L1). **Executor's own render:** the Oak's Scuffs01 now repeats at hand size. At full strength, Dust01 and Scratches01 (tagged 1 cm) read only as a matte film at preview distance. **Hypothesis for the sitting:** their *content* was tuned at about 10 cm, so the tag, not the sampling, may be what is wrong. | lead sitting (First human test); L1 |
+| Divergence | — | **Execute's "gates are frozen" overrides the Brief's planned seam and size guard lanes:** not authored; they are asked as a YOUR CALL instead. The assembler's own input checks stay (tool validation, not a gate). | — |

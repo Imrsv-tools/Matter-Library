@@ -18,10 +18,12 @@
       <input name="offset" type="vector2" interfacename="uv_offset" />
       <input name="rotate" type="float" interfacename="uv_rotation" />
     </place2d>
-    <image name="maskset_tex" type="color3" colorspace="lin_rec709">
+    <tiledimage name="maskset_tex" type="color3" colorspace="lin_rec709">
       <input name="file" type="filename" value="../../../textures/shared/masks/RustBloom01_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-    </image>
+      <input name="realworldimagesize" type="vector2" value="0.1, 0.1" />
+      <input name="realworldtilesize" type="vector2" value="0.5, 0.5" />
+    </tiledimage>
     <extract name="maskset_r" type="float">
       <input name="in" type="color3" nodename="maskset_tex" />
       <input name="index" type="integer" value="0" />
