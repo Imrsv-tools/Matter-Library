@@ -16,9 +16,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Future
 
-### Release Bundle and Consumer Contract — RESEARCH
+### Phase04 — Release Bundle and Consumer Contract — SEEDED
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Passes 4 and 9, seed 3) · `docs/specs/Consumers.md` · `docs/Planning/PlatformDependencies.md`
+- `docs/Planning/Phases/Future/Phase04_ReleaseBundleConsumerContract.md`
 
 ### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
 **Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
