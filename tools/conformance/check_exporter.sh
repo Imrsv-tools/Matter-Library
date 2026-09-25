@@ -10,7 +10,8 @@
 #   shared   — two meshes share ONE datablock -> exporter SPLITS to per-mesh instance prims (§2)
 #   renamed  — datablock renamed off its identity, durable property carries identity (§1)
 # Each scenario runs: real export -> assert_profile lightweight -> usdchecker + usdcat --flatten
-# -> pxr binding-resolution + instance-uniqueness + identity check.
+# -> pxr binding-resolution + instance-uniqueness + identity check -> check_lcd_carrier.py (every
+# Creator override is a connected Material input, LCDSchema §Carrier rule, Matter-Library#1).
 #
 # Exit 0 iff every check passes. Companion to check_conformance.sh (which validates the golden).
 set -uo pipefail
@@ -92,6 +93,9 @@ print("  [%s] every instance carries assetInfo:identifier == %r (§1 durable car
 print("  => bindings: %s (%d meshes)" % ("OK" if ok else "VIOLATION", len(bound)))
 sys.exit(0 if ok else 1)
 PYEOF
+
+  echo "### 5. Creator overrides are connected Material inputs (LCDSchema §Carrier rule, Matter-Library#1)"
+  "$PY" "$CONF/check_lcd_carrier.py" "$USDA" || rc=1
 }
 
 run_portable() {
@@ -129,6 +133,9 @@ run_portable() {
     echo "  usdcat --flatten: FAIL"; cat "$OUT/portable.err"; rc=1
   fi
 
+  echo "### 3b. Creator overrides are connected Material inputs (no search path)"
+  ( unset PXR_AR_DEFAULT_SEARCH_PATH; cd "$POUT" && "$PY" "$CONF/check_lcd_carrier.py" creator_copper_portable.usda ) || rc=1
+
   echo "### 4. Independence structure: every bare library ref rewritten local"
   if grep -qE 'references = @[A-Za-z0-9_]+\.mtlx@' "$USDA"; then
     echo "  [FAIL] a bare @Name.mtlx@ library ref survived in the portable .usda"; rc=1
@@ -148,6 +155,14 @@ if "$PY" "$REPO/blender/addons/imrsv_lcd_export/test_lcd_portable.py"; then
   echo "  lcd_portable unit: PASS"
 else
   echo "  lcd_portable unit: FAIL"; rc=1
+fi
+
+echo ""
+echo "======== UNIT: check_lcd_carrier goes RED on an unconnected override ========"
+if "$PY" "$CONF/test_check_lcd_carrier.py" > "$OUT/carrier_unit.log" 2>&1; then
+  echo "  check_lcd_carrier unit: PASS"
+else
+  echo "  check_lcd_carrier unit: FAIL"; grep -E "^(PASS|FAIL):" "$OUT/carrier_unit.log"; rc=1
 fi
 
 echo ""

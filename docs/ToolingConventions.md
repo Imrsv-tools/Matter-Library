@@ -18,7 +18,7 @@
 | `tools/validators/` | the structural gate `run_all.py` and its checks (`validate_material.py`, `validate_manifest.py`, `check_determinism.py`, `check_fixture_sync.py`, `source_provenance.py`) + `fixtures/` | Apache-2.0 |
 | `tools/releases/` | the release lifecycle: `stage_release.py` → `freeze_release.py` → `promote_release.py` (+ `validate_approval.py`) → `activate_release.py` | Apache-2.0 |
 | `tools/compressors/` | BCn compression (`compress_textures.py`) + negative fixtures | Apache-2.0 |
-| `tools/conformance/` | Creator-asset and parity checks: `assert_profile.py`, the `check_*.sh` wrappers, `codec_ab.py`, `build_ocio_parity_config.py`, the Blender slice exporters, `golden/`, `fixtures/` | Apache-2.0 |
+| `tools/conformance/` | Creator-asset and parity checks: `assert_profile.py`, `check_lcd_carrier.py` (+ `test_check_lcd_carrier.py`), the `check_*.sh` wrappers, `codec_ab.py`, `build_ocio_parity_config.py`, the Blender slice exporters, `golden/`, `fixtures/` | Apache-2.0 |
 | `tools/generators/` | the Blender Asset-Browser library generator (`gen_asset_library.py`, `matter_proxy.py`) | Apache-2.0 |
 | `tools/preview_generators/` | usdview/usdrecord preview wrapper | Apache-2.0 |
 | `tools/usd-toolchain/` | the pinned OpenUSD + MaterialX build recipe (`environment.yml`, `build-usd-tools.sh`, `run-all.sh`) | Apache-2.0 |

@@ -16,6 +16,7 @@ The release machinery exists and has cut one pilot (`matterlib-0.1.0`). What has
 - Immutability after promotion enforced by a gate (a changed file under a shipped `vNN` is rejected), not just stated.
 - The semver bump rule applied and checked.
 - **Open question:** does immutability bind in `0.x`, or only from `1.0`, given that `0.1.0` is a pilot (lead R7/R8)? *(Also a `Reevaluate` in `docs/specs/Contract/Manifest.md`.)*
+  - **Precedent (2026-09-24, Matter-Library#1):** asked whether a roughness clamp should ship as new `_v02` articles in a new release or as an in-place edit of the approved `v01`, the lead answered *"Fix forward only... we have no legacy projects yet"*. The 10 affected `v01` articles were regenerated in place and `matterlib-0.1.0` was re-frozen and re-approved (`4ed38dc`, `4172c74`). That is a ruling for this case while no consumer holds a release, not yet the general rule this question asks for; this phase states the general rule.
 
 ## The original draft (2026-05-30), marked
 

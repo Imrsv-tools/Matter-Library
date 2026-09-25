@@ -18,7 +18,12 @@
       <input name="in1" type="float" nodename="roughness_const" />
       <input name="in2" type="float" interfacename="roughness_bias" />
     </add>
-    <output name="roughness_out" type="float" nodename="roughness_biased" />
+    <clamp name="roughness_biased_clamped" type="float">
+      <input name="in" type="float" nodename="roughness_biased" />
+      <input name="low" type="float" value="0.0" />
+      <input name="high" type="float" value="1.0" />
+    </clamp>
+    <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
   </nodegraph>
   <open_pbr_surface name="SR_ABS_Matte_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />

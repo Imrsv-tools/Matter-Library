@@ -454,7 +454,13 @@ def assemble(spec: MaterialSpec) -> str:
         biased = ng.addNode("add", "roughness_biased", "float")
         _add_input(biased, "in1", "float", nodename=rough_src)
         _add_input(biased, "in2", "float", interfacename="roughness_bias")
-        rough_src = "roughness_biased"
+        # Clamp the biased total to [0,1] (LCDSchema.md, `roughness_bias`): OpenPBR does not clamp
+        # specular_roughness, so a negative total would render ROUGH in a stock viewer while the
+        # Unreal masters (which clamp) render it glossy. The article owns the clamp.
+        rough_src = _node("clamp", "roughness_biased_clamped", "float",
+                          **{"in": ("float", "nodename", "roughness_biased"),
+                             "low": ("float", "value", 0.0),
+                             "high": ("float", "value", 1.0)})
     ng.addOutput("roughness_out", "float").setNodeName(rough_src)
 
     # --- Metalness: a graph output whenever a texture OR a second layer exists ---

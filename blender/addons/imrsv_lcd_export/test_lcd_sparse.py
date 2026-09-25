@@ -12,7 +12,8 @@ Two layers (mirrors test_lcd_transform.py's split):
     materials (one untouched, one tinted) each with an on-disk image texture, runs the add-on's
     `export_lcd_usd`, then asserts against the exported `.usda`:
        - the UNTOUCHED material carries ZERO `inputs:` LCD overrides,
-       - the TINTED material carries exactly `color3f inputs:base_color_tint`,
+       - the TINTED material carries exactly `color3f inputs:base_color_tint`, CONNECTED from
+         its article's `NG_<id>` (LCDSchema §Carrier rule), and the untouched one no connection,
        - ZERO Matter-texture files are copied into the export dir (export_textures_mode='PRESERVE'),
        - the bridge ID custom-props are cleaned up (source materials byte-unchanged).
 
@@ -102,12 +103,14 @@ def test_pure_no_baseline_is_delta():
 
 # --------------------------------------------------------------------------- bpy integration
 def _material_block(text, name):
-    """Return the `def Material "name"` body text (brace-depth aware). '' if not found."""
-    marker = 'def Material "%s"' % name
+    """Return the reshaped material's body text (brace-depth aware). '' if not found. The
+    reshape retypes each Material to a typeless `def "name"` referencing its `.mtlx`."""
+    marker = 'def "%s"' % name
     i = text.find(marker)
     if i < 0:
         return ""
-    j = text.find("{", i)
+    j = text.find("\n", text.find(")\n", i)) + 1  # past the ( ) metadata block (assetInfo has braces)
+    j = text.find("{", j)
     if j < 0:
         return ""
     depth, k = 0, j
@@ -174,6 +177,7 @@ def test_bpy_end_to_end():
         ob = bpy.data.objects.new(obj_name, me)
         ob.data.materials.append(mat)
         bpy.context.collection.objects.link(ob)
+        ob.select_set(True)  # the add-on exports the Creator's SELECTED meshes only
 
     mat_u, _grp_u = _make_material("Copper_Untouched")            # sockets left at baseline
     mat_t, grp_t = _make_material("Copper_Tinted")
@@ -194,6 +198,12 @@ def test_bpy_end_to_end():
     check(_lcd_inputs_in(block_t) == ["base_color_tint"],
           "TINTED material -> exactly inputs:base_color_tint (got %r)" % _lcd_inputs_in(block_t))
     check("color3f inputs:base_color_tint" in block_t, "the tint is authored as color3f inputs:")
+    # the Carrier rule (LCDSchema.md, Matter-Library#1): the override is connected from the
+    # article's nodegraph, or no stock USD tool renders it
+    check("color3f inputs:base_color_tint.connect = </" in block_t
+          and "Copper_Tinted.inputs:base_color_tint>" in block_t,
+          "the tint is connected: NG_<id>.inputs:base_color_tint.connect = <Material.inputs:...>")
+    check(".connect" not in block_u, "the UNTOUCHED material authors no connection (sparse)")
 
     # no-texture-duplication (§9 piece 2a / §6): the heavy on-disk Matter texture must NOT be
     # copied beside the model. PRESERVE keeps the original path; NEW would duplicate it under a

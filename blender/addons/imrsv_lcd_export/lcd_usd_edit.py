@@ -11,7 +11,10 @@ pass over the ASCII `.usda`:
 
   1. Convert each Material-scoped LCD `userProperties:<port>` into a standard `inputs:<port>`
      UsdShade override and strip the off-spec `userProperties:` bridge (Discovery 9: standard
-     `inputs:` is the sole carrier).
+     `inputs:` is the sole carrier). Each override is CONNECTED from the article's nodegraph
+     (`over "NG_<id>" { <type> inputs:<port>.connect = <Material>.inputs:<port> }`, in the Material
+     body): without that connection the override is inert in every stock USD tool
+     (docs/specs/Contract/LCDSchema.md §Carrier rule; Matter-Library#1).
   2. Reshape each `_materials` Material into the lightweight profile form (Phase 60sq1 Step 1):
        * STRIP the exporter's shader network (`def Shader …` subtrees) and its
          `token outputs:surface[.connect]` — the material IS the referenced Matter `.mtlx`,
@@ -44,8 +47,9 @@ Idempotent by construction: a reshaped material is a typeless `def "<name>"` (no
 present. Running the transform on its own output is a no-op.
 
 Bounded assumptions (true for Blender's USD export): dictionaries appear only inside `( )`
-prim-metadata; a `def Material` header carries no inline `( )` metadata block (Blender writes
-prim metadata on following lines, and materials get none); Matter identity names are
+prim-metadata; a `def Material` header either carries no metadata or OPENS its `( )` block on the
+header line (Blender 5.2 writes `prepend apiSchemas = ["ColorSpaceAPI"]` there; the reshape then
+authors its reference + assetInfo inside that block); Matter identity names are
 `[A-Za-z0-9_]` so the `_NNN` duplicate-suffix strip never truncates a real name (they end
 `_v01`/`_s01`, never a bare `_NNN`).
 
@@ -309,18 +313,36 @@ def _is_material_junk(stripped):
     return False
 
 
-def _material_metadata_block(indent, name, ident):
+def _material_metadata_block(indent, name, ident, keep_open=False):
     """The reshaped material header: keep the ORIGINAL prim `name` (so `material:binding`
     targets still resolve and the two same-identity instances stay distinct prims), and author
-    the bare library reference + exact-identity carrier from the canonical `ident` (rules 4/5)."""
+    the bare library reference + exact-identity carrier from the canonical `ident` (rules 4/5).
+    `keep_open` leaves the `( )` block open, for a header that already opens one (Blender 5.2
+    writes `prepend apiSchemas = ["ColorSpaceAPI"]` there); the original block's lines and its
+    closing `)` then follow unchanged."""
     return (
         '%sdef "%s" (\n'
         '%s    prepend references = @%s.mtlx@</MaterialX/Materials/%s>\n'
         '%s    assetInfo = {\n'
         '%s        string identifier = "%s"\n'
         '%s    }\n'
-        '%s)\n'
-    ) % (indent, name, indent, ident, ident, indent, indent, ident, indent, indent)
+    ) % (indent, name, indent, ident, ident, indent, indent, ident, indent) + (
+        "" if keep_open else "%s)\n" % indent)
+
+
+def _connect_block(indent, ident, mat_path, ports):
+    """The LCDSchema §Carrier rule connection for one Material: `NG_<ident>.inputs:<port>` connects
+    to the Material's `inputs:<port>`, typed as the override. Without it the override is inert in
+    every stock USD tool (usdMtlx exposes only the surface shader's inputs on the Material). The
+    nodegraph is the article's `NG_<ident>` (MaterialXTemplate.md), a child of the Material once
+    the `.mtlx` reference composes; the connection is path-based, so it is authored even when the
+    reference does not resolve at export time."""
+    lines = ['%sover "NG_%s"\n' % (indent, ident), '%s{\n' % indent]
+    for port, kind in ports:
+        lines.append('%s    %s inputs:%s.connect = <%s.inputs:%s>\n'
+                     % (indent, "color3f" if kind == "color3" else "float", port, mat_path, port))
+    lines.append('%s}\n' % indent)
+    return "".join(lines)
 
 
 def transform_text(text):
@@ -340,6 +362,8 @@ def transform_text(text):
     release_done = (RELEASE_KEY in text)   # idempotency: don't re-stamp
     strip_base = None         # material-body depth while dropping a shader subtree
     strip_armed = False       # waiting for the shader subtree's '{' to open
+    mat_info = {}             # Material prim name -> (identity, absolute prim path)
+    mat_ports = {}            # Material prim name -> [(port, kind)] converted in its body
 
     for raw_line in lines:
         stripped = raw_line.lstrip()
@@ -377,10 +401,16 @@ def transform_text(text):
             if rw is not None:
                 new_line, (port, value) = rw
                 converted.append((cur[1], port, value))
+                mat_ports.setdefault(cur[1], []).append((port, LCD_PORTS[port][0]))
                 out_lines.append(new_line)
                 paren_depth, in_string, scope_stack, pending = _advance(
                     raw_line, paren_depth, in_string, scope_stack, pending)
                 continue
+            if stripped.startswith("}") and mat_ports.get(cur[1]) and cur[1] in mat_info:
+                # the Material body closes: connect each converted override (Carrier rule)
+                ident, mat_path = mat_info[cur[1]]
+                indent = raw_line[: len(raw_line) - len(raw_line.lstrip())] + "    "
+                out_lines.append(_connect_block(indent, ident, mat_path, mat_ports[cur[1]]))
             out_lines.append(raw_line)
             paren_depth, in_string, scope_stack, pending = _advance(
                 raw_line, paren_depth, in_string, scope_stack, pending)
@@ -399,7 +429,12 @@ def transform_text(text):
                 ident = identities.get(name)
                 if ident is None:
                     ident = canonical_identity(name)
-                out_lines.append(_material_metadata_block(indent, name, ident))
+                mat_info[name] = (ident, "/" + "/".join(
+                    [n for (_, n) in scope_stack] + [name]))
+                # Blender 5.2 opens an inline `(` metadata block on the header itself.
+                header_opens_meta = stripped.rstrip().endswith("(")
+                out_lines.append(_material_metadata_block(indent, name, ident,
+                                                          keep_open=header_opens_meta))
                 paren_depth, in_string, scope_stack, pending = _advance(
                     raw_line, paren_depth, in_string, scope_stack, pending)
                 seen_prim = True

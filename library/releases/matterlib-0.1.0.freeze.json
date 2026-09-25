@@ -137,43 +137,43 @@
     "mtlx": [
       {
         "path": "MatterLibrary/materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
-        "sha256": "49c6eb30eebe212f6b61b6856d35dc4984834a1112d766566fa1ff4f286991b6"
+        "sha256": "d06e2cc2c4f75678ae56fcd9b75e4d83453db1ad918cbeba394e4721b657d672"
       },
       {
         "path": "MatterLibrary/materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
-        "sha256": "4e998afa68bd1744e0cdce68b36bf1c2faf2aec3dd21cb00125a9f79a12c8d57"
+        "sha256": "34f0c0f56ad8792fa3699eed128413f1496ad09a03fa05d2f8c29e786009f241"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
-        "sha256": "5420857e533d77b3fe05c72a99c80225bb07b18c9da31a51bc1140abfd79f83e"
+        "sha256": "3b744a28766a17eafa5a6bcacb57449b7cb2751702eb2721a06a28b30029f74c"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
-        "sha256": "5a0fce669e1f5943848729074e639f1ea7590d3c433d851d9ba3a4d690fdc356"
+        "sha256": "16735fd8d11b14ed3d69aed3408c49bb72c969f18c24e187be6a999d9b65f8e0"
       },
       {
         "path": "MatterLibrary/materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
-        "sha256": "87ed5e6273ecba98f7ec5299760d482b1c829173bbc76ee26b185765f53cec9a"
+        "sha256": "1002b045120d0f57b3b0696f98bbc41ea49b598991c3013dbd731554afe1885b"
       },
       {
         "path": "MatterLibrary/materials/natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
-        "sha256": "dac4d441e2913e14bfe21a985e1d488dc48795b561bc61926821b7995f802525"
+        "sha256": "41e11d8e8f32ee9e8f68d224d5b46f6ffd8edecf4401ad9ff2dce1ee6921d46a"
       },
       {
         "path": "MatterLibrary/materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
-        "sha256": "5d103744686055ff9e173aa2a901daf1f2f30967de76dcec418e46c8f8751925"
+        "sha256": "e939f15a283b7dc74d3ac4ef5ef763649b2951f85829dfbd5e0e33b3fe3a0b68"
       },
       {
         "path": "MatterLibrary/materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
-        "sha256": "79f22189861a81c6ec8cd1058f214ebbbe64cc77567ee1c22f8ca732fb99a762"
+        "sha256": "f55307daac80ca05d272d2573374a90c7411d7f37962f616c3b66e0c0942ac6e"
       },
       {
         "path": "MatterLibrary/materials/synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx",
-        "sha256": "e55a7df239eef6c25d612d2c1e74cf1cec4aa1ae4c19c1e8f6cea1a321701ff8"
+        "sha256": "ddf6aba40ec8b3e935b68f787f26a3e6f0cecbb21c49e9b080a6e12094001409"
       },
       {
         "path": "MatterLibrary/materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
-        "sha256": "7fc4a5787355234a645299cc622f6fdef3d4990c032287702b8fe982896fd067"
+        "sha256": "26baf956656184da73acad33198d1b9426c7ae34961faea9164600258229d201"
       },
       {
         "path": "MatterLibrary/materials/utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
@@ -307,12 +307,12 @@
       }
     ]
   },
-  "payload_digest": "a58de5948eed80b23277bb2d6368afbbc98a8c2a985b32bdd63bb1939e6fb9de",
+  "payload_digest": "be6894983bd93752ee557e2db62b69e907b40327943ec570e3811c81edf6104f",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
     "dds_set": "743656e794b85cea06c3f2cc505d95b07d903fc4bb07fea6db860e6f79336e4e",
     "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
-    "mtlx_set": "7001355bae6c9518b67d905e3cad3ac95750dfb830ae1885a1fd40eecc861998",
+    "mtlx_set": "f06986dc4d4d9463319da1052e89f66394d95b74d17b0fd1326e7eab73e7f6b0",
     "source_textures_set": "93d21f3e121fac95ff235c0ff9bc59f2ff500a222fc1c7443bb5608abd2612d3"
   },
   "release": "0.1.0"

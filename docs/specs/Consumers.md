@@ -54,6 +54,7 @@ A USD viewer consumes the raw `.mtlx` articles:
 - It must set the MaterialX standard-library search path for its build (decision 7).
 - It should honour the active-release selector rather than scanning every installed release (*Drift, 2026-09-23: USDLiveView scans all releases today; listed in `docs/Planning/PlatformDependencies.md`*).
 - This repo's own validation baseline for USD rendering is [USDValidationToolchain](Tooling/USDValidationToolchain.md).
+- **Creator overrides need nothing extra.** They are Material inputs that the article's nodegraph connects to ([LCDSchema §Carrier rule](Contract/LCDSchema.md#carrier-rule-no-imrsv-attrs)), so a stock viewer renders them through normal UsdShade resolution. A viewer must **not** add a resolution rule of its own: if an override does not render, the writer is at fault (`tools/conformance/check_lcd_carrier.py` says which).
 
 ## Adding a consumer
 

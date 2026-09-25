@@ -100,6 +100,16 @@ generator emits it; USD's MSL `emitPixelStage` may omit it the same way).
 
 > **Reevaluate (2026-09-23):** the macOS path has not been built or measured.
 
+## Checks run on this toolchain
+
+These need `pxr`, so they run under the toolchain's Python rather than in the core `run_all.py` gate (whose environment has MaterialX but no USD).
+
+| Check | What it enforces | Run by |
+|---|---|---|
+| `tools/conformance/check_lcd_carrier.py <asset.usd>` | every Material-level Creator input is **connected** from the article's `NG_<id>` input, on a port the article **declares**, with the article's **type**, and wins `GetValueProducingAttributes()` when it has a value ([LCDSchema §Carrier rule](../Contract/LCDSchema.md#carrier-rule-no-imrsv-attrs)). None of the 26 stock `UsdValidation` validators catches an unconnected override, because it is inert, not invalid. | `tools/conformance/check_exporter.sh` (every real Blender export); its self-test `test_check_lcd_carrier.py` shows it failing on an unconnected override first |
+
+*(Added 2026-09-24, Matter-Library#1.)*
+
 ## Status
 
 **Live Storm render working** (2026-06-21): `usdview` renders bound MaterialX
