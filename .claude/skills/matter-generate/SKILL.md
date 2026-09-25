@@ -29,7 +29,7 @@ Read what you need, then tell the maintainer your plan in a short block and cont
 | **Name** `Material_Variant_Condition_Detail_sNN_vNN` — exactly six tokens | `docs/specs/Ontology/Identity.md`. Material = the matter/species · Variant = the look (default `Natural`) · Condition = damage (overlay 1; `Clean` for a new draft) · Detail = other layers (overlays 2–3; `Base` for a new draft). ≤63 chars, `[A-Za-z0-9_]`. A see-through colour is its own article (`Glass_Green`). |
 | **Scale tag** | the closed set in `docs/NamingConventions.md`; param-only articles use `s01` |
 | **Version** `vNN` | the next free integer for that stem: look in `tools/converters/recipes/` and `MatterLibrary/materials/` |
-| **Lane** | **L1 param-only** (constants from Physically Based) or **L3 an ambientCG scan** (§2a) — both available. L2 (generated base textures) arrives in a later step of Phase03: if the brief needs it, say so and stop. |
+| **Lane** | **L1 param-only** (constants from Physically Based), **L3 an ambientCG scan** (§2a), or **L2 generated base textures** (§2b), when no scan fits. |
 | **Wear layers** | §3 below |
 
 `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md` has a draft list of ~170 articles with a master, lane and layer set per row. **Use it as a reference, not an authority** — it is research, and nothing in it is committed. If your plan differs from its row, say why.
@@ -57,6 +57,15 @@ uv run tools/converters/import_ambientcg.py import <AssetId> --set <Material>_<V
 - `import` writes the maps (`basecolor`, `roughness`, `normal` as NormalGL, `metalness`, `opacity`) flat into the class folder, records provenance under `library/provenance/sources/`, adds the CREDITS.md row, and prints `meters_per_tile` from the asset's real size. Use that value, and the nearest scale tag.
 - It fetches only from ambientCG (CC0) and refuses to overwrite. Physically Based rarely has an entry for a scanned matter; record any constant you add (e.g. `specular_ior`) as judgement.
 
+## 2b. Generated base textures (L2)
+
+Write one generator per texture set: `tools/converters/base/gen_<material>_<variant>.py`. Copy the shape of `gen_earthenware_natural.py`:
+
+- **Use `tools/converters/tileable.py`** (seamless noise, wrap-around gradients, NormalGL normals, sRGB encoding). The older helpers in `gen_shared_textures.py` do not tile.
+- **Ground the colour**: anchor the texture's MEAN linear albedo to a Physically Based entry when one fits, re-normalising so the mean is exact, and record that entry in the recipe's `sources` with a `note`. Vary only around it.
+- Write `basecolor` (sRGB-encoded), `roughness` and `normal` (linear data) to `MatterLibrary/textures/base/<domain>/<class>/<Set>_<channel>_<sNN>.png`; refuse to overwrite; `--out DIR` for a /tmp trial.
+- Generate to /tmp first and **look** at the basecolor; check the mean albedo and the seam (wrap-edge difference ≈ neighbouring-pixel difference); then write for real, `cmp` a second run, and record provenance (`source: procedural`, `evidence: <script>`) under `library/provenance/sources/base/…`.
+
 ## 3. Assign the wear layers (lead ruling C1, "smart, not lean")
 
 Every article carries **all the wear layers relevant to its matter**, up to the cap, with every slider at 0: the article reads as its name (`Clean`, `Base`) and the app dials the wear up. Leaving out a relevant layer is not an option.
@@ -72,7 +81,7 @@ Every article carries **all the wear layers relevant to its matter**, up to the 
 
 A layer is shared by many articles, so it is made once, carefully, and judged on its own.
 
-1. **Write one generator script per layer**: `tools/converters/layers/gen_<name><nn>.py` (e.g. `gen_scuffs01.py`). Copy the shape of `gen_fingerprints01.py`: reuse `_value_noise`, `_gradients` and `_pack` from `gen_shared_textures.py`; a fixed seed; no network; a seamless tile (wrap positions toroidally); refuse to overwrite an existing file; `--out DIR` to write elsewhere.
+1. **Write one generator script per layer**: `tools/converters/layers/gen_<name><nn>.py` (e.g. `gen_scuffs01.py`). Copy the shape of `gen_edgewear01.py` (an overlay) or `gen_crevice01.py` (a mask): use `tools/converters/tileable.py` (`pack_overlay`, `pack_mask`, seamless noise); a fixed seed; no network; a seamless tile (wrap positions toroidally); refuse to overwrite an existing file; `--out DIR` to write elsewhere.
 2. **Honour the frozen channel contract** (`docs/specs/Ontology/MasterSet.md` §Overlay/MaskSet model). An **overlay** is `R/G` normal XY (0.5 = flat) · `B` roughness bias, which can only ROUGHEN · `A` density (where it appears). A **mask** is `R` layer-2 coverage · `G`/`B`/`A` the gates for overlays 1/2/3. Both are data, never colour.
 3. **Pick the scale tag for the feature's real size**: `s0001` (1 mm tile) for pores and micro-scratches, `s001` (1 cm) for dust and fine scratches, `s01` (10 cm) for fingerprints, scuffs and chips. File names: `<Name><NN>_overlay_<sNN>.png` for overlays, `<Name><NN>_<sNN>.png` for masks.
 4. **Generate to `/tmp` first and look:** save the `A` (and `B`) channel as greyscale PNGs and Read them. Does it read as the feature? Is it sparse where it should be? Then run the script for real, and check that a second run into `/tmp` is byte-identical (`cmp`).
@@ -113,6 +122,16 @@ uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>
 - what the library cannot express yet for this matter (e.g. "metal: no F82 edge tint", "satin: no sheen", "brushed: no anisotropy");
 - **see-through matter** (any `transmission` > 0 — glass, gems, liquids, clear plastics): say plainly that **the preview cannot show it**. The only renderer here (Storm, via `usdrecord`) ignores `transmission_color` and renders `transmission = 1.0` black (it has no opacity floor; the engine masters do — MasterSet.md §Opacity floor). Never fudge the recipe to make the preview look right. The colour is judged in an engine, later (*Parity Baselines* owns a proper preview);
 - anything the maintainer should look at closely.
+
+## 6a. Open it for the maintainer (lead ruling, 2026-09-25)
+
+The review happens in **USDLiveView**, not in chat. Open the draft's preview scene, and one scene with its layers dialled up (`make_preview.py … --set overlay1_density=1 …`, no `--render` needed), each in its own window, in the background:
+
+```sh
+IMRSV_MATTER_SOURCE=<repo>/MatterLibrary <USDLiveView checkout>/usdliveview <scene.usda>
+```
+
+USDLiveView has no slider controls yet (its own Phase 04); a slider setting the maintainer asks for is another `--set` scene.
 
 ## 7. Hand back
 
