@@ -19,7 +19,7 @@
 | C3 | **One matter may have several articles with different overlay sets** (lead, 2026-09-25): e.g. an `Oak` article per Condition/Detail, each carrying the layers that fit it. That is how a fourth or fifth relevant layer is covered, not by a larger cap. |
 | C4 | **The filename has exactly six tokens — five underscores — so it can be parsed** (lead, 2026-09-25, restating the original grammar). Layer information goes *inside* `Condition` / `Detail` (e.g. `Distressed_Dusty`), never in added tokens. See Pass 6. |
 | C5 | **Each name token is a fixed axis** (lead, 2026-09-25; "apply"). **Material** = the matter, down to species or alloy (`WhiteOak`, `MildSteel`; optionally a base-set id, as in `Limestone26b`). **Variant** = the *look*: base-texture choice plus tint and the other Creator settings (`Natural`, `Polished`, `Weathered`, `Blue`), so a white oak tinted blue is `WhiteOak_Blue`. For see-through matter (glass, gems, liquids, clear plastics) a colour Variant is a separate authored article (`Glass_Green`), because the tint does not reach `transmission_color` (E2, lead 2026-09-25). **Condition** = the **damage** axis, driven by overlay 1 (+ mask): `Clean` (0) → `Worn` → `Distressed`, with an optional save counter (`VeryDistressed12`). **Detail** = everything else, driven by overlays 2–3 (usually deposits, but a second damage layer too; E1 (a), lead 2026-09-25): `Base` (0) → `Dusty` → `ScratchedButNotVeryDusty`. Names can be user-made from slider states; the exact values live in the file. **Overlay slot 1 is the damage layer.** See Pass 7. |
-| C6 | **Composed materials are not matter; a single leaf is** (lead, 2026-09-25): "leaf textures as materials would be good, just not a full ground of leaves." The test: pick up one piece; is it the same substance as the whole? `LeafLitter_Autumn` and `Grass_Lawn` moved to a **Composed (planned)** section, kept, not deleted. `OakLeaf` stays, and `MapleLeaf` and `IvyLeaf` were added. `Topsoil_Forest` is flagged `Composed?`. |
+| C6 | **Composed materials are not matter; a single leaf is** (lead, 2026-09-25): "leaf textures as materials would be good, just not a full ground of leaves." The test: pick up one piece; is it the same substance as the whole? `LeafLitter_Autumn` and `Grass_Lawn` moved to a **Composed (planned)** section, kept, not deleted. `OakLeaf` stays, and `MapleLeaf` and `IvyLeaf` were added. `Topsoil_Forest` was flagged `Composed?`, then ruled **plain soil** (lead, 2026-09-25). |
 
 ---
 
@@ -108,7 +108,7 @@
 |---|---|---|---|---|---|---|---|
 | 1 | `Loam_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 2 | `Loam_Wet_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
-| 3 | `Topsoil_Forest_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now · Composed? | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 3 | `Topsoil_Forest_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 4 | `RedClay_DryCracked_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 5 | `GreyClay_Wet_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 6 | `Mud_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
@@ -592,6 +592,7 @@ Structure (O11 rulings this list needs; no recommendation forced):
 
 **Passes captured:** 7 (2026-09-25).
 
+- **`Topsoil_Forest` is plain soil** (lead, 2026-09-25); the `Composed?` flag is removed.
 - **E5 resolved (lead): `Natural`** is the default Variant (untinted, library look). `Identity.md` still says `Base` and needs updating when the C4/C5 naming rules land there. The shipped `Base`-variant articles are unaffected (none use a `Base` Variant).
 - **E2 resolved (lead): accept.** A see-through colour (`Glass_Green`, `Glass_Amber`) is its own authored article; `base_color_tint` stays surface-only, and there is no LCD change.
 - **E1 resolved (lead): (a).** Condition = overlay 1 (the primary damage) only; Detail = overlays 2–3, whatever their kind (`ScratchedButNotVeryDusty` is the precedent). The 59 two-damage rows stand as they are.
