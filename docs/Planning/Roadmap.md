@@ -11,14 +11,12 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase.*
+### Phase04 — Wear Layers at Their Own Scale — ACTIVE
+**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
+- `docs/Planning/Phases/Future/Phase04_WearLayersAtTheirOwnScale.md`
 
 ==================================================================================
 ## Future
-
-### Phase04 — Wear Layers at Their Own Scale — SEEDED
-**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
-- `docs/Planning/Phases/Future/Phase04_WearLayersAtTheirOwnScale.md`
 
 ### Phase05 — Library Coverage — SEEDED
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
