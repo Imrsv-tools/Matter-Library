@@ -19,6 +19,7 @@
 | C3 | **One matter may have several articles with different overlay sets** (lead, 2026-09-25): e.g. an `Oak` article per Condition/Detail, each carrying the layers that fit it. That is how a fourth or fifth relevant layer is covered, not by a larger cap. |
 | C4 | **The filename has exactly six tokens — five underscores — so it can be parsed** (lead, 2026-09-25, restating the original grammar). Layer information goes *inside* `Condition` / `Detail` (e.g. `Distressed_Dusty`), never in added tokens. See Pass 6. |
 | C5 | **Each name token is a fixed axis** (lead, 2026-09-25; "apply"). **Material** = the matter, down to species or alloy (`WhiteOak`, `MildSteel`; optionally a base-set id, as in `Limestone26b`). **Variant** = the *look*: base-texture choice plus tint and the other Creator settings (`Natural`, `Polished`, `Weathered`, `Blue`), so a white oak tinted blue is `WhiteOak_Blue`. **Condition** = the **damage** axis, driven by overlay 1 (+ mask): `Clean` (0) → `Worn` → `Distressed`, with an optional save counter (`VeryDistressed12`). **Detail** = the **deposit** axis, driven by overlays 2–3: `Base` (0) → `Dusty` → `ScratchedButNotVeryDusty`. Names can be user-made from slider states; the exact values live in the file. **Overlay slot 1 is the damage layer.** See Pass 7. |
+| C6 | **Composed materials are not matter; a single leaf is** (lead, 2026-09-25): "leaf textures as materials would be good, just not a full ground of leaves." The test: pick up one piece; is it the same substance as the whole? `LeafLitter_Autumn` and `Grass_Lawn` moved to a **Composed (planned)** section, kept, not deleted. `OakLeaf` stays, and `MapleLeaf` and `IvyLeaf` were added. `Topsoil_Forest` is flagged `Composed?`. |
 
 ---
 
@@ -107,7 +108,7 @@
 |---|---|---|---|---|---|---|---|
 | 1 | `Loam_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 2 | `Loam_Wet_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
-| 3 | `Topsoil_Forest_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
+| 3 | `Topsoil_Forest_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now · Composed? | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 4 | `RedClay_DryCracked_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 5 | `GreyClay_Wet_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
 | 6 | `Mud_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Cracks01 · Pitting01 · — · Patches01 | ~Wet (the wet rows are authored wet) |
@@ -282,18 +283,25 @@
 | 5 | `PeaGravel_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · — · Patches01 | ~Wet |
 | 6 | `CrushedGravel_Natural_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now · O11 | Pitting01 · Dust01 · — · Patches01 | ~Wet |
 
-**environmental/vegetation** — 6
+**environmental/vegetation** — 6 *(leaves are matter: a single leaf's tissue on a card. A ground covered in leaves is not; see Composed below)*
 
 | # | Filename | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
 |---|---|---|---|---|---|---|---|
-| 1 | `Grass_Lawn_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
-| 2 | `Moss_Natural_Clean_Base_s01_v01.mtlx` | Opaque | L3 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
-| 3 | `Lichen_Crustose_Clean_Base_s01_v01.mtlx` | Opaque | L2 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
-| 4 | `LeafLitter_Autumn_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
-| 5 | `Straw_Natural_Clean_Base_s01_v01.mtlx` | Opaque | L3 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
-| 6 | `OakLeaf_Natural_Clean_Base_s01_v01.mtlx` | Masked | L3 | s01 | Now ‡ | Pitting01 · Dust01 · — · Patches01 | ~Wet · ~Autumn colour |
+| 1 | `Moss_Natural_Clean_Base_s01_v01.mtlx` | Opaque | L3 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 2 | `Lichen_Crustose_Clean_Base_s01_v01.mtlx` | Opaque | L2 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 3 | `Straw_Natural_Clean_Base_s01_v01.mtlx` | Opaque | L3 | s01 | Now | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 4 | `OakLeaf_Natural_Clean_Base_s01_v01.mtlx` | Masked | L3 | s01 | Now ‡ | Pitting01 · Dust01 · — · Patches01 | ~Wet · ~Autumn colour |
+| 5 | `MapleLeaf_Natural_Clean_Base_s01_v01.mtlx` | Masked | L3 | s01 | Now ‡ | Pitting01 · Dust01 · — · Patches01 | ~Wet · ~Autumn colour |
+| 6 | `IvyLeaf_Natural_Clean_Base_s01_v01.mtlx` | Masked | L3 | s01 | Now ‡ | Pitting01 · Dust01 · — · Patches01 | ~Wet · ~Autumn colour |
 
 ‡ A leaf card is Masked today; the two-sided thin-transmission *foliage variant* is `(planned)` in `MasterSet.md`.
+
+**Composed (planned) — not matter, kept so the intent survives** *(ruling C6)*. Each of these is an **arrangement** of several matters (loose leaves, twigs and soil; living grass over soil). By D1 that is not a substance, so they sit outside the matter list, waiting for the `(planned)` Realm above Domain (`Taxonomy.md` §Growth model). Later they could be **composed from library matter** (e.g. `Loam_Natural` + a scattered-`OakLeaf` layer) rather than shipped as one flat scan. Not counted in any class.
+
+| # | Filename | Master | Lane | Scale | Status | Overlays 1 · 2 · 3 · Mask | Also wanted |
+|---|---|---|---|---|---|---|---|
+| 1 | `Grass_Lawn_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Composed | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
+| 2 | `LeafLitter_Autumn_Clean_Base_s1_v01.mtlx` | Opaque | L3 | s1 | Composed | Creases01 · Dust01 · — · Patches01 | ~Wet · ~Dry-out colour |
 
 **environmental/liquid** — 8
 
@@ -583,6 +591,8 @@ Structure (O11 rulings this list needs; no recommendation forced):
 ## Status
 
 **Passes captured:** 7 (2026-09-25).
+
+- **C6 (lead):** composed materials are out of the matter list. `LeafLitter_Autumn` and `Grass_Lawn` moved to *Composed (planned)*; `MapleLeaf` and `IvyLeaf` added, so vegetation stays at 6; `Topsoil_Forest` flagged `Composed?`.
 
 - **Pass 7: C5 applied.** Each name token is a fixed axis: Material = matter/species · Variant = the look (texture + tint + settings) · Condition = damage (overlay 1) · Detail = deposits (overlays 2–3). 89 rows renamed, overlay slots reordered, all 173 names checked (six tokens, unique, ≤ 43 chars). **Eight edge cases (E1–E8)** are listed for the lead's hunt; E1 (59 rows with two damage layers) is the big one.
 
