@@ -91,12 +91,32 @@ What B runs into, which is why it is a phase and not a quick-fix:
 | A + B + C | **the full loop: browse, apply, sliders, on every draft** | a phase (`/discovery`) | R1 ruling; the test-composition choice; two small probes (symlinks, `.dds`) |
 | A + C + D (Stage env override) | the same loop, no writes into the runtime | a phase + a Stage ask | Stage accepting the override |
 
+## Pass 5 — Lead ruling, and the built answer (2026-09-25)
+
+**Lead, verbatim:** "Why so much overhead? Make a material, serve it to stage. no versioning, no faffing around. we are VERY pre release right now ... we have 200 materials to build and test before we have our first versionable library ... nobody is using it, just us." And: "I mean moving forward with this project."
+
+**Built (lead-directed `/quick-fix`):** `tools/releases/serve_to_stage.py`, a lighter take on option B with none of the ceremony:
+- It serves **every** article in the working tree. The catalog is projected from disk at each article's on-disk `vNN`, `status: draft`, with no lockfile. `releases/matterlib-dev/{materials,textures}` are **symlinks into the checkout**. The selector moves to `matterlib-dev`, and Stage is restarted.
+- The served catalog reports `release: 0.1.0`. Stage treats the installed release as `matterlib-<release>`, and existing compositions are stamped `matterlib-0.1.0`, so none of them hit ReleaseConflict. There are no version axes to manage pre-release.
+- `--view <composition>` opens USDLiveView resolving from the checkout only (`IMRSV_MATTER_LIBRARY`), so the viewer and Stage read the same copy. That sidesteps the Pass 3 trap.
+- The skill §6a now uses it. The `--set`-scene workaround is superseded.
+
+**Proved on the lead's box:**
+- Stage's library op lists 16 creator-selectable articles, all 5 Phase03 drafts included.
+- On a throwaway copy of the slider-smoke composition, Stage **applied** `Earthenware_Natural` to a cube and **accepted** `overlay1_density = 1`. The saved file carries the carrier-rule override.
+- Stage resolved the textures through the symlinked `matterlib-dev/textures`.
+- A stock `usdrecord` of the saved file shows the cube as earthenware with EdgeWear chips.
+- Pass 4's unverified symlink question is **answered: Stage follows them.** The `.dds` question is moot for this loop (Stage served the PNGs).
+
+**Closes Q1 and Q2** (full loop, served into the maintainer's own runtime; R1's no-deploy stance does not bind a pre-release dev loop on the lead's box). **Q3 is moot:** the review surface is no longer a temp preview scene. **Q4 stays open as a per-box pointer:** `$MATTER_TEST_COMPOSITION`, set by the maintainer.
+
 ---
 
 ## Status
 
-- **Passes captured:** 4.
-- **Current direction:** the preview tooling was designed as a headless-render helper with an optional look (Phase03 Pass 2), and USDLiveView has since grown into the real test bench (browser plus live sliders, 2026-09-25). **The missing piece is a way to get a working-tree draft into Stage's installed catalog without cutting a release**: a *draft install* (B). A is a same-day quick win, but view-only.
+- **RESOLVED 2026-09-25 (Pass 5):** the lead ruled "serve it to stage, no versioning". `tools/releases/serve_to_stage.py` is built and proved. The text below is the pre-ruling state, kept for history. Only Q4 (which composition is `$MATTER_TEST_COMPOSITION`) remains, as a per-box choice.
+- **Passes captured:** 5.
+- **Direction before the ruling:** the preview tooling was designed as a headless-render helper with an optional look (Phase03 Pass 2), and USDLiveView has since grown into the real test bench (browser plus live sliders, 2026-09-25). **The missing piece is a way to get a working-tree draft into Stage's installed catalog without cutting a release**: a *draft install* (B). A is a same-day quick win, but view-only.
 - **Open questions (lead):**
   1. **Target loop:** view-only (A), or the full browse/apply/slider loop (B, or D)? Recommendation: A now, then B as a phase.
   2. **R1:** may a maintainer-box dev tool in this repo write a non-release `matterlib-draft` install and the selector into the maintainer's own Stage runtime? Or do we ask Stage for an install-root override (D) instead?

@@ -125,13 +125,19 @@ uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>
 
 ## 6a. Open it for the maintainer (lead ruling, 2026-09-25)
 
-The review happens in **USDLiveView**, not in chat. Open the draft's preview scene, and one scene with its layers dialled up (`make_preview.py … --set overlay1_density=1 …`, no `--render` needed), each in its own window, in the background:
+The review happens in **USDLiveView, served by Stage**, not in chat (lead, 2026-09-25: "Make a material, serve it to stage. no versioning"). Serve the whole working tree and open the maintainer's test composition:
 
 ```sh
-IMRSV_MATTER_SOURCE=<repo>/MatterLibrary <USDLiveView checkout>/usdliveview <scene.usda>
+uv run tools/releases/serve_to_stage.py --view "$MATTER_TEST_COMPOSITION"
 ```
 
-USDLiveView has no slider controls yet (its own Phase 04); a slider setting the maintainer asks for is another `--set` scene.
+- It serves **every** article in `MatterLibrary/` as it is on disk (Stage reads the checkout through symlinks), restarts Stage, and opens USDLiveView. No lockfile, no release, no version bump.
+- The maintainer picks the draft in USDLiveView's **Installed Materials** browser, applies it to a mesh, and drags the Creator sliders (overlay/mask densities, tint, UV, roughness bias) live. There are no `--set` scenes to make.
+- A re-assembled article or a regenerated texture is live without re-serving; a **new** article needs one re-run (the catalog lists it).
+- `$MATTER_TEST_COMPOSITION` is a per-box pointer to a composition the maintainer is happy to have edited (every Apply and slider change saves into it). If it is unset, ask which composition to open; don't make one up.
+- `--off` puts Stage back on the release it was serving.
+
+*(Superseded 2026-09-25: opening the temp preview `.usda` directly, with one `--set` scene per slider. USDLiveView's sliders shipped (its Phase 04), and they need Stage to serve the article.)*
 
 ## 7. Hand back
 
@@ -139,5 +145,5 @@ End with exactly this:
 
 - **Files written** — the recipe, the `.mtlx`, and any layer you made (its script, its PNG, its provenance record), as repo-relative paths.
 - **Render** — the PNG path (and show it if your surface can).
-- **Closer look** — the `.usda` scene path `make_preview.py` printed; it opens in USDLiveView or usdview.
+- **Closer look** — served to Stage and open in USDLiveView (§6a): name the article to pick in the browser, and the sliders worth moving.
 - **Keep:** `git add <paths>` then commit. **Discard:** `git restore`/`rm` those paths. It is the maintainer's call; you do neither.

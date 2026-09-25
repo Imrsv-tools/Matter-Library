@@ -90,6 +90,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `validate_approval.py` | checks an approval artifact's shape (never creates one) |
 | `activate_release.py` | offline `activate` / `resolve-check` / `recover-unapproved` — writes the active-release selector atomically |
 | `fixtures/approval_{valid,shallow}.approval.json` | positive / shallow-negative approval fixtures |
+| `serve_to_stage.py` | **pre-release dev loop, outside the lifecycle** (lead, 2026-09-25): serves every article in the working tree to a local Stage runtime (catalog projected from disk, `materials/` + `textures/` symlinked to the checkout, selector → `matterlib-dev`, Stage restarted), so USDLiveView can browse, apply and tune it. `--view <composition>` opens USDLiveView; `--off` restores the previous selector. It writes no `library/releases/` record. |
 
 ### `tools/compressors/` — BCn ([CompressedDistribution](CompressedDistribution.md))
 

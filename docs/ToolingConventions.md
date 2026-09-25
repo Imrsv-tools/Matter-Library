@@ -43,6 +43,7 @@
 | (re)generate articles from recipes | `python tools/converters/build_proof_subset.py [<recipe.json> …]` |
 | re-project a catalog from its lockfile | `python tools/converters/project_runtime_catalog.py` |
 | stage / freeze / promote / activate a release | the scripts in `tools/releases/` ([ReleaseModel](specs/Distribution/ReleaseModel.md)) |
+| **serve the working tree to Stage and test it in USDLiveView** (pre-release; no versioning) | `uv run tools/releases/serve_to_stage.py [--view <composition>]` (`--off` to undo). Needs `IMRSV_STAGE_RUNTIME`. |
 | build the USD validation toolchain | `tools/usd-toolchain/run-all.sh` ([USDValidationToolchain](specs/Tooling/USDValidationToolchain.md)) |
 
 **Tool locations (environment variables, all optional):**
