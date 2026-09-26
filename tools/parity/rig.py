@@ -50,11 +50,32 @@ BAR = 2.0
 GRADED = {"Opaque", "Masked", "Emissive", "TwoLayer"}
 
 
+# The sweep (Phase05 Brief, first human test click 2): each slider the article declares,
+# moved on its own from the article's start values.
+SWEEP = [
+    ("base_color_tint", [("tint blue", (0.5, 0.75, 1.0))]),
+    ("roughness_bias", [("roughness -0.5", -0.5), ("roughness +0.5", 0.5)]),
+    ("overlay1_density", [("wear 1 at 0", 0.0), ("wear 1 at 0.5", 0.5), ("wear 1 at 1", 1.0)]),
+    ("overlay2_density", [("wear 2 at 0", 0.0), ("wear 2 at 0.5", 0.5), ("wear 2 at 1", 1.0)]),
+    ("overlay3_density", [("wear 3 at 0", 0.0), ("wear 3 at 0.5", 0.5), ("wear 3 at 1", 1.0)]),
+    ("maskset_blend", [("mask blend 0", 0.0), ("mask blend 1", 1.0)]),
+    ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
+    ("uv_rotation", [("UV rotation 90", 90.0)]),
+]
+
+
 def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
     s = [{"id": "defaults", "label": "defaults", "set": {}}]
     if not sweep:
         return s
-    raise SystemExit("--sweep arrives in Phase05 step 5.2")
+    for port, rows in SWEEP:
+        if port not in art.ports:
+            continue
+        for label, value in rows:
+            sid = label.replace(" ", "_").replace("+", "p").replace("-", "m").replace(".", "")
+            s.append({"id": sid, "label": label, "port": port,
+                      "set": {port: list(value) if isinstance(value, tuple) else value}})
+    return s
 
 
 def run_blender(job_path: Path) -> None:
@@ -103,9 +124,12 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
         sheet.paste(heat[s["id"]].resize((cell, cell)), (label_w + 3 * cell, y))
         sc = scores[s["id"]]["subjects"]
         verdict = "under the bar" if sc["dE_mean"] < BAR else "OVER the bar"
+        mv = scores[s["id"]].get("moved")
+        moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
+                 if mv else "")
         d.text((label_w + 10, y + cell + 8),
-               f"dE2000 on the subjects: mean {sc['dE_mean']:.2f}, p95 {sc['dE_p95']:.2f}  "
-               f"(bar {BAR:g}: {verdict})   SSIM {sc['ssim']:.3f}",
+               f"dE2000 between the tools: mean {sc['dE_mean']:.2f}, p95 {sc['dE_p95']:.2f}  "
+               f"(bar {BAR:g}: {verdict}){moved}",
                fill=(120, 230, 120) if sc["dE_mean"] < BAR else (255, 140, 120), font=fs)
     p = out / "sheet.png"
     sheet.save(p)
@@ -123,15 +147,32 @@ def write_scorecard(job: dict, scores: dict) -> Path:
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
              "ΔE2000 between USDLiveView's renderer (Storm) and Blender (Cycles), over the "
              "subjects' pixels (sphere, cube, floor).", "",
-             "| Setting | Subjects mean | Subjects p95 | Sphere | Cube | Floor | SSIM | Verdict |",
-             "|---|---|---|---|---|---|---|---|"]
+             "**Moved** is how far the slider changed each tool's own picture from its defaults "
+             "(mean dE2000 on the subjects). A slider that moves one tool and not the other is "
+             "**ONE-SIDED**.", "",
+             "| Setting | Between tools: mean | p95 | Sphere | Cube | Floor | SSIM | Moved: Storm | Moved: Blender | Verdict |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
     for s in job["settings"]:
         sc = scores[s["id"]]
         m = sc["subjects"]
         v = "under" if m["dE_mean"] < BAR else "**OVER**"
+        mv = sc.get("moved")
+        if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
+            v += " · **ONE-SIDED**"
+        ms = f"{mv['storm']:.2f} | {mv['blender']:.2f}" if mv else "— | —"
         lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
                      f"{sc['sphere']['dE_mean']:.2f} | {sc['cube']['dE_mean']:.2f} | "
-                     f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {v} |")
+                     f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {ms} | {v} |")
+    worst = {}
+    for s in job["settings"]:
+        if s.get("port"):
+            d = scores[s["id"]]["subjects"]["dE_mean"]
+            if d > worst.get(s["port"], (0, ""))[0]:
+                worst[s["port"]] = (d, s["label"])
+    if worst:
+        lines += ["", "**Per slider, the worst difference between the tools:**", ""]
+        lines += [f"- `{p}`: {d:.2f} at *{lab}* ({'under' if d < BAR else 'OVER'} the bar)"
+                  for p, (d, lab) in worst.items()]
     p = out / "scorecard.md"
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
     (out / "scorecard.json").write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
@@ -160,11 +201,15 @@ def main(argv=None) -> int:
     t2 = time.time()
 
     scores, heat = {}, {}
+    mask = out / "mask.png"
     for s in job["settings"]:
         sc, dE = compare.compare(out / "storm" / f"{s['id']}.png",
-                                 out / "blender" / f"{s['id']}.png", out / "mask.png")
+                                 out / "blender" / f"{s['id']}.png", mask)
+        if s["id"] != "defaults":
+            sc["moved"] = {t: compare.moved(out / t / f"{s['id']}.png", out / t / "defaults.png", mask)
+                           for t in ("storm", "blender")}
         scores[s["id"]] = sc
-        heat[s["id"]] = compare.heatmap(dE, BAR)
+        heat[s["id"]] = compare.heatmap(dE, BAR, compare.masks(mask)["subjects"])
     sheet = build_sheet(job, scores, heat, args.cell)
     card = write_scorecard(job, scores)
     print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s")

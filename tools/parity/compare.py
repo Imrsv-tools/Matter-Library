@@ -102,12 +102,25 @@ def compare(png_a: Path, png_b: Path, mask_png: Path) -> tuple[dict, np.ndarray]
     return scores, dE
 
 
-def heatmap(dE: np.ndarray, bar: float) -> Image.Image:
-    """Black = identical, yellow at the bar, red at 3x the bar and above."""
+def moved(png_setting: Path, png_defaults: Path, mask_png: Path) -> float:
+    """How far a slider moved ONE tool's picture: mean dE2000 vs its own defaults, subjects."""
+    a, b = read_rgb(png_setting), read_rgb(png_defaults)
+    m = masks(mask_png)["subjects"]
+    return float(delta_e2000(srgb_to_lab(a), srgb_to_lab(b))[m].mean())
+
+
+def heatmap(dE: np.ndarray, bar: float, subjects: np.ndarray | None = None) -> Image.Image:
+    """Black below half the bar, yellow at the bar, red at 3x the bar and above.
+
+    (Black starts at half the bar so that Cycles' residual render noise, ~0.5-1 dE on flat
+    areas, does not paint the whole panel: 5.1 sitting.)
+    """
     t = dE / bar
-    r = np.clip(t, 0, 1)
+    r = np.clip((t - 0.5) / 0.5, 0, 1)
     g = r * np.clip((3 - t) / 2, 0, 1)
     rgb = np.stack([r, g, np.zeros_like(t)], axis=-1)
+    if subjects is not None:        # the furniture is not scored: show it at 30 %
+        rgb = np.where(subjects[..., None], rgb, rgb * 0.3)
     return Image.fromarray((rgb * 255).astype(np.uint8))
 
 

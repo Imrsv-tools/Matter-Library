@@ -39,6 +39,7 @@ class ArticleData:
     ports: dict[str, list[float]] = field(default_factory=dict)       # Creator start values
     shader: dict[str, list[float]] = field(default_factory=dict)      # lane-A values
     textures: dict[str, tuple[Path, str]] = field(default_factory=dict)  # role -> (file, cs)
+    layer_scale: dict[str, float] = field(default_factory=dict)  # role -> tilesize / imagesize
     consts: dict[str, list[float]] = field(default_factory=dict)      # role -> value
 
 
@@ -58,6 +59,13 @@ def read(path: Path) -> ArticleData:
                 f = node.find("input[@name='file']")
                 cs = node.get("colorspace", doc_cs if node.get("type", "").startswith("color") else None)
                 art.textures[name[:-4]] = ((path.parent / f.get("value")).resolve(), cs)
+                if node.tag == "tiledimage":
+                    # MaterialX NG_tiledimage: uv / realworldimagesize * realworldtilesize
+                    img = _floats(node.find("input[@name='realworldimagesize']").get("value"))
+                    tile = _floats(node.find("input[@name='realworldtilesize']").get("value"))
+                    if img[0] != img[-1] or tile[0] != tile[-1]:
+                        raise NotImplementedError(f"{path.stem}/{name}: non-square layer size")
+                    art.layer_scale[name[:-4]] = tile[0] / img[0]
             elif name.endswith("_const") and node.tag == "constant":
                 art.consts[name[:-6]] = _floats(node.find("input[@name='value']").get("value"))
     sh = root.find("open_pbr_surface")
@@ -129,8 +137,6 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
             tex.location = (-300, y)
             L(place.outputs["UV"], tex.inputs["Vector"])
             L(tex.outputs["Color"], master.inputs[socket])
-            if role == "normal":
-                master.inputs["Use Normal Map"].default_value = 1.0
         elif role in art.consts:
             v = art.consts[role]
             master.inputs[socket].default_value = _rgba(v) if role == "base_color" else v[0]
@@ -141,6 +147,33 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
         elif role == "metalness" and "base_metalness" in art.shader:
             master.inputs[socket].default_value = art.shader["base_metalness"][0]
         y -= 300
+
+    # shared layers: data textures (never colour), each at its own real-world size
+    for role, socket in [("maskset", "Maskset")] + [(f"overlay{n}", f"Overlay {n}")
+                                                   for n in build_masters.OVERLAYS]:
+        if role not in art.textures:
+            continue
+        file, _cs = art.textures[role]
+        img = bpy.data.images.load(str(file), check_existing=True)
+        img.colorspace_settings.name = "Non-Color"
+        img.alpha_mode = "CHANNEL_PACKED"       # alpha is data (density / gate), not coverage
+        scale = nt.nodes.new("ShaderNodeVectorMath")
+        scale.operation = "SCALE"
+        scale.location = (-450, y)
+        L(place.outputs["UV"], scale.inputs[0])
+        scale.inputs["Scale"].default_value = art.layer_scale.get(role, 1.0)
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(scale.outputs[0], tex.inputs["Vector"])
+        L(tex.outputs["Color"], master.inputs[socket])
+        L(tex.outputs["Alpha"], master.inputs[f"{socket} Alpha"])
+        y -= 300
+    for port in ("maskset_blend",) + tuple(f"overlay{n}_density" for n in build_masters.OVERLAYS):
+        if port in ports:
+            master.inputs[port].default_value = ports[port][0]
 
     if "base_color_tint" in ports:
         master.inputs["base_color_tint"].default_value = _rgba(ports["base_color_tint"])
