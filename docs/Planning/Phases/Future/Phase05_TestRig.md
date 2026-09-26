@@ -1,6 +1,6 @@
 # Phase05 — Test Rig: Blender and USDLiveView Side by Side
 
-**Status:** DISCOVERY — the Brief is complete (2026-09-26, Passes 1–2). **Lane: `build`** (verified: §Risk lane). Numbered by the lead, 2026-09-26, verbatim: *"seed Phase05 and Phase06 … we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6 … and once we have the UE runtime we can move back here for phase 7 and on."* It takes over the build of the Roadmap's *Parity Baselines*. Background: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (rulings BP1–BP9).
+**Status:** IN EXECUTION (2026-09-26, `/execute P5`). Discovery: the Brief is complete (2026-09-26, Passes 1–2). **Lane: `build`** (verified: §Risk lane). Numbered by the lead, 2026-09-26, verbatim: *"seed Phase05 and Phase06 … we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6 … and once we have the UE runtime we can move back here for phase 7 and on."* It takes over the build of the Roadmap's *Parity Baselines*. Background: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (rulings BP1–BP9).
 
 ## Outcome
 
@@ -144,4 +144,10 @@ The controls, read: the release lifecycle (`freeze_release.py`, `promote_release
 
 ## Execution Log
 
-_(populated during execution)_
+*Ledger: step · result · next. Findings live in the commit messages.*
+
+**Tree at start (2026-09-26):** `main` @ `a4b234b`, clean, no other session visible. **Always-on gate:** `run_all.py` has 16 lanes PASS/SKIP and `approval_binds_freeze` FAIL. That lane is inherited: Phase04's close records it red "alone" until the maintainer re-approves the `matterlib-0.1.0` pilot. This phase does not touch `library/releases/`.
+
+| Step | Result | Next |
+|---|---|---|
+| **5.1** | **▶ SCAFFOLD COMPLETE — sitting owed** (first human test click 1). `uv run tools/parity/rig.py GreyCard_Neutral18_Clean_Base_s01_v01` → Storm 1.8 s, Blender 3.3 s, sheet + scorecard. **Grey card ΔE2000 on the subjects: mean 0.39, p95 0.94** (bar 2). Linear radiance agrees within 1–2 % on the sphere, cube, floor, UV-grid wall and dome, with **both light factors at 1.0** (no calibration fudge). Four findings on the way (see the 5.1 commit): the preview scene's lights never lit anything; Storm needs a normalized sun and a textured dome; Storm misreads a flat `.hdr`; one `usdrecord` run is not stable. | The lead opens the sheet. Then 5.2. |
