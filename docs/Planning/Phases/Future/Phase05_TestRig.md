@@ -140,7 +140,7 @@ The controls, read: the release lifecycle (`freeze_release.py`, `promote_release
 
 - **Passes captured:** 2. **The Brief is complete.**
 - **Open decisions:** none.
-- **Checks to carry forward:** `usdrecord` needs the desktop's display (`DISPLAY=:0`), which matters for any unattended run later. Confirm Blender's Principled has no transmission-colour input before designing the Glass path. The first grey-card numbers set how "matching lighting" is judged.
+- **Checks to carry forward:** **Blender version first.** This box has Blender 5.1.0; the current release is **5.2.2 (5.2 LTS)**, checked 2026-09-26 on download.blender.org, and inside our "5.1+" target. Install 5.2.2 beside 5.1.0 (user directory, no system change), **re-run probe P1** (does its USD importer build our MaterialX?) and render on 5.2 LTS from then on. If 5.2 imports faithfully, the Blender-masters plan shrinks; say so before building. `usdrecord` needs the desktop's display (`DISPLAY=:0`), which matters for any unattended run later. Confirm Blender's Principled has no transmission-colour input before designing the Glass path. The first grey-card numbers set how "matching lighting" is judged.
 
 ## Execution Log
 
