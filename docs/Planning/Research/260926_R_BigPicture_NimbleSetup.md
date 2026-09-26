@@ -207,6 +207,15 @@ Each proposed phase has a user-facing outcome and maps onto Roadmap entries that
 - **Roadmap (updated with this pass):** Phase05 *Test Rig* (takes over *Parity Baselines*' build) · Phase06 *Unreal Test Runtime* (builds the masters *Unreal Reference Masters* will later publish) · Phase07 *Library Coverage* (renumbered, and marked Reevaluate for its re-cut as the build loop). Nothing was removed; the two RESEARCH entries stay, each pointing at the phase that builds its core.
 - **Wording:** earlier drafts of this doc used "M0–M6" for proposed phases. They are now the real phase numbers.
 
+
+## Pass 12 — Considerations raised in conversation, routed here (2026-09-26)
+
+Said to the lead in chat before Phase05 started; recorded so the phases that need them can find them.
+- **Phase07: prove the build loop on about 30 materials before the full list,** and size each nightly batch deliberately: it uses this machine's GPU and the maintainer's usage allowance.
+- **Phase06: passing our own Unreal runtime shows a material can work in Unreal, not that IMRSV Studio matches.** An occasional Studio spot check covers that (already in the Phase06 stub).
+- **Two machines, one repo:** keep the Unreal work in its own folder, and pull before every commit (already in the Phase06 stub).
+- **Real refraction in USDLiveView** needs a path-tracing renderer inside USDLiveView, which is USDLiveView's own project, not this one (Phase05 Pass 2, F9). Not yet raised as an ask in `PlatformDependencies.md`; the lead decides whether to.
+
 ---
 
 ## Open questions
