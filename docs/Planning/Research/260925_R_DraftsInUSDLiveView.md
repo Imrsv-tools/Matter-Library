@@ -122,7 +122,7 @@ What B runs into, which is why it is a phase and not a quick-fix:
   2. **R1:** may a maintainer-box dev tool in this repo write a non-release `matterlib-draft` install and the selector into the maintainer's own Stage runtime? Or do we ask Stage for an install-root override (D) instead?
   3. **Preview location (A):** is an in-repo gitignored `library/preview/` right, or another name/place?
   4. **Test composition:** reuse USDLiveView's cube-and-cone smoke composition, or have this repo own one?
-- **Stale, found here (not this verb's errand):** skill §6a and the Phase03 out-of-scope row both say USDLiveView has no sliders. That is false since USDLiveView Phase 04 completed on 2026-09-25.
-- **Unverified:** whether Stage follows a symlinked install; whether a draft with no `.dds` loads through Stage; whether Stage re-reads the catalog without a restart (restart assumed, per ReleaseModel step 7).
+- **Stale, found here:** skill §6a said USDLiveView has no sliders. *Fixed 2026-09-25 in `9dabea1`.* The Phase03 out-of-scope row ("USDLiveView LCD sliders … parked") is **still stale**: a completed phase doc, left for a dated annotation by whoever next touches it.
+- **Answered by Pass 5:** Stage follows a symlinked install ✔; a draft with no `.dds` serves ✔. **Still unverified:** whether Stage re-reads a new catalog without a restart (the tool always restarts, so it doesn't matter for the loop).
 - **Not touched:** the working tree carries another session's uncommitted edits (`Fingerprints01`/`Scuffs01` PNGs and generators). This research read none of it and committed none of it.
-- **Next step:** the lead answers Q1–Q4. Then `/quick-fix` for A, and `/discovery` for a draft-install phase if B or D is chosen. **This is a deliberate gate, not a slide.**
+- **Next step:** none owed. The loop is in use (`tools/releases/serve_to_stage.py --view <composition>`). The lead sets `$MATTER_TEST_COMPOSITION` per box (Q4). On the lead's box, the composition used on 2026-09-25 was a copy of USDLiveView's slider-smoke composition, kept outside every repo.
