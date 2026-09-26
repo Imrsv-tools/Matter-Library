@@ -23,7 +23,7 @@ No running service: the surface is **a command and the picture sheet it writes**
 
 5. **In Blender, from the Asset Browser**, drag `Copper_Verdigris_Aged` onto a mesh and move its wear sliders. **Expect:** the wear appears, as it does in USDLiveView. Today those sliders do nothing.
 
-**Reconciled with the steps:** click 1 is step 5.1's, clicks 2 and 3 are step 5.2's, click 4 is step 5.3's, and click 5 is step 5.4's.
+**Reconciled with the steps:** click 1 is step 5.1's, clicks 2 and 3 are step 5.2's (re-clicked after 5.3's normal fix), click 4 is step 5.4's, and click 5 is step 5.5's. *(Renumbered 2026-09-26 when 5.3 was inserted.)*
 
 ### In now
 
@@ -33,6 +33,8 @@ No running service: the surface is **a command and the picture sheet it writes**
 - **The sheet and four checks:** colour (ΔE2000, reusing `codec_ab.py`'s comparison), size against the ruler, slider response (does each slider move both tools the same way), and seams. Add more checks only when a real problem needs one.
 - **The 9 test materials** through the rig, with every disagreement fixed or written down.
 - **Creators' Blender library switches to the new masters** (Lead call 1, answered): the Asset-Browser materials become the faithful ones, keeping the same slider sockets so the Blender exporter still works.
+- **The articles' normal fixed at the source** (added 2026-09-26, step 5.3). Lead, verbatim, on why a wrong article is not a question: *"so we can make the correct test articles so we can cresate the correct materaisl so we can build things in Blender and aplly materilas and open them in studio/theater and they look right"*. The `.mtlx` is the single source of truth, so a defect in it is fixed there first.
+- **The preview tool's lights made to work** (added 2026-09-26). `make_preview.py`'s scene lights have never lit anything (5.1 finding), so every preview the skill judges was lit by `usdrecord`'s headlight. Its scene gets the rig's normalized sun and textured dome.
 - **The skill's stale glass note corrected** (`.claude/skills/matter-generate/SKILL.md` §6 says the preview renders see-through matter black; Pass 2 shows it only lacked a backdrop).
 - **The hand-off to Phase06:** the render-job format and the scene, documented well enough to build the Unreal driver without asking.
 
@@ -83,8 +85,9 @@ The controls, read: the release lifecycle (`freeze_release.py`, `promote_release
 
 - **5.1 — Grey card side by side.** The scene, the render-job format, both drivers, the Opaque master's plain path (colour, roughness, metalness, normal), the sheet, and the colour check, with the lighting tuned until the grey card and UV grid agree. *(First human test click 1.)*
 - **5.2 — Every slider on a layered material.** The full Opaque master: UV math, tint, roughness bias with clamp, three wear layers, mask gates and layer scale. The slider sweep, the slider-response and ruler checks, and seams. Copper and Oak pass, or their gaps are written down. *(Clicks 2–3.)*
-- **5.3 — The other masters.** TwoLayer (Rust), Masked (Lace), Emissive (Neon), TranslucentThin (Glass), TranslucentThick (Diamond) and Subsurface (Marble), with the per-master bars set from the numbers, and the two glass defects run to ground. *(Click 4.)*
-- **5.4 — Creators get the real thing in Blender.** The Asset-Browser library is regenerated on the new masters, and the exporter and asset-library checks still pass. *(Click 5.)*
+- **5.3 — Fix the articles' normal (added 2026-09-26, during 5.2).** The assembler builds every article's normal in the wrong space (Execution Log F10). The fix: combine the normal map, the overlay bumps and the layer-2 blend in tangent space, and convert to world space once with one `normalmap`. Reassemble the articles. **Before changing any article, measure what reassembly does to the frozen `matterlib-0.1.0` pilot** (Phase04 re-froze it for the same kind of change, and the maintainer re-approves) and tell the lead. Expect: ABS_Glossy and the two glasses get their shading back in USDLiveView, and Copper and Oak's wear agrees across the columns.
+- **5.4 — The other masters.** *(Was 5.3.)* TwoLayer (Rust), Masked (Lace), Emissive (Neon), TranslucentThin (Glass), TranslucentThick (Diamond) and Subsurface (Marble), with the per-master bars set from the numbers, and the two glass defects run to ground (F10 is the first suspect for both). *(Click 4.)*
+- **5.5 — Creators get the real thing in Blender.** *(Was 5.4.)* The Asset-Browser library is regenerated on the new masters, and the exporter and asset-library checks still pass. *(Click 5.)*
 - **Close.** The Phase06 hand-off section (job format, scene, expected output, and the 9-material test set: Phase06's seed says 7), `ToolingConventions.md` gains `tools/parity/`, and **commit and push**.
 
 **Why this order:** 5.1 proves the lighting and the plumbing on the simplest material, so later differences are the material's fault. 5.2 is the heart of the phase (the sliders). 5.3 is breadth. Time to the first click (5.1) is within 90 minutes; 5.2 is the largest step.
@@ -100,7 +103,8 @@ The controls, read: the release lifecycle (`freeze_release.py`, `promote_release
   - `JOB_FORMAT.md` (or the module docstring): the Phase06 contract.
 - **`blender/masters/`** (new): `build_masters.py` creates the 7 node groups from `MasterSet.md`'s formulas; `load_article.py` reads a `.mtlx` (Blender's bundled USD, or `xml.etree` like `matter_proxy.py`) and fills a master.
 - **`pyproject.toml`:** add `colour-science` if the comparison runs in the repo environment.
-- **5.4:** `tools/generators/gen_asset_library.py` builds from `blender/masters/` instead of `matter_proxy.py` (kept as a file, with a dated note that it is retired); `blender/asset_library/MatterLibrary.blend` is regenerated. Guard: `tools/conformance/check_exporter.sh`, `check_asset_library.sh` and `verify_asset_library.py` still pass. `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped ("v1 Blender representation = … proxy") is updated with a date, keeping the history.
+- **5.3** (added 2026-09-26): `tools/converters/assemble_mtlx.py` (the normal section) and the reassembled articles in `MatterLibrary/materials/`; the determinism lane's expectations follow. This amends the "Nothing in `MatterLibrary/` or `tools/converters/`" line below for this one fix.
+- **5.5:** `tools/generators/gen_asset_library.py` builds from `blender/masters/` instead of `matter_proxy.py` (kept as a file, with a dated note that it is retired); `blender/asset_library/MatterLibrary.blend` is regenerated. Guard: `tools/conformance/check_exporter.sh`, `check_asset_library.sh` and `verify_asset_library.py` still pass. `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped ("v1 Blender representation = … proxy") is updated with a date, keeping the history.
 - **Nothing** in `MatterLibrary/`, `library/releases/`, `tools/converters/` or `blender/addons/`.
 
 ## Lead calls
@@ -151,3 +155,4 @@ The controls, read: the release lifecycle (`freeze_release.py`, `promote_release
 | Step | Result | Next |
 |---|---|---|
 | **5.1** | **✅ (sitting 2026-09-26).** Lead, on the grey-card sheet, verbatim: *"Oh wow.. Ok.. I see what is happening. cool... looks like a great start"*. Sitting fix: the rig ignores stray punctuation around the article name (the first run copied a comma from the handback). Owed to 5.2: the difference panel exaggerates (Cycles noise reads yellow, grid lines red). Built: `uv run tools/parity/rig.py GreyCard_Neutral18_Clean_Base_s01_v01` → Storm 1.8 s, Blender 3.3 s, sheet + scorecard. **Grey card ΔE2000 on the subjects: mean 0.39, p95 0.94** (bar 2). Linear radiance agrees within 1–2 % on the sphere, cube, floor, UV-grid wall and dome, with **both light factors at 1.0** (no calibration fudge). Four findings on the way (see the 5.1 commit): the preview scene's lights never lit anything; Storm needs a normalized sun and a textured dome; Storm misreads a flat `.hdr`; one `usdrecord` run is not stable. | The lead opens the sheet. Then 5.2. |
+| **5.2** | In progress. **F10 (measured 2026-09-26): the assembler builds the articles' normal in the wrong space.** MaterialX 1.39's `normalmap` outputs a WORLD-space normal (`stdlib_defs.mtlx`: "into 'world' space"). `assemble_mtlx.py` treats it as tangent space: overlay bumps `(dx, dy, 0)` are added along world X/Y, and with no normal map its "flat" fallback `(0, 0, 1)` becomes a fixed world +Z normal. Evidence: ABS_Glossy renders flat white in Storm alone; blocking only its `geometry_normal` connection brings the shading back (`library/parity/_probe/ABS_Glossy/`). Affects Glass_Clear, Glass_Green and ABS_Glossy (fixed normal), and every overlay article (orientation-dependent wear). **Not a MaterialX or Blender issue: our assembler's.** → New step 5.3. The Blender master implements the intended tangent-space maths. | Build the rest of 5.2; then 5.3. |
