@@ -181,9 +181,19 @@ def Xform "World"
         float focalLength = 50.0
         float horizontalAperture = 36.0
         float verticalAperture = 36.0
-        float2 clippingRange = (0.05, 100)
+        float2 clippingRange = (0.02, 100)
         double3 xformOp:translate = (0.0, 0.48, 1.95)
-        float3 xformOp:rotateXYZ = (-11.0, 0, 0)
+        float3 xformOp:rotateXYZ = (-11.0, 0.0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
+    }
+    def Camera "CamClose"
+    {
+        float focalLength = 50.0
+        float horizontalAperture = 36.0
+        float verticalAperture = 36.0
+        float2 clippingRange = (0.02, 100)
+        double3 xformOp:translate = (0.1, 0.34, 0.58)
+        float3 xformOp:rotateXYZ = (-20.2, -12.5, 0)
         uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]
     }
 }

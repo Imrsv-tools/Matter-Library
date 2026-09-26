@@ -74,10 +74,12 @@ def run(job_path: Path) -> list[Path]:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     out = Path(job["out_dir"]) / TOOL
     pngs = []
+    views = job.get("views") or {"wide": {"camera": job["camera"], "suffix": ""}}
     for s in job["settings"]:
-        png = out / f"{s['id']}.png"
-        render_setting(s["scene"], png, job["width"], job["camera"])
-        pngs.append(png)
+        for v in views.values():
+            png = out / f"{s['id']}{v['suffix']}.png"
+            render_setting(s["scene"], png, job["width"], v["camera"])
+            pngs.append(png)
     return pngs
 
 

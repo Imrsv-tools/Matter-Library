@@ -106,10 +106,11 @@ def _font(size: int):
 def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
     out = Path(job["out_dir"])
     cols = ["USDLiveView (Storm)", "Blender (Cycles)", "Unreal", "Where they differ"]
-    label_w, head_h, row_gap = 190, 72, 34
-    rows = job["settings"]
+    label_w, head_h, line_h, row_gap = 190, 72, 30, 30
+    rows, views = job["settings"], list(job["views"])
+    block = len(views) * (cell + line_h) + row_gap          # one setting: every view, stacked
     W = label_w + cell * len(cols)
-    H = head_h + len(rows) * (cell + row_gap)
+    H = head_h + len(rows) * block
     sheet = Image.new("RGB", (W, H), (24, 24, 24))
     d = ImageDraw.Draw(sheet)
     f, fs = _font(18), _font(15)
@@ -118,24 +119,30 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
     for i, c in enumerate(cols):
         d.text((label_w + i * cell + 10, 42), c, fill=(200, 200, 200), font=f)
     for r, s in enumerate(rows):
-        y = head_h + r * (cell + row_gap)
-        d.text((10, y + 10), s["label"], fill=(235, 235, 235), font=f)
-        for i, tool in enumerate(("storm", "blender")):
-            img = Image.open(out / tool / f"{s['id']}.png").convert("RGB").resize((cell, cell))
-            sheet.paste(img, (label_w + i * cell, y))
-        d.rectangle([label_w + 2 * cell, y, label_w + 3 * cell - 1, y + cell - 1], fill=(40, 40, 40))
-        d.text((label_w + 2 * cell + 20, y + cell // 2 - 10), "Unreal: no pictures yet",
-               fill=(150, 150, 150), font=f)
-        sheet.paste(heat[s["id"]].resize((cell, cell)), (label_w + 3 * cell, y))
-        sc = scores[s["id"]]["subjects"]
-        verdict = "under the bar" if sc["dE_mean"] < BAR else "OVER the bar"
-        mv = scores[s["id"]].get("moved")
-        moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
-                 if mv else "")
-        d.text((label_w + 10, y + cell + 8),
-               f"dE2000 between the tools: mean {sc['dE_mean']:.2f}, p95 {sc['dE_p95']:.2f}  "
-               f"(bar {BAR:g}: {verdict}){moved}",
-               fill=(120, 230, 120) if sc["dE_mean"] < BAR else (255, 140, 120), font=fs)
+        y0 = head_h + r * block
+        d.text((10, y0 + 10), s["label"], fill=(235, 235, 235), font=f)
+        for k, v in enumerate(views):
+            y = y0 + k * (cell + line_h)
+            sfx = job["views"][v]["suffix"]
+            d.text((10, y + 40), f"({'whole set' if v == 'wide' else 'close-up'})",
+                   fill=(150, 150, 150), font=fs)
+            for i, tool in enumerate(("storm", "blender")):
+                img = Image.open(out / tool / f"{s['id']}{sfx}.png").convert("RGB").resize((cell, cell))
+                sheet.paste(img, (label_w + i * cell, y))
+            d.rectangle([label_w + 2 * cell, y, label_w + 3 * cell - 1, y + cell - 1], fill=(40, 40, 40))
+            d.text((label_w + 2 * cell + 20, y + cell // 2 - 10), "Unreal: no pictures yet",
+                   fill=(150, 150, 150), font=f)
+            sheet.paste(heat[s["id"]][v].resize((cell, cell)), (label_w + 3 * cell, y))
+            sc = scores[s["id"]]["views"][v]
+            m = sc["subjects"]
+            verdict = "under the bar" if m["dE_mean"] < BAR else "OVER the bar"
+            mv = sc.get("moved")
+            moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
+                     if mv else "")
+            d.text((label_w + 10, y + cell + 6),
+                   f"dE2000 between the tools: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
+                   f"(bar {BAR:g}: {verdict}){moved}",
+                   fill=(120, 230, 120) if m["dE_mean"] < BAR else (255, 140, 120), font=fs)
     p = out / "sheet.png"
     sheet.save(p)
     return p
@@ -200,16 +207,33 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
         lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
                      f"{sc['sphere']['dE_mean']:.2f} | {sc['cube']['dE_mean']:.2f} | "
                      f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {ms} | {v} |")
+    for view in [v for v in job["views"] if v != "wide"]:
+        lines += ["", f"## The {view}-up view (the cube's front face and the floor in front)", "",
+                  "Wear layers are big enough to see here (a 1 cm grain is ~15 px).", "",
+                  "| Setting | Between tools: mean | p95 | SSIM | Moved: Storm | Moved: Blender | Verdict |",
+                  "|---|---|---|---|---|---|---|"]
+        for s in job["settings"]:
+            sc = scores[s["id"]]["views"][view]
+            m = sc["subjects"]
+            v = "under" if m["dE_mean"] < BAR else "**OVER**"
+            mv = sc.get("moved")
+            if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
+                v += " · **ONE-SIDED**"
+            ms = f"{mv['storm']:.2f} | {mv['blender']:.2f}" if mv else "— | —"
+            lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
+                         f"{m['ssim']:.3f} | {ms} | {v} |")
     worst = {}
     for s in job["settings"]:
         if s.get("port"):
-            d = scores[s["id"]]["subjects"]["dE_mean"]
-            if d > worst.get(s["port"], (0, ""))[0]:
-                worst[s["port"]] = (d, s["label"])
+            for view, sc in scores[s["id"]]["views"].items():
+                d = sc["subjects"]["dE_mean"]
+                if d > worst.get(s["port"], (0, "", ""))[0]:
+                    worst[s["port"]] = (d, s["label"], view)
     if worst:
-        lines += ["", "**Per slider, the worst difference between the tools:**", ""]
-        lines += [f"- `{p}`: {d:.2f} at *{lab}* ({'under' if d < BAR else 'OVER'} the bar)"
-                  for p, (d, lab) in worst.items()]
+        lines += ["", "**Per slider, the worst difference between the tools (either view):**", ""]
+        lines += [f"- `{p}`: {d:.2f} at *{lab}*, {view} view "
+                  f"({'under' if d < BAR else 'OVER'} the bar)"
+                  for p, (d, lab, view) in worst.items()]
     mpt = job["article"]["meters_per_tile"]
     lines += ["", f"## Scale (the ruler check) — recorded size {mpt:g} m per tile", ""]
     if checks["scale"]:
@@ -244,7 +268,7 @@ def main(argv=None) -> int:
     ap.add_argument("--sweep", action="store_true", help="every declared slider through its range")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--samples", type=int, default=128)
-    ap.add_argument("--cell", type=int, default=320, help="picture size on the sheet")
+    ap.add_argument("--cell", type=int, default=400, help="picture size on the sheet")
     ap.add_argument("--out", default=None, help=f"default: {OUT_ROOT}/<article>")
     ap.add_argument("--score-only", action="store_true",
                     help="re-score the pictures already rendered (no Storm, no Blender)")
@@ -264,15 +288,21 @@ def main(argv=None) -> int:
     t2 = time.time()
 
     scores, heat = {}, {}
-    mask = out / "mask.png"
+    views = job["views"]
     for s in job["settings"]:
-        sc, dE = compare.compare(out / "storm" / f"{s['id']}.png",
-                                 out / "blender" / f"{s['id']}.png", mask)
-        if s["id"] != "defaults":
-            sc["moved"] = {t: compare.moved(out / t / f"{s['id']}.png", out / t / "defaults.png", mask)
-                           for t in ("storm", "blender")}
-        scores[s["id"]] = sc
-        heat[s["id"]] = compare.heatmap(dE, BAR, compare.masks(mask)["subjects"])
+        per_view, heat[s["id"]] = {}, {}
+        for v, spec in views.items():
+            sfx = spec["suffix"]
+            mask = out / f"mask{sfx}.png"
+            sc, dE = compare.compare(out / "storm" / f"{s['id']}{sfx}.png",
+                                     out / "blender" / f"{s['id']}{sfx}.png", mask)
+            if s["id"] != "defaults":
+                sc["moved"] = {t: compare.moved(out / t / f"{s['id']}{sfx}.png",
+                                                out / t / f"defaults{sfx}.png", mask)
+                               for t in ("storm", "blender")}
+            per_view[v] = sc
+            heat[s["id"]][v] = compare.heatmap(dE, BAR, compare.masks(mask)["subjects"])
+        scores[s["id"]] = per_view["wide"] | {"views": per_view}
     checks = {"scale": scale_checks(art, job), "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
     sheet = build_sheet(job, scores, heat, args.cell)
     card = write_scorecard(job, scores, checks)

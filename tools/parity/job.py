@@ -121,6 +121,11 @@ def write_setting_scene(art: Article, setting: dict, out: Path) -> Path:
     return out
 
 
+def view_suffix(view: str) -> str:
+    """The wide view keeps the plain file name; any other view is ``<id>__<view>.png``."""
+    return "" if view == "wide" else f"__{view}"
+
+
 def write_job(art: Article, settings: list[dict], out_dir: Path, width: int, samples: int) -> Path:
     """Write every setting's scene and the job.json that names them."""
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -132,6 +137,8 @@ def write_job(art: Article, settings: list[dict], out_dir: Path, width: int, sam
                     "meters_per_tile": art.meters_per_tile},
         "scene": str(SCENE),
         "camera": "/World/Cam",
+        # every view is rendered for every setting: <tool>/<id><suffix>.png
+        "views": {v: {"camera": c, "suffix": view_suffix(v)} for v, c in build_scene.CAMERAS.items()},
         "subjects": list(build_scene.SUBJECTS),
         "width": width,
         "samples": samples,

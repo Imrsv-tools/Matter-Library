@@ -67,10 +67,10 @@ def setup_scene(job: dict) -> None:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.usd_import(filepath=job["settings"][0]["scene"])
     scn = bpy.context.scene
-    cams = [o for o in scn.objects if o.type == "CAMERA"]
-    if len(cams) != 1:
-        raise SystemExit(f"expected one camera in the scene, found {[c.name for c in cams]}")
-    scn.camera = cams[0]
+    wide = bpy.data.objects.get(job["camera"].rsplit("/", 1)[1])
+    if wide is None or wide.type != "CAMERA":
+        raise SystemExit(f"camera {job['camera']!r} not found after import")
+    scn.camera = wide
 
     # lights: keep the imported sun's direction, set every value from the scene's numbers
     suns = [o for o in scn.objects if o.type == "LIGHT" and o.data.type == "SUN"]
@@ -173,16 +173,28 @@ def run(job_path: Path) -> None:
     objs = subjects(job)
     out = Path(job["out_dir"]) / TOOL
     out.mkdir(parents=True, exist_ok=True)
-    render_mask(objs, Path(job["out_dir"]) / "mask.png")
+    scn = bpy.context.scene
+    views = job.get("views") or {"wide": {"camera": job["camera"], "suffix": ""}}
+    cams = {}
+    for v, spec in views.items():
+        name = spec["camera"].rsplit("/", 1)[1]
+        cams[v] = bpy.data.objects.get(name)
+        if cams[v] is None or cams[v].type != "CAMERA":
+            raise SystemExit(f"view {v!r}: camera {name!r} not found after import")
+        scn.camera = cams[v]
+        render_mask(objs, Path(job["out_dir"]) / f"mask{spec['suffix']}.png")
     art = Path(job["article"]["path"])
     for s in job["settings"]:
         mat = load_article.build(art, s.get("set", {}), name=f"{job['article']['name']}__{s['id']}")
         for o in objs:
             o.data.materials.clear()
             o.data.materials.append(mat)
-        bpy.context.scene.render.filepath = str(out / f"{s['id']}.png")
-        bpy.ops.render.render(write_still=True)
-        print(f"blender: wrote {out / (s['id'] + '.png')}")
+        for v, spec in views.items():
+            scn.camera = cams[v]
+            png = out / f"{s['id']}{spec['suffix']}.png"
+            scn.render.filepath = str(png)
+            bpy.ops.render.render(write_still=True)
+            print(f"blender: wrote {png}")
 
 
 if __name__ == "__main__":
