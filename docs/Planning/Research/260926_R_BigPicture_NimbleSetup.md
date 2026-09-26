@@ -1,6 +1,6 @@
 # Research — The big picture: what the Matter Library is for, and the quickest way to get it working
 
-**Opened:** 2026-09-26 · **Mode:** research. It gathers and commits to nothing. **Next:** `/discovery` for M1 on this machine, and for M2 on the UE machine (§Status).
+**Opened:** 2026-09-26 · **Mode:** research. It gathers and commits to nothing. **Next:** `/discovery Phase05` on this machine (§Status).
 
 **Question (lead, 2026-09-26, condensed):** "Phase 4 got too lost in some issues and I feel like this project is not flowing correctly… back up and look at the big picture of what the Matter Library is, the value it brings and assess the best way to get it up and running… we need to be way more nimble." The lead proposed this sequence and asked for review:
 1. an **automated test rig** that renders an article in USDLiveView, Blender and Unreal under controlled settings, across the ranges of its parameters, and judges the results side by side;
@@ -21,10 +21,11 @@
 | BP2 | **The UE leg is a bespoke UE project owned by this repo.** It carries Matter reference masters that mirror the master contract; it is not IMRSV Studio. This brings forward the Roadmap's *Unreal Reference Masters* (R14 "B later"). |
 | BP3 | **Tools are judged against each other; no single renderer counts as the truth.** An article passes when Storm, Blender and UE agree within the per-master bar across the parameter sweep, and each render matches the recipe's own anchors (albedo, roughness, scale). An agent and the lead judge whether it *looks like the matter*. |
 | BP4 | **Drafts keep `v01`; their state lives in a status field.** The lifecycle already exists (`draft → candidate → approved → deprecated → retired`, `_Architecture.md` §Versioning). Names never change on passing, so saved test compositions keep working. The v00 → v01 rename is not used. |
-| BP5 | **Phase04 is closed on its content fix** (lead, 2026-09-26: "Closing P4 now"; `a383e86`). The milestone sequence M0–M6 is accepted as the working plan. |
+| BP5 | **Phase04 is closed on its content fix** (lead, 2026-09-26: "Closing P4 now"; `a383e86`). The proposed sequence (Pass 5) is accepted as the working plan. |
 | BP6 | **The UE machine runs Linux, and an agent can work there with its own clone of this repo.** Git is the channel between the two machines. This machine does everything it can; the UE work happens there. |
 | BP7 | **The UE leg is a standalone packaged runtime,** not an editor-driven project. It is built on the UE machine, then runs headless on any Linux machine with a GPU, this one included (Pass 7). |
 | BP8 | **"You build them."** The agent makes the materials by whatever works: measured values, free scans, code-generated textures, image-generation models. **Licensing and provenance do not block the seed library** (lead, 2026-09-26: "we are trying to prove a concept"). The tools keep noting where each texture came from automatically; nothing is added on top. This unparks what earlier docs called "generative imagery". |
+| BP9 | **Phase05 and Phase06 are seeded, and they run one after the other, not in parallel** (lead, 2026-09-26: *"we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6, and once we have the UE runtime we can move back here for phase 7 and on"*). Library Coverage is renumbered Phase05 → Phase07. |
 
 ---
 
@@ -70,7 +71,7 @@
 1. **Start the rig on a proving set of about 6 articles, not the whole library.** One per master family, plus layered and TwoLayer cases: `GreyCard_Neutral18` (calibration), `Copper_Verdigris_Aged` (metal, layered), `Oak_Natural` (scan, layered), `Rust_OnSteel_Flaking` (TwoLayer), `Glass_Clear` (transmission), `Lace_Floral` (Masked), `Neon_Signage` (Emissive). When the rig and the proving set agree, the structure is validated. Generation at volume comes after that.
 2. **A faithful Blender form is the rig's biggest hidden item.** Today's proxy would fail every layered article. The architecture already names the fix: *"masters are where per-target gaps are bridged."* So Blender needs **Blender masters**, one node group per master that mirrors the MaterialX graph including the overlay and mask network. The UE side needs the same. A cheaper path may exist and should be probed first: Blender 5.1's USD importer (`import_materials` is present; the fidelity of its MaterialX graph import is **unverified**). *(This supersedes part of the Parking-lot item "automated transformers, after manual parity is proven". The item is kept, not deleted: the masters **are** the hand-built transformer.)*
 3. **The UE leg is a remote runner (BP1, BP2).** A bespoke UE 5.8 Substrate project in this repo holds reference masters that mirror `MasterSet.md`, plus a script that builds a material instance from an article's `.mtlx` by its master token, which is what Stage does for Studio. It is run headless on the UE machine (UE's command-line editor with a Python script and a fixed-camera capture) and returns PNGs. *How* the agent reaches that machine is open (Q-C). Fallback: the lead runs one command there per batch.
-4. **Take the release out of the content loop until the first real release (M4).** The pilot `0.1.0` should not gate content work. Its lanes skip, or the pilot is marked `Reevaluate`, until the first real release is cut from `approved` articles. *(Don't Delete: the machinery stays; it just stops running in the loop.)*
+4. **Take the release out of the content loop until the first real release (the first release).** The pilot `0.1.0` should not gate content work. Its lanes skip, or the pilot is marked `Reevaluate`, until the first real release is cut from `approved` articles. *(Don't Delete: the machinery stays; it just stops running in the loop.)*
 5. **Resolve naming rulings on contact, not up front.** The loop uses the draft's recommended defaults. A ruling is asked for only when the loop reaches a row it affects, and before that row reaches `approved`. Names are cheap until a release.
 
 **On the lead's other points:**
@@ -111,21 +112,21 @@
 - **Blender:** `blender -b` with a Matter test `.blend` and the Blender masters. Cycles for the parity render; EEVEE optionally, as creators preview in it.
 - **UE:** the remote runner (Pass 3 item 3).
 
-## Pass 5 — Proposed milestones (the answer)
+## Pass 5 — Proposed phases (the answer)
 
-Each milestone has a user-facing outcome and maps onto Roadmap entries that already exist. Nothing below is committed. Numbering and order are the lead's.
+Each proposed phase has a user-facing outcome and maps onto Roadmap entries that already exist. Nothing below is committed. Numbering and order are the lead's.
 
-| Milestone | Outcome | Absorbs | Size |
+| Phase | Outcome | Absorbs | Size |
 |---|---|---|---|
-| **M0. Land Phase04 on content** | Wear layers are the right size, and the phase is closed | Phase04. The pilot re-freeze is dropped: L1 becomes moot under Pass 3 item 4 | hours |
-| **M1. Parity rig: Storm + Blender** | For any article, see Storm and Blender side by side across every slider, with a scorecard | *Parity Baselines*; the Blender masters (Pass 3 item 2); the Blender MaterialX-import probe first | a phase |
-| **M2. Parity rig: the UE leg** | The same sheet with a third column from our own UE project | *Unreal Reference Masters* (BP2) | a phase |
-| **M3. The generation loop** | The library fills itself in scheduled batches; the lead reviews sheets, not scenes | Phase05 *Library Coverage*, re-cut as a loop over a tracked queue (the coverage list as data) | a small phase, then a loop |
-| **M4. The first real release** | Creators install a versioned release of `approved` articles | *Release Bundle and Consumer Contract*; *Blender from a Release*; *IMRSV Consumes Releases* | a phase |
-| **M5. Library management** | The maintainer adds, supersedes and retires articles between releases in minutes | *Version Management*; *Author a Material End to End* (the Matter Manager) | a phase |
-| **M6. Community** | Outsiders contribute and get credit; usage is visible; perhaps a CMS | *Contribution Path*; *See the Library*; the Parking lot's scoring and reputation | later |
+| **Phase04. Land it on content** | Wear layers are the right size, and the phase is closed | Phase04. The pilot re-freeze is dropped: L1 becomes moot under Pass 3 item 4 | hours |
+| **Phase05. Parity rig: Storm + Blender** | For any article, see Storm and Blender side by side across every slider, with a scorecard | *Parity Baselines*; the Blender masters (Pass 3 item 2); the Blender MaterialX-import probe first | a phase |
+| **Phase06. Parity rig: the UE leg** | The same sheet with a third column from our own UE project | *Unreal Reference Masters* (BP2) | a phase |
+| **Phase07. The generation loop** | The library fills itself in scheduled batches; the lead reviews sheets, not scenes | *Library Coverage* (then numbered Phase05), re-cut as a loop over a tracked queue (the coverage list as data) | a small phase, then a loop |
+| **Later. The first real release** | Creators install a versioned release of `approved` articles | *Release Bundle and Consumer Contract*; *Blender from a Release*; *IMRSV Consumes Releases* | a phase |
+| **Later. Library management** | The maintainer adds, supersedes and retires articles between releases in minutes | *Version Management*; *Author a Material End to End* (the Matter Manager) | a phase |
+| **Later. Community** | Outsiders contribute and get credit; usage is visible; perhaps a CMS | *Contribution Path*; *See the Library*; the Parking lot's scoring and reputation | later |
 
-**M1 and M2 can overlap.** The UE project's masters can be built while the Blender masters are, since both mirror one `MasterSet.md`.
+**Phase05 and Phase06 can overlap.** The UE project's masters can be built while the Blender masters are, since both mirror one `MasterSet.md`.
 
 **Rig before loop, strictly.** The loop's "passes the rig" condition is the rig. Generating before the rig exists repeats Phase03 → Phase04: design flaws found article by article.
 
@@ -165,8 +166,8 @@ Each milestone has a user-facing outcome and maps onto Roadmap entries that alre
 
 | This machine (now) | The UE machine |
 |---|---|
-| M1: the Blender import probe → Blender masters if needed → the scene → the Storm and Blender drivers → contact sheets and scorecards → the proving set passing on two tools | M2: the grey sphere proof → the 7 masters → the loader → the sweep → the package |
-| M3: start the generation loop on two tools (the UE column fills in later) | runs the UE column of the proving set while the package isn't ready yet |
+| Phase05: the Blender import probe → Blender masters if needed → the scene → the Storm and Blender drivers → contact sheets and scorecards → the proving set passing on two tools | Phase06: the grey sphere proof → the 7 masters → the loader → the sweep → the package |
+| Phase07: start the generation loop on two tools (the UE column fills in later) | runs the UE column of the proving set while the package isn't ready yet |
 | receives the package, and from then on runs all three columns here | back to Studio work; the package is rebuilt only when a master changes |
 
 **Momentum rule (a proposal):** a material that passes on Storm and Blender is **candidate**. It becomes **approved** only once the UE column agrees too. So the loop doesn't wait for the UE runtime, and nothing is called finished without it.
@@ -182,9 +183,9 @@ Each milestone has a user-facing outcome and maps onto Roadmap entries that alre
 
 **Each morning:** a short summary lists what was built, the contact sheets, and what got stuck. The lead looks at sheets, not scenes. **Keep** marks it approved (subject to the UE column); **redo** sends a note back to the list. USDLiveView stays available for a closer look at any one material.
 
-**What the loop needs that doesn't exist yet:** the list file, the rig (M1), a small driver script the scheduler calls, and the status field (BP4). The `/matter-generate` skill already does the building half, one material at a time.
+**What the loop needs that doesn't exist yet:** the list file, the rig (Phase05), a small driver script the scheduler calls, and the status field (BP4). The `/matter-generate` skill already does the building half, one material at a time.
 
-## Pass 10 — After the library works (M4–M6), plainly
+## Pass 10 — After the library works (the later phases (first release, management, community)), plainly
 
 - **A release is a download, not the git repo.** Creators get one bundle per version from the project's releases page. That also avoids the download limits on the repo's large-file storage: textures are 46 MB for 17 materials today, so a few hundred MB to a couple of GB for 170 (a rough estimate).
 - **Blender:** the add-on and the material library ship as one Blender extension that installs from a file or a link.
@@ -195,6 +196,17 @@ Each milestone has a user-facing outcome and maps onto Roadmap entries that alre
 - **Tracking use and changes:** download counts come free with releases. A creator's slider changes are already saved in their scene, so "share my version back" could turn a tweak into a new variant. Anything beyond that would be opt-in.
 - **A CMS:** first a browsable website built from each release (pictures and names; the Roadmap's *See the Library*). A real CMS only if working through git becomes the bottleneck. Git stays the source either way.
 
+
+## Pass 11 — Seeded, one machine at a time (2026-09-26)
+
+**The lead's ruling (BP9) replaces Pass 8's "in parallel" with a simpler order:** Phase05 is done entirely on this machine and pushed; Phase06 is done on the UE machine and pushed; work comes back here for Phase07 on, with all three tools available.
+
+**What changes:**
+- **Phase05's hand-off matters most.** The render-job format and the test scene must be written down well enough for the agent on the UE machine to build against them without asking. That is in the Phase05 stub's Notes.
+- **Pass 8's momentum rule (candidate on two tools, approved on three) matters less.** By Phase07 all three tools exist, so the build loop can require all three from the start. It stays a fallback in case the runtime slips.
+- **Roadmap (updated with this pass):** Phase05 *Test Rig* (takes over *Parity Baselines*' build) · Phase06 *Unreal Test Runtime* (builds the masters *Unreal Reference Masters* will later publish) · Phase07 *Library Coverage* (renumbered, and marked Reevaluate for its re-cut as the build loop). Nothing was removed; the two RESEARCH entries stay, each pointing at the phase that builds its core.
+- **Wording:** earlier drafts of this doc used "M0–M6" for proposed phases. They are now the real phase numbers.
+
 ---
 
 ## Open questions
@@ -204,21 +216,21 @@ Each milestone has a user-facing outcome and maps onto Roadmap entries that alre
 | ~~Q-A~~ | ~~Close Phase04 without re-freezing the pilot?~~ **Done (BP5).** | — |
 | ~~Q-B~~ | ~~Probe Blender's import first?~~ **Yes (BP5).** | — |
 | ~~Q-C~~ | ~~How does an agent reach the UE machine?~~ **An agent there, with git between the machines (BP6).** | — |
-| Q-D | The wish list: a plain file in the repo (Pass 9)? | Yes; decided at M3 |
+| Q-D | The wish list: a plain file in the repo (Pass 9)? | Yes; decided at Phase07 |
 | Q-E | The proving set: the 7 in Pass 3 item 1? | As listed |
 | Q-F | Rig pictures go in an ignored scratch folder, with a small scorecard kept beside each material? | Yes |
 | Q-G | The status field is written in both the recipe and the `.mtlx`? | Yes |
 | Q-H | Two-tool pass = candidate, three-tool pass = approved (Pass 8)? | Yes |
 
-None of these blocks M1. Each can be settled when its milestone starts, using the recommendation.
+None of these blocks Phase05. Each can be settled when its phase starts, using the recommendation.
 
 **Unverified:** how faithfully Blender 5.1's USD import brings in MaterialX · Substrate in a packaged Linux Unreal build · runtime texture colour settings in Unreal · the texture-size estimate for 170 materials.
 
 ## Status
 
-- **Passes captured:** 10 (2026-09-26).
-- **Lead rulings:** BP1–BP8. Unreal work happens on the UE machine (Linux, with an agent) as a standalone runtime. Materials are judged by the tools agreeing with each other. Drafts keep `v01` with a status field. Phase04 is closed. The agent builds materials by any means, and licensing doesn't block the seed library.
-- **The plan:** M0 is done. **M1 is next, on this machine:** the Storm and Blender rig with an empty UE column, starting with the Blender import probe. **M2 runs in parallel on the UE machine:** the packaged runtime, starting with one grey sphere. M3, the nightly generation loop, starts once two tools agree on the proving set. M4–M6 are sketched in Pass 10.
+- **Passes captured:** 11 (2026-09-26).
+- **Lead rulings:** BP1–BP9. Unreal work happens on the UE machine (Linux, with an agent) as a standalone runtime. Materials are judged by the tools agreeing with each other. Drafts keep `v01` with a status field. Phase04 is closed. The agent builds materials by any means, and licensing doesn't block the seed library. Phase05 and Phase06 are seeded and run one after the other.
+- **The plan:** **Phase05 (this machine):** the Blender and USDLiveView test rig, starting with the Blender import check, and closing with a push. **Phase06 (UE machine):** the packaged Unreal test runtime, starting with one grey sphere. **Phase07 (back here):** Library Coverage, expected to be re-cut as the nightly build loop. The later phases (first release, management, community) are sketched in Pass 10.
 - **Open:** Q-D to Q-H, each with a recommendation and none blocking.
 - **Process note for `/retro`:** the lead has asked repeatedly for less ceremony and plainer words (Pass 6). Filling a library is a loop, not a sequence of phases. Keep release checks out of content work before the first release. *(For the Workflow Refiner; this doc doesn't edit the method.)*
-- **Next step:** `/discovery` for M1 on this machine, and a separate `/discovery` for M2 by the agent on the UE machine, both pointing here. **A deliberate step, not a slide:** this doc changes no Roadmap entry. Adding M1 and M2 to the Roadmap is the lead's call.
+- **Next step:** `/discovery Phase05` on this machine.

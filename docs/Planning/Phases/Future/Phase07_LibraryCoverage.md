@@ -1,6 +1,6 @@
-# Phase05 — Library Coverage
+# Phase07 — Library Coverage
 
-**Status:** SEED (phase doc written 2026-09-25; discovery has not opened). Numbered by the lead, 2026-09-25, verbatim: *"i and then seed phase 5 and that will be building materials"*. It follows Phase04 (Wear Layers at Their Own Scale) and precedes the release bundle: *"we have 200 materials to build and test before we have our first versionable library"* (lead, 2026-09-25, `260925_R_DraftsInUSDLiveView.md` Pass 5).
+**Status:** SEED (phase doc written 2026-09-25; discovery has not opened). **Renumbered Phase05 → Phase07 by the lead, 2026-09-26:** the test rig (Phase05) and the Unreal test runtime (Phase06) now come first, so every material this phase builds is checked in all three tools. **Reevaluate (2026-09-26):** this phase is expected to be re-cut as the nightly build loop over a wish list (`260926_R_BigPicture_NimbleSetup.md` Pass 9); the scope below predates that and is kept until discovery re-cuts it. Originally numbered by the lead, 2026-09-25, verbatim: *"i and then seed phase 5 and that will be building materials"*. It follows Phase04 (Wear Layers at Their Own Scale) and precedes the release bundle: *"we have 200 materials to build and test before we have our first versionable library"* (lead, 2026-09-25, `260925_R_DraftsInUSDLiveView.md` Pass 5).
 
 ## Outcome
 

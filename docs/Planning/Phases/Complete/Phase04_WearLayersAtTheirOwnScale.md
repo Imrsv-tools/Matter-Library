@@ -36,7 +36,7 @@ Reconciled with the step list: **every click is step 4.1's.** Clicks 4 and 5 nee
 
 ### Not now
 
-- Making the other 13 layers in the Coverage list: **Phase05**, which consumes this contract and these generators.
+- Making the other 13 layers in the Coverage list: **Phase07 (was Phase05)**, which consumes this contract and these generators.
 - Localised colour or gloss through a mask (Coverage research L7).
 - The always-carried-layer shader-cost measurement (`MasterSet.md` Reevaluate). `tiledimage` adds four arithmetic nodes per layer, which is negligible and doesn't change that question.
 - Consumer implementation (Stage, UE masters): the platform's work, recorded as an ask.
@@ -58,7 +58,7 @@ Reconciled with the step list: **every click is step 4.1's.** Clicks 4 and 5 nee
 ### Decisions that bind
 
 - **D1 — A shared layer is sampled at its own size.** Each overlay and maskset render-role node (`overlay{1,2,3}_tex`, `maskset_tex`) becomes a `tiledimage`, with `realworldimagesize` = the layer's metres, `realworldtilesize` = the article's `meters_per_tile`, and `texcoord` still from `uv_place`. **The Creator's UV controls therefore still move the whole material together.** The per-article textures (base, layer 2, opacity) stay `image`, sampled at the article's size.
-- **D2 — A shared layer's size is its scale tag**, per `Identity.md`'s own definition. A shared layer is authored at exactly its tag's size, and `sUKN` is not allowed on a shared layer. *(Phase05 may import ambientCG imperfections at other sizes. It resamples them to a tag, or revisits this rule with evidence; the question does not arise on today's 9 layers, all procedural at decade sizes.)*
+- **D2 — A shared layer's size is its scale tag**, per `Identity.md`'s own definition. A shared layer is authored at exactly its tag's size, and `sUKN` is not allowed on a shared layer. *(Phase07 (was Phase05) may import ambientCG imperfections at other sizes. It resamples them to a tag, or revisits this rule with evidence; the question does not arise on today's 9 layers, all procedural at decade sizes.)*
 - **D3 — The article's size is its recipe `meters_per_tile`** (precise), not its coarse tag. An article carrying layers must have `meters_per_tile > 0`.
 - **D4 — Masks follow D1 as well as overlays.** This is answered by `Identity.md`, not a fork: a shared texture's tag *is* its metres-per-tile, and sampling it at any other size contradicts that. **Visible effect, by measurement:** every mask is `s01` (0.1 m), so the five 0.1 m articles are unchanged (ratio 1). Only **Oak** (`Grime01`, 8x) and **Rust** (`RustBloom01`, 5x) change.
 - **D5 — Re-assembled articles keep `v01` in place,** per the lead's "no versioning ... we are VERY pre release" (2026-09-25) and "Fix forward only" (Matter-Library#1). The pilot `matterlib-0.1.0` is **re-frozen and the maintainer re-approves it**, as in the #1 precedent (`4ed38dc` → `4172c74`). Its `.dds` handling is L1.
@@ -147,9 +147,9 @@ The controls, read: `promote_release.py` (the sole approval flip), `freeze_relea
 
 | Item | Disposition |
 |---|---|
-| Seam guard lane over `textures/shared/**` | **Deferred as an ADDITION** (a new gate needs the lead's ruling under execute's frozen-gates rule; recommended yes) → Phase05 question 7, which adds 13 layers. Not a correction: the Outcome holds, and every layer measures seamless. |
+| Seam guard lane over `textures/shared/**` | **Deferred as an ADDITION** (a new gate needs the lead's ruling under execute's frozen-gates rule; recommended yes) → Phase07 (was Phase05) question 7, which adds 13 layers. Not a correction: the Outcome holds, and every layer measures seamless. |
 | Size guard lane in `validate_material.py` | **Ruled out:** the assembler now refuses an unsized layer and `meters_per_tile ≤ 0`, so the input side is covered where articles are made. |
 | Unreal rendering layers at their own size | **Out of repo:** consumer work, `PlatformDependencies.md` **P13** (Separation). The Outcome holds for every material as the library defines it (MaterialX/USD); the headline says so. |
-| Per-article base textures from the pre-Phase03 generators may not tile (Lace, Marble, Rust base; `tileable.py`'s own docstring says those generators "can show a seam"; unmeasured) | **Deferred as an ADDITION:** a pre-existing defect, not a wear layer → Phase05 question 8. |
+| Per-article base textures from the pre-Phase03 generators may not tile (Lace, Marble, Rust base; `tileable.py`'s own docstring says those generators "can show a seam"; unmeasured) | **Deferred as an ADDITION:** a pre-existing defect, not a wear layer → Phase07 (was Phase05) question 8. |
 | `.dds` re-lock of the pilot | → Release Bundle (its F4; the encoder is its dependency). |
 | Pilot re-approval | **Owed by the maintainer:** one command (§Status). |
