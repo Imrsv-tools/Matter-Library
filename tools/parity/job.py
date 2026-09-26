@@ -36,13 +36,21 @@ USD_TYPES = {"float": "float", "vector2": "float2", "color3": "color3f", "color4
 
 
 def find_article(name: str) -> Path:
-    """An article by stem (or a path to its .mtlx)."""
+    """An article by stem (or a path to its .mtlx).
+
+    Stray punctuation or quotes around the name (copied along from prose) are ignored.
+    """
+    name = name.strip().strip(",.;:'\"`")
     p = Path(name)
     if p.suffix == ".mtlx" and p.is_file():
         return p.resolve()
     hits = sorted(MATERIALS.rglob(f"{p.stem}.mtlx"))
     if not hits:
-        raise SystemExit(f"no article named {name!r} under {MATERIALS}")
+        import difflib
+        stems = sorted(m.stem for m in MATERIALS.rglob("*.mtlx"))
+        near = difflib.get_close_matches(p.stem, stems, n=3, cutoff=0.5)
+        hint = f"; did you mean {' or '.join(near)}?" if near else f"; articles: {', '.join(stems)}"
+        raise SystemExit(f"no article named {name!r} under {MATERIALS}{hint}")
     return hits[0]
 
 
