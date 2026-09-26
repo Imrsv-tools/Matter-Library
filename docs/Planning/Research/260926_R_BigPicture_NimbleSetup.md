@@ -1,6 +1,6 @@
 # Research — The big picture: what the Matter Library is for, and the quickest way to get it working
 
-**Opened:** 2026-09-26 · **Mode:** research. It gathers and commits to nothing. **Next:** the lead rules on the milestone sequence (§Status). The first phase then goes to `/discovery`.
+**Opened:** 2026-09-26 · **Mode:** research. It gathers and commits to nothing. **Next:** `/discovery` for M1 on this machine, and for M2 on the UE machine (§Status).
 
 **Question (lead, 2026-09-26, condensed):** "Phase 4 got too lost in some issues and I feel like this project is not flowing correctly… back up and look at the big picture of what the Matter Library is, the value it brings and assess the best way to get it up and running… we need to be way more nimble." The lead proposed this sequence and asked for review:
 1. an **automated test rig** that renders an article in USDLiveView, Blender and Unreal under controlled settings, across the ranges of its parameters, and judges the results side by side;
@@ -21,6 +21,10 @@
 | BP2 | **The UE leg is a bespoke UE project owned by this repo.** It carries Matter reference masters that mirror the master contract; it is not IMRSV Studio. This brings forward the Roadmap's *Unreal Reference Masters* (R14 "B later"). |
 | BP3 | **Tools are judged against each other; no single renderer counts as the truth.** An article passes when Storm, Blender and UE agree within the per-master bar across the parameter sweep, and each render matches the recipe's own anchors (albedo, roughness, scale). An agent and the lead judge whether it *looks like the matter*. |
 | BP4 | **Drafts keep `v01`; their state lives in a status field.** The lifecycle already exists (`draft → candidate → approved → deprecated → retired`, `_Architecture.md` §Versioning). Names never change on passing, so saved test compositions keep working. The v00 → v01 rename is not used. |
+| BP5 | **Phase04 is closed on its content fix** (lead, 2026-09-26: "Closing P4 now"; `a383e86`). The milestone sequence M0–M6 is accepted as the working plan. |
+| BP6 | **The UE machine runs Linux, and an agent can work there with its own clone of this repo.** Git is the channel between the two machines. This machine does everything it can; the UE work happens there. |
+| BP7 | **The UE leg is a standalone packaged runtime,** not an editor-driven project. It is built on the UE machine, then runs headless on any Linux machine with a GPU, this one included (Pass 7). |
+| BP8 | **"You build them."** The agent makes the materials by whatever works: measured values, free scans, code-generated textures, image-generation models. **Licensing and provenance do not block the seed library** (lead, 2026-09-26: "we are trying to prove a concept"). The tools keep noting where each texture came from automatically; nothing is added on top. This unparks what earlier docs called "generative imagery". |
 
 ---
 
@@ -125,27 +129,96 @@ Each milestone has a user-facing outcome and maps onto Roadmap entries that alre
 
 **Rig before loop, strictly.** The loop's "passes the rig" condition is the rig. Generating before the rig exists repeats Phase03 → Phase04: design flaws found article by article.
 
+
+## Pass 6 — The lead's second round (2026-09-26)
+
+**Answers:** Phase04 is closed (BP5). The UE machine is Linux with an agent (BP6). The UE leg is a standalone runtime (BP7). The agent builds materials by any means, and licensing doesn't block (BP8). The lead also said plainly that the process vocabulary is getting in the way: *"I don't know the magic words you are using here… how many times do I need to say stop with the bureaucracy."* **From here this doc uses plain words:** "tools" for Blender, UE and USDLiveView; "sliders" for the Creator controls; "ways to make a material" instead of lanes.
+
+**What this settles:** Q-A (yes, done) · Q-B (probe Blender's import first) · Q-C (an agent on the UE machine, git between the two). **A new simplification:** both machines are Linux, so the UE runtime is built and run natively. No cross-compiling, and the same package runs here.
+
+## Pass 7 — The Matter UE runtime (what it is, and what is hard)
+
+**What it is:** a small packaged Unreal 5.8 app (Substrate on) that does one job. Given a material's `.mtlx`, a list of slider settings and the test scene, it renders one PNG per setting and exits. No editor, no window. It is the third column of the rig, and it doubles as the public Unreal reference the Roadmap already wanted (*Unreal Reference Masters*).
+
+**What goes inside it:**
+- **The 7 masters, built in Unreal to mirror `MasterSet.md`.** Every input a material can set (textures, colours, the slider values, the wear-layer sizes from Phase04) is a parameter on the master. A packaged app can't compile new shaders, so everything must be a parameter; that is already what a master *is*.
+- **A loader.** It reads the `.mtlx` (plain XML): which master to use, which textures, which constant values, and the default slider values. It loads the PNGs as textures at runtime and sets them on an instance of the master. IMRSV does the same thing privately; this is our public version.
+- **The test scene** (Pass 8) and a fixed camera. It renders the whole slider sweep in one launch, so the load cost is paid once.
+
+**Built only on the UE machine, and run anywhere:** writing the masters (ideally by an editor script that reads `MasterSet.md`'s data, so they can be rebuilt rather than hand-clicked) and packaging. After that, the package is copied to any Linux GPU box, this one included. The package is hundreds of MB, so it lives outside git (a release download, or copied across).
+
+**Where it is likely to hurt (check each early, on the UE machine):**
+- **Texture settings at runtime.** Colour textures must load as sRGB and data textures (roughness, normals, the wear layers) as linear. The normal-map green channel must be the right way up. These are the classic reasons Blender and Unreal disagree; the rig's normal and colour checks exist to catch them.
+- **Repeatable frames.** Auto-exposure, temporal anti-aliasing and Lumen noise change a render from frame to frame. Turn auto-exposure off, let frames settle before capture, or use Unreal's path tracer for the parity renders.
+- **Substrate in a packaged Linux (Vulkan) build.** Expected to work, but **unverified**. It is the first thing to prove with a single grey sphere.
+- **Capture without an editor.** The editor's movie-render tools don't ship in a packaged app. The runtime reads the frame back itself and writes the PNG.
+
+**The order on the UE machine:** grey sphere in a packaged build → one master and one material loaded from `.mtlx` → the sweep → all 7 masters. Parity numbers can come from the editor build while the packaging is sorted out; the editor is the development loop, and the package is the deliverable.
+
+## Pass 8 — One plan, two machines
+
+**The seam that makes this work: a render job.** The rig defines one simple job format: *this material, these slider settings, this scene, write PNGs here*. Each tool gets a small driver that takes a job and returns PNGs: Storm (here), Blender (here), and the UE runtime (built there, run anywhere). The comparison, contact sheets and scorecards never care which tool made a picture. So the rig is built here first with an empty UE column, and the column fills in when the runtime arrives.
+
+**The scene is authored once.** A USD file holds the geometry (a sphere, a rounded cube, a 1 m plane with a ruler), the camera and the lights. Storm reads it directly, Blender imports it, and the UE runtime has it built in from the same file. **The lighting is calibrated before any material is judged:** the grey card, the UV grid, and a plain grey sphere must match across the tools first. Otherwise every material fails for reasons that aren't the material's fault. The grey card and UV grid articles already exist for exactly this.
+
+**What happens where:**
+
+| This machine (now) | The UE machine |
+|---|---|
+| M1: the Blender import probe → Blender masters if needed → the scene → the Storm and Blender drivers → contact sheets and scorecards → the proving set passing on two tools | M2: the grey sphere proof → the 7 masters → the loader → the sweep → the package |
+| M3: start the generation loop on two tools (the UE column fills in later) | runs the UE column of the proving set while the package isn't ready yet |
+| receives the package, and from then on runs all three columns here | back to Studio work; the package is rebuilt only when a master changes |
+
+**Momentum rule (a proposal):** a material that passes on Storm and Blender is **candidate**. It becomes **approved** only once the UE column agrees too. So the loop doesn't wait for the UE runtime, and nothing is called finished without it.
+
+## Pass 9 — Building the materials, plainly (the generation loop)
+
+**The list:** one file in the repo, the wish list. Each line is a material we want, plus a note or two ("dusty concrete, board-formed"). Anyone adds to it at any time. The 173-row table in `260925_R_LibraryCoverage_FirstRelease.md` seeds it. Names use that table's defaults, and they can be changed freely until the first release.
+
+**The run, at fixed times:** a scheduled job on this machine (for example nightly) takes the next few materials from the list. For each one it:
+1. **builds the material by whatever works best:** measured values, a free scan, a texture generated in code, or an image model (BP8);
+2. **runs it through the rig**, reads its own contact sheet, fixes what's off, and runs it again, up to a set number of tries;
+3. **marks it on the list:** *ready for review*, or *stuck, with why*.
+
+**Each morning:** a short summary lists what was built, the contact sheets, and what got stuck. The lead looks at sheets, not scenes. **Keep** marks it approved (subject to the UE column); **redo** sends a note back to the list. USDLiveView stays available for a closer look at any one material.
+
+**What the loop needs that doesn't exist yet:** the list file, the rig (M1), a small driver script the scheduler calls, and the status field (BP4). The `/matter-generate` skill already does the building half, one material at a time.
+
+## Pass 10 — After the library works (M4–M6), plainly
+
+- **A release is a download, not the git repo.** Creators get one bundle per version from the project's releases page. That also avoids the download limits on the repo's large-file storage: textures are 46 MB for 17 materials today, so a few hundred MB to a couple of GB for 170 (a rough estimate).
+- **Blender:** the add-on and the material library ship as one Blender extension that installs from a file or a link.
+- **Unreal:** the runtime's masters and loader become the public Unreal package: *Unreal Reference Masters*, by then already built and tested.
+- **USD tools:** unzip the bundle and point USD's search path at it (as today).
+- **Managing the library:** one command, and later a small screen, to add, replace or retire a material in the next release. The version rules already exist; what's missing is making it quick.
+- **Contributors:** they submit through a pull request, and the rig is the automatic reviewer. It needs a GPU, so one of our two machines acts as the build runner. Credit goes in `CREDITS.md`.
+- **Tracking use and changes:** download counts come free with releases. A creator's slider changes are already saved in their scene, so "share my version back" could turn a tweak into a new variant. Anything beyond that would be opt-in.
+- **A CMS:** first a browsable website built from each release (pictures and names; the Roadmap's *See the Library*). A real CMS only if working through git becomes the bottleneck. Git stays the source either way.
+
 ---
 
 ## Open questions
 
 | # | Question | Recommendation |
 |---|---|---|
-| Q-A | Close Phase04 on its content fix and **drop** the pilot re-freeze (L1 moot; the pilot's release lanes skip until M4)? | Yes |
-| Q-B | Blender's faithful form: probe Blender 5.1's USD MaterialX import first, then build hand-made Blender masters only if the import falls short? | Yes, probe first (about an hour) |
-| Q-C | How does an agent reach the UE machine: SSH over Tailscale, a runner the lead starts, or files the lead carries across? And which OS is it? | A pull-based runner (the UE machine pulls, renders, and writes PNGs back) |
-| Q-D | Where does the queue live? The coverage list as a tracked data file (for example `library/queue.yaml`) that the loop reads and updates with status | A tracked data file; the research table stays as history |
-| Q-E | The proving set: are the 7 in Pass 3 item 1 right? | As listed |
-| Q-F | Where do rig outputs live? Images in gitignored scratch, with a small tracked scorecard beside each article or recipe? | Yes; the images are rebuildable |
-| Q-G | The status field (BP4): in the recipe and the `.mtlx` `imrsv_metadata`, so the loop, `serve_to_stage.py` and USDLiveView can all see it? | Both (the recipe is authored; the `.mtlx` carries it through) |
+| ~~Q-A~~ | ~~Close Phase04 without re-freezing the pilot?~~ **Done (BP5).** | — |
+| ~~Q-B~~ | ~~Probe Blender's import first?~~ **Yes (BP5).** | — |
+| ~~Q-C~~ | ~~How does an agent reach the UE machine?~~ **An agent there, with git between the machines (BP6).** | — |
+| Q-D | The wish list: a plain file in the repo (Pass 9)? | Yes; decided at M3 |
+| Q-E | The proving set: the 7 in Pass 3 item 1? | As listed |
+| Q-F | Rig pictures go in an ignored scratch folder, with a small scorecard kept beside each material? | Yes |
+| Q-G | The status field is written in both the recipe and the `.mtlx`? | Yes |
+| Q-H | Two-tool pass = candidate, three-tool pass = approved (Pass 8)? | Yes |
 
-**Unverified (to verify before building on it):** Blender 5.1's MaterialX-in-USD import fidelity · UE 5.8 headless capture of a Substrate material on the UE machine · whether USDLiveView surfaces a status field.
+None of these blocks M1. Each can be settled when its milestone starts, using the recommendation.
+
+**Unverified:** how faithfully Blender 5.1's USD import brings in MaterialX · Substrate in a packaged Linux Unreal build · runtime texture colour settings in Unreal · the texture-size estimate for 170 materials.
 
 ## Status
 
-- **Passes captured:** 5 (2026-09-26).
-- **Lead rulings:** BP1–BP4 (UE is on another machine; a bespoke UE project; tools judged against each other; `v01` plus a status field).
-- **Direction:** the lead's sequence holds. The central claim (smart materials behave the same across tools) has never been measured, and the Blender form cannot pass it by design. So **M1, the Storm + Blender rig on a proving set, is the next real work**, after closing Phase04 on content. Release machinery leaves the content loop until M4.
-- **Open:** Q-A to Q-G, each with a recommendation. Nothing is blocked on them except the M1 kickoff.
-- **Process note for `/retro`:** filling a library is a loop, not a sequence of phases. Keep release gates out of content work pre-release. Ask naming rulings on contact. *(For the Workflow Refiner; not edited here.)*
-- **Next step:** the lead rules on the milestones and Q-A. Then close Phase04 through `/execute`, and open `/discovery` for M1 with the Blender import probe as its first act. **A deliberate gate, not a slide:** no Roadmap entry is changed by this doc.
+- **Passes captured:** 10 (2026-09-26).
+- **Lead rulings:** BP1–BP8. Unreal work happens on the UE machine (Linux, with an agent) as a standalone runtime. Materials are judged by the tools agreeing with each other. Drafts keep `v01` with a status field. Phase04 is closed. The agent builds materials by any means, and licensing doesn't block the seed library.
+- **The plan:** M0 is done. **M1 is next, on this machine:** the Storm and Blender rig with an empty UE column, starting with the Blender import probe. **M2 runs in parallel on the UE machine:** the packaged runtime, starting with one grey sphere. M3, the nightly generation loop, starts once two tools agree on the proving set. M4–M6 are sketched in Pass 10.
+- **Open:** Q-D to Q-H, each with a recommendation and none blocking.
+- **Process note for `/retro`:** the lead has asked repeatedly for less ceremony and plainer words (Pass 6). Filling a library is a loop, not a sequence of phases. Keep release checks out of content work before the first release. *(For the Workflow Refiner; this doc doesn't edit the method.)*
+- **Next step:** `/discovery` for M1 on this machine, and a separate `/discovery` for M2 by the agent on the UE machine, both pointing here. **A deliberate step, not a slide:** this doc changes no Roadmap entry. Adding M1 and M2 to the Roadmap is the lead's call.
