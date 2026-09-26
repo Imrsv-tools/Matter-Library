@@ -124,6 +124,99 @@ def heatmap(dE: np.ndarray, bar: float, subjects: np.ndarray | None = None) -> I
     return Image.fromarray((rgb * 255).astype(np.uint8))
 
 
+# ------------------------------------------------------------------ scale (the ruler check)
+
+def _camera():
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent / "scene"))
+    import build_scene as bs
+    return bs
+
+
+def project(points: np.ndarray, width: int) -> np.ndarray:
+    """World points (N, 3) -> pixel (x, y) through the scene's camera (square frame)."""
+    bs = _camera()
+    a = np.radians(bs.CAM_PITCH)
+    rx = np.array([[1, 0, 0], [0, np.cos(a), -np.sin(a)], [0, np.sin(a), np.cos(a)]])
+    local = (points - np.array(bs.CAM_POS)) @ rx          # R^T (p - c), row vectors
+    half = bs.CAM_APERTURE / 2
+    nx = bs.CAM_FOCAL * local[:, 0] / -local[:, 2] / half
+    ny = bs.CAM_FOCAL * local[:, 1] / -local[:, 2] / half
+    return np.stack([(nx + 1) / 2 * width, (1 - (ny + 1) / 2) * width], axis=1)
+
+
+def _bilinear(img: np.ndarray, x: np.ndarray, y: np.ndarray, wrap: bool = False) -> np.ndarray:
+    h, w = img.shape[:2]
+    x, y = x - 0.5, y - 0.5
+    x0, y0 = np.floor(x).astype(int), np.floor(y).astype(int)
+    fx, fy = x - x0, y - y0
+    if img.ndim == 3:
+        fx, fy = fx[:, None], fy[:, None]
+
+    def at(yy, xx):
+        if wrap:
+            return img[yy % h, xx % w]
+        return img[np.clip(yy, 0, h - 1), np.clip(xx, 0, w - 1)]
+    return ((at(y0, x0) * (1 - fx) + at(y0, x0 + 1) * fx) * (1 - fy)
+            + (at(y0 + 1, x0) * (1 - fx) + at(y0 + 1, x0 + 1) * fx) * fy)
+
+
+def _lum_linear(rgb: np.ndarray) -> np.ndarray:
+    lin = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
+    return lin @ np.array([0.2126, 0.7152, 0.0722])
+
+
+# The floor band sampled: in front of the objects, behind the ruler (z = 0.40).
+BAND_X = np.linspace(-0.45, 0.45, 360)
+BAND_Z = np.linspace(0.22, 0.36, 15)
+
+
+def texture_scale(render_png: Path, texture_png: Path, meters_per_tile: float) -> dict:
+    """At what size does the base texture appear on the floor?
+
+    Samples the floor straight down (through the scene's camera) in a band in front of the
+    objects, and correlates it with the article's base texture laid on the floor at
+    ``k x`` its recorded size, for k from 0.25 to 4. ``size`` is the best k: 1.0 means the
+    texture renders at exactly ``meters_per_tile``. The floor's st is (x + 0.5, 0.5 - z) in
+    metres, divided by meters_per_tile by the render job.
+    """
+    img = read_rgb(render_png)
+    X, Z = np.meshgrid(BAND_X, BAND_Z)
+    pts = np.stack([X.ravel(), np.zeros(X.size), Z.ravel()], axis=1)
+    px = project(pts, img.shape[1])
+    r = _lum_linear(_bilinear(img, px[:, 0], px[:, 1]))
+    tex = _lum_linear(read_rgb(texture_png))
+    th, tw = tex.shape
+    u0, v0 = (X.ravel() + 0.5) / meters_per_tile, (0.5 - Z.ravel()) / meters_per_tile
+    best = (0.0, 0.0)
+    for k in np.geomspace(0.25, 4.0, 241):
+        t = _bilinear(tex, (u0 / k) * tw, (1 - v0 / k) * th, wrap=True)
+        c = float(np.corrcoef(r, t)[0, 1])
+        if c > best[1]:
+            best = (float(k), c)
+    return {"size": best[0], "ncc": best[1]}
+
+
+# ------------------------------------------------------------------ seams (Phase04's measure)
+
+def seam(texture_png: Path) -> dict:
+    """Difference across the wrap edge vs between interior neighbours (0-255 scale).
+
+    A SEAM is a wrap difference over ``SEAM_RATIO`` x the interior one. Phase04's real seams
+    measured 2.1x to 26x (F3), while a seamless but noisy texture sits near 1x either side
+    (Scratches01, regenerated seamless: 1.1x). A strict "wrap <= interior" is a coin flip on
+    noisy textures (it flagged three seamless ones on its first run, Phase05 5.2).
+    """
+    a = np.asarray(Image.open(texture_png).convert("RGBA"), dtype=np.float64)
+    wrap = (np.abs(a[:, 0] - a[:, -1]).mean() + np.abs(a[0] - a[-1]).mean()) / 2
+    interior = (np.abs(np.diff(a, axis=1)).mean() + np.abs(np.diff(a, axis=0)).mean()) / 2
+    return {"wrap": float(wrap), "interior": float(interior),
+            "seamless": bool(wrap <= SEAM_RATIO * interior)}
+
+
+SEAM_RATIO = 1.5
+
+
 # Sharma, Wu & Dalal (2005), Table 1 — a sample of the published pairs.
 SHARMA = [
     ((50.0, 2.6772, -79.7751), (50.0, 0.0, -82.7485), 2.0425),

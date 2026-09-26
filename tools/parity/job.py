@@ -61,16 +61,20 @@ class Article:
     master: str
     meters_per_tile: float
     ports: dict[str, tuple[str, str]] = field(default_factory=dict)  # port -> (mtlx type, value)
+    textures: dict[str, Path] = field(default_factory=dict)          # node name -> file
 
     @classmethod
     def read(cls, path: Path) -> "Article":
         root = ET.parse(path).getroot()
+        textures = {n.get("name"): (path.parent / f.get("value")).resolve()
+                    for n in root.iter() if n.tag in ("image", "tiledimage")
+                    for f in n.findall("input[@name='file']")}
         meta = {i.get("name"): i.get("value") for i in root.iter("input")
                 if i.get("name") in ("master_material", "meters_per_tile")}
         ng = root.find("nodegraph")
         ports = {i.get("name"): (i.get("type"), i.get("value")) for i in ng.findall("input")} if ng is not None else {}
         mpt = float(meta.get("meters_per_tile") or 0) or 1.0
-        return cls(path, path.stem, meta.get("master_material", "Opaque"), mpt, ports)
+        return cls(path, path.stem, meta.get("master_material", "Opaque"), mpt, ports, textures)
 
 
 def _usd_value(mtype: str, value) -> str:

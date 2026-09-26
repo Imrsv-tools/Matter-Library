@@ -58,7 +58,9 @@ SWEEP = [
     ("overlay1_density", [("wear 1 at 0", 0.0), ("wear 1 at 0.5", 0.5), ("wear 1 at 1", 1.0)]),
     ("overlay2_density", [("wear 2 at 0", 0.0), ("wear 2 at 0.5", 0.5), ("wear 2 at 1", 1.0)]),
     ("overlay3_density", [("wear 3 at 0", 0.0), ("wear 3 at 0.5", 0.5), ("wear 3 at 1", 1.0)]),
-    ("maskset_blend", [("mask blend 0", 0.0), ("mask blend 1", 1.0)]),
+    # the mask only GATES wear, so its rows turn every declared wear layer up to 1 (on an
+    # article whose wear starts at 0, a bare mask row moves nothing: Oak, 5.2)
+    ("maskset_blend", [("mask blend 0, wear at 1", 0.0), ("mask blend 1, wear at 1", 1.0)]),
     ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
     ("uv_rotation", [("UV rotation 90", 90.0)]),
 ]
@@ -72,9 +74,12 @@ def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
         if port not in art.ports:
             continue
         for label, value in rows:
-            sid = label.replace(" ", "_").replace("+", "p").replace("-", "m").replace(".", "")
-            s.append({"id": sid, "label": label, "port": port,
-                      "set": {port: list(value) if isinstance(value, tuple) else value}})
+            sid = (label.replace(",", "").replace(" ", "_").replace("+", "p")
+                   .replace("-", "m").replace(".", ""))
+            setting = {port: list(value) if isinstance(value, tuple) else value}
+            if port == "maskset_blend":
+                setting.update({p: 1.0 for p in art.ports if p.startswith("overlay")})
+            s.append({"id": sid, "label": label, "port": port, "set": setting})
     return s
 
 
@@ -136,7 +141,39 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
     return p
 
 
-def write_scorecard(job: dict, scores: dict) -> Path:
+SCALE_TOLERANCE = 0.03     # found size within 3 % of the expected one
+
+
+def scale_checks(art: jobmod.Article, job: dict) -> list[dict]:
+    """The ruler check: does the base texture render at its recorded size, in each tool?
+
+    Run on the defaults and on each UV-scale row, where the expected size is the slider's
+    value (uv_scale divides the coordinate, so 2 renders the texture twice as large). A
+    rotated row is skipped (the check correlates the unrotated texture).
+    """
+    tex = art.textures.get("base_color_tex")
+    if tex is None:
+        return []
+    out = Path(job["out_dir"])
+    rows = []
+    for s in job["settings"]:
+        port = s.get("port")
+        if s["id"] == "defaults":
+            want = float(art.ports.get("uv_scale", ("", "1, 1"))[1].split(",")[0])
+        elif port == "uv_scale":
+            want = float(s["set"]["uv_scale"][0])
+        else:
+            continue
+        row = {"setting": s["label"], "expected": want}
+        for tool in ("storm", "blender"):
+            r = compare.texture_scale(out / tool / f"{s['id']}.png", tex, art.meters_per_tile)
+            row[tool] = r
+        row["ok"] = all(abs(row[t]["size"] / want - 1) <= SCALE_TOLERANCE for t in ("storm", "blender"))
+        rows.append(row)
+    return rows
+
+
+def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
     out = Path(job["out_dir"])
     master = job["article"]["master"]
     graded = master in GRADED
@@ -173,9 +210,31 @@ def write_scorecard(job: dict, scores: dict) -> Path:
         lines += ["", "**Per slider, the worst difference between the tools:**", ""]
         lines += [f"- `{p}`: {d:.2f} at *{lab}* ({'under' if d < BAR else 'OVER'} the bar)"
                   for p, (d, lab) in worst.items()]
+    mpt = job["article"]["meters_per_tile"]
+    lines += ["", f"## Scale (the ruler check) — recorded size {mpt:g} m per tile", ""]
+    if checks["scale"]:
+        lines += ["The floor is sampled straight down and matched against the article's base "
+                  "texture laid at k x its recorded size. **Size found** is the best k "
+                  "(1.00 = exactly the recorded size); *match* is the correlation there.", "",
+                  "| Setting | Expected | Storm: size found (match) | Blender: size found (match) | |",
+                  "|---|---|---|---|---|"]
+        for r in checks["scale"]:
+            lines.append(f"| {r['setting']} | {r['expected']:.2f} | {r['storm']['size']:.2f} "
+                         f"({r['storm']['ncc']:.2f}) | {r['blender']['size']:.2f} "
+                         f"({r['blender']['ncc']:.2f}) | {'ok' if r['ok'] else '**OFF**'} |")
+    else:
+        lines.append("No base texture: nothing to measure.")
+    lines += ["", "## Seams (Phase04's measure, on each texture the article uses)", "",
+              "| Texture node | Across the wrap edge | Between interior neighbours | |", "|---|---|---|---|"]
+    for n, s in checks["seams"].items():
+        lines.append(f"| `{n}` | {s['wrap']:.1f} | {s['interior']:.1f} | "
+                     f"{'seamless' if s['seamless'] else '**SEAM**'} |")
+    if not checks["seams"]:
+        lines.append("| (no textures) | | | |")
     p = out / "scorecard.md"
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    (out / "scorecard.json").write_text(json.dumps(scores, indent=2) + "\n", encoding="utf-8")
+    (out / "scorecard.json").write_text(json.dumps({"settings": scores, "checks": checks},
+                                                   indent=2, default=str) + "\n", encoding="utf-8")
     return p
 
 
@@ -187,6 +246,8 @@ def main(argv=None) -> int:
     ap.add_argument("--samples", type=int, default=128)
     ap.add_argument("--cell", type=int, default=320, help="picture size on the sheet")
     ap.add_argument("--out", default=None, help=f"default: {OUT_ROOT}/<article>")
+    ap.add_argument("--score-only", action="store_true",
+                    help="re-score the pictures already rendered (no Storm, no Blender)")
     args = ap.parse_args(argv)
 
     art = jobmod.Article.read(jobmod.find_article(args.article))
@@ -195,9 +256,11 @@ def main(argv=None) -> int:
     job = json.loads(job_path.read_text(encoding="utf-8"))
 
     t0 = time.time()
-    storm.run(job_path)
+    if not args.score_only:
+        storm.run(job_path)
     t1 = time.time()
-    run_blender(job_path)
+    if not args.score_only:
+        run_blender(job_path)
     t2 = time.time()
 
     scores, heat = {}, {}
@@ -210,8 +273,9 @@ def main(argv=None) -> int:
                            for t in ("storm", "blender")}
         scores[s["id"]] = sc
         heat[s["id"]] = compare.heatmap(dE, BAR, compare.masks(mask)["subjects"])
+    checks = {"scale": scale_checks(art, job), "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
     sheet = build_sheet(job, scores, heat, args.cell)
-    card = write_scorecard(job, scores)
+    card = write_scorecard(job, scores, checks)
     print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")
