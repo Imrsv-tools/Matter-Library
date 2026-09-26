@@ -11,16 +11,14 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase.*
+### Phase05 — Test Rig: Blender and USDLiveView Side by Side — ACTIVE *(discovery Brief complete 2026-09-26; takes over Parity Baselines)*
+**Outcome:** the maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.
+- `docs/Planning/Phases/Future/Phase05_TestRig.md`
 
 ==================================================================================
 ## Future
 
 > **Re-sequenced 2026-09-26 (lead):** the test rig comes before building materials at volume. Phase05 runs on this machine and is pushed; Phase06 runs on the UE machine; work returns here for Phase07 on. Why: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md`.
-
-### Phase05 — Test Rig: Blender and USDLiveView Side by Side — SEEDED *(takes over Parity Baselines)*
-**Outcome:** the maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.
-- `docs/Planning/Phases/Future/Phase05_TestRig.md`
 
 ### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.

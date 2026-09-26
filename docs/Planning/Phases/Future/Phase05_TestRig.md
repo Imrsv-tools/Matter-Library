@@ -1,56 +1,131 @@
 # Phase05 — Test Rig: Blender and USDLiveView Side by Side
 
-**Status:** SEEDED (phase doc written 2026-09-26; discovery has not opened). Numbered by the lead, 2026-09-26, verbatim: *"seed Phase05 and Phase06 … we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6 … and once we have the UE runtime we can move back here for phase 7 and on."* It takes over the Roadmap's *Parity Baselines* entry. The thinking behind it is `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (Passes 3, 4, 8; rulings BP1–BP9).
+**Status:** DISCOVERY — the Brief is complete (2026-09-26, Pass 1). **Lane: `build`** (verified: §Risk lane). Numbered by the lead, 2026-09-26, verbatim: *"seed Phase05 and Phase06 … we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6 … and once we have the UE runtime we can move back here for phase 7 and on."* It takes over the build of the Roadmap's *Parity Baselines*. Background: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (rulings BP1–BP9).
 
 ## Outcome
 
 **The maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.**
 
-Concretely, at close: one command renders a material in both tools in the same test scene, across its slider settings, and produces a picture sheet plus a short scorecard. The 7 test materials (below) have been through it. Where they disagree, the cause is either fixed or written down. **The Unreal column exists but is empty,** and the format it will be filled with is written down for Phase06.
+Concretely, at close: one command renders a material in both tools in the same test scene, across its slider settings, and writes one picture sheet plus a short scorecard. The 9 test materials (the research's 7 plus Diamond and Marble, so every master is covered) have been through it. Every disagreement is either fixed or written down with its cause. **The Unreal column is on the sheet but empty,** and the render-job format that fills it is written down for Phase06.
 
-## Why this is a phase
+---
 
-The library's whole promise is that a material behaves the same in every tool as its sliders move. That has never been measured (research Pass 1). This phase builds the measuring tool and points it at a small set first, so that design flaws show up on 7 materials rather than 170. Two choices here are expensive to change later: **the render-job format** (Phase06 builds against it on another machine) and **the test scene** (every future result is judged in it).
+## The Brief
 
-## Scope
+### First human test
 
-**In:**
-- **Check first (about an hour):** does Blender 5.1's USD import bring our MaterialX materials in faithfully, wear layers included? If not, build **Blender versions of the 7 master materials**, one node group each, wear-layer network included. Today's Blender material is a look-alike whose wear sliders do nothing (`tools/generators/matter_proxy.py`), so this is expected to be the biggest piece.
-- **The test scene,** made once as a USD file: sphere, rounded cube, a 1 m plane with a ruler, fixed camera. Start with the simplest lighting that can match across tools: one sun, flat ambient light, no tone curve.
-- **Matching the lighting first:** the grey card and UV grid must agree between the tools before any material is judged.
-- **The render job, written down:** *this material, these slider settings, this scene, write pictures here*. There is one small driver per tool: USDLiveView's renderer (Storm, via `usdrecord`) and Blender (headless). Unreal's slot is defined but empty.
-- **The picture sheet and four checks:** colour, size against the ruler, whether each slider does the same thing in each tool, and seams. Add more checks only when a real problem needs one.
-- **The status field** (draft, candidate, approved) on each material, so the later build loop can track progress (ruling BP4: names stay `v01`).
-- **The 7 test materials:** `GreyCard_Neutral18`, `Copper_Verdigris_Aged`, `Oak_Natural`, `Rust_OnSteel_Flaking`, `Glass_Clear`, `Lace_Floral`, `Neon_Signage`. Between them they cover every master, the wear layers and a two-layer material.
+No running service: the surface is **a command and the picture sheet it writes** (a PNG, plus a scorecard beside it).
 
-**Out:**
-- The Unreal column: **Phase06**, on the UE machine.
-- Building new materials and the nightly build loop: **Phase07**.
-- Releases of any kind (research Pass 3 item 4).
-- Automatic checks on pull requests (Contribution Path, later).
+1. `uv run tools/parity/rig.py GreyCard_Neutral18_Clean_Base_s01_v01` → it prints the sheet's path; open it. **Expect:** two columns (USDLiveView's renderer, Blender) that look the same grey under the same light, with the scorecard showing the colour difference under the bar. A third column reads *"Unreal: no pictures yet"*. *This proves the lighting matches before any material is judged.*
+2. `… rig.py Copper_Verdigris_Aged_Base_s01_v01` → **Expect:** one row per slider setting: defaults; tint; roughness bias at −0.5 and +0.5; each wear layer at 0, 0.5 and 1; mask blend; UV scale 0.5 and 2; rotation 90°. **Each row changes the same way in both columns.** The scorecard lists, per slider, the worst difference between the tools and the value where it crosses the bar.
+3. `… rig.py Oak_Natural_Clean_Base_s1_v01` → **Expect:** on the 1 m plane with its 10 cm ruler, the oak boards and the scuffs are the same size in both columns, and the scale check agrees with the material's recorded size.
+4. `… rig.py` on `Rust_OnSteel_Flaking`, `Lace_Floral`, `Neon_Signage`, `Marble_Veined_Polished`, `Glass_Clear` and `Diamond_Brilliant` → **Expect:** rust in patches, lace with holes, neon glowing, marble with a soft glow at its edges, all matching across columns. Glass and Diamond carry a note that USDLiveView's renderer can't show see-through surfaces (known, below), and their judgement waits for the Unreal column.
 
-## Open questions (settle during this phase)
+**Reconciled with the steps:** click 1 is step 5.1's, clicks 2 and 3 are step 5.2's, click 4 is step 5.3's.
 
-- What range counts as "agrees" for each master? Let the first numbers set it, rather than assuming a colour difference under 2 up front. Glossy highlights, glass and subsurface will never match exactly between a path tracer and a real-time renderer.
-- Blender: Cycles, EEVEE, or both? Cycles is the more faithful render; EEVEE is what creators see while they work.
-- Where rig pictures live: an ignored scratch folder, with a small scorecard kept beside each material (research Q-F)?
+### In now
 
-## Notes
+- **Blender versions of the master materials, built by code.** One Blender node group per master, generated by a Python script, implementing `MasterSet.md`'s formulas exactly: the wear-layer mix, the mask gates, the two-layer blend, layer sampling at each layer's own size, and the MaterialX UV math and roughness clamp. Plus a loader that reads a `.mtlx` and fills the node group's values and textures.
+- **The test scene, one USD file:** a sphere, a rounded cube, a 1 m plane with a 10 cm ruler, a fixed camera, a white dome plus one sun, and no tone curve. USDLiveView's renderer reads it directly; Blender imports it (meshes, camera and lights import cleanly, measured).
+- **The render job:** *this material, these slider settings, this scene, write pictures here*. There is one driver per tool: USDLiveView's renderer (`usdrecord`, reusing `make_preview.py`'s scene writer and override writer) and Blender (headless Cycles).
+- **The sheet and four checks:** colour (ΔE2000, reusing `codec_ab.py`'s comparison), size against the ruler, slider response (does each slider move both tools the same way), and seams. Add more checks only when a real problem needs one.
+- **The 9 test materials** through the rig, with every disagreement fixed or written down.
+- **The hand-off to Phase06:** the render-job format and the scene, documented well enough to build the Unreal driver without asking.
 
-- **Close = committed and pushed,** so the agent on the UE machine can start Phase06 from a clean clone.
-- **The render-job format and the test scene must be documented well enough for Phase06 to build against them without asking.** That is the hand-off between the two machines.
-- Keep it small: the rig serves the library, not the other way round.
+### Not now
+
+- The Unreal column: **Phase06**.
+- **The status field (draft, candidate, approved): moved to Phase07.** Nothing in this phase reads it, and adding it would re-assemble all 17 articles. *(The seed had it here; narrowed at Pass 1.)*
+- Swapping the Blender Asset-Browser library onto the new masters. Creators keep today's look-alike until the lead decides (§Lead calls).
+- EEVEE as a scored column (it renders headless, measured, and can be added later).
+- More checks (highlight shape, Fresnel and the rest of the research's list) until a real problem needs them.
+- A nightly or automatic run: **Phase07**.
+
+### Reuse check: what the stack already gives us
+
+| Need | What exists | Evidence (2026-09-26) |
+|---|---|---|
+| Render in USDLiveView's renderer, headless | `make_preview.py`: scene writer, `usdrecord`, and slider overrides written the only way that works (LCDSchema §Carrier rule) | rendered Copper in this pass |
+| Read our `.mtlx` inside Blender | Blender 5.1 bundles USD **with the MaterialX plugin**: its Python reads Copper's full network (98 shader nodes) | probe, Pass 1 |
+| **Blender turning our `.mtlx` into a Blender material** | **Nothing.** Blender's USD importer converts only the simple USD preview shader; our material imported with **0 nodes**, and the importer has no MaterialX option | probe, Pass 1. **This is the gap that justifies hand-built Blender masters.** |
+| Bring the scene into Blender | Blender's USD importer: meshes, camera and lights | probe, Pass 1 |
+| Blender render, headless, on the GPU | Cycles with OptiX on the RTX 2080: 512 px at 128 samples in 3.1 s | probe, Pass 1 |
+| Colour difference between two pictures | `codec_ab.py`'s ΔE2000 and SSIM comparison (uses the `colour` package, which is not in the repo's `pyproject.toml` yet) | read |
+| Seam check | Phase04's measure (wrap-edge vs interior difference) | Phase04 doc |
+| Consistent colour handling | `build_ocio_parity_config.py` | exists; only needed if tone curves come in |
+| The Blender look-alike | `matter_proxy.py`, labelled "recognizable, not faithful" (wear sliders unwired). **Not reused:** it is what the rig would fail | read |
+
+### Decisions that bind
+
+- **Tools are judged against each other** (BP3). **But a slider's math is MaterialX's** (lead, 2026-09-24, LCDSchema: *"the number we see in [a consuming application] is the number we see in a stock USD viewer"*). So the Blender masters copy the MaterialX math (UV scale divides, rotation turns counter-clockwise about the UV origin, offset is subtracted after rotation; roughness bias is added, then clamped to 0–1), and the rig measures how close the *pictures* come.
+- **The formulas are `MasterSet.md`'s:** the overlay mix (it bends the normal and roughens; it never tints), mask channels (R = layer 2; G, B, A gate overlays 1–3), the two-layer blend, layer scale (Phase04), and the opacity floor of 0.05 on the see-through masters. Overlays and masks load as data (linear), never as colour.
+- **Each master's settings** (cut-out, two-sided, refraction, subsurface) follow `MasterSet.md`'s settings table.
+- **Bars:** colour difference under 2 is the target for Opaque, Masked and Emissive, and "recognisable" for see-through and subsurface (Decision of record 9). **The first numbers set the final bar per master;** the target is not assumed.
+- **Blender's parity render is Cycles** (the faithful one; Phase06 can pair it with Unreal's path tracer).
+- **The Blender look-alike stays untouched** in this phase (the 2026-07 lead directive on the proxy stands until the lead says otherwise).
+- **Nothing in `library/releases/` is touched** (research Pass 3 item 4).
+
+### Known gaps to expect (from the docs; the rig confirms or clears each)
+
+- **USDLiveView's renderer can't show see-through surfaces:** full transmission renders black, and it ignores `transmission_color` (skill §6). Glass and Diamond are judged on Blender now, and Unreal later.
+- **Blender's Principled BSDF likely has no separate transmission colour and no thin-walled mode** (unverified). Glass tint may need handling in the Blender master.
+- **Emission units differ** (MaterialX luminance vs Blender strength). Neon calibrates on this.
+- **Rasteriser vs path tracer:** glossy highlights will differ a little by nature; that is what per-master bars are for.
+
+### Risk lane: `build` (verified)
+
+The controls, read: the release lifecycle (`freeze_release.py`, `promote_release.py`) and `run_all.py`'s release lanes guard `library/releases/`, and the determinism lane guards the assembled `.mtlx`. **This phase writes to neither.** It adds new tools and Blender scripts, and moving the status field out keeps every article byte-identical. No authorization, secrets, destructive migration or public edge is involved, and the push stays the lead's.
+
+### Step list
+
+- **5.1 — Grey card side by side.** The scene, the render-job format, both drivers, the Opaque master's plain path (colour, roughness, metalness, normal), the sheet, and the colour check, with the lighting tuned until the grey card and UV grid agree. *(First human test click 1.)*
+- **5.2 — Every slider on a layered material.** The full Opaque master: UV math, tint, roughness bias with clamp, three wear layers, mask gates and layer scale. The slider sweep, the slider-response and ruler checks, and seams. Copper and Oak pass, or their gaps are written down. *(Clicks 2–3.)*
+- **5.3 — The other masters.** TwoLayer (Rust), Masked (Lace), Emissive (Neon), TranslucentThin (Glass), TranslucentThick (Diamond) and Subsurface (Marble), with the per-master bars set from the numbers. *(Click 4.)*
+- **Close.** The Phase06 hand-off section (job format, scene, expected output, and the 9-material test set: Phase06's seed says 7), `ToolingConventions.md` gains `tools/parity/`, and **commit and push**.
+
+**Why this order:** 5.1 proves the lighting and the plumbing on the simplest material, so later differences are the material's fault. 5.2 is the heart of the phase (the sliders). 5.3 is breadth. Time to the first click (5.1) is within 90 minutes; 5.2 is the largest step.
+
+### Compact build map
+
+- **`tools/parity/`** (new root, recorded in `ToolingConventions.md` at close):
+  - `rig.py`: takes an article name, builds the job, runs each driver, builds the sheet and scorecard, and prints their paths. Pictures go to a git-ignored scratch folder (for example `library/parity/`, beside the ignored `library/staging/`).
+  - `scene/test_scene.usda`: the one test scene.
+  - `drivers/storm.py`: reuses `make_preview.py`'s scene and override writers.
+  - `drivers/blender_render.py`: run by `blender -b`; imports the scene, builds the material with the Blender masters, and sets the slider values.
+  - `compare.py`: ΔE2000 and SSIM from `codec_ab.py`, the ruler scale check, slider response, and seams.
+  - `JOB_FORMAT.md` (or the module docstring): the Phase06 contract.
+- **`blender/masters/`** (new): `build_masters.py` creates the 7 node groups from `MasterSet.md`'s formulas; `load_article.py` reads a `.mtlx` (Blender's bundled USD, or `xml.etree` like `matter_proxy.py`) and fills a master.
+- **`pyproject.toml`:** add `colour-science` if the comparison runs in the repo environment.
+- **Nothing** in `MatterLibrary/`, `library/releases/`, `tools/converters/` or `blender/addons/`.
+
+## Lead calls (none blocks the start)
+
+1. **After this phase, should creators' Blender library switch to the new faithful masters?** Today's Asset-Browser materials are look-alikes whose wear sliders do nothing, by a 2026-07 directive (*"recognizable, not faithful"*). **Recommendation: yes, once 5.2 passes,** as a quick follow-up. Not in this phase.
 
 ## Discovery Log
 
-_(numbered passes accrue here: examined → finding → decision / hypothesis / open question)_
+### Pass 1 (2026-09-26): the contract docs read against the Outcome, plus four probes
+
+**Examined:** `_Architecture.md` · `LCDSchema.md` (in full) · `MasterSet.md` (in full) · `CompressedDistribution.md` §Parity · `ToolingConventions.md` · `Experience_MatterLibrary.md` (Blender lines) · `tools/preview_generators/make_preview.py` + `preview_wrapper.usda` · `tools/conformance/codec_ab.py` (structure) · `tools/generators/matter_proxy.py` · the research doc. **Learnings:** `docs/Learnings/` holds only its README; nothing applies. **Consumer docs:** not touched (no Unreal in this phase). **Grep for the phase's own terms:** `render_leg_probe.py` and `codec_ab.py` exist (one renderer only); no rig, no Blender masters.
+
+**Probes (disposable, in `/tmp/p05probe`, nothing in the repo):**
+- **P1 — Blender imports our material?** No: Copper imported with a material of **0 nodes**, and the importer's options have no MaterialX path (only the USD preview shader).
+- **P2 — Does Blender's bundled USD read our `.mtlx`?** Yes: `usdMtlx` is present and it lists 98 shader nodes in Copper.
+- **P3 — Cycles on the GPU, headless?** Yes: OptiX on the RTX 2080, 512 px at 128 samples in 3.1 s.
+- **P4 — EEVEE headless?** Yes: 19.5 s including the first shader compile.
+
+**Findings:**
+- **F1 — The Blender masters are required, not optional** (P1). They are the phase's largest piece.
+- **F2 — The formulas to copy are fully written down** (`MasterSet.md` overlay, mask, two-layer and scale sections; LCDSchema's UV and clamp rules), so the Blender masters are transcription, not invention.
+- **F3 — The ΔE comparison and the USDLiveView-renderer driver already exist** (`codec_ab.py`, `make_preview.py`).
+- **F4 — The status field has no reader in this phase**, and adding it changes every article. → Not now (Phase07).
+- **F5 — A two-ruling tension was checked and does not fork:** the 2026-07 directive keeps the Blender *look-alike* "recognizable, not faithful". This phase builds a separate faithful Blender material for the rig and leaves the look-alike alone, so both rulings hold. Whether creators move onto it is Lead call 1.
 
 ## Discovery Status
 
-- **Passes captured:** —
-- **Current working direction:** —
-- **Open decisions:** —
-- **Checks to carry forward:** —
+- **Passes captured:** 1. **The Brief is complete.**
+- **Open decisions:** Lead call 1 (non-blocking).
+- **Checks to carry forward:** `usdrecord` needs the desktop's display (`DISPLAY=:0`), which matters for any unattended run later. Confirm Blender's Principled has no transmission-colour input before designing the Glass path. The first grey-card numbers set how "matching lighting" is judged.
 
 ## Execution Log
 
