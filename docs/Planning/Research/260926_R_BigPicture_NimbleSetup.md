@@ -237,7 +237,7 @@ None of these blocks Phase05. Each can be settled when its phase starts, using t
 
 ## Status
 
-- **Passes captured:** 11 (2026-09-26).
+- **Passes captured:** 12 (2026-09-26; Pass 12 routes chat-only considerations).
 - **Lead rulings:** BP1–BP9. Unreal work happens on the UE machine (Linux, with an agent) as a standalone runtime. Materials are judged by the tools agreeing with each other. Drafts keep `v01` with a status field. Phase04 is closed. The agent builds materials by any means, and licensing doesn't block the seed library. Phase05 and Phase06 are seeded and run one after the other.
 - **The plan:** **Phase05 (this machine):** the Blender and USDLiveView test rig, starting with the Blender import check, and closing with a push. **Phase06 (UE machine):** the packaged Unreal test runtime, starting with one grey sphere. **Phase07 (back here):** Library Coverage, expected to be re-cut as the nightly build loop. The later phases (first release, management, community) are sketched in Pass 10.
 - **Open:** Q-D to Q-H, each with a recommendation and none blocking.
