@@ -40,6 +40,9 @@ It is **the** material-building phase: the lead's "building materials". It is th
 4. **The gut-check the list is waiting on.** N1–N8 and S1–S6 (partly superseded by C5 and resolved rulings E1, E2, E5). Discovery compiles what is still open into one lead pass, rather than asking row by row.
 5. **The layer library as a deliverable:** generate procedurally (L2) or convert ambientCG's imperfection sets (research Pass 9)? This is decided per layer by the skill today. Confirm that no policy is needed.
 6. **The risk lane.** The hypothesis is `build`: content and generators, with no authorization, secrets or public edge. The push is irreversible, and the lead gates it.
+7. **A seam guard lane over `MatterLibrary/textures/shared/**`?** Routed from Phase04's close: the old layers' seams went unnoticed through every earlier phase, and this phase adds 13 layers. A new gate needs the lead's ruling; Phase04 recommended yes. *The check Phase04 used: mean wrap-edge difference vs mean interior neighbour difference per axis.*
+8. **Do the per-article base textures from the pre-Phase03 generators tile?** (Lace, Marble, Rust base sets; `tileable.py`'s docstring says those generators "can show a seam"; unmeasured.) A pre-existing defect routed from Phase04's close. Measure before building on them.
+9. **Layers are now sampled at their own size** (Phase04, `MasterSet.md` §Scale): a new layer's scale tag is its rendered size, and a recipe's `meters_per_tile` must be the article's real tile size.
 
 ## Sources (pointers, not copies)
 

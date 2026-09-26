@@ -71,6 +71,8 @@ Every base texture uses a **real-world physical scale** — meters per UV tile �
 | `s100`  | 100 m   | Macro | Geological scale, landscapes, cliffs |
 | `sUKN`  | Unknown | Unknown | Not defined / not relevant |
 
+**Shared layers (overlays and masksets) are sampled at the size their tag names** (Phase04, 2026-09-26; [MasterSet §Scale](MasterSet.md)). So a shared layer's tag is not a label but its rendered size: it is authored at exactly that size, and `sUKN` is not allowed on one. The assembler refuses an untagged or `sUKN` layer.
+
 Changing what a scale tag *means* is a library semver-**major** change (see [_Architecture](../_Architecture.md) §Versioning).
 
 ## Two version axes (don't conflate)

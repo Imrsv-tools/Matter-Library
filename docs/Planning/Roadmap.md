@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase04 — Wear Layers at Their Own Scale — ACTIVE
-**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
-- `docs/Planning/Phases/Future/Phase04_WearLayersAtTheirOwnScale.md`
+*No active phase.*
 
 ==================================================================================
 ## Future
@@ -83,3 +81,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a maintainer can ask an agent for new materials and receive validated candidates, with recorded provenance, ready for human judgement.
 - `docs/Planning/Phases/Complete/Phase03_AgenticMaterialGeneration.md`
 *Closed 2026-09-25.*
+
+### Phase04 — Wear Layers at Their Own Scale — COMPLETE
+**Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
+- `docs/Planning/Phases/Complete/Phase04_WearLayersAtTheirOwnScale.md`
+*Closed 2026-09-26; the pilot's re-approval is owed by the maintainer.*

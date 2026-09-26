@@ -118,7 +118,7 @@ uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>
 - does it read as the matter in the brief — colour, gloss, translucency?
 - the grounded values, and any clamp or `not_carried` value;
 - the layers it carries (all at 0, so invisible in this render) or why it carries none;
-- **layer scale**: every overlay and the mask tile with the article's UVs, so a layer's own scale tag has no effect. A 10 cm layer on a 0.8 m article is stretched 8x (a library-wide limitation, recorded in Phase03). Say so when the scales differ a lot;
+- **layer scale**: each overlay and the mask is sampled at its own size (its scale tag) relative to the recipe's `meters_per_tile`, so `meters_per_tile` must be the article's real tile size. A layer's tag is its rendered size (Phase04, MasterSet.md §Scale). Say whether each layer reads the right size at that scale;
 - what the library cannot express yet for this matter (e.g. "metal: no F82 edge tint", "satin: no sheen", "brushed: no anisotropy");
 - **see-through matter** (any `transmission` > 0 — glass, gems, liquids, clear plastics): say plainly that **the preview cannot show it**. The only renderer here (Storm, via `usdrecord`) ignores `transmission_color` and renders `transmission = 1.0` black (it has no opacity floor; the engine masters do — MasterSet.md §Opacity floor). Never fudge the recipe to make the preview look right. The colour is judged in an engine, later (*Parity Baselines* owns a proper preview);
 - anything the maintainer should look at closely.

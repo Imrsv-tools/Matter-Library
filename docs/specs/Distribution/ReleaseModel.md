@@ -29,6 +29,8 @@ Four independent records, never conflated:
 
 *(Updated 2026-09-23, measured: `library/releases/` holds `matterlib-0.0.1.{lock.yaml,catalog.json}` and `matterlib-0.1.0.{lock.yaml,catalog.json,freeze.json,approval.json}`; the approval's `payload_sha256` and `payload_digest` match the freeze record.)*
 
+*(Updated 2026-09-26, Phase04: the wear-layer change moved `matterlib-0.1.0`'s payload (4 articles, 5 shared layers), so it was **re-frozen without its `.dds` set**. The pinned encoder is absent on the maintainer's box, so the freeze carries no `dds_set` and activation's `.dds` check skips. The approval is re-issued against the new freeze by the maintainer, as in the Matter-Library#1 precedent. The `.dds` re-lock belongs to the release-bundle phase, which needs the encoder anyway.)*
+
 **Approval ≠ activation.** Promotion creates the approval artifact (the sole promotion flip). Activation
 writes the selector. Rollback re-points the selector; it never revokes or rewrites approval.
 

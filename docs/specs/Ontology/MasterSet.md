@@ -162,6 +162,17 @@ normal      = normalize( lerp(n1, n2, t) )                # decode BOTH to tange
 
 **Defaults are chosen so the identity falls out:** `layer_blend_balance = 0.5`, `layer_blend_contrast = 0.0` ⇒ `c = 1`, `k = saturate(m)`, `t = m × maskset_blend`. At defaults the blend is exactly *"mask × maskset_blend"* — the plain, intuitive behavior — and balance/contrast are pure shaping on top.
 
+### Scale — every layer is sampled at its OWN real-world size *(normative, Phase04, 2026-09-26)*
+
+Overlays and masksets are **shared** textures with their own physical size, so a layer looks the same size on every article whatever the article's tile size:
+
+- **A layer's size is its scale tag** ([Identity §Scale tags](Identity.md): metres per UV tile). A shared layer is authored at exactly that size; `sUKN` is not allowed on a layer.
+- **An article's size is its `meters_per_tile`** (the recipe value, also carried in `imrsv_metadata`), not its coarser tag. An article that carries layers must have `meters_per_tile > 0`.
+- **The layer's UV is the article's UV × (article size ÷ layer size)**, taken *after* the Creator's `place2d` (`uv_scale` / `uv_offset` / `uv_rotation`), so the Creator's UV controls still move the whole material together.
+- **Producer form:** each layer render-role node is a MaterialX `tiledimage` with `realworldimagesize` = the layer's size and `realworldtilesize` = the article's `meters_per_tile`, fed from `uv_place` ([LCDSchema §Render-role texture nodes](../Contract/LCDSchema.md)). The per-article textures (base, layer 2, opacity) stay at the article's size.
+
+*(Before Phase04 every layer tiled with the article's UVs, so its own tag had no effect: a 1 cm dust layer on a 1 m concrete was stretched 100x. The assembler enforces the two input rules above.)*
+
 ### Colour space — overlays and masksets are LINEAR
 
 ⚠ **Overlay and maskset textures load LINEAR (`lin_rec709`), never `srgb_texture`.** They are data, not colour. Loading a packed data texture through an sRGB transfer curve corrupts every channel it carries. [LCDSchema](../Contract/LCDSchema.md)'s render-role table follows this rule.
