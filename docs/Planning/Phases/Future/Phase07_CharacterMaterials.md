@@ -1,6 +1,6 @@
 # Phase07 — Character Materials
 
-**Status:** DISCOVERY COMPLETE (2026-09-27): **the Brief is complete**, and the four lead calls are ruled (§Lead rulings). Lane: `build` (verified, §Risk lane). Next: `/execute P7`.
+**Status:** IN EXECUTION (`/execute P7`, 2026-09-27). Discovery complete the same day: the Brief is complete and the four lead calls are ruled (§Lead rulings). Lane: `build` (verified, §Risk lane).
 - **Seeded** 2026-09-27 from `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md`, first as an unnumbered phase (CM3).
 - **Numbered Phase07 by the lead, 2026-09-27** (CM4), verbatim:
   - *"I would like to get the character materials in as soon as possible after phase 5… Studio is going to be pulling from the matter library and there no character materials in the library at all so they will magenta… I would rather have everything in and 'uncalibrated' yet then a bunch of magenta"*;
@@ -188,4 +188,10 @@ The controls, read: the release lifecycle (`validate_manifest.py`, `freeze_relea
 
 ## Execution Log
 
-_(populated during execution)_
+*Ledger: step · result · next. Findings live in the commit messages.*
+
+**Tree at start (2026-09-27):** `main` @ `e35bf83`, clean, 3 ahead of origin, no other session visible. **Always-on gate at start:** `run_all.py` 14 PASS / 2 SKIP / 1 FAIL, `approval_binds_freeze` alone (inherited from Phase05's close: the pilot re-approval is still owed).
+
+| Step | Result | Next |
+|---|---|---|
+| **7.1** | **▶ SCAFFOLD COMPLETE — sitting owed (click 1).** Built: the `biological` Domain (`Taxonomy.md`, `MasterSet.md` coverage, `validate_recipe.py`, the recipe schema); `Skin_FitzpatrickIII_Clean_Base_s001_v01` on Subsurface; the shared `Skin_Pores` micro-surface (1 cm tile, seamless, roughness mean 0.500); the Physically Based lookup now carries `subsurfaceRadius` (**centimetres**, established from the paper the entry cites: Skin IV–VI is exactly Jensen 2001's skin1 diffusion length). **Deviation (small):** the pores are the article's own normal and roughness, not a wear overlay, because an overlay ships at 0 (C1) and would leave skin plastic by default. **F12 — the rig imported every Blender scene at 1/100 scale.** Each setting scene sublayers the test scene but did not author `metersPerUnit`, which USD reads from the root layer only, so Blender took centimetres. Harmless on opaque matter; on subsurface, 4.8 mm of scatter crossed a 3.6 mm sphere and the skin rendered pale and waxy (ΔE 12.8). Fixed in `job.py` (the header now carries the test scene's `upAxis`/`metersPerUnit`, shared constants in `build_scene.py`; the test scene regenerates byte-identical). **Skin: ΔE 12.8 → 2.69 whole set / 2.44 close-up** (Subsurface bar: recognisable). Phase05's distance-bearing numbers were taken at the wrong scale. **Marble: 3.95 → 2.60** (whole set; close-up 2.56), so Phase05's F16 colour gap was mostly this bug. Its Blender ruler check now reads OFF (match 0.05): 8.5 mm of real scatter blurs the veins on the floor, and Storm's approximation does not blur. **Oak (opaque) is unchanged** (0.79 / 0.65, ruler 1.00 in both), so the fix does not touch sizing. Diamond (absorption depth) re-measured at 7.3. Gate: 14 PASS / 2 SKIP / 1 FAIL, the inherited `approval_binds_freeze` alone; the determinism lane shows every existing article byte-stable. | Lead: click 1. Then 7.2. |

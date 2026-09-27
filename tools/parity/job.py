@@ -113,7 +113,9 @@ def write_setting_scene(art: Article, setting: dict, out: Path) -> Path:
             f'        {{\n            texCoord2f[] primvars:st = [{st}] (\n'
             '                interpolation = "vertex"\n            )\n'
             f'            rel material:binding = <{mat}>\n        }}\n')
-    text = ("#usda 1.0\n(\n    subLayers = [@" + SCENE.as_posix() + "@]\n)\n\n"
+    # the root layer carries the stage metadata; a sublayer's is ignored (build_scene.py)
+    text = ("#usda 1.0\n(\n    subLayers = [@" + SCENE.as_posix() + "@]\n"
+            f'    upAxis = "{build_scene.UP_AXIS}"\n    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
             'over "World"\n{\n'
             f'    def "Library" (\n        prepend references = @{art.path.as_posix()}@</MaterialX>\n    )\n    {{\n'
             + mat_over + "    }\n"

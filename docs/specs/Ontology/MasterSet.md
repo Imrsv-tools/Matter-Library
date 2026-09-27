@@ -23,7 +23,7 @@ This spec is the **producer side** of the master contract: the masters, their to
 
 *(Updated 2026-09-23, measured: `MatterLibrary/materials/utility/virtual/IMRSV_MissingMaterial.mtlx` declares `master_material = "system"` in its `imrsv_metadata`; it is magenta (`1.0, 0.0, 1.0`) and is `creator_selectable: false` in the `matterlib-0.1.0` catalog.)*
 
-**Coverage: 19 of 20 taxonomy classes** *(was 18 of 19; `ceramic` added 2026-09-23)*. `atmospheric` (volume materials) is **out of scope** for prop-applied matter — owned by a future Volumes/Effector domain *(planned)* ([Taxonomy](Taxonomy.md)).
+**Coverage: 22 of 23 taxonomy classes** *(was 18 of 19; `ceramic` added 2026-09-23; the three `biological` classes added 2026-09-27, covered by Subsurface (skin, mucosa, sclera), Opaque (nail, enamel, bone) and Masked (hair fibre))*. `atmospheric` (volume materials) is **out of scope** for prop-applied matter — owned by a future Volumes/Effector domain *(planned)* ([Taxonomy](Taxonomy.md)).
 
 **Mapping sanity check.** Against the consumer's earlier keep-set (historical examples; only Glass and Diamond exist in this library — see [Catalog](../Catalog/Catalog.md) for the real articles): Glass→TranslucentThin · Diamond→TranslucentThick · White_Plastic/Gold_Foil/Brass→Opaque · Ceramic→Opaque(+coat). `Diamond` is the first material that doesn't fit TranslucentThin → it is exactly what justifies TranslucentThick; `Marble` justifies Subsurface.
 

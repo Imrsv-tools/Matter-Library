@@ -49,6 +49,7 @@ TAXONOMY = {
     "synthetic": {"plastic", "polymer", "textile", "coating"},
     "environmental": {"sand", "vegetation", "liquid"},
     "utility": {"emissive", "virtual", "energy"},
+    "biological": {"tissue", "keratin", "bone"},  # Phase07 (CM1, 2026-09-27)
 }
 
 # G6 — physical ranges. Colours are linear reflectances/transmittances; an IOR outside

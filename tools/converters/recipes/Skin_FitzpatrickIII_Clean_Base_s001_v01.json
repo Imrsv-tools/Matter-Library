@@ -1,0 +1,31 @@
+{
+  "_comment": "Human skin, Fitzpatrick type III (Phase07 step 7.1). SUBSURFACE: skin's look is light scattering inside it. Topology-free (CM2): a tone plus a tiling micro-surface at real size, so it works on any mesh. Values from Physically Based `Skin III` (albedo, IOR 1.4, roughness 0.5, scatter distance). `subsurface_radius` is in metres (OpenPBR scene units; Learnings/MaterialX M4): Physically Based gives the diffuse mean free path in cm (0.482, 0.169, 0.109), so 4.82 mm red, with the channels over it as the scale. `subsurface_weight` 1.0 and `subsurface_color` = the albedo (judgement): skin is a scattering body throughout, and OpenPBR mixes the diffuse colour towards `subsurface_color` by the weight, so an unset colour (OpenPBR's light grey) would wash the tone out. The shared `Skin_Pores` micro-surface (pores and furrows at a 1 cm tile) is the article's OWN normal and roughness, not a wear overlay: an overlay ships at 0 (C1) and would leave the skin plastic by default. Wear layers at 0 (C1): scratches (overlay 1, damage) and dust/dirt (overlay 2).",
+  "name": "Skin_FitzpatrickIII_Clean_Base_s001_v01",
+  "path": "biological/tissue/Skin_FitzpatrickIII_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_const": "0.623, 0.433, 0.343",
+  "roughness_tex": "../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
+  "normal_tex": "../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_color": "0.623, 0.433, 0.343",
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "roughness_bias"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Skin III", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.623, 0.433, 0.343", "metalness_const": 0, "roughness_const": 0.5, "specular_ior": 1.4, "subsurface_radius": 0.00482, "subsurface_radius_scale": "1, 0.351, 0.226"},
+     "note": "roughness 0.5 is the MEAN of the Skin_Pores roughness map"},
+    {"kind": "judgement", "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_skin_pores.py", "provenance": "library/provenance/sources/base/biological/tissue/Skin_Pores.yaml"}
+  ]
+}

@@ -67,9 +67,20 @@ def ground(entry: dict, header: dict) -> dict:
         if isinstance(v, (int, float)):
             used[dst] = v
 
+    # subsurfaceRadius is the diffuse mean free path per channel, in CENTIMETRES: Skin IV-VI's
+    # (0.367, 0.137, 0.068) is exactly 1/sqrt(3 sigma_a sigma_t') for Jensen et al. 2001's skin1
+    # (3.67 / 1.37 / 0.68 mm), the paper the entry cites (checked 2026-09-27, Phase07 7.1).
+    # OpenPBR takes scene units (metres here, Learnings/MaterialX M4), as one length plus a
+    # per-channel scale, so it is split into the largest channel (m) and the channels over it.
+    rad = entry.get("subsurfaceRadius")
+    if isinstance(rad, list) and len(rad) == 3 and max(rad) > 0:
+        top = max(rad)
+        used["subsurface_radius"] = round(top / 100.0, 6)
+        used["subsurface_radius_scale"] = _fmt(round(c / top, 3) for c in rad)
+
     # Values Physically Based carries that the library has no carrier for yet: named, not used.
     unused = [k for k in ("specularColor", "complexIor", "transmissionDispersion",
-                          "volumeCoefficients", "subsurfaceRadius", "thinFilmThickness")
+                          "volumeCoefficients", "thinFilmThickness")
               if k in entry]
 
     source = {
