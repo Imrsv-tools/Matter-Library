@@ -1,0 +1,33 @@
+{
+  "_comment": "Lip mucosa (Phase07 7.5). SUBSURFACE, as skin, but redder, smoother and moist: MPFB2's enhanced skin gives the lips roughness 0.35 and smaller pores; here no pores (the lip surface is a smooth mucosa at this scale). A mid tone: a Creator tints it (`base_color_tint`) to sit with a darker or lighter skin.",
+  "name": "Lips_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Lips_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.52, 0.26, 0.24",
+  "roughness_const": 0.35,
+  "specular_ior": 1.4,
+  "subsurface_color": "0.52, 0.26, 0.24",
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.2,
+  "coat_ior": 1.336,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: redder and darker than Skin III (no measured lip albedo exists). Roughness 0.35: MPFB2's enhanced-skin lips (CC0 settings, research Pass 3). Coat 0.3 at 0.2, IOR 1.336: a thin film of saliva. Scatter as skin (Physically Based Skin I-III's radius, anisotropy 0.8, `subsurface_color` = the albedo), since mucosa and sclera are soft tissue of the same kind; no measured radius exists for them."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "_comment": "The white of the eye (Phase07 7.5). SUBSURFACE (D-E: the eye is composed from existing masters). Physically Based Eye (Sclera). Its wet shine comes from the cornea shell over it, so the sclera itself is not glossy.",
+  "name": "Sclera_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Sclera_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.652, 0.5, 0.394",
+  "roughness_const": 0.3,
+  "specular_ior": 1.4,
+  "subsurface_color": "0.652, 0.5, 0.394",
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Eye (Sclera)",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.652, 0.5, 0.394",
+        "specular_ior": 1.4,
+        "subsurface_radius": 0.00482,
+        "subsurface_radius_scale": "1, 0.351, 0.226"
+      }
+    },
+    {
+      "kind": "judgement",
+      "why": "Roughness 0.3, not Physically Based's 0: the 0 is the tear film, which the cornea shell carries on MakeHuman's eye; a glossy sclera under it would double the highlight."
+    }
+  ]
+}

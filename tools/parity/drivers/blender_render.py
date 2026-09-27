@@ -28,6 +28,7 @@ Colour: the Standard view transform (a plain sRGB encode, no tone curve), like u
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import sys
@@ -132,6 +133,21 @@ def subjects(job: dict) -> list:
     return objs
 
 
+@contextlib.contextmanager
+def hide(job: dict, spec: dict):
+    """Hide a view's `hide` prims from the render for the duration (a character's mouth view)."""
+    objs = [bpy.data.objects.get(p.rsplit("/", 1)[1]) for p in spec.get("hide", [])]
+    if None in objs:
+        raise SystemExit(f"view hides a prim not found after import: {spec.get('hide')}")
+    for o in objs:
+        o.hide_render = True
+    try:
+        yield
+    finally:
+        for o in objs:
+            o.hide_render = False
+
+
 def mask_colours(job: dict, objs: list) -> list:
     """Each subject's flat mask colour: the job's ``mask_colours`` (a character job, one per part),
     else the test scene's sphere red, cube green, floor blue."""
@@ -192,7 +208,11 @@ def run(job_path: Path) -> None:
         if cams[v] is None or cams[v].type != "CAMERA":
             raise SystemExit(f"view {v!r}: camera {name!r} not found after import")
         scn.camera = cams[v]
-        render_mask(objs, Path(job["out_dir"]) / f"mask{spec['suffix']}.png", mask_colours(job, objs))
+        hidden = set(spec.get("hide", []))
+        shown = [(p, o, c) for p, o, c in zip(job["subjects"], objs, mask_colours(job, objs)) if p not in hidden]
+        with hide(job, spec):
+            render_mask([o for _, o, _ in shown], Path(job["out_dir"]) / f"mask{spec['suffix']}.png",
+                        [c for _, _, c in shown])
     # what goes on which subject: a character job binds one article per part (Phase07 7.4);
     # the test scene binds the one article to all three subjects
     bindings = job.get("bindings") or [{"subject": p, "article": job["article"]} for p in job["subjects"]]
@@ -212,7 +232,8 @@ def run(job_path: Path) -> None:
             scn.view_settings.exposure = float(spec.get("exposure", 0.0))
             png = out / f"{s['id']}{spec['suffix']}.png"
             scn.render.filepath = str(png)
-            bpy.ops.render.render(write_still=True)
+            with hide(job, spec):
+                bpy.ops.render.render(write_still=True)
             print(f"blender: wrote {png}")
         scn.view_settings.exposure = 0.0
 

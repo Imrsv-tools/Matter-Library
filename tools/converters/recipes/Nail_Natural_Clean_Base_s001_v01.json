@@ -1,0 +1,28 @@
+{
+  "_comment": "A fingernail or toenail (Phase07 7.5): keratin over the pink nail bed. OPAQUE (MasterSet: nail is Opaque), smooth, with a natural sheen as a light coat.",
+  "name": "Nail_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/keratin/Nail_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "biological",
+  "class": "keratin",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.80, 0.60, 0.55",
+  "roughness_const": 0.25,
+  "specular_ior": 1.55,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.05,
+  "coat_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Roughness 0.25: MPFB2's enhanced-skin nails (no pores). IOR 1.55: keratin. Colour: the nail bed's pink through a translucent plate (no measured value). Coat 0.3 at 0.05: a natural nail's sheen."
+    }
+  ]
+}

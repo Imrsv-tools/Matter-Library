@@ -61,18 +61,38 @@ SOURCES = {
     },
 }
 PACK = "makehuman_system_assets_cc0.zip"
+_MPFB = "https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/"
+for _mask, _sha in (("lips", "572630c2b4bb061dfd3b5bb75228615527442296b0db40feffffb0d439e8c203"),
+                    ("fingernails", "0828222964a14c14a46e72445f549a2124de06f072daab71e5a6716324c37362"),
+                    ("toenails", "029404d4efadbfd84cf7a9c9d9b1d93c6ba9b806a85897d52474a6f8edc803a4")):
+    SOURCES[f"mpfb_{_mask}.jpg"] = {"url": _MPFB + f"mpfb_{_mask}.jpg", "sha256": _sha,
+                                    "licence": "CC0 (MPFB2 LICENSE.ASSETS.md: region masks on hm08's UVs)"}
 
-# part name -> the base mesh's group, or a proxy fitted to the base mesh (pack members)
-PARTS = {
-    "Body": {"group": "body"},
-    "Eyes": {"proxy": "eyes/high-poly/high-poly"},
-    "Teeth": {"proxy": "teeth/teeth_base/teeth_base"},
-    "Tongue": {"proxy": "tongue/tongue01/tongue01"},
+# One source mesh -> one or more parts (Phase07 ruling L1: one part per substance). A face goes
+# to the first split whose rule selects it, else to the mesh's `rest` part. Rules read the face's
+# UV centroid: `mask` (an MPFB2 region mask on hm08's UVs, > 50 %), `alpha` (the mesh's own
+# MakeHuman texture is transparent there), `circles` (inside any (u, v, r) circle in UV) and
+# `red` (the texture's red exceeds green and blue by > 30 levels).
+MESHES = {
+    "body": {"group": "body", "rest": "Body",
+             "split": [("Lips", {"mask": ["mpfb_lips.jpg"]}),
+                       ("Nails", {"mask": ["mpfb_fingernails.jpg", "mpfb_toenails.jpg"]})]},
+    # The HIGH-poly eye has an outer shell (the cornea), mapped to a disc of its texture that is
+    # fully transparent, so MakeHuman never shows it (Phase07 7.5: the research's "no cornea
+    # shell" holds for the low-poly eye only). The iris circles are measured off the texture.
+    "eyes": {"proxy": "eyes/high-poly/high-poly", "texture": "eyes/materials/brown_eye.png",
+             "rest": "Sclera",
+             "split": [("Cornea", {"alpha": True}),
+                       ("Pupil", {"circles": [(0.705, 0.700, 0.034), (0.290, 0.288, 0.034)]}),
+                       ("Iris", {"circles": [(0.705, 0.700, 0.118), (0.290, 0.288, 0.118)]})]},
+    "teeth": {"proxy": "teeth/teeth_base/teeth_base", "texture": "teeth/teeth_base/teeth.png",
+              "rest": "Teeth", "split": [("Gums", {"red": True})]},
+    "tongue": {"proxy": "tongue/tongue01/tongue01", "rest": "Tongue"},
 }
+PARTS = [p for m in MESHES.values() for p in [s for s, _ in m.get("split", [])] + [m["rest"]]]
 
 # Cameras (the rig's 50 mm lens on a 36 mm square), framed from the body's own measured bounds.
 CAM_FOCAL, CAM_APERTURE = build_scene.CAM_FOCAL, build_scene.CAM_APERTURE
-VIEWS = {"wide": "Cam", "face": "CamFace", "hand": "CamHand"}
 
 
 _VERIFIED: dict[str, bytes] = {}
@@ -212,12 +232,65 @@ def uv_density(pts, faces, vt) -> tuple[float, float, float]:
     return r[int(0.05 * (len(r) - 1))], statistics.median(r), r[int(0.95 * (len(r) - 1))]
 
 
+def _image(data: bytes):
+    from PIL import Image          # noqa: PLC0415 (only the build needs it)
+    im = Image.open(io.BytesIO(data)).convert("RGBA")
+    return im.size, im.load()
+
+
+def split_faces(spec: dict, faces, vt) -> dict[str, list[int]]:
+    """Face indices per part: the first split rule that selects a face wins, else `rest`."""
+    rules = spec.get("split", [])
+    imgs = {}
+    for _, rule in rules:
+        for m in rule.get("mask", []):
+            imgs.setdefault(m, _image(source(m)))
+    tex = _image(source(PACK, spec["texture"])) if "texture" in spec else None
+
+    def at(img, u, v):
+        (W, H), px = img
+        return px[min(W - 1, int((u % 1.0) * W)), min(H - 1, int((1 - v % 1.0) * H))]
+
+    out = {name: [] for name, _ in rules}
+    out[spec["rest"]] = []
+    for i, f in enumerate(faces):
+        u = statistics.mean(vt[t][0] for _, t in f)
+        v = statistics.mean(vt[t][1] for _, t in f)
+        for name, rule in rules:
+            if "mask" in rule and any(at(imgs[m], u, v)[0] > 127 for m in rule["mask"]):
+                break
+            if rule.get("alpha") and at(tex, u, v)[3] < 128:
+                break
+            if "circles" in rule and any(math.hypot(u - cu, v - cv) < r for cu, cv, r in rule["circles"]):
+                break
+            if rule.get("red"):
+                r, g, b, _ = at(tex, u, v)
+                if r > g + 30 and r > b + 30:
+                    break
+        else:
+            name = spec["rest"]
+        out[name].append(i)
+    return out
+
+
+def subset(pts, normals, faces):
+    """The points, normals and faces of a face subset, re-indexed in first-use order."""
+    remap, p_pts, p_nrm = {}, [], []
+    for f in faces:
+        for vi, _ in f:
+            if vi not in remap:
+                remap[vi] = len(p_pts)
+                p_pts.append(pts[vi])
+                p_nrm.append(normals[vi])
+    return p_pts, p_nrm, [[(remap[vi], ti) for vi, ti in f] for f in faces]
+
+
 def load_parts() -> dict:
     """Every part: points, normals, faces, faceVarying st in metres, and its UV density."""
     base_text = source("base.obj").decode("utf-8", "replace")
     base = base_vertices(base_text)
     parts = {}
-    for name, spec in PARTS.items():
+    for spec in MESHES.values():
         if "group" in spec:
             pts, faces, vt = read_obj(base_text, spec["group"])
         else:
@@ -237,12 +310,16 @@ def load_parts() -> dict:
             pts = [None] * len(order)
             for vi, k in order.items():
                 pts[k] = fitted[vi]
-        d = uv_density(pts, faces, vt)
-        st = [(vt[ti][0] * d[1], vt[ti][1] * d[1]) for f in faces for _, ti in f]
-        parts[name] = {"points": pts, "normals": vertex_normals(pts, faces), "faces": faces,
-                       "st": st, "density": d}
-    # feet on the ground: shift every part by the body's lowest point
-    y0 = min(p[1] for p in parts["Body"]["points"])
+        normals = vertex_normals(pts, faces)        # over the whole mesh: no crease at a split
+        for name, sel in split_faces(spec, faces, vt).items():
+            if not sel:
+                raise SystemExit(f"part {name!r}: its rule selected no faces")
+            p_pts, p_nrm, p_faces = subset(pts, normals, [faces[i] for i in sel])
+            d = uv_density(p_pts, p_faces, vt)
+            st = [(vt[ti][0] * d[1], vt[ti][1] * d[1]) for f in p_faces for _, ti in f]
+            parts[name] = {"points": p_pts, "normals": p_nrm, "faces": p_faces, "st": st, "density": d}
+    # feet on the ground: shift every part by the lowest point of all of them
+    y0 = min(p[1] for part in parts.values() for p in part["points"])
     for part in parts.values():
         part["points"] = [(x, y - y0, z) for x, y, z in part["points"]]
     return parts
@@ -280,9 +357,10 @@ def _look_at(pos, target):
     return pitch, yaw
 
 
-def cameras(body: dict) -> dict:
-    """Three framings from the body's bounds: whole body, face, the character's left hand."""
-    pts = body["points"]
+def cameras(parts: dict) -> dict:
+    """Framings from the parts' bounds: whole body, face, the character's left hand, the mouth
+    (teeth, gums and tongue; the rig hides the face for that view)."""
+    pts = parts["Body"]["points"]
     top = max(p[1] for p in pts)
     half = math.tan(math.atan(CAM_APERTURE / 2 / CAM_FOCAL))   # half-width per metre of distance
     cams = {}
@@ -299,6 +377,9 @@ def cameras(body: dict) -> dict:
     hand = [p for p in pts if p[0] > xmax - 0.12]
     hc = tuple((min(p[k] for p in hand) + max(p[k] for p in hand)) / 2 for k in range(3))
     cams["CamHand"] = ((hc[0] + 0.02, hc[1] + 0.02, hc[2] + 0.17 / half), hc)
+    mouth = [p for n in ("Teeth", "Gums", "Tongue") for p in parts[n]["points"]]
+    mc = tuple((min(p[k] for p in mouth) + max(p[k] for p in mouth)) / 2 for k in range(3))
+    cams["CamMouth"] = ((mc[0], mc[1] - 0.02, mc[2] + 0.06 / half), mc)
     return cams
 
 
@@ -337,7 +418,7 @@ def build(parts: dict) -> str:
     ]
     out += [mesh_block(n, p) for n, p in parts.items()]
     out.append('    }\n')
-    out += [camera_block(n, pos, tgt) for n, (pos, tgt) in cameras(parts["Body"]).items()]
+    out += [camera_block(n, pos, tgt) for n, (pos, tgt) in cameras(parts).items()]
     out.append('}\n')
     return "".join(out)
 
@@ -347,8 +428,6 @@ def part_uvs() -> dict[str, list[tuple[float, float]]]:
     return {f"/World/Character/{n}": p["st"] for n, p in load_parts().items()}
 
 
-PRIMS = tuple(f"/World/Character/{n}" for n in PARTS)
-CAMERA_PATHS = {v: f"/World/{c}" for v, c in VIEWS.items()}
 
 
 def main() -> int:

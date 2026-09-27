@@ -1,0 +1,33 @@
+{
+  "_comment": "Gum mucosa (Phase07 7.5). SUBSURFACE, moist.",
+  "name": "Gum_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Gum_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.194, 0.038, 0.045",
+  "roughness_const": 0.3,
+  "specular_ior": 1.4,
+  "subsurface_color": "0.194, 0.038, 0.045",
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.5,
+  "coat_roughness": 0.1,
+  "coat_ior": 1.336,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: MakeHuman system assets (CC0, makehuman_system_assets_cc0.zip sha256 b542127a...0107), mean linear colour of the region in its texture; the texture bakes in some shading (teeth.png, the red gum islands). Coat 0.5 at 0.1, IOR 1.336: saliva. Scatter as skin (Physically Based Skin I-III's radius, anisotropy 0.8, `subsurface_color` = the albedo), since mucosa and sclera are soft tissue of the same kind; no measured radius exists for them."
+    }
+  ]
+}

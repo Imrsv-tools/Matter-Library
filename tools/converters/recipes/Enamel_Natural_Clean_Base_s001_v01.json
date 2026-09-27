@@ -1,0 +1,25 @@
+{
+  "_comment": "Tooth enamel (Phase07 7.5). OPAQUE (MasterSet: enamel is Opaque). Smooth and slightly warm white.",
+  "name": "Enamel_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/bone/Enamel_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "biological",
+  "class": "bone",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.70, 0.67, 0.60",
+  "roughness_const": 0.15,
+  "specular_ior": 1.63,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: a little under Physically Based Bone (0.793, 0.793, 0.664); MakeHuman's teeth texture reads 0.30 mean, 0.54 top decile, darkened by baked shadow. IOR 1.63: enamel's measured index (~1.62-1.63). Roughness 0.15: polished-looking, wet."
+    }
+  ]
+}

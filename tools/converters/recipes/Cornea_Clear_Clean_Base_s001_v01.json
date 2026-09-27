@@ -1,0 +1,38 @@
+{
+  "_comment": "The cornea and tear film (Phase07 7.5): the clear shell over the eye. TRANSLUCENTTHIN (thin-walled: a shell), Physically Based Eye (Cornea). MakeHuman's high-poly eye has this shell (its texture hides it); without a clear article on it the eye renders covered.",
+  "name": "Cornea_Clear_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Cornea_Clear_Clean_Base_s001_v01.mtlx",
+  "master": "TranslucentThin",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "1.0, 1.0, 1.0",
+  "roughness_const": 0.0,
+  "specular_ior": 1.376,
+  "transmission": 1.0,
+  "transmission_color": "1.0, 1.0, 1.0",
+  "thin_walled": true,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Eye (Cornea)",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "1, 1, 1",
+        "roughness_const": 0,
+        "specular_ior": 1.376,
+        "transmission": 1
+      }
+    }
+  ]
+}

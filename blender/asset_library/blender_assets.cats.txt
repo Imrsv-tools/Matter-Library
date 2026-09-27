@@ -3,6 +3,8 @@
 
 VERSION 1
 
+c63ae30d-f4de-55e2-8265-134a8760f59c:biological/bone:biological-bone
+2b158137-f219-5ff0-8a8c-a6c4f9e6a7fd:biological/keratin:biological-keratin
 238c4f47-9ef2-5426-8814-5863d223d1b6:biological/tissue:biological-tissue
 e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementitious
 04cf9d02-7bbc-54c8-adb2-e6878ff7e727:engineered/ceramic:engineered-ceramic

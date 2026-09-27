@@ -128,9 +128,13 @@ def write_setting_scene(art: Article, setting: dict, out: Path) -> Path:
 CHARACTER_SCENE = HERE / "scene" / "character_scene.usda"
 # one flat mask colour per character part (the Blender driver renders them; compare.py scores
 # each as its own region). Distinct, saturated, and far apart so an edge pixel is never mistaken.
-CHARACTER_COLOURS = {"Body": (1, 0, 0), "Eyes": (0, 1, 0), "Teeth": (0, 0, 1), "Tongue": (1, 1, 0)}
+CHARACTER_COLOURS = {"Body": (1, 0, 0), "Lips": (1, 0, 1), "Nails": (0, 1, 1),
+                     "Cornea": (0.5, 0.5, 1), "Pupil": (0.5, 1, 0.5), "Iris": (1, 0.5, 0), "Sclera": (0, 1, 0),
+                     "Teeth": (0, 0, 1), "Gums": (0.5, 0, 0.5), "Tongue": (1, 1, 0)}
 CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFace", "face"),
-                   "hand": ("/World/CamHand", "hand")}
+                   "hand": ("/World/CamHand", "hand"), "mouth": ("/World/CamMouth", "mouth, face hidden")}
+# prims a view hides (the teeth, gums and tongue sit behind closed lips on MakeHuman's body)
+CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
 
 
 def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
@@ -188,6 +192,7 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
         "scene": str(CHARACTER_SCENE),
         "camera": CHARACTER_VIEWS["wide"][0],
         "views": {v: {"camera": c, "suffix": view_suffix(v), "label": label}
+                  | ({"hide": CHARACTER_HIDE[v]} if v in CHARACTER_HIDE else {})
                   for v, (c, label) in CHARACTER_VIEWS.items()},
         "subjects": [f"/World/Character/{p}" for p in bindings],
         # the mask: one flat colour per subject; compare.py scores each colour as a region

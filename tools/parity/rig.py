@@ -288,6 +288,19 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
 
 
 CHARACTER_SKIN = "Skin_FitzpatrickIII_Clean_Base_s001_v01"
+# The character's cast: one article per part (Phase07 7.5). "Body" is the skin, the positional
+# argument; every other part is fixed here.
+CHARACTER_CAST = {
+    "Lips": "Lips_Natural_Clean_Base_s001_v01",
+    "Nails": "Nail_Natural_Clean_Base_s001_v01",
+    "Cornea": "Cornea_Clear_Clean_Base_s001_v01",
+    "Pupil": "Pupil_Dark_Clean_Base_s001_v01",
+    "Iris": "Iris_Brown_Clean_Base_s001_v01",
+    "Sclera": "Sclera_Natural_Clean_Base_s001_v01",
+    "Teeth": "Enamel_Natural_Clean_Base_s001_v01",
+    "Gums": "Gum_Natural_Clean_Base_s001_v01",
+    "Tongue": "Tongue_Natural_Clean_Base_s001_v01",
+}
 
 
 def region_colours(job: dict) -> dict | None:
@@ -341,7 +354,9 @@ def main(argv=None) -> int:
             raise SystemExit("--sweep runs on the test scene; the character renders the defaults")
         art = jobmod.Article.read(jobmod.find_article(args.article or CHARACTER_SKIN))
         out = Path(args.out) if args.out else OUT_ROOT / f"Character__{art.name}"
-        job_path = jobmod.write_character_job({"Body": art}, out, args.width, args.samples)
+        cast = {"Body": art} | {p: jobmod.Article.read(jobmod.find_article(a))
+                                for p, a in CHARACTER_CAST.items()}
+        job_path = jobmod.write_character_job(cast, out, args.width, args.samples)
     else:
         if not args.article:
             ap.error("an article is required (or --character)")

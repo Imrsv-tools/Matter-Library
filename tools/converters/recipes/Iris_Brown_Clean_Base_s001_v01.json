@@ -1,0 +1,25 @@
+{
+  "_comment": "A brown iris (Phase07 7.5): a pigment, OPAQUE (D-E). Seen through the cornea shell, which carries the wet highlight. A pigment with no pattern for now (the radial pattern is mesh-bound detail, research CM2).",
+  "name": "Iris_Brown_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Iris_Brown_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.06, 0.006, 0.001",
+  "roughness_const": 0.4,
+  "specular_ior": 1.4,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: MakeHuman system assets (CC0, makehuman_system_assets_cc0.zip sha256 b542127a...0107), mean linear colour of the region in its texture; the texture bakes in some shading (brown_eye.png, the iris annulus between the pupil and the limbus)."
+    }
+  ]
+}

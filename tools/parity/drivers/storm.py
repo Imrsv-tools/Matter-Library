@@ -70,6 +70,26 @@ def render_setting(scene: str, png: Path, width: int, camera: str) -> None:
     raise SystemExit(f"Storm never produced two agreeing renders of {scene} in {TRIES + 1} tries")
 
 
+def _overs(opinions: dict[str, list[str]]) -> str:
+    """One `over` tree for every prim path (a layer may not name a prim twice)."""
+    tree: dict = {}
+    for path, lines in opinions.items():
+        node = tree
+        for name in path.strip("/").split("/"):
+            node = node.setdefault(name, {})
+        node.setdefault("", []).extend(lines)
+
+    def emit(node: dict, depth: int) -> str:
+        ind = "    " * depth
+        out = "".join(f"{ind}{line}\n" for line in node.get("", []))
+        for name, child in node.items():
+            if name:
+                out += f'{ind}over "{name}"\n{ind}{{\n{emit(child, depth + 1)}{ind}}}\n'
+        return out
+
+    return emit(tree, 0)
+
+
 def run(job_path: Path) -> list[Path]:
     """Render every setting and view; supersampled by ``job["storm_supersample"]``.
 
@@ -87,14 +107,17 @@ def run(job_path: Path) -> list[Path]:
         for v in views.values():
             png = out / f"{s['id']}{v['suffix']}.png"
             scene = s["scene"]
-            if v.get("exposure"):
-                # the view's exposure, on the USD camera (Storm honours `exposure`)
-                cam = v["camera"].rsplit("/", 1)[1]
+            if v.get("exposure") or v.get("hide"):
+                # the view's exposure, on the USD camera (Storm honours `exposure`), and the
+                # prims it hides (a character's mouth view), as USD visibility
+                opinions = {}          # prim path -> the attribute lines to author on it
+                if v.get("exposure"):
+                    opinions[v["camera"]] = [f"float exposure = {v['exposure']}"]
+                for prim in v.get("hide", []):
+                    opinions.setdefault(prim, []).append('token visibility = "invisible"')
                 wrap = Path(scene).with_name(f"{s['id']}{v['suffix']}.usda")
                 wrap.write_text("#usda 1.0\n(\n    subLayers = [@./" + Path(scene).name + "@]\n)\n\n"
-                                f'over "World"\n{{\n    over "{cam}"\n    {{\n'
-                                f'        float exposure = {v["exposure"]}\n    }}\n}}\n',
-                                encoding="utf-8")
+                                + _overs(opinions), encoding="utf-8")
                 scene = str(wrap)
             render_setting(scene, png, job["width"] * ss, v["camera"])
             if ss > 1:

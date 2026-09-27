@@ -86,8 +86,11 @@ def masks(mask_png: Path, colours: dict | None = None) -> dict[str, np.ndarray]:
     every channel is that region, so an anti-aliased edge between two parts is in neither."""
     m = read_rgb(mask_png)
     if colours:
-        out = {name: np.all(np.abs(m - np.array(c, dtype=np.float64)) < 0.1, axis=-1)
-               for name, c in colours.items()}
+        # the mask is an emission render through a plain sRGB encode: 0.5 is written as 0.735
+        def enc(c):
+            c = np.array(c, dtype=np.float64)
+            return np.where(c <= 0.0031308, 12.92 * c, 1.055 * c ** (1 / 2.4) - 0.055)
+        out = {name: np.all(np.abs(m - enc(c)) < 0.1, axis=-1) for name, c in colours.items()}
     else:
         out = {name: m[..., ch] > 0.5 for name, ch in REGIONS.items()}
     out["subjects"] = np.logical_or.reduce(list(out.values()))
