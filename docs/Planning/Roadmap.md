@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase07 — Character Materials — ACTIVE *(discovery complete 2026-09-27, next `/execute`; runs here while Phase06 runs on the UE machine)*
-**Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
-- `docs/Planning/Phases/Future/Phase07_CharacterMaterials.md`
+*No active phase on this machine (Phase07 closed 2026-09-27). Phase06 runs on the UE machine.*
 
 ==================================================================================
 ## Future
@@ -101,3 +99,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.
 - `docs/Planning/Phases/Complete/Phase05_TestRig.md`
 *Closed 2026-09-27; one maintainer re-approval of the pilot covers Phase04 and Phase05.*
+
+### Phase07 — Character Materials — COMPLETE
+**Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
+- `docs/Planning/Phases/Complete/Phase07_CharacterMaterials.md`
+*Closed 2026-09-27; 19 candidates, awaiting the Unreal column (Phase06).*
