@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase07 — Character Materials — ACTIVE *(discovery opened 2026-09-27; runs here while Phase06 runs on the UE machine)*
+### Phase07 — Character Materials — ACTIVE *(discovery complete 2026-09-27, next `/execute`; runs here while Phase06 runs on the UE machine)*
 **Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
 - `docs/Planning/Phases/Future/Phase07_CharacterMaterials.md`
 
