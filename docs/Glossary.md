@@ -53,6 +53,7 @@
 | **Creator tier** | The 9 end-user-adjustable ports (stable per version; `overlay3_density` added 2026-09-25): `base_color_tint`, `uv_scale`, `uv_offset`, `uv_rotation`, `overlay1_density`, `overlay2_density`, `overlay3_density`, `maskset_blend`, `roughness_bias`. → `docs/specs/Contract/LCDSchema.md` |
 | **Author tier** | The parameters an author sets and a Creator does not, including each master's defining property (cutoff · IOR · absorption · subsurface · layer blend · emission). → `docs/specs/Contract/LCDSchema.md` |
 | **Carriage lane** (A / B) | Where an author-tier value lives in the `.mtlx`: **A** on the shader node under its OpenPBR name (OpenPBR has an input for it); **B** as a named author-tier interface input on the nodegraph (OpenPBR has none — the Masked cutoff and the TwoLayer layer-2 set). → `docs/specs/Contract/LCDSchema.md` |
+| **Cut-out map** (`cutout_map`) | A **mesh's** own transparency (a hair card's strands), supplied when a Masked article is bound: a value on the bound Material connected into the article, by the Carrier rule. It is **never part of the article** (D1), so one hair article dresses any card mesh. It is sampled on the mesh's primary UVs. With none supplied, the card is solid, never magenta. It is the first piece of what the character research calls a **fit**: body-bound data kept beside the substance, never inside it. Added Phase07, 2026-09-27. → `docs/specs/Contract/LCDSchema.md` §Cut-out map |
 | **Render-role texture** | A fixed per-article texture node, `overlay1_tex` / `overlay2_tex` / `overlay3_tex` / `maskset_tex`, loaded **linear** (`lin_rec709`). It is not Creator-adjustable. → `docs/specs/Contract/LCDSchema.md` |
 | **Overlay** | A tiling surface effect (dust, scratches) packed as a *data* texture (normal XY · roughness bias · mask density), never an albedo bitmap. → `docs/specs/Ontology/MasterSet.md` |
 | **Maskset** | A packed multi-mask data texture (up to 4 masks) driving blends such as paint or rust. → `docs/specs/Ontology/MasterSet.md` |
@@ -60,14 +61,14 @@
 | **TwoLayer blend** | The master whose single OpenPBR surface blends two layers per channel by the maskset (e.g. rust on steel). → `docs/specs/Ontology/MasterSet.md` |
 | **Opacity floor** | `MIN_TRANSMISSIVE_OPACITY = 0.05`: the translucent masters never drop below it, so an article can state honest physics (`transmission = 1.0`) and still present a surface. The fix lives in the master, never in the article. → `docs/specs/Ontology/MasterSet.md` |
 | **`imrsv_metadata`** | The optional nodedef in each `.mtlx` carrying hints (master, scale tag, meters-per-tile, domain, class). The historical name is kept. → `docs/specs/Contract/MaterialXTemplate.md` |
-| **Parity** | How closely renders of one article match across MaterialX/USD, Blender and Unreal: calibrated, not pixel-identical (target ΔE < 2 where the master allows). Measured by the parity rig, `tools/parity/rig.py` (since 2026-09-27). → `docs/specs/Tooling/CompressedDistribution.md` |
+| **Parity** | How closely renders of one article match across MaterialX/USD, Blender and Unreal: calibrated, not pixel-identical (target ΔE < 2 where the master allows). Measured by the parity rig, `tools/parity/rig.py` (since 2026-09-27). The rig's **character job** (`rig.py --character`, Phase07) renders MakeHuman's CC0 body split into one part per substance, with one article bound per part. → `docs/specs/Tooling/CompressedDistribution.md` · `tools/parity/JOB_FORMAT.md` |
 
 ## Releases and distribution
 
 | Term | Definition |
 |---|---|
 | **Manifest** (library lockfile) | The authored YAML (`matterlib-X.Y.Z.lock.yaml`) pinning each article's and texture's version and status. It is the authored source of truth for a release. → `docs/specs/Contract/Manifest.md` |
-| **Status lifecycle** | draft → candidate → approved → deprecated → retired, per material/texture version. → `docs/specs/Contract/Manifest.md` |
+| **Status lifecycle** | draft → candidate → approved → deprecated → retired, per material/texture version. → `docs/specs/Contract/Manifest.md` **Before a release** (since Phase07, 2026-09-27) an article's status lives in its **recipe** (`status`; missing = `draft`) and **never in the `.mtlx`**, so promoting an article never changes its frozen file. **candidate** = passed USDLiveView's renderer and Blender in the parity rig; **approved** = Unreal agrees too. It reaches people through the dev install (`serve_to_stage.py`) and as a Blender asset tag. |
 | **Immutability after promotion** | Once `material@vNN` ships in a release, that file is frozen; a change is always a new `vNN+1`. → `docs/specs/Contract/Manifest.md` |
 | **Carry-forward** | The next release's manifest keeps the same pins for unchanged articles: no copying, no churn. → `docs/specs/Contract/Manifest.md` |
 | **Library release** | A curated, semver-versioned set of articles pinned by a manifest (`matterlib-X.Y.Z`). → `docs/specs/Distribution/ReleaseModel.md` |
@@ -159,7 +160,7 @@
 | **COMPLETE** | Roadmap status: closed; the phase doc moves to `Phases/Complete/`. |
 | **TBD** | Roadmap status: a phase the lead has not numbered. It may hold a perfectly settled position — order is position in the list, never an ordinal. |
 | **Probe** *(a.k.a. spike)* | A local, disposable feasibility test answering what documentation cannot settle. → `.ai/commands/research.md` §Disposable probes. |
-| **Candidate** vs **selection** | A candidate has been assessed or probe-verified; a selection has been decided by the lead. A passed probe yields a candidate, never a selection. *(Not the same as the manifest status `candidate`, which is a material passing CI.)* |
+| **Candidate** vs **selection** | A candidate has been assessed or probe-verified; a selection has been decided by the lead. A passed probe yields a candidate, never a selection. *(Not the same as the article status `candidate`, which is a material that passed USDLiveView's renderer and Blender in the parity rig: see Status lifecycle.)* |
 | **`(planned)` · `Todo` · `Drift` · `Reevaluate`** | The dated markers this project uses instead of deleting a specified capability that isn't built or has diverged. → `.ai/AI_WorkingAgreement.md` §Project practices |
 | **Pre-standalone** | Work done in this repo by IMRSV platform phases (2026-06 → 2026-07), before it had its own phase line. Archived in `docs/Planning/Phases/Complete/PreStandalone/`. |
 

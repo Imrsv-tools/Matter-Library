@@ -29,6 +29,14 @@ It is one thing, the Unreal leg of the rig. It needs a machine with Unreal on it
 
 **Coupling with Phase07 (added 2026-09-27, lead re-sequencing CM4):** Phase07 runs while this phase builds the masters. It may add inputs to the Subsurface master (coat, fuzz, scatter anisotropy), a colour channel on layers, and possibly Hair or Eye masters. A packaged app can't compile new shaders, so **pull before building the masters, and read Phase07's rulings first.** A contract change that lands later means rebuilding the package, which the lead accepts.
 
+**What Phase07 actually landed (closed 2026-09-27):**
+- **No new master.** There is no Eye master (D-E), no `Skin` master (CM-Q10) and no Hair master (L2: Masked served). The layer colour channel was not built, and stays with Phase08 (L3).
+- **Subsurface** runs Blender's `RANDOM_WALK_SKIN` method, and its inputs gain `subsurface_scatter_anisotropy`.
+- **Every master may carry** coat (`coat_{weight,color,roughness,ior}`), fuzz (`fuzz_{weight,color,roughness}`) and specular anisotropy (`specular_roughness_anisotropy`, along UV0's `U`). Each is authored only when set, and each is off at its default.
+- **Masked** gains `cutout_map`: the mesh's cut-out texture, supplied per binding, sampled on UV0 without `place2d`, and thresholded by `opacity_cutoff` ([LCDSchema §Cut-out map](../../../specs/Contract/LCDSchema.md#cut-out-map-the-meshs-supplied-at-binding)).
+- **The rig's character job** (`tools/parity/JOB_FORMAT.md` §The character job) is the Unreal driver's second job shape: one article per part, and `bindings[].cutout_map` on the hair, brows and lashes.
+- The consumer side of all this is `PlatformDependencies.md` P15–P19.
+
 ## Open questions (settle during this phase)
 
 - Is Unreal 5.8 available and working on the UE machine's Linux install?
