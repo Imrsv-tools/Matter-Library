@@ -34,7 +34,7 @@ import build_scene  # noqa: E402
 STORM_SUPERSAMPLE = 4
 
 USD_TYPES = {"float": "float", "vector2": "float2", "color3": "color3f", "color4": "color4f",
-             "vector3": "float3", "integer": "int", "boolean": "bool"}
+             "vector3": "float3", "integer": "int", "boolean": "bool", "filename": "asset"}
 
 
 def find_article(name: str) -> Path:
@@ -70,7 +70,8 @@ class Article:
         root = ET.parse(path).getroot()
         textures = {n.get("name"): (path.parent / f.get("value")).resolve()
                     for n in root.iter() if n.tag in ("image", "tiledimage")
-                    for f in n.findall("input[@name='file']")}
+                    for f in n.findall("input[@name='file']")
+                    if f.get("value")}     # a cut-out's file is the binding's, not the article's
         meta = {i.get("name"): i.get("value") for i in root.iter("input")
                 if i.get("name") in ("master_material", "meters_per_tile")}
         ng = root.find("nodegraph")
@@ -131,7 +132,8 @@ CHARACTER_SCENE = HERE / "scene" / "character_scene.usda"
 CHARACTER_COLOURS = {"Body": (1, 0, 0), "Lips": (1, 0, 1), "Nails": (0, 1, 1),
                      "Cornea": (0.5, 0.5, 1), "Pupil": (0.5, 1, 0.5), "Iris": (1, 0.5, 0), "Sclera": (0, 1, 0),
                      "Teeth": (0, 0, 1), "Gums": (0.5, 0, 0.5), "Tongue": (1, 1, 0),
-                     "Shirt": (1, 1, 1), "Trousers": (0, 0.5, 1), "Shoes": (1, 0, 0.5)}
+                     "Shirt": (1, 1, 1), "Trousers": (0, 0.5, 1), "Shoes": (1, 0, 0.5),
+                     "Hair": (0.5, 1, 1), "Brows": (1, 0.5, 0.5), "Lashes": (0.5, 0, 1)}
 CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFace", "face"),
                    "hand": ("/World/CamHand", "hand"), "mouth": ("/World/CamMouth", "mouth, face hidden"),
                    "waist": ("/World/CamWaist", "waist"), "feet": ("/World/CamFeet", "feet")}
@@ -146,30 +148,48 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     article is referenced under its own ``/World/Library_<i>``; a bound part gets the binding
     and its st divided by that article's ``meters_per_tile`` (the scene's st is in metres, as the
     test scene's is). An unbound part keeps the scene's grey ``Unbound`` look.
+
+    A cut-out part (hair, brows, lashes: ``build_character.cutout_maps``) bound to an article
+    that declares ``cutout_map`` gets the mesh's map on a Material instance of its own, by the
+    carrier rule (LCDSchema §Cut-out map: a value on the Material, connected into the article);
+    its st is the atlas the map is drawn on, so it is not rescaled.
     """
     import build_character  # noqa: PLC0415 (heavy: parses the pinned sources)
     uvs = build_character.part_uvs()
-    libs, lib_of = [], {}
-    for art in bindings.values():
-        if art.name not in lib_of:
-            lib_of[art.name] = len(libs)
-            libs.append(art)
+    cutouts = build_character.cutout_maps()
+    libs, lib_of = [], {}           # one Library per (article, cut-out map)
+    for part, art in bindings.items():
+        key = (art.name, cutout_for(part, art, cutouts))
+        if key not in lib_of:
+            lib_of[key] = len(libs)
+            libs.append(key + (art,))
     text = ["#usda 1.0\n(\n    subLayers = [@" + CHARACTER_SCENE.as_posix() + "@]\n"
             f'    upAxis = "{build_scene.UP_AXIS}"\n    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
             'over "World"\n{\n']
-    for i, art in enumerate(libs):
+    for i, (name, cut, art) in enumerate(libs):
+        body = ""
+        if cut is not None:
+            mat = f"/World/Library_{i}/Materials/{name}"
+            body = ('        over "Materials"\n        {\n'
+                    f'            over "{name}"\n            {{\n'
+                    f'                asset inputs:cutout_map = @{cut.as_posix()}@\n'
+                    f'                over "NG_{name}"\n                {{\n'
+                    f'                    asset inputs:cutout_map.connect = <{mat}.inputs:cutout_map>\n'
+                    '                }\n            }\n        }\n')
         text.append(f'    def "Library_{i}" (\n        prepend references = @{art.path.as_posix()}@</MaterialX>\n'
-                    '    )\n    {\n    }\n')
+                    '    )\n    {\n' + body + '    }\n')
     text.append('    over "Character"\n    {\n')
     for part, art in bindings.items():
         prim = f"/World/Character/{part}"
         if prim not in uvs:
             raise SystemExit(f"no character part {part!r} (have {sorted(p.rsplit('/', 1)[1] for p in uvs)})")
-        st = ", ".join(f"({s / art.meters_per_tile:.5f}, {t / art.meters_per_tile:.5f})" for s, t in uvs[prim])
+        k = 1.0 if prim in cutouts else art.meters_per_tile
+        st = ", ".join(f"({s / k:.5f}, {t / k:.5f})" for s, t in uvs[prim])
+        cut = cutout_for(part, art, cutouts)
         text.append(f'        over "{part}"\n        {{\n'
                     f'            texCoord2f[] primvars:st = [{st}] (\n'
                     '                interpolation = "faceVarying"\n            )\n'
-                    f'            rel material:binding = </World/Library_{lib_of[art.name]}/Materials/{art.name}>\n'
+                    f'            rel material:binding = </World/Library_{lib_of[(art.name, cut)]}/Materials/{art.name}>\n'
                     '        }\n')
     text.append('    }\n}\n')
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -177,20 +197,30 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     return out
 
 
+def cutout_for(part: str, art: "Article", cutouts: dict[str, Path]) -> Path | None:
+    """The mesh's cut-out map for this binding: the part has one and the article declares the input."""
+    return cutouts.get(f"/World/Character/{part}") if "cutout_map" in art.ports else None
+
+
 def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:
     """A character job: the defaults only (sliders are swept on the test scene), every view."""
+    import build_character  # noqa: PLC0415
     out_dir.mkdir(parents=True, exist_ok=True)
     scene = write_character_scene(bindings, out_dir / "scenes" / "defaults.usda")
+    cutouts = build_character.cutout_maps()
     first = next(iter(bindings.values()))
     job = {
         "format": 1,
         "mode": "character",
         "article": {"name": first.name, "path": str(first.path), "master": first.master,
                     "meters_per_tile": first.meters_per_tile},
-        # one entry per bound part: the driver builds the article on its master and assigns it
+        # one entry per bound part: the driver builds the article on its master and assigns it;
+        # `cutout_map` (a cut-out part) is the mesh's map, supplied as the binding's input
         "bindings": [{"subject": f"/World/Character/{p}", "article":
                       {"name": a.name, "path": str(a.path), "master": a.master,
-                       "meters_per_tile": a.meters_per_tile}} for p, a in bindings.items()],
+                       "meters_per_tile": a.meters_per_tile}}
+                     | ({"cutout_map": str(c)} if (c := cutout_for(p, a, cutouts)) else {})
+                     for p, a in bindings.items()],
         "scene": str(CHARACTER_SCENE),
         "camera": CHARACTER_VIEWS["wide"][0],
         "views": {v: {"camera": c, "suffix": view_suffix(v), "label": label}

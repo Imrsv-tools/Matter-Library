@@ -45,8 +45,10 @@
     "fuzz_weight": {"type": "number", "description": "OpenPBR fuzz (lane A; Phase07): a fine grazing-angle sheen. Blender's Sheen."},
     "fuzz_color": {"$ref": "#/$defs/color3"},
     "fuzz_roughness": {"type": "number"},
+    "specular_roughness_anisotropy": {"type": "number", "minimum": 0, "maximum": 1, "description": "OpenPBR's own input (lane A, carrier C3, Phase07 7.6): the highlight stretched along the mesh's UV tangent (U). Hair: strands run along V."},
 
     "opacity_cutoff": {"type": "number"},
+    "cutout_map": {"type": "boolean", "description": "Masked only (Phase07 7.6, L2): the article declares the cutout_map input, the mesh's own cut-out supplied when the article is bound (LCDSchema §Cut-out map). Needs opacity_cutoff; excludes opacity_tex."},
     "layer_blend_balance": {"type": "number"},
     "layer_blend_contrast": {"type": "number"},
     "layer2_base_color_tex": {"type": "string"},

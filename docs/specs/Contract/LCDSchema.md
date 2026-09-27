@@ -41,7 +41,7 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 | Master | Defining property | Producer input(s) | Lane |
 |---|---|---|---|
 | **Opaque** | base PBR | *(base PBR)* | — |
-| **Masked** | opacity **cutoff** | `geometry_opacity` · **`opacity_cutoff`** | A · **B** |
+| **Masked** | opacity **cutoff** | `geometry_opacity` · **`opacity_cutoff`** · *(optional)* **`cutout_map`**, the mesh's own cut-out supplied at binding ([§Cut-out map](#cut-out-map-the-meshs-supplied-at-binding), 2026-09-27) | A · **B** |
 | **TranslucentThin** | **IOR** | `specular_ior` · `transmission_weight` · `transmission_color` · **`geometry_thin_walled = true`** | A |
 | **TranslucentThick** | **absorption** colour + depth | *(as Thin)* + **`transmission_depth`** · **`geometry_thin_walled = false`** | A |
 | **Subsurface** | **SSS** colour + radius | `subsurface_weight` · `subsurface_color` · `subsurface_radius` *(float)* · `subsurface_radius_scale` *(color3)* | A |
@@ -57,6 +57,9 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 | **Coat** | `coat_weight` · `coat_color` · `coat_roughness` · `coat_ior` | any | `Coat Weight` · `Coat Color` → **Coat Tint** · `Coat Roughness` · `Coat IOR` |
 | **Fuzz** | `fuzz_weight` · `fuzz_color` · `fuzz_roughness` | any | `Fuzz Weight` / `Fuzz Color` / `Fuzz Roughness` → **Sheen** Weight / Tint / Roughness |
 | **Scatter anisotropy** | `subsurface_scatter_anisotropy` *(−1…1; > 0 = forward)* | Subsurface | `Subsurface Anisotropy` *(Blender honours 0…1, random-walk methods only)* |
+| **Specular anisotropy** *(carrier C3, added 2026-09-27 at Phase07 step 7.6)* | `specular_roughness_anisotropy` *(0…1)* | any | `Anisotropy` → Principled **Anisotropic** = a ÷ 0.9 and **Roughness** × (2(1−a) ÷ (1+(1−a)²))^¼, with the **UV-map** tangent. That matches OpenPBR's lobe (its axis ratio and its area) exactly up to a = 0.9, and is the identity at a = 0 |
+
+**The anisotropy tangent is the mesh's UV `U` direction.** OpenPBR's `geometry_tangent` defaults to `Tworld`, derived from texcoord 0, and the highlight stretches **along** it. A card mesh whose strands run along `V` therefore gets the fibre's band across the strands. That is a requirement on the mesh (the platform's side), not on the article.
 
 Defaults are OpenPBR's (weight 0; coat IOR 1.6; fuzz roughness 0.5). The coat sits on the **geometry** normal, not the article's normal map, as OpenPBR's `geometry_coat_normal` defaults to it. *Consumer-side:* an Unreal master gains the matching parameters when it is built (Phase06), and IMRSV's extractor must read them to show them ([PlatformDependencies](../../Planning/PlatformDependencies.md) M1).
 
@@ -124,6 +127,21 @@ This is UsdShade's documented pattern for exposing a parameter on a Material (`u
 
 Per-object adjustment requires **per-object material instances** (separate material prims per object, e.g. `<name>_Instance_<N>`) since input overrides on a shared material affect every prim bound to it.
 
+## Cut-out map (the mesh's, supplied at binding)
+
+*(Added 2026-09-27, Phase07 step 7.6, ruling L2: "a cut-out map the mesh supplies when the material is bound". Additive: no existing port, name, type or range moved, and every existing article assembles byte-identically.)*
+
+Hair, brows and lashes are cards whose strands are the **transparency of the mesh's own texture**. That picture belongs to the mesh, not to the substance ([D1](../../Glossary.md): matter only, never assemblies), so it is **never part of the article**. A Masked article that accepts one **declares the input**, and the mesh supplies the map when the article is bound.
+
+- **The input:** `cutout_map`, a nodegraph interface input of type `filename` (USD `asset`). It is an **author-tier, lane-B** input (`AUTHOR_TIER_PORTS`; OpenPBR has no such input), **Masked only**, and it is **not a Creator port**. The article's value is **empty**.
+- **Carried by the [Carrier rule](#carrier-rule-no-imrsv-attrs), unchanged:** `asset inputs:cutout_map = @<the mesh's map>@` on the bound Material, with `NG_<id>.inputs:cutout_map` connected to it. Each mesh has its own map, so **each binding needs its own Material instance**, as any per-object adjustment does. *(Measured 2026-09-27, OpenUSD 26.03 + MaterialX 1.39.5, `usdrecord`: the map set on the Material and connected reaches the image in Storm.)*
+- **With no map supplied the card is solid, never magenta.** The article's `cutout_tex` image has `default = 1`, which MaterialX returns for an empty file. *(Measured in Storm the same day.)*
+- **Where the map is sampled:** texcoord 0 (the mesh's `st`), **directly, not through `place2d`**. The map is drawn on the mesh's own UVs, so the Creator's UV nudges must not move it. It is one channel: MaterialX reads a `float` image's **first** channel, so a texture's alpha is supplied as an image of its own. White is strand, black is gap. The article thresholds it with `opacity_cutoff` like any Masked source.
+- **Why not a second UV set:** Storm reads `st` for every `texcoord` index (measured 2026-09-27: index 1 over an authored `primvars:st1` rendered identically to index 0). A dedicated UV set would work in Blender and Unreal and silently not in USD viewers, which fails the LCD principle.
+- **Consequence for a card mesh:** its primary UVs are the atlas its map is drawn on. A tiling detail on the same article would be sampled on that atlas too, so the hair article carries none (its colour, roughness and anisotropy are constants). How this meets the character's real-scale detail UV set (Phase07 F13, platform side) is recorded in [PlatformDependencies](../../Planning/PlatformDependencies.md).
+- **One opacity source per article:** its own `opacity_tex` (a pattern of the substance, like Lace) **or** the mesh's `cutout_map`, never both. The assembler refuses both.
+- **Render-role node:** `cutout_tex` (an `image`) has **no `file` value in the article**. Its file comes from the binding. A consumer that enumerates image `file` values must skip an empty one (as `validate_material.py`, the rig and the Blender loader do) and read the Material's `inputs:cutout_map` instead.
+
 *(Corrected 2026-09-24, Matter-Library#1. This rule used to read "a standard `inputs:` override on the bound material prim (or a `place2d` nodegraph input for UV)". It named the carrier but not the connection that makes it resolve, so every Creator tuning was invisible outside the one consumer that read the Material input with its own rule. Measured on OpenUSD 26.03 + MaterialX 1.39.5 with `usdrecord`: the unconnected override renders byte-identical to no override; connected with no value, byte-identical to no override; connected with a value, identical to setting the nodegraph input directly. No port name, type, op or range changed.)*
 
 ## Render-role texture nodes — assembler-owned node-name contract
@@ -173,3 +191,4 @@ The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_
 - 2026-07-14: emissive colour as a Creator control was raised as a product question and left open rather than reopening the frozen vocabulary.
 - 2026-09-24: the Carrier rule was corrected to require the connection from the article's nodegraph (Matter-Library#1), after a generic USD viewer showed every Creator tuning was inert outside the one consumer that read the Material input directly. In the same change, the UV ports were stated as MaterialX `place2d` semantics and the articles began clamping the biased roughness to [0, 1], both on lead rulings that the article's MaterialX meaning is the contract every consumer matches. No port name, type, op or range changed.
 - 2026-09-27: the optional lane-A carriers coat, fuzz and scatter anisotropy were added to the author tier (Phase07 step 7.3), for skin. Additive: every existing article assembles byte-identically, and the Creator vocabulary is untouched.
+- 2026-09-27: for hair (Phase07 step 7.6), the lane-A carrier specular anisotropy (C3) and the Masked lane-B input `cutout_map` were added: the mesh's cut-out, supplied at binding through the Carrier rule. Additive in the same way.

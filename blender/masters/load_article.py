@@ -67,6 +67,8 @@ def read(path: Path) -> ArticleData:
             art.ports[i.get("name")] = _floats(i.get("value"))
         for node in ng:
             name = node.get("name", "")
+            if name == "cutout_tex":
+                continue        # its file is the binding's cut-out map (build's `cutout_map`)
             if name.endswith("_tex") and node.tag in ("image", "tiledimage"):
                 f = node.find("input[@name='file']")
                 cs = node.get("colorspace", doc_cs if node.get("type", "").startswith("color") else None)
@@ -94,8 +96,14 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
     return (v[0], v[1], v[2], 1.0)
 
 
-def build(path: Path, sliders: dict | None = None, name: str | None = None):
-    """A new material for ``path`` with ``sliders`` applied; returns the material."""
+def build(path: Path, sliders: dict | None = None, name: str | None = None,
+          cutout_map: Path | None = None):
+    """A new material for ``path`` with ``sliders`` applied; returns the material.
+
+    ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
+    a USD writer sets the Material's ``inputs:cutout_map``. It is sampled on the mesh's own UVs
+    (not the article's placement); with none, the master's Opacity stays 1 (opaque).
+    """
     build_masters.ensure_all()
     art = read(path)
     if art.master not in build_masters.MASTERS:
@@ -172,6 +180,20 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
             master.inputs[socket].default_value = art.shader["base_metalness"][0]
         y -= 300
 
+    if cutout_map is not None:
+        if "cutout_map" not in art.ports or "Opacity" not in master.inputs:
+            raise KeyError(f"{art.name} does not declare the cut-out input (cutout_map)")
+        img = bpy.data.images.load(str(cutout_map), check_existing=True)
+        img.colorspace_settings.name = "Non-Color"
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(uv.outputs["UV"], tex.inputs["Vector"])     # the mesh's UVs, unplaced
+        L(tex.outputs["Color"], master.inputs["Opacity"])
+        y -= 300
+
     # shared layers: data textures (never colour), each at its own real-world size
     for role, socket in [("maskset", "Maskset")] + [(f"overlay{n}", f"Overlay {n}")
                                                    for n in build_masters.OVERLAYS]:
@@ -225,7 +247,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
               "coat_weight": ("Coat Weight", None), "coat_color": ("Coat Color", _rgba),
               "coat_roughness": ("Coat Roughness", None), "coat_ior": ("Coat IOR", None),
               "fuzz_weight": ("Fuzz Weight", None), "fuzz_color": ("Fuzz Color", _rgba),
-              "fuzz_roughness": ("Fuzz Roughness", None)}
+              "fuzz_roughness": ("Fuzz Roughness", None),
+              "specular_roughness_anisotropy": ("Anisotropy", None)}
     for key, (socket, conv) in lane_a.items():
         if key in sh and socket in master.inputs:
             master.inputs[socket].default_value = conv(sh[key]) if conv else sh[key][0]

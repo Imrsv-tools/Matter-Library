@@ -70,6 +70,9 @@ LCD_PORTS = {
 # per article; never reaches the Creator UI. Emitted only when a spec authors them.
 AUTHOR_TIER_PORTS = {
     "opacity_cutoff": ("float", "0.5", "Opacity Cutoff", {}),
+    # Phase07 7.6 (L2): the MESH's cut-out, supplied when the article is bound (LCDSchema
+    # §Cut-out map). Empty here: with no map supplied the image's default (1) is opaque.
+    "cutout_map": ("filename", "", "Cut-out Map", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -162,9 +165,11 @@ class MaterialSpec:
     fuzz_weight: Optional[float] = None
     fuzz_color: Optional[str] = None              # color3
     fuzz_roughness: Optional[float] = None
+    specular_roughness_anisotropy: Optional[float] = None  # 0..1 along the UV tangent (7.6, C3)
 
     # --- Author tier, Lane B: no OpenPBR input exists -> named interface inputs ---
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
+    cutout_map: bool = False                      # Masked; declares the mesh-supplied cut-out input
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -256,10 +261,19 @@ def _check_spec(spec: MaterialSpec) -> None:
         raise ValueError(
             "a maskset requires the 'maskset_blend' LCD port — it is the master strength of the "
             "maskset's whole effect (MasterSet.md); without it the maskset is inert.")
-    if spec.opacity_cutoff is not None and not spec.opacity_tex:
+    if spec.opacity_cutoff is not None and not (spec.opacity_tex or spec.cutout_map):
         raise ValueError(
             "opacity_cutoff needs an opacity source to threshold — a cutoff with nothing to "
             "threshold makes no holes.")
+    if spec.cutout_map:
+        if spec.master != "Masked":
+            raise ValueError("cutout_map is the Masked master's input (MasterSet.md); "
+                             f"this article is {spec.master}")
+        if spec.opacity_tex:
+            raise ValueError("an article has ONE opacity source: its own opacity_tex (a pattern "
+                             "of the substance, like lace) or the mesh's cutout_map, not both")
+        if spec.opacity_cutoff is None:
+            raise ValueError("cutout_map needs opacity_cutoff: Masked thresholds its source")
     layers = [o.texture for o in spec.overlays] + ([spec.maskset_tex] if spec.maskset_tex else [])
     if layers and not spec.meters_per_tile > 0:
         raise ValueError(
@@ -295,6 +309,7 @@ def assemble(spec: MaterialSpec) -> str:
     # channel, so every author-tier input in the emitted graph has a consumer (no dangling inputs).
     author_values = {
         "opacity_cutoff": spec.opacity_cutoff,
+        "cutout_map": None,                  # the binding supplies it; the article's is empty
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -304,6 +319,8 @@ def assemble(spec: MaterialSpec) -> str:
     author_ports = []
     if spec.opacity_cutoff is not None:
         author_ports.append("opacity_cutoff")
+    if spec.cutout_map:
+        author_ports.append("cutout_map")
     if has_layer2:
         author_ports += ["layer_blend_balance", "layer_blend_contrast"]
         if not spec.layer2_base_color_tex:
@@ -638,13 +655,26 @@ def assemble(spec: MaterialSpec) -> str:
     # The Masked cutoff is thresholded IN the graph (both here and in the UE master, P1) —
     # the alternative, UE's OpacityMaskClipValue, is a static base-property override a MID
     # cannot reach. Thresholding here also keeps opacity_cutoff a consumed input.
-    has_opacity_out = bool(spec.opacity_tex)
+    # Phase07 7.6: the source may instead be the MESH's cut-out (`cutout_map`, supplied when the
+    # article is bound). It samples texcoord 0 directly, not `uv_place`: the map is drawn on the
+    # mesh's own UVs, so the article's placement must not move it. (A second UV set is not an
+    # option: Storm reads `st` for every texcoord index, measured 2026-09-27.) With no map
+    # supplied the file is empty and the image returns its `default`, 1: opaque, never magenta.
+    has_opacity_out = bool(spec.opacity_tex or spec.cutout_map)
     if has_opacity_out:
-        _image("opacity_tex", "float", spec.opacity_tex)
-        op_src = "opacity_tex"
+        if spec.cutout_map:
+            _node("texcoord", "cutout_uv", "vector2", index=("integer", "value", 0))
+            _node("image", "cutout_tex", "float",
+                  file=("filename", "interfacename", "cutout_map"),
+                  default=("float", "value", 1.0),
+                  texcoord=("vector2", "nodename", "cutout_uv"))
+            op_src = "cutout_tex"
+        else:
+            _image("opacity_tex", "float", spec.opacity_tex)
+            op_src = "opacity_tex"
         if spec.opacity_cutoff is not None:
             op_src = _node("ifgreatereq", "opacity_thresholded", "float",
-                           value1=("float", "nodename", "opacity_tex"),
+                           value1=("float", "nodename", op_src),
                            value2=("float", "interfacename", "opacity_cutoff"),
                            in1=("float", "value", 1.0),
                            in2=("float", "value", 0.0))
@@ -687,7 +717,8 @@ def assemble(spec: MaterialSpec) -> str:
                      ("coat_weight", "float"), ("coat_color", "color3"),
                      ("coat_roughness", "float"), ("coat_ior", "float"),
                      ("fuzz_weight", "float"), ("fuzz_color", "color3"),
-                     ("fuzz_roughness", "float")):
+                     ("fuzz_roughness", "float"),
+                     ("specular_roughness_anisotropy", "float")):
         if getattr(spec, key) is not None:
             _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:

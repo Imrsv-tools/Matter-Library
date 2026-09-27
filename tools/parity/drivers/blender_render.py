@@ -221,12 +221,18 @@ def run(job_path: Path) -> None:
         built = {}
         for b in bindings:
             a = b["article"]
-            if a["name"] not in built:
-                built[a["name"]] = load_article.build(Path(a["path"]), s.get("set", {}),
-                                                      name=f"{a['name']}__{s['id']}")
+            # one material per (article, the binding's cut-out map), as the USD side has one
+            # Material instance per map (Phase07 7.6)
+            cut = b.get("cutout_map")
+            key = (a["name"], cut)
+            if key not in built:
+                tag = f"__{Path(cut).stem}" if cut else ""
+                built[key] = load_article.build(Path(a["path"]), s.get("set", {}),
+                                                name=f"{a['name']}__{s['id']}{tag}",
+                                                cutout_map=Path(cut) if cut else None)
             o = by_prim[b["subject"]]
             o.data.materials.clear()
-            o.data.materials.append(built[a["name"]])
+            o.data.materials.append(built[key])
         for v, spec in views.items():
             scn.camera = cams[v]
             scn.view_settings.exposure = float(spec.get("exposure", 0.0))

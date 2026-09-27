@@ -346,8 +346,8 @@ def texture_refs(mtlx: Path) -> list[str]:
     for img in root.iter():
         if img.tag.endswith("image"):
             for inp in img:
-                if inp.get("name") == "file":
-                    refs.append(inp.get("value"))
+                if inp.get("name") == "file" and inp.get("value"):
+                    refs.append(inp.get("value"))   # a cut-out's file comes from the binding
     return sorted(set(refs))
 
 

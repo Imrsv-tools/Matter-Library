@@ -18,8 +18,9 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             (LCDSchema); metalness; up to three wear layers gated by the
                             maskset (MasterSet §Overlay semantic); the normal combined in
                             TANGENT space and converted once (MasterSet, since 5.3);
-                            OpenPBR coat (-> Coat) and fuzz (-> Sheen), off at weight 0
-  TwoLayer                  + a second layer blended by the maskset's R (MasterSet
+                            OpenPBR coat (-> Coat) and fuzz (-> Sheen), off at weight 0;
+                            specular anisotropy along the UV tangent, off at 0
+  TwoLayer                 + a second layer blended by the maskset's R (MasterSet
                             §TwoLayer blend): colour, roughness and metalness mixed, the
                             two normals mixed in tangent space; the tint applies after
   Masked                    + the cut-out: alpha = opacity >= ``opacity_cutoff`` (the
@@ -53,8 +54,9 @@ import math
 
 import bpy
 
-VERSION = 5     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 6     # bump when a group's contents change; ensure_*() rebuilds an older one
                 # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
+                # 6 (Phase07 7.6): specular anisotropy (carrier C3) on the UV tangent
 
 # The Subsurface master's Cycles method (Phase07 CM-Q10, measured 2026-09-27 in the rig, ΔE
 # to Storm, whole set): RANDOM_WALK_SKIN serves marble AND skin better than RANDOM_WALK
@@ -196,7 +198,9 @@ def _sockets(parts: set) -> list:
          ("Coat IOR", "NodeSocketFloat", 1.6),
          ("Fuzz Weight", "NodeSocketFloat", 0.0),
          ("Fuzz Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
-         ("Fuzz Roughness", "NodeSocketFloat", 0.5)]
+         ("Fuzz Roughness", "NodeSocketFloat", 0.5),
+         # OpenPBR specular_roughness_anisotropy (Phase07 7.6, carrier C3), off at 0
+         ("Anisotropy", "NodeSocketFloat", 0.0)]
     for n in OVERLAYS:
         s += [(f"Overlay {n}", "NodeSocketColor", (0.5, 0.5, 0.0, 1.0)),
               (f"Overlay {n} Alpha", "NodeSocketFloat", 0.0),
@@ -330,7 +334,43 @@ def _build(name: str, parts: set):
     rc = _math(ng, "ADD", 200, 200, clamp=True)                # roughness_biased_clamped
     L(rough, rc.inputs[0])
     L(gi.outputs["roughness_bias"], rc.inputs[1])
-    L(rc.outputs[0], bsdf.inputs["Roughness"])
+
+    # OpenPBR anisotropy -> Principled (Phase07 7.6). OpenPBR: at = r^2 sqrt(2 / (1 + (1-a)^2)),
+    # ab = (1-a) at. Principled (Disney 2012): aspect = sqrt(1 - 0.9 a'), ax = r'^2 / aspect,
+    # ay = r'^2 aspect. Same axis ratio: a' = a / 0.9 (exact up to a = 0.9, clamped past it).
+    # Same lobe area (ax ay = at ab): r' = r (2 (1-a) / (1 + (1-a)^2))^(1/4), which is r at a = 0,
+    # so an isotropic article is untouched. Both elongate along the tangent: OpenPBR's default
+    # is Tworld (from texcoord 0), so the tangent is the UV map's, not Principled's default
+    # (the object's radial "generated" tangent).
+    an = gi.outputs["Anisotropy"]
+    om = _math(ng, "SUBTRACT", 200, 60, clamp=True)           # 1 - a
+    om.inputs[0].default_value = 1.0
+    L(an, om.inputs[1])
+    sq = _math(ng, "MULTIPLY", 330, 20)                        # (1-a)^2
+    L(om.outputs[0], sq.inputs[0])
+    L(om.outputs[0], sq.inputs[1])
+    den = _math(ng, "ADD", 460, 20)                            # 1 + (1-a)^2
+    den.inputs[0].default_value = 1.0
+    L(sq.outputs[0], den.inputs[1])
+    num = _math(ng, "MULTIPLY", 330, 100)                      # 2 (1-a)
+    num.inputs[0].default_value = 2.0
+    L(om.outputs[0], num.inputs[1])
+    q = _math(ng, "DIVIDE", 590, 60)
+    L(num.outputs[0], q.inputs[0])
+    L(den.outputs[0], q.inputs[1])
+    f = _math(ng, "POWER", 720, 60)
+    L(q.outputs[0], f.inputs[0])
+    f.inputs[1].default_value = 0.25
+    rr = _math(ng, "MULTIPLY", 720, 200)
+    L(rc.outputs[0], rr.inputs[0])
+    L(f.outputs[0], rr.inputs[1])
+    L(rr.outputs[0], bsdf.inputs["Roughness"])
+    ap = _math(ng, "DIVIDE", 590, -60, clamp=True)
+    L(an, ap.inputs[0])
+    ap.inputs[1].default_value = 0.9
+    L(ap.outputs[0], bsdf.inputs["Anisotropic"])
+    tan = _node(ng, "ShaderNodeTangent", 590, -180, direction_type="UV_MAP", uv_map="")
+    L(tan.outputs["Tangent"], bsdf.inputs["Tangent"])
 
     nrm = _vmath(ng, "NORMALIZE", 0, -700)                     # tangent -> world, ONCE
     L(n_ts, nrm.inputs[0])

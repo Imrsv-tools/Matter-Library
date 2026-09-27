@@ -1,0 +1,28 @@
+{
+  "_comment": "Hair fibre (Phase07 7.6, ruling L2): keratin coloured by eumelanin, on MASKED. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes alike. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V.",
+  "name": "Hair_DarkBrown_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/keratin/Hair_DarkBrown_Clean_Base_s001_v01.mtlx",
+  "master": "Masked",
+  "domain": "biological",
+  "class": "keratin",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.090, 0.052, 0.030",
+  "roughness_const": 0.4,
+  "specular_ior": 1.55,
+  "specular_roughness_anisotropy": 0.8,
+  "cutout_map": true,
+  "opacity_cutoff": 0.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "No measured hair in Physically Based (research Pass 4). Colour: a dark-brown eumelanin fibre's diffuse albedo, linear (dark hair reflects under 10 %). IOR 1.55: keratin, as the nail. Roughness 0.4 with anisotropy 0.8: a fibre's highlight is a band across the strands, which a card approximates by a lobe stretched across them (MakeHuman shades its hair with an anisotropic litsphere). Cut-out threshold 0.5, as Lace."
+    }
+  ]
+}

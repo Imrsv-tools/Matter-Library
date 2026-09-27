@@ -303,6 +303,10 @@ CHARACTER_CAST = {
     "Shirt": "Cotton_Jersey_Clean_Base_s001_v01",
     "Trousers": "Denim_Indigo_Clean_Base_s001_v01",
     "Shoes": "Leather_Brown_Clean_Base_s001_v01",
+    # one article on all three; each part supplies its own cut-out map (7.6, L2)
+    "Hair": "Hair_DarkBrown_Clean_Base_s001_v01",
+    "Brows": "Hair_DarkBrown_Clean_Base_s001_v01",
+    "Lashes": "Hair_DarkBrown_Clean_Base_s001_v01",
 }
 
 
