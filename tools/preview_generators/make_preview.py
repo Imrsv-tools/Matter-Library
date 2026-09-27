@@ -5,7 +5,8 @@
                     [--set PORT=VALUE ...]
 
 Writes ``<Stem>_preview.usda`` (a UV sphere with the article bound, dome + key light and a
-camera; shape in ``preview_wrapper.usda``). With ``--render`` it also runs ``usdrecord`` to
+camera; shape in ``preview_wrapper.usda``; the lights really light it only since Phase05,
+before which usdrecord's camera headlight did). With ``--render`` it also runs ``usdrecord`` to
 write ``<Stem>_preview.png``. Both go to ``--out-dir``, else ``$MATTER_PREVIEW_DIR``, else
 ``<tmp>/matter-preview/``. Nothing is written into the repo: previews are review material,
 not library content.
@@ -70,6 +71,7 @@ def _sphere() -> tuple[str, str, str, str]:
 def write_scene(mtlx: Path, out: Path) -> None:
     points, counts, indices, uvs = _sphere()
     text = (TEMPLATE.replace("<MTLX>", mtlx.resolve().as_posix())
+            .replace("<DOME>", (HERE / "dome_env.png").as_posix())
             .replace("<NAME>", mtlx.stem)
             .replace("<POINTS>", points).replace("<COUNTS>", counts)
             .replace("<INDICES>", indices).replace("<UVS>", uvs))
@@ -116,20 +118,47 @@ def usd_env(inst: Path) -> dict:
     return env
 
 
-def render(scene: Path, png: Path, width: int) -> int:
-    inst = usd_install()
-    usdrecord = inst / "bin" / "usdrecord"
-    if not usdrecord.exists():
-        print(f"NOT RENDERED: usdrecord not found at {usdrecord} "
-              "(set USD_TOOLS_ROOT, or build it: tools/usd-toolchain/run-all.sh)", file=sys.stderr)
-        return 2
-    cmd = [str(usdrecord), "--camera", "/World/Cam", "--imageWidth", str(width), str(scene), str(png)]
+def _record(usdrecord: Path, inst: Path, scene: Path, png: Path, width: int) -> int:
+    # --disableCameraLight: only the scene's own lights (the headlight used to be the ONLY
+    # light, Phase05). --enableDomeLightVisibility: the dome is the backdrop.
+    cmd = [str(usdrecord), "--camera", "/World/Cam", "--imageWidth", str(width),
+           "--disableCameraLight", "--enableDomeLightVisibility", str(scene), str(png)]
     proc = subprocess.run(cmd, env=usd_env(inst), capture_output=True, text=True)
     if proc.returncode != 0 or not png.exists():
         print(f"NOT RENDERED: usdrecord exited {proc.returncode}\n{proc.stdout}{proc.stderr}",
               file=sys.stderr)
         return 2
     return 0
+
+
+def render(scene: Path, png: Path, width: int, tries: int = 5) -> int:
+    """Render until two consecutive frames agree.
+
+    One usdrecord run is not stable: the same scene once came back almost entirely white
+    (measured, Phase05 5.1; tools/parity/drivers/storm.py does the same).
+    """
+    import numpy as np
+    from PIL import Image
+
+    inst = usd_install()
+    usdrecord = inst / "bin" / "usdrecord"
+    if not usdrecord.exists():
+        print(f"NOT RENDERED: usdrecord not found at {usdrecord} "
+              "(set USD_TOOLS_ROOT, or build it: tools/usd-toolchain/run-all.sh)", file=sys.stderr)
+        return 2
+    prev = png.with_suffix(".prev.png")
+    if _record(usdrecord, inst, scene, prev, width):
+        return 2
+    px = lambda p: np.asarray(Image.open(p).convert("RGB"), dtype=np.float32)
+    for _ in range(tries):
+        if _record(usdrecord, inst, scene, png, width):
+            return 2
+        if float(np.abs(px(png) - px(prev)).mean()) < 0.5:
+            prev.unlink()
+            return 0
+        png.replace(prev)
+    print(f"NOT RENDERED: no two agreeing renders of {scene} in {tries + 1} tries", file=sys.stderr)
+    return 2
 
 
 def main(argv=None) -> int:

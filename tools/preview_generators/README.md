@@ -15,6 +15,7 @@ uv run tools/preview_generators/make_preview.py MatterLibrary/materials/<domain>
 ## Files
 
 - `preview_wrapper.usda` — the scene template: a UV-sphere mesh with the article bound, a dome plus a key light, and a camera. Slots are listed in its header.
+- `dome_env.png` — the dome's constant 0.5 texture. Storm ignores an untextured dome, and until Phase05 (2026-09-27) neither light lit anything: previews were lit by `usdrecord`'s headlight, which `make_preview.py` now turns off.
 - `make_preview.py` — fills the template and runs `usdrecord`.
 
 ## What makes a real article render

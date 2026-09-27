@@ -13,11 +13,18 @@
       * USD 26.03 ignores material:binding unless the prim applies MaterialBindingAPI;
       * an implicit Sphere has no UVs, so the sphere is a mesh carrying an `st` primvar.
 
-    Path resolution: the .mtlx is referenced by ABSOLUTE filesystem path, because the scene
-    is written outside the repo. Texture paths are relative INSIDE the .mtlx and resolve
+    The lights (Phase05, 2026-09-27; the same setup as the parity rig's test scene). Before
+    this, NEITHER light lit anything: every preview was lit by usdrecord's camera headlight.
+    Storm multiplies an un-normalized DistantLight's intensity by the 0.53-degree sun disk's
+    solid angle (~6.7e-5 sr), so the Key is `normalize = true` (intensity = irradiance); and
+    Storm ignores a DomeLight with no texture, so the Dome carries dome_env.png (a constant
+    0.5). make_preview.py renders with --disableCameraLight so only these light the scene.
+
+    Path resolution: the .mtlx and the dome texture are referenced by ABSOLUTE filesystem
+    path, because the scene is written outside the repo. Texture paths are relative INSIDE the .mtlx and resolve
     against it. PXR_MTLX_STDLIB_SEARCH_PATHS owns only the MaterialX stdlib nodedefs.
 
-    Slots: <MTLX> <NAME> <POINTS> <COUNTS> <INDICES> <UVS>
+    Slots: <MTLX> <DOME> <NAME> <POINTS> <COUNTS> <INDICES> <UVS>
     """
     upAxis = "Y"
     metersPerUnit = 1.0
@@ -28,11 +35,14 @@ def Xform "World"
     def DomeLight "Dome"
     {
         float inputs:intensity = 1
+        asset inputs:texture:file = @<DOME>@
+        token inputs:texture:format = "latlong"
     }
 
     def DistantLight "Key"
     {
-        float inputs:intensity = 3
+        float inputs:intensity = 1.5
+        bool inputs:normalize = true
         float3 xformOp:rotateXYZ = (-35, 30, 0)
         uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]
     }
