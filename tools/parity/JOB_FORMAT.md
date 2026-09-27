@@ -67,7 +67,9 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
   "mask_colours": {"/World/Character/Body": [1, 0, 0]},
   "views": {"wide": {"camera": "/World/Cam", "suffix": "", "label": "whole body"},
             "face": {"camera": "/World/CamFace", "suffix": "__face", "label": "face"},
-            "hand": {"camera": "/World/CamHand", "suffix": "__hand", "label": "hand"}}
+            "mouth": {"camera": "/World/CamMouth", "suffix": "__mouth", "label": "mouth, face hidden",
+                      "hide": ["/World/Character/Body", "/World/Character/Lips"]},
+            "…": "hand, waist, feet"}
 }
 ```
 
@@ -76,8 +78,11 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 | `bindings` | Build each distinct article on its master once, and assign it to its `subject`. A test-scene job has no `bindings`: `article` goes on every subject. `article` is still present (the first binding), for a driver that reads only it. |
 | `mask_colours` | The mask's flat colour per subject (the test scene's default is sphere red, cube green, floor blue). The rig scores each colour as its own region. |
 | `settings` | The defaults only. Sliders are swept on the test scene. |
+| `views[].hide` | Prims to hide for that view only *(Phase07 7.5)*. The `mouth` view hides the body and lips, because MakeHuman's mouth is closed. Storm: `token visibility = "invisible"` in the view's wrapper layer. Blender: `hide_render`. The mask for that view leaves them out too. |
 
-- **The parts** are the body, the eyes, the teeth and the tongue (more come with Phase07 7.5). An **unbound** part keeps the scene's grey `UsdPreviewSurface` (`/World/Looks/Unbound`).
+- **The parts** (one per substance, Phase07 ruling L1): `Body`, `Lips`, `Nails`, `Cornea`, `Pupil`, `Iris`, `Sclera`, `Teeth`, `Gums`, `Tongue`, `Shirt`, `Trousers`, `Shoes`. `build_character.py` splits MakeHuman's meshes into them by a per-face rule (MPFB2's CC0 region masks for lips and nails; the eye's and the teeth's own textures; a UV rectangle for the jeans), and drops the body faces a garment's `.mhclo` marks as covered, as MakeHuman does. An **unbound** part keeps the scene's grey `UsdPreviewSurface` (`/World/Looks/Unbound`).
+- **The views:** whole body, face, hand, mouth (face hidden), waist, feet.
+- **Scoring:** each part is its mask colour, **and a pixel counts only when its eight neighbours are the same colour**, so an anti-aliased edge between two parts (whose blend can equal a third part's colour) is in no region. Parts behind the cornea (iris, pupil, sclera) are scored as the cornea: the eye as seen.
 - **UVs:** the scene's `st` is in **metres per part**, like the test scene's subjects. MakeHuman's own UVs are one 0–1 atlas over the whole body (1 UV unit ≈ 1.69 m on the body), so the build scales each part's UVs by its measured median density; the setting scene then divides the bound parts' `st` by the article's `meters_per_tile`. The atlas's islands are not all at the median (body p5–p95: 0.8–2.6 m per UV unit), so detail still varies in size across the body. **An Unreal driver must import the setting scene's `st`, not the mesh's own UVs.**
 - **No floor and no wall:** the dome is the background. The lighting rules below (matched lighting, colour, units) are unchanged.
 

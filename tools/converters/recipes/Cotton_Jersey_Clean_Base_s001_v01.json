@@ -1,0 +1,37 @@
+{
+  "_comment": "Cotton single jersey, undyed (Phase07 7.5): a T-shirt's knit. OPAQUE with FUZZ: a cotton knit's look is its loose surface fibres, which catch light at grazing angles. The knit (12 wales x 16 courses per cm) is the article's own normal and roughness. Off-white yarn: a Creator dyes it with `base_color_tint`.",
+  "name": "Cotton_Jersey_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Cotton_Jersey_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Cotton_Jersey_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Cotton_Jersey_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.78, 0.77, 0.74",
+  "specular_ior": 1.53,
+  "fuzz_weight": 0.6,
+  "fuzz_color": "0.9, 0.9, 0.88",
+  "fuzz_roughness": 0.6,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed cotton, off-white. IOR 1.53: cellulose. Roughness ~0.82 in the map: a matte knit. Fuzz 0.6: loose cotton fibres (no measured value; Physically Based has no fabric entries)."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Cotton_Jersey.yaml"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "_comment": "Brown full-grain leather (Phase07 7.5): a finished hide with a pebbled grain. OPAQUE, semi-matte, with a light COAT for the finish.",
+  "name": "Leather_Brown_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Leather_Brown_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Leather_Grain_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Leather_Grain_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.16, 0.07, 0.03",
+  "specular_ior": 1.5,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.35,
+  "coat_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: a mid-brown dyed hide. Roughness ~0.55 in the map (semi-matte, creases rougher). Coat 0.3 at 0.35: a finished (not patent) leather's wax or lacquer."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Leather_Grain.yaml"
+    }
+  ]
+}

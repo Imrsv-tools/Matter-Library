@@ -1,0 +1,37 @@
+{
+  "_comment": "Indigo denim (Phase07 7.5): a 3/1 warp-faced twill, rope-dyed indigo warp over an undyed weft. OPAQUE with a little FUZZ. The colour IS the weave: the base-colour map carries the indigo warp and the white weft flecks, which a tint cannot make, so this article has a base-colour texture where the jersey has a constant.",
+  "name": "Denim_Indigo_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Denim_Indigo_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Denim_Twill_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Denim_Twill_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_tex": "../../../textures/base/synthetic/textile/Denim_Twill_basecolor_s001.png",
+  "specular_ior": 1.53,
+  "fuzz_weight": 0.3,
+  "fuzz_color": "0.6, 0.62, 0.7",
+  "fuzz_roughness": 0.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Weave and colour: 3/1 twill, 32 x 32 threads per cm; the warp's indigo (linear ~0.02, 0.04, 0.12) lighter towards ~0.05, 0.08, 0.18 where the yarn core shows (thread-scale only). IOR 1.53: cellulose. Fuzz 0.3: fewer loose fibres than a knit."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Denim_Twill.yaml"
+    }
+  ]
+}

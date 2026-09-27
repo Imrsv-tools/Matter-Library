@@ -90,7 +90,19 @@ def masks(mask_png: Path, colours: dict | None = None) -> dict[str, np.ndarray]:
         def enc(c):
             c = np.array(c, dtype=np.float64)
             return np.where(c <= 0.0031308, 12.92 * c, 1.055 * c ** (1 / 2.4) - 0.055)
-        out = {name: np.all(np.abs(m - enc(c)) < 0.1, axis=-1) for name, c in colours.items()}
+        out = {}
+        for name, c in colours.items():
+            match = np.all(np.abs(m - enc(c)) < 0.1, axis=-1)
+            hit = match.copy()
+            # ...and its 8 neighbours too: an anti-aliased edge between two parts blends their
+            # colours, and a blend can equal a THIRD part's colour (body red + lips magenta =
+            # the shoes' pink, which put "shoes" in the face view, 7.5.2). An edge pixel is in no
+            # region, by construction, whatever the palette.
+            for dy in (-1, 0, 1):
+                for dx in (-1, 0, 1):
+                    if dy or dx:
+                        hit &= np.roll(np.roll(match, dy, axis=0), dx, axis=1)
+            out[name] = hit
     else:
         out = {name: m[..., ch] > 0.5 for name, ch in REGIONS.items()}
     out["subjects"] = np.logical_or.reduce(list(out.values()))

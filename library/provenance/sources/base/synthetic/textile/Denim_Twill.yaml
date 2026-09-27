@@ -1,0 +1,13 @@
+# Draft provenance for one texture set (Phase07 step 7.5; the Phase03 shape, lead ruling Q2 = A).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: base/synthetic/textile/Denim_Twill    # 3/1 warp-faced twill, 32 ends x 32 picks per cm, indigo warp
+version: v01
+files:
+  - MatterLibrary/textures/base/synthetic/textile/Denim_Twill_basecolor_s001.png
+  - MatterLibrary/textures/base/synthetic/textile/Denim_Twill_normal_s001.png
+  - MatterLibrary/textures/base/synthetic/textile/Denim_Twill_roughness_s001.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/base/gen_fabrics.py

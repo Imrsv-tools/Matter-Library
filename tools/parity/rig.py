@@ -300,6 +300,9 @@ CHARACTER_CAST = {
     "Teeth": "Enamel_Natural_Clean_Base_s001_v01",
     "Gums": "Gum_Natural_Clean_Base_s001_v01",
     "Tongue": "Tongue_Natural_Clean_Base_s001_v01",
+    "Shirt": "Cotton_Jersey_Clean_Base_s001_v01",
+    "Trousers": "Denim_Indigo_Clean_Base_s001_v01",
+    "Shoes": "Leather_Brown_Clean_Base_s001_v01",
 }
 
 

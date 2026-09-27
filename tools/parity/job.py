@@ -130,9 +130,11 @@ CHARACTER_SCENE = HERE / "scene" / "character_scene.usda"
 # each as its own region). Distinct, saturated, and far apart so an edge pixel is never mistaken.
 CHARACTER_COLOURS = {"Body": (1, 0, 0), "Lips": (1, 0, 1), "Nails": (0, 1, 1),
                      "Cornea": (0.5, 0.5, 1), "Pupil": (0.5, 1, 0.5), "Iris": (1, 0.5, 0), "Sclera": (0, 1, 0),
-                     "Teeth": (0, 0, 1), "Gums": (0.5, 0, 0.5), "Tongue": (1, 1, 0)}
+                     "Teeth": (0, 0, 1), "Gums": (0.5, 0, 0.5), "Tongue": (1, 1, 0),
+                     "Shirt": (1, 1, 1), "Trousers": (0, 0.5, 1), "Shoes": (1, 0, 0.5)}
 CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFace", "face"),
-                   "hand": ("/World/CamHand", "hand"), "mouth": ("/World/CamMouth", "mouth, face hidden")}
+                   "hand": ("/World/CamHand", "hand"), "mouth": ("/World/CamMouth", "mouth, face hidden"),
+                   "waist": ("/World/CamWaist", "waist"), "feet": ("/World/CamFeet", "feet")}
 # prims a view hides (the teeth, gums and tongue sit behind closed lips on MakeHuman's body)
 CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
 

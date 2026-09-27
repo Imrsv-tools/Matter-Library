@@ -88,6 +88,13 @@ MESHES = {
     "teeth": {"proxy": "teeth/teeth_base/teeth_base", "texture": "teeth/teeth_base/teeth.png",
               "rest": "Teeth", "split": [("Gums", {"red": True})]},
     "tongue": {"proxy": "tongue/tongue01/tongue01", "rest": "Tongue"},
+    # Clothing (7.5.2): a T-shirt and jeans on one atlas (the jeans are its lower-left island),
+    # and leather shoes. `delete` drops the body faces a garment's .mhclo marks as covered, as
+    # MakeHuman does, so the skin cannot show through the cloth.
+    "suit": {"proxy": "clothes/female_casualsuit01/female_casualsuit01", "rest": "Shirt", "delete": True,
+             # the jeans island, and its waistband corner past u 0.73 (the sleeves there stop at v 0.42)
+             "split": [("Trousers", {"rect": [(0.0, 0.0, 0.73, 0.56), (0.73, 0.43, 0.78, 0.56)]})]},
+    "shoes": {"proxy": "clothes/shoes01/shoes01", "rest": "Shoes", "delete": True},
 }
 PARTS = [p for m in MESHES.values() for p in [s for s, _ in m.get("split", [])] + [m["rest"]]]
 
@@ -126,6 +133,30 @@ def base_vertices(text: str) -> list[tuple[float, float, float]]:
             if line.startswith("v ")]
 
 
+def deleted_verts(mhclo: str) -> set[int]:
+    """The base vertices a proxy's ``delete_verts`` section covers (indices and ``a - b`` ranges)."""
+    out, on = set(), False
+    for line in mhclo.splitlines():
+        p = line.split()
+        if not p or p[0].startswith("#"):
+            continue
+        if p[0] == "delete_verts":
+            on = True
+            continue
+        if on and not p[0].isdigit():
+            break
+        if on:
+            k = 0
+            while k < len(p):
+                if k + 2 < len(p) and p[k + 1] == "-":
+                    out.update(range(int(p[k]), int(p[k + 2]) + 1))
+                    k += 3
+                else:
+                    out.add(int(p[k]))
+                    k += 1
+    return out
+
+
 def fit_proxy(mhclo: str, base: list) -> list[tuple[float, float, float]]:
     """A MakeHuman proxy's vertices, fitted to the base mesh (metres).
 
@@ -159,7 +190,8 @@ def fit_proxy(mhclo: str, base: list) -> list[tuple[float, float, float]]:
 
 
 def read_obj(text: str, group: str | None):
-    """Points (metres), faces as [(vertex index, uv index)], uvs — only the kept group's."""
+    """Points (metres), faces as [(vertex index, uv index)], uvs, and each point's index in the
+    file — only the kept group's."""
     v, vt, faces, g = [], [], [], None
     for line in text.splitlines():
         p = line.split()
@@ -178,13 +210,14 @@ def read_obj(text: str, group: str | None):
                 face.append((int(parts[0]) - 1, int(parts[1]) - 1 if len(parts) > 1 and parts[1] else -1))
             faces.append(face)
     # keep only the vertices the kept faces use, in first-use order (deterministic)
-    remap, pts = {}, []
+    remap, pts, src = {}, [], []
     for f in faces:
         for vi, _ in f:
             if vi not in remap:
                 remap[vi] = len(pts)
                 pts.append(v[vi])
-    return pts, [[(remap[vi], ti) for vi, ti in f] for f in faces], vt
+                src.append(vi)
+    return pts, [[(remap[vi], ti) for vi, ti in f] for f in faces], vt, src
 
 
 def _cross(u, w):
@@ -263,6 +296,8 @@ def split_faces(spec: dict, faces, vt) -> dict[str, list[int]]:
                 break
             if "circles" in rule and any(math.hypot(u - cu, v - cv) < r for cu, cv, r in rule["circles"]):
                 break
+            if "rect" in rule and any(u0 <= u < u1 and v0 <= v < v1 for u0, v0, u1, v1 in rule["rect"]):
+                break
             if rule.get("red"):
                 r, g, b, _ = at(tex, u, v)
                 if r > g + 30 and r > b + 30:
@@ -289,27 +324,26 @@ def load_parts() -> dict:
     """Every part: points, normals, faces, faceVarying st in metres, and its UV density."""
     base_text = source("base.obj").decode("utf-8", "replace")
     base = base_vertices(base_text)
-    parts = {}
+    # the body faces the garments cover, as MakeHuman removes them (any deleted vertex)
+    covered = set()
     for spec in MESHES.values():
+        if spec.get("delete"):
+            covered |= deleted_verts(source(PACK, spec["proxy"] + ".mhclo").decode("utf-8", "replace"))
+    parts = {}
+    for key, spec in MESHES.items():
         if "group" in spec:
-            pts, faces, vt = read_obj(base_text, spec["group"])
+            pts, faces, vt, src = read_obj(base_text, spec["group"])
+            if covered:
+                faces = [f for f in faces if not any(src[vi] in covered for vi, _ in f)]
+                pts, _, faces = subset(pts, pts, faces)
         else:
             obj = source(PACK, spec["proxy"] + ".obj").decode("utf-8", "replace")
             fitted = fit_proxy(source(PACK, spec["proxy"] + ".mhclo").decode("utf-8", "replace"), base)
-            _, faces, vt = read_obj(obj, None)
+            _, faces, vt, src = read_obj(obj, None)
             n_obj = sum(1 for line in obj.splitlines() if line.startswith("v "))
             if n_obj != len(fitted):
-                raise SystemExit(f"{name}: the .obj has {n_obj} vertices, the .mhclo fits {len(fitted)}")
-            # read_obj remapped to first-use order; rebuild the points in that order from the fit
-            order = {}
-            for line in obj.splitlines():
-                if line.startswith("f "):
-                    for c in line.split()[1:]:
-                        vi = int(c.split("/")[0]) - 1
-                        order.setdefault(vi, len(order))
-            pts = [None] * len(order)
-            for vi, k in order.items():
-                pts[k] = fitted[vi]
+                raise SystemExit(f"{key}: the .obj has {n_obj} vertices, the .mhclo fits {len(fitted)}")
+            pts = [fitted[vi] for vi in src]
         normals = vertex_normals(pts, faces)        # over the whole mesh: no crease at a split
         for name, sel in split_faces(spec, faces, vt).items():
             if not sel:
@@ -380,6 +414,15 @@ def cameras(parts: dict) -> dict:
     mouth = [p for n in ("Teeth", "Gums", "Tongue") for p in parts[n]["points"]]
     mc = tuple((min(p[k] for p in mouth) + max(p[k] for p in mouth)) / 2 for k in range(3))
     cams["CamMouth"] = ((mc[0], mc[1] - 0.02, mc[2] + 0.06 / half), mc)
+    # waist: where the shirt's hem meets the jeans' waistband, framed 0.36 m
+    hem = max(p[1] for p in parts["Trousers"]["points"])
+    band = [p for p in parts["Trousers"]["points"] if p[1] > hem - 0.08]
+    wc = (0.0, hem - 0.04, max(p[2] for p in band) - 0.04)
+    cams["CamWaist"] = ((wc[0] + 0.06, wc[1] + 0.05, wc[2] + 0.18 / half), wc)
+    # feet: both shoes, framed 0.40 m, from the front and a little above
+    sp = parts["Shoes"]["points"]
+    fc = tuple((min(p[k] for p in sp) + max(p[k] for p in sp)) / 2 for k in range(3))
+    cams["CamFeet"] = ((fc[0], fc[1] + 0.20, fc[2] + 0.20 / half), fc)
     return cams
 
 
