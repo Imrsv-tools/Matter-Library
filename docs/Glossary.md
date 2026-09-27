@@ -60,7 +60,7 @@
 | **TwoLayer blend** | The master whose single OpenPBR surface blends two layers per channel by the maskset (e.g. rust on steel). → `docs/specs/Ontology/MasterSet.md` |
 | **Opacity floor** | `MIN_TRANSMISSIVE_OPACITY = 0.05`: the translucent masters never drop below it, so an article can state honest physics (`transmission = 1.0`) and still present a surface. The fix lives in the master, never in the article. → `docs/specs/Ontology/MasterSet.md` |
 | **`imrsv_metadata`** | The optional nodedef in each `.mtlx` carrying hints (master, scale tag, meters-per-tile, domain, class). The historical name is kept. → `docs/specs/Contract/MaterialXTemplate.md` |
-| **Parity** | How closely renders of one article match across MaterialX/USD, Blender and Unreal: calibrated, not pixel-identical (target ΔE < 2 where the master allows). → `docs/specs/Tooling/CompressedDistribution.md` |
+| **Parity** | How closely renders of one article match across MaterialX/USD, Blender and Unreal: calibrated, not pixel-identical (target ΔE < 2 where the master allows). Measured by the parity rig, `tools/parity/rig.py` (since 2026-09-27). → `docs/specs/Tooling/CompressedDistribution.md` |
 
 ## Releases and distribution
 

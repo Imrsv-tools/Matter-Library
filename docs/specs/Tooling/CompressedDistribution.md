@@ -71,7 +71,9 @@ Measured benefit (Copper article): a BC texture is ~1.3 MiB mip-complete vs ~4 M
 ## Parity — calibrated, not pixel-identical
 
 Parity **catches material/compression regressions without pretending different renderers produce
-pixel-identical images** (the acceptance invariant). Two gates:
+pixel-identical images** (the acceptance invariant).
+
+*Shipped (Phase05, 2026-09-27): the **cross-renderer** leg.* `tools/parity/rig.py` renders one article side by side in USDLiveView's renderer (Storm) and Blender (Cycles), in one test scene with matched lighting, over every Creator slider. It scores ΔE2000 per setting against the per-master bar (< 2 for Opaque, Masked, Emissive and TwoLayer; "recognisable" by eye for the see-through and subsurface masters), plus a ruler (real-world size) check and a seam check. The render-job contract for a third renderer is `tools/parity/JOB_FORMAT.md` (Unreal: Phase06). The two gates below are the **codec** leg, one renderer against itself. Two gates:
 
 ### OCIO 2.4-native parity config
 Built by `tools/conformance/build_ocio_parity_config.py` (a machine-local, reproducible artifact written to the builder's default output directory, overridable with `--out`; never committed). It

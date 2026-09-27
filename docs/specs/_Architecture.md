@@ -63,7 +63,7 @@ The Matter Library is a **gathering of components, organised by concern**. Each 
 | **Tooling** | the authoring harness and validators · the USD validation toolchain · compression and parity | [AuthoringHarness](Tooling/AuthoringHarness.md) · [USDValidationToolchain](Tooling/USDValidationToolchain.md) · [CompressedDistribution](Tooling/CompressedDistribution.md) | `tools/` |
 | **Blender bridge** | the Asset-Browser library and the Matter exporter | [Experience §Shipped](Experience/Experience_MatterLibrary.md) · [CreatorAssetProfile](Contract/CreatorAssetProfile.md) | `blender/`, `tools/generators/`, `tools/conformance/` |
 | **Matter Manager** *(planned)* | import · promotion · subset/export · path remap | — | — |
-| **Automated transformers** *(planned)* | MaterialX → Blender / Unreal, after manual parity is proven | — | — |
+| **Automated transformers** *(planned; Blender shipped 2026-09-27)* | MaterialX → Blender / Unreal, after manual parity is proven. *Blender (Phase05): `blender/masters/` builds each article on one master group per master, and the parity rig measures it against USDLiveView's renderer. Unreal: Phase06.* | [ToolingConventions](../ToolingConventions.md) | `blender/masters/`, `tools/parity/` |
 | **Unreal deliverable** *(planned, optional)* | a reference UE masters package for Unreal users outside IMRSV (R14 "B later") | — | — |
 
 > **Experience** ([Experience_MatterLibrary](Experience/Experience_MatterLibrary.md)) is the **product/UX** view (the Creator Golden Path), distinct from this architecture/contract view. It links to the Contract and Ontology specs; it does not restate them.
@@ -112,7 +112,7 @@ The **LCD discipline** is two-tier ([LCDSchema](Contract/LCDSchema.md)). The **a
 - Tracked with **Git LFS**. Stored once under `MatterLibrary/textures/base` (by the matter hierarchy) and `MatterLibrary/textures/shared` (overlays, masks), and referenced by many articles.
 
 ### Governance
-- Source PRs are open but **CI-gated**: schema valid, naming/taxonomy valid, scale tag present, referenced textures exist, eventually an automated parity render. *(Reevaluate, 2026-09-23: the gates are one command, `uv run tools/validators/run_all.py` (Phase02), run by hand for now. Automatic PR CI is **parked** by the lead ("that is really advanced and I don't want it"); a dormant `.github/workflows/gate.yml` is kept for the contribution-path phase to decide on. The parity render is still (planned).)*
+- Source PRs are open but **CI-gated**: schema valid, naming/taxonomy valid, scale tag present, referenced textures exist, eventually an automated parity render. *(Reevaluate, 2026-09-23: the gates are one command, `uv run tools/validators/run_all.py` (Phase02), run by hand for now. Automatic PR CI is **parked** by the lead ("that is really advanced and I don't want it"); a dormant `.github/workflows/gate.yml` is kept for the contribution-path phase to decide on. The parity render is still (planned).)* *(Updated 2026-09-27, Phase05: the parity render exists as a manual command, `uv run tools/parity/rig.py <article> [--sweep]` (Storm and Blender side by side, ΔE2000 scored, an Unreal column waiting on Phase06). Running it automatically (nightly or per PR) is still (planned), owned by Phase08.)*
 - The release manifests under `library/releases/` are **maintainer-gated**: only maintainers promote.
 - **Contributions are CC0-1.0 and must be CC0-dedicable**; contributors are credited, and consumers are asked (not required) to credit the Matter Library (R13). Code is Apache-2.0 (R10).
 

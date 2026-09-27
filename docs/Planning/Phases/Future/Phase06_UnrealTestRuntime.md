@@ -19,7 +19,7 @@ It is one thing, the Unreal leg of the rig. It needs a machine with Unreal on it
 - **The 7 masters,** mirroring `docs/specs/Ontology/MasterSet.md`. Every input is a parameter, since a packaged app can't compile new shaders. Ideally they are built by an editor script, so they can be rebuilt rather than hand-clicked.
 - **The loader:** it reads a `.mtlx` (which master, which textures, which values, the default slider values), loads the PNGs with the right colour settings (colour textures as sRGB, data textures as linear, the normal map's green channel the right way up), and sets them on the master.
 - **The test scene** from Phase05's USD file, and **the render-job driver** exactly as Phase05 wrote it down.
-- **The Unreal column** for the 7 test materials, compared in Phase05's picture sheets.
+- **The Unreal column** for the 7 test materials, compared in Phase05's picture sheets. *(Updated 2026-09-27 at the Phase05 close: the test set is **11 articles**, the grey card for calibration first. The render-job contract, the scene, the matched lighting an Unreal driver must reproduce, and the two open questions its column should settle (F12, F16) are in `tools/parity/JOB_FORMAT.md`. The Blender masters Phase05 built by code (`blender/masters/`) are a worked reference for the Unreal ones.)*
 - **The package,** and how it gets to the other machine (it is too large for git).
 
 **Out:**

@@ -15,19 +15,19 @@
     "mtlx": [
       {
         "path": "MatterLibrary/materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
-        "sha256": "583e97bbb5e6e75940462ab07bf24f972a053547e2b5927d2c617e1e6d837b5a"
+        "sha256": "9aa761384c7dae78c1141ad53d54b7be99b625a1f12605504985c8a211615d09"
       },
       {
         "path": "MatterLibrary/materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
-        "sha256": "fe96893bd54b59478e0cacb2b77ce75771286854350d36a29c17127f9050ce9f"
+        "sha256": "2ed382c221940580521a56c8cf10791730619f2913e0c61231ed91f8e39a9ade"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
-        "sha256": "cacfd61efa5856a4e6c5156d54d1f061decd31887348219daf0d6773976943b9"
+        "sha256": "fdeef76a581cc87c35fb67077d017a60f81b986ccf551e6de2ec31160fe35242"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
-        "sha256": "9bd24f016b8181b9a2437e64d2f0767a791fc55b9f76d3484d22ec54f65b657f"
+        "sha256": "a268b63839b269dd6042727f88a3b21d79cedb0f60b50c65b472040c4c597dff"
       },
       {
         "path": "MatterLibrary/materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
@@ -39,7 +39,7 @@
       },
       {
         "path": "MatterLibrary/materials/natural/stone/Marble_Veined_Polished_Base_s01_v01.mtlx",
-        "sha256": "e939f15a283b7dc74d3ac4ef5ef763649b2951f85829dfbd5e0e33b3fe3a0b68"
+        "sha256": "7549487d2793964d31f900bc2d4a90967bfa9f7f899a7659e8def2cd5026e8f2"
       },
       {
         "path": "MatterLibrary/materials/synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
@@ -185,11 +185,11 @@
       }
     ]
   },
-  "payload_digest": "74073470bd02bde53174ea4acfef55d03abd4a1ea445066b11b8a8c496a9df40",
+  "payload_digest": "94c8185a56423efee1f9dfbca7651bef758fb2c32182b84c79b2cb396e9dc6ef",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
     "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
-    "mtlx_set": "3054348e5fb5f11e49a03448a824e27d57efc28c233ec89de05240dab1abb395",
+    "mtlx_set": "d089c0923a9a821c3a0e0e162c069f0a723ba210096459ed17b80df4085d93fc",
     "source_textures_set": "39bc67dbb3f0947a358e034f37bf421872b87f2756b8809474f8d5bc4ed63c5e"
   },
   "release": "0.1.0"

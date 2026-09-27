@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase05 — Test Rig: Blender and USDLiveView Side by Side — ACTIVE *(discovery Brief complete 2026-09-26; takes over Parity Baselines)*
-**Outcome:** the maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.
-- `docs/Planning/Phases/Future/Phase05_TestRig.md`
+*No active phase (Phase05 closed 2026-09-27; Phase06 runs on the UE machine and Phase07 here).*
 
 ==================================================================================
 ## Future
@@ -64,7 +62,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 ### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here)*
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Future/Phase05_TestRig.md`
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Complete/Phase05_TestRig.md`
 
 ### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26)*
 **Outcome:** an Unreal user outside IMRSV can drop in a package of the Matter masters and render library materials from a release.
@@ -100,3 +98,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a wear layer (dust, scratches, scuffs) looks the right size on every material, whatever that material's tile size.
 - `docs/Planning/Phases/Complete/Phase04_WearLayersAtTheirOwnScale.md`
 *Closed 2026-09-26; the pilot's re-approval is owed by the maintainer.*
+
+### Phase05 — Test Rig: Blender and USDLiveView Side by Side — COMPLETE
+**Outcome:** the maintainer can put any material side by side in Blender and USDLiveView, with every slider moved through its range, and see where the two agree and where they drift.
+- `docs/Planning/Phases/Complete/Phase05_TestRig.md`
+*Closed 2026-09-27; one maintainer re-approval of the pilot covers Phase04 and Phase05.*

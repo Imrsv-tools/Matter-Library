@@ -31,6 +31,8 @@ Four independent records, never conflated:
 
 *(Updated 2026-09-26, Phase04: the wear-layer change moved `matterlib-0.1.0`'s payload (4 articles, 5 shared layers), so it was **re-frozen without its `.dds` set**. The pinned encoder is absent on the maintainer's box, so the freeze carries no `dds_set` and activation's `.dds` check skips. The approval is re-issued against the new freeze by the maintainer, as in the Matter-Library#1 precedent. The `.dds` re-lock belongs to the release-bundle phase, which needs the encoder anyway.)*
 
+*(Updated 2026-09-27, Phase05 close: `matterlib-0.1.0` re-frozen again, still without `.dds`. Five of its articles moved: Concrete, Copper, Glass_Clear and Rust because their normal is now combined in tangent space (MasterSet §Overlay semantic), and Marble because its `subsurface_radius` was a fudge in the wrong unit. Only the `mtlx_set` hash changed; the catalog, manifest and source textures are byte-identical. One maintainer re-approval covers this and the Phase04 re-freeze.)*
+
 **Approval ≠ activation.** Promotion creates the approval artifact (the sole promotion flip). Activation
 writes the selector. Rollback re-points the selector; it never revokes or rewrites approval.
 

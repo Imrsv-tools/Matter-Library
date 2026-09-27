@@ -178,6 +178,8 @@ Where usdview / the `pxr` Python module is unavailable, the parity gate
 
 *Shipped (Phase03, 2026-09-25):* the preview renders real articles headless (`usdrecord`), and a maintainer reviews drafts in USDLiveView. **Limits recorded, not fixed:** the preview renderer (Storm) shows no transmission colour and renders `transmission = 1.0` black, and light intensity barely changes its output (owned by *Parity Baselines*).
 
+*Resolved (Phase05, 2026-09-27), kept for history:* both limits were the preview **scene**, not Storm. Its lights never lit anything: an un-normalized DistantLight's intensity is the sun disk's radiance (×~6.7e-5), and Storm ignores an untextured dome. Every preview was lit by `usdrecord`'s camera headlight, which is why light intensity changed nothing. The preview now uses a normalized sun and a textured dome, with the headlight off. "Black" glass was the missing backdrop; green glass keeps its tint in Storm (measured on the parity rig's UV-grid wall). Storm still shows see-through as transparency, not refraction. The parity rig (`tools/parity/`) now judges a draft side by side against Blender.
+
 ## Status
 
 **Authoring harness + QC gate set stood up** and proven by authoring the range-covering
