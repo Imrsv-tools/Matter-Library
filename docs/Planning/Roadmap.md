@@ -28,6 +28,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
 - `docs/Planning/Phases/Future/Phase07_LibraryCoverage.md`
 
+### Character Materials — SEEDED *(TBD; seeded 2026-09-27 from research CM3; follows Phase07, which builds the first six skins)*
+**Outcome:** a Creator can dress a character from the library: skin with its lips, nails and fine detail, eyes, teeth and hair. It looks right in Blender, a USD viewer and Unreal, on any character.
+- `docs/Planning/Phases/Future/PhaseTBD_CharacterMaterials.md`
+
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
 - `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`
