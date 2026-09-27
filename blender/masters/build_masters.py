@@ -9,12 +9,34 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
   order 0): ``uv / scale``, then ``rotate2d`` (which turns the COORDINATE clockwise by
   ``uv_rotation`` degrees, so the texture appears counter-clockwise), then ``- offset``.
   Blender's Vector Rotate turns counter-clockwise, so it is given ``-uv_rotation``.
-* ``ML_Opaque`` — the Opaque master: ``base_color x base_color_tint`` (the article's
-  ``base_color_tinted``), roughness plus each wear layer's bias, then ``+ roughness_bias``
-  clamped to 0..1 (LCDSchema), metalness, up to three wear layers gated by the maskset
-  (MasterSet §Overlay semantic), and the normal combined in TANGENT space and converted
-  once (see ``ensure_opaque``), into a Principled BSDF standing in for
-  ``open_pbr_surface`` (both are the OpenPBR model).
+* ``ML_<Master>`` — one group per master (MasterSet §v1 baseline), all built on the same
+  Opaque core (``_build``), with the master's own part switched on:
+
+  ========================  ==========================================================
+  Opaque                    the core: ``base_color`` (x ``base_color_tint``); roughness
+                            + each wear layer's bias + ``roughness_bias``, clamped 0..1
+                            (LCDSchema); metalness; up to three wear layers gated by the
+                            maskset (MasterSet §Overlay semantic); the normal combined in
+                            TANGENT space and converted once (MasterSet, since 5.3)
+  TwoLayer                  + a second layer blended by the maskset's R (MasterSet
+                            §TwoLayer blend): colour, roughness and metalness mixed, the
+                            two normals mixed in tangent space; the tint applies after
+  Masked                    + the cut-out: alpha = opacity >= ``opacity_cutoff`` (the
+                            article's ``ifgreatereq``)
+  Emissive                  + emission: colour x luminance (MaterialX's OpenPBR takes
+                            luminance as radiance directly, as Blender's Strength is)
+  TranslucentThin           + transmission, Thin Wall on; the tint of what shows through
+                            is ``transmission_color``
+  TranslucentThick          + transmission, Thin Wall off, and absorption inside the
+                            volume: sigma = -ln(transmission_color) / transmission_depth
+  Subsurface                + subsurface weight, radius and radius scale
+  ========================  ==========================================================
+
+  A Principled BSDF stands in for ``open_pbr_surface`` (both are the OpenPBR model). Two
+  places where Principled has one colour where OpenPBR has two, and the mapping used:
+  transmission is tinted by Base Color, so Base Color = lerp(base, transmission tint,
+  transmission_weight); and subsurface uses Base Color, so Base Color = lerp(base,
+  subsurface_color, subsurface_weight). Each is exact at weight 0 and at weight 1.
 
 Sockets that are Creator ports carry the frozen port name (LCDSchema §Creator subset), so
 the Blender exporter reads them as it read the look-alike's.
@@ -29,7 +51,21 @@ import math
 
 import bpy
 
-VERSION = 2     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 3     # bump when a group's contents change; ensure_*() rebuilds an older one
+
+OVERLAYS = (1, 2, 3)
+GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
+
+# master -> the parts it switches on over the Opaque core
+MASTER_PARTS = {
+    "Opaque": set(),
+    "TwoLayer": {"layer2"},
+    "Masked": {"opacity"},
+    "Emissive": {"emission"},
+    "TranslucentThin": {"transmission"},
+    "TranslucentThick": {"transmission", "thick"},
+    "Subsurface": {"subsurface"},
+}
 
 
 def _group(name: str, sockets_in, sockets_out):
@@ -66,6 +102,41 @@ def _math(ng, op: str, x, y, clamp: bool = False):
     return _node(ng, "ShaderNodeMath", x, y, operation=op, use_clamp=clamp)
 
 
+def _sep(ng, x, y):
+    return _node(ng, "ShaderNodeSeparateColor", x, y)
+
+
+def _lerp_color(ng, a, b, t, x, y):
+    """a + (b - a) * t for colours (as vectors)."""
+    d = _vmath(ng, "SUBTRACT", x, y)
+    ng.links.new(b, d.inputs[0])
+    ng.links.new(a, d.inputs[1])
+    s = _vmath(ng, "SCALE", x + 150, y)
+    ng.links.new(d.outputs[0], s.inputs[0])
+    ng.links.new(t, s.inputs["Scale"])
+    add = _vmath(ng, "ADD", x + 300, y)
+    ng.links.new(a, add.inputs[0])
+    ng.links.new(s.outputs[0], add.inputs[1])
+    return add.outputs[0]
+
+
+def _lerp_float(ng, a, b, t, x, y):
+    m = _node(ng, "ShaderNodeMix", x, y, data_type="FLOAT")
+    ng.links.new(t, m.inputs["Factor"])
+    ng.links.new(a, m.inputs[2])      # A (float)
+    ng.links.new(b, m.inputs[3])      # B (float)
+    return m.outputs[0]               # Result (float)
+
+
+def _decode(ng, color, x, y):
+    """A normal-map colour -> a tangent-space vector (2c - 1)."""
+    d = _vmath(ng, "MULTIPLY_ADD", x, y)
+    ng.links.new(color, d.inputs[0])
+    d.inputs[1].default_value = (2.0, 2.0, 2.0)
+    d.inputs[2].default_value = (-1.0, -1.0, -1.0)
+    return d.outputs[0]
+
+
 def ensure_place2d():
     ng, fresh = _group(
         "ML_Place2D",
@@ -96,134 +167,199 @@ def ensure_place2d():
     return ng
 
 
-OVERLAYS = (1, 2, 3)
-GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
-
-
-def _sep(ng, x, y):
-    return _node(ng, "ShaderNodeSeparateColor", x, y)
-
-
-def ensure_opaque():
-    """The Opaque master: base PBR, Creator sliders, and up to three wear layers.
-
-    Per overlay N (MasterSet §Overlay semantic):
-        gate_N   = mix(1, maskset.<G|B|A>, maskset_blend)      # MaterialX mix(bg=1, fg, mix)
-        effect_N = overlayN_density * overlayN.A * gate_N
-        roughness += overlayN.B * effect_N                      # then + roughness_bias, clamp 0..1
-        normal    += (overlayN.RG * 2 - 1, 0) * effect_N        # TANGENT space
-    The normal is combined in TANGENT space (the article's normal map decoded, or flat
-    (0, 0, 1) where it has none), renormalized, and converted to world space ONCE. That is
-    the spec's intent; the articles built before Phase05 step 5.3 add the bumps to an
-    already-world normal instead (Execution Log F10).
-    """
-    sockets = [("Base Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
-               ("base_color_tint", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
-               ("Roughness", "NodeSocketFloat", 0.5),
-               ("roughness_bias", "NodeSocketFloat", 0.0),
-               ("Metalness", "NodeSocketFloat", 0.0),
-               ("Normal Map", "NodeSocketColor", (0.5, 0.5, 1.0, 1.0)),
-               ("IOR", "NodeSocketFloat", 1.5),
-               ("Specular Weight", "NodeSocketFloat", 1.0),
-               ("Maskset", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
-               ("Maskset Alpha", "NodeSocketFloat", 1.0),
-               ("maskset_blend", "NodeSocketFloat", 0.0)]
+def _sockets(parts: set) -> list:
+    s = [("Base Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
+         ("base_color_tint", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+         ("Roughness", "NodeSocketFloat", 0.5),
+         ("roughness_bias", "NodeSocketFloat", 0.0),
+         ("Metalness", "NodeSocketFloat", 0.0),
+         ("Normal Map", "NodeSocketColor", (0.5, 0.5, 1.0, 1.0)),
+         ("IOR", "NodeSocketFloat", 1.5),
+         ("Specular Weight", "NodeSocketFloat", 1.0),
+         ("Maskset", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+         ("Maskset Alpha", "NodeSocketFloat", 1.0),
+         ("maskset_blend", "NodeSocketFloat", 0.0)]
     for n in OVERLAYS:
-        sockets += [(f"Overlay {n}", "NodeSocketColor", (0.5, 0.5, 0.0, 1.0)),
-                    (f"Overlay {n} Alpha", "NodeSocketFloat", 0.0),
-                    (f"overlay{n}_density", "NodeSocketFloat", 0.0)]
-    ng, fresh = _group("ML_Opaque", sockets, [("BSDF", "NodeSocketShader")])
+        s += [(f"Overlay {n}", "NodeSocketColor", (0.5, 0.5, 0.0, 1.0)),
+              (f"Overlay {n} Alpha", "NodeSocketFloat", 0.0),
+              (f"overlay{n}_density", "NodeSocketFloat", 0.0)]
+    if "layer2" in parts:
+        s += [("Layer 2 Base Color", "NodeSocketColor", (0.5, 0.5, 0.5, 1.0)),
+              ("Layer 2 Roughness", "NodeSocketFloat", 0.5),
+              ("Layer 2 Metalness", "NodeSocketFloat", 0.0),
+              ("Layer 2 Normal Map", "NodeSocketColor", (0.5, 0.5, 1.0, 1.0)),
+              ("layer_blend_balance", "NodeSocketFloat", 0.5),
+              ("layer_blend_contrast", "NodeSocketFloat", 0.0)]
+    if "opacity" in parts:
+        s += [("Opacity", "NodeSocketFloat", 1.0),
+              ("opacity_cutoff", "NodeSocketFloat", 0.5)]
+    if "emission" in parts:
+        s += [("Emission Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+              ("Emission Luminance", "NodeSocketFloat", 0.0)]
+    if "transmission" in parts:
+        s += [("Transmission Weight", "NodeSocketFloat", 0.0),
+              ("Transmission Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0))]
+    if "thick" in parts:
+        s += [("Absorption", "NodeSocketVector", (0.0, 0.0, 0.0))]
+    if "subsurface" in parts:
+        s += [("Subsurface Weight", "NodeSocketFloat", 0.0),
+              ("Subsurface Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
+              ("Subsurface Radius", "NodeSocketFloat", 1.0),
+              ("Subsurface Radius Scale", "NodeSocketVector", (1.0, 1.0, 1.0))]
+    return s
+
+
+def _build(name: str, parts: set):
+    outs = [("BSDF", "NodeSocketShader")] + ([("Volume", "NodeSocketShader")] if "thick" in parts else [])
+    ng, fresh = _group(name, _sockets(parts), outs)
     if not fresh:
         return ng
     L = ng.links.new
-    gi = _node(ng, "NodeGroupInput", -1600, 0)
-    go = _node(ng, "NodeGroupOutput", 900, 0)
-    bsdf = _node(ng, "ShaderNodeBsdfPrincipled", 550, 0)
+    gi = _node(ng, "NodeGroupInput", -2000, 0)
+    go = _node(ng, "NodeGroupOutput", 1200, 0)
+    bsdf = _node(ng, "ShaderNodeBsdfPrincipled", 850, 0)
     L(bsdf.outputs["BSDF"], go.inputs["BSDF"])
-
-    tint = _vmath(ng, "MULTIPLY", -300, 500)                  # base_color_tinted
-    L(gi.outputs["Base Color"], tint.inputs[0])
-    L(gi.outputs["base_color_tint"], tint.inputs[1])
-    L(tint.outputs[0], bsdf.inputs["Base Color"])
-    L(gi.outputs["Metalness"], bsdf.inputs["Metallic"])
     L(gi.outputs["IOR"], bsdf.inputs["IOR"])
-    spec = _math(ng, "MULTIPLY", -300, 350)                    # 0.5 = "use the IOR as is"
+    spec = _math(ng, "MULTIPLY", 500, 350)                     # 0.5 = "use the IOR as is"
     L(gi.outputs["Specular Weight"], spec.inputs[0])
     spec.inputs[1].default_value = 0.5
     L(spec.outputs[0], bsdf.inputs["Specular IOR Level"])
 
-    mask = _sep(ng, -1300, -200)
+    mask = _sep(ng, -1700, -200)
     L(gi.outputs["Maskset"], mask.inputs["Color"])
-    mask_ch = {"G": mask.outputs["Green"], "B": mask.outputs["Blue"], "A": gi.outputs["Maskset Alpha"]}
+    mask_ch = {"R": mask.outputs["Red"], "G": mask.outputs["Green"], "B": mask.outputs["Blue"],
+               "A": gi.outputs["Maskset Alpha"]}
 
-    # tangent-space normal: decode the map (2c - 1); flat maps decode to (0, 0, 1)
-    dec = _vmath(ng, "MULTIPLY_ADD", -1000, -600)
-    L(gi.outputs["Normal Map"], dec.inputs[0])
-    dec.inputs[1].default_value = (2.0, 2.0, 2.0)
-    dec.inputs[2].default_value = (-1.0, -1.0, -1.0)
-    n_src = dec.outputs[0]
-    rough_src = gi.outputs["Roughness"]
+    base = gi.outputs["Base Color"]
+    rough = gi.outputs["Roughness"]
+    metal = gi.outputs["Metalness"]
+    n_ts = _decode(ng, gi.outputs["Normal Map"], -1400, -700)
+
+    if "layer2" in parts:
+        # MasterSet §TwoLayer blend: c = 1/max(1e-4, 1-contrast); k = saturate((R-bal)*c+.5)
+        inv = _math(ng, "SUBTRACT", -1700, 700)
+        inv.inputs[0].default_value = 1.0
+        L(gi.outputs["layer_blend_contrast"], inv.inputs[1])
+        safe = _math(ng, "MAXIMUM", -1550, 700)
+        L(inv.outputs[0], safe.inputs[0])
+        safe.inputs[1].default_value = 1e-4
+        cen = _math(ng, "SUBTRACT", -1550, 850)
+        L(mask_ch["R"], cen.inputs[0])
+        L(gi.outputs["layer_blend_balance"], cen.inputs[1])
+        scl = _math(ng, "DIVIDE", -1400, 800)
+        L(cen.outputs[0], scl.inputs[0])
+        L(safe.outputs[0], scl.inputs[1])
+        k = _math(ng, "ADD", -1250, 800, clamp=True)
+        L(scl.outputs[0], k.inputs[0])
+        k.inputs[1].default_value = 0.5
+        t = _math(ng, "MULTIPLY", -1100, 800)
+        L(k.outputs[0], t.inputs[0])
+        L(gi.outputs["maskset_blend"], t.inputs[1])
+        tt = t.outputs[0]
+        base = _lerp_color(ng, base, gi.outputs["Layer 2 Base Color"], tt, -900, 600)
+        rough = _lerp_float(ng, rough, gi.outputs["Layer 2 Roughness"], tt, -900, 400)
+        metal = _lerp_float(ng, metal, gi.outputs["Layer 2 Metalness"], tt, -900, 250)
+        n2 = _decode(ng, gi.outputs["Layer 2 Normal Map"], -1400, -900)
+        nb = _lerp_color(ng, n_ts, n2, tt, -1200, -800)
+        nn = _vmath(ng, "NORMALIZE", -800, -800)
+        L(nb, nn.inputs[0])
+        n_ts = nn.outputs[0]
+    L(metal, bsdf.inputs["Metallic"])
+
+    tint = _vmath(ng, "MULTIPLY", -300, 600)                  # base_color_tinted (after layer 2)
+    L(base, tint.inputs[0])
+    L(gi.outputs["base_color_tint"], tint.inputs[1])
+    base = tint.outputs[0]
 
     for n in OVERLAYS:
-        y = -200 - 350 * n
-        # gate = 1 + (mask - 1) * blend  ==  mix(bg=1, fg=mask, mix=blend)
-        gm = _math(ng, "SUBTRACT", -1000, y)
+        y = -300 - 350 * n
+        gm = _math(ng, "SUBTRACT", -1100, y)                   # gate = mix(1, mask, blend)
         L(mask_ch[GATE_CHANNEL[n]], gm.inputs[0])
         gm.inputs[1].default_value = 1.0
-        gate = _math(ng, "MULTIPLY_ADD", -800, y)
+        gate = _math(ng, "MULTIPLY_ADD", -950, y)
         L(gm.outputs[0], gate.inputs[0])
         L(gi.outputs["maskset_blend"], gate.inputs[1])
         gate.inputs[2].default_value = 1.0
-        e1 = _math(ng, "MULTIPLY", -600, y)
+        e1 = _math(ng, "MULTIPLY", -800, y)
         L(gi.outputs[f"overlay{n}_density"], e1.inputs[0])
         L(gi.outputs[f"Overlay {n} Alpha"], e1.inputs[1])
-        eff = _math(ng, "MULTIPLY", -400, y)
+        eff = _math(ng, "MULTIPLY", -650, y)
         L(e1.outputs[0], eff.inputs[0])
         L(gate.outputs[0], eff.inputs[1])
-
-        ov = _sep(ng, -800, y - 150)
+        ov = _sep(ng, -950, y - 150)
         L(gi.outputs[f"Overlay {n}"], ov.inputs["Color"])
-        rd = _math(ng, "MULTIPLY_ADD", -200, y + 100)            # rough += B * effect
+        rd = _math(ng, "MULTIPLY_ADD", -450, y + 100)          # rough += B * effect
         L(ov.outputs["Blue"], rd.inputs[0])
         L(eff.outputs[0], rd.inputs[1])
-        L(rough_src, rd.inputs[2])
-        rough_src = rd.outputs[0]
-
-        # (R*2-1, G*2-1, 0) * effect, added to the tangent-space normal
-        comb = _node(ng, "ShaderNodeCombineXYZ", -600, y - 150)
+        L(rough, rd.inputs[2])
+        rough = rd.outputs[0]
+        comb = _node(ng, "ShaderNodeCombineXYZ", -650, y - 150)
         for axis, ch in (("X", "Red"), ("Y", "Green")):
-            m = _math(ng, "MULTIPLY_ADD", -700, y - 150)
+            m = _math(ng, "MULTIPLY_ADD", -800, y - 150)
             L(ov.outputs[ch], m.inputs[0])
             m.inputs[1].default_value = 2.0
             m.inputs[2].default_value = -1.0
             L(m.outputs[0], comb.inputs[axis])
-        sc = _vmath(ng, "SCALE", -400, y - 150)
+        sc = _vmath(ng, "SCALE", -450, y - 150)
         L(comb.outputs[0], sc.inputs[0])
         L(eff.outputs[0], sc.inputs["Scale"])
-        add = _vmath(ng, "ADD", -200, y - 150)
-        L(n_src, add.inputs[0])
+        add = _vmath(ng, "ADD", -300, y - 150)
+        L(n_ts, add.inputs[0])
         L(sc.outputs[0], add.inputs[1])
-        n_src = add.outputs[0]
+        n_ts = add.outputs[0]
 
-    rough = _math(ng, "ADD", 100, 200, clamp=True)             # roughness_biased_clamped
-    L(rough_src, rough.inputs[0])
-    L(gi.outputs["roughness_bias"], rough.inputs[1])
-    L(rough.outputs[0], bsdf.inputs["Roughness"])
+    rc = _math(ng, "ADD", 200, 200, clamp=True)                # roughness_biased_clamped
+    L(rough, rc.inputs[0])
+    L(gi.outputs["roughness_bias"], rc.inputs[1])
+    L(rc.outputs[0], bsdf.inputs["Roughness"])
 
-    # normalize in tangent space, re-encode, and convert to world space ONCE
-    nrm = _vmath(ng, "NORMALIZE", 0, -600)
-    L(n_src, nrm.inputs[0])
-    enc = _vmath(ng, "MULTIPLY_ADD", 150, -600)
+    nrm = _vmath(ng, "NORMALIZE", 0, -700)                     # tangent -> world, ONCE
+    L(n_ts, nrm.inputs[0])
+    enc = _vmath(ng, "MULTIPLY_ADD", 150, -700)
     L(nrm.outputs[0], enc.inputs[0])
     enc.inputs[1].default_value = (0.5, 0.5, 0.5)
     enc.inputs[2].default_value = (0.5, 0.5, 0.5)
-    nmap = _node(ng, "ShaderNodeNormalMap", 300, -600, space="TANGENT", uv_map="st")
+    nmap = _node(ng, "ShaderNodeNormalMap", 300, -700, space="TANGENT", uv_map="st")
     L(enc.outputs[0], nmap.inputs["Color"])
     L(nmap.outputs["Normal"], bsdf.inputs["Normal"])
+
+    if "opacity" in parts:
+        # the article's ifgreatereq: opacity >= cutoff -> 1, else 0  (== 1 - (opacity < cutoff))
+        lt = _math(ng, "LESS_THAN", 300, 450)
+        L(gi.outputs["Opacity"], lt.inputs[0])
+        L(gi.outputs["opacity_cutoff"], lt.inputs[1])
+        a = _math(ng, "SUBTRACT", 450, 450)
+        a.inputs[0].default_value = 1.0
+        L(lt.outputs[0], a.inputs[1])
+        L(a.outputs[0], bsdf.inputs["Alpha"])
+    if "emission" in parts:
+        L(gi.outputs["Emission Color"], bsdf.inputs["Emission Color"])
+        L(gi.outputs["Emission Luminance"], bsdf.inputs["Emission Strength"])
+    if "transmission" in parts:
+        L(gi.outputs["Transmission Weight"], bsdf.inputs["Transmission Weight"])
+        bsdf.inputs["Thin Wall"].default_value = "thick" not in parts
+        base = _lerp_color(ng, base, gi.outputs["Transmission Color"],
+                           gi.outputs["Transmission Weight"], 0, 800)
+    if "thick" in parts:
+        vol = _node(ng, "ShaderNodeVolumeCoefficients", 850, -500)
+        L(gi.outputs["Absorption"], vol.inputs["Absorption Coefficients"])
+        vol.inputs["Scatter Coefficients"].default_value = (0.0, 0.0, 0.0)
+        L(vol.outputs[0], go.inputs["Volume"])
+    if "subsurface" in parts:
+        L(gi.outputs["Subsurface Weight"], bsdf.inputs["Subsurface Weight"])
+        L(gi.outputs["Subsurface Radius Scale"], bsdf.inputs["Subsurface Radius"])
+        L(gi.outputs["Subsurface Radius"], bsdf.inputs["Subsurface Scale"])
+        base = _lerp_color(ng, base, gi.outputs["Subsurface Color"],
+                           gi.outputs["Subsurface Weight"], 0, 800)
+    L(base, bsdf.inputs["Base Color"])
     return ng
 
 
-MASTERS = {"Opaque": ensure_opaque}
+MASTERS = {m: (lambda m=m: _build(f"ML_{m}", MASTER_PARTS[m])) for m in MASTER_PARTS}
+
+
+def ensure_opaque():
+    return MASTERS["Opaque"]()
 
 
 def ensure_all():

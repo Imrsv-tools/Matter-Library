@@ -192,10 +192,12 @@ def run(job_path: Path) -> None:
             o.data.materials.append(mat)
         for v, spec in views.items():
             scn.camera = cams[v]
+            scn.view_settings.exposure = float(spec.get("exposure", 0.0))
             png = out / f"{s['id']}{spec['suffix']}.png"
             scn.render.filepath = str(png)
             bpy.ops.render.render(write_still=True)
             print(f"blender: wrote {png}")
+        scn.view_settings.exposure = 0.0
 
 
 if __name__ == "__main__":

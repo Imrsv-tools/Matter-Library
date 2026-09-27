@@ -15,6 +15,7 @@ inputs; ``sliders`` overrides them, as a Creator would.
 
 from __future__ import annotations
 
+import math
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -24,7 +25,14 @@ import bpy
 import build_masters
 
 COLOR_SPACES = {"srgb_texture": "sRGB", "lin_rec709": "Non-Color", None: "Non-Color"}
-DATA_ROLES = ("roughness", "metalness", "normal")
+# per-article texture roles (the assembler's <role>_tex / <role>_const) -> the master socket;
+# a role is wired only where the article's master has the socket
+ROLES = (("base_color", "Base Color"), ("roughness", "Roughness"), ("metalness", "Metalness"),
+         ("normal", "Normal Map"), ("layer2_base_color", "Layer 2 Base Color"),
+         ("layer2_roughness", "Layer 2 Roughness"), ("layer2_metalness", "Layer 2 Metalness"),
+         ("layer2_normal", "Layer 2 Normal Map"), ("opacity", "Opacity"))
+DATA_ROLES = ("roughness", "metalness", "normal", "layer2_roughness", "layer2_metalness",
+              "layer2_normal", "opacity")
 
 
 def _floats(text: str | None) -> list[float]:
@@ -124,8 +132,9 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
         place.inputs["uv_rotation"].default_value = ports["uv_rotation"][0]
 
     y = 400
-    for role, socket in (("base_color", "Base Color"), ("roughness", "Roughness"),
-                         ("metalness", "Metalness"), ("normal", "Normal Map")):
+    for role, socket in ROLES:
+        if socket not in master.inputs:
+            continue
         if role in art.textures:
             file, cs = art.textures[role]
             img = bpy.data.images.load(str(file), check_existing=True)
@@ -137,9 +146,9 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
             tex.location = (-300, y)
             L(place.outputs["UV"], tex.inputs["Vector"])
             L(tex.outputs["Color"], master.inputs[socket])
-        elif role in art.consts:
-            v = art.consts[role]
-            master.inputs[socket].default_value = _rgba(v) if role == "base_color" else v[0]
+        elif role in art.consts or (role.startswith("layer2_") and role in ports):
+            v = art.consts.get(role) or ports[role]     # layer 2's consts are author-tier ports
+            master.inputs[socket].default_value = _rgba(v) if role.endswith("base_color") else v[0]
         elif role == "base_color" and "base_color" in art.shader:
             master.inputs[socket].default_value = _rgba(art.shader["base_color"])
         elif role == "roughness" and "specular_roughness" in art.shader:
@@ -185,4 +194,34 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
         master.inputs["Specular Weight"].default_value = art.shader["specular_weight"][0]
     if "base_weight" in art.shader and art.shader["base_weight"][0] != 1.0:
         raise NotImplementedError(f"{art.name}: base_weight != 1 is not mapped yet")
+
+    # author-tier ports (lane B) and lane-A shader values, wherever the master has the socket
+    for port in ("layer_blend_balance", "layer_blend_contrast", "opacity_cutoff"):
+        if port in ports and port in master.inputs:
+            master.inputs[port].default_value = ports[port][0]
+    sh = art.shader
+    lane_a = {"emission_color": ("Emission Color", _rgba), "emission_luminance": ("Emission Luminance", None),
+              "transmission_weight": ("Transmission Weight", None),
+              "transmission_color": ("Transmission Color", _rgba),
+              "subsurface_weight": ("Subsurface Weight", None), "subsurface_color": ("Subsurface Color", _rgba),
+              "subsurface_radius": ("Subsurface Radius", None),
+              "subsurface_radius_scale": ("Subsurface Radius Scale", tuple)}
+    for key, (socket, conv) in lane_a.items():
+        if key in sh and socket in master.inputs:
+            master.inputs[socket].default_value = conv(sh[key]) if conv else sh[key][0]
+    if "Absorption" in master.inputs:
+        # OpenPBR thick: transmission_color is what is left after transmission_depth of
+        # travel (Beer-Lambert), so sigma = -ln(color) / depth, per channel; the SURFACE is
+        # untinted (the colour lives in the volume)
+        tc = sh.get("transmission_color", [1.0, 1.0, 1.0])
+        depth = sh.get("transmission_depth", [0.0])[0]
+        sigma = [(-math.log(max(c, 1e-4)) / depth) if depth > 0 else 0.0 for c in tc]
+        master.inputs["Absorption"].default_value = tuple(sigma)
+        master.inputs["Transmission Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+        L(master.outputs["Volume"], out.inputs["Volume"])
+    if "geometry_thin_walled" in sh:
+        thin = sh["geometry_thin_walled"][0] > 0.5
+        want = art.master == "TranslucentThin"
+        if art.master.startswith("Translucent") and thin != want:
+            raise ValueError(f"{art.name}: geometry_thin_walled={thin} contradicts master {art.master}")
     return mat

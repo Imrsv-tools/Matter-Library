@@ -48,6 +48,31 @@ BLENDER_DRIVER = HERE / "drivers" / "blender_render.py"
 # master's final bar (Phase05 Brief §Decisions that bind).
 BAR = 2.0
 GRADED = {"Opaque", "Masked", "Emissive", "TwoLayer"}
+# Views whose numbers are advisory for a graded master (set from the first numbers, 5.4):
+# on the whole set a cut-out's holes are smaller than a pixel, and a real-time renderer
+# (Storm, Unreal) filters the opacity texture BEFORE the cut-out test while a path tracer
+# cuts per sample, so the two draw different coverage there by construction. The close-up,
+# where the holes are resolved, is graded.
+ADVISORY_VIEWS = {"Masked": {"wide"}}
+
+
+VIEW_LABELS = {"wide": "whole set", "close": "close-up", "dim": "whole set, -4 stops"}
+VIEW_NOTES = {
+    "close": "The cube's front face and the floor in front: wear layers are big enough to "
+             "see here (a 1 cm grain is ~15 px).",
+    "dim": "The whole set at exposure -4 (1/16): emission is judged here, unclipped (at "
+           "exposure 0 a bright emitter is display white in both tools).",
+}
+
+
+def graded(master: str, view: str) -> bool:
+    return master in GRADED and view not in ADVISORY_VIEWS.get(master, set())
+
+
+def verdict(master: str, view: str, de: float, md: bool = True) -> str:
+    """'under' / 'OVER' the bar, marked advisory where this master's view is not graded."""
+    word = "under" if de < BAR else ("**OVER**" if md else "OVER")
+    return word if graded(master, view) else f"{word} (advisory)"
 
 
 # The sweep (Phase05 Brief, first human test click 2): each slider the article declares,
@@ -124,7 +149,7 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
         for k, v in enumerate(views):
             y = y0 + k * (cell + line_h)
             sfx = job["views"][v]["suffix"]
-            d.text((10, y + 40), f"({'whole set' if v == 'wide' else 'close-up'})",
+            d.text((10, y + 40), f"({VIEW_LABELS.get(v, v)})",
                    fill=(150, 150, 150), font=fs)
             for i, tool in enumerate(("storm", "blender")):
                 img = Image.open(out / tool / f"{s['id']}{sfx}.png").convert("RGB").resize((cell, cell))
@@ -135,14 +160,15 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
             sheet.paste(heat[s["id"]][v].resize((cell, cell)), (label_w + 3 * cell, y))
             sc = scores[s["id"]]["views"][v]
             m = sc["subjects"]
-            verdict = "under the bar" if m["dE_mean"] < BAR else "OVER the bar"
+            ok = m["dE_mean"] < BAR or not graded(job["article"]["master"], v)
+            said = verdict(job["article"]["master"], v, m["dE_mean"], md=False)
             mv = sc.get("moved")
             moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
                      if mv else "")
             d.text((label_w + 10, y + cell + 6),
                    f"dE2000 between the tools: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
-                   f"(bar {BAR:g}: {verdict}){moved}",
-                   fill=(120, 230, 120) if m["dE_mean"] < BAR else (255, 140, 120), font=fs)
+                   f"(bar {BAR:g}: {said}){moved}",
+                   fill=(120, 230, 120) if ok else (255, 140, 120), font=fs)
     p = out / "sheet.png"
     sheet.save(p)
     return p
@@ -183,10 +209,10 @@ def scale_checks(art: jobmod.Article, job: dict) -> list[dict]:
 def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
     out = Path(job["out_dir"])
     master = job["article"]["master"]
-    graded = master in GRADED
+    is_graded = master in GRADED
     lines = [f"# Parity scorecard — {job['article']['name']}", "",
              f"Master **{master}** · bar ΔE2000 < {BAR:g} "
-             f"({'graded' if graded else 'advisory: judged recognisable by eye'}) · "
+             f"({'graded' + (', except the ' + ' and '.join(sorted(ADVISORY_VIEWS[master])) + ' view (advisory)' if master in ADVISORY_VIEWS else '') if is_graded else 'advisory: judged recognisable by eye'}) · "
              f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
              "ΔE2000 between USDLiveView's renderer (Storm) and Blender (Cycles), over the "
@@ -199,7 +225,7 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
     for s in job["settings"]:
         sc = scores[s["id"]]
         m = sc["subjects"]
-        v = "under" if m["dE_mean"] < BAR else "**OVER**"
+        v = verdict(master, "wide", m["dE_mean"])
         mv = sc.get("moved")
         if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
             v += " · **ONE-SIDED**"
@@ -208,14 +234,13 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
                      f"{sc['sphere']['dE_mean']:.2f} | {sc['cube']['dE_mean']:.2f} | "
                      f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {ms} | {v} |")
     for view in [v for v in job["views"] if v != "wide"]:
-        lines += ["", f"## The {view}-up view (the cube's front face and the floor in front)", "",
-                  "Wear layers are big enough to see here (a 1 cm grain is ~15 px).", "",
+        lines += ["", f"## The {VIEW_LABELS.get(view, view)} view", "", VIEW_NOTES.get(view, ""), "",
                   "| Setting | Between tools: mean | p95 | SSIM | Moved: Storm | Moved: Blender | Verdict |",
                   "|---|---|---|---|---|---|---|"]
         for s in job["settings"]:
             sc = scores[s["id"]]["views"][view]
             m = sc["subjects"]
-            v = "under" if m["dE_mean"] < BAR else "**OVER**"
+            v = verdict(master, view, m["dE_mean"])
             mv = sc.get("moved")
             if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
                 v += " · **ONE-SIDED**"

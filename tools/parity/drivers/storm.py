@@ -71,14 +71,35 @@ def render_setting(scene: str, png: Path, width: int, camera: str) -> None:
 
 
 def run(job_path: Path) -> list[Path]:
+    """Render every setting and view; supersampled by ``job["storm_supersample"]``.
+
+    usdrecord renders one sample per pixel (no anti-aliasing), where USDLiveView on screen
+    and Cycles' 128 samples both smooth edges. Unsupersampled, a cut-out (Lace) measured
+    6.43 against Blender on the whole set and 2.55 close up, almost all of it hard, jagged
+    hole edges; rendered at 4x and box-filtered down, 3.62 and 1.69 (Phase05 5.4).
+    """
     job = json.loads(job_path.read_text(encoding="utf-8"))
     out = Path(job["out_dir"]) / TOOL
+    ss = int(job.get("storm_supersample", 1))
     pngs = []
     views = job.get("views") or {"wide": {"camera": job["camera"], "suffix": ""}}
     for s in job["settings"]:
         for v in views.values():
             png = out / f"{s['id']}{v['suffix']}.png"
-            render_setting(s["scene"], png, job["width"], v["camera"])
+            scene = s["scene"]
+            if v.get("exposure"):
+                # the view's exposure, on the USD camera (Storm honours `exposure`)
+                cam = v["camera"].rsplit("/", 1)[1]
+                wrap = Path(scene).with_name(f"{s['id']}{v['suffix']}.usda")
+                wrap.write_text("#usda 1.0\n(\n    subLayers = [@./" + Path(scene).name + "@]\n)\n\n"
+                                f'over "World"\n{{\n    over "{cam}"\n    {{\n'
+                                f'        float exposure = {v["exposure"]}\n    }}\n}}\n',
+                                encoding="utf-8")
+                scene = str(wrap)
+            render_setting(scene, png, job["width"] * ss, v["camera"])
+            if ss > 1:
+                Image.open(png).convert("RGB").resize(
+                    (job["width"], job["width"]), Image.Resampling.BOX).save(png)
             pngs.append(png)
     return pngs
 

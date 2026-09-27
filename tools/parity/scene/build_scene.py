@@ -147,11 +147,43 @@ def rounded_cube():
     return pts, nrm, uvs, idx
 
 
+FLOOR_DEPTH = 0.02
+
+
 def floor():
-    s = FLOOR / 2
-    pts = [(-s, 0.0, s), (s, 0.0, s), (s, 0.0, -s), (-s, 0.0, -s)]
-    uvs = [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, FLOOR), (0.0, FLOOR)]
-    return pts, [(0.0, 1.0, 0.0)] * 4, uvs, [(0, 1, 2, 3)]
+    """A 1 m x 1 m slab, FLOOR_DEPTH thick, its top face at y = 0.
+
+    A closed solid, not a plane: a volume (TranslucentThick's absorption) or subsurface
+    scattering on an open plane is ill-defined in a path tracer, and Cycles drew a single-
+    plane floor opaque white (Diamond) and dark grey (Marble) (5.4). The top face keeps the
+    plane's st, so the ruler check and Storm's picture are unchanged.
+    """
+    s, d = FLOOR / 2, FLOOR_DEPTH
+    pts, nrm, uvs, idx = [], [], [], []
+
+    def quad(corners, n, st):
+        b = len(pts)
+        pts.extend(corners)
+        nrm.extend([n] * 4)
+        uvs.extend(st)
+        idx.append((b, b + 1, b + 2, b + 3))
+
+    # top (+Y), wound CCW seen from above; st as the plane had it
+    quad([(-s, 0.0, s), (s, 0.0, s), (s, 0.0, -s), (-s, 0.0, -s)], (0.0, 1.0, 0.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, FLOOR), (0.0, FLOOR)])
+    # bottom (-Y)
+    quad([(-s, -d, -s), (s, -d, -s), (s, -d, s), (-s, -d, s)], (0.0, -1.0, 0.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, FLOOR), (0.0, FLOOR)])
+    # sides: front (+Z), back (-Z), right (+X), left (-X); st in metres along the edge
+    quad([(-s, -d, s), (s, -d, s), (s, 0.0, s), (-s, 0.0, s)], (0.0, 0.0, 1.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, d), (0.0, d)])
+    quad([(s, -d, -s), (-s, -d, -s), (-s, 0.0, -s), (s, 0.0, -s)], (0.0, 0.0, -1.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, d), (0.0, d)])
+    quad([(s, -d, s), (s, -d, -s), (s, 0.0, -s), (s, 0.0, s)], (1.0, 0.0, 0.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, d), (0.0, d)])
+    quad([(-s, -d, -s), (-s, -d, s), (-s, 0.0, s), (-s, 0.0, -s)], (-1.0, 0.0, 0.0),
+         [(0.0, 0.0), (FLOOR, 0.0), (FLOOR, d), (0.0, d)])
+    return pts, nrm, uvs, idx
 
 
 def wall():

@@ -31,6 +31,8 @@ MATERIALS = REPO / "MatterLibrary" / "materials"
 sys.path.insert(0, str(HERE / "scene"))
 import build_scene  # noqa: E402
 
+STORM_SUPERSAMPLE = 4
+
 USD_TYPES = {"float": "float", "vector2": "float2", "color3": "color3f", "color4": "color4f",
              "vector3": "float3", "integer": "int", "boolean": "bool"}
 
@@ -121,6 +123,20 @@ def write_setting_scene(art: Article, setting: dict, out: Path) -> Path:
     return out
 
 
+def views_for(master: str) -> dict:
+    """The views a job renders. An Emissive article adds the whole set at -4 stops.
+
+    Emission is judged unclipped: Neon's luminance 12 x its pink is over display white in
+    every channel, so at exposure 0 both tools draw it pure white and "agree" on nothing
+    (5.4). Storm honours the USD camera's `exposure` (measured: the neon reads (225, 95,
+    198) at -4); Blender's view exposure is the same multiply, before the display encode.
+    """
+    views = {v: {"camera": c, "suffix": view_suffix(v)} for v, c in build_scene.CAMERAS.items()}
+    if master == "Emissive":
+        views["dim"] = {"camera": build_scene.CAMERAS["wide"], "suffix": "__dim", "exposure": -4.0}
+    return views
+
+
 def view_suffix(view: str) -> str:
     """The wide view keeps the plain file name; any other view is ``<id>__<view>.png``."""
     return "" if view == "wide" else f"__{view}"
@@ -138,10 +154,13 @@ def write_job(art: Article, settings: list[dict], out_dir: Path, width: int, sam
         "scene": str(SCENE),
         "camera": "/World/Cam",
         # every view is rendered for every setting: <tool>/<id><suffix>.png
-        "views": {v: {"camera": c, "suffix": view_suffix(v)} for v, c in build_scene.CAMERAS.items()},
+        "views": views_for(art.master),
         "subjects": list(build_scene.SUBJECTS),
         "width": width,
         "samples": samples,
+        # Storm renders at width x this and is box-filtered down (it has no anti-aliasing
+        # of its own in usdrecord); Blender's own samples do the same job
+        "storm_supersample": STORM_SUPERSAMPLE,
         "settings": settings,
         "out_dir": str(out_dir),
     }
