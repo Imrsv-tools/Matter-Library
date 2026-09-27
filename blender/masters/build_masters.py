@@ -51,7 +51,7 @@ import math
 
 import bpy
 
-VERSION = 3     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 4     # bump when a group's contents change; ensure_*() rebuilds an older one
 
 OVERLAYS = (1, 2, 3)
 GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
@@ -319,7 +319,9 @@ def _build(name: str, parts: set):
     L(nrm.outputs[0], enc.inputs[0])
     enc.inputs[1].default_value = (0.5, 0.5, 0.5)
     enc.inputs[2].default_value = (0.5, 0.5, 0.5)
-    nmap = _node(ng, "ShaderNodeNormalMap", 300, -700, space="TANGENT", uv_map="st")
+    # uv_map "" = the mesh's ACTIVE UV map: a Blender mesh names it "UVMap", a USD import "st",
+    # and a named map the mesh lacks gives Cycles zero UVs (tangents), silently
+    nmap = _node(ng, "ShaderNodeNormalMap", 300, -700, space="TANGENT", uv_map="")
     L(enc.outputs[0], nmap.inputs["Color"])
     L(nmap.outputs["Normal"], bsdf.inputs["Normal"])
 

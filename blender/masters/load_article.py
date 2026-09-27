@@ -131,7 +131,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
     L(master.outputs["BSDF"], out.inputs["BSDF"])
 
     uv = nt.nodes.new("ShaderNodeUVMap")
-    uv.uv_map = "st"
+    uv.uv_map = ""          # the ACTIVE UV map (a Blender mesh's "UVMap", a USD import's "st")
     uv.location = (-900, 0)
     place = nt.nodes.new("ShaderNodeGroup")
     place.node_tree = bpy.data.node_groups["ML_Place2D"]
