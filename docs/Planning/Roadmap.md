@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (Phase05 closed 2026-09-27; Phase06 runs on the UE machine and Phase07 here).*
+### Phase07 — Character Materials — ACTIVE *(discovery opened 2026-09-27; runs here while Phase06 runs on the UE machine)*
+**Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
+- `docs/Planning/Phases/Future/Phase07_CharacterMaterials.md`
 
 ==================================================================================
 ## Future
@@ -23,10 +25,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine, alongside Phase07)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
-
-### Phase07 — Character Materials — SEEDED *(numbered 2026-09-27; runs here after Phase05)*
-**Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
-- `docs/Planning/Phases/Future/Phase07_CharacterMaterials.md`
 
 ### Phase08 — Library Coverage — SEEDED *(renumbered from Phase07, 2026-09-27; its character classes moved to Phase07)*
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
