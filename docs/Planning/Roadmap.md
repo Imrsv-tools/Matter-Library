@@ -19,18 +19,20 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ## Future
 
 > **Re-sequenced 2026-09-26 (lead):** the test rig comes before building materials at volume. Phase05 runs on this machine and is pushed; Phase06 runs on the UE machine; work returns here for Phase07 on. Why: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md`.
+>
+> **Re-sequenced 2026-09-27 (lead):** Character Materials becomes **Phase07** and runs here straight after Phase05, **at the same time as Phase06** on the UE machine. Its materials ship as candidates (uncalibrated) until the Unreal column exists: *"I would rather have everything in and 'uncalibrated' yet then a bunch of magenta."* Library Coverage becomes Phase08. Why: `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md` (CM4).
 
-### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine)*
+### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine, alongside Phase07)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
 
-### Phase07 — Library Coverage — SEEDED *(renumbered from Phase05, 2026-09-26)*
-**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Phases/Future/Phase07_LibraryCoverage.md`
+### Phase07 — Character Materials — SEEDED *(numbered 2026-09-27; runs here after Phase05)*
+**Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
+- `docs/Planning/Phases/Future/Phase07_CharacterMaterials.md`
 
-### Character Materials — SEEDED *(TBD; seeded 2026-09-27 from research CM3; follows Phase07, which builds the first six skins)*
-**Outcome:** a Creator can dress a character from the library: skin with its lips, nails and fine detail, eyes, teeth and hair. It looks right in Blender, a USD viewer and Unreal, on any character.
-- `docs/Planning/Phases/Future/PhaseTBD_CharacterMaterials.md`
+### Phase08 — Library Coverage — SEEDED *(renumbered from Phase07, 2026-09-27; its character classes moved to Phase07)*
+**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+- `docs/Planning/Phases/Future/Phase08_LibraryCoverage.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.

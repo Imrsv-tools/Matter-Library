@@ -25,7 +25,9 @@ It is one thing, the Unreal leg of the rig. It needs a machine with Unreal on it
 **Out:**
 - IMRSV Studio. Our runtime passing shows the materials can work in Unreal, not that Studio matches; Studio gets an occasional spot check.
 - Publishing the masters as a public Unreal package (*Unreal Reference Masters*, later).
-- Building new materials (Phase07).
+- Building new materials (Phase07 Character Materials, which runs here at the same time; Phase08 Library Coverage).
+
+**Coupling with Phase07 (added 2026-09-27, lead re-sequencing CM4):** Phase07 runs while this phase builds the masters. It may add inputs to the Subsurface master (coat, fuzz, scatter anisotropy), a colour channel on layers, and possibly Hair or Eye masters. A packaged app can't compile new shaders, so **pull before building the masters, and read Phase07's rulings first.** A contract change that lands later means rebuilding the package, which the lead accepts.
 
 ## Open questions (settle during this phase)
 
