@@ -23,7 +23,7 @@ Materials are named `Material_Variant_Condition_Detail_sNN_vNN` (for example `Co
 
 ## Using it
 
-- **In Blender (5.1+):** the Asset-Browser library (`blender/asset_library/`) lets you assign Matter materials, and the Matter add-on (`blender/addons/imrsv_lcd_export/`) exports USD in one of two forms: a lightweight one that references the library, or a self-contained portable one.
+- **In Blender (5.1+):** the Asset-Browser library (`blender/asset_library/`) lets you assign Matter materials, and the Matter add-on (`blender/addons/imrsv_lcd_export/`) exports USD in one of two forms: a lightweight one that references the library, or a self-contained portable one. To set it up, add the `blender/asset_library/` folder under *Preferences → File Paths → Asset Libraries* and set that library's **Import Method** to **Append (Reuse Data)**: Blender's default for a new library links the material read-only, which greys out every slider.
 - **In a USD tool:** reference an article by name (`@Name.mtlx@`) and put the library's material folders on the USD search path.
 - **In Unreal-based apps** such as IMRSV: the app installs a release and builds its materials at runtime from a small set of master materials. Target: Unreal 5.8+ with Substrate.
 
