@@ -1,0 +1,78 @@
+{
+  "_comment": "Human skin, Fitzpatrick type V (Phase07 step 7.3). SUBSURFACE: skin's look is light scattering inside it. Topology-free (CM2): a tone plus a tiling micro-surface at real size, so it works on any mesh. Values from Physically Based `Skin V` (albedo, IOR 1.4, roughness 0.5, scatter distance). `subsurface_radius` is in metres (OpenPBR scene units; Learnings/MaterialX M4): Physically Based gives the diffuse mean free path in cm (0.367, 0.137, 0.068), so 3.67 mm red, with the channels over it as the scale. `subsurface_weight` 1.0 and `subsurface_color` = the albedo (judgement): skin is a scattering body throughout, and OpenPBR mixes the diffuse colour towards `subsurface_color` by the weight, so an unset colour (OpenPBR's light grey) would wash the tone out. The shared `Skin_Pores` micro-surface (pores and furrows at a 1 cm tile) is the article's OWN normal and roughness, not a wear overlay: an overlay ships at 0 (C1) and would leave the skin plastic by default. Wear layers at 0 (C1): scratches (overlay 1, damage) and dust/dirt (overlay 2).",
+  "name": "Skin_FitzpatrickV_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Skin_FitzpatrickV_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_const": "0.283, 0.148, 0.079",
+  "roughness_tex": "../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
+  "normal_tex": "../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_color": "0.283, 0.148, 0.079",
+  "subsurface_radius": 0.00367,
+  "subsurface_radius_scale": "1, 0.373, 0.185",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.1,
+  "coat_roughness": 0.3,
+  "coat_ior": 1.5,
+  "fuzz_weight": 0.1,
+  "fuzz_color": "0.283, 0.148, 0.079",
+  "fuzz_roughness": 0.5,
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Skin V",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.283, 0.148, 0.079",
+        "metalness_const": 0,
+        "roughness_const": 0.5,
+        "specular_ior": 1.4,
+        "subsurface_radius": 0.00367,
+        "subsurface_radius_scale": "1, 0.373, 0.185"
+      },
+      "note": "roughness 0.5 is the MEAN of the Skin_Pores roughness map"
+    },
+    {
+      "kind": "judgement",
+      "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone."
+    },
+    {
+      "kind": "judgement",
+      "why": "Phase07 7.3. Coat 0.1 at roughness 0.3 is MPFB2's 'enhanced skin' clearcoat (skin oil; CC0 shader settings, research Pass 3); coat_ior 1.5 is the value MPFB2 inherits from Blender (sebum is ~1.47). subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_skin_pores.py",
+      "provenance": "library/provenance/sources/base/biological/tissue/Skin_Pores.yaml"
+    }
+  ]
+}

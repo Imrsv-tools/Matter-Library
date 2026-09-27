@@ -54,10 +54,14 @@ TAXONOMY = {
 
 # G6 — physical ranges. Colours are linear reflectances/transmittances; an IOR outside
 # [1, 3] is no common solid or liquid (diamond is 2.42). Emission is not bounded.
-UNIT_COLOURS = ("base_color_const", "layer2_base_color", "transmission_color", "subsurface_color")
+UNIT_COLOURS = ("base_color_const", "layer2_base_color", "transmission_color", "subsurface_color",
+                "coat_color", "fuzz_color")
 UNIT_FLOATS = ("roughness_const", "metalness_const", "transmission", "subsurface_weight",
                "opacity_cutoff", "layer_blend_balance", "layer_blend_contrast",
-               "layer2_roughness", "layer2_metalness")
+               "layer2_roughness", "layer2_metalness",
+               "coat_weight", "coat_roughness", "fuzz_weight", "fuzz_roughness")
+SIGNED_UNIT_FLOATS = ("subsurface_scatter_anisotropy",)     # [-1, 1]
+IOR_KEYS = ("specular_ior", "coat_ior")
 IOR_RANGE = (1.0, 3.0)
 # G6 is waived where unphysical is the point: the system fallback (magenta) and the
 # utility/virtual references (the UV grid).
@@ -161,8 +165,12 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
         for k in UNIT_FLOATS:
             if k in d and not 0.0 <= d[k] <= 1.0:
                 errs.append(f"G6 {k} = {d[k]}: must be in [0, 1]")
-        if "specular_ior" in d and not IOR_RANGE[0] <= d["specular_ior"] <= IOR_RANGE[1]:
-            errs.append(f"G6 specular_ior = {d['specular_ior']}: outside {list(IOR_RANGE)}")
+        for k in SIGNED_UNIT_FLOATS:
+            if k in d and not -1.0 <= d[k] <= 1.0:
+                errs.append(f"G6 {k} = {d[k]}: must be in [-1, 1]")
+        for k in IOR_KEYS:
+            if k in d and not IOR_RANGE[0] <= d[k] <= IOR_RANGE[1]:
+                errs.append(f"G6 {k} = {d[k]}: outside {list(IOR_RANGE)}")
 
     # G7 — layer assignment (and every texture path resolves)
     art_dir = (MATERIALS / d["path"]).parent

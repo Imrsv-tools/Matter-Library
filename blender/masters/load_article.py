@@ -220,7 +220,12 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
               "transmission_color": ("Transmission Color", _rgba),
               "subsurface_weight": ("Subsurface Weight", None), "subsurface_color": ("Subsurface Color", _rgba),
               "subsurface_radius": ("Subsurface Radius", None),
-              "subsurface_radius_scale": ("Subsurface Radius Scale", tuple)}
+              "subsurface_radius_scale": ("Subsurface Radius Scale", tuple),
+              "subsurface_scatter_anisotropy": ("Subsurface Anisotropy", None),
+              "coat_weight": ("Coat Weight", None), "coat_color": ("Coat Color", _rgba),
+              "coat_roughness": ("Coat Roughness", None), "coat_ior": ("Coat IOR", None),
+              "fuzz_weight": ("Fuzz Weight", None), "fuzz_color": ("Fuzz Color", _rgba),
+              "fuzz_roughness": ("Fuzz Roughness", None)}
     for key, (socket, conv) in lane_a.items():
         if key in sh and socket in master.inputs:
             master.inputs[socket].default_value = conv(sh[key]) if conv else sh[key][0]

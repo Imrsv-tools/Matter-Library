@@ -17,7 +17,8 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             + each wear layer's bias + ``roughness_bias``, clamped 0..1
                             (LCDSchema); metalness; up to three wear layers gated by the
                             maskset (MasterSet §Overlay semantic); the normal combined in
-                            TANGENT space and converted once (MasterSet, since 5.3)
+                            TANGENT space and converted once (MasterSet, since 5.3);
+                            OpenPBR coat (-> Coat) and fuzz (-> Sheen), off at weight 0
   TwoLayer                  + a second layer blended by the maskset's R (MasterSet
                             §TwoLayer blend): colour, roughness and metalness mixed, the
                             two normals mixed in tangent space; the tint applies after
@@ -29,7 +30,8 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             is ``transmission_color``
   TranslucentThick          + transmission, Thin Wall off, and absorption inside the
                             volume: sigma = -ln(transmission_color) / transmission_depth
-  Subsurface                + subsurface weight, radius and radius scale
+  Subsurface                + subsurface weight, radius, radius scale and scatter
+                            anisotropy; the Cycles method is ``SUBSURFACE_METHOD``
   ========================  ==========================================================
 
   A Principled BSDF stands in for ``open_pbr_surface`` (both are the OpenPBR model). Two
@@ -51,7 +53,15 @@ import math
 
 import bpy
 
-VERSION = 4     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 5     # bump when a group's contents change; ensure_*() rebuilds an older one
+                # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
+
+# The Subsurface master's Cycles method (Phase07 CM-Q10, measured 2026-09-27 in the rig, ΔE
+# to Storm, whole set): RANDOM_WALK_SKIN serves marble AND skin better than RANDOM_WALK
+# (Blender's default, implicit through Phase05): Marble 2.60 -> 1.82, Skin III 5.64 -> 3.46,
+# Skin I 6.99 -> 3.10 (under RANDOM_WALK its forward scatter turned a light skin grey-green).
+# One setting serves both, so no `Skin` master token (Learnings Blender B8).
+SUBSURFACE_METHOD = "RANDOM_WALK_SKIN"
 
 OVERLAYS = (1, 2, 3)
 GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
@@ -178,7 +188,15 @@ def _sockets(parts: set) -> list:
          ("Specular Weight", "NodeSocketFloat", 1.0),
          ("Maskset", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
          ("Maskset Alpha", "NodeSocketFloat", 1.0),
-         ("maskset_blend", "NodeSocketFloat", 0.0)]
+         ("maskset_blend", "NodeSocketFloat", 0.0),
+         # OpenPBR coat and fuzz (Phase07 7.3), at OpenPBR's defaults: off at weight 0
+         ("Coat Weight", "NodeSocketFloat", 0.0),
+         ("Coat Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+         ("Coat Roughness", "NodeSocketFloat", 0.0),
+         ("Coat IOR", "NodeSocketFloat", 1.6),
+         ("Fuzz Weight", "NodeSocketFloat", 0.0),
+         ("Fuzz Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+         ("Fuzz Roughness", "NodeSocketFloat", 0.5)]
     for n in OVERLAYS:
         s += [(f"Overlay {n}", "NodeSocketColor", (0.5, 0.5, 0.0, 1.0)),
               (f"Overlay {n} Alpha", "NodeSocketFloat", 0.0),
@@ -205,7 +223,8 @@ def _sockets(parts: set) -> list:
         s += [("Subsurface Weight", "NodeSocketFloat", 0.0),
               ("Subsurface Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
               ("Subsurface Radius", "NodeSocketFloat", 1.0),
-              ("Subsurface Radius Scale", "NodeSocketVector", (1.0, 1.0, 1.0))]
+              ("Subsurface Radius Scale", "NodeSocketVector", (1.0, 1.0, 1.0)),
+              ("Subsurface Anisotropy", "NodeSocketFloat", 0.0)]
     return s
 
 
@@ -325,6 +344,16 @@ def _build(name: str, parts: set):
     L(enc.outputs[0], nmap.inputs["Color"])
     L(nmap.outputs["Normal"], bsdf.inputs["Normal"])
 
+    # OpenPBR coat -> Principled Coat (coat_color = Coat Tint: both tint what lies under the
+    # coat). Coat Normal stays unlinked = the geometry normal, as OpenPBR's
+    # geometry_coat_normal defaults to it. OpenPBR fuzz -> Principled Sheen (both a layer of
+    # fine fibres over the rest, lit at grazing angles), on the base's normal as fuzz is.
+    for sock, pin in (("Coat Weight", "Coat Weight"), ("Coat Color", "Coat Tint"),
+                      ("Coat Roughness", "Coat Roughness"), ("Coat IOR", "Coat IOR"),
+                      ("Fuzz Weight", "Sheen Weight"), ("Fuzz Color", "Sheen Tint"),
+                      ("Fuzz Roughness", "Sheen Roughness")):
+        L(gi.outputs[sock], bsdf.inputs[pin])
+
     if "opacity" in parts:
         # the article's ifgreatereq: opacity >= cutoff -> 1, else 0  (== 1 - (opacity < cutoff))
         lt = _math(ng, "LESS_THAN", 300, 450)
@@ -351,6 +380,8 @@ def _build(name: str, parts: set):
         L(gi.outputs["Subsurface Weight"], bsdf.inputs["Subsurface Weight"])
         L(gi.outputs["Subsurface Radius Scale"], bsdf.inputs["Subsurface Radius"])
         L(gi.outputs["Subsurface Radius"], bsdf.inputs["Subsurface Scale"])
+        L(gi.outputs["Subsurface Anisotropy"], bsdf.inputs["Subsurface Anisotropy"])
+        bsdf.subsurface_method = SUBSURFACE_METHOD
         base = _lerp_color(ng, base, gi.outputs["Subsurface Color"],
                            gi.outputs["Subsurface Weight"], 0, 800)
     L(base, bsdf.inputs["Base Color"])

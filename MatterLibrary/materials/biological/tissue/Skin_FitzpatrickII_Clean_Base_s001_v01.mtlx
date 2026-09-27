@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <materialx version="1.39" colorspace="lin_rec709">
-  <nodegraph name="NG_Skin_FitzpatrickIII_Clean_Base_s001_v01">
+  <nodegraph name="NG_Skin_FitzpatrickII_Clean_Base_s001_v01">
     <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
     <input name="uv_scale" type="vector2" value="1.0, 1.0" uiname="UV Scale" />
     <input name="uv_offset" type="vector2" value="0.0, 0.0" uiname="UV Offset" />
@@ -46,7 +46,7 @@
       <input name="in2" type="float" nodename="overlay2_density_mask" />
     </multiply>
     <constant name="base_color_const" type="color3">
-      <input name="value" type="color3" value="0.623, 0.433, 0.343" />
+      <input name="value" type="color3" value="0.799, 0.485, 0.347" />
     </constant>
     <multiply name="base_color_tinted" type="color3">
       <input name="in1" type="color3" nodename="base_color_const" />
@@ -193,27 +193,27 @@
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
   </nodegraph>
-  <open_pbr_surface name="SR_Skin_FitzpatrickIII_Clean_Base_s001_v01" type="surfaceshader">
+  <open_pbr_surface name="SR_Skin_FitzpatrickII_Clean_Base_s001_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
-    <input name="base_color" type="color3" nodegraph="NG_Skin_FitzpatrickIII_Clean_Base_s001_v01" output="base_color_out" />
+    <input name="base_color" type="color3" nodegraph="NG_Skin_FitzpatrickII_Clean_Base_s001_v01" output="base_color_out" />
     <input name="base_metalness" type="float" value="0.0" />
-    <input name="specular_roughness" type="float" nodegraph="NG_Skin_FitzpatrickIII_Clean_Base_s001_v01" output="roughness_out" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Skin_FitzpatrickII_Clean_Base_s001_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.4" />
-    <input name="geometry_normal" type="vector3" nodegraph="NG_Skin_FitzpatrickIII_Clean_Base_s001_v01" output="normal_out" />
+    <input name="geometry_normal" type="vector3" nodegraph="NG_Skin_FitzpatrickII_Clean_Base_s001_v01" output="normal_out" />
     <input name="subsurface_weight" type="float" value="1.0" />
-    <input name="subsurface_color" type="color3" value="0.623, 0.433, 0.343" />
+    <input name="subsurface_color" type="color3" value="0.799, 0.485, 0.347" />
     <input name="subsurface_radius" type="float" value="0.00482" />
-    <input name="subsurface_radius_scale" type="color3" value="1.0, 0.351, 0.226" />
+    <input name="subsurface_radius_scale" type="color3" value="1, 0.351, 0.226" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
     <input name="coat_weight" type="float" value="0.1" />
     <input name="coat_roughness" type="float" value="0.3" />
     <input name="coat_ior" type="float" value="1.5" />
     <input name="fuzz_weight" type="float" value="0.1" />
-    <input name="fuzz_color" type="color3" value="0.623, 0.433, 0.343" />
+    <input name="fuzz_color" type="color3" value="0.799, 0.485, 0.347" />
     <input name="fuzz_roughness" type="float" value="0.5" />
   </open_pbr_surface>
-  <surfacematerial name="Skin_FitzpatrickIII_Clean_Base_s001_v01" type="material">
-    <input name="surfaceshader" type="surfaceshader" nodename="SR_Skin_FitzpatrickIII_Clean_Base_s001_v01" />
+  <surfacematerial name="Skin_FitzpatrickII_Clean_Base_s001_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Skin_FitzpatrickII_Clean_Base_s001_v01" />
   </surfacematerial>
   <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
     <output name="out" type="string" />

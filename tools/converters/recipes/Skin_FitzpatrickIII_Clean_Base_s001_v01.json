@@ -17,6 +17,13 @@
   "subsurface_color": "0.623, 0.433, 0.343",
   "subsurface_radius": 0.00482,
   "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.1,
+  "coat_roughness": 0.3,
+  "coat_ior": 1.5,
+  "fuzz_weight": 0.1,
+  "fuzz_color": "0.623, 0.433, 0.343",
+  "fuzz_roughness": 0.5,
   "overlays": [
     {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density"}
@@ -27,6 +34,7 @@
      "used": {"base_color_const": "0.623, 0.433, 0.343", "metalness_const": 0, "roughness_const": 0.5, "specular_ior": 1.4, "subsurface_radius": 0.00482, "subsurface_radius_scale": "1, 0.351, 0.226"},
      "note": "roughness 0.5 is the MEAN of the Skin_Pores roughness map"},
     {"kind": "judgement", "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone."},
+    {"kind": "judgement", "why": "Phase07 7.3. Coat 0.1 at roughness 0.3 is MPFB2's 'enhanced skin' clearcoat (skin oil; CC0 shader settings, research Pass 3); coat_ior 1.5 is the value MPFB2 inherits from Blender (sebum is ~1.47). subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."},
     {"kind": "procedural", "script": "tools/converters/base/gen_skin_pores.py", "provenance": "library/provenance/sources/base/biological/tissue/Skin_Pores.yaml"}
   ]
 }

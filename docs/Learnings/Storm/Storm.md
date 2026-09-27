@@ -20,3 +20,5 @@
 **S6 — The USD camera's `exposure` attribute IS honoured** (a multiply by 2^exposure before the display encode). That's the way to judge a bright emitter unclipped: at exposure 0, luminance 12 is display white in every channel.
 
 **S7 — See-through is transparency, not refraction.** Storm uses MaterialX's opacity method for `transmission` (it says so, to keep pre-1.38.5 behaviour). What is behind shows through **unbent** but **tinted per channel** by `transmission_color`. At a high IOR (diamond), the Fresnel-reflected sky dominates and the object reads as smoky grey.
+
+**S8 — `subsurface_scatter_anisotropy` is ignored.** *(Phase07 7.3, 2026-09-27.)* Skin at 0.8 and at 0 gives the same Storm picture (mean subject colour moves by 0.1 of 255), while Cycles' random walk honours it. On Skin I, anisotropy adds about 1.2 to the rig's ΔE between the tools (1.90 → 3.10 under Blender's `RANDOM_WALK_SKIN`; it was 2.0 → 7.0 under `RANDOM_WALK`, Blender B8). Coat and fuzz are honoured in both (2.7 with both on). **So a Subsurface article's ΔE is not a regression when it authors anisotropy:** the article is correct OpenPBR, and the viewer approximates, as with S7.

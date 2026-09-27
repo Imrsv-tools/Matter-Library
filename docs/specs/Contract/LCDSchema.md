@@ -50,6 +50,16 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 *Consumer-side (IMRSV): the same carriers' wire-field, runtime-domain, Unreal material-instance parameter and Unreal pin names for each master — see [Consumers](../Consumers.md).*
 
+**Optional lane-A carriers — coat, fuzz and scatter anisotropy** *(added 2026-09-27, Phase07 step 7.3; additive)*. Real `open_pbr_surface` inputs under their OpenPBR names, so they take lane A like every value above. None defines a master: they are the optional params [MasterSet](../Ontology/MasterSet.md) row 1 already names (*"sheen, clearcoat"*), which skin needs (an oily sheen, a fine grazing-angle fuzz, forward scatter). **An article authors each only when it sets it**, so an article that sets none of them is byte-identical to before, and a consumer that does not read one renders that article exactly as before.
+
+| Carrier | Producer input(s) (OpenPBR) | Masters | Blender master socket → Principled BSDF |
+|---|---|---|---|
+| **Coat** | `coat_weight` · `coat_color` · `coat_roughness` · `coat_ior` | any | `Coat Weight` · `Coat Color` → **Coat Tint** · `Coat Roughness` · `Coat IOR` |
+| **Fuzz** | `fuzz_weight` · `fuzz_color` · `fuzz_roughness` | any | `Fuzz Weight` / `Fuzz Color` / `Fuzz Roughness` → **Sheen** Weight / Tint / Roughness |
+| **Scatter anisotropy** | `subsurface_scatter_anisotropy` *(−1…1; > 0 = forward)* | Subsurface | `Subsurface Anisotropy` *(Blender honours 0…1, random-walk methods only)* |
+
+Defaults are OpenPBR's (weight 0; coat IOR 1.6; fuzz roughness 0.5). The coat sits on the **geometry** normal, not the article's normal map, as OpenPBR's `geometry_coat_normal` defaults to it. *Consumer-side:* an Unreal master gains the matching parameters when it is built (Phase06), and IMRSV's extractor must read them to show them ([PlatformDependencies](../../Planning/PlatformDependencies.md) M1).
+
 ⭐ **`geometry_thin_walled` is the OpenPBR thin-vs-thick discriminator** — it is what makes TranslucentThick *not* TranslucentThin **at the producer**. Without it the two masters are the same material described twice.
 
 *Consumer-side (IMRSV): the Unreal material-instance naming rule (snake_case reserved for the Creator ports, PascalCase for every author-tier parameter — the tier boundary made visible) — see [Consumers](../Consumers.md).*
@@ -162,3 +172,4 @@ The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_
 - 2026-07-14: the render-role overlay rows were corrected from sRGB albedo to linear data, after the assembler had mixed overlay bitmaps over base colour because of the wrong annotation.
 - 2026-07-14: emissive colour as a Creator control was raised as a product question and left open rather than reopening the frozen vocabulary.
 - 2026-09-24: the Carrier rule was corrected to require the connection from the article's nodegraph (Matter-Library#1), after a generic USD viewer showed every Creator tuning was inert outside the one consumer that read the Material input directly. In the same change, the UV ports were stated as MaterialX `place2d` semantics and the articles began clamping the biased roughness to [0, 1], both on lead rulings that the article's MaterialX meaning is the contract every consumer matches. No port name, type, op or range changed.
+- 2026-09-27: the optional lane-A carriers coat, fuzz and scatter anisotropy were added to the author tier (Phase07 step 7.3), for skin. Additive: every existing article assembles byte-identically, and the Creator vocabulary is untouched.

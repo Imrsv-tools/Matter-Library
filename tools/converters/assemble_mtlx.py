@@ -151,6 +151,17 @@ class MaterialSpec:
     subsurface_color: Optional[str] = None        # color3
     subsurface_radius: Optional[float] = None     # float — the length scale
     subsurface_radius_scale: Optional[str] = None  # color3 — per-channel MFP multiplier
+    subsurface_scatter_anisotropy: Optional[float] = None  # -1..1; >0 = forward (skin, Phase07)
+    # coat and fuzz (Phase07 7.3): OpenPBR layers any master may carry (MasterSet: sheen and
+    # clearcoat are Opaque params). Each is authored only when set, so an article that sets
+    # none of them assembles byte-identically to before (the determinism lane).
+    coat_weight: Optional[float] = None
+    coat_color: Optional[str] = None              # color3 — the coat's tint of what lies under it
+    coat_roughness: Optional[float] = None
+    coat_ior: Optional[float] = None
+    fuzz_weight: Optional[float] = None
+    fuzz_color: Optional[str] = None              # color3
+    fuzz_roughness: Optional[float] = None
 
     # --- Author tier, Lane B: no OpenPBR input exists -> named interface inputs ---
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
@@ -671,6 +682,14 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(shader, "subsurface_radius", "float", value=spec.subsurface_radius)
     if spec.subsurface_radius_scale is not None:
         _add_input(shader, "subsurface_radius_scale", "color3", value=spec.subsurface_radius_scale)
+    # Phase07 7.3 — lane A, OpenPBR's own names, each only when the spec sets it
+    for key, typ in (("subsurface_scatter_anisotropy", "float"),
+                     ("coat_weight", "float"), ("coat_color", "color3"),
+                     ("coat_roughness", "float"), ("coat_ior", "float"),
+                     ("fuzz_weight", "float"), ("fuzz_color", "color3"),
+                     ("fuzz_roughness", "float")):
+        if getattr(spec, key) is not None:
+            _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:
         _add_input(shader, "emission_luminance", "float", value=spec.emission_luminance)
         _add_input(shader, "emission_color", "color3", value=spec.emission_color)
