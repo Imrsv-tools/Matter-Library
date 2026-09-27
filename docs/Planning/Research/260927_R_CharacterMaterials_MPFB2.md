@@ -1,6 +1,6 @@
 # Research — Character materials: bringing MPFB2 / MakeHuman into the Matter Library
 
-**Opened:** 2026-09-27 · **Mode:** research. It gathers and commits to nothing. **Next:** a lead pass on the questions in §Open questions (CM-Q1 to CM-Q4 decide the shape; the rest can wait), then either a Phase07 tranche or a phase of its own (CM-Q7).
+**Opened:** 2026-09-27 · **Mode:** research. It gathers and commits to nothing. **Ruled so far:** CM1 (a `biological` Domain), CM2 (substance in Matter, fit beside it). **Next:** CM-Q7, a Phase07 tranche or a phase of its own (§Status).
 
 **Question (lead, 2026-09-27, condensed):** the IMRSV platform is starting on characters, using MPFB2 (the MakeHuman plugin for Blender) and its asset library to seed and test. "We need to convert those materials into our library concept, find a home for them in the ontology… these will be different than the other materials, as they will likely be more complex, especially with skins. That is OK… if you have a better solution for anything that fits with our matter philosophy and still ends up with great results, I'm up for it."
 
@@ -12,7 +12,10 @@
 
 ## Resolved — lead decisions
 
-*(None yet. This section collects the rulings from §Open questions as they are made.)*
+| # | Decision |
+|---|---|
+| CM1 | **Character matter lives in a new `biological` Domain** (lead, 2026-09-27: *"biological domain and the split — go with both"*). It carries the classes recommended in Pass 7, `tissue` / `keratin` / `bone`; confirm the class list at discovery. Plant matter stays in `natural/wood` and `environmental/vegetation`. `Taxonomy.md` is not edited by this research: the Domain lands when a phase builds the first article in it. Answers CM-Q1. |
+| CM2 | **The split: substance in Matter, fit beside it** (same ruling). Skin, lips, nails, eye tissues, enamel, mucosa and hair fibre are Matter articles that work on any mesh. The hm08-bound layer (region masks, photo detail, card and garment atlases) is a **fit set**, outside the taxonomy; where it lives is still CM-Q6. MPFB2's library is **mined** for values, masks and reference atlases, not ported file-for-file (Pass 8b). Answers CM-Q2. |
 
 ---
 
@@ -195,7 +198,74 @@ In the order it could happen:
 
 Domain and Class are **folder-only** (`Taxonomy.md`), so any of these can be changed later without renaming an article. Adding classes is semver-minor. **Adding a Domain is not covered by today's growth model**, so it is a lead call either way.
 
-**Recommendation: option 1, `biological`**, with `tissue` / `keratin` / `bone`. The **fit sets** (6b) go to the Realm idea or to the character package, **never** into a Domain.
+**Recommendation: option 1, `biological`**, with `tissue` / `keratin` / `bone`. The **fit sets** (6b) go to the Realm idea or to the character package, **never** into a Domain. **→ Ruled 2026-09-27: CM1.**
+
+## Pass 8 — The lead's two follow-ups (2026-09-27)
+
+**Asked, verbatim:** *"should we consider a new master material for skin or will we have the controls we need to make SubSurfaceScattering and other realism effect work? Is the approach that we would move MH materials into our library, refine them so they are good in MaterialX and then make NEW blender and UE versions that then Blender would consume OUR version?"*
+
+### 8a — A Skin master? Not on the graph side. Possibly on the settings side, so measure it.
+
+`MasterSet.md` defines a master as **a graph plus a settings block**. It justifies a new master only where a renderer that partitions shader space forces one. So the question splits in two.
+
+**The graph: the Subsurface master can carry skin once three inputs are added.** Measured 2026-09-27: `subsurface_weight` / `_color` / `_radius` / `_radius_scale` are carried by the recipe schema, the assembler (`assemble_mtlx.py`, lane A) and the Blender proxy. What skin's realism needs, and where each piece lands:
+
+| Effect | Where it lives | Today | Master needed? |
+|---|---|---|---|
+| Light bleeding through skin (colour + per-channel distance) | `subsurface_*` (OpenPBR) | ✅ carried | no |
+| Forward scattering | `subsurface_scatter_anisotropy` | ✗ not carried | no, add a lane-A input |
+| Skin-oil sheen (a second specular lobe) | `coat_weight` / `coat_roughness` / `coat_ior` | planned carrier **C2**, not built | no |
+| Peach fuzz (vellus hair) at grazing angles | `fuzz_weight` / `fuzz_color` / `fuzz_roughness` | ✗ not carried, not planned | no, add a lane-A input |
+| Skin's specular level (IOR ≈ 1.4) | `specular_ior` | ✅ carried | no |
+| Pores and fine lines (micro-normal + roughness) | an **overlay** at `s0001`/`s001` | ✅ mechanism exists; the layer has to be generated | no |
+| Region tone, freckles, makeup | a layer that adds colour | ✗ forbidden by the modulator rule (**CM-Q5**) | no; a contract change, not a master |
+| Cavity / specular occlusion in creases | OpenPBR has no specular-occlusion input | open: fold into roughness/specular, or a fit-set map | no |
+| Expression wrinkles | a wrinkle overlay whose `overlayN_density` the consumer drives from the face expression | the port exists; the drive is consumer-side | no |
+
+⇒ **No new master for the graph.** Skin needs three more lane-A inputs (scatter anisotropy, coat, fuzz; coat was already planned as C2), plus the CM-Q5 colour-layer ruling. All of them are additive.
+
+**The settings: this is where a Skin master could still be justified, and it should be decided on rendered evidence.**
+- **Blender:** the Principled BSDF picks a subsurface **method** per material: Christensen-Burley, Random Walk, or Random Walk (Skin). *(From knowledge; not re-verified this pass.)* Our proxy sets none, so Blender's default applies.
+- **Unreal:**
+  - Its legacy model has a cheap wrap-style `Subsurface` shading model and a separate skin-grade `Subsurface Profile` model. That is a real shader-space partition.
+  - Under Substrate (the R15 target), a slab takes its scatter distances per pixel, with an optional profile. Whether the scattering *type* is a static, per-material choice there is **unverified**.
+- **USD viewers:** one model, approximated. Decision of record 9 already sets their bar for subsurface at "recognisable".
+
+⇒ **Recommendation (CM-Q10):**
+- Raise the Subsurface master's settings intent to **diffusion-grade** for every subsurface article (marble, jade, wax, milk, skin).
+- Then render **Marble and one skin** in the Phase05 rig, and Phase06's once it exists, under each candidate setting.
+- **If one settings block serves both, keep one master.** If skin needs a setting that makes marble wrong (for example Blender's skin-specific random walk, or a profile asset in Unreal), add a **`Skin` master token**. Adding a token is additive, so it is semver-minor.
+- Either way, **eyes and hair**, not skin, are the likelier new masters (CM-Q3 / CM-Q4).
+
+**A parity gap found while checking (Blender).**
+- `tools/generators/matter_proxy.py`'s Subsurface branch sets only `Subsurface Weight` and `Subsurface Radius` (× scale). It sets no method, anisotropy, coat or fuzz.
+- Blender's current Principled BSDF also has **no separate subsurface colour**: it scatters the base colour. *(From knowledge; check at the build.)* So an article whose `subsurface_color` differs from its base colour renders one way in MaterialX and another in Blender.
+- ⇒ **Rule for skin articles, to stay LCD-true:** leave `subsurface_color` equal to the base colour, or unset, and express the skin's reddish scatter through `subsurface_radius_scale` (Physically Based's `(0.482, 0.169, 0.109)` does exactly that).
+
+### 8b — The pipeline: yes, with three corrections
+
+**The shape the lead describes is the library's architecture already** (`_Architecture.md` §Key characteristics): "MaterialX is the single source of truth… Blender and Unreal representations are **derived**, never hand-authored as the master." For characters it runs:
+
+```
+MPFB2 / MakeHuman (CC0)          values · shader settings · region masks · reference atlases
+        │  mined, not copied
+        ▼
+recipe (per article) ──► assembler ──► .mtlx (the article; single source of truth)
+        │                                   │
+        │                                   ├─► judged in the rig: Storm · Blender · Unreal, side by side (BP3)
+        │                                   └─► release (manifest · catalog · freeze)
+        ▼
+Blender:  generated MatterLCD_<id> proxy (matter_proxy.py) in the Asset-Browser library
+Unreal:   no per-material asset; the Subsurface reference master + the article's data (Phase06)
+```
+
+1. **We don't move the MakeHuman materials in; we mine them.** The `.mhmat` files hold an albedo map and legacy flags (Pass 3). What we take is MPFB2's CC0 **settings** (roughness per region, pore scale, SSS radii), its **region masks**, and its photo atlases **as fit-set input** (CM2). Every article comes out of a recipe and the assembler, like every other article; none is hand-edited.
+2. **"Good in MaterialX first, then port" becomes "good in all three at once".** BP3: no single renderer is the truth. A skin passes when Storm, Blender and Unreal agree within the Subsurface bar across the slider sweep, and it looks like skin. That is the rig's job.
+3. **There are no hand-made Blender or Unreal versions, but the Blender one has to be *good enough*.**
+   - Blender's version is **generated** from the same recipe (the `MatterLCD_<id>` proxy). Unreal's version is **data** on one reference master per token (Phase06 / *Unreal Reference Masters*); no per-material Unreal asset exists.
+   - **Blender consuming our version** means: MPFB2 generates the body; our Asset-Browser library supplies the skin; it is bound to the body's slots; our exporter writes the character with **Matter identity references**, and the platform resolves them by name. That is the platform's "no bespoke pixels" rule.
+   - **The catch:** MPFB2's own Blender skin shader is richer than our proxy today (8a gap). An artist who swaps MPFB2's skin for ours would see a step down until the proxy generator gains the same inputs. **Extend the proxy in the same unit as the three new carriers**, never after.
+   - Who does the slot binding in the platform's character generator is **platform-side** (an M1 ask).
 
 ---
 
@@ -203,8 +273,8 @@ Domain and Class are **folder-only** (`Taxonomy.md`), so any of these can be cha
 
 | # | Question | Why it matters | Recommendation |
 |---|---|---|---|
-| CM-Q1 | **Ontology home:** a new `biological` Domain, classes under `natural`, or a Character Realm? | Every character article's folder, plus Phase07's Outcome | `biological`: `tissue` / `keratin` / `bone` |
-| CM-Q2 | **Port MPFB2's library literally, or split substance from fit?** | Decides whether the photo atlases become articles | Split: substance now, fit sets after a rig comparison (6e) |
+| ~~CM-Q1~~ | ~~Ontology home~~ | — | ✅ **Ruled CM1 (2026-09-27): `biological`** |
+| ~~CM-Q2~~ | ~~Literal port or split~~ | — | ✅ **Ruled CM2 (2026-09-27): the split** |
 | CM-Q3 | **Hair:** a new `Hair` master (Chiang/melanin), or Masked cards for v1? | The first non-OpenPBR shader, or no hair model at all | Masked cards to seed; probe `chiang_hair_bsdf` in Storm and Blender before ruling |
 | CM-Q4 | **Eyes:** composed from existing masters, or an `Eye` master? Is an iris matter? | MakeHuman's eye has no cornea shell | Compose for v1 (a sclera/iris atlas as a fit, cornea when a shell exists) |
 | CM-Q5 | **A colour channel on layers** (region tone, freckles, makeup, and Phase07's dust colour) | The modulator rule forbids it today; four needs point at one change | Rule it once, together with Phase07 question 10 |
@@ -212,6 +282,7 @@ Domain and Class are **folder-only** (`Taxonomy.md`), so any of these can be cha
 | CM-Q7 | **Who owns the build:** a Phase07 tranche, or a phase of its own? | Phase07 is the volume build. Character work needs contract calls (CM-Q3–Q5) and a new Domain | Its own phase after Phase07's first tranche; the six skin articles can ride Phase07 |
 | CM-Q8 | **The CC-BY packs:** use them locally for testing only, or not at all? | BP8 frees the seed from provenance, but a public CC0 repo cannot carry CC-BY pixels | Local testing only; never committed |
 | CM-Q9 | **Ask the platform for region slots** (skin / lips / nails as mesh subsets)? | Route 6c.2(i) needs no contract change here | Raise it under M1 when the platform opens its Appearance work |
+| CM-Q10 | **A `Skin` master, or skin on the Subsurface master?** (Pass 8a) | The graph needs no new master, only three lane-A inputs; the per-material *settings* (Blender's subsurface method, Unreal's shading model) might differ between marble and skin | One Subsurface master with diffusion-grade settings; add a `Skin` token only if the rig shows marble and skin need different settings |
 
 ## Status
 
@@ -226,15 +297,20 @@ Domain and Class are **folder-only** (`Taxonomy.md`), so any of these can be cha
   5. The fit problem: every MPFB2 asset is an object-bound atlas with a substance inside it (D1).
   6. The proposed shape: substance in Matter, fit sets beside it; contract questions named; a no-contract-change seed path.
   7. Ontology options.
-- **Current direction:** recommended, **not decided**:
-  - build skin (and then lips, nails, eye tissues, enamel, mucosa) as **Matter substances** on existing masters, grounded in Physically Based and MPFB2's CC0 shader values;
-  - judge them on the MakeHuman body in the Phase05 rig;
-  - then decide the home for hm08-bound **fit sets**;
-  - home the substances in a new `biological` Domain.
+  8. The lead's follow-ups (2026-09-27):
+     - **8a:** skin needs no new master for its graph, only three lane-A inputs (scatter anisotropy, coat = C2, fuzz) plus CM-Q5. The per-material settings (Blender's subsurface method, Unreal's shading model) decide whether a `Skin` token is ever needed, measured on Marble vs skin in the rig (CM-Q10).
+     - **8a, Blender:** the proxy's Subsurface branch is minimal. Blender scatters the base colour, so skin articles keep `subsurface_color` equal to the base colour.
+     - **8b:** the pipeline is the architecture already: mine MPFB2 → recipe → `.mtlx` → judged in all three renderers → a generated Blender proxy and Unreal data on the reference master. There are no hand-made versions, but the proxy has to be extended alongside the new inputs.
+- **Decided (2026-09-27):** **CM1**, a `biological` Domain; **CM2**, substance in Matter with fit sets beside it.
+- **Current direction:**
+  - build skin (then lips, nails, eye tissues, enamel, mucosa) as **Matter substances** in `biological/tissue` (etc.) on the Subsurface master, grounded in Physically Based and MPFB2's CC0 settings;
+  - add the three lane-A inputs and the matching Blender proxy inputs;
+  - judge Marble and a skin on the MakeHuman body in the Phase05 rig (CM-Q10);
+  - then decide the home for hm08-bound **fit sets** (CM-Q6).
 - **Unverified, recorded as such:**
   - that Storm/USDLiveView render `chiang_hair_bsdf`;
   - that Blender's Principled Hair and Unreal's hair and eye shading models match the MaterialX parametrisation (from knowledge);
   - the licence of any pack other than the system assets and `skins01` (listing only);
   - the region masks' UV layout relative to the skin atlases (they look like a separate layout; not traced).
-- **Open questions:** CM-Q1 to CM-Q9. CM-Q1 to CM-Q4 shape everything else; none blocks the six-skin seed in 6d.
-- **Next step (lead-gated):** rule CM-Q1 and CM-Q2. Then either fold the six skin articles into Phase07's first tranche, or seed a character-materials phase (CM-Q7). The cheapest evidence to gather first is the disposable rig comparison in 6d step 3.
+- **Open questions:** CM-Q3 to CM-Q10 (CM-Q1 and CM-Q2 are ruled). CM-Q7 (who owns the build) is the next one that changes what happens; CM-Q10 is answered by rendering, not by ruling. None blocks the six-skin seed in 6d.
+- **Next step (lead-gated):** rule CM-Q7: fold the six skin articles into Phase07's first tranche, or seed a character-materials phase. The Blender-side Subsurface details marked "from knowledge" (the method enum, no separate subsurface colour) get checked at that build.
