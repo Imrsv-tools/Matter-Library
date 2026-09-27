@@ -272,6 +272,20 @@ def preview_material(name: str, color=None, texture: str | None = None,
         f'{tex}        }}\n')
 
 
+def lights_block(dome_tex: str = f"./{DOME_TEX}") -> str:
+    """The rig's lights, shared by every scene it renders (the character scene too, 7.4)."""
+    return ('    def Scope "Lights"\n    {\n'
+            f'        def DomeLight "Dome"\n        {{\n            float inputs:intensity = {DOME_INTENSITY}\n'
+            f'            asset inputs:texture:file = @{dome_tex}@\n'
+            '            token inputs:texture:format = "latlong"\n        }\n'
+            f'        def DistantLight "Sun"\n        {{\n'
+            f'            float inputs:intensity = {SUN_INTENSITY}\n'
+            '            bool inputs:normalize = true\n'
+            f'            float inputs:angle = {SUN_ANGLE}\n'
+            f'            float3 xformOp:rotateXYZ = ({SUN_ROTATE[0]}, {SUN_ROTATE[1]}, {SUN_ROTATE[2]})\n'
+            '            uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]\n        }\n    }\n')
+
+
 def build() -> str:
     parts = [
         '#usda 1.0\n(\n    """\n'
@@ -280,16 +294,7 @@ def build() -> str:
         '    """\n'
         f'    defaultPrim = "World"\n    upAxis = "{UP_AXIS}"\n    metersPerUnit = {METERS_PER_UNIT}\n)\n\n'
         'def Xform "World"\n{\n',
-        '    def Scope "Lights"\n    {\n'
-        f'        def DomeLight "Dome"\n        {{\n            float inputs:intensity = {DOME_INTENSITY}\n'
-        f'            asset inputs:texture:file = @./{DOME_TEX}@\n'
-        '            token inputs:texture:format = "latlong"\n        }\n'
-        f'        def DistantLight "Sun"\n        {{\n'
-        f'            float inputs:intensity = {SUN_INTENSITY}\n'
-        '            bool inputs:normalize = true\n'
-        f'            float inputs:angle = {SUN_ANGLE}\n'
-        f'            float3 xformOp:rotateXYZ = ({SUN_ROTATE[0]}, {SUN_ROTATE[1]}, {SUN_ROTATE[2]})\n'
-        '            uniform token[] xformOpOrder = ["xformOp:rotateXYZ"]\n        }\n    }\n',
+        lights_block(),
         '    def Scope "Looks"\n    {\n',
         preview_material("UVGrid", texture=UVGRID, roughness=0.8),
         preview_material("RulerBlack", color=0.02),

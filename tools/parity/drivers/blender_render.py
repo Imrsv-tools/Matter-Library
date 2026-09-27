@@ -132,8 +132,17 @@ def subjects(job: dict) -> list:
     return objs
 
 
-def render_mask(objs: list, png: Path) -> None:
-    """One flat colour per subject (sphere red, cube green, floor blue), all else black."""
+def mask_colours(job: dict, objs: list) -> list:
+    """Each subject's flat mask colour: the job's ``mask_colours`` (a character job, one per part),
+    else the test scene's sphere red, cube green, floor blue."""
+    given = job.get("mask_colours")
+    if given:
+        return [tuple(given[p]) for p in job["subjects"]]
+    return [(1, 0, 0), (0, 1, 0), (0, 0, 1)][:len(objs)]
+
+
+def render_mask(objs: list, png: Path, colours: list) -> None:
+    """One flat colour per subject, all else black."""
     scn = bpy.context.scene
     keep = {o.name: list(o.data.materials) for o in objs}
     world, samples, denoise = scn.world, scn.cycles.samples, scn.cycles.use_denoising
@@ -144,7 +153,7 @@ def render_mask(objs: list, png: Path) -> None:
     hidden = [o for o in scn.objects if o.type == "MESH" and o not in objs]
     for o in hidden:
         o.hide_render = True
-    for o, rgb in zip(objs, ((1, 0, 0), (0, 1, 0), (0, 0, 1))):
+    for o, rgb in zip(objs, colours):
         m = bpy.data.materials.new(f"ML_Mask_{o.name}")
         nt = m.node_tree
         nt.nodes.clear()
@@ -183,13 +192,21 @@ def run(job_path: Path) -> None:
         if cams[v] is None or cams[v].type != "CAMERA":
             raise SystemExit(f"view {v!r}: camera {name!r} not found after import")
         scn.camera = cams[v]
-        render_mask(objs, Path(job["out_dir"]) / f"mask{spec['suffix']}.png")
-    art = Path(job["article"]["path"])
+        render_mask(objs, Path(job["out_dir"]) / f"mask{spec['suffix']}.png", mask_colours(job, objs))
+    # what goes on which subject: a character job binds one article per part (Phase07 7.4);
+    # the test scene binds the one article to all three subjects
+    bindings = job.get("bindings") or [{"subject": p, "article": job["article"]} for p in job["subjects"]]
+    by_prim = {p: o for p, o in zip(job["subjects"], objs)}
     for s in job["settings"]:
-        mat = load_article.build(art, s.get("set", {}), name=f"{job['article']['name']}__{s['id']}")
-        for o in objs:
+        built = {}
+        for b in bindings:
+            a = b["article"]
+            if a["name"] not in built:
+                built[a["name"]] = load_article.build(Path(a["path"]), s.get("set", {}),
+                                                      name=f"{a['name']}__{s['id']}")
+            o = by_prim[b["subject"]]
             o.data.materials.clear()
-            o.data.materials.append(mat)
+            o.data.materials.append(built[a["name"]])
         for v, spec in views.items():
             scn.camera = cams[v]
             scn.view_settings.exposure = float(spec.get("exposure", 0.0))

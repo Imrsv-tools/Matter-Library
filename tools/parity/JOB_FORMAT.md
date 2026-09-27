@@ -55,6 +55,32 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 | `settings[].set` | The Creator sliders to move from the article's own values, by frozen port name (LCDSchema §Creator subset): floats, `[x, y]` for `uv_scale`/`uv_offset`, `[r, g, b]` for `base_color_tint`. |
 | `settings[].scene` | A USD file per setting that sublayers the test scene and adds the article (referenced at `/World/Library`, bound to the subjects), the subjects' rescaled `st`, and each moved slider **by the carrier rule** (a value on the bound Material's `inputs:<port>`, connected from `NG_<stem>`). A driver that imports USD can load this file; one that cannot reads `set` instead. |
 
+## The character job *(added 2026-09-27, Phase07 step 7.4)*
+
+`rig.py --character [<skin>]` renders the **MakeHuman body** (`scene/character_scene.usda`, built by `scene/build_character.py` from pinned CC0 sources) with **one article per part**. The job carries three more fields, and a driver that reads them handles both kinds of job:
+
+```json
+{
+  "mode": "character",
+  "bindings": [{"subject": "/World/Character/Body", "article": {"name": "…", "path": "…", "master": "Subsurface", "meters_per_tile": 0.01}}],
+  "subjects": ["/World/Character/Body"],
+  "mask_colours": {"/World/Character/Body": [1, 0, 0]},
+  "views": {"wide": {"camera": "/World/Cam", "suffix": "", "label": "whole body"},
+            "face": {"camera": "/World/CamFace", "suffix": "__face", "label": "face"},
+            "hand": {"camera": "/World/CamHand", "suffix": "__hand", "label": "hand"}}
+}
+```
+
+| Field | Meaning for a driver |
+|---|---|
+| `bindings` | Build each distinct article on its master once, and assign it to its `subject`. A test-scene job has no `bindings`: `article` goes on every subject. `article` is still present (the first binding), for a driver that reads only it. |
+| `mask_colours` | The mask's flat colour per subject (the test scene's default is sphere red, cube green, floor blue). The rig scores each colour as its own region. |
+| `settings` | The defaults only. Sliders are swept on the test scene. |
+
+- **The parts** are the body, the eyes, the teeth and the tongue (more come with Phase07 7.5). An **unbound** part keeps the scene's grey `UsdPreviewSurface` (`/World/Looks/Unbound`).
+- **UVs:** the scene's `st` is in **metres per part**, like the test scene's subjects. MakeHuman's own UVs are one 0–1 atlas over the whole body (1 UV unit ≈ 1.69 m on the body), so the build scales each part's UVs by its measured median density; the setting scene then divides the bound parts' `st` by the article's `meters_per_tile`. The atlas's islands are not all at the median (body p5–p95: 0.8–2.6 m per UV unit), so detail still varies in size across the body. **An Unreal driver must import the setting scene's `st`, not the mesh's own UVs.**
+- **No floor and no wall:** the dome is the background. The lighting rules below (matched lighting, colour, units) are unchanged.
+
 ## What a driver writes
 
 - `<out_dir>/<tool>/<setting id><view suffix>.png` — 8-bit sRGB, `width` × `width`, one per setting per view.

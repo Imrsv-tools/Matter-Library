@@ -1,0 +1,365 @@
+#!/usr/bin/env python3
+"""Write the parity rig's CHARACTER scene: ``character_scene.usda`` beside this file (Phase07 7.4).
+
+    uv run tools/parity/scene/build_character.py
+
+The MakeHuman body (CC0), split into one mesh per substance (Phase07 ruling L1), under the
+rig's own lights (``build_scene.lights_block``) and three square cameras: the whole body, a
+face close-up and a hand close-up. Generated from PINNED sources (URL + sha256, below), fetched
+once into ``library/parity/_sources/`` (git-ignored) and verified; the output is committed, so
+every tool reads the same bytes, and it is deterministic.
+
+What is in it (Y up, metres, feet on y = 0, facing +Z):
+
+* ``/World/Character/<Part>`` — one mesh per part (``PARTS``). MakeHuman's meshes are in
+  decimetres; they are scaled to metres here.
+* **st in METRES, like the test scene's subjects.** MakeHuman's UVs are one 0–1 atlas over the
+  whole body (hm08): one UV unit spans ~1.7 m of body (Phase07 F13), so an article sized per UV
+  tile (skin: 1 cm) would render ~170x too large. Each part's UVs are scaled by its own
+  measured density (the median, over its faces, of sqrt(3D area / UV area)) so that 1 UV unit
+  = 1 m on that part. A render job then divides by the article's ``meters_per_tile`` exactly as
+  for the test scene. This is the rig's stand-in for a "fit" (research CM2): the article is
+  unchanged, and the mesh is made to state real-world UVs. The atlas's islands are not all at
+  the median density, so detail still varies in size across the body (recorded per part in the
+  file's doc string).
+* Unbound parts carry a mid-grey ``UsdPreviewSurface`` (``/World/Looks/Unbound``).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import io
+import math
+import statistics
+import sys
+import urllib.request
+import zipfile
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parents[2]
+OUT = HERE / "character_scene.usda"
+CACHE = REPO / "library" / "parity" / "_sources"
+sys.path.insert(0, str(HERE))
+import build_scene  # noqa: E402
+
+DM = 0.1        # MakeHuman units are decimetres
+
+# Pinned CC0 sources (research 260927_R_CharacterMaterials_MPFB2.md, Pass 3).
+SOURCES = {
+    "base.obj": {
+        "url": "https://raw.githubusercontent.com/makehumancommunity/mpfb2/"
+               "3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/3dobjs/base.obj",
+        "sha256": "8e761e6624b8f54536409135d1636da63b32486a90d4897f84e121d144f6fb4c",
+        "licence": "CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh)",
+    },
+    "makehuman_system_assets_cc0.zip": {
+        "url": "https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/"
+               "makehuman_system_assets_cc0.zip",
+        "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+        "licence": "CC0 (each file's header: 'explicitly released as CC0 in september 2020')",
+    },
+}
+PACK = "makehuman_system_assets_cc0.zip"
+
+# part name -> the base mesh's group, or a proxy fitted to the base mesh (pack members)
+PARTS = {
+    "Body": {"group": "body"},
+    "Eyes": {"proxy": "eyes/high-poly/high-poly"},
+    "Teeth": {"proxy": "teeth/teeth_base/teeth_base"},
+    "Tongue": {"proxy": "tongue/tongue01/tongue01"},
+}
+
+# Cameras (the rig's 50 mm lens on a 36 mm square), framed from the body's own measured bounds.
+CAM_FOCAL, CAM_APERTURE = build_scene.CAM_FOCAL, build_scene.CAM_APERTURE
+VIEWS = {"wide": "Cam", "face": "CamFace", "hand": "CamHand"}
+
+
+_VERIFIED: dict[str, bytes] = {}
+
+
+def source(name: str, member: str | None = None) -> bytes:
+    """A pinned source's bytes (or one member of a pinned zip), from the cache or fetched once;
+    refused unless the whole file's sha256 matches the pin."""
+    if name not in _VERIFIED:
+        spec = SOURCES[name]
+        path = CACHE / name
+        if not path.exists():
+            CACHE.mkdir(parents=True, exist_ok=True)
+            req = urllib.request.Request(spec["url"], headers={"User-Agent": "matter-library-tools"})
+            with urllib.request.urlopen(req, timeout=600) as r:
+                path.write_bytes(r.read())
+        data = path.read_bytes()
+        got = hashlib.sha256(data).hexdigest()
+        if got != spec["sha256"]:
+            raise SystemExit(f"{name}: sha256 {got} != pinned {spec['sha256']} ({path})")
+        _VERIFIED[name] = data
+    if member is None:
+        return _VERIFIED[name]
+    with zipfile.ZipFile(io.BytesIO(_VERIFIED[name])) as z:
+        return z.read(member)
+
+
+def base_vertices(text: str) -> list[tuple[float, float, float]]:
+    """Every base-mesh vertex, in MakeHuman units (a proxy's .mhclo indexes these)."""
+    return [tuple(float(x) for x in line.split()[1:4]) for line in text.splitlines()
+            if line.startswith("v ")]
+
+
+def fit_proxy(mhclo: str, base: list) -> list[tuple[float, float, float]]:
+    """A MakeHuman proxy's vertices, fitted to the base mesh (metres).
+
+    Each ``verts`` line is ``v`` (exactly that base vertex) or ``v1 v2 v3 w1 w2 w3 dx dy dz``:
+    the weighted sum of three base vertices plus an offset, the offset scaled per axis by the
+    ``<axis>_scale a b ref`` lines (|base[a] - base[b]| along that axis / ref). MakeHuman's own
+    proxy fitting; on the default body the scales are ~1.
+    """
+    scale, out, in_verts = [1.0, 1.0, 1.0], [], False
+    for line in mhclo.splitlines():
+        p = line.split()
+        if not p or p[0].startswith("#"):
+            continue
+        if p[0] in ("x_scale", "y_scale", "z_scale"):
+            ax = "xyz".index(p[0][0])
+            a, b, ref = int(p[1]), int(p[2]), float(p[3])
+            scale[ax] = abs(base[a][ax] - base[b][ax]) / ref
+        elif p[0] == "verts":
+            in_verts = True
+        elif in_verts and len(p) == 1 and p[0].isdigit():
+            out.append(base[int(p[0])])
+        elif in_verts and len(p) == 9:
+            v = [int(x) for x in p[:3]]
+            w = [float(x) for x in p[3:6]]
+            d = [float(x) for x in p[6:9]]
+            out.append(tuple(sum(w[i] * base[v[i]][ax] for i in range(3)) + d[ax] * scale[ax]
+                             for ax in range(3)))
+        elif in_verts:
+            in_verts = False        # the next section (e.g. delete_verts)
+    return [(x * DM, y * DM, z * DM) for x, y, z in out]
+
+
+def read_obj(text: str, group: str | None):
+    """Points (metres), faces as [(vertex index, uv index)], uvs — only the kept group's."""
+    v, vt, faces, g = [], [], [], None
+    for line in text.splitlines():
+        p = line.split()
+        if not p:
+            continue
+        if p[0] == "v":
+            v.append(tuple(float(x) * DM for x in p[1:4]))
+        elif p[0] == "vt":
+            vt.append((float(p[1]), float(p[2])))
+        elif p[0] == "g":
+            g = p[1] if len(p) > 1 else None
+        elif p[0] == "f" and (group is None or g == group):
+            face = []
+            for c in p[1:]:
+                parts = c.split("/")
+                face.append((int(parts[0]) - 1, int(parts[1]) - 1 if len(parts) > 1 and parts[1] else -1))
+            faces.append(face)
+    # keep only the vertices the kept faces use, in first-use order (deterministic)
+    remap, pts = {}, []
+    for f in faces:
+        for vi, _ in f:
+            if vi not in remap:
+                remap[vi] = len(pts)
+                pts.append(v[vi])
+    return pts, [[(remap[vi], ti) for vi, ti in f] for f in faces], vt
+
+
+def _cross(u, w):
+    return (u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0])
+
+
+def _sub(a, b):
+    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+
+def face_normal(pts, f):
+    """Area-weighted (unnormalized) normal of a polygon (fan)."""
+    n = [0.0, 0.0, 0.0]
+    p0 = pts[f[0][0]]
+    for i in range(1, len(f) - 1):
+        c = _cross(_sub(pts[f[i][0]], p0), _sub(pts[f[i + 1][0]], p0))
+        n = [n[k] + c[k] for k in range(3)]
+    return n
+
+
+def vertex_normals(pts, faces):
+    acc = [[0.0, 0.0, 0.0] for _ in pts]
+    for f in faces:
+        n = face_normal(pts, f)
+        for vi, _ in f:
+            acc[vi] = [acc[vi][k] + n[k] for k in range(3)]
+    out = []
+    for a in acc:
+        L = math.sqrt(sum(x * x for x in a)) or 1.0
+        out.append((a[0] / L, a[1] / L, a[2] / L))
+    return out
+
+
+def uv_density(pts, faces, vt) -> tuple[float, float, float]:
+    """Metres of surface per UV unit: (p5, median, p95) over the faces' sqrt(3D area / UV area)."""
+    r = []
+    for f in faces:
+        a3 = 0.5 * math.sqrt(sum(x * x for x in face_normal(pts, f)))
+        uv = [vt[ti] for _, ti in f]
+        a2 = abs(sum(uv[i][0] * uv[(i + 1) % len(uv)][1] - uv[(i + 1) % len(uv)][0] * uv[i][1]
+                     for i in range(len(uv)))) / 2
+        if a2 > 1e-12 and a3 > 0:
+            r.append(math.sqrt(a3 / a2))
+    r.sort()
+    return r[int(0.05 * (len(r) - 1))], statistics.median(r), r[int(0.95 * (len(r) - 1))]
+
+
+def load_parts() -> dict:
+    """Every part: points, normals, faces, faceVarying st in metres, and its UV density."""
+    base_text = source("base.obj").decode("utf-8", "replace")
+    base = base_vertices(base_text)
+    parts = {}
+    for name, spec in PARTS.items():
+        if "group" in spec:
+            pts, faces, vt = read_obj(base_text, spec["group"])
+        else:
+            obj = source(PACK, spec["proxy"] + ".obj").decode("utf-8", "replace")
+            fitted = fit_proxy(source(PACK, spec["proxy"] + ".mhclo").decode("utf-8", "replace"), base)
+            _, faces, vt = read_obj(obj, None)
+            n_obj = sum(1 for line in obj.splitlines() if line.startswith("v "))
+            if n_obj != len(fitted):
+                raise SystemExit(f"{name}: the .obj has {n_obj} vertices, the .mhclo fits {len(fitted)}")
+            # read_obj remapped to first-use order; rebuild the points in that order from the fit
+            order = {}
+            for line in obj.splitlines():
+                if line.startswith("f "):
+                    for c in line.split()[1:]:
+                        vi = int(c.split("/")[0]) - 1
+                        order.setdefault(vi, len(order))
+            pts = [None] * len(order)
+            for vi, k in order.items():
+                pts[k] = fitted[vi]
+        d = uv_density(pts, faces, vt)
+        st = [(vt[ti][0] * d[1], vt[ti][1] * d[1]) for f in faces for _, ti in f]
+        parts[name] = {"points": pts, "normals": vertex_normals(pts, faces), "faces": faces,
+                       "st": st, "density": d}
+    # feet on the ground: shift every part by the body's lowest point
+    y0 = min(p[1] for p in parts["Body"]["points"])
+    for part in parts.values():
+        part["points"] = [(x, y - y0, z) for x, y, z in part["points"]]
+    return parts
+
+
+def _f3(vs):
+    return ", ".join(f"({x:.5f}, {y:.5f}, {z:.5f})" for x, y, z in vs)
+
+
+def _f2(vs):
+    return ", ".join(f"({s:.5f}, {t:.5f})" for s, t in vs)
+
+
+def mesh_block(name: str, part: dict) -> str:
+    i = "        "
+    counts = ", ".join(str(len(f)) for f in part["faces"])
+    flat = ", ".join(str(vi) for f in part["faces"] for vi, _ in f)
+    return (
+        f'{i}def Mesh "{name}" (\n{i}    prepend apiSchemas = ["MaterialBindingAPI"]\n{i})\n{i}{{\n'
+        f'{i}    uniform token subdivisionScheme = "none"\n'
+        f'{i}    point3f[] points = [{_f3(part["points"])}]\n'
+        f'{i}    normal3f[] normals = [{_f3(part["normals"])}] (\n{i}        interpolation = "vertex"\n{i}    )\n'
+        f'{i}    int[] faceVertexCounts = [{counts}]\n'
+        f'{i}    int[] faceVertexIndices = [{flat}]\n'
+        f'{i}    texCoord2f[] primvars:st = [{_f2(part["st"])}] (\n{i}        interpolation = "faceVarying"\n{i}    )\n'
+        f'{i}    rel material:binding = </World/Looks/Unbound>\n'
+        f'{i}}}\n')
+
+
+def _look_at(pos, target):
+    """(pitch, yaw) in degrees, rotateXYZ X then Y, for a camera looking down -Z at target."""
+    dx, dy, dz = (target[k] - pos[k] for k in range(3))
+    yaw = math.degrees(math.atan2(-dx, -dz))
+    pitch = math.degrees(math.atan2(dy, math.hypot(dx, dz)))
+    return pitch, yaw
+
+
+def cameras(body: dict) -> dict:
+    """Three framings from the body's bounds: whole body, face, the character's left hand."""
+    pts = body["points"]
+    top = max(p[1] for p in pts)
+    half = math.tan(math.atan(CAM_APERTURE / 2 / CAM_FOCAL))   # half-width per metre of distance
+    cams = {}
+    # whole body: frame the height + 10 %
+    h = top * 1.1
+    cams["Cam"] = ((0.0, top / 2, h / 2 / half), (0.0, top / 2, 0.0))
+    # face: the front-most points in the top 12 % of the height, framed 0.30 m
+    head = [p for p in pts if p[1] > top * 0.88]
+    fz = max(p[2] for p in head)
+    face = (0.0, statistics.median(p[1] for p in head) - 0.02, fz - 0.08)
+    cams["CamFace"] = ((face[0] + 0.05, face[1] + 0.03, face[2] + 0.15 / half), face)
+    # hand: the points within 12 cm of the extreme +x point (the character's left hand)
+    xmax = max(p[0] for p in pts)
+    hand = [p for p in pts if p[0] > xmax - 0.12]
+    hc = tuple((min(p[k] for p in hand) + max(p[k] for p in hand)) / 2 for k in range(3))
+    cams["CamHand"] = ((hc[0] + 0.02, hc[1] + 0.02, hc[2] + 0.17 / half), hc)
+    return cams
+
+
+def camera_block(name: str, pos, target) -> str:
+    pitch, yaw = _look_at(pos, target)
+    x, y, z = pos
+    return (f'    def Camera "{name}"\n    {{\n'
+            f'        float focalLength = {CAM_FOCAL}\n'
+            f'        float horizontalAperture = {CAM_APERTURE}\n'
+            f'        float verticalAperture = {CAM_APERTURE}\n'
+            '        float2 clippingRange = (0.02, 100)\n'
+            f'        double3 xformOp:translate = ({x:.4f}, {y:.4f}, {z:.4f})\n'
+            f'        float3 xformOp:rotateXYZ = ({pitch:.3f}, {yaw:.3f}, 0)\n'
+            '        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:rotateXYZ"]\n    }\n')
+
+
+def build(parts: dict) -> str:
+    dens = "\n".join(f"    {n}: 1 UV unit = {p['density'][1]:.3f} m (p5 {p['density'][0]:.3f}, "
+                     f"p95 {p['density'][2]:.3f})" for n, p in parts.items())
+    srcs = "\n".join(f"    {k}: {s['url']} sha256 {s['sha256']}" for k, s in SOURCES.items())
+    out = [
+        '#usda 1.0\n(\n    """\n'
+        "    The Matter parity rig's CHARACTER scene (generated by build_character.py; do not hand-edit).\n"
+        "    The CC0 MakeHuman body, one mesh per substance. st is in METRES per part (source UVs x the\n"
+        "    part's median density); a render job rescales st by the article's meters_per_tile.\n"
+        f"{dens}\n    Sources (CC0):\n{srcs}\n"
+        '    """\n'
+        f'    defaultPrim = "World"\n    upAxis = "{build_scene.UP_AXIS}"\n'
+        f'    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
+        'def Xform "World"\n{\n',
+        build_scene.lights_block(f"./{build_scene.DOME_TEX}"),
+        '    def Scope "Looks"\n    {\n',
+        build_scene.preview_material("Unbound", color=0.18, roughness=0.6),
+        '    }\n',
+        '    def Xform "Character"\n    {\n',
+    ]
+    out += [mesh_block(n, p) for n, p in parts.items()]
+    out.append('    }\n')
+    out += [camera_block(n, pos, tgt) for n, (pos, tgt) in cameras(parts["Body"]).items()]
+    out.append('}\n')
+    return "".join(out)
+
+
+def part_uvs() -> dict[str, list[tuple[float, float]]]:
+    """Each part's faceVarying st in metres, keyed by prim path (a job divides by meters_per_tile)."""
+    return {f"/World/Character/{n}": p["st"] for n, p in load_parts().items()}
+
+
+PRIMS = tuple(f"/World/Character/{n}" for n in PARTS)
+CAMERA_PATHS = {v: f"/World/{c}" for v, c in VIEWS.items()}
+
+
+def main() -> int:
+    parts = load_parts()
+    OUT.write_text(build(parts), encoding="utf-8")
+    for n, p in parts.items():
+        print(f"{n}: {len(p['points'])} points, {len(p['faces'])} faces, "
+              f"1 UV unit = {p['density'][1]:.3f} m (p5 {p['density'][0]:.3f}, p95 {p['density'][2]:.3f})")
+    print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

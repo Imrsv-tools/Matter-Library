@@ -80,19 +80,27 @@ def ssim(a: np.ndarray, b: np.ndarray) -> float:
     return float(((2 * mua * mub + c1) * (2 * cov + c2)) / ((mua ** 2 + mub ** 2 + c1) * (va + vb + c2)))
 
 
-def masks(mask_png: Path) -> dict[str, np.ndarray]:
+def masks(mask_png: Path, colours: dict | None = None) -> dict[str, np.ndarray]:
+    """Region masks. The test scene: one channel per subject (``REGIONS``). A character job
+    (Phase07 7.4) passes ``colours`` {region: [r, g, b]}: a pixel within 0.1 of a colour in
+    every channel is that region, so an anti-aliased edge between two parts is in neither."""
     m = read_rgb(mask_png)
-    out = {name: m[..., ch] > 0.5 for name, ch in REGIONS.items()}
-    out["subjects"] = out["sphere"] | out["cube"] | out["floor"]
+    if colours:
+        out = {name: np.all(np.abs(m - np.array(c, dtype=np.float64)) < 0.1, axis=-1)
+               for name, c in colours.items()}
+    else:
+        out = {name: m[..., ch] > 0.5 for name, ch in REGIONS.items()}
+    out["subjects"] = np.logical_or.reduce(list(out.values()))
     return out
 
 
-def compare(png_a: Path, png_b: Path, mask_png: Path) -> tuple[dict, np.ndarray]:
+def compare(png_a: Path, png_b: Path, mask_png: Path,
+            colours: dict | None = None) -> tuple[dict, np.ndarray]:
     """Per-region ΔE2000 (mean, p95) and SSIM; returns (scores, the per-pixel ΔE map)."""
     A, B = read_rgb(png_a), read_rgb(png_b)
     dE = delta_e2000(srgb_to_lab(A), srgb_to_lab(B))
     scores = {}
-    for name, m in masks(mask_png).items():
+    for name, m in masks(mask_png, colours).items():
         if not m.any():
             continue
         d = dE[m]
@@ -102,10 +110,10 @@ def compare(png_a: Path, png_b: Path, mask_png: Path) -> tuple[dict, np.ndarray]
     return scores, dE
 
 
-def moved(png_setting: Path, png_defaults: Path, mask_png: Path) -> float:
+def moved(png_setting: Path, png_defaults: Path, mask_png: Path, colours: dict | None = None) -> float:
     """How far a slider moved ONE tool's picture: mean dE2000 vs its own defaults, subjects."""
     a, b = read_rgb(png_setting), read_rgb(png_defaults)
-    m = masks(mask_png)["subjects"]
+    m = masks(mask_png, colours)["subjects"]
     return float(delta_e2000(srgb_to_lab(a), srgb_to_lab(b))[m].mean())
 
 

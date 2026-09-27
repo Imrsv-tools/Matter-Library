@@ -125,6 +125,84 @@ def write_setting_scene(art: Article, setting: dict, out: Path) -> Path:
     return out
 
 
+CHARACTER_SCENE = HERE / "scene" / "character_scene.usda"
+# one flat mask colour per character part (the Blender driver renders them; compare.py scores
+# each as its own region). Distinct, saturated, and far apart so an edge pixel is never mistaken.
+CHARACTER_COLOURS = {"Body": (1, 0, 0), "Eyes": (0, 1, 0), "Teeth": (0, 0, 1), "Tongue": (1, 1, 0)}
+CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFace", "face"),
+                   "hand": ("/World/CamHand", "hand")}
+
+
+def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
+    """The character's defaults scene (Phase07 7.4): one article bound per part.
+
+    ``bindings`` maps a part name (``build_character.PARTS``) to its article. Each distinct
+    article is referenced under its own ``/World/Library_<i>``; a bound part gets the binding
+    and its st divided by that article's ``meters_per_tile`` (the scene's st is in metres, as the
+    test scene's is). An unbound part keeps the scene's grey ``Unbound`` look.
+    """
+    import build_character  # noqa: PLC0415 (heavy: parses the pinned sources)
+    uvs = build_character.part_uvs()
+    libs, lib_of = [], {}
+    for art in bindings.values():
+        if art.name not in lib_of:
+            lib_of[art.name] = len(libs)
+            libs.append(art)
+    text = ["#usda 1.0\n(\n    subLayers = [@" + CHARACTER_SCENE.as_posix() + "@]\n"
+            f'    upAxis = "{build_scene.UP_AXIS}"\n    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
+            'over "World"\n{\n']
+    for i, art in enumerate(libs):
+        text.append(f'    def "Library_{i}" (\n        prepend references = @{art.path.as_posix()}@</MaterialX>\n'
+                    '    )\n    {\n    }\n')
+    text.append('    over "Character"\n    {\n')
+    for part, art in bindings.items():
+        prim = f"/World/Character/{part}"
+        if prim not in uvs:
+            raise SystemExit(f"no character part {part!r} (have {sorted(p.rsplit('/', 1)[1] for p in uvs)})")
+        st = ", ".join(f"({s / art.meters_per_tile:.5f}, {t / art.meters_per_tile:.5f})" for s, t in uvs[prim])
+        text.append(f'        over "{part}"\n        {{\n'
+                    f'            texCoord2f[] primvars:st = [{st}] (\n'
+                    '                interpolation = "faceVarying"\n            )\n'
+                    f'            rel material:binding = </World/Library_{lib_of[art.name]}/Materials/{art.name}>\n'
+                    '        }\n')
+    text.append('    }\n}\n')
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("".join(text), encoding="utf-8")
+    return out
+
+
+def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:
+    """A character job: the defaults only (sliders are swept on the test scene), every view."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    scene = write_character_scene(bindings, out_dir / "scenes" / "defaults.usda")
+    first = next(iter(bindings.values()))
+    job = {
+        "format": 1,
+        "mode": "character",
+        "article": {"name": first.name, "path": str(first.path), "master": first.master,
+                    "meters_per_tile": first.meters_per_tile},
+        # one entry per bound part: the driver builds the article on its master and assigns it
+        "bindings": [{"subject": f"/World/Character/{p}", "article":
+                      {"name": a.name, "path": str(a.path), "master": a.master,
+                       "meters_per_tile": a.meters_per_tile}} for p, a in bindings.items()],
+        "scene": str(CHARACTER_SCENE),
+        "camera": CHARACTER_VIEWS["wide"][0],
+        "views": {v: {"camera": c, "suffix": view_suffix(v), "label": label}
+                  for v, (c, label) in CHARACTER_VIEWS.items()},
+        "subjects": [f"/World/Character/{p}" for p in bindings],
+        # the mask: one flat colour per subject; compare.py scores each colour as a region
+        "mask_colours": {f"/World/Character/{p}": list(CHARACTER_COLOURS[p]) for p in bindings},
+        "width": width,
+        "samples": samples,
+        "storm_supersample": STORM_SUPERSAMPLE,
+        "settings": [{"id": "defaults", "label": "defaults", "set": {}, "scene": str(scene)}],
+        "out_dir": str(out_dir),
+    }
+    p = out_dir / "job.json"
+    p.write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8")
+    return p
+
+
 def views_for(master: str) -> dict:
     """The views a job renders. An Emissive article adds the whole set at -4 stops.
 

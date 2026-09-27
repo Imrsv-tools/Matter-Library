@@ -149,7 +149,7 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
         for k, v in enumerate(views):
             y = y0 + k * (cell + line_h)
             sfx = job["views"][v]["suffix"]
-            d.text((10, y + 40), f"({VIEW_LABELS.get(v, v)})",
+            d.text((10, y + 40), f"({job['views'][v].get('label') or VIEW_LABELS.get(v, v)})",
                    fill=(150, 150, 150), font=fs)
             for i, tool in enumerate(("storm", "blender")):
                 img = Image.open(out / tool / f"{s['id']}{sfx}.png").convert("RGB").resize((cell, cell))
@@ -287,9 +287,46 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
     return p
 
 
+CHARACTER_SKIN = "Skin_FitzpatrickIII_Clean_Base_s001_v01"
+
+
+def region_colours(job: dict) -> dict | None:
+    """A character job's regions: part name -> mask colour (None for the test scene)."""
+    mc = job.get("mask_colours")
+    return {p.rsplit("/", 1)[1]: c for p, c in mc.items()} if mc else None
+
+
+def write_character_scorecard(job: dict, scores: dict) -> Path:
+    out = Path(job["out_dir"])
+    sc = scores["defaults"]["views"]
+    parts = {b["subject"].rsplit("/", 1)[1]: b["article"] for b in job["bindings"]}
+    lines = [f"# Parity scorecard — the character ({', '.join(f'{p}: {a['name']}' for p, a in parts.items())})",
+             "", f"{job['width']} px · Cycles {job['samples']} samples · "
+             f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
+             "ΔE2000 between USDLiveView's renderer (Storm) and Blender (Cycles), per bound part, "
+             "per view. Unbound parts are the scene's grey and are not scored.", "",
+             "| Part | Article (master) | " + " | ".join(
+                 job["views"][v].get("label", v) for v in job["views"]) + " |",
+             "|---|---|" + "---|" * len(job["views"])]
+    for p, a in parts.items():
+        cells = []
+        for v in job["views"]:
+            r = sc[v].get(p)
+            cells.append(f"{r['dE_mean']:.2f} (p95 {r['dE_p95']:.2f})" if r else "not in view")
+        lines.append(f"| {p} | {a['name']} ({a['master']}) | " + " | ".join(cells) + " |")
+    card = out / "scorecard.md"
+    card.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / "scorecard.json").write_text(json.dumps({"settings": scores}, indent=2, default=str) + "\n",
+                                        encoding="utf-8")
+    return card
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Render one material side by side in Storm and Blender.")
-    ap.add_argument("article")
+    ap.add_argument("article", nargs="?",
+                    help=f"the article (with --character: the skin; default {CHARACTER_SKIN})")
+    ap.add_argument("--character", action="store_true",
+                    help="the MakeHuman body instead of the test scene: whole body, face, hand")
     ap.add_argument("--sweep", action="store_true", help="every declared slider through its range")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--samples", type=int, default=128)
@@ -299,10 +336,20 @@ def main(argv=None) -> int:
                     help="re-score the pictures already rendered (no Storm, no Blender)")
     args = ap.parse_args(argv)
 
-    art = jobmod.Article.read(jobmod.find_article(args.article))
-    out = Path(args.out) if args.out else OUT_ROOT / art.name
-    job_path = jobmod.write_job(art, settings_for(art, args.sweep), out, args.width, args.samples)
+    if args.character:
+        if args.sweep:
+            raise SystemExit("--sweep runs on the test scene; the character renders the defaults")
+        art = jobmod.Article.read(jobmod.find_article(args.article or CHARACTER_SKIN))
+        out = Path(args.out) if args.out else OUT_ROOT / f"Character__{art.name}"
+        job_path = jobmod.write_character_job({"Body": art}, out, args.width, args.samples)
+    else:
+        if not args.article:
+            ap.error("an article is required (or --character)")
+        art = jobmod.Article.read(jobmod.find_article(args.article))
+        out = Path(args.out) if args.out else OUT_ROOT / art.name
+        job_path = jobmod.write_job(art, settings_for(art, args.sweep), out, args.width, args.samples)
     job = json.loads(job_path.read_text(encoding="utf-8"))
+    colours = region_colours(job)
 
     t0 = time.time()
     if not args.score_only:
@@ -320,17 +367,21 @@ def main(argv=None) -> int:
             sfx = spec["suffix"]
             mask = out / f"mask{sfx}.png"
             sc, dE = compare.compare(out / "storm" / f"{s['id']}{sfx}.png",
-                                     out / "blender" / f"{s['id']}{sfx}.png", mask)
+                                     out / "blender" / f"{s['id']}{sfx}.png", mask, colours)
             if s["id"] != "defaults":
                 sc["moved"] = {t: compare.moved(out / t / f"{s['id']}{sfx}.png",
-                                                out / t / f"defaults{sfx}.png", mask)
+                                                out / t / f"defaults{sfx}.png", mask, colours)
                                for t in ("storm", "blender")}
             per_view[v] = sc
-            heat[s["id"]][v] = compare.heatmap(dE, BAR, compare.masks(mask)["subjects"])
+            heat[s["id"]][v] = compare.heatmap(dE, BAR, compare.masks(mask, colours)["subjects"])
         scores[s["id"]] = per_view["wide"] | {"views": per_view}
-    checks = {"scale": scale_checks(art, job), "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
     sheet = build_sheet(job, scores, heat, args.cell)
-    card = write_scorecard(job, scores, checks)
+    if args.character:
+        card = write_character_scorecard(job, scores)
+    else:
+        checks = {"scale": scale_checks(art, job),
+                  "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
+        card = write_scorecard(job, scores, checks)
     print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")
