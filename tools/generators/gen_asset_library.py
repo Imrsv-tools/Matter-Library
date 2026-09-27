@@ -1,10 +1,11 @@
 """Phase 60sq1 Step 4 (re-seq §9) — generate the installed Blender Asset-Browser Matter library
 for ALL Creator-selectable articles (11 for matterlib-0.1.0).
 
-Generalizes the E9 Copper-only generator. Builds each article's proxy from scratch via the ONE
-generic recipe->Principled mapper (`matter_proxy.build_matter_proxy`) — canonical recipe +
-`.mtlx` in, `MatterLCD_<id>` Principled proxy out (lead directive, E11: recognizable authoring
-proxy, not render parity; NO per-article branches). For each Creator-selectable catalog article
+Since Phase05 step 5.5 (2026-09-27) each article is built on the FAITHFUL Blender masters
+(`blender/masters/load_article.py`: the article's `.mtlx` in, a `MatterLCD_<id>` group on
+`ML_<Master>` out), the ones the parity rig measures against USDLiveView's renderer. Until then
+it was `matter_proxy.build_matter_proxy`, a "recognizable, not faithful" look-alike (E11); that
+file is kept, retired. For each Creator-selectable catalog article
 (honors the durable `creator_selectable` field, RD-5 — IMRSV_MissingMaterial excluded):
 
   * builds the proxy material with the durable `imrsv_matter_identity` carrier (survives
@@ -14,7 +15,7 @@ proxy, not render parity; NO per-article branches). For each Creator-selectable 
   * writes one `blender_assets.cats.txt` covering every article's catalog path;
   * saves the library `.blend`.
 
-Run (no scaffold needed — built from the recipes):
+Run (no scaffold needed — built from the articles' .mtlx):
   blender --background --factory-startup \
           --python tools/generators/gen_asset_library.py -- [OUT_DIR]
 Default OUT_DIR = <repo>/Matter-Library/blender/asset_library
@@ -28,8 +29,9 @@ MTLX_ROOT = os.path.join(REPO, "MatterLibrary")   # payload_path is relative to 
 IDENTITY_PROP = "imrsv_matter_identity"           # matches lcd_usd_edit.IDENTITY_PROP
 CATALOG_NS = uuid.uuid5(uuid.NAMESPACE_URL, "imrsv:matterlib:asset-catalog")
 
-sys.path.insert(0, os.path.join(REPO, "tools/generators"))
-import matter_proxy  # noqa: E402
+sys.path.insert(0, os.path.join(REPO, "blender/masters"))
+from pathlib import Path  # noqa: E402
+import load_article  # noqa: E402
 
 argv = sys.argv
 post = argv[argv.index("--") + 1:] if "--" in argv else []
@@ -76,11 +78,13 @@ def main():
 
     ok, skipped = 0, []
     for a in arts:
-        if not os.path.isfile(a["recipe"]):
-            skipped.append("%s (no recipe)" % a["identity"]); continue
-        with open(a["recipe"]) as f:
-            recipe = json.load(f)
-        mat, notes = matter_proxy.build_matter_proxy(a["identity"], recipe, a["mtlx"])
+        if not os.path.isfile(a["mtlx"]):
+            skipped.append("%s (no .mtlx)" % a["identity"]); continue
+        # Phase05 5.5: the faithful Blender master (blender/masters), built from the article's
+        # .mtlx, replaces matter_proxy's "recognizable, not faithful" look-alike (lead,
+        # 2026-09-26: "the goal indeed is to get things actaully working").
+        mat = load_article.build(Path(a["mtlx"]), name=a["identity"])
+        notes = None
 
         mat[IDENTITY_PROP] = a["identity"]          # §1 durable carrier
         if mat.asset_data is None:

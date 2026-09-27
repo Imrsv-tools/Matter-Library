@@ -31,6 +31,10 @@ ROLES = (("base_color", "Base Color"), ("roughness", "Roughness"), ("metalness",
          ("normal", "Normal Map"), ("layer2_base_color", "Layer 2 Base Color"),
          ("layer2_roughness", "Layer 2 Roughness"), ("layer2_metalness", "Layer 2 Metalness"),
          ("layer2_normal", "Layer 2 Normal Map"), ("opacity", "Opacity"))
+# The Creator ports that travel Blender -> USD as material inputs (the exporter's
+# LCD_TRAVEL_PORTS); the UV ports travel as geometry and are fixed inside the group.
+TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
+                "maskset_blend", "roughness_bias")
 DATA_ROLES = ("roughness", "metalness", "normal", "layer2_roughness", "layer2_metalness",
               "layer2_normal", "opacity")
 
@@ -105,15 +109,26 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
     mat = bpy.data.materials.new(name or art.name)
     mat["ml_article"] = str(path)
     mat["ml_master"] = art.master
-    nt = mat.node_tree
-    nt.nodes.clear()
+    thick = "thick" in build_masters.MASTER_PARTS[art.master]
+
+    # The whole article network lives in ONE per-article group, MatterLCD_<name>, whose inputs
+    # are the article's Creator travel ports, defaulting to the ARTICLE'S values. The Blender
+    # exporter measures a Creator's edits against exactly those interface defaults (sparse
+    # deltas: an untouched material exports nothing), as it did on the look-alike's groups.
+    wrap = bpy.data.node_groups.new(f"MatterLCD_{name or art.name}", "ShaderNodeTree")
+    wrap.interface.new_socket(name="BSDF", in_out="OUTPUT", socket_type="NodeSocketShader")
+    if thick:
+        wrap.interface.new_socket(name="Volume", in_out="OUTPUT", socket_type="NodeSocketShader")
+    nt = wrap
     L = nt.links.new
-    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    gin = nt.nodes.new("NodeGroupInput")
+    gin.location = (-1200, 600)
+    out = nt.nodes.new("NodeGroupOutput")
     out.location = (900, 0)
     master = nt.nodes.new("ShaderNodeGroup")
     master.node_tree = bpy.data.node_groups[f"ML_{art.master}"]
     master.location = (500, 0)
-    L(master.outputs["BSDF"], out.inputs["Surface"])
+    L(master.outputs["BSDF"], out.inputs["BSDF"])
 
     uv = nt.nodes.new("ShaderNodeUVMap")
     uv.uv_map = "st"
@@ -224,4 +239,26 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None):
         want = art.master == "TranslucentThin"
         if art.master.startswith("Translucent") and thin != want:
             raise ValueError(f"{art.name}: geometry_thin_walled={thin} contradicts master {art.master}")
+
+    # the Creator travel ports: exposed on the wrapper, defaulting to the ARTICLE's values
+    travel = [p for p in TRAVEL_PORTS if p in art.ports and p in master.inputs]
+    for p in travel:
+        is_color = p == "base_color_tint"
+        s = wrap.interface.new_socket(name=p, in_out="INPUT",
+                                      socket_type="NodeSocketColor" if is_color else "NodeSocketFloat")
+        s.default_value = _rgba(art.ports[p]) if is_color else art.ports[p][0]
+        L(gin.outputs[p], master.inputs[p])
+
+    # the material: the article's group, with the sliders on it as a Creator would set them
+    mnt = mat.node_tree
+    mnt.nodes.clear()
+    node = mnt.nodes.new("ShaderNodeGroup")
+    node.node_tree = wrap
+    mout = mnt.nodes.new("ShaderNodeOutputMaterial")
+    mout.location = (300, 0)
+    mnt.links.new(node.outputs["BSDF"], mout.inputs["Surface"])
+    if thick:
+        mnt.links.new(node.outputs["Volume"], mout.inputs["Volume"])
+    for p in travel:
+        node.inputs[p].default_value = _rgba(ports[p]) if p == "base_color_tint" else ports[p][0]
     return mat

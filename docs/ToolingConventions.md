@@ -19,7 +19,7 @@
 | `tools/releases/` | the release lifecycle: `stage_release.py` → `freeze_release.py` → `promote_release.py` (+ `validate_approval.py`) → `activate_release.py` | Apache-2.0 |
 | `tools/compressors/` | BCn compression (`compress_textures.py`) + negative fixtures | Apache-2.0 |
 | `tools/conformance/` | Creator-asset and parity checks: `assert_profile.py`, `check_lcd_carrier.py` (+ `test_check_lcd_carrier.py`), the `check_*.sh` wrappers, `codec_ab.py`, `build_ocio_parity_config.py`, the Blender slice exporters, `golden/`, `fixtures/` | Apache-2.0 |
-| `tools/generators/` | the Blender Asset-Browser library generator (`gen_asset_library.py`, `matter_proxy.py`) | Apache-2.0 |
+| `tools/generators/` | the Blender Asset-Browser library generator (`gen_asset_library.py`, which builds on `blender/masters/` since 2026-09-27; `matter_proxy.py`, the look-alike it used before, retired and kept) | Apache-2.0 |
 | `tools/preview_generators/` | the preview scene for one article, rendered headless with `usdrecord` (`--render`); `--set` previews a moved Creator slider | Apache-2.0 |
 | `tools/usd-toolchain/` | the pinned OpenUSD + MaterialX build recipe (`environment.yml`, `build-usd-tools.sh`, `run-all.sh`) | Apache-2.0 |
 | `blender/addons/imrsv_lcd_export/` | the Matter exporter add-on + its `test_lcd_*.py` | Apache-2.0 |

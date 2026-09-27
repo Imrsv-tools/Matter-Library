@@ -1,4 +1,11 @@
-"""Phase 60sq1 Step 4 — the ONE generic recipe->Principled proxy mapper.
+"""RETIRED 2026-09-27 (Phase05 step 5.5) — kept as a file for history; nothing imports it.
+
+Creators' Blender library is now built on the faithful Blender masters
+(`blender/masters/load_article.py`, via `tools/generators/gen_asset_library.py`), on the lead's
+2026-09-26 ruling: "Yes - the goal indeed is to get things actaully working so we see how it is
+in practice". That retires this module's "recognizable, not faithful" boundary below.
+
+Phase 60sq1 Step 4 — the ONE generic recipe->Principled proxy mapper.
 
 Builds a Blender authoring proxy (a `MatterLCD_<id>` Principled-BSDF material) for a Matter
 article from its canonical recipe + `.mtlx`. The proxy is the frozen v1 Blender representation

@@ -122,7 +122,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | Path | Role |
 |---|---|
 | `gen_asset_library.py` | generates `blender/asset_library/MatterLibrary.blend` for every `creator_selectable` article |
-| `matter_proxy.py` | the one generic recipe → Principled-BSDF `MatterLCD_<id>` proxy mapper |
+| `matter_proxy.py` | the one generic recipe → Principled-BSDF `MatterLCD_<id>` proxy mapper. **Retired 2026-09-27** (Phase05 step 5.5): the Asset-Browser library is built on the faithful Blender masters, `blender/masters/` |
 
 ### `tools/preview_generators/` — usdview parity preview
 
