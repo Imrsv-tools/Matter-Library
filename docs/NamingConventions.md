@@ -42,9 +42,31 @@
 | **Catalog schema** | `schema_version: <int>` | a contract phase only | `docs/specs/Contract/RuntimeCatalog.md` |
 | **Phases** | `Phase<NN>` once the lead numbers it; `PhaseTBD_<Name>` until then; steps `<NN>.<n>`, tasks `<NN>.<n>.<m>`, **numeric at every level, never a letter suffix** | the lead | `docs/Planning/Roadmap.md` |
 | **Research docs** | `YYMMDD_R_<Concept>.md` (probe results: `YYMMDD_R_Spike_<Subject>.md`) | whoever opens the research | the file name |
-| **Lead rulings in a research thread** | `R<n>` within that doc | the doc's author, at recording | that doc's `## Resolved` table |
+| **Lead rulings in a research thread** | `R<n>` within that doc (up to 2026-09-27); new rulings `RD-<MNEMONIC>-<n>` (§Planning ids) | the doc's author, at recording | that doc's `## Resolved` table |
 
 *No gate-id or check-id series exists yet (2026-09-23).*
+
+## Planning ids — the method's grammar, live from 2026-09-27
+
+**This section is the method's, carried from upstream.** Every question, finding or ruling id that a phase doc, Issue workbench or research doc **mints** takes the shape **`<KIND>-<SCOPE>-<n>`**. *(Without it, every doc invents its own series, and a bare `F12` cited outside its phase collides with another phase's `F12`.)*
+
+| Segment | What it is | Values |
+|---|---|---|
+| `KIND` | what the thing is | `Q` open question · `F` finding · `RD` recorded decision (a lead ruling) |
+| `SCOPE` | **which file to open** | `P<NN>` phase (`P07`) · `I<n>` Issue workbench (`I1`) · a 2–4 letter uppercase mnemonic for a research doc or an unnumbered `PhaseTBD_` doc, declared once in that doc's header |
+| `n` | ordinal within that scope, from 1, in the order raised — no zero-padding | `1`, `4`, `12` |
+
+`Q-P07-4` · `F-P05-12` · `RD-I1-2` · `Q-CM-3`
+
+- **The id resolves itself** — the scope names the file (`Roadmap.md` indexes phases; a mnemonic resolves with one `grep -rl`, and the doc that *declares* the series owns it). The scope also makes these ids doc-local, so they are **not** a shared series to claim at execution.
+- **The id never encodes anything that can change.** Status is a marker on the line: **`[lead]`** (only the lead can answer) or **`[open]`** (answerable by measurement or research). Dashes, never underscores.
+- **A question keeps its id for life.** The ruling that answers it cites it (`RD-P07-9 — answers Q-P07-4`) and the question's line gains `→ RD-P07-9`, in the same edit.
+- **Cite another doc's item by its full id**, never a bare `F12` from a different series.
+- **An unnumbered doc that gets a number keeps its mnemonic ids;** new ones take `P<NN>` (Workflow §Phase Numbering — ids that have left the repository are frozen).
+- **Landed ids are never renamed.** This project's earlier series (`R<n>`, `BP<n>`, `CM<n>`, bare `F<n>`/`L<n>` in Phase01–07) stay valid as written; this governs what is minted next.
+- **Not these namespaces:** plan step numbers, test / gate ids, Learnings entries and the identifier vocabularies in the table above keep their own forms.
+
+In chat, a question for the lead is written out, never cited by id — `.ai/AI_WorkingAgreement.md`.
 
 ## Historical names kept on purpose
 

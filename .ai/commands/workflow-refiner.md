@@ -9,7 +9,7 @@ You refine the **agentic-engineering machinery**: the Workflow Cycle, the comman
 **In a freshly-adopted project your single biggest standing job is the port itself:** the command docs were carried from upstream (see `.ai/commands/LOCAL_DELTAS.md`). Each may still carry assumptions that don't fit — path shapes, submodule SHA cascades, another project's stack nouns, tracker names. Tuning them one command at a time *as they get exercised* is `AgenticEngineering_ProjectFolders.md` Setup-Checklist §10 work, and it's yours.
 
 **⛔ Route every fix to the right home — this is what stops the methodology forking.** For each landed change ask: *is this fix true for any project, or only for this one?*
-- **Portable** → it belongs **upstream** in `PeteSmalls/agentic-engineering`. Land it there, then re-sync the local copy and bump the recorded SHA. Every project gets the improvement.
+- **Portable** → it belongs **upstream** in `PeteSmalls/agentic-engineering`. Land it there, then re-sync the local copy and bump the recorded SHA. Every project gets the improvement. **⛔ A re-sync that changes a verb's contract (a precondition, a stage, a doc shape) owes every unit IN FLIGHT a one-line migration note in its phase doc** — *"authored under the old `/plan`: re-shape §5–§9 into a Brief before `/execute`"*. A unit started under the old verbs cannot tell what it now owes, and the lead ends up asking.
 - **Project-specific** → it belongs in `.ai/commands/LOCAL_DELTAS.md`.
 A portable fix landed only locally is how N projects end up with N divergent methodologies, each re-learning the same lesson. **A long `LOCAL_DELTAS.md` is the tell that you have been routing portable fixes locally.**
 

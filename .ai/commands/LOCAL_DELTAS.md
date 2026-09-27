@@ -1,6 +1,6 @@
 # Local Deltas — read this once, then read the other commands *for method*
 
-The other files in `.ai/commands/` were **carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering)** on `2026-09-23` (upstream `9f52c7f`). They encode a mature Agentic-Engineering workflow, which is exactly why they're here. But upstream cannot know your stack, your repo shape or your tracker. Read them for the *method*, and translate the assumptions listed below as you go.
+The other files in `.ai/commands/` were **carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering)** on `2026-09-23` (upstream `9f52c7f`), last re-synced `2026-09-27` (upstream `ebbfab3`). They encode a mature Agentic-Engineering workflow, which is exactly why they're here. But upstream cannot know your stack, your repo shape or your tracker. Read them for the *method*, and translate the assumptions listed below as you go.
 
 **This file is the override seam.** Upstream ships the method; this file records where *this* project diverges. Keep it short: a long deltas file means the divergence belongs upstream.
 

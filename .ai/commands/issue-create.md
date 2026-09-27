@@ -54,7 +54,11 @@ were never shown.
      and the lead numbered the phase two turns later.)* Imperative + specific ("Add-Prop relative-layer
      warning on reopen", not "bug");
    - a **body**: what's wrong / wanted, where (file·symbol·phase if known), repro or
-     context, and — when it came up mid-work — a one-line "surfaced while doing X" note;
+     context, and — when it came up mid-work — a one-line "surfaced while doing X" note.
+     **⛔ Re-read every cited source line NOW, at filing time** — a finding carried from an
+     earlier pass is a hypothesis, and one filed against another project's tracker is the
+     most expensive place for it to be wrong. *(A "missing field" drafted as a defect was
+     by design: the code comment at the cited site said so, and was read only while drafting);*
    - **labels — auto-suggest, show in the confirm step, fire with `--label`.** The platform
      tracker's label vocabulary is **`docs/ToolingConventions.md`
      §Issue tracker conventions** (the 4 axes `type:`/`area:`/`status:`/`source:` — NOT the

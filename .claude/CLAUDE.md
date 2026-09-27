@@ -61,7 +61,7 @@ See `../AGENTS.md` — canonical agent entry point. The Matter Library is **a co
 | a SHA you read seconds ago | may have been rewritten by a sibling's amend | `git cat-file -e <sha>` before citing it |
 | `git rebase` to converge a diverged trunk | may refuse; `--autostash` would stash a sibling's work | `git reset --mixed origin/main`, then re-stage your paths |
 
-**⛔ A MULTI-LINE COMMIT MESSAGE GOES IN A FILE, PASSED WITH `-F`** — inside `-m "…"` a backtick is command substitution: the word silently vanishes and `git` reports success.
+**⛔ A MULTI-LINE COMMIT MESSAGE GOES IN A FILE, PASSED WITH `-F`** — inside `-m "…"` a backtick is command substitution: the word silently vanishes and `git` reports success. **The same holds for ANY double-quoted argument** — a `grep` pattern, an `echo`, a `sed` expression: single-quote anything containing a backtick.
 
 **⛔ No Claude co-author trailer — ever. Attribute to the lead only.** It is stated here, once, because it **overrides the harness default**, which appends one unless told otherwise. Stating it only inside individual verbs means an agent must already be running a verb to learn it — and an agent that instead matches what it sees in `git log` gets it wrong for a whole session. The repeats in `quick-fix.md`, `retro.md`, `execute.md` and `workflow-refiner.md` are references to this line, not independent rules.
 
