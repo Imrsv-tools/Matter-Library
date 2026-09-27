@@ -29,7 +29,7 @@ Prefer the **Grep / Glob / Read** tools directly (they never prompt). For big sw
 
 You read all that to orient **yourself** — **do not parrot it back.** The end output is a **≤2-line orientation + a ready prompt**:
 
-1. **Orientation line** — `📍 <branch> · <clean | N uncommitted> · last: <most recent completed phase, or "no phases closed yet"> · active: <what's in flight — a phase, a live research thread, or "nothing in flight">`. Pull branch + cleanliness from `git -C <repo root> status -sb`; last + active from the Roadmap glance. (`git status -sb` also reports ahead/behind against `origin/main` — that's the cheap signal; **howdy stays light and does not call `gh`**.)
+1. **Orientation line** — `📍 <branch> · <clean | N uncommitted> · last: <most recent completed phase, or "no phases closed yet"> · active: <what's in flight — a phase, a live research thread, or "nothing in flight">`. Pull branch + cleanliness from `git -C <repo root> status -sb`; last + active from the Roadmap glance. (`git status -sb` also reports ahead/behind against `origin/main` — that's the cheap signal; **howdy stays light and does not call `gh`** — unless the lead's argument points at a tracker item; then read that item and what it links, and nothing more.)
 2. **Ready** — hand back with on-ramps: *"Ready — want to **research** something, **spike** a quick idea, or **kick off a phase**?"* At most one clarifying question, only if something essential is missing.
 3. **Attention line — ONLY if something's actually off** (dirty tree, an uncommitted snapshot, **commits ahead of `origin/main`** — work that is committed but not pushed does not exist from anywhere else, per `.ai/AI_WorkingAgreement.md` §Working With the Lead). No-news → omit and stay at two lines.
 

@@ -62,7 +62,7 @@ Matter-Library/
 
 ## Build / Test / Deploy
 
-- **The structural gate:** `python tools/validators/run_all.py` (16 lanes). **Measured 2026-09-23: it fails at import on the lead's box**, because the MaterialX Python module is installed neither in the system Python nor in the `imrsv-usd-tools` conda env. `compressonatorcli` is also absent, so the compression and staging lanes skip. Making this run on a fresh box is the one-command-check phase (Roadmap).
+- **The structural gate:** `uv run tools/validators/run_all.py` — its lanes, flags and environment are in `docs/ToolingConventions.md` §Entry points and §Gates and CI (CI is parked). How the gates, the exporter check and the parity rig fit a run: `.ai/commands/LOCAL_DELTAS.md`, the "RUN" row.
 - **Toolchain recipe:** `tools/usd-toolchain/` (OpenUSD 26.03 + MaterialX 1.39.5 in the conda env `imrsv-usd-tools`). Blender 5.1+ runs the add-on and the Asset-Browser generator.
 - **Releases:** the lifecycle scripts are in `tools/releases/`; the records are in `library/releases/`.
 - `docs/CodingStandards.md` is still a stub. It gets written when a phase first rules on how code is written here.
@@ -79,14 +79,14 @@ Matter-Library/
 - `docs/CodingStandards.md` — how code is written here. **A stub, deliberately empty.**
 - `docs/ToolingConventions.md` — where scripts, fixtures and CI entry points live.
 - `docs/NamingConventions.md` — the filename grammar, scale tags, casing and id series. **Active.**
-- `docs/Learnings/<Domain>/` — what the technology did that surprised us. **Arrives on the first lesson actually paid for here.**
+- `docs/Learnings/<Domain>/` — what the technology did that surprised us. One folder per domain that has paid for a lesson here.
 - `Methodology/AgenticEngineering_Workflow.md` — the canonical Workflow Cycle.
 - `Methodology/AgenticEngineering_DocumentationMap.md` — which doc owns what.
 - `Methodology/AgenticEngineering_ProjectFolders.md` — the blueprint this repo was built from.
 
 ## Heritage
 
-Methodology carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering) on 2026-09-23 (upstream `9f52c7f`).
+Methodology carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering) on 2026-09-23 (upstream `9f52c7f`); the current SHA is in `AGENTS.md` §Heritage.
 - This project keeps its **own** session-memory namespace. Durable facts belong in *these* docs, not in the originating repo's memory.
-- Read the commands *for method*. Where an assumption doesn't fit, adapt, record it in `.ai/commands/LOCAL_DELTAS.md`, and file the friction via `/retro` → `/workflow-refiner`.
+- Read the commands *for method*. Where an assumption doesn't fit, adapt in the moment and file the friction via `/retro` → `/workflow-refiner`; the refiner, not the working verb, records it in `.ai/commands/LOCAL_DELTAS.md`.
 - The pre-adoption scaffold (`.ai/context.md`, `.ai/conventions.md`, `.ai/plan/`, `.ai/phases/`, `.ai/research/`) was folded into this shape with `git mv` on 2026-09-23 (Phase01 step 1.1).

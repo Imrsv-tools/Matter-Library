@@ -139,7 +139,7 @@ Acceptance over two or more instances of one type is not covered by a single-ins
 - **The recommended approach only** — a rejected option becomes a *why-not* note, never a live alternative.
 - **Exact files and functions** — full paths, no ellipsis, existing utilities reused and cited. Trace the real routes and cite lines.
 - **Deliberate behaviour changes.**
-- **`## Acceptance invariants`** — every phrase in the Goal carrying an **absolute quantifier** (*"no deferrals" · "every" · "all" · "only" · "anyone" · "never"*) quoted **verbatim**. This is what makes `execute_close.md` row `A0` mechanical rather than self-scored.
+- **`## Acceptance invariants`** — every phrase in the Goal making an **absolute claim** (universal, negative, exclusive or total — `execute_close.md` row `A0`'s arming question owns the class) quoted **verbatim**. This is what makes `execute_close.md` row `A0` mechanical rather than self-scored.
 - **A scope-coverage table** — see [Scope coverage](#scope-coverage).
 - **An Execution access check** — see [Access check](#access-check).
 - **Verification** — how each claim is tested end to end, and for **every gate, `runs-in:`** the workflow file and step, or the literal `local-only`. An invariant containing "in CI" or "on every push" names its workflow step.
