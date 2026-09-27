@@ -104,7 +104,9 @@ def layer_size_m(path: str) -> float:
     return SCALE_TAG_METRES[m.group(1)]
 
 # Recipe keys that are not spec fields: harness metadata, not material data (Phase03 G1).
-RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources"}
+# `status` (Phase07, D-S) is the article's lifecycle state BEFORE a release; it never reaches
+# the .mtlx, which is frozen once released, so promoting an article never changes its file.
+RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources", "status"}
 
 
 @dataclass

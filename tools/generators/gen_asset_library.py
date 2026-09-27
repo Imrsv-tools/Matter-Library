@@ -1,5 +1,6 @@
 """Phase 60sq1 Step 4 (re-seq §9) — generate the installed Blender Asset-Browser Matter library
-for ALL Creator-selectable articles (11 for matterlib-0.1.0).
+for ALL Creator-selectable articles in the working tree, each tagged with its status (since
+Phase07 7.2, 2026-09-27; it read `matterlib-0.1.0`'s 11 until then).
 
 Since Phase05 step 5.5 (2026-09-27) each article is built on the FAITHFUL Blender masters
 (`blender/masters/load_article.py`: the article's `.mtlx` in, a `MatterLCD_<id>` group on
@@ -23,15 +24,22 @@ Default OUT_DIR = <repo>/Matter-Library/blender/asset_library
 import bpy, sys, os, json, uuid
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))  # this repo
-CATALOG = os.path.join(REPO, "library/releases/matterlib-0.1.0.catalog.json")
-RECIPES = os.path.join(REPO, "tools/converters/recipes")
-MTLX_ROOT = os.path.join(REPO, "MatterLibrary")   # payload_path is relative to this in source
 IDENTITY_PROP = "imrsv_matter_identity"           # matches lcd_usd_edit.IDENTITY_PROP
 CATALOG_NS = uuid.uuid5(uuid.NAMESPACE_URL, "imrsv:matterlib:asset-catalog")
 
 sys.path.insert(0, os.path.join(REPO, "blender/masters"))
+sys.path.insert(0, os.path.join(REPO, "tools/converters"))
 from pathlib import Path  # noqa: E402
 import load_article  # noqa: E402
+import working_tree  # noqa: E402
+
+STATUS_MEANS = {
+    "draft": "not yet checked side by side",
+    "candidate": "checked in USDLiveView and Blender; Unreal not yet",
+    "approved": "checked in USDLiveView, Blender and Unreal",
+    "deprecated": "kept for old scenes; prefer a newer material",
+    "retired": "no longer offered",
+}
 
 argv = sys.argv
 post = argv[argv.index("--") + 1:] if "--" in argv else []
@@ -40,21 +48,17 @@ os.makedirs(out_dir, exist_ok=True)
 
 
 def selectable_articles():
-    """The Creator-selectable catalog rows (RD-5): creator_selectable == true."""
-    with open(CATALOG) as f:
-        cat = json.load(f)
-    arts = []
-    for m in cat.get("materials", []):
-        if not m.get("creator_selectable", True):
-            continue
-        identity = os.path.splitext(os.path.basename(m["payload_path"]))[0]
-        arts.append({
-            "identity": identity,
-            "catalog_path": "%s/%s" % (m["domain"], m["material_class"]),
-            "mtlx": os.path.join(MTLX_ROOT, m["payload_path"]),
-            "recipe": os.path.join(RECIPES, identity + ".json"),
-        })
-    return arts
+    """Every Creator-selectable article in the WORKING TREE (RD-5: creator_selectable), with
+    its status (Phase07 7.2). It read `matterlib-0.1.0`'s frozen catalog until then, so a new
+    article could never reach Blender; the lead's ruling is to have everything in, marked,
+    before the first release ("I would rather have everything in and 'uncalibrated' yet then
+    a bunch of magenta", 2026-09-27)."""
+    return [{
+        "identity": a["identity"],
+        "catalog_path": "%s/%s" % (a["domain"], a["material_class"]),
+        "mtlx": str(a["mtlx"]),
+        "status": a["status"],
+    } for a in working_tree.articles() if a["creator_selectable"]]
 
 
 def write_cats(paths):
@@ -92,11 +96,13 @@ def main():
         ad = mat.asset_data
         ad.catalog_id = cat_ids[a["catalog_path"]]
         ad.author = "IMRSV"
-        ad.description = ("Matter material %s (matterlib-0.1.0). Assign to a mesh; export via IMRSV "
-                          "LCD USD. Identity travels on imrsv_matter_identity." % a["identity"])
+        ad.description = ("Matter material %s (%s: %s). Assign to a mesh; export via IMRSV LCD "
+                          "USD. Identity travels on imrsv_matter_identity."
+                          % (a["identity"], a["status"], STATUS_MEANS[a["status"]]))
         try:
             ad.tags.new("matter")
             ad.tags.new(a["catalog_path"].split("/")[-1])
+            ad.tags.new(a["status"])
         except Exception:
             pass
         try:

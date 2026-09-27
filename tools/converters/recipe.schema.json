@@ -8,6 +8,7 @@
   "required": ["name", "path", "master", "domain", "class", "scale_tag", "meters_per_tile", "lcd_ports"],
   "properties": {
     "_comment": {"type": "string", "description": "Why this master, what the article is for."},
+    "status": {"type": "string", "enum": ["draft", "candidate", "approved", "deprecated", "retired"], "description": "The article's lifecycle state before a release (Phase07, D-S): missing = draft. candidate = passed USDLiveView and Blender in the parity rig; approved = Unreal agrees too. Never written into the .mtlx; a release's own status lives in its lockfile."},
     "name": {"type": "string", "pattern": "^[A-Za-z0-9_]{1,63}$", "description": "The stem: Material_Variant_Condition_Detail_sNN_vNN (Identity.md)."},
     "path": {"type": "string", "pattern": "^[a-z]+/[a-z]+/[A-Za-z0-9_]+\\.mtlx$", "description": "<domain>/<class>/<name>.mtlx under MatterLibrary/materials/."},
     "master": {"type": "string", "enum": ["Opaque", "Masked", "TranslucentThin", "TranslucentThick", "Subsurface", "TwoLayer", "Emissive", "system"]},

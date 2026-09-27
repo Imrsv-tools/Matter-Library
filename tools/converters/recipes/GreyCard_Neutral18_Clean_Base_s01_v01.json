@@ -1,6 +1,7 @@
 {
   "_comment": "Calibration reference — the 18% neutral grey card (middle grey). Opaque master: a rough diffuse dielectric with nothing to layer. A utility/virtual reference stays pure: no overlays, no mask, and no Creator controls, so no app can move it off 18% reflectance. Values from Physically Based 'Gray Card'.",
   "name": "GreyCard_Neutral18_Clean_Base_s01_v01",
+  "status": "candidate",
   "path": "utility/virtual/GreyCard_Neutral18_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "utility",

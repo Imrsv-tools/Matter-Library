@@ -1,6 +1,7 @@
 {
   "_comment": "Glossy ABS plastic: the moulded, high-gloss finish of appliance and toy housings. Opaque: a solid dielectric. The glossy sibling of the shipped ABS_Matte (same off-white base; colour is the Creator's tint, N5). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints and dust, gated by the Grime mask. Gloss is what makes fingerprints and fine scratches show, so this is the article that judges Fingerprints01.",
   "name": "ABS_Glossy_Clean_Base_s01_v01",
+  "status": "candidate",
   "path": "synthetic/plastic/ABS_Glossy_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

@@ -1,5 +1,15 @@
 """Phase 60sq1 Step 4 (re-seq §9) — headless STRUCTURE verifier for the generated Blender
-Asset-Browser library, ALL Creator-selectable articles (11 for matterlib-0.1.0).
+Asset-Browser library, ALL Creator-selectable articles.
+
+Subject set (since Phase07 7.2, 2026-09-27): the WORKING TREE's Creator-selectable articles,
+from `tools/converters/working_tree.py`, the same list the generator reads, and each one must
+carry its status as an asset tag. A floor keeps the release honest: every Creator-selectable
+article of `matterlib-0.1.0` must still be in the library. (Until then the subject set was
+`matterlib-0.1.0`'s catalog alone, with a hard count of 11.)
+
+FALSE RED: 2026-09-27 — "recipe declares LCD travel ports" failed GreyCard_Neutral18, a
+calibration target with no sliders by design; the check now requires the recipe and every
+port it declares, not at least one port (Phase07 7.2).
 
 Opens the generated MatterLibrary.blend and asserts, for every creator_selectable catalog
 article (RD-5): the proxy material is present + asset-marked with a catalog, carries the durable
@@ -42,9 +52,16 @@ def travel_ports_for(identity):
         return set(json.load(f).get("lcd_ports", [])) & LCD_TRAVEL_PORTS
 
 
-cat = load_catalog()
-selectable = [m for m in cat.get("materials", []) if m.get("creator_selectable", True)]
-system = [m for m in cat.get("materials", []) if not m.get("creator_selectable", True)]
+sys.path.insert(0, os.path.join(REPO, "tools/converters"))
+import working_tree  # noqa: E402
+
+tree = working_tree.articles()
+selectable = [{"payload_path": a["identity"] + ".mtlx", "domain": a["domain"],
+               "material_class": a["material_class"], "status": a["status"]}
+              for a in tree if a["creator_selectable"]]
+system = [{"payload_path": a["identity"] + ".mtlx"} for a in tree if not a["creator_selectable"]]
+released = [os.path.splitext(os.path.basename(m["payload_path"]))[0]
+            for m in load_catalog().get("materials", []) if m.get("creator_selectable", True)]
 
 libdir = os.path.dirname(bpy.data.filepath)
 cats_path = os.path.join(libdir, "blender_assets.cats.txt")
@@ -52,7 +69,10 @@ cats_txt = open(cats_path).read() if os.path.isfile(cats_path) else ""
 check(bool(cats_txt), "blender_assets.cats.txt exists beside the library", cats_path)
 check("VERSION 1" in cats_txt, "cats file has VERSION 1 header")
 
-check(len(selectable) == 11, "catalog has 11 creator-selectable articles", str(len(selectable)))
+check(len(released) == 11, "matterlib-0.1.0 has 11 creator-selectable articles", str(len(released)))
+tree_ids = {os.path.splitext(m["payload_path"])[0] for m in selectable}
+check(set(released) <= tree_ids, "every matterlib-0.1.0 article is in the working tree",
+      "missing %s" % sorted(set(released) - tree_ids))
 
 for m in selectable:
     identity = os.path.splitext(os.path.basename(m["payload_path"]))[0]
@@ -64,6 +84,9 @@ for m in selectable:
     check(mat.get(IDENTITY_PROP) == identity,
           "%s: durable identity carrier == identity" % identity, str(mat.get(IDENTITY_PROP)))
     check(mat.asset_data is not None, "%s: asset-marked (browsable)" % identity)
+    tags = {t.name for t in mat.asset_data.tags} if mat.asset_data else set()
+    check(m["status"] in tags, "%s: tagged with its status (%s)" % (identity, m["status"]),
+          "tags %s" % sorted(tags))
     cid = mat.asset_data.catalog_id if mat.asset_data else ""
     check(bool(cid) and cid != "00000000-0000-0000-0000-000000000000",
           "%s: catalog assigned" % identity, cid)
@@ -77,7 +100,10 @@ for m in selectable:
         socks = {it.name for it in ng[0].node_tree.interface.items_tree
                  if getattr(it, "in_out", "") == "INPUT"}
         want = travel_ports_for(identity)
-        check(bool(want), "%s: recipe declares LCD travel ports" % identity, str(want))
+        # a reference article may have no sliders at all (GreyCard: exposed=[]), so what is
+        # checked is that the recipe exists and every port it declares is exposed
+        check(os.path.isfile(os.path.join(RECIPES, identity + ".json")),
+              "%s: recipe present (its LCD travel ports: %s)" % (identity, sorted(want) or "none"))
         check(want <= socks, "%s: proxy exposes the article's LCD travel ports" % identity,
               "missing %s" % (want - socks))
 

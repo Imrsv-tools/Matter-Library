@@ -1,6 +1,7 @@
 {
   "_comment": "Green bottle glass: soda-lime glass tinted green by iron and chromium oxides. TranslucentThin: a bottle wall is a thin shell seen through, the same master as Glass_Clear. The green is transmission_color, authored here, because the Creator tint does not reach what is seen through glass (E2), so a see-through colour is its own article. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust, fingerprints, gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article.",
   "name": "Glass_Green_Clean_Base_s01_v01",
+  "status": "candidate",
   "path": "engineered/glass/Glass_Green_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThin",
   "domain": "engineered",

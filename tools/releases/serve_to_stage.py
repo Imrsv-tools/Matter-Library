@@ -11,7 +11,8 @@ What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
   * ``releases/matterlib-dev/materials`` and ``textures`` -> symlinks into this checkout, so a
     re-assembled article or a regenerated texture is live with no re-serve;
   * ``releases/matterlib-dev/matterlib-dev.catalog.json`` -> projected from the working tree
-    (every ``.mtlx``, ``status: draft``);
+    (every ``.mtlx``; ``status`` from its recipe, else ``draft``; plus each article's own
+    ``master`` token, so a consumer can route by it rather than by class: Phase07 7.2, L4);
   * ``active-release.json`` -> ``matterlib-dev`` (the previous value is kept in
     ``active-release.before-dev.json``; ``--off`` puts it back);
   * then (re)starts the Stage daemon from that runtime, unless ``--no-restart``.
@@ -30,7 +31,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import signal
 import socket
 import subprocess
@@ -43,28 +43,27 @@ REPO = HERE.parent.parent
 SOURCE = REPO / "MatterLibrary"
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 from project_runtime_catalog import SCHEMA_VERSION, derive_entry  # noqa: E402
+import working_tree  # noqa: E402
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
 SELECTOR = "active-release.json"
 BACKUP = "active-release.before-dev.json"
 PORT = 8081
-VERSION_RE = re.compile(r"^(?P<leaf>.+)_(?P<ver>v\d+)$")
-SYSTEM = {"IMRSV_MissingMaterial"}
 
 
 def working_tree_catalog() -> dict:
+    """Every article on disk, each with its recipe's status (else draft) and its own master
+    token (Phase07 7.2, L4): the master lets a consumer route by the article rather than by a
+    class table it has to be taught (PlatformDependencies P4)."""
     entries = []
-    for mtlx in sorted((SOURCE / "materials").rglob("*.mtlx")):
-        rel = mtlx.relative_to(SOURCE / "materials").with_suffix("").as_posix()
-        m = VERSION_RE.match(rel)
-        mid, ver = (m["leaf"], m["ver"]) if m else (rel, "v01")
-        row = {"id": mid, "version": ver, "status": "draft"}
-        if mtlx.stem in SYSTEM:
-            row["creator_selectable"] = False
+    for art in working_tree.articles():
+        row = {"id": art["id"], "version": art["version"], "status": art["status"],
+               "creator_selectable": art["creator_selectable"]}
         entry = derive_entry(row)
+        entry["master"] = art["master"]
         if not (SOURCE / entry["payload_path"]).is_file():
-            raise SystemExit(f"cannot serve {mtlx}: expected payload {entry['payload_path']}")
+            raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)
     return {"schema_version": SCHEMA_VERSION, "release": SERVED_RELEASE, "materials": entries}
 

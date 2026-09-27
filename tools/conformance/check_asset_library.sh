@@ -17,7 +17,7 @@ rc=0
 # Blender uses its OWN bundled USD — run with a clean env (see check_exporter.sh).
 CLEAN="env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH"
 
-echo "### 1. Generate the Asset-Browser library (blender --background --factory-startup -> gen_asset_library.py, all 11 articles)"
+echo "### 1. Generate the Asset-Browser library (blender --background --factory-startup -> gen_asset_library.py, every Creator-selectable article in the working tree)"
 if $CLEAN blender --background --factory-startup --python "$GEN" -- "$OUT" > "$OUT/gen.log" 2>&1 \
         && grep -q ASSET_LIB_OK "$OUT/gen.log"; then
   echo "  generate: OK"; grep ASSET_LIB_OK "$OUT/gen.log"

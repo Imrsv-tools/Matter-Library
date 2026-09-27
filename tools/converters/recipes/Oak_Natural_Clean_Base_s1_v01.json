@@ -1,6 +1,7 @@
 {
   "_comment": "Natural oak: plain, smooth, unfinished oak boards (ambientCG Wood049, CC0; photogrammetry, an 80 x 80 cm sample). Opaque: a solid, diffuse-dominant dielectric. Named Oak, not WhiteOak: the source says oak and not which species. Carries every relevant wear layer at 0 (C1): scuffs (overlay 1, damage), scratches, dust, gated by the Grime mask (dirt settles in low areas).",
   "name": "Oak_Natural_Clean_Base_s1_v01",
+  "status": "candidate",
   "path": "natural/wood/Oak_Natural_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",

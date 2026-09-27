@@ -3,11 +3,14 @@
 
 VERSION 1
 
+238c4f47-9ef2-5426-8814-5863d223d1b6:biological/tissue:biological-tissue
 e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementitious
+04cf9d02-7bbc-54c8-adb2-e6878ff7e727:engineered/ceramic:engineered-ceramic
 3f33cced-4f95-545a-88e2-2b5f70082073:engineered/glass:engineered-glass
 1d4eba5e-8429-54a4-811a-42e7056b20ee:engineered/metal:engineered-metal
 0c85cfcc-f203-5a18-902c-a152b6f2f966:natural/mineral:natural-mineral
 57771307-e81e-5a87-966e-482639f264bd:natural/stone:natural-stone
+10c839d1-df8d-563b-bde4-ea627a5a6eee:natural/wood:natural-wood
 62f8858f-976a-5243-9508-b37fab10a81e:synthetic/plastic:synthetic-plastic
 196a75d2-9441-501c-b2b0-f1430ea50a41:synthetic/textile:synthetic-textile
 e9233954-7e64-57c6-9050-4dca0d92079d:utility/emissive:utility-emissive
