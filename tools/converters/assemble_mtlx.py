@@ -541,28 +541,44 @@ def assemble(spec: MaterialSpec) -> str:
     if has_metal_out:
         ng.addOutput("metalness_out", "float").setNodeName(metal_src)
 
-    # --- Normal: decode -> [layer-2 blend] -> [overlay perturbation] -> normalize -> out ---
+    # --- Normal ---
+    # MaterialX's `normalmap` outputs a WORLD-space normal (stdlib: "into 'world' space"). So
+    # everything that COMBINES normals — the layer-2 blend and the overlay bumps — happens in
+    # TANGENT space, on decoded maps (2c - 1), and one `normalmap` converts the result to
+    # world space at the end. Before Phase05 step 5.3 the combination was done on the
+    # already-world output of `normalmap`: overlay bumps were added along world X/Y, and the
+    # "flat" (0, 0, 1) fallback became a fixed world +Z normal (Execution Log F10).
+    # An article with ONLY a normal map needs no combination and keeps the direct graph.
     has_normal_out = bool(spec.normal_tex or spec.layer2_normal_tex or ov_effect)
-    if has_normal_out:
+    combine = bool(spec.layer2_normal_tex or ov_effect)
+    if has_normal_out and not combine:
+        _image("normal_tex", "vector3", spec.normal_tex)
+        nmap = ng.addNode("normalmap", "surface_normal", "vector3")
+        _add_input(nmap, "in", "vector3", nodename="normal_tex")
+        n_src = "surface_normal"
+    elif has_normal_out:
+        def _decode(tex: str, name: str) -> str:
+            scaled = _node("multiply", f"{name}_x2", "vector3",
+                           in1=("vector3", "nodename", tex), in2=("float", "value", 2.0))
+            return _node("subtract", name, "vector3",
+                         in1=("vector3", "nodename", scaled), in2=("float", "value", 1.0))
+
         if spec.normal_tex:
             _image("normal_tex", "vector3", spec.normal_tex)
-            nmap = ng.addNode("normalmap", "surface_normal", "vector3")
-            _add_input(nmap, "in", "vector3", nodename="normal_tex")
-            n_src = "surface_normal"
+            n_src = _decode("normal_tex", "surface_normal_ts")
         else:
             # An overlay/layer-2 normal needs a base normal to perturb, or its contribution
-            # is silently dropped. Flat tangent-space normal.
+            # is silently dropped. Flat, in TANGENT space: it becomes the surface's own normal.
             n_src = _node("constant", "surface_normal_flat", "vector3",
                           value=("vector3", "value", "0.0, 0.0, 1.0"))
 
         if spec.layer2_normal_tex:
             _image("layer2_normal_tex", "vector3", spec.layer2_normal_tex)
-            n2map = ng.addNode("normalmap", "layer2_normal", "vector3")
-            _add_input(n2map, "in", "vector3", nodename="layer2_normal_tex")
+            n2 = _decode("layer2_normal_tex", "layer2_normal_ts")
             # Decode BOTH to tangent space FIRST, then blend, then renormalize.
             blended = _node("mix", "normal_layered", "vector3",
                             bg=("vector3", "nodename", n_src),
-                            fg=("vector3", "nodename", "layer2_normal"),
+                            fg=("vector3", "nodename", n2),
                             mix=("float", "nodename", t_src))
             n_src = _node("normalize", "normal_layered_unit", "vector3",
                           **{"in": ("vector3", "nodename", blended)})
@@ -594,7 +610,15 @@ def assemble(spec: MaterialSpec) -> str:
         if ov_effect:
             n_src = _node("normalize", "normal_out_unit", "vector3",
                           **{"in": ("vector3", "nodename", n_src)})
+        # re-encode (n * 0.5 + 0.5) and convert the tangent-space result to world space ONCE
+        half = _node("multiply", "normal_ts_half", "vector3",
+                     in1=("vector3", "nodename", n_src), in2=("float", "value", 0.5))
+        enc = _node("add", "normal_ts_encoded", "vector3",
+                    in1=("vector3", "nodename", half), in2=("float", "value", 0.5))
+        n_src = _node("normalmap", "surface_normal", "vector3",
+                      **{"in": ("vector3", "nodename", enc)})
 
+    if has_normal_out:
         ng.addOutput("normal_out", "vector3").setNodeName(n_src)
 
     # --- Opacity: source -> [cutoff threshold] -> out.

@@ -141,10 +141,12 @@ Both overlays and masksets are **data textures**: they may bend a normal, bias a
 
 ```
 effect_N   = overlayN_density * overlayN_tex.A * lerp(1, maskset.<G|B|A>, maskset_blend)
-normal    += (overlayN_tex.RG * 2 - 1) * effect_N        # then renormalize
+normal    += (overlayN_tex.RG * 2 - 1) * effect_N        # TANGENT space; then renormalize
 roughness += overlayN_tex.B_bias       * effect_N
 base_color: UNTOUCHED                                     # an overlay never tints
 ```
+
+**The normal is combined in tangent space and converted to world space once** *(stated 2026-09-27, Phase05 step 5.3)*. The article's normal map is decoded (`2c − 1`), or taken as flat `(0, 0, 1)` where it has none; the layer-2 blend and every overlay's `(RG·2 − 1, 0) · effect` are added there; the sum is renormalized and passed through ONE MaterialX `normalmap`, whose output is world space. *(Before 5.3 the assembler combined on the output of `normalmap`, which MaterialX 1.39 defines as world space. So overlay bumps were added along world X/Y, and an article with overlays but no normal map, Glass_Clear, Glass_Green and ABS_Glossy, shaded with one fixed world +Z normal. Measured in USDLiveView's renderer: ABS_Glossy rendered flat white until fixed. The formula above was always meant in tangent space; it now says so.)*
 
 ### TwoLayer blend (v1)
 
@@ -255,3 +257,4 @@ The per-master **author-tier** carriers (the values that make each master *be* t
 - 2026-07 — all seven masters were shown rendering their defining behaviour in a consumer, each with a real Creator-selectable example article.
 - 2026-09-23 — master resolution changed from class routing with name exceptions to "the article declares its master; the class is a typical default" (lead). A master is the structure for a type of material. Class routing would have made ordinary fabrics Masked, and full coverage would have needed dozens of exceptions. No master was added or changed.
 - 2026-09-24 — translucent roughness parity was measured in a consumer (IMRSV #88 RD-8) and accepted on eyes-on: roughness visibly frosts Glass and Diamond in both a stock USD viewer and Unreal, in the same direction. The translucent rows and settings notes now say so.
+- 2026-09-27 — the articles' normal was found combined in the wrong space (Phase05 step 5.3): the assembler added the overlay bumps and the layer-2 blend to the world-space output of MaterialX's `normalmap`, and its flat fallback became a fixed world +Z normal, so three articles shaded as one flat colour. The assembler now combines in tangent space and converts once; eight articles were re-assembled in place (`v01` kept) and the pilot is re-frozen at the Phase05 close. The overlay formula gained the word "tangent".

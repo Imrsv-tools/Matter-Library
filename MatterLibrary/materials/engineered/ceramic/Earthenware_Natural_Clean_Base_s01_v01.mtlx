@@ -129,9 +129,14 @@
       <input name="file" type="filename" value="../../../textures/base/engineered/ceramic/Earthenware_Natural_normal_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
-    <normalmap name="surface_normal" type="vector3">
-      <input name="in" type="vector3" nodename="normal_tex" />
-    </normalmap>
+    <multiply name="surface_normal_ts_x2" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_tex" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="surface_normal_ts" type="vector3">
+      <input name="in1" type="vector3" nodename="surface_normal_ts_x2" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
     <extract name="overlay1_nx_raw" type="float">
       <input name="in" type="color4" nodename="overlay1_tex" />
       <input name="index" type="integer" value="0" />
@@ -166,7 +171,7 @@
       <input name="in2" type="float" nodename="overlay1_effect" />
     </multiply>
     <add name="normal_overlay1" type="vector3">
-      <input name="in1" type="vector3" nodename="surface_normal" />
+      <input name="in1" type="vector3" nodename="surface_normal_ts" />
       <input name="in2" type="vector3" nodename="overlay1_normal_scaled" />
     </add>
     <extract name="overlay2_nx_raw" type="float">
@@ -209,7 +214,18 @@
     <normalize name="normal_out_unit" type="vector3">
       <input name="in" type="vector3" nodename="normal_overlay2" />
     </normalize>
-    <output name="normal_out" type="vector3" nodename="normal_out_unit" />
+    <multiply name="normal_ts_half" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_out_unit" />
+      <input name="in2" type="float" value="0.5" />
+    </multiply>
+    <add name="normal_ts_encoded" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_ts_half" />
+      <input name="in2" type="float" value="0.5" />
+    </add>
+    <normalmap name="surface_normal" type="vector3">
+      <input name="in" type="vector3" nodename="normal_ts_encoded" />
+    </normalmap>
+    <output name="normal_out" type="vector3" nodename="surface_normal" />
   </nodegraph>
   <open_pbr_surface name="SR_Earthenware_Natural_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />

@@ -14,8 +14,8 @@ assigned to the subjects, with the setting's sliders applied as a Creator would.
 The lights are set here from the scene's own numbers (``build_scene.py``), not from the
 importer's unit conversion, so the mapping is explicit and measured:
 
-* dome: a constant world colour of radiance ``DOME_INTENSITY x DOME_K`` — Storm's dome is a
-  radiance-1 texture times its intensity, and so is a Blender world of strength 1;
+* dome: a constant world colour ``DOME_RADIANCE`` at strength ``DOME_INTENSITY x DOME_K`` —
+  Storm's dome is its texture's linear value times its intensity, and so is this world;
 * sun: a Sun of strength ``SUN_INTENSITY x SUN_K`` along the imported light's direction —
   a normalized UsdLux distant light's intensity is irradiance, as is a Sun's strength.
 
@@ -97,7 +97,8 @@ def setup_scene(job: dict) -> None:
     world = bpy.data.worlds.new("ML_ParityDome")
     world.use_nodes = True
     bg = world.node_tree.nodes["Background"]
-    bg.inputs["Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+    r = build_scene.DOME_RADIANCE          # the dome texture's linear value (Storm reads it)
+    bg.inputs["Color"].default_value = (r, r, r, 1.0)
     bg.inputs["Strength"].default_value = build_scene.DOME_INTENSITY * DOME_K
     scn.world = world
 

@@ -16,12 +16,12 @@ def Xform "World"
         def DomeLight "Dome"
         {
             float inputs:intensity = 1.0
-            asset inputs:texture:file = @./white_env.png@
+            asset inputs:texture:file = @./dome_env.png@
             token inputs:texture:format = "latlong"
         }
         def DistantLight "Sun"
         {
-            float inputs:intensity = 3.0
+            float inputs:intensity = 1.5
             bool inputs:normalize = true
             float inputs:angle = 0.53
             float3 xformOp:rotateXYZ = (-40.0, 35.0, 0.0)

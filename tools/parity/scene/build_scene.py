@@ -61,13 +61,23 @@ CAMERAS = {"wide": "/World/Cam", "close": "/World/CamClose"}
 #     (hdSt/light.cpp multiplies it by the 0.53-degree disk's solid angle, ~6.7e-5 sr), so
 #     the sun is normalized: its intensity is then the irradiance, like Blender's strength;
 #   * Storm ignores a DomeLight with no texture ("Dome light has no texture asset path"),
-#     so the dome carries DOME_TEX, a constant-white environment written by this script.
-#     It is an 8-bit PNG (255 = radiance 1.0): a hand-written flat Radiance .hdr was
-#     MISREAD by Storm (visible dome 0.36-0.52 and uneven, dome light ~56%), while the
-#     white PNG reads exactly 1.0 (measured, Phase05 5.1).
+#     so the dome carries DOME_TEX, a constant environment written by this script.
+#     It is an 8-bit PNG: a hand-written flat Radiance .hdr was MISREAD by Storm (visible
+#     dome 0.36-0.52 and uneven, dome light ~56%), while a PNG reads exactly (a white one
+#     read 1.0; measured, Phase05 5.1).
+#
+# Levels: a white surface (albedo ~0.9) facing the sun must stay UNDER display white, or
+# both tools clip it identically and "agree" on pixels that carry no information. At dome
+# 1 + sun 3 an albedo-0.85 plastic reached ~1.37 and rendered flat white (measured 5.3), so
+# the levels are halved: dome 0.5 + sun 1.5 puts that surface near 0.7.
+# The dome's 0.5 lives in its TEXTURE, not its intensity: Storm draws the visible dome as the
+# raw texture and applies `intensity` only to the lighting (a white texture at intensity 0.5
+# showed a white background in Storm and a grey one in Blender, measured 5.3).
 DOME_INTENSITY = 1.0
-DOME_TEX = "white_env.png"
-SUN_INTENSITY = 3.0
+DOME_TEX = "dome_env.png"
+DOME_CODE = 188                                          # 8-bit sRGB code of the texture
+DOME_RADIANCE = ((DOME_CODE / 255 + 0.055) / 1.055) ** 2.4   # its linear value, ~0.503
+SUN_INTENSITY = 1.5
 SUN_ROTATE = (-40.0, 35.0, 0.0)
 SUN_ANGLE = 0.53
 
@@ -286,7 +296,10 @@ def subject_uvs() -> dict[str, list[tuple[float, float]]]:
 def main() -> int:
     from PIL import Image
     OUT.write_text(build(), encoding="utf-8")
-    Image.new("RGB", (64, 32), (255, 255, 255)).save(HERE / DOME_TEX, optimize=True)
+    Image.new("RGB", (64, 32), (DOME_CODE,) * 3).save(HERE / DOME_TEX, optimize=True)
+    old = HERE / "white_env.png"
+    if old.exists():
+        old.unlink()
     print(f"wrote {OUT}")
     return 0
 

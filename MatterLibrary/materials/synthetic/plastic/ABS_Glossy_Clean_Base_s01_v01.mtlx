@@ -280,7 +280,18 @@
     <normalize name="normal_out_unit" type="vector3">
       <input name="in" type="vector3" nodename="normal_overlay3" />
     </normalize>
-    <output name="normal_out" type="vector3" nodename="normal_out_unit" />
+    <multiply name="normal_ts_half" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_out_unit" />
+      <input name="in2" type="float" value="0.5" />
+    </multiply>
+    <add name="normal_ts_encoded" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_ts_half" />
+      <input name="in2" type="float" value="0.5" />
+    </add>
+    <normalmap name="surface_normal" type="vector3">
+      <input name="in" type="vector3" nodename="normal_ts_encoded" />
+    </normalmap>
+    <output name="normal_out" type="vector3" nodename="surface_normal" />
   </nodegraph>
   <open_pbr_surface name="SR_ABS_Glossy_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />

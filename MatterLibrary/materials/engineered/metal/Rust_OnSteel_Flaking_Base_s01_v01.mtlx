@@ -120,25 +120,46 @@
       <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
-    <normalmap name="surface_normal" type="vector3">
-      <input name="in" type="vector3" nodename="normal_tex" />
-    </normalmap>
+    <multiply name="surface_normal_ts_x2" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_tex" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="surface_normal_ts" type="vector3">
+      <input name="in1" type="vector3" nodename="surface_normal_ts_x2" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
     <image name="layer2_normal_tex" type="vector3">
       <input name="file" type="filename" value="../../../textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
     </image>
-    <normalmap name="layer2_normal" type="vector3">
-      <input name="in" type="vector3" nodename="layer2_normal_tex" />
-    </normalmap>
+    <multiply name="layer2_normal_ts_x2" type="vector3">
+      <input name="in1" type="vector3" nodename="layer2_normal_tex" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="layer2_normal_ts" type="vector3">
+      <input name="in1" type="vector3" nodename="layer2_normal_ts_x2" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
     <mix name="normal_layered" type="vector3">
-      <input name="bg" type="vector3" nodename="surface_normal" />
-      <input name="fg" type="vector3" nodename="layer2_normal" />
+      <input name="bg" type="vector3" nodename="surface_normal_ts" />
+      <input name="fg" type="vector3" nodename="layer2_normal_ts" />
       <input name="mix" type="float" nodename="layer_blend_t" />
     </mix>
     <normalize name="normal_layered_unit" type="vector3">
       <input name="in" type="vector3" nodename="normal_layered" />
     </normalize>
-    <output name="normal_out" type="vector3" nodename="normal_layered_unit" />
+    <multiply name="normal_ts_half" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_layered_unit" />
+      <input name="in2" type="float" value="0.5" />
+    </multiply>
+    <add name="normal_ts_encoded" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_ts_half" />
+      <input name="in2" type="float" value="0.5" />
+    </add>
+    <normalmap name="surface_normal" type="vector3">
+      <input name="in" type="vector3" nodename="normal_ts_encoded" />
+    </normalmap>
+    <output name="normal_out" type="vector3" nodename="surface_normal" />
   </nodegraph>
   <open_pbr_surface name="SR_Rust_OnSteel_Flaking_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
