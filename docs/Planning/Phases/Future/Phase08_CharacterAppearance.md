@@ -142,6 +142,26 @@ The controls, read 2026-09-28:
 
 *Ledger: step · result · next. Findings live in the commit messages.*
 
+### Resume block (written at the 2026-09-28 hand-off; the lead: *"yes to 1 and 2, then hand off"*)
+
+- **Where:** 8.1 is **reworking**. The `Hair` token, `Hair_Natural` (candidate) and the Blender library landed. The lead judged the hair unusable (see the verdicts below), so the Hair master's graph is being redone. **Not pushed** since `de08ccc`: 8.1's commits, the research, and this hand-off. **Push after the rework lands** (the platform builds against the Hair master).
+- **Ruled by the lead, 2026-09-28** (*"yes to 1 and 2"*):
+  - **(1)** the mesh-UV rule and the `uv_scale` formula are now in the contract (`LCDSchema.md` §Notes, `PlatformDependencies.md` P18). Done at this hand-off.
+  - **(2)** the hair ships as an **interim**: light through the strands, soft edges and much less gloss, **marked interim**. The real fix is its own research thread: card maps (root-to-tip, strand variation, depth), strands, and better card assets than MakeHuman's bob (`260928_R_HairAndNailRendering.md` H4/H5; Roadmap *Hair That Reads as Hair*).
+- **Next, 8.1 rework, in this order:**
+  1. **Storm probe first** (HR-Q1, HR-Q2): the character's hair with a hand-edited `Hair_Natural` (`geometry_thin_walled = true`, `subsurface_weight` ≈ 0.6, `subsurface_color` = the fibre colour, forward `subsurface_scatter_anisotropy`; then a continuous `geometry_opacity` with no threshold), rendered through the rig. Blender's equivalent is probe B/C (`260928_R_HairAndNailRendering_probe.py`).
+  2. **The Hair graph:**
+     - the assembler authors `geometry_thin_walled` and the subsurface set on Hair;
+     - `validate_material.py`'s Hair branch requires them;
+     - `build_masters.py` gives `ML_Hair` a translucency part (OpenPBR's thin-walled split: reflection × (1 − a), a Translucent BSDF × (1 + a); HR-Q6 whether Principled's `Thin Wall` does it natively);
+     - soft coverage, if HR-Q2 passes;
+     - `MasterSet.md` (the Hair row and settings row: *"masked, dithered"*; RD-P08-1 superseded) and `LCDSchema.md`.
+  3. **Less gloss** (the lead: *"too glossy"*): roughness up from 0.4, specular weight down. Re-author `Hair_Natural` in place (`v01`, unreleased, "no versioning") with an **interim** note in its recipe.
+  4. Rig sweep and character sheet; Blender library rebuilt; `check_asset_library.sh`; then the lead's sitting on the **character's hair cards**, never on cubes.
+- **Then 8.2 with nails (N1):** `Nail_FitzpatrickI…VI` on **Subsurface + a glossy coat**, `subsurface_color` from the tone (the lead: *"Agreed nails are bad we need to fix them"*). This replaces the Brief's Opaque nail.
+- **Gate state at hand-off:** `run_all.py` 14 / 2 / 1 (`approval_binds_freeze` alone, inherited). `check_exporter.sh` red for its environment (no MaterialX in its Python), identical before and after 8.1.
+- **Left open on the desktop (disposable, unsaved):** a Blender session holding the scenes *P08 hair probe* and the four-cube demo. Close it without saving.
+
 **Tree at start (2026-09-28):** `main` @ `de08ccc`, level with origin; 49 tracked textures modified in the working tree by no session of this phase. **Gate at start:** `run_all.py` 10 PASS / 2 SKIP / **5 FAIL** (Phase07 closed on 14 / 2 / 1, `approval_binds_freeze` alone). `check_exporter.sh` red at start: its Python cannot import MaterialX (environment, not code).
 
 **F-P08-7 — Every texture in the working tree was an 8×8 placeholder PNG.** The 49 tracked PNGs under `MatterLibrary/textures/` were 67–74 bytes (mtimes 2026-09-23 15:02 and 2026-09-27 20:52), while their real objects sat intact in the local LFS store. That caused the four extra release-hash reds, and it would have put stub textures in every rig sheet, every Blender preview and the dev install Studio links to. The cause is not traced. **Restored by the lead's ruling**, verbatim: *"yes restore the textures"* (`git checkout -- MatterLibrary/textures`). The gate is back to 14 / 2 / 1, `approval_binds_freeze` alone (inherited).
