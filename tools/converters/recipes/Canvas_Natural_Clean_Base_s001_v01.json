@@ -1,0 +1,37 @@
+{
+  "_comment": "Undyed cotton canvas (duck) (Phase08 8.4, RD-P08-5): a heavy plain weave, the stuff of sneakers, tote bags and work jackets. Authored at the unbleached cotton's own pale ecru so a Creator's tint (a 0-1 multiply) reaches the khakis, olives, navies and black below it. OPAQUE with a little FUZZ: matte, with fewer loose fibres than a knit. The weave (16 ends x 14 picks per cm) is the article's own normal and roughness.",
+  "name": "Canvas_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Canvas_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Canvas_Duck_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Canvas_Duck_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.66, 0.60, 0.48",
+  "specular_ior": 1.53,
+  "fuzz_weight": 0.35,
+  "fuzz_color": "0.85, 0.82, 0.74",
+  "fuzz_roughness": 0.6,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: unbleached cotton duck's pale ecru (linear 0.66, 0.60, 0.48; no measured value; Physically Based has no fabric entries), a little darker and warmer than Cotton_Jersey's bleached yarn. IOR 1.53: cellulose. Roughness ~0.86 in the map: matte. Fuzz 0.35: a tightly woven, plied yarn sheds less than a knit (Cotton_Jersey 0.6), more than denim (0.3)."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Canvas_Duck.yaml"
+    }
+  ]
+}
