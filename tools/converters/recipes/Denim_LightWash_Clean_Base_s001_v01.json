@@ -1,0 +1,42 @@
+{
+  "_comment": "Light-wash denim (Phase08 8.3, RD-P08-5): Denim_Indigo's 3/1 twill with the indigo warp bleached, authored light so a Creator's tint (a 0-1 multiply) reaches the mid and dark washes and other colours, which it cannot do from dark indigo. OPAQUE with a little FUZZ. The colour IS the weave (warp and white weft flecks), so a base-colour texture; its normal and roughness are Denim_Twill's (the same weave).",
+  "name": "Denim_LightWash_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Denim_LightWash_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Denim_Twill_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Denim_Twill_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_tex": "../../../textures/base/synthetic/textile/Denim_TwillLight_basecolor_s001.png",
+  "specular_ior": 1.53,
+  "fuzz_weight": 0.3,
+  "fuzz_color": "0.6, 0.62, 0.7",
+  "fuzz_roughness": 0.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "A light (bleached) wash: the warp's indigo at linear ~0.22, 0.33, 0.55, lighter towards ~0.32, 0.45, 0.66 where the yarn core shows (thread-scale only), over Denim_Indigo's undyed weft. Everything else is Denim_Indigo's: 32 x 32 threads per cm, IOR 1.53 (cellulose), fuzz 0.3."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Denim_TwillLight.yaml"
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Denim_Twill.yaml"
+    }
+  ]
+}

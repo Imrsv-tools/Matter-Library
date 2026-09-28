@@ -301,8 +301,11 @@ CHARACTER_CAST = {
     "Gums": "Gum_Natural_Clean_Base_s001_v01",
     "Tongue": "Tongue_Natural_Clean_Base_s001_v01",
     "Shirt": "Cotton_Jersey_Clean_Base_s001_v01",
-    "Trousers": "Denim_Indigo_Clean_Base_s001_v01",
-    "Shoes": "Leather_Brown_Clean_Base_s001_v01",
+    # Phase08 8.3: the light fabrics a Creator tints (RD-P08-5), and a rubber sole of its own
+    # (Denim_Indigo and Leather_Brown are kept)
+    "Trousers": "Denim_LightWash_Clean_Base_s001_v01",
+    "Shoes": "Leather_Natural_Clean_Base_s001_v01",
+    "Soles": "Rubber_Natural_Clean_Base_s001_v01",
     # one article on all three; each part supplies its own cut-out map (7.6, L2)
     # (Phase08 8.1: the untinted Hair_Natural on the Hair master; Hair_DarkBrown is kept)
     "Hair": "Hair_Natural_Clean_Base_s001_v01",

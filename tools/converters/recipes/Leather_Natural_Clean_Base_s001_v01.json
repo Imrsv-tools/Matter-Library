@@ -1,0 +1,37 @@
+{
+  "_comment": "Natural (undyed) full-grain leather (Phase08 8.3, RD-P08-5): a vegetable-tanned hide's own pale tan, authored light so a Creator's tint (a 0-1 multiply) reaches the browns, black and other dyed colours below it; Leather_Brown is kept. OPAQUE, semi-matte, with a light COAT for the finish, on Leather_Brown's pebbled grain.",
+  "name": "Leather_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Leather_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Leather_Grain_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Leather_Grain_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.58, 0.38, 0.21",
+  "specular_ior": 1.5,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.35,
+  "coat_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: an undyed vegetable-tanned hide's pale tan (linear 0.58, 0.38, 0.21; no measured value). Leather_Brown (0.16, 0.07, 0.03) is a tint of about (0.28, 0.18, 0.14). Grain, roughness and coat are Leather_Brown's (Phase07 7.5): semi-matte, coat 0.3 at 0.35 for a finished (not patent) leather."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Leather_Grain.yaml"
+    }
+  ]
+}

@@ -12,11 +12,13 @@ fabric at real size, on a 1 cm tile (scale `s001`, 1024 px, ~10 um per pixel).
   repeat every centimetre), normal, roughness.
 - **Leather_Grain** — a pebbled full-grain hide: rounded cells about 0.8 mm across (12 per
   centimetre, jittered), with creases between them. Normal and roughness.
+- **Denim_TwillLight** (Phase08 8.3) — Denim_Twill's weave, light-washed: base colour only (its
+  normal and roughness are Denim_Twill's).
 
 Seamless (tileable.py; every count divides the tile, and the cell pattern wraps), fixed seeds,
 no network. Writes MatterLibrary/textures/base/synthetic/textile/<Set>_<channel>_s001.png.
 
-    gen_fabrics.py [--out DIR]
+    gen_fabrics.py [--out DIR] [--sets NAME ...]
 
 It refuses to overwrite an existing file (AI_WorkingAgreement §Build Safety).
 """
@@ -54,7 +56,7 @@ def jersey(seed: int = 7501) -> dict:
     return {"normal": tl.normal_map(height, strength=2.0), "roughness": tl.gray(rough)}
 
 
-def twill(seed: int = 7502) -> dict:
+def twill(seed: int = 7502, indigo=(0.020, 0.040, 0.120), worn=(0.050, 0.080, 0.180)) -> dict:
     """3/1 twill: warp (vertical) up in three cells of four, the step moving one per pick."""
     ends = picks = 32
     i = np.floor(X * ends).astype(int)   # warp thread (column)
@@ -72,8 +74,8 @@ def twill(seed: int = 7502) -> dict:
     # colour, linear: rope-dyed indigo warp, lighter where the ring-dyed yarn's core shows, and
     # an undyed, slightly warm weft
     fade = tl.fbm((64, 128, 256), seed + 1)
-    indigo = np.array([0.020, 0.040, 0.120])
-    worn = np.array([0.050, 0.080, 0.180])
+    indigo = np.array(indigo)
+    worn = np.array(worn)
     warp_c = indigo + (worn - indigo) * fade[..., None]
     warp_c *= (0.92 + 0.16 * slub)[..., None]
     # the weft shows only in the gap between two warp floats, partly shadowed by them, so its
@@ -108,15 +110,26 @@ def grain(seed: int = 7503) -> dict:
     return {"normal": tl.normal_map(height, strength=2.0), "roughness": tl.gray(rough)}
 
 
-SETS = {"Cotton_Jersey": jersey, "Denim_Twill": twill, "Leather_Grain": grain}
+def twill_light(seed: int = 7502) -> dict:
+    """Phase08 8.3: the same twill, light-washed (bleached indigo), authored light so a Creator's
+    tint (a 0-1 multiply) reaches the darker washes and other colours (RD-P08-5). The weave, seed
+    and so the normal and roughness are Denim_Twill's, so only the colour is written."""
+    t = twill(seed, indigo=(0.22, 0.33, 0.55), worn=(0.32, 0.45, 0.66))
+    return {"basecolor": t["basecolor"]}
+
+
+SETS = {"Cotton_Jersey": jersey, "Denim_Twill": twill, "Leather_Grain": grain,
+        "Denim_TwillLight": twill_light}
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Generate the fabric base texture sets.")
     ap.add_argument("--out", default=str(OUT))
+    ap.add_argument("--sets", nargs="+", choices=sorted(SETS), default=sorted(SETS),
+                    help="only these sets (default: all)")
     args = ap.parse_args(argv)
     out = Path(args.out)
-    made = {name: fn() for name, fn in SETS.items()}
+    made = {name: SETS[name]() for name in args.sets}
     targets = {(name, ch): out / f"{name}_{ch}_{SCALE}.png" for name, maps in made.items() for ch in maps}
     if any(p.exists() for p in targets.values()):
         print(f"refusing to overwrite a fabric set in {out} (Build Safety); use --out <dir>", file=sys.stderr)
