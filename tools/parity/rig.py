@@ -311,6 +311,22 @@ CHARACTER_CAST = {
 }
 
 
+def cast_for(skin: str) -> dict:
+    """The character's cast for a skin: its tone's lips and nails where they exist.
+
+    Phase08 8.2 (RD-P08-3): a skin, its lips and its nails pair by the shared Variant token
+    (``Skin_FitzpatrickIV`` <-> ``Lips_FitzpatrickIV`` <-> ``Nail_FitzpatrickIV``). A skin with
+    no such pair keeps the Natural articles.
+    """
+    cast = dict(CHARACTER_CAST)
+    variant = skin.split("_")[1] if skin.count("_") >= 5 else None
+    for part, family in (("Lips", "Lips"), ("Nails", "Nail")):
+        stem = f"{family}_{variant}_Clean_Base_s001_v01"
+        if variant and any(jobmod.MATERIALS.rglob(f"{stem}.mtlx")):
+            cast[part] = stem
+    return cast
+
+
 def region_colours(job: dict) -> dict | None:
     """A character job's regions: part name -> mask colour (None for the test scene)."""
     mc = job.get("mask_colours")
@@ -363,7 +379,7 @@ def main(argv=None) -> int:
         art = jobmod.Article.read(jobmod.find_article(args.article or CHARACTER_SKIN))
         out = Path(args.out) if args.out else OUT_ROOT / f"Character__{art.name}"
         cast = {"Body": art} | {p: jobmod.Article.read(jobmod.find_article(a))
-                                for p, a in CHARACTER_CAST.items()}
+                                for p, a in cast_for(art.name).items()}
         job_path = jobmod.write_character_job(cast, out, args.width, args.samples)
     else:
         if not args.article:

@@ -1,0 +1,33 @@
+{
+  "_comment": "Lip mucosa for skin type IV (Phase08 8.2, RD-P08-3): paired with Skin_FitzpatrickIV_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, as skin, but redder, smoother and moist. Derived from the skin by one rule (sources).",
+  "name": "Lips_FitzpatrickIV_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Lips_FitzpatrickIV_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.349, 0.125, 0.079",
+  "roughness_const": 0.35,
+  "specular_ior": 1.4,
+  "subsurface_color": "0.349, 0.125, 0.079",
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00367,
+  "subsurface_radius_scale": "1, 0.373, 0.185",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.2,
+  "coat_ior": 1.336,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Phase08 8.2 derivation rule (judgement; no measured lip albedo exists, F-P08-1): lips = the skin's albedo x (0.80, 0.55, 0.60), i.e. the skin's own melanin with blood showing through a thinner stratum corneum (red kept, green and blue drop). On Skin III this gives (0.50, 0.24, 0.21), the shipped Lips_Natural (0.52, 0.26, 0.24) within 0.03. Every other value is Lips_Natural's (roughness 0.35 and coat 0.3 at 0.2, IOR 1.336: MPFB2's lips and a film of saliva); the scatter radius and its per-channel scale are the skin's own (Physically Based). Inputs: Skin_FitzpatrickIV_Clean_Base_s001_v01 base_color_const (0.436, 0.227, 0.131)."
+    }
+  ]
+}

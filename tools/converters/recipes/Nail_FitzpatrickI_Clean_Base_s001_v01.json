@@ -1,0 +1,33 @@
+{
+  "_comment": "A fingernail or toenail for skin type I (Phase08 8.2, RD-P08-3; N1): paired with Skin_FitzpatrickI_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, smooth, with a light coat: the bed's colour through a translucent keratin plate. Derived from the skin by one rule (sources). The lunula and free-edge whitening would be mesh-bound maps, later (research Pass 4).",
+  "name": "Nail_FitzpatrickI_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/keratin/Nail_FitzpatrickI_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "keratin",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.824, 0.619, 0.551",
+  "roughness_const": 0.2,
+  "specular_ior": 1.55,
+  "subsurface_color": "0.824, 0.619, 0.551",
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.001,
+  "subsurface_radius_scale": "1, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.3,
+  "coat_roughness": 0.05,
+  "coat_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Phase08 8.2 derivation rule (judgement; no measured nail albedo exists, F-P08-1; the lead: 'Agreed nails are bad', research 260928_R_HairAndNailRendering N1): nail = 0.5 x the skin's albedo + 0.5 x the nail bed's pink (0.80, 0.60, 0.55, Nail_Natural's colour): the plate is translucent keratin, so half of what shows is the finger's own tone and half the blood-perfused bed. SUBSURFACE (not Opaque): the bed's colour scattering under the plate, subsurface_color = that colour, a short radius (1 mm: a ~0.5 mm plate over the bed) with the skin's per-channel scale, anisotropy 0.8 as tissue. The plate's gloss is its own smooth keratin surface (base roughness 0.2, IOR 1.55) under Nail_Natural's light coat (0.3 at roughness 0.05). A coat of 0.8 was tried first and dropped: Storm darkened a type-I nail to brown under it (rig dE2000 7.9 vs 2.8 at coat 0; the scatter radius moved nothing). Inputs: Skin_FitzpatrickI_Clean_Base_s001_v01 base_color_const (0.847, 0.638, 0.552)."
+    }
+  ]
+}
