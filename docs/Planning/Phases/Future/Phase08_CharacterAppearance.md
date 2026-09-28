@@ -160,6 +160,7 @@ The controls, read 2026-09-28:
   4. Rig sweep and character sheet; Blender library rebuilt; `check_asset_library.sh`; then the lead's sitting on the **character's hair cards**, never on cubes.
 - **Then 8.2 with nails (N1):** `Nail_FitzpatrickI…VI` on **Subsurface + a glossy coat**, `subsurface_color` from the tone (the lead: *"Agreed nails are bad we need to fix them"*). This replaces the Brief's Opaque nail.
 - **Gate state at hand-off:** `run_all.py` 14 / 2 / 1 (`approval_binds_freeze` alone, inherited). `check_exporter.sh` red for its environment (no MaterialX in its Python), identical before and after 8.1.
+- **Offered, not ruled (a later step, not this phase's scope):** a Blender-side helper that sets `uv_scale` from the mesh's measured UV density when a Matter material is dropped on it, so a Blender user does not meet F-P08-8's furrows. The contract rule it would apply is in `LCDSchema.md` §Notes.
 - **Left open on the desktop (disposable, unsaved):** a Blender session holding the scenes *P08 hair probe* and the four-cube demo. Close it without saving.
 
 **Tree at start (2026-09-28):** `main` @ `de08ccc`, level with origin; 49 tracked textures modified in the working tree by no session of this phase. **Gate at start:** `run_all.py` 10 PASS / 2 SKIP / **5 FAIL** (Phase07 closed on 14 / 2 / 1, `approval_binds_freeze` alone). `check_exporter.sh` red at start: its Python cannot import MaterialX (environment, not code).
