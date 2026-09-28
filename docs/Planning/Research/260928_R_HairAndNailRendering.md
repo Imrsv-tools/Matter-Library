@@ -88,7 +88,8 @@ MakeHuman's nail is part of the body mesh, split by MPFB2's CC0 mask (Phase07 7.
 
 - **Passes captured:** 1–5 (2026-09-28): the physics and production practice; the three renderers (thin-walled translucency verified in the local OpenPBR graph and Storm's GLSL; Blender's Thin Wall and coat inputs probed live); a live Blender probe (A / B / C); nails; options H1–H5 and N1.
 - **Decided:** nothing. Phase08 rules H1/H2 (step 8.1 is suspended on this research) and N1 (step 8.2).
-- **Current direction:** H1 (thin-walled translucency as the Hair master's graph), with H2 if HR-Q2 allows it. The lead's eye on probe B/C comes first.
+- **The lead on probe A / B / C (2026-09-28), verbatim:** *"I will follow your lead - they all look bad to me... too glossy, no "life" looks clearly extermly fake and really really bad... if that is the best we can do then it is what it is.. but eventuall this needs to be reseerached and fixed.. this is not usable..."*. On nails: *"Agreed nails are bad we need to fix them."*
+- **Current direction:** H1 + H2 as the **interim** hair (translucency and soft edges), plus **less gloss** (the lead's *"too glossy"*). H4 (card maps) and H5 (strands) are the **real** fix: *"eventuall this needs to be reseerached and fixed"*. That needs a research thread of its own, and better card assets than MakeHuman's bob.
 - **Unverified, recorded as such:** Storm on thin-walled subsurface for cards (HR-Q1) and on soft coverage (HR-Q2); Principled's Thin Wall semantics (HR-Q6); Storm on `chiang_hair_bsdf`; Unreal Substrate's hair path (only the legacy Hair shading model's inputs were read, from Epic's 5.8 docs).
 - **Next step:** the lead judges probe A / B / C. Then, if B or C is right, a Storm probe of the same (HR-Q1, HR-Q2) and the 8.1 rework.
 
