@@ -10,9 +10,8 @@
   "meters_per_tile": 0.01,
   "metalness_const": 0.0,
   "base_color_const": "0.78, 0.68, 0.52",
-  "roughness_const": 0.6,
+  "roughness_const": 0.65,
   "specular_ior": 1.55,
-  "specular_weight": 0.5,
   "specular_roughness_anisotropy": 0.8,
   "thin_walled": true,
   "subsurface_weight": 0.6,
@@ -25,7 +24,7 @@
   "sources": [
     {
       "kind": "judgement",
-      "why": "No measured hair in Physically Based (Phase07 research Pass 4). Colour: the diffuse albedo of a pale, low-eumelanin fibre (platinum blonde), linear, chosen as the lightest natural hair so that base_color_tint (multiply, 0-1) reaches the others below it: dark brown (0.09, 0.052, 0.03) is a tint of about (0.115, 0.076, 0.058), auburn about (0.32, 0.12, 0.07), mid grey (0.4, 0.4, 0.4) about (0.51, 0.59, 0.77). Pure white is out of reach (the base is warm). IOR 1.55 and anisotropy 0.8 as Hair_DarkBrown (Phase07 7.6). Interim (Phase08 8.1 rework, the lead's 'too glossy', 'no transparency, no SSS'): roughness 0.6 (was 0.4) and specular_weight 0.5 for much less gloss; 60 % of the diffuse becomes thin-walled subsurface, scattered forward (anisotropy 0.5: a quarter reflects, three quarters pass through), the Blender probe B that the lead picked with soft edges (probe C)."
+      "why": "No measured hair in Physically Based (Phase07 research Pass 4). Colour: the diffuse albedo of a pale, low-eumelanin fibre (platinum blonde), linear, chosen as the lightest natural hair so that base_color_tint (multiply, 0-1) reaches the others below it: dark brown (0.09, 0.052, 0.03) is a tint of about (0.115, 0.076, 0.058), auburn about (0.32, 0.12, 0.07), mid grey (0.4, 0.4, 0.4) about (0.51, 0.59, 0.77). Pure white is out of reach (the base is warm). IOR 1.55 and anisotropy 0.8 as Hair_DarkBrown (Phase07 7.6). Interim (Phase08 8.1 rework, the lead's 'too glossy', 'no transparency, no SSS'): roughness 0.65 (was 0.4) for much less gloss, by roughness alone; 60 % of the diffuse becomes thin-walled subsurface, scattered forward (anisotropy 0.5: a quarter reflects, three quarters pass through), the Blender probe B that the lead picked with soft edges (probe C)."
     }
   ]
 }

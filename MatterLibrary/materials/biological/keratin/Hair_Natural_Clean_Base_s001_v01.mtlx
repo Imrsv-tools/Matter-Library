@@ -13,7 +13,7 @@
     </multiply>
     <output name="base_color_out" type="color3" nodename="base_color_tinted" />
     <constant name="roughness_const" type="float">
-      <input name="value" type="float" value="0.6" />
+      <input name="value" type="float" value="0.65" />
     </constant>
     <add name="roughness_biased" type="float">
       <input name="in1" type="float" nodename="roughness_const" />
@@ -47,7 +47,6 @@
     <input name="subsurface_color" type="color3" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="base_color_out" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.5" />
     <input name="specular_roughness_anisotropy" type="float" value="0.8" />
-    <input name="specular_weight" type="float" value="0.5" />
   </open_pbr_surface>
   <surfacematerial name="Hair_Natural_Clean_Base_s001_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_Hair_Natural_Clean_Base_s001_v01" />

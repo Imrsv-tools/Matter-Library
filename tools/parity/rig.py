@@ -53,7 +53,7 @@ GRADED = {"Opaque", "Masked", "Hair", "Emissive", "TwoLayer"}
 # (Storm, Unreal) filters the opacity texture BEFORE the cut-out test while a path tracer
 # cuts per sample, so the two draw different coverage there by construction. The close-up,
 # where the holes are resolved, is graded.
-ADVISORY_VIEWS = {"Masked": {"wide"}, "Hair": {"wide"}}   # Hair: Masked's graph (Phase08 8.1)
+ADVISORY_VIEWS = {"Masked": {"wide"}, "Hair": {"wide"}}   # Hair: a cut-out too (Phase08 8.1)
 
 
 VIEW_LABELS = {"wide": "whole set", "close": "close-up", "dim": "whole set, -4 stops"}
