@@ -47,13 +47,13 @@ BLENDER_DRIVER = HERE / "drivers" / "blender_render.py"
 # judged "recognisable" by eye and their numbers are advisory. The first numbers set each
 # master's final bar (Phase05 Brief §Decisions that bind).
 BAR = 2.0
-GRADED = {"Opaque", "Masked", "Emissive", "TwoLayer"}
+GRADED = {"Opaque", "Masked", "Hair", "Emissive", "TwoLayer"}
 # Views whose numbers are advisory for a graded master (set from the first numbers, 5.4):
 # on the whole set a cut-out's holes are smaller than a pixel, and a real-time renderer
 # (Storm, Unreal) filters the opacity texture BEFORE the cut-out test while a path tracer
 # cuts per sample, so the two draw different coverage there by construction. The close-up,
 # where the holes are resolved, is graded.
-ADVISORY_VIEWS = {"Masked": {"wide"}}
+ADVISORY_VIEWS = {"Masked": {"wide"}, "Hair": {"wide"}}   # Hair: Masked's graph (Phase08 8.1)
 
 
 VIEW_LABELS = {"wide": "whole set", "close": "close-up", "dim": "whole set, -4 stops"}
@@ -304,9 +304,10 @@ CHARACTER_CAST = {
     "Trousers": "Denim_Indigo_Clean_Base_s001_v01",
     "Shoes": "Leather_Brown_Clean_Base_s001_v01",
     # one article on all three; each part supplies its own cut-out map (7.6, L2)
-    "Hair": "Hair_DarkBrown_Clean_Base_s001_v01",
-    "Brows": "Hair_DarkBrown_Clean_Base_s001_v01",
-    "Lashes": "Hair_DarkBrown_Clean_Base_s001_v01",
+    # (Phase08 8.1: the untinted Hair_Natural on the Hair master; Hair_DarkBrown is kept)
+    "Hair": "Hair_Natural_Clean_Base_s001_v01",
+    "Brows": "Hair_Natural_Clean_Base_s001_v01",
+    "Lashes": "Hair_Natural_Clean_Base_s001_v01",
 }
 
 

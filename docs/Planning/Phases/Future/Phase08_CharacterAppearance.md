@@ -1,6 +1,6 @@
 # Phase08 — Character Appearance for Studio
 
-**Status:** DISCOVERY COMPLETE — the Brief is complete (2026-09-28, `/discovery P8`, Pass 1). Lane: `build` (verified, §Risk lane). Next: `/execute P8`.
+**Status:** IN EXECUTION (2026-09-28, `/execute P8`). Discovery complete the same day (Pass 1; the Brief is complete). Lane: `build` (verified, §Risk lane).
 - **Seeded** 2026-09-28 from `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md` (the platform's asks, Passes 1–4; the library's review, Passes 5–6).
 - **Numbered by the lead, 2026-09-28**: first as Phase09 (*"seed Phase09 with items 1–3.. I would like to address this issue now"*), then as **Phase08** the same day (*"make this Phase 8, mark the current Phase8 as TBD - we have many other little things to get in here befoer we build out the full library"*). Library Coverage, which held Phase08, is now unnumbered (`PhaseTBD_LibraryCoverage.md`). *(Anything written before 2026-09-28 that says "Phase08" means Library Coverage, not this phase.)*
 - **Why now:** the IMRSV platform's Appearance phase (Phase 66) is under way and focused on Studio. Its skin and hair sittings wait on this phase (`PlatformDependencies.md` **M3**, **M4**); the lead: *"We need to update things in the matter library to address the needs of Studio."*

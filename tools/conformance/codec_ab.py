@@ -60,7 +60,7 @@ DEFAULT_STAGING = Path(__file__).resolve().parents[2] / "library/staging/matterl
 
 # Per-class parity bar (Experience_Materials.md — ΔE2000 under standardized lighting).
 TIGHT_BAR = 2.0
-TIGHT_CLASSES = {"Opaque", "Masked", "Emissive"}   # graded (fail the exit code)
+TIGHT_CLASSES = {"Opaque", "Masked", "Hair", "Emissive"}   # graded (fail the exit code); Hair = Masked's graph (Phase08)
 RELAXED_CLASSES = {"Transmission", "SSS", "Subsurface"}  # advisory only
 
 # Normal-role tokens (need BC5 Z-reconstruction on decode).

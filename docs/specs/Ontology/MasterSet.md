@@ -13,7 +13,8 @@ This spec is the **producer side** of the master contract: the masters, their to
 | Master (identity token) | Typical materials, by class (examples, not a routing rule; see [§Master resolution](#master-resolution--the-article-declares-its-master)) | Key extra params | Notes |
 |-------------------------|---------------------------|------------------|-------|
 | **Opaque** | stone, wood, soil, most mineral, metal, ceramic, cementitious, composite, plastic, polymer, coating, sand — **the ~85% workhorse** | anisotropy, sheen, clearcoat as optional Substrate slab features | brushed metal / velvet / glaze are *params*, not masters |
-| **Masked** | textile (lace), perforated metal¹, vegetation, hair fibre (hair, brows, lashes) | opacity cutoff; the cut-out source is the article's own opacity texture **or** the mesh's `cutout_map`, supplied at binding (2026-09-27, Phase07 L2; [LCDSchema §Cut-out map](../Contract/LCDSchema.md#cut-out-map-the-meshs-supplied-at-binding)); possible foliage variant (two-sided + thin transmission) | foliage variant open *(planned)*; a dedicated `Hair` master only if Masked hair looks wrong (L2) *(planned probe)* |
+| **Masked** | textile (lace), perforated metal¹, vegetation, hair fibre (hair, brows, lashes) | opacity cutoff; the cut-out source is the article's own opacity texture **or** the mesh's `cutout_map`, supplied at binding (2026-09-27, Phase07 L2; [LCDSchema §Cut-out map](../Contract/LCDSchema.md#cut-out-map-the-meshs-supplied-at-binding)); possible foliage variant (two-sided + thin transmission) | foliage variant open *(planned)*; ~~a dedicated `Hair` master only if Masked hair looks wrong (L2) *(planned probe)*~~ **resolved 2026-09-28:** the platform found Masked hair cards read as plastic in Unreal, so hair fibre has its own **Hair** master (next row); `Hair_DarkBrown` stays on Masked |
+| **Hair** *(added 2026-09-28, Phase08)* | hair fibre on cards (hair, brows, lashes) | **as Masked**: opacity cutoff; the cut-out is the mesh's `cutout_map` (or an own opacity texture); specular anisotropy for the fibre's highlight | **settings-only**: Masked's graph with a **hair** shading model in its settings row (§Material-settings intent, below). The article stays `open_pbr_surface` (Decision of record 1), so every USD viewer and Blender render it as Masked; a renderer with a hair model (Unreal) shades the same article with it. The lead wants *"one hair material … really good"* that also serves strands later |
 | **TranslucentThin** | window glass, resin, thin plastics | opacity, tint, IOR | thin-surface model; roughness blurs the transmitted view in every consumer (measured, IMRSV #88 RD-8) |
 | **TranslucentThick** | gemstones (**Diamond**), liquids, thick glass | IOR, absorption color + depth | real-time refraction (e.g. Unreal) is approximated — parity bar is "close"; roughness blurs the transmitted view in every consumer (measured, IMRSV #88 RD-8) |
 | **Subsurface** | **Marble**, jade, wax | SSS color, radius/MFP | Marble alone justifies it |
@@ -23,7 +24,7 @@ This spec is the **producer side** of the master contract: the masters, their to
 
 *(Updated 2026-09-23, measured: `MatterLibrary/materials/utility/virtual/IMRSV_MissingMaterial.mtlx` declares `master_material = "system"` in its `imrsv_metadata`; it is magenta (`1.0, 0.0, 1.0`) and is `creator_selectable: false` in the `matterlib-0.1.0` catalog.)*
 
-**Coverage: 22 of 23 taxonomy classes** *(was 18 of 19; `ceramic` added 2026-09-23; the three `biological` classes added 2026-09-27, covered by Subsurface (skin, mucosa, sclera), Opaque (nail, enamel, bone) and Masked (hair fibre))*. `atmospheric` (volume materials) is **out of scope** for prop-applied matter — owned by a future Volumes/Effector domain *(planned)* ([Taxonomy](Taxonomy.md)).
+**Coverage: 22 of 23 taxonomy classes** *(was 18 of 19; `ceramic` added 2026-09-23; the three `biological` classes added 2026-09-27, covered by Subsurface (skin, mucosa, sclera), Opaque (nail, enamel, bone) and Masked (hair fibre); hair fibre also by **Hair** since 2026-09-28)*. **8 masters since 2026-09-28** (`Hair`, Phase08; additive): the heading above keeps its v1 wording. `atmospheric` (volume materials) is **out of scope** for prop-applied matter — owned by a future Volumes/Effector domain *(planned)* ([Taxonomy](Taxonomy.md)).
 
 **Mapping sanity check.** Against the consumer's earlier keep-set (historical examples; only Glass and Diamond exist in this library — see [Catalog](../Catalog/Catalog.md) for the real articles): Glass→TranslucentThin · Diamond→TranslucentThick · White_Plastic/Gold_Foil/Brass→Opaque · Ceramic→Opaque(+coat). `Diamond` is the first material that doesn't fit TranslucentThin → it is exactly what justifies TranslucentThick; `Marble` justifies Subsurface.
 
@@ -33,6 +34,7 @@ This spec is the **producer side** of the master contract: the masters, their to
 |---|---|
 | `Opaque` | ABS_Matte · Limestone_Veined · Concrete_Smooth_Worn_Dusty · Copper_Verdigris_Aged · Diagnostic_UVGrid |
 | `Masked` | Lace_Floral |
+| `Hair` *(2026-09-28)* | Hair_Natural |
 | `TranslucentThin` | Glass_Clear |
 | `TranslucentThick` | Diamond_Brilliant |
 | `Subsurface` | Marble_Veined_Polished |
@@ -44,7 +46,9 @@ This spec is the **producer side** of the master contract: the masters, their to
 
 The **canonical master token** used in the manifest / `imrsv_metadata` / name-keyed resolution is the bare identity. The v1 token set is closed:
 
-`Opaque` · `Masked` · `TranslucentThin` · `TranslucentThick` · `Subsurface` · `TwoLayer` · `Emissive` · `system`
+`Opaque` · `Masked` · `TranslucentThin` · `TranslucentThick` · `Subsurface` · `TwoLayer` · `Emissive` · `Hair` · `system`
+
+*(`Hair` added 2026-09-28, Phase08 step 8.1: additive, so semver-minor under the rule below. A consumer that does not know it yet renders a `Hair` article as its missing material, which is why `Hair_DarkBrown` stays on Masked; `PlatformDependencies.md` M3.)*
 
 - A token is **data**, not an asset name. The Matter Library pins the *token*; each consumer maps token → its own asset. Adding a token is additive; removing or renaming one is a breaking master-contract change (library semver-**major**, see [_Architecture](../_Architecture.md) §Versioning).
 - `system` is reserved for the system fallback (`IMRSV_MissingMaterial`); no matter article may declare it.
@@ -63,7 +67,7 @@ The **canonical master token** used in the manifest / `imrsv_metadata` / name-ke
 - **Every article declares the master that fits what the material physically is**, from the closed master set. Today it is carried as `imrsv_metadata.master_material` in the article's `.mtlx`. Under R14 it is also the per-article master token in release data.
 - **The class gives only a typical default** (the "Typical materials" column above). It never overrides the article's declaration.
 - **A consumer resolves an article's master from the article's own token, never from its class** (consumer side: [PlatformDependencies](../../Planning/PlatformDependencies.md) P4).
-- **No new masters are needed for coverage.** Covering new matter means an article choosing one of the existing masters.
+- **No new masters are needed for coverage.** Covering new matter means an article choosing one of the existing masters. *(Still true after `Hair` (2026-09-28): hair was already covered by Masked. `Hair` was added because a renderer that partitions shader space shades card hair with its own model, which is this spec's governing insight, not a coverage gap.)*
 
 Examples where the material, not its class's typical master, decides: lace (textile) is **Masked**, while cotton and denim (textile) are **Opaque**; sapphire (mineral) is **TranslucentThick**; acrylic (plastic) is **TranslucentThin**; grass ground cover (vegetation) is **Opaque**, while a leaf card is **Masked**.
 
@@ -191,6 +195,7 @@ Overlays and masksets are **shared** textures with their own physical size, so a
 |---|---|---|---|---|
 | **Opaque** | opaque | default lit | no | none |
 | **Masked** | masked (alpha-tested at the cutoff) | default lit | **yes** | none |
+| **Hair** *(2026-09-28)* | masked (alpha-tested at the cutoff) | **hair** | **yes** | none |
 | **TranslucentThin** | translucent | default lit | **yes** | **index of refraction** |
 | **TranslucentThick** | translucent | default lit | **yes** | **index of refraction** |
 | **Subsurface** | opaque | **subsurface** | no | none |
@@ -200,7 +205,8 @@ Overlays and masksets are **shared** textures with their own physical size, so a
 **Notes on the non-obvious cells:**
 - **The subsurface shading model on Subsurface is load-bearing** — without it the subsurface colour is inert and Marble cannot bleed at all. It is the shading model, not the graph, that makes the master scatter.
 - **Default lit on TwoLayer** — a clearcoat shading model is not this master (see [TwoLayer is two real layers](#twolayer-is-two-real-layers)); a clearcoat cannot render rust.
-- **Two-sided on Masked / TranslucentThin / TranslucentThick** is a property **of the master**, not driven per-prim. At least one partitioning renderer (Unreal) cannot vary two-sidedness per material instance — it is a static shader property — so a per-prim two-sided value has nowhere to land on these three. **Trade accepted:** per-prim two-sidedness is lost on exactly the three masters where two-sidedness is *semantically non-negotiable* — a lattice with holes; seeing the far face through glass or a gem. The alternative (pre-baked one-sided/two-sided variants, 7 → 14 masters) was rejected as a poor trade.
+- **The hair shading model on Hair is the master's whole reason to exist** *(2026-09-28, Phase08)*. Its graph is Masked's, and its articles stay `open_pbr_surface`. A renderer with a hair model for cards (Unreal) uses it here; one without (Blender's Principled, a USD viewer) renders the article exactly as Masked, which is also why the parity rig grades Hair as it grades Masked.
+- **Two-sided on Masked / Hair / TranslucentThin / TranslucentThick** is a property **of the master**, not driven per-prim. At least one partitioning renderer (Unreal) cannot vary two-sidedness per material instance — it is a static shader property — so a per-prim two-sided value has nowhere to land on these three. **Trade accepted:** per-prim two-sidedness is lost on exactly the three masters where two-sidedness is *semantically non-negotiable* — a lattice with holes; seeing the far face through glass or a gem. The alternative (pre-baked one-sided/two-sided variants, 7 → 14 masters) was rejected as a poor trade.
 - **Roughness on TranslucentThin / TranslucentThick blurs what is seen through the surface** (rough transmission), not only the specular highlight. A consumer whose real-time refraction approximates this must still blur the transmitted view by roughness; how it does so is consumer-side (see [Consumers](../Consumers.md)). The two renderers measured so far change by different mechanisms (a blurred background vs a milky surface), so parity here is judged by eye, not by a pixel ratio.
 - **This intent ships as part of the master contract** *(planned, R14)*, so each consumer maps it to its native settings and gates its masters against it. **This table and each consumer's settings gate must move together.**
 
@@ -230,7 +236,7 @@ A translucent master that derives coverage as `Opacity = Opacity × (1 − Trans
 
 ## Status
 
-**Baseline chosen.** 7 masters + `IMRSV_MissingMaterial` (token `system`). The master set + its param schemas **is** the producer↔consumer integration contract.
+**Baseline chosen.** 7 masters + `IMRSV_MissingMaterial` (token `system`); **8 since 2026-09-28** (`Hair`, settings-only, Phase08). The master set + its param schemas **is** the producer↔consumer integration contract.
 
 **TwoLayer retained** — the set stays at 7; the collapse-to-6 spike is waived by product decision.
 
@@ -258,3 +264,4 @@ The per-master **author-tier** carriers (the values that make each master *be* t
 - 2026-09-23 — master resolution changed from class routing with name exceptions to "the article declares its master; the class is a typical default" (lead). A master is the structure for a type of material. Class routing would have made ordinary fabrics Masked, and full coverage would have needed dozens of exceptions. No master was added or changed.
 - 2026-09-24 — translucent roughness parity was measured in a consumer (IMRSV #88 RD-8) and accepted on eyes-on: roughness visibly frosts Glass and Diamond in both a stock USD viewer and Unreal, in the same direction. The translucent rows and settings notes now say so.
 - 2026-09-27 — the articles' normal was found combined in the wrong space (Phase05 step 5.3): the assembler added the overlay bumps and the layer-2 blend to the world-space output of MaterialX's `normalmap`, and its flat fallback became a fixed world +Z normal, so three articles shaded as one flat colour. The assembler now combines in tangent space and converts once; eight articles were re-assembled in place (`v01` kept) and the pilot is re-frozen at the Phase05 close. The overlay formula gained the word "tangent".
+- 2026-09-28 — the **`Hair`** master was added (Phase08 step 8.1), the first since the v1 baseline. The IMRSV platform found Masked hair cards read as plastic in Unreal, which met L2's condition for a dedicated master. It is **settings-only**: Masked's graph with a hair shading model, so its articles stay `open_pbr_surface` (Decision of record 1) and a stock USD viewer or Blender renders them as Masked. The Chiang hair BSDF was not taken, because it would have been the first non-OpenPBR article. `Hair_Natural` is its first article; `Hair_DarkBrown` stays on Masked, so a consumer that does not know the token yet loses nothing.

@@ -21,7 +21,7 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 {
   "format": 1,
   "article": {"name": "<stem>", "path": "<abs path to the .mtlx>",
-              "master": "Opaque | TwoLayer | Masked | Emissive | TranslucentThin | TranslucentThick | Subsurface",
+              "master": "Opaque | TwoLayer | Masked | Hair | Emissive | TranslucentThin | TranslucentThick | Subsurface",
               "meters_per_tile": 0.1},
   "scene": "<abs path to tools/parity/scene/test_scene.usda>",
   "camera": "/World/Cam",

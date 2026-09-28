@@ -84,8 +84,12 @@ AUTHOR_TIER_PORTS = {
 # asset name (M_MasterMaterial_<token>) is Plugin-owned and resolved Plugin-side.
 KNOWN_MASTERS = {
     "Opaque", "Masked", "TranslucentThin", "TranslucentThick",
-    "Subsurface", "TwoLayer", "Emissive", "system",
+    "Subsurface", "TwoLayer", "Emissive", "Hair", "system",
 }
+
+# Masters whose coverage is a cut-out (MasterSet.md). `Hair` (Phase08 8.1) is Masked's graph
+# with its own settings row (a hair shading model), so it takes the same opacity sources.
+CUTOUT_MASTERS = {"Masked", "Hair"}
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
@@ -266,9 +270,9 @@ def _check_spec(spec: MaterialSpec) -> None:
             "opacity_cutoff needs an opacity source to threshold — a cutoff with nothing to "
             "threshold makes no holes.")
     if spec.cutout_map:
-        if spec.master != "Masked":
-            raise ValueError("cutout_map is the Masked master's input (MasterSet.md); "
-                             f"this article is {spec.master}")
+        if spec.master not in CUTOUT_MASTERS:
+            raise ValueError("cutout_map is an input of the cut-out masters "
+                             f"{sorted(CUTOUT_MASTERS)} (MasterSet.md); this article is {spec.master}")
         if spec.opacity_tex:
             raise ValueError("an article has ONE opacity source: its own opacity_tex (a pattern "
                              "of the substance, like lace) or the mesh's cutout_map, not both")

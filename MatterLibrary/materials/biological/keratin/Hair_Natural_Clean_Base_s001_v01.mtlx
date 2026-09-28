@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Hair_Natural_Clean_Base_s001_v01">
+    <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="opacity_cutoff" type="float" value="0.5" uiname="Opacity Cutoff" />
+    <input name="cutout_map" type="filename" value="" uiname="Cut-out Map" />
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="0.78, 0.68, 0.52" />
+    </constant>
+    <multiply name="base_color_tinted" type="color3">
+      <input name="in1" type="color3" nodename="base_color_const" />
+      <input name="in2" type="color3" interfacename="base_color_tint" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.4" />
+    </constant>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_const" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <clamp name="roughness_biased_clamped" type="float">
+      <input name="in" type="float" nodename="roughness_biased" />
+      <input name="low" type="float" value="0.0" />
+      <input name="high" type="float" value="1.0" />
+    </clamp>
+    <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
+    <texcoord name="cutout_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <image name="cutout_tex" type="float">
+      <input name="file" type="filename" interfacename="cutout_map" />
+      <input name="default" type="float" value="1.0" />
+      <input name="texcoord" type="vector2" nodename="cutout_uv" />
+    </image>
+    <ifgreatereq name="opacity_thresholded" type="float">
+      <input name="value1" type="float" nodename="cutout_tex" />
+      <input name="value2" type="float" interfacename="opacity_cutoff" />
+      <input name="in1" type="float" value="1.0" />
+      <input name="in2" type="float" value="0.0" />
+    </ifgreatereq>
+    <output name="opacity_out" type="float" nodename="opacity_thresholded" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Hair_Natural_Clean_Base_s001_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.55" />
+    <input name="geometry_opacity" type="float" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="opacity_out" />
+    <input name="specular_roughness_anisotropy" type="float" value="0.8" />
+  </open_pbr_surface>
+  <surfacematerial name="Hair_Natural_Clean_Base_s001_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Hair_Natural_Clean_Base_s001_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Hair" uniform="true" />
+    <input name="scale_tag" type="string" value="s001" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.01" />
+    <input name="domain" type="string" value="biological" uniform="true" />
+    <input name="class" type="string" value="keratin" uniform="true" />
+  </nodedef>
+</materialx>

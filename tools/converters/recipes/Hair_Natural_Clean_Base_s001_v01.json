@@ -1,0 +1,28 @@
+{
+  "_comment": "Hair fibre, untinted (Phase08 8.1, RD-P08-1/2): keratin with the least melanin, so its own look is a pale platinum blonde, and every natural hair colour is a base_color_tint BELOW it (the tint is a 0-1 multiply: LCDSchema). On the HAIR master: Masked's graph, with a hair shading model in its settings row (MasterSet), which Unreal has. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V. Hair_DarkBrown (on Masked) is kept.",
+  "name": "Hair_Natural_Clean_Base_s001_v01",
+  "status": "draft",
+  "path": "biological/keratin/Hair_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Hair",
+  "domain": "biological",
+  "class": "keratin",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.78, 0.68, 0.52",
+  "roughness_const": 0.4,
+  "specular_ior": 1.55,
+  "specular_roughness_anisotropy": 0.8,
+  "cutout_map": true,
+  "opacity_cutoff": 0.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "No measured hair in Physically Based (Phase07 research Pass 4). Colour: the diffuse albedo of a pale, low-eumelanin fibre (platinum blonde), linear, chosen as the lightest natural hair so that base_color_tint (multiply, 0-1) reaches the others below it: dark brown (0.09, 0.052, 0.03) is a tint of about (0.115, 0.076, 0.058), auburn about (0.32, 0.12, 0.07), mid grey (0.4, 0.4, 0.4) about (0.51, 0.59, 0.77). Pure white is out of reach (the base is warm). IOR 1.55, roughness 0.4, anisotropy 0.8 and cutoff 0.5: as Hair_DarkBrown (Phase07 7.6), so the two differ only in colour and master."
+    }
+  ]
+}

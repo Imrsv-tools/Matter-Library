@@ -25,6 +25,9 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             two normals mixed in tangent space; the tint applies after
   Masked                    + the cut-out: alpha = opacity >= ``opacity_cutoff`` (the
                             article's ``ifgreatereq``)
+  Hair                      the Masked graph (Phase08 8.1). The master differs from
+                            Masked only in its SETTINGS row (MasterSet: a hair shading
+                            model, which Unreal has); Principled has none for a card
   Emissive                  + emission: colour x luminance (MaterialX's OpenPBR takes
                             luminance as radiance directly, as Blender's Strength is)
   TranslucentThin           + transmission, Thin Wall on; the tint of what shows through
@@ -73,6 +76,7 @@ MASTER_PARTS = {
     "Opaque": set(),
     "TwoLayer": {"layer2"},
     "Masked": {"opacity"},
+    "Hair": {"opacity"},            # settings-only master: Masked's graph (Phase08 RD-P08-1)
     "Emissive": {"emission"},
     "TranslucentThin": {"transmission"},
     "TranslucentThick": {"transmission", "thick"},

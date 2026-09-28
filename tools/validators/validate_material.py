@@ -161,11 +161,11 @@ def check_master_conformance(doc) -> list:
             errs.append(f"{master}: geometry_thin_walled={inp.getValueString()!r}, "
                         f"expected {'true' if want else 'false'}")
 
-    if master == "Masked":
+    if master in ("Masked", "Hair"):     # Hair = Masked's graph, its own settings (Phase08 8.1)
         need_iface("opacity_cutoff", "the cutoff IS this master's defining property")
         op = _shader_input(doc, "geometry_opacity")
         if not _is_graph_driven(op):
-            errs.append("Masked: geometry_opacity has no connected source — a cutoff with "
+            errs.append(f"{master}: geometry_opacity has no connected source — a cutoff with "
                         "nothing to threshold makes no holes")
 
     elif master in ("TranslucentThin", "TranslucentThick"):
