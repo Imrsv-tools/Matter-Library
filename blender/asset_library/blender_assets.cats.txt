@@ -14,6 +14,7 @@ e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementit
 57771307-e81e-5a87-966e-482639f264bd:natural/stone:natural-stone
 10c839d1-df8d-563b-bde4-ea627a5a6eee:natural/wood:natural-wood
 62f8858f-976a-5243-9508-b37fab10a81e:synthetic/plastic:synthetic-plastic
+6fd533b6-b083-5084-9dd1-f33b2266d520:synthetic/polymer:synthetic-polymer
 196a75d2-9441-501c-b2b0-f1430ea50a41:synthetic/textile:synthetic-textile
 e9233954-7e64-57c6-9050-4dca0d92079d:utility/emissive:utility-emissive
 112b849f-0edb-5edd-bff2-f2e12dccde1d:utility/virtual:utility-virtual
