@@ -19,18 +19,20 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-09-26 (lead):** the test rig comes before building materials at volume. Phase05 runs on this machine and is pushed; Phase06 runs on the UE machine; work returns here for Phase07 on. Why: `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md`.
 >
 > **Re-sequenced 2026-09-27 (lead):** Character Materials becomes **Phase07** and runs here straight after Phase05, **at the same time as Phase06** on the UE machine. Its materials ship as candidates (uncalibrated) until the Unreal column exists: *"I would rather have everything in and 'uncalibrated' yet then a bunch of magenta."* Library Coverage becomes Phase08. Why: `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md` (CM4).
+>
+> **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
 
-### Phase09 — Character Appearance for Studio — SEEDED *(seeded 2026-09-28 for the platform's Appearance work in Studio; the lead wants it next on this machine)*
+### Phase08 — Character Appearance for Studio — SEEDED *(seeded 2026-09-28 for the platform's Appearance work in Studio; numbered Phase09, then Phase08 the same day; next on this machine)*
 **Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
-- `docs/Planning/Phases/Future/Phase09_CharacterAppearance.md`
+- `docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`
 
 ### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine, alongside Phase07)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
 
-### Phase08 — Library Coverage — SEEDED *(renumbered from Phase07, 2026-09-27; its character classes moved to Phase07)*
+### Library Coverage — SEEDED *(un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Phases/Future/Phase08_LibraryCoverage.md`
+- `docs/Planning/Phases/Future/PhaseTBD_LibraryCoverage.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.

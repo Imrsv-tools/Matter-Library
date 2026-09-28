@@ -25,12 +25,12 @@ It is one thing, the Unreal leg of the rig. It needs a machine with Unreal on it
 **Out:**
 - IMRSV Studio. Our runtime passing shows the materials can work in Unreal, not that Studio matches; Studio gets an occasional spot check.
 - Publishing the masters as a public Unreal package (*Unreal Reference Masters*, later).
-- Building new materials (Phase07 Character Materials, which runs here at the same time; Phase08 Library Coverage).
+- Building new materials (Phase07 Character Materials, which runs here at the same time; Library Coverage, now unnumbered).
 
 **Coupling with Phase07 (added 2026-09-27, lead re-sequencing CM4):** Phase07 runs while this phase builds the masters. It may add inputs to the Subsurface master (coat, fuzz, scatter anisotropy), a colour channel on layers, and possibly Hair or Eye masters. A packaged app can't compile new shaders, so **pull before building the masters, and read Phase07's rulings first.** A contract change that lands later means rebuilding the package, which the lead accepts.
 
 **What Phase07 actually landed (closed 2026-09-27):**
-- **No new master.** There is no Eye master (D-E), no `Skin` master (CM-Q10) and no Hair master (L2: Masked served). The layer colour channel was not built, and stays with Phase08 (L3).
+- **No new master.** There is no Eye master (D-E), no `Skin` master (CM-Q10) and no Hair master (L2: Masked served). The layer colour channel was not built, and stays with Library Coverage (L3; it was Phase08 until 2026-09-28).
 - **Subsurface** runs Blender's `RANDOM_WALK_SKIN` method, and its inputs gain `subsurface_scatter_anisotropy`.
 - **Every master may carry** coat (`coat_{weight,color,roughness,ior}`), fuzz (`fuzz_{weight,color,roughness}`) and specular anisotropy (`specular_roughness_anisotropy`, along UV0's `U`). Each is authored only when set, and each is off at its default.
 - **Masked** gains `cutout_map`: the mesh's cut-out texture, supplied per binding, sampled on UV0 without `place2d`, and thresholded by `opacity_cutoff` ([LCDSchema §Cut-out map](../../../specs/Contract/LCDSchema.md#cut-out-map-the-meshs-supplied-at-binding)).

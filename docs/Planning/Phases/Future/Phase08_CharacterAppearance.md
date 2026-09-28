@@ -1,6 +1,6 @@
-# Phase09 — Character Appearance for Studio
+# Phase08 — Character Appearance for Studio
 
-**Status:** SEEDED (phase doc written 2026-09-28; discovery has not opened). **Numbered by the lead, 2026-09-28**, verbatim: *"seed Phase09 with items 1–3.. I would like to address this issue now"*. It answers the needs of the IMRSV platform's Appearance phase (Phase 66), which is under way and focused on Studio. **Deliberate gate:** it opens by the lead's `/discovery P9`, never by a slide from research.
+**Status:** SEEDED (phase doc written 2026-09-28; discovery has not opened). **Numbered by the lead, 2026-09-28**: first as Phase09 (*"seed Phase09 with items 1–3.. I would like to address this issue now"*), then as **Phase08** the same day (*"make this Phase 8, mark the current Phase8 as TBD - we have many other little things to get in here befoer we build out the full library"*). Library Coverage, which held Phase08, is now unnumbered (`PhaseTBD_LibraryCoverage.md`). *(Anything written before 2026-09-28 that says "Phase08" means Library Coverage, not this phase.)* It answers the needs of the IMRSV platform's Appearance phase (Phase 66), which is under way and focused on Studio. **Deliberate gate:** it opens by the lead's `/discovery P8`, never by a slide from research.
 - **Seeded from** `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`: the platform's asks (Passes 1–4) and the library's review of them (Passes 5–6).
 - **The consumer asks it answers:** `docs/Planning/PlatformDependencies.md` **M3** (a Hair master) and **M4** (tone-matched lips and nails), plus the wardrobe fabrics (research A5).
 
@@ -29,13 +29,13 @@ One user-facing result: Studio's characters get the hair, skin and clothing choi
    - The review's reading, for discovery to test: **settings-only over the existing OpenPBR graph** (AP-F2), so stock USD viewers keep matching and the `chiang_hair_bsdf` probe does not gate this phase.
    - **A new hair article authored at a light base**, so `base_color_tint` (a multiply that only darkens) reaches every hair colour (AP-F1). `Hair_DarkBrown` stays on Masked, so nothing Studio uses today breaks while its Hair master does not exist yet (research Pass 4).
 2. **Lips and nails for the six skin tones** (research A2; `PlatformDependencies.md` M4). Up to twelve articles, and a deterministic pairing to each `Skin_Fitzpatrick*`.
-3. **Wardrobe fabrics** (research A5, AP-F8). Pulled forward from Phase08's draft list (`260925_R_LibraryCoverage_FirstRelease.md`, the `synthetic/textile` and polymer rows), as Phase07 pulled cotton, denim and leather. Every fabric Studio recolours is **authored light**. First: rubber (every shoe's sole), a light leather, a lighter denim wash. Then: canvas, felt, satin, and the two the draft list lacks, a synthetic stretch knit and a wool suiting.
+3. **Wardrobe fabrics** (research A5, AP-F8). Pulled forward from Library Coverage's draft list (`260925_R_LibraryCoverage_FirstRelease.md`, the `synthetic/textile` and polymer rows), as Phase07 pulled cotton, denim and leather. Every fabric Studio recolours is **authored light**. First: rubber (every shoe's sole), a light leather, a lighter denim wash. Then: canvas, felt, satin, and the two the draft list lacks, a synthetic stretch knit and a wool suiting.
 
 **Not now:**
 - **Who splits a garment into its fabrics** (research A6, AP-Q5). A CC0 outfit is one mesh with several fabrics. If discovery rules that the library owns the split, it may come in; if Studio owns it, nothing is built here.
 - **Colour on layers** (CM-Q5): garment prints, trims and fades, and makeup (research A7). It is a contract change, and it stays out unless the lead pulls it in.
 - **A real skin-tone control** (research A4): a change to the frozen Creator vocabulary.
-- The small cleanups the review noticed (the Glossary's retired-proxy row, Phase08's stale C2 / C3 blockers, `check_lcd_carrier.py` not seeing `cutout_map`): `/retro` or `/quick-fix` material.
+- The small cleanups the review noticed (the Glossary's retired-proxy row, Library Coverage's stale C2 / C3 blockers, `check_lcd_carrier.py` not seeing `cutout_map`): `/retro` or `/quick-fix` material.
 - A release (Phase07 L4: Studio takes the dev install).
 
 ## Open questions (settle during this phase)

@@ -28,7 +28,7 @@ platform paths or code. *(The phase is named at the lead's request.)*
 - **Skin:** the Creator **picks one of the six skin tones**, and **the lips and nails change with it** (lead: *"either way
   yes — lips etc need to change as well"*). The lead's real wish is a proper tone control aligned with the library; that is
   deferred (Pass 3, A4).
-- **Makeup is out of the platform phase** — it needs the colour channel on layers (CM-Q5), which stays with Phase08.
+- **Makeup is out of the platform phase** — it needs the colour channel on layers (CM-Q5), which stays with Library Coverage (then Phase08; unnumbered 2026-09-28).
 - **Fabrics:** garments from the CC0 MakeHuman system pack are bound to the existing `Cotton_Jersey`, `Denim_Indigo` and
   `Leather_Brown` articles. No new fabric is asked for now.
 
@@ -100,7 +100,7 @@ tone, melanin, redness — already on the Phase07 skin wish-list). It is a chang
 
 **Why:** the lead framed the platform's need as *"refinement … to address wardrobe"*. Pass 1 says *"no new fabric is asked for now"*, so this pass checks that claim against the garments themselves.
 
-**Examined:** the pinned `makehuman_system_assets_cc0.zip`, from the rig's cache (`library/parity/_sources/`, git-ignored). Its sha256 begins `b542127a8e25547c`, which matches the research's Pass 3 pin. Every garment's `.mhclo` and diffuse atlas was read and laid out on one contact sheet (a disposable probe in `/tmp`, torn down; the script is under §Reproduction). Also read: `build_character.py` `MESHES` and the Phase08 draft list (`260925_R_LibraryCoverage_FirstRelease.md`, the `synthetic/textile` rows).
+**Examined:** the pinned `makehuman_system_assets_cc0.zip`, from the rig's cache (`library/parity/_sources/`, git-ignored). Its sha256 begins `b542127a8e25547c`, which matches the research's Pass 3 pin. Every garment's `.mhclo` and diffuse atlas was read and laid out on one contact sheet (a disposable probe in `/tmp`, torn down; the script is under §Reproduction). Also read: `build_character.py` `MESHES` and the Library Coverage draft list (`260925_R_LibraryCoverage_FirstRelease.md`, the `synthetic/textile` rows).
 
 **The CC0 wardrobe:** 12 outfits (`male_casualsuit01–06`, `female_casualsuit01–02`, `female_sportsuit01`, `female_elegantsuit01`, `male_elegantsuit01`, `male_worksuit01`), 6 shoes (`shoes01–06`) and a fedora (two meshes, one material).
 
@@ -111,7 +111,7 @@ tone, melanin, redness — already on the Phase07 skin wish-list). It is a chang
   So the platform's *"P15 delivered as meshes (… garments)"* means one mesh per **garment**, not per **substance**. The wardrobe inherits L1's question once per garment. Each outfit needs a **per-garment substance split** (a UV-region rule or face sets) before two fabrics can be bound. That split is garment-bound data, which makes it a **fit** (CM-Q6), not matter. Without it, one fabric covers both the shirt and the jeans.
 - **AP-F8 — The substances in the wardrobe, and the library's coverage.** *Identified by eye from the albedo atlases; not measured.*
 
-  | Substance | Seen in | The library today | Phase08 draft list |
+  | Substance | Seen in | The library today | Library Coverage draft list |
   |---|---|---|---|
   | Cotton jersey (tees, trims) | casual outfits, sports top | `Cotton_Jersey` ✓ (light, so it tints) | — |
   | Denim, stonewashed (dark to light) | 6 outfits; the work overalls are lighter | `Denim_Indigo` ✓, one dark wash that cannot tint lighter (AP-F1) | row 3 |
@@ -126,14 +126,14 @@ tone, melanin, redness — already on the Phase07 skin wish-list). It is a chang
   | Synthetic mesh and foam (trainers) | `shoes05`, `06` | — | `Nylon_Ripstop` (row 8) is the nearest |
   | Buttons, rivets (metal, plastic) | work overalls, elegant suits | `ABS_*` for plastic; no clean brass or steel | metal rows |
 
-  **The Phase08 list's blockers are stale for textiles.** Its `C2` / `C2 + C3` status on Suede, Velvet and Satin predates Phase07, which built coat, fuzz and specular anisotropy (7.3, 7.6). Those rows are no longer blocked.
+  **The Library Coverage list's blockers are stale for textiles.** Its `C2` / `C2 + C3` status on Suede, Velvet and Satin predates Phase07, which built coat, fuzz and specular anisotropy (7.3, 7.6). Those rows are no longer blocked.
 - **AP-F9 — Prints, trims, logos, fades and baked AO are garment-bound pixels.** Examples on the sheet: the tee's logo and orange trim, denim whiskers and fades, and the AO maps shipped with 11 of the 20 garments. Under D1 they are the garment's fit, not matter. The platform's own research put them in *"a garment overlay or mask over a tileable fabric"* (research Pass 2, item 4). That is **the same colour-on-layers need as makeup (CM-Q5)**, which Pass 1 moves out of the platform phase. **So a Phase 66 wardrobe built from substance articles renders plain garments:** a blue tee with no logo or trim, jeans with no fade. CM-Q5 now has five needs pointing at one contract change: makeup, region tone, freckles, dust colour, and garment prints.
 - **AP-F10 — Fabric scale on a garment atlas.** A garment's atlas is its primary UV set, and S9 shows a second UV set is not an LCD option (Storm reads `st` for every index). The platform's per-mesh `uv_scale` stopgap (P18) is therefore what makes a 1 cm weave read at weave size on clothing. A garment atlas's islands differ in texel density, so one `uv_scale` per mesh is approximate. The rig avoids the problem by storing each part's UVs in metres.
 - **AP-F11 — "Wardrobe per scene mark" splits cleanly.** Changing a garment means changing the mesh and its bindings, which is platform-side. Changing a garment's **colour** is `base_color_tint` on a fabric article, library-side, **provided the article is authored light** (AP-F1).
 
 ### Proposed additions to the asks (for the lead; not decided)
 
-- **A5 — Wardrobe fabrics.** Pull forward the Phase08 textile rows the CC0 wardrobe uses, as Phase07 did with cotton, denim and leather: **Rubber** (every shoe needs it), **Canvas**, a **light Leather**, **Felt** and **Satin**. Add the two the draft list lacks: a **synthetic stretch knit** and a **wool suiting**. Author every tintable fabric **light** (AP-F1), and consider a lighter denim wash.
+- **A5 — Wardrobe fabrics.** Pull forward the Library Coverage textile rows the CC0 wardrobe uses, as Phase07 did with cotton, denim and leather: **Rubber** (every shoe needs it), **Canvas**, a **light Leather**, **Felt** and **Satin**. Add the two the draft list lacks: a **synthetic stretch knit** and a **wool suiting**. Author every tintable fabric **light** (AP-F1), and consider a lighter denim wash.
 - **A6 — Who owns the per-garment substance split** (AP-F7): the platform, extending P15 from the body to garments, or a library fit set (CM-Q6). The rig's rect rule is a working example of the data either side would hold.
 - **A7 — Garment prints and trims** (AP-F9): accept plain garments for Phase 66, or bring CM-Q5 (colour on layers) forward, which serves makeup at the same time.
 - **A1, refined** (AP-F1, AP-F2): a settings-only `Hair` token over the existing OpenPBR graph, with the hair article **re-authored at a light base** so that one tint reaches every hair colour.
@@ -169,7 +169,7 @@ uv run --with pillow python sheet.py
 | AP-Q3 | How is a tone's lips / nails pairing expressed — naming or a release field? | The platform's skin-tone control reads it (A2) | Three options measured (AP-F6); a served-catalog field follows the `status` / `master` precedent |
 | AP-Q4 | Is `base_color_tint` alone the right hair-colour control, or does the Hair master want a melanin-style parameter (a vocabulary change)? | The lead's "one tinted hair material" | The tint works **only on a light base**; today's hair is dark and can only darken (AP-F1) |
 | AP-Q5 | Who owns a garment's substance split: the platform (P15 extended) or a library fit set (CM-Q6)? | Every CC0 outfit is one mesh with several fabrics (AP-F7) | Open; the rig's rect rule is a worked example |
-| AP-Q6 | Which wardrobe fabrics come forward from Phase08, and are the two missing from its list (stretch knit, wool suiting) added? | Rubber alone is on every shoe (AP-F8) | Open (A5) |
+| AP-Q6 | Which wardrobe fabrics come forward from Library Coverage, and are the two missing from its list (stretch knit, wool suiting) added? | Rubber alone is on every shoe (AP-F8) | Open (A5) |
 | AP-Q7 | Garment prints and trims: plain for Phase 66, or CM-Q5 brought forward? | Without it garments render plain (AP-F9) | Open (A7); a lead call |
 | AP-Q8 | Does the platform's P17 supply the **mesh's** cut-out map, as P17 specifies? | Pass 2's wording says *"from the article"* (AP-F5) | Confirm before marking P17 DONE |
 
@@ -194,9 +194,9 @@ uv run --with pillow python sheet.py
     knowledge);
   - everything in Pass 2, which is the platform's report of its private code, 2026-09-28;
   - the wardrobe substances in AP-F8, which were identified by eye from albedo atlases.
-- **Routed (lead, 2026-09-28):** A1, A2 and A5 are **seeded as Phase09 Character Appearance for Studio**
-  (`docs/Planning/Phases/Future/Phase09_CharacterAppearance.md`). A6 is an open question there; A7 and A4 stay out.
-  The thread is **parked**. **Next step:** the lead's `/discovery P9`. The platform builds its Hair master and
+- **Routed (lead, 2026-09-28):** A1, A2 and A5 are **seeded as Phase08 Character Appearance for Studio (first numbered Phase09, renumbered the same day)**
+  (`docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`). A6 is an open question there; A7 and A4 stay out.
+  The thread is **parked**. **Next step:** the lead's `/discovery P8`. The platform builds its Hair master and
   skin-tone control in parallel. **A3 is DONE (2026-09-28, a lead-directed `/quick-fix`):**
   `PlatformDependencies.md` now has P4 reported done; P15 in progress (body done, garments open); P16 narrowed; P17 in
   progress until AP-Q8 is confirmed; P18's stopgap done. A1 and A2 are recorded there as **M3** and **M4**.
