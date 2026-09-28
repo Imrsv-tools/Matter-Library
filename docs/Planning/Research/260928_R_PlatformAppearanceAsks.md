@@ -195,7 +195,7 @@ uv run --with pillow python sheet.py
   - everything in Pass 2, which is the platform's report of its private code, 2026-09-28;
   - the wardrobe substances in AP-F8, which were identified by eye from albedo atlases.
 - **Routed (lead, 2026-09-28):** A1, A2 and A5 are **seeded as Phase08 Character Appearance for Studio (first numbered Phase09, renumbered the same day)**
-  (`docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`). A6 is an open question there; A7 and A4 stay out.
+  (`docs/Planning/Phases/Complete/Phase08_CharacterAppearance.md`; moved at its close, 2026-09-28). A6 is an open question there; A7 and A4 stay out.
   The thread is **parked**. **Next step:** the lead's `/discovery P8`. The platform builds its Hair master and
   skin-tone control in parallel. **A3 is DONE (2026-09-28, a lead-directed `/quick-fix`):**
   `PlatformDependencies.md` now has P4 reported done; P15 in progress (body done, garments open); P16 narrowed; P17 in

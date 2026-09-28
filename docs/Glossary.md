@@ -43,7 +43,7 @@
 
 | Term | Definition |
 |---|---|
-| **Matter master** | The rendering class every article declares (Opaque, Masked, TranslucentThin, TranslucentThick, Subsurface, TwoLayer, Emissive). A renderer that partitions shader space (e.g. Unreal) implements one template per master. → `docs/specs/Ontology/MasterSet.md` |
+| **Matter master** | The rendering class every article declares (Opaque, Masked, TranslucentThin, TranslucentThick, Subsurface, TwoLayer, Emissive, and since 2026-09-28 **Hair**: hair fibre on cards, softly covered by the mesh's cut-out and lit through, Phase08). A renderer that partitions shader space (e.g. Unreal) implements one template per master. → `docs/specs/Ontology/MasterSet.md` |
 | **Master set** | The versioned collection of masters. It defines what an article can *be*: a template instance, not arbitrary node soup. → `docs/specs/Ontology/MasterSet.md` |
 | **Master token** | The master's name as data (`Opaque`, …, plus `system` for the missing-material fallback). The library pins the token; each consumer maps it to its own asset. → `docs/specs/Ontology/MasterSet.md` |
 | **Class routing** | A Class's *typical* master (e.g. stone → Opaque). Since 2026-09-23 it is a default only: every article declares the master that fits its material (e.g. marble → Subsurface, lace → Masked), and consumers resolve from that declared token, never from the Class. *Drift (2026-09-23): IMRSV still routes by Class in code; R14 moves the per-article token into release data.* → `docs/specs/Ontology/MasterSet.md` |

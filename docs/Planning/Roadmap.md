@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase08 — Character Appearance for Studio — ACTIVE *(discovery complete 2026-09-28; execute next. Seeded as Phase09, renumbered Phase08 the same day)*
-**Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
-- `docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`
+*No active phase (2026-09-28, Phase08 closed).*
 
 *Phase06 runs on the UE machine.*
 
@@ -114,3 +112,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character wears real materials from the library (skin, eyes, mouth, lips, nails, hair and basic clothing fabrics) in Blender and a USD viewer, and in Unreal once it is calibrated. None shows the missing-material magenta, on any character.
 - `docs/Planning/Phases/Complete/Phase07_CharacterMaterials.md`
 *Closed 2026-09-27; 19 candidates, awaiting the Unreal column (Phase06).*
+
+### Phase08 — Character Appearance for Studio — COMPLETE
+**Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
+- `docs/Planning/Phases/Complete/Phase08_CharacterAppearance.md`
+*Closed 2026-09-28 on the library side; the hair is an interim, and Studio's check is the platform's.*
