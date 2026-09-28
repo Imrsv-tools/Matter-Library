@@ -195,5 +195,6 @@ uv run --with pillow python sheet.py
   - everything in Pass 2, which is the platform's report of its private code, 2026-09-28;
   - the wardrobe substances in AP-F8, which were identified by eye from albedo atlases.
 - **Next step:** the lead reads A5–A7 and routes the set into a library phase (by `/discovery`). The platform builds its
-  Hair master and skin-tone control in parallel. **One piece fits a single sitting:** A3's row reconcile in
-  `PlatformDependencies.md`, with AP-F5's corrections, as a `/quick-fix` once AP-Q8 is confirmed.
+  Hair master and skin-tone control in parallel. **A3 is DONE (2026-09-28, a lead-directed `/quick-fix`):**
+  `PlatformDependencies.md` now has P4 reported done; P15 in progress (body done, garments open); P16 narrowed; P17 in
+  progress until AP-Q8 is confirmed; P18's stopgap done. A1 and A2 are recorded there as **M3** and **M4**.
