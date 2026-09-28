@@ -142,9 +142,26 @@ The controls, read 2026-09-28:
 
 *Ledger: step · result · next. Findings live in the commit messages.*
 
-### Resume block (written at the 2026-09-28 hand-off; the lead: *"yes to 1 and 2, then hand off"*)
+### Resume block (second hand-off, 2026-09-28; the lead: *"yes push and we will handoff"*)
 
-- **Superseded by the 8.1 rework row in the ledger below** (items 1–3 of "Next" landed; item 4's sitting is owed).
+- **Where:** 8.1 (interim hair), 8.2 (per-tone lips and nails) and 8.3 (rubber soles, natural leather, light-wash denim) are **✅, each with the lead's verdict** (ledger below), and **pushed**. Nothing is owed on them.
+- **Next: 8.4**, in the Brief's order: **canvas, satin, felt, a synthetic stretch knit, a wool suiting** (F-P08-6). For each fabric:
+  - a texture set from `tools/converters/base/gen_fabrics.py` (add a function to `SETS`; `--sets <Name>` writes only that set, because the tool refuses to overwrite; re-hash any set you refactor);
+  - a provenance YAML beside `Denim_TwillLight.yaml`;
+  - a recipe, **authored light** (RD-P08-5), `candidate`; names fixed under C5 (`Natural` = untinted);
+  - `rig.py <article> --sweep` for its article sheet and tint sweep. **Click 6 is judged on the article sheet, not on outfits** (RD-P08-4).
+  - Rebuild the Blender library (`check_asset_library.sh <repo>/blender/asset_library`, 51 articles at this hand-off). **Stop where the phase is done**; the rest stays on Library Coverage's list.
+- **Then the close** (the Brief's Close step): M3 and M4 in `PlatformDependencies.md`; Phase06's coupling note (a Hair master that is now a real graph: soft coverage and thin-walled translucency, not settings-only); `Glossary.md` (`Hair`); `Experience_MatterLibrary.md` §Shipped; `PhaseTBD_LibraryCoverage.md` (the rows built here, and its stale C2/C3 blockers).
+- **Open, recorded, not blocking:**
+  - Storm vs Blender on `Hair_Natural` is 2.8 on the test scene (the translucency lobe; a diagnostic under the lead's LCD ruling `7df7222`, not a bar).
+  - The shoe collar pokes through the jeans at the ankle in the rig (Phase07 geometry; the lead left it).
+  - `Nail_Natural` is still Opaque.
+- **Gate at hand-off:** `run_all.py` 14 / 2 / 1 (`approval_binds_freeze` alone, inherited).
+- **Showing the lead a character in Blender:** do not reuse `blender_render.py`'s `setup_scene` in his session (it runs `read_factory_settings`, which resets his preferences in memory). Import the rig's setting scene into a new scene, and bind each article to **that scene's** objects by base name (a second import names them `<part>.001`).
+
+### Resume block (first hand-off, 2026-09-28; the lead: *"yes to 1 and 2, then hand off"*)
+
+- **Superseded:** 8.1's rework landed and passed (ledger below).
 - **Where:** 8.1 is **reworking**. The `Hair` token, `Hair_Natural` (candidate) and the Blender library landed. The lead judged the hair unusable (see the verdicts below), so the Hair master's graph is being redone. **Not pushed** since `de08ccc`: 8.1's commits, the research, and this hand-off. **Push after the rework lands** (the platform builds against the Hair master).
 - **Ruled by the lead, 2026-09-28** (*"yes to 1 and 2"*):
   - **(1)** the mesh-UV rule and the `uv_scale` formula are now in the contract (`LCDSchema.md` §Notes, `PlatformDependencies.md` P18). Done at this hand-off.
