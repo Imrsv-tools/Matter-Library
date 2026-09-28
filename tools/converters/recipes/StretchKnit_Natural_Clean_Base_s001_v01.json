@@ -1,0 +1,37 @@
+{
+  "_comment": "Undyed synthetic stretch knit (Phase08 8.4, RD-P08-5): a polyester-elastane single jersey, the stuff of leggings, sportswear and a fitted top. Authored white so a Creator's tint (a 0-1 multiply) reaches every dyed colour. OPAQUE with a soft sheen and very little FUZZ: continuous filament, unlike Cotton_Jersey's staple cotton. The knit (Cotton_Jersey's loop, 20 wales x 28 courses per cm) is the article's own normal and roughness.",
+  "name": "StretchKnit_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/StretchKnit_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Knit_Stretch_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Knit_Stretch_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.80, 0.80, 0.79",
+  "specular_ior": 1.57,
+  "fuzz_weight": 0.15,
+  "fuzz_color": "0.9, 0.9, 0.9",
+  "fuzz_roughness": 0.4,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed polyester, a near-neutral white (linear 0.80, 0.80, 0.79; no measured value). IOR 1.57: polyester, the bulk of the blend (elastane is a few per cent). Roughness ~0.55 in the map: the soft sheen of a filament knit (Cotton_Jersey is ~0.82). Fuzz 0.15: filament sheds little."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Knit_Stretch.yaml"
+    }
+  ]
+}

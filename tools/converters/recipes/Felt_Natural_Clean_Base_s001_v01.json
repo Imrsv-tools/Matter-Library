@@ -1,0 +1,37 @@
+{
+  "_comment": "Undyed wool felt (Phase08 8.4, RD-P08-5): pressed, matted wool with no weave, the stuff of a hat, a slipper or a craft sheet. Authored at undyed wool's pale oatmeal so a Creator's tint (a 0-1 multiply) reaches the dyed colours below it. OPAQUE, very matte, with heavy FUZZ: felt's look is its loose surface fibres. The matted fibres are the article's own normal and roughness.",
+  "name": "Felt_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Felt_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Felt_Wool_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Felt_Wool_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.66, 0.63, 0.56",
+  "specular_ior": 1.55,
+  "fuzz_weight": 0.9,
+  "fuzz_color": "0.85, 0.83, 0.78",
+  "fuzz_roughness": 0.7,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed, scoured wool, a pale oatmeal (linear 0.66, 0.63, 0.56; no measured value). IOR 1.55: keratin (as Hair). Roughness ~0.92 in the map: a fibre mat has no smooth face. Fuzz 0.9: the most of any shipped textile (Cotton_Jersey 0.6), because a felt's surface is loose fibre ends."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Felt_Wool.yaml"
+    }
+  ]
+}

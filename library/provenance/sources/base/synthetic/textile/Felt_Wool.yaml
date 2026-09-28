@@ -1,0 +1,12 @@
+# Draft provenance for one texture set (Phase08 step 8.4; the Phase03 shape, lead ruling Q2 = A).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: base/synthetic/textile/Felt_Wool    # pressed wool felt: matted 1.5-4 mm fibres, no weave
+version: v01
+files:
+  - MatterLibrary/textures/base/synthetic/textile/Felt_Wool_normal_s001.png
+  - MatterLibrary/textures/base/synthetic/textile/Felt_Wool_roughness_s001.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/base/gen_fabrics.py

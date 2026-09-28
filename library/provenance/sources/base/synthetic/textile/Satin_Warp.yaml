@@ -1,0 +1,12 @@
+# Draft provenance for one texture set (Phase08 step 8.4; the Phase03 shape, lead ruling Q2 = A).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: base/synthetic/textile/Satin_Warp    # five-end warp satin, 100 ends x 40 picks per cm
+version: v01
+files:
+  - MatterLibrary/textures/base/synthetic/textile/Satin_Warp_normal_s001.png
+  - MatterLibrary/textures/base/synthetic/textile/Satin_Warp_roughness_s001.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/base/gen_fabrics.py

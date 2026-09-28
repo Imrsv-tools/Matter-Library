@@ -1,0 +1,37 @@
+{
+  "_comment": "Undyed worsted wool suiting (Phase08 8.4, RD-P08-5): a fine, balanced 2/2 twill in combed wool, the cloth of a suit, a blazer or trousers. Authored at undyed wool's ecru so a Creator's tint (a 0-1 multiply) reaches the greys, navies, browns and charcoal below it: a suit is piece-dyed, so its colour is one constant. OPAQUE, semi-matte, with some FUZZ (worsted is smoother than felt, still wool). The twill (36 ends x 32 picks per cm) is the article's own normal and roughness.",
+  "name": "WoolSuiting_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/WoolSuiting_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Wool_Suiting_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Wool_Suiting_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.64, 0.61, 0.54",
+  "specular_ior": 1.55,
+  "fuzz_weight": 0.35,
+  "fuzz_color": "0.8, 0.78, 0.72",
+  "fuzz_roughness": 0.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed, scoured worsted wool, ecru (linear 0.64, 0.61, 0.54; no measured value), a touch darker than Felt_Natural's looser fibre. IOR 1.55: keratin. Roughness ~0.72 in the map: combed worsted has a faint lustre (felt ~0.92). Fuzz 0.35: smoother than felt (0.9), as denim-to-canvas among the cottons."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Wool_Suiting.yaml"
+    }
+  ]
+}

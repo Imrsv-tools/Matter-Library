@@ -1,0 +1,35 @@
+{
+  "_comment": "Undyed satin (Phase08 8.4, RD-P08-5): a five-end warp satin in fine polyester filament, the face of a lining, a slip dress or a blouse. Authored white so a Creator's tint (a 0-1 multiply) reaches every dyed colour. OPAQUE, glossy, with SPECULAR ANISOTROPY: the face is almost all warp float, so the highlight is stretched across the warp (the warp runs along V; the highlight along U, as the hair's, Learnings B9). No fuzz: filament does not shed. The weave is the article's own normal and roughness.",
+  "name": "Satin_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "synthetic/textile/Satin_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Satin_Warp_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Satin_Warp_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.80, 0.79, 0.76",
+  "specular_ior": 1.57,
+  "specular_roughness_anisotropy": 0.7,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed (optically unbrightened) polyester filament, a slightly warm white (linear 0.80, 0.79, 0.76; no measured value). IOR 1.57: polyester (PET, ~1.57 across the fibre). Roughness ~0.24 in the map: a lustrous float face, rougher at the interlacings. Anisotropy 0.7: long parallel floats (no measured value; Hair's 0.8 is a single fibre)."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Satin_Warp.yaml"
+    }
+  ]
+}
