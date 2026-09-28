@@ -37,6 +37,15 @@ It is one thing, the Unreal leg of the rig. It needs a machine with Unreal on it
 - **The rig's character job** (`tools/parity/JOB_FORMAT.md` §The character job) is the Unreal driver's second job shape: one article per part, and `bindings[].cutout_map` on the hair, brows and lashes.
 - The consumer side of all this is `PlatformDependencies.md` P15–P19.
 
+**Since then (2026-09-28): Phase08 adds a `Hair` master** (in progress on this machine; the "no Hair master" line above predates it). Its graph is Masked's plus thin-walled translucency and soft coverage; Unreal's side is the **Hair shading model**. Pull and read `Phase08_CharacterAppearance.md` and `260928_R_HairAndNailRendering.md` before building it.
+
+**Reevaluate under the lead's LCD ruling (2026-09-28)** (`_Architecture.md` §Design principles). The lead: *"we use the master materails to lean in on the egines BEST qaulities to make the material look as good as it can"*. The LCD is the shared parameter vocabulary, not a shared ceiling, so **each Unreal master should use Unreal's best feature for its matter**, even where Storm and Blender have no equivalent. Cross-tool agreement is judged on whether each parameter moves every tool the same way, not on matching pictures. Candidates, for this phase's discovery:
+1. **Masked coverage: dithered, not hard-cut.** *Opacity Mask Dither* with temporal AA, two-sided, on Masked and Hair. This follows the lead's pick for hair, soft edges (Phase08, *"I do think c soft edges is the way"*), and applies to Lace too. Storm keeps a cutoff.
+2. **Skin: Unreal's best skin scattering** (a Subsurface Profile, or Substrate's skin path) for skin, even if marble, jade and wax want another. CM-Q10 kept one Subsurface master because Blender's `RANDOM_WALK_SKIN` served both. That was a Blender measurement, so it does not decide Unreal. A `Skin` master (or an Unreal-side split) is now legitimate if Unreal needs it.
+3. **Fabrics: Unreal's Cloth shading model** for Opaque articles that set fuzz (cotton, denim, felt, velvet). Fuzz is OpenPBR's sheen; the Cloth model is Unreal's best at it.
+4. **Eyes: reconsider D-E** (no `Eye` master). D-E refused one because Unreal's eye model has inputs (iris depth, caustics) the others lack, which is the superseded wording. The open catch: Unreal's eye model expects one eye mesh with an iris mask, while the character's eye is split into sclera, iris, pupil and cornea (Phase07 L1).
+5. **Strands later:** when the platform moves to grooms, the Hair master uses Unreal's strand hair model, driven by the same article parameters (colour, roughness). The article stays `open_pbr_surface` (Decision of record 1); the master picks the engine's fibre model.
+
 ## Open questions (settle during this phase)
 
 - Is Unreal 5.8 available and working on the UE machine's Linux install?
