@@ -64,7 +64,7 @@ The Matter Library is a **gathering of components, organised by concern**. Each 
 | **Blender bridge** | the Asset-Browser library and the Matter exporter | [Experience §Shipped](Experience/Experience_MatterLibrary.md) · [CreatorAssetProfile](Contract/CreatorAssetProfile.md) | `blender/`, `tools/generators/`, `tools/conformance/` |
 | **Matter Manager** *(planned)* | import · promotion · subset/export · path remap | — | — |
 | **Automated transformers** *(planned; Blender shipped 2026-09-27)* | MaterialX → Blender / Unreal, after manual parity is proven. *Blender (Phase05): `blender/masters/` builds each article on one master group per master, and the parity rig measures it against USDLiveView's renderer. Unreal: Phase06.* | [ToolingConventions](../ToolingConventions.md) | `blender/masters/`, `tools/parity/` |
-| **Unreal deliverable** *(planned, optional)* | a reference UE masters package for Unreal users outside IMRSV (R14 "B later") | — | — |
+| **Unreal deliverable** *(planned; no longer optional since 2026-09-28)* | **the** Unreal masters package: IMRSV Studio adopts it instead of maintaining its own (lead, 2026-09-28: *"yes, Studio adopts the library masters"*; [PlatformDependencies](../Planning/PlatformDependencies.md) P20), and any other Unreal user can drop it in. First built by Phase06. *(Was: "a reference UE masters package for Unreal users outside IMRSV (R14 'B later')", optional.)* | — | — |
 
 > **Experience** ([Experience_MatterLibrary](Experience/Experience_MatterLibrary.md)) is the **product/UX** view (the Creator Golden Path), distinct from this architecture/contract view. It links to the Contract and Ontology specs; it does not restate them.
 

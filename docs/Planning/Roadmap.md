@@ -70,8 +70,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Complete/Phase05_TestRig.md`
 
-### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26)*
-**Outcome:** an Unreal user outside IMRSV can drop in a package of the Matter masters and render library materials from a release.
+### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26; **re-scoped 2026-09-28, lead: "Studio adopts the library masters"**, `PlatformDependencies.md` P20)*
+**Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
 
 ### Parking lot — TBD
