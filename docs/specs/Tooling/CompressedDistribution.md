@@ -92,6 +92,8 @@ control ΔE 0.0 (`--self-test`); a materially-wrong injected colour fires the ga
 *(Updated 2026-09-23, measured: the tool path — the original said `tools/.../codec_ab.py`; it is `tools/conformance/codec_ab.py`, with `--self-test` and `--red-demo` flags.)*
 
 ### Per-class ΔE bars (from real first pairs)
+> **Scope (stated 2026-09-28):** these bars compare **one renderer with itself**: an article's source textures against their compressed release copies, through one pinned Storm pipeline. There, sameness is the point. They are **not** a cross-renderer bar. Between tools, the library measures whether each parameter moves every tool the same way, and lets each master look as good as its engine can (lead ruling, [_Architecture](../_Architecture.md) §Design principles).
+
 Target ΔE<2 for Opaque/Masked/Emissive; relaxed for transmission/SSS. Set per [master](../Ontology/MasterSet.md) class from the
 first calibrated pairs OR a recorded lead decision (`measurement-OR-lead-decision`). Measured first pairs
 (render ΔE2000 mean): Copper 0.69 · Limestone 0.23 · Concrete 0.43 — all well under the

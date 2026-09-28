@@ -90,9 +90,25 @@ The **LCD discipline** is two-tier ([LCDSchema](Contract/LCDSchema.md)). The **a
 
 *(Carried from this repo's `.ai/conventions.md`, 2026-09-23.)*
 
-### Least Common Denominator (LCD)
-- Expose only parameters every target (MaterialX / Unreal with Substrate / Blender Principled BSDF) can honour. If one target can do something the others can't, don't rely on it.
-- Masters are where per-target gaps are bridged, so the visible result stays close (target ΔE < 2 under standardised lighting, where the master allows; see [CompressedDistribution](Tooling/CompressedDistribution.md) for the per-class bars).
+### Least Common Denominator (LCD) — a shared vocabulary, not a shared ceiling
+
+**Lead ruling, 2026-09-28, verbatim:** *"I just wnat to make sure LCD is not about making everything look equally bad... We are not tryong to make someting look intnetionlly worse so that it looks the same in storm... the goal is with the params that they look the best they can in the tool they are in, and have NOD toward what is changed.. the use case is that in belnder a creator adds matter to thier object and do a few renders and tweek a few params to get CLOSE to the goal or can see it is achaiveable. then when they come into Studio with those params, they have a starting point but will for sure need to a adjust things based on this engine... same if they take it to houdini or whatver... we use the master materails to lean in on the egines BEST qaulities to make the material look as good as it can"*
+
+What that means here:
+- **What is common is the PARAMETERS, not the picture.** The LCD is the vocabulary a Creator's settings travel in: the port names, what each one means, and its range ([LCDSchema](Contract/LCDSchema.md)). Only parameters every target can *take* are exposed, so a tweak made in Blender arrives in Studio, Houdini or a USD viewer as a **starting point** that nods the same way. The Creator is expected to adjust per engine.
+- **Each master makes the article look as good as its engine can.** A master **leans on its engine's best features**, even one no other target has: a hair shading model, dithered coverage, a skin-grade subsurface method. What a master may **not** do is change what a parameter means.
+- **The article states the real substance.** An article is never made worse so that a weaker renderer matches it (the same rule as MasterSet's opacity floor: *"never fudge the article to protect the master"*). A value one viewer ignores is still authored (Phase07: Storm ignores scatter anisotropy, which stays at 0.8 for Blender).
+- **Cross-tool agreement is measured on the NOD: does each parameter move every tool the same way, and by about the same amount?** The parity rig's **"Moved"** column (and its ONE-SIDED flag). A picture-to-picture ΔE between tools is a **diagnostic**: a large one flags a real bug (wrong units, a lost texture, a mis-mapped input; Phase07 F12's 1/100 scale was found this way). It is not a bar that caps the better renderer. **Storm and other USD viewers are a reference, not the ceiling.**
+
+> **Superseded (2026-09-28), kept for history:** *"Expose only parameters every target (MaterialX / Unreal with Substrate / Blender Principled BSDF) can honour. If one target can do something the others can't, don't rely on it."* and *"Masters are where per-target gaps are bridged, so the visible result stays close (target ΔE < 2 under standardised lighting, where the master allows; see [CompressedDistribution](Tooling/CompressedDistribution.md) for the per-class bars)."* Read literally, the first capped every engine at the weakest. The ΔE < 2 bar it cited is **a codec bar**: one Storm pipeline comparing an article's source textures with their compressed copies, where sameness *is* the point ([CompressedDistribution](Tooling/CompressedDistribution.md) §Per-class ΔE bars). It had been taken for a cross-renderer target.
+>
+> **Reevaluate (2026-09-28), decisions argued on the superseded wording:**
+> - Phase07 **D-E** (no `Eye` master, because Unreal's eye model has inputs the others lack);
+> - Phase08 **RD-P08-1** (a "settings-only" `Hair` master argued on stock-viewer parity; already reworked on the lead's eye, `260928_R_HairAndNailRendering.md`);
+> - the parity rig's pass/fail bar (`tools/parity/rig.py` `BAR` / `GRADED`, ΔE < 2 between Storm and Blender): **Todo**, make the "Moved" agreement the criterion and demote picture ΔE to a diagnostic;
+> - the "ΔE < 2" wording in [Glossary](../Glossary.md) *Parity* (updated in the same change) and in [MasterSet](Ontology/MasterSet.md) and [LCDSchema](Contract/LCDSchema.md) (Todo; those two are mid-edit by Phase08 as this is written).
+>
+> *"No new masters are needed for coverage"* (MasterSet) still stands: that is about coverage. A master added to use an engine's best quality is this principle working, not an exception to it.
 
 ### Two-tier library (source vs versioned)
 - The **source collection** is volatile and community-contributable under the matter taxonomy.
@@ -167,3 +183,4 @@ docs/specs/
 - 2025-11 → 2026-05 — the library model, taxonomy and filename grammar were designed in this repo's Readme and planning docs.
 - 2026-06 — the IMRSV platform promoted and corrected that design into its own durable specs: 7 masters (not 5), `open_pbr_surface` (not `standard_surface`), the 63-character name budget. It then built the harness, the articles and the release machinery into this repo (2026-06 → 2026-07).
 - 2026-09-23 — the specs came home. This repo became a standalone producer and the authority for its own contract.
+- 2026-09-28 — the LCD principle was restated by the lead: a shared **parameter vocabulary**, not a shared ceiling. Each master makes the article look as good as its engine can, and cross-tool agreement is measured on whether parameters move every tool the same way. The old wording (*"don't rely on"* what one target alone can do; a cross-tool ΔE < 2 target, which was really a codec bar) had pulled decisions towards matching the weakest renderer: an Eye master refused, a hair master first kept "settings-only".
