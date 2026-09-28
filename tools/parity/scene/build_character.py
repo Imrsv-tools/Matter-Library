@@ -72,8 +72,9 @@ for _mask, _sha in (("lips", "572630c2b4bb061dfd3b5bb75228615527442296b0db40feff
 # to the first split whose rule selects it, else to the mesh's `rest` part. Rules read the face's
 # UV centroid: `mask` (an MPFB2 region mask on hm08's UVs, > 50 %), `alpha` (the mesh's own
 # MakeHuman texture is transparent there), `circles` (inside any (u, v, r) circle in UV) and
-# `red` (the texture's red exceeds green and blue by > 30 levels). One rule reads 3D instead:
-# `below` (the face's centroid within that many metres of the mesh's lowest point; Phase08 8.3).
+# `red` (the texture's red exceeds green and blue by > 30 levels). `grow` (Phase08 8.3) widens a
+# rule's own UV selection by that many rings of neighbouring faces (sharing a vertex): on a
+# loop-modelled mesh, whole edge loops.
 MESHES = {
     "body": {"group": "body", "rest": "Body",
              "split": [("Lips", {"mask": ["mpfb_lips.jpg"]}),
@@ -98,9 +99,12 @@ MESHES = {
     # Phase08 8.3: the sole is its own part (rubber, not the leather upper), so the rig can judge
     # rubber on a sole. The rig's own copy only; splitting the platform's garments is platform-side
     # (Phase08 §Not now). The underside is its own UV island (u < 0.835, v >= 0.69: 224 faces, all
-    # within 2.75 cm of the ground, measured 2026-09-28); `below` adds the sole's side wall.
+    # within 2.75 cm of the ground); the sole slab's side is the next FOUR edge loops up from it
+    # (44 faces a shoe each; the fifth is the upper), measured 2026-09-28, so its top edge is the
+    # mesh's own seam. (A height band was tried first: it cut across the loops in stair-steps
+    # and missed the heel.)
     "shoes": {"proxy": "clothes/shoes01/shoes01", "rest": "Shoes", "delete": True,
-              "split": [("Soles", {"rect": [(0.0, 0.69, 0.835, 1.0)], "below": 0.015})]},
+              "split": [("Soles", {"rect": [(0.0, 0.69, 0.835, 1.0)], "grow": 4})]},
     # Hair, brows and lashes (7.6, ruling L2): cards whose strands are the transparency of their
     # own texture. `cutout` keeps the part's st in the source atlas (the map is drawn on it) and
     # writes that alpha as the part's cut-out map, which the rig supplies when it binds the
@@ -288,12 +292,29 @@ def _image(data: bytes):
     return im.size, im.load()
 
 
-def split_faces(spec: dict, faces, vt, pts=None) -> dict[str, list[int]]:
+def _grown(faces, vt, rects, rings: int) -> set[int]:
+    """The faces whose UV centroid is in `rects`, widened by `rings` rings of faces sharing a vertex."""
+    sel = set()
+    for i, f in enumerate(faces):
+        u = statistics.mean(vt[t][0] for _, t in f)
+        v = statistics.mean(vt[t][1] for _, t in f)
+        if any(u0 <= u < u1 and v0 <= v < v1 for u0, v0, u1, v1 in rects):
+            sel.add(i)
+    by_v: dict[int, set[int]] = {}
+    for i, f in enumerate(faces):
+        for vi, _ in f:
+            by_v.setdefault(vi, set()).add(i)
+    front = set(sel)
+    for _ in range(rings):
+        front = {j for i in front for vi, _ in faces[i] for j in by_v[vi]} - sel
+        sel |= front
+    return sel
+
+
+def split_faces(spec: dict, faces, vt) -> dict[str, list[int]]:
     """Face indices per part: the first split rule that selects a face wins, else `rest`."""
     rules = spec.get("split", [])
-    if any("below" in rule for _, rule in rules) and pts is None:
-        raise ValueError("a `below` rule needs the mesh's points")
-    y0 = min(p[1] for p in pts) if pts else 0.0
+    grown = {name: _grown(faces, vt, rule["rect"], rule["grow"]) for name, rule in rules if "grow" in rule}
     imgs = {}
     for _, rule in rules:
         for m in rule.get("mask", []):
@@ -318,7 +339,7 @@ def split_faces(spec: dict, faces, vt, pts=None) -> dict[str, list[int]]:
                 break
             if "rect" in rule and any(u0 <= u < u1 and v0 <= v < v1 for u0, v0, u1, v1 in rule["rect"]):
                 break
-            if "below" in rule and statistics.mean(pts[vi][1] for vi, _ in f) - y0 < rule["below"]:
+            if "grow" in rule and i in grown[name]:
                 break
             if rule.get("red"):
                 r, g, b, _ = at(tex, u, v)
@@ -367,7 +388,7 @@ def load_parts() -> dict:
                 raise SystemExit(f"{key}: the .obj has {n_obj} vertices, the .mhclo fits {len(fitted)}")
             pts = [fitted[vi] for vi in src]
         normals = vertex_normals(pts, faces)        # over the whole mesh: no crease at a split
-        for name, sel in split_faces(spec, faces, vt, pts).items():
+        for name, sel in split_faces(spec, faces, vt).items():
             if not sel:
                 raise SystemExit(f"part {name!r}: its rule selected no faces")
             p_pts, p_nrm, p_faces = subset(pts, normals, [faces[i] for i in sel])
