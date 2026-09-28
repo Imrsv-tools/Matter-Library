@@ -11,7 +11,11 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase on this machine (Phase07 closed 2026-09-27). Phase06 runs on the UE machine.*
+### Phase08 — Character Appearance for Studio — ACTIVE *(discovery complete 2026-09-28; execute next. Seeded as Phase09, renumbered Phase08 the same day)*
+**Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
+- `docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`
+
+*Phase06 runs on the UE machine.*
 
 ==================================================================================
 ## Future
@@ -21,10 +25,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-09-27 (lead):** Character Materials becomes **Phase07** and runs here straight after Phase05, **at the same time as Phase06** on the UE machine. Its materials ship as candidates (uncalibrated) until the Unreal column exists: *"I would rather have everything in and 'uncalibrated' yet then a bunch of magenta."* Library Coverage becomes Phase08. Why: `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md` (CM4).
 >
 > **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
-
-### Phase08 — Character Appearance for Studio — SEEDED *(seeded 2026-09-28 for the platform's Appearance work in Studio; numbered Phase09, then Phase08 the same day; next on this machine)*
-**Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
-- `docs/Planning/Phases/Future/Phase08_CharacterAppearance.md`
 
 ### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine, alongside Phase07)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
