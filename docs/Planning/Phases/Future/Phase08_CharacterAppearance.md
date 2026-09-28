@@ -140,4 +140,12 @@ The controls, read 2026-09-28:
 
 ## Execution Log
 
-_(populated during execution)_
+*Ledger: step · result · next. Findings live in the commit messages.*
+
+**Tree at start (2026-09-28):** `main` @ `de08ccc`, level with origin; 49 tracked textures modified in the working tree by no session of this phase. **Gate at start:** `run_all.py` 10 PASS / 2 SKIP / **5 FAIL** (Phase07 closed on 14 / 2 / 1, `approval_binds_freeze` alone). `check_exporter.sh` red at start: its Python cannot import MaterialX (environment, not code).
+
+**F-P08-7 — Every texture in the working tree was an 8×8 placeholder PNG.** The 49 tracked PNGs under `MatterLibrary/textures/` were 67–74 bytes (mtimes 2026-09-23 15:02 and 2026-09-27 20:52), while their real objects sat intact in the local LFS store. That caused the four extra release-hash reds, and it would have put stub textures in every rig sheet, every Blender preview and the dev install Studio links to. The cause is not traced. **Restored by the lead's ruling**, verbatim: *"yes restore the textures"* (`git checkout -- MatterLibrary/textures`). The gate is back to 14 / 2 / 1, `approval_binds_freeze` alone (inherited).
+
+| Step | Result | Next |
+|---|---|---|
+| **8.1** | **Click 1 ✅ (sitting 2026-09-28).** Lead, on the sweep sheet, verbatim: *"sheet looks plausable"*. Storm vs Blender, `Hair_Natural`: ΔE 0.81 whole set / 0.54 close-up; the tint moves both alike (14.8 / 14.6). Landed at `8.1` (WIP): the `Hair` token through the specs and the seven tool files, and `Hair_Natural`. **Deviation (small):** the rig's sweep has one tint setting ("tint blue"), so click 1 shows the tint behaving alike in both tools, not a walk through hair colours. The colour range is judged in Blender (click 2). **Then:** `Hair_Natural` marked `candidate`; the Blender library rebuilt (36 articles, `check_asset_library.sh` CONFORMS); the character sheet rendered with it on the bob, brows and lashes. Storm vs Blender: hair 0.71 / 0.80 (whole / face), was 1.34 / 1.71 on `Hair_DarkBrown`; brows 2.18, lashes 4.95 (thin cards, advisory as Lace). Nothing magenta. **Clicks 2–3 owed.** | Lead: clicks 2–3; then push. |

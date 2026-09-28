@@ -1,7 +1,7 @@
 {
   "_comment": "Hair fibre, untinted (Phase08 8.1, RD-P08-1/2): keratin with the least melanin, so its own look is a pale platinum blonde, and every natural hair colour is a base_color_tint BELOW it (the tint is a 0-1 multiply: LCDSchema). On the HAIR master: Masked's graph, with a hair shading model in its settings row (MasterSet), which Unreal has. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V. Hair_DarkBrown (on Masked) is kept.",
   "name": "Hair_Natural_Clean_Base_s001_v01",
-  "status": "draft",
+  "status": "candidate",
   "path": "biological/keratin/Hair_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Hair",
   "domain": "biological",
