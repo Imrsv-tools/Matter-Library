@@ -87,8 +87,9 @@ KNOWN_MASTERS = {
     "Subsurface", "TwoLayer", "Emissive", "Hair", "system",
 }
 
-# Masters whose coverage is a cut-out (MasterSet.md). `Hair` (Phase08 8.1) is Masked's graph
-# with its own settings row (a hair shading model), so it takes the same opacity sources.
+# Masters whose coverage is the mesh's cut-out (MasterSet.md). Masked THRESHOLDS it at
+# `opacity_cutoff`; Hair (Phase08 8.1) takes it as SOFT coverage, unthresholded, and lets light
+# through the card: thin-walled subsurface whose colour is the (tinted) base colour.
 CUTOUT_MASTERS = {"Masked", "Hair"}
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
@@ -170,6 +171,7 @@ class MaterialSpec:
     fuzz_color: Optional[str] = None              # color3
     fuzz_roughness: Optional[float] = None
     specular_roughness_anisotropy: Optional[float] = None  # 0..1 along the UV tangent (7.6, C3)
+    specular_weight: Optional[float] = None       # 0..1, OpenPBR's own (Phase08 8.1: hair's gloss)
 
     # --- Author tier, Lane B: no OpenPBR input exists -> named interface inputs ---
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
@@ -276,8 +278,19 @@ def _check_spec(spec: MaterialSpec) -> None:
         if spec.opacity_tex:
             raise ValueError("an article has ONE opacity source: its own opacity_tex (a pattern "
                              "of the substance, like lace) or the mesh's cutout_map, not both")
-        if spec.opacity_cutoff is None:
+        if spec.master == "Masked" and spec.opacity_cutoff is None:
             raise ValueError("cutout_map needs opacity_cutoff: Masked thresholds its source")
+    if spec.master == "Hair":
+        # Phase08 8.1 (the lead's interim hair: light through the strands, soft edges)
+        if not spec.cutout_map or spec.opacity_cutoff is not None:
+            raise ValueError("Hair takes the mesh's cutout_map as soft coverage: cutout_map, "
+                             "and no opacity_cutoff (that is Masked's hard cut-out)")
+        if spec.thin_walled is not True or not spec.subsurface_weight > 0:
+            raise ValueError("Hair lets light through the card: thin_walled true and "
+                             "subsurface_weight > 0 (OpenPBR thin-walled subsurface)")
+        if spec.subsurface_color is not None:
+            raise ValueError("Hair's subsurface colour IS its tinted base colour (so the tint "
+                             "reaches the light through the strands); do not author one")
     layers = [o.texture for o in spec.overlays] + ([spec.maskset_tex] if spec.maskset_tex else [])
     if layers and not spec.meters_per_tile > 0:
         raise ValueError(
@@ -712,6 +725,9 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(shader, "subsurface_weight", "float", value=spec.subsurface_weight)
     if spec.subsurface_color is not None:
         _add_input(shader, "subsurface_color", "color3", value=spec.subsurface_color)
+    elif spec.master == "Hair":
+        # the fibre's colour, tint included: what passes through a strand is coloured by it
+        _add_input(shader, "subsurface_color", "color3", nodegraph=ng_name, output="base_color_out")
     if spec.subsurface_radius is not None:
         _add_input(shader, "subsurface_radius", "float", value=spec.subsurface_radius)
     if spec.subsurface_radius_scale is not None:
@@ -722,7 +738,8 @@ def assemble(spec: MaterialSpec) -> str:
                      ("coat_roughness", "float"), ("coat_ior", "float"),
                      ("fuzz_weight", "float"), ("fuzz_color", "color3"),
                      ("fuzz_roughness", "float"),
-                     ("specular_roughness_anisotropy", "float")):
+                     ("specular_roughness_anisotropy", "float"),
+                     ("specular_weight", "float")):
         if getattr(spec, key) is not None:
             _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:

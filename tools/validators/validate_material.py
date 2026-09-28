@@ -161,12 +161,27 @@ def check_master_conformance(doc) -> list:
             errs.append(f"{master}: geometry_thin_walled={inp.getValueString()!r}, "
                         f"expected {'true' if want else 'false'}")
 
-    if master in ("Masked", "Hair"):     # Hair = Masked's graph, its own settings (Phase08 8.1)
+    if master == "Masked":
         need_iface("opacity_cutoff", "the cutoff IS this master's defining property")
         op = _shader_input(doc, "geometry_opacity")
         if not _is_graph_driven(op):
             errs.append(f"{master}: geometry_opacity has no connected source — a cutoff with "
                         "nothing to threshold makes no holes")
+
+    elif master == "Hair":
+        # Phase08 8.1: the mesh's cut-out as SOFT coverage, and light through the card
+        need_iface("cutout_map", "the strands are the mesh's cut-out, supplied at binding")
+        if "opacity_cutoff" in iface:
+            errs.append("Hair: opacity_cutoff is Masked's hard cut-out; Hair's coverage is soft")
+        if not _is_graph_driven(_shader_input(doc, "geometry_opacity")):
+            errs.append("Hair: geometry_opacity has no connected source (the cut-out map)")
+        need_thin_walled(True)
+        sw = _shader_input(doc, "subsurface_weight")
+        if sw is None or _as_float(sw.getValueString()) <= 0:
+            errs.append("Hair: subsurface_weight is absent or 0 — no light passes through")
+        if not _is_graph_driven(_shader_input(doc, "subsurface_color")):
+            errs.append("Hair: subsurface_color must follow the tinted base colour "
+                        "(base_color_out), or the tint never reaches the light through the strands")
 
     elif master in ("TranslucentThin", "TranslucentThick"):
         need_shader("specular_ior", "IOR is what refracts")

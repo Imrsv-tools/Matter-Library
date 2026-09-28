@@ -3,7 +3,6 @@
   <nodegraph name="NG_Hair_Natural_Clean_Base_s001_v01">
     <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
-    <input name="opacity_cutoff" type="float" value="0.5" uiname="Opacity Cutoff" />
     <input name="cutout_map" type="filename" value="" uiname="Cut-out Map" />
     <constant name="base_color_const" type="color3">
       <input name="value" type="color3" value="0.78, 0.68, 0.52" />
@@ -14,7 +13,7 @@
     </multiply>
     <output name="base_color_out" type="color3" nodename="base_color_tinted" />
     <constant name="roughness_const" type="float">
-      <input name="value" type="float" value="0.4" />
+      <input name="value" type="float" value="0.6" />
     </constant>
     <add name="roughness_biased" type="float">
       <input name="in1" type="float" nodename="roughness_const" />
@@ -34,13 +33,7 @@
       <input name="default" type="float" value="1.0" />
       <input name="texcoord" type="vector2" nodename="cutout_uv" />
     </image>
-    <ifgreatereq name="opacity_thresholded" type="float">
-      <input name="value1" type="float" nodename="cutout_tex" />
-      <input name="value2" type="float" interfacename="opacity_cutoff" />
-      <input name="in1" type="float" value="1.0" />
-      <input name="in2" type="float" value="0.0" />
-    </ifgreatereq>
-    <output name="opacity_out" type="float" nodename="opacity_thresholded" />
+    <output name="opacity_out" type="float" nodename="cutout_tex" />
   </nodegraph>
   <open_pbr_surface name="SR_Hair_Natural_Clean_Base_s001_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -49,7 +42,12 @@
     <input name="specular_roughness" type="float" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.55" />
     <input name="geometry_opacity" type="float" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="opacity_out" />
+    <input name="geometry_thin_walled" type="boolean" value="true" />
+    <input name="subsurface_weight" type="float" value="0.6" />
+    <input name="subsurface_color" type="color3" nodegraph="NG_Hair_Natural_Clean_Base_s001_v01" output="base_color_out" />
+    <input name="subsurface_scatter_anisotropy" type="float" value="0.5" />
     <input name="specular_roughness_anisotropy" type="float" value="0.8" />
+    <input name="specular_weight" type="float" value="0.5" />
   </open_pbr_surface>
   <surfacematerial name="Hair_Natural_Clean_Base_s001_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_Hair_Natural_Clean_Base_s001_v01" />

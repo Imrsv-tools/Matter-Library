@@ -25,9 +25,15 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             two normals mixed in tangent space; the tint applies after
   Masked                    + the cut-out: alpha = opacity >= ``opacity_cutoff`` (the
                             article's ``ifgreatereq``)
-  Hair                      the Masked graph (Phase08 8.1). The master differs from
-                            Masked only in its SETTINGS row (MasterSet: a hair shading
-                            model, which Unreal has); Principled has none for a card
+  Hair                      (Phase08 8.1) the mesh's cut-out as SOFT coverage (no cutoff),
+                            and OpenPBR's thin-walled subsurface, copied from MaterialX's
+                            graph: with c = the tinted base colour, w = subsurface weight,
+                            a = scatter anisotropy, the diffuse becomes
+                            lerp(base, c*c*(1-a)/2, w) and a Translucent BSDF of colour
+                            w*c*c*(1+a)/2 is added (MaterialX applies c twice: as the
+                            BSDF's colour and as its factor). The one approximation: the
+                            Translucent lobe sits beside Principled, not under its
+                            specular layer, so it is not dimmed by the specular's Fresnel
   Emissive                  + emission: colour x luminance (MaterialX's OpenPBR takes
                             luminance as radiance directly, as Blender's Strength is)
   TranslucentThin           + transmission, Thin Wall on; the tint of what shows through
@@ -57,9 +63,10 @@ import math
 
 import bpy
 
-VERSION = 6     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 7     # bump when a group's contents change; ensure_*() rebuilds an older one
                 # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
                 # 6 (Phase07 7.6): specular anisotropy (carrier C3) on the UV tangent
+                # 7 (Phase08 8.1): ML_Hair's own part (soft coverage, light through)
 
 # The Subsurface master's Cycles method (Phase07 CM-Q10, measured 2026-09-27 in the rig, ΔE
 # to Storm, whole set): RANDOM_WALK_SKIN serves marble AND skin better than RANDOM_WALK
@@ -76,7 +83,7 @@ MASTER_PARTS = {
     "Opaque": set(),
     "TwoLayer": {"layer2"},
     "Masked": {"opacity"},
-    "Hair": {"opacity"},            # settings-only master: Masked's graph (Phase08 RD-P08-1)
+    "Hair": {"hair"},               # soft coverage + thin-walled translucency (Phase08 8.1)
     "Emissive": {"emission"},
     "TranslucentThin": {"transmission"},
     "TranslucentThick": {"transmission", "thick"},
@@ -219,6 +226,10 @@ def _sockets(parts: set) -> list:
     if "opacity" in parts:
         s += [("Opacity", "NodeSocketFloat", 1.0),
               ("opacity_cutoff", "NodeSocketFloat", 0.5)]
+    if "hair" in parts:
+        s += [("Opacity", "NodeSocketFloat", 1.0),
+              ("Subsurface Weight", "NodeSocketFloat", 0.0),
+              ("Subsurface Anisotropy", "NodeSocketFloat", 0.0)]
     if "emission" in parts:
         s += [("Emission Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
               ("Emission Luminance", "NodeSocketFloat", 0.0)]
@@ -428,6 +439,48 @@ def _build(name: str, parts: set):
         bsdf.subsurface_method = SUBSURFACE_METHOD
         base = _lerp_color(ng, base, gi.outputs["Subsurface Color"],
                            gi.outputs["Subsurface Weight"], 0, 800)
+    if "hair" in parts:
+        # OpenPBR thin-walled subsurface (MaterialX open_pbr_surface.mtlx, "Subsurface
+        # (thin-walled)"): mix(reflection, transmission, 0.5), each lobe coloured c and
+        # factored c(1 -/+ a); subsurface_color = the tinted base (the Hair graph's rule)
+        c2 = _vmath(ng, "MULTIPLY", 0, 1000)
+        L(base, c2.inputs[0])
+        L(base, c2.inputs[1])
+        w = gi.outputs["Subsurface Weight"]
+        an_ss = gi.outputs["Subsurface Anisotropy"]
+        rf = _math(ng, "SUBTRACT", 0, 1150)                    # (1 - a) / 2
+        rf.inputs[0].default_value = 1.0
+        L(an_ss, rf.inputs[1])
+        rh = _math(ng, "MULTIPLY", 150, 1150)
+        L(rf.outputs[0], rh.inputs[0])
+        rh.inputs[1].default_value = 0.5
+        refl = _vmath(ng, "SCALE", 300, 1100)
+        L(c2.outputs[0], refl.inputs[0])
+        L(rh.outputs[0], refl.inputs["Scale"])
+        tf = _math(ng, "ADD", 0, 1300)                         # w (1 + a) / 2
+        tf.inputs[0].default_value = 1.0
+        L(an_ss, tf.inputs[1])
+        th = _math(ng, "MULTIPLY", 150, 1300)
+        L(tf.outputs[0], th.inputs[0])
+        L(w, th.inputs[1])
+        th2 = _math(ng, "MULTIPLY", 300, 1300)
+        L(th.outputs[0], th2.inputs[0])
+        th2.inputs[1].default_value = 0.5
+        trans = _vmath(ng, "SCALE", 450, 1250)
+        L(c2.outputs[0], trans.inputs[0])
+        L(th2.outputs[0], trans.inputs["Scale"])
+        base = _lerp_color(ng, base, refl.outputs[0], w, 450, 1050)
+        tl = _node(ng, "ShaderNodeBsdfTranslucent", 850, 500)
+        L(trans.outputs[0], tl.inputs["Color"])
+        add = _node(ng, "ShaderNodeAddShader", 1000, 300)
+        L(bsdf.outputs["BSDF"], add.inputs[0])
+        L(tl.outputs["BSDF"], add.inputs[1])
+        clear = _node(ng, "ShaderNodeBsdfTransparent", 1000, 450)
+        cover = _node(ng, "ShaderNodeMixShader", 1100, 200)    # soft coverage: no cutoff
+        L(gi.outputs["Opacity"], cover.inputs["Fac"])
+        L(clear.outputs["BSDF"], cover.inputs[1])
+        L(add.outputs["Shader"], cover.inputs[2])
+        L(cover.outputs["Shader"], go.inputs["BSDF"])
     L(base, bsdf.inputs["Base Color"])
     return ng
 
