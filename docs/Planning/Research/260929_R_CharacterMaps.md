@@ -30,7 +30,7 @@ Asked and answered in the session that wrote Passes 1–6, after the lead read t
 | MAP-RD2 | **No picture that fits only one mesh** (*"no bespoke one image one mesh solutions"*). A library texture that fits any mesh following a known layout, placed by settings, is fine (*"eyes need images to look good"*); a picture painted to one mesh's UV layout is not. This retires, for skin and eyes, every Pass 4–6 option that supplied a mesh's own picture at binding (S-a, S-b, S-c's masks, E-a). |
 | MAP-RD3 | **Card hair is the one exception to MAP-RD2** (option 1; *"yes 1"*, after *"GAD I hate hair cards... it is like the worst "game engine" fix of all"*). Each hairstyle has its own strand picture; the library's hair article stays one general article with the tint. The matte look the lead approved at the platform's sitting is where card *quality* stops. **Amended the same day (lead: *"yes on hair"*): the exception is supported properly in the library.** The hair article takes the hairstyle's picture as an input and uses its light-and-dark **structure to shade the article's own light colour** (Pass 4's MODULATE), not to replace it. So every renderer draws the picture (Blender and USD viewers as well as Studio), and the tint reaches every colour on every style (MAP-F2). This answers the HS asks the library's way. *(Was: "nothing more is invested in cards", which had shelved this; corrected because it left the tint broken on 9 of 10 styles.)* |
 | MAP-RD4 | **Strands are the real hair path, as a phase of their own** (*"and what you say"*, accepting the recommendation). The picture-per-mesh problem does not exist for strands: the hair is geometry and the library ships one material. |
-| MAP-RD5 | **Where the effort goes instead** (the same *"what you say"*): skin stays general and gains what already exists but does not reach Studio (coat, fuzz, glow); the wet eye highlight by **coat**, not the cornea. **Eyes, amended the same day (lead: *"for the eyes.. whatever makes the eyes look best is what we would like"*):** not an iris-only texture but **the whole eyeball picture** (iris, limbal ring, sclera veins) in the library, bound to all three eye parts and placed by the existing `uv_scale` / `uv_offset` settings (Pass 7). Every MakeHuman eye shares one layout, so the picture lives in the library like the hair's. *(Was: "a library iris texture", Pass 7's first version.)* |
+| MAP-RD5 | **Where the effort goes instead** (the same *"what you say"*): skin stays general and gains what already exists but does not reach Studio (coat, fuzz, glow); the wet eye highlight by **coat**, not the cornea. **Eyes, amended the same day (lead: *"for the eyes.. whatever makes the eyes look best is what we would like"*):** not an iris-only texture but **the whole eyeball picture** (iris, limbal ring, sclera veins) in the library, bound to all three eye parts and placed by the existing `uv_scale` / `uv_offset` settings (Pass 7). Every MakeHuman eye shares one layout, so the picture lives in the library like the hair's. *(Was: "a library iris texture", Pass 7's first version.)* **The placement mechanism is superseded by Pass 8** (the picture is sampled on the eye's own UVs, as the hair's is); the ruling's intent is unchanged. The lead leans to **separate pictures per colour** (MAP-Q5, Pass 8). |
 | MAP-RD6 | **Leverage Unreal where it can do better: an `Eye` master** (lead: *"This is a case to leverage UE where we can - but indeed adding mesh is not the time. I like the eye master idea"*). Unreal's eye shading (refraction through the cornea, a concave iris, depth) is used for Studio's eyes; Blender and USD viewers render the same article with what they have. **No new eye geometry now** (no cornea shell, lid shadow or tear line). This **reopens Phase07's D-E** (*"no `Eye` master; the eye is composed from existing masters"*, refused then under *"if one target can do something the others can't, don't rely on it"*), on the later LCD reading that each Unreal master leans on Unreal's best features (`PlatformDependencies.md` P20). |
 
 ## Pass 1 — Where Studio's character stands after the platform's Appearance phase (read 2026-09-29)
@@ -263,6 +263,38 @@ next opens hair):
 already authored and does not arrive yet: coat and fuzz (P16), the glow's calibration, and Studio adopting the library's
 masters (P20).
 
+## Pass 8 — The eye quick-fix, stopped at the balloon check (2026-09-29)
+
+**What happened:** the lead directed the eye work as a `/quick-fix` (*"do the eye quick-fix"*). Its mid-flight balloon
+check fired before anything was changed: the placement Pass 7 proposed is a contract rule, not a recipe edit. Nothing was
+built or committed. **Examined:** the nine CC0 eye pictures (pixels), the rig's `build_character.py` and `job.py`, the
+iris and sclera recipes, the platform's character recipe (its per-mesh `uv_scale`).
+
+- **MAP-F9 — Eight of the nine eye pictures are one photograph, recoloured.** Iris luminance correlation between them is
+  0.91–1.00; only **brown** is a different photograph (0.74–0.79 against the rest). So "separate pictures per colour" gives
+  **two real iris patterns**, each colour with its own painted variation (e.g. blue-green's two tones), which a single
+  tint cannot make. Still the higher-quality choice (the lead's lean on MAP-Q5), for that narrower reason.
+- **MAP-F10 — Placing a picture by `uv_scale` / `uv_offset` clashes with three existing things.**
+  - The platform's import already writes `uv_scale` on **every** character mesh from its measured UV density (the P18
+    stopgap that fixed the skin's pore size), so it would overwrite an eye part's placement.
+  - `LCDSchema.md` §Notes rules *one UV unit = one tile*; a placed, non-tiling picture needs a different rule.
+  - The rig's character job takes defaults only (F-P08-4) and rescales each part's `st` by that part's own density, so
+    the sclera, iris and pupil would each need different numbers.
+- **MAP-F11 — The simpler route is the hair's mechanism.** Every MakeHuman eye shares one layout, so the library holds
+  the eye picture **in that layout** and the article samples it **on the mesh's own `st`, outside `place2d`** — as
+  `cutout_map` is (§Cut-out map). No placement numbers, no clash with the density `uv_scale`, and the rig keeps the eye
+  parts' source `st` as it already does for the hair's cut-out parts. **It is the same contract addition as the hair
+  picture input (MAP-RD3)**: one input kind serves both. *(Supersedes Pass 7's "placed by settings" and its numbers; kept
+  above as the record. The rig's measured iris radius is 0.118 UV, `build_character.py`, not the 0.105 read off the
+  picture.)*
+- **MAP-F12 — The rig's eye is not Studio's eye.** The rig still has the cornea shell, and `Sclera_Natural`'s recipe
+  relies on it for the wet shine (*"a glossy sclera under it would double the highlight"*); Studio dropped the shell. Eye
+  work should be judged on a rig eye that matches Studio's (no shell). Coat on the eye parts reaches Studio only once P16
+  carries coat, or with the `Eye` master.
+
+**Routed:** the eye picture joins the hair picture and the `Eye` master in one phase, seeded 2026-09-29 on the lead's word
+(*"yes 1, seed the phase"*): `docs/Planning/Phases/Future/PhaseTBD_HairAndEyeMasters.md`.
+
 ## Open questions
 
 | # | Question | Why it matters | Research reading |
@@ -271,10 +303,10 @@ masters (P20).
 | ~~MAP-Q2~~ | ~~Who normalises the maps~~ | — | **Answered by MAP-RD1: the library prepares them** (for hair, the one member of the family) |
 | ~~MAP-Q3~~ | ~~One input family or one per role~~ | — | **Answered by MAP-RD2 / RD3:** one input, on the Hair article only; the eye's picture is an ordinary article texture |
 | ~~MAP-Q4~~ | ~~Which skin atlas, at what strength~~ | — | **Retired by MAP-RD2** (hm08-only pictures) |
-| MAP-Q5 | **The eye picture's colour: one light picture the tint takes to each colour, or a picture per colour from the nine?** | A light, neutral iris reaches any colour darker than itself (F-P08-1), but real irises differ in **pattern** too: brown is dense, blue shows fibres and crypts, hazel has a ring of a second colour round the pupil | Whatever looks best on the rig's face view (MAP-RD5): try one light picture with the tint first, and add a picture where a pattern differs |
+| MAP-Q5 | **The eye picture's colour: one light picture the tint takes to each colour, or a picture per colour from the nine?** | A light, neutral iris reaches any colour darker than itself (F-P08-1), but real irises differ in **pattern** too: brown is dense, blue shows fibres and crypts, hazel has a ring of a second colour round the pupil | **Lead leans to separate pictures** (2026-09-29). MAP-F9: 8 of 9 are one photograph recoloured, brown is a second, so that is two real patterns with painted colour variation. Ruled at the phase's discovery, on the rig's face view |
 | ~~MAP-Q6~~ | ~~Coat on the eye parts, or the cornea~~ | — | **Ruled MAP-RD5: coat**; no new geometry (MAP-RD6) |
 | ~~MAP-Q7~~ | ~~Brows and lashes: do they take the hair tint?~~ | — | **Answered by MAP-RD3 as amended:** they will, once their colour comes from the article (Pass 7) |
-| MAP-Q8 | **Eye placement: two settings per eye now, or an eye UV layout the mesh follows?** | Settings work today; a layout needs the platform to re-lay the eye | Settings now (MAP-RD6: no mesh work now) |
+| ~~MAP-Q8~~ | ~~Eye placement: settings per eye, or an eye UV layout?~~ | — | **Answered by MAP-F11: neither** — the picture is held in the MakeHuman eye's own layout and sampled on the mesh's `st`, as the hair's cut-out is |
 | MAP-Q9 | **Seed the strands phase, and who runs its first spike** (a runtime groom in Unreal, platform-side)? | MAP-RD4 | The lead's call; the spike decides whether the phase is real |
 | MAP-Q10 | **Reopen Decision of record 1 for a strand hair material?** | A fibre model is not `open_pbr_surface` | The lead's call, at the strands phase |
 | MAP-Q11 | **Matter-Library#3** (declare `strand_color_map`) | The issue is open and public | **Pursued, the library's way** (MAP-RD3 as amended): the input is declared, read as modulate, not replace; the lead comments on the issue |
@@ -300,29 +332,26 @@ repo was written by either; the scratch in `/tmp` is torn down.
 
 - **Passes captured (2026-09-29):** 1 — Studio's character after the platform's Appearance phase; 2 — the map inventory;
   3 — what the pictures carry; 4 — the replace/modulate probe; 5 — the contract shape (narrowed to hair); 6 — per-part
-  options (dispositioned); 7 — the direction after the lead's rulings.
+  options (dispositioned); 7 — the direction after the lead's rulings; 8 — the eye quick-fix stopped at its balloon check
+  (the eye rides the hair's input).
 - **Decided (lead, 2026-09-29):** **MAP-RD1** the library prepares every material and asset, consumers only consume, and
   only names and settings travel · **MAP-RD2** no picture that fits only one mesh · **MAP-RD3** card hair is the one
   exception, **supported properly**: its picture shades a light hair article, so every renderer draws it and the tint
   reaches every colour · **MAP-RD4** strands are the real hair path, as their own phase · **MAP-RD5** eyes: whatever looks
   best — the whole eyeball picture in the library, placed by settings, with coat; skin stays general · **MAP-RD6** an `Eye`
   master using Unreal's eye shading, no new eye geometry now (reopens Phase07's D-E).
-- **Current direction:** **eyes** — the whole eyeball picture (CC0) as a library texture on all three eye parts, placed by
-  `uv_scale` / `uv_offset`, with coat, and an `Eye` master whose Unreal side uses the engine's eye shading; **hair** — the
-  hairstyle's picture, prepared by the library, shades the light `Hair` article (the HS asks and Matter-Library#3, answered
-  the library's way); strands as a phase; **skin** — general, lifted by what already exists reaching Studio (P16, P20, the
-  glow's calibration).
-- **Unverified, recorded as such:** every probe result is flat 2D colour, not a lit render; the iris radius (≈ 0.105, read
-  off the picture, measured at the build); that Studio's own masters apply the UV ports as `place2d` does; how Unreal's eye
-  model wants the eye bound (MAP-Q12, from knowledge); a runtime groom in Unreal (platform sizing, 2026-09-28: unproven).
-- **Open questions:** MAP-Q5, Q8–Q13 (Q1–Q3 and Q7 answered by the rulings, Q4 retired, Q6 ruled).
-- **Next step:** parked. The work falls into three units:
-  - **The eye picture and coat — buildable in one sitting as a `/quick-fix`:** cut the whole-eye texture from the CC0 pack
-    (with provenance), re-author the sclera, iris and pupil articles with it and the two UV ports plus a coat, and give the
-    rig's character job the two numbers per eye, seen on the rig's face view and in Blender. It needs no contract change and
-    helps every renderer today.
-  - **A phase, unnumbered — Hair and Eye Masters:** the hair picture input read as modulate (the library's tool prepares
-    the pictures; `LCDSchema.md`, the assembler, the validator, the Blender masters, the rig), and the `Eye` token with its
-    settings row; the Unreal sides built by Phase06 / Unreal Reference Masters (P20), with interim asks to the platform.
-  - **Strands:** a phase of its own (MAP-Q9), seeded only on the lead's word.
-  The Roadmap's *Hair That Reads as Hair* entry points here.
+- **Current direction:** **eyes** — the whole eyeball picture (CC0; two real patterns, MAP-F9) held by the library in the
+  MakeHuman eye's layout and sampled on the eye parts' own `st` (MAP-F11), with coat, and an `Eye` master whose Unreal side
+  uses the engine's eye shading; **hair** — the hairstyle's picture, prepared by the library, shades the light `Hair`
+  article (the HS asks and Matter-Library#3, answered the library's way); **both ride one new input kind**; strands as a
+  phase; **skin** — general, lifted by what already exists reaching Studio (P16, P20, the glow's calibration).
+- **Unverified, recorded as such:** every probe result is flat 2D colour, not a lit render; how Unreal's eye model wants
+  the eye bound (MAP-Q12, from knowledge); a runtime groom in Unreal (platform sizing, 2026-09-28: unproven).
+- **Open questions:** MAP-Q5, Q9–Q13 (Q1–Q3, Q7 and Q8 answered, Q4 retired, Q6 ruled).
+- **Next step:** parked; the work is routed.
+  - **Seeded 2026-09-29 (lead: *"yes 1, seed the phase"*): `docs/Planning/Phases/Future/PhaseTBD_HairAndEyeMasters.md`** —
+    the one picture input kind (hair and eyes), the hair picture read as modulate, the eye picture, and the `Eye` token with
+    its settings row; the Unreal sides with Phase06 / Unreal Reference Masters (P20). It opens by the lead's `/discovery`.
+  - **Strands:** a phase of its own (MAP-Q9), seeded only on the lead's word; the Roadmap's *Hair That Reads as Hair*
+    entry holds it.
+  - *(The eye `/quick-fix` offered earlier was attempted and stopped at its balloon check: Pass 8.)*
