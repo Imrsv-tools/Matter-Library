@@ -66,12 +66,14 @@ TIMEOUT_S = 3600         # a first editor-mode launch compiles shaders for ~12 m
 # The calibration (Phase06 step 6.1, `--calibrate` on the grey card; the value and how it was
 # measured are in the phase doc's execution log). Like Blender's DOME_K / SUN_K: the light a
 # scene value asks for, times the factor that makes Unreal's picture of it agree.
-# Measured 2026-09-29 against Storm (this machine's Blender cannot render parity): the grey card,
-# editor mode; fitted per-pixel error over the subjects median 0.9 %, p95 2.5 %; sphere / cube /
-# floor 1.007 / 1.002 / 0.997 of Storm.
+# Measured 2026-09-29 against Storm (this machine's Blender cannot render parity), editor mode,
+# the two-call Opaque master at 160 bytes/pixel (6.3, run 3): DOME_K from the white mirror (it reads
+# 0.4975 of the dome's 0.5029 at factor 1), SUN_K on the grey card with the dome fixed; fitted
+# per-pixel error over the subjects median 1.0 %, p95 3.3 %; sphere / cube / floor 1.002 / 1.000 /
+# 0.995 of Storm. (6.1's two-factor grey-card fit, SUN_K 1.033 / DOME_K 1.068, lit specular 6 % hot.)
 EXPOSURE_K = 0.999       # Unreal's scene colour for a radiance of 1 (read off the visible dome)
-SUN_K = 1.033
-DOME_K = 1.068
+SUN_K = 1.130
+DOME_K = 1.011
 
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.

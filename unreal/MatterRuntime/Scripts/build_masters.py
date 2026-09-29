@@ -220,7 +220,7 @@ def build_opaque_core(token, white, no_wear, flat):
       the two to its value and leaves the other white);
     * roughness: specular_roughness x roughness_tex, + each overlay's B x effect, then
       roughness_biased_clamped = saturate(+ roughness_bias);
-    * metalness: base_metalness x metalness_tex;
+    * metalness: base_metalness x metalness_tex, the Mix of the two calls (metalness 0 and 1);
     * the normal, in TANGENT space: normal_tex x 2 - 1, + each overlay's (RG x 2 - 1, 0) x effect,
       normalised ONCE (MasterSet, since 5.3);
     * an overlay's effect = overlayN_density x overlay.A x gate, gate = mix(1, maskset[G|B|A],
@@ -230,19 +230,34 @@ def build_opaque_core(token, white, no_wear, flat):
     mat = fresh(f"M_Matter_{token}")
     g = Graph(mat)
     fn = unreal.load_asset(FN_OPAQUE)
-    call = g.node(M.MaterialExpressionMaterialFunctionCall, 1)
-    call.set_material_function(fn)
-    inputs = set(MEL.get_material_expression_input_names(call))
+    # OpenPBR's base is a LINEAR mix of the dielectric and metal lobes by metalness. Epic's
+    # function mixes them by blending parameters (its "Is Metal?" mix), which reads 0 < metalness
+    # < 1 wrong (Copper's floor x1.16 / x1.31). So: two calls, metalness 0 (dielectric) and 1
+    # (metal), every other input the same, mixed per pixel by our own horizontal mix with
+    # parameter blending off (Phase06 6.3, the lead's ruling "c then b"). It needs Substrate's
+    # 160-byte budget (Config/DefaultEngine.ini), or the compiler flattens each coat to fit.
+    calls = []
+    for col in (1, 2):
+        c = g.node(M.MaterialExpressionMaterialFunctionCall, col)
+        c.set_material_function(fn)
+        calls.append(c)
+    inputs = set(MEL.get_material_expression_input_names(calls[0]))
+
+    def feed(src, name, src_out=""):
+        for c in calls:
+            g.link(src, c, name, src_out)
+
     placed = place2d(g, 22)
     uv = image_uv(g, placed, 15)
 
     base = g.op(M.MaterialExpressionMultiply, g.vector("base_color", (0.8, 0.8, 0.8)),
                 texture(g, "base_color_tex", white, uv, 12), 11, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
-    g.link(base, call, "base_color")
+    feed(base, "base_color")
     metal = g.op(M.MaterialExpressionMultiply, g.scalar("base_metalness", 0.0),
                  texture(g, "metalness_tex", white, uv, 12), 11, b_out="R")
-    g.link(metal, call, "base_metalness")
+    for c, m in zip(calls, (0.0, 1.0)):
+        g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
     rough = g.op(M.MaterialExpressionMultiply, g.scalar("specular_roughness", 0.3),
                  texture(g, "roughness_tex", white, uv, 12), 11, b_out="R")
     # the article's normal map; where the article has none the rig's driver sets an exact flat
@@ -267,13 +282,13 @@ def build_opaque_core(token, white, no_wear, flat):
 
     # roughness_biased_clamped (LCDSchema): the bias is added, then clamped to 0..1
     rough = g.op(M.MaterialExpressionAdd, rough, g.scalar("roughness_bias", 0.0, col=4), 3)
-    g.link(g.one(M.MaterialExpressionSaturate, rough, 2), call, "specular_roughness")
+    feed(g.one(M.MaterialExpressionSaturate, rough, 2), "specular_roughness")
     normal = g.one(M.MaterialExpressionNormalize, n_ts, 3)
     if NORMAL_SPACE == "world":
         normal = g.one(M.MaterialExpressionTransform, normal, 2,
                        transform_source_type=M.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_TANGENT,
                        transform_type=M.MaterialVectorCoordTransform.TRANSFORM_WORLD)
-    g.link(normal, call, "geometry_normal")
+    feed(normal, "geometry_normal")
 
     missing = []
     for name, default in PASS_THROUGH.items():
@@ -281,14 +296,19 @@ def build_opaque_core(token, white, no_wear, flat):
             missing.append(name)
             continue
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
-        g.link(p, call, name)
+        feed(p, name)
     if missing:
         raise RuntimeError(f"{token}: Epic's function has no input {missing}")
 
-    outs = list(MEL.get_material_expression_output_names(call))
+    outs = list(MEL.get_material_expression_output_names(calls[0]))
     front = next(o for o in outs if "front" in o.lower())
-    if not MEL.connect_material_property(call, front, unreal.MaterialProperty.MP_FRONT_MATERIAL):
-        raise RuntimeError(f"{token}: cannot connect {front!r} to the front material")
+    mix = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
+    mix.set_editor_property("use_parameter_blending", False)
+    g.link(calls[0], mix, "Background", front)
+    g.link(calls[1], mix, "Foreground", front)
+    g.link(metal, mix, "Mix")
+    if not MEL.connect_material_property(mix, "", unreal.MaterialProperty.MP_FRONT_MATERIAL):
+        raise RuntimeError(f"{token}: cannot connect the metalness mix to the front material")
     blend, two_sided = SETTINGS[token]
     mat.set_editor_property("blend_mode", {"opaque": unreal.BlendMode.BLEND_OPAQUE}[blend])
     mat.set_editor_property("two_sided", two_sided)
