@@ -293,7 +293,7 @@ iris and sclera recipes, the platform's character recipe (its per-mesh `uv_scale
   carries coat, or with the `Eye` master.
 
 **Routed:** the eye picture joins the hair picture and the `Eye` master in one phase, seeded 2026-09-29 on the lead's word
-(*"yes 1, seed the phase"*): `docs/Planning/Phases/Future/PhaseTBD_HairAndEyeMasters.md`.
+(*"yes 1, seed the phase"*): `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`.
 
 ## Open questions
 
@@ -349,7 +349,7 @@ repo was written by either; the scratch in `/tmp` is torn down.
   the eye bound (MAP-Q12, from knowledge); a runtime groom in Unreal (platform sizing, 2026-09-28: unproven).
 - **Open questions:** MAP-Q5, Q9–Q13 (Q1–Q3, Q7 and Q8 answered, Q4 retired, Q6 ruled).
 - **Next step:** parked; the work is routed.
-  - **Seeded 2026-09-29 (lead: *"yes 1, seed the phase"*): `docs/Planning/Phases/Future/PhaseTBD_HairAndEyeMasters.md`** —
+  - **Seeded 2026-09-29 (lead: *"yes 1, seed the phase"*), numbered Phase09 the same day (*"make it Phase09"*): `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`** —
     the one picture input kind (hair and eyes), the hair picture read as modulate, the eye picture, and the `Eye` token with
     its settings row; the Unreal sides with Phase06 / Unreal Reference Masters (P20). It opens by the lead's `/discovery`.
   - **Strands:** a phase of its own (MAP-Q9), seeded only on the lead's word; the Roadmap's *Hair That Reads as Hair*

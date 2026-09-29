@@ -24,9 +24,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 >
 > **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
 
-### Hair and Eye Masters — SEEDED *(2026-09-29, lead: "yes 1, seed the phase"; opens only by the lead's `/discovery`)*
+### Phase09 — Hair and Eye Masters — SEEDED *(2026-09-29, lead: "yes 1, seed the phase", then "make it Phase09"; opens only by the lead's `/discovery`)*
 **Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
-- `docs/Planning/Phases/Future/PhaseTBD_HairAndEyeMasters.md`
+- `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
 
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.

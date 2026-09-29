@@ -1,6 +1,6 @@
-# PhaseTBD — Hair and Eye Masters
+# Phase09 — Hair and Eye Masters
 
-**Status:** SEEDED (2026-09-29; phase doc exists; discovery has not opened). **Not numbered** — numbering is the lead's call.
+**Status:** SEEDED (2026-09-29; phase doc exists; discovery has not opened). **Numbered Phase09 by the lead, 2026-09-29** (*"yes push it, make it Phase09"*); seeded unnumbered the same day.
 - **Seeded** from `docs/Planning/Research/260929_R_CharacterMaps.md` (Passes 1–8, rulings MAP-RD1–RD6), on the lead's word:
   *"yes 1, seed the phase"*.
 - **The deliberate gate:** this is a pointer-shell. It opens only by the lead's `/discovery`; nothing here is a plan.
