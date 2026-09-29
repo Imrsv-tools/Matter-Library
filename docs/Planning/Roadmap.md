@@ -11,10 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase06 — Unreal Test Runtime — IN EXECUTION *(2026-09-29: 6.1 done, 6.2's package built, not yet published; runs on the UE machine)*
-**Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
-- `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md` · research `docs/Planning/Research/260929_R_UnrealTestRuntimeHere.md`, `260929_R_Spike_UnrealRuntime.md`
-
 ### Phase09 — Hair and Eye Masters — ACTIVE *(discovery done 2026-09-29, the Brief is ready; 9.1–9.2 on this machine, 9.3 on the UE machine after Phase06's 6.5)*
 **Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
 - `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
@@ -70,7 +66,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 ### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26; **re-scoped 2026-09-28, lead: "Studio adopts the library masters"**, `PlatformDependencies.md` P20)*
 **Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
@@ -117,3 +113,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** in Studio, a Creator can give a character any hair colour from one good hair material, pick any of six skin tones and have the lips and nails match, and dress it in clothes whose fabrics, soles included, come from the library in any colour.
 - `docs/Planning/Phases/Complete/Phase08_CharacterAppearance.md`
 *Closed 2026-09-28 on the library side; the hair is an interim, and Studio's check is the platform's.*
+
+### Phase06 — Unreal Test Runtime — COMPLETE
+**Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
+- `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
+*Closed 2026-09-30; the pinned build is `unreal-runtime-v1`.*

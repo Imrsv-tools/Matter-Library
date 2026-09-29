@@ -182,7 +182,7 @@ The controls, read: the release lifecycle (`validate_manifest.py`, `freeze_relea
 
 - `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md`: the whole thread (pinned sources and hashes in Pass 3).
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryCoverage.md`: questions 3 (carriers) and 10 (layer colour).
-- `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`: the masters this phase's contract calls touch.
+- `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`: the masters this phase's contract calls touch.
 - `docs/Planning/Phases/Complete/Phase05_TestRig.md`: the rig; F13, F16.
 - `docs/specs/Ontology/{Taxonomy,MasterSet}.md` · `docs/specs/Contract/LCDSchema.md` · `docs/specs/Distribution/ReleaseModel.md` · `docs/Planning/PlatformDependencies.md` (M1, P4).
 
