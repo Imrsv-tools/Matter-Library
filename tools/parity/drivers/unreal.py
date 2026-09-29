@@ -449,14 +449,18 @@ def run(job_path: Path) -> None:
 # ------------------------------------------------------------------ calibration
 
 def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
-    """Fit SUN_K and DOME_K on the grey card, against a reference tool's picture of it.
+    """Fit SUN_K and DOME_K on the grey-card job, against a reference tool's picture of it.
 
     One launch renders the job's defaults three ways (sun and dome, sun only, dome only) at
-    factors 1, plus a view straight up into the dome and Unreal's own mask. The dome view gives
-    EXPOSURE_K (an unlit sphere of radiance r reads EXPOSURE_K x r). Unreal's light is linear in
-    each light, so the reference's linear picture over the subjects is fitted as
-    SUN_K x sun-only + DOME_K x dome-only. The reference is Storm (USDLiveView's renderer) unless
-    told otherwise: at the Phase05 close Storm and Blender agreed on the grey card to 0.35 dE2000.
+    factors 1, the subjects as a white mirror under the dome alone, plus a view straight up into
+    the dome and Unreal's own mask. The dome view gives EXPOSURE_K (an unlit sphere of radiance r
+    reads EXPOSURE_K x r). **DOME_K comes from the mirror** (Phase06 6.3, the lead's ruling): a
+    white mirror reflects exactly the dome's radiance, so it measures the light with no material
+    model in it. **SUN_K is then fitted on the grey card with the dome fixed**:
+    reference - DOME_K x dome-only = SUN_K x sun-only. (Fitting both on the grey card, as 6.1 did,
+    let the two renderers' diffuse difference set DOME_K, which then scaled Unreal's specular
+    6 % too bright.) The reference is Storm (USDLiveView's renderer) unless told otherwise: at
+    the Phase05 close Storm and Blender agreed on the grey card to 0.35 dE2000.
     """
     global EXPOSURE_K
     import compare  # noqa: PLC0415  (tools/parity: the rig's own region reader)
@@ -472,9 +476,13 @@ def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
     ujob = unreal_job(job, folder, sun_k=1.0, dome_k=1.0)
     spec = json.loads(ujob.read_text(encoding="utf-8"))
     mats, mask_s = spec["settings"][0]["materials"], spec["settings"][-1]
+    names = [p.rsplit("/", 1)[1] for p in job["subjects"]]
+    mirror = {"master": "Opaque", "scalars": {"specular_roughness": 0.0, "base_metalness": 1.0},
+              "vectors": {"base_color": [1.0, 1.0, 1.0]}, "textures": {"normal_tex": {"constant": FLAT_NORMAL}}}
     spec["settings"] = [{"id": "both", "materials": mats},
                         {"id": "sun", "materials": mats, "sky_scale": 0.0},
-                        {"id": "dome", "materials": mats, "sun_scale": 0.0}, mask_s]
+                        {"id": "dome", "materials": mats, "sun_scale": 0.0},
+                        {"id": "mirror", "materials": mats | {n: mirror for n in names}, "sun_scale": 0.0}, mask_s]
     # the wide view, and one looking straight up from 3 m, where only the dome is in frame
     spec["views"] = [spec["views"][0], {"suffix": "__sky", "location": [0, 0, 300], "forward": [0, 0, 1],
                                         "up": [1, 0, 0], "fov": 30.0, "near": 2.0, "hide": []}]
@@ -484,17 +492,26 @@ def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
     raw = folder / "raw"
     sky = read_pfm(raw / "both__sky.pfm")
     EXPOSURE_K = float(sky.mean() / build_scene.DOME_RADIANCE)
-    names = [p.rsplit("/", 1)[1] for p in job["subjects"]]
     mask = folder / "mask.png"
     write_mask(raw / f"{MASK_ID}.pfm", mask, mask_colours(job, names))
-    both, sun, dome = (linear(raw / f"{k}.pfm") for k in ("both", "sun", "dome"))
+    both, sun, dome, mir = (linear(raw / f"{k}.pfm") for k in ("both", "sun", "dome", "mirror"))
     r8 = np.asarray(Image.open(ref).convert("RGB"), dtype=np.float64) / 255.0
     refl = np.where(r8 <= 0.04045, r8 / 12.92, ((r8 + 0.055) / 1.055) ** 2.4)
     regions = compare.masks(mask)
     on = regions["subjects"] & (refl.max(axis=2) < 0.98)
+    # The dome from the white mirror, which reflects exactly the dome's radiance in any correct
+    # renderer: the light alone, no material model in it (the lead, 6.3; it was fitted on the
+    # grey card with the sun, which let the diffuse models' difference leak into the specular).
+    dome_k = build_scene.DOME_RADIANCE / float(mir[regions["subjects"]].mean())
+    # The sun on the grey card, the dome fixed: ref - DOME_K x dome = SUN_K x sun.
+    s, r = sun[on].ravel(), (refl - dome_k * dome)[on].ravel()
+    sun_k = float(s @ r / (s @ s))
     A = np.stack([sun[on].ravel(), dome[on].ravel()], axis=1)
-    (sun_k, dome_k), *_ = np.linalg.lstsq(A, refl[on].ravel(), rcond=None)
+    (old_sun, old_dome), *_ = np.linalg.lstsq(A, refl[on].ravel(), rcond=None)
     fit = sun_k * sun + dome_k * dome
+    print(f"white mirror at factor 1 reads {mir[regions['subjects']].mean():.5f} "
+          f"(dome radiance {build_scene.DOME_RADIANCE}); the two-factor grey-card fit would give "
+          f"SUN_K {old_sun:.5f}, DOME_K {old_dome:.5f}")
     print(f"reference  = {ref_tool} ({ref})")
     print(f"EXPOSURE_K = {EXPOSURE_K:.5f}   (dome view mean {sky.mean():.5f}, spread "
           f"{sky.min():.5f}..{sky.max():.5f})")
