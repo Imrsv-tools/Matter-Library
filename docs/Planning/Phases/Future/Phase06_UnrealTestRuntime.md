@@ -1,6 +1,6 @@
 # Phase06 — Unreal Test Runtime
 
-**Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). No `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
+**Status:** IN EXECUTION (2026-09-29, `/execute Phase 6`). Discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). No `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
 - **Seeded** 2026-09-26 from `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (Passes 7, 8). Numbered by the lead the same day.
 - **Opened** 2026-09-29 (lead: *"push it and start /discovery Phase06"*), after `260929_R_UnrealTestRuntimeHere.md` (the plan, UR-D1–D3) and `260929_R_Spike_UnrealRuntime.md` (probes 1–3 passed).
 - **Runs on this machine, the UE machine** (UR-D1, lead: *"yes run it here"*). The other machine, where Phases 05, 07 and 08 were built, has no Unreal. It pulls the repo and tests the package, which the repo pins and the driver downloads from a GitHub Release (UR-D3 as amended, D2).
@@ -222,4 +222,12 @@ All of it is in the contract docs and `JOB_FORMAT.md`, which this Brief binds to
 
 ## Execution Log
 
-_(populated during execution)_
+**Run 1 (2026-09-29, this machine).** The lead is traffic control for Unreal: another session builds and runs UE 5.8 here, so **every build, commandlet and launch is cleared with the lead first** (lead: *"please check with me before running anything… I'll be traffic controll for now"*).
+
+**Deviations from the build map (6.1):**
+- **The scene is not imported by Epic's USD importer.** The driver converts the rig's meshes and cameras from the generators that write the USD (`build_scene.py`, later `build_character.py`), and the Unreal job carries them as buffers that the app builds with `ProceduralMeshComponent`. **Gap:** the USD importer is editor-only, so a packaged runtime cannot import at run time. Each article and setting also rescales `st` (÷ `meters_per_tile`, per part for the character), so imported static meshes would need a new package per article. The unit trap (JOB_FORMAT §Units) is handled once, in the driver's `(x, y, z) → 100 (−z, x, y)`. The Brief's reuse row "USD importer" is superseded for this reason.
+- **The dome is an unlit sphere of constant radiance that a sky light captures** (`SLS_CapturedScene`), so no environment file is read at all (D10's intent: no misread `.hdr`). The same sphere is the visible background.
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 6.1 | *(pending the gate)* | Written: `unreal/MatterRuntime` (runtime, `build_masters.py`: Opaque first form + base-colour texture for the wall, Sky), `unreal/build.sh` (editor, masters), `drivers/unreal.py` (+ `--calibrate`), the rig's Unreal column. The reader moved to `blender/masters/article.py`: 57 articles, 0 differ from HEAD's `read()`. CPU smoke: all 6 meshes front-facing by the engine's convention. | the lead's go for the run list |

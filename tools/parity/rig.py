@@ -39,6 +39,7 @@ sys.path.insert(0, str(HERE / "drivers"))
 import compare  # noqa: E402
 import job as jobmod  # noqa: E402
 import storm  # noqa: E402
+import unreal as unreal_driver  # noqa: E402  (drivers/unreal.py, Phase06)
 
 OUT_ROOT = jobmod.REPO / "library" / "parity"
 BLENDER_DRIVER = HERE / "drivers" / "blender_render.py"
@@ -121,6 +122,21 @@ def run_blender(job_path: Path) -> None:
         raise SystemExit(f"Blender driver failed (exit {rc}); see {log}")
 
 
+def run_unreal(job_path: Path) -> str | None:
+    """Render the Unreal column (Phase06). Returns why it was skipped, or None when it ran.
+
+    Skipped, with the reason on the sheet, when this machine has no Unreal runtime or the
+    article needs a master part Unreal does not carry yet; a runtime that fails is an error.
+    """
+    if unreal_driver.find_runtime() is None:
+        return "no Unreal runtime on this machine"
+    try:
+        unreal_driver.run(job_path)
+    except unreal_driver.Unsupported as e:
+        return str(e)
+    return None
+
+
 def _font(size: int):
     try:
         return ImageFont.load_default(size=size)
@@ -128,7 +144,12 @@ def _font(size: int):
         return ImageFont.load_default()
 
 
-def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
+def _wrap(text: str, width: int) -> str:
+    import textwrap
+    return "\n".join(textwrap.wrap(text, width))
+
+
+def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str | None = None) -> Path:
     out = Path(job["out_dir"])
     cols = ["USDLiveView (Storm)", "Blender (Cycles)", "Unreal", "Where they differ"]
     label_w, head_h, line_h, row_gap = 190, 72, 30, 30
@@ -154,9 +175,14 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
             for i, tool in enumerate(("storm", "blender")):
                 img = Image.open(out / tool / f"{s['id']}{sfx}.png").convert("RGB").resize((cell, cell))
                 sheet.paste(img, (label_w + i * cell, y))
-            d.rectangle([label_w + 2 * cell, y, label_w + 3 * cell - 1, y + cell - 1], fill=(40, 40, 40))
-            d.text((label_w + 2 * cell + 20, y + cell // 2 - 10), "Unreal: no pictures yet",
-                   fill=(150, 150, 150), font=f)
+            upng = out / "unreal" / f"{s['id']}{sfx}.png"
+            if unreal_skip is None and upng.is_file():
+                sheet.paste(Image.open(upng).convert("RGB").resize((cell, cell)), (label_w + 2 * cell, y))
+            else:
+                d.rectangle([label_w + 2 * cell, y, label_w + 3 * cell - 1, y + cell - 1], fill=(40, 40, 40))
+                d.multiline_text((label_w + 2 * cell + 20, y + cell // 2 - 30),
+                                 "Unreal: no picture\n" + _wrap(unreal_skip or "not rendered", 38),
+                                 fill=(150, 150, 150), font=fs)
             sheet.paste(heat[s["id"]][v].resize((cell, cell)), (label_w + 3 * cell, y))
             sc = scores[s["id"]]["views"][v]
             m = sc["subjects"]
@@ -164,10 +190,12 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int) -> Path:
             said = verdict(job["article"]["master"], v, m["dE_mean"], md=False)
             mv = sc.get("moved")
             moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
-                     if mv else "")
+                     + (f", Unreal {mv['unreal']:.1f}" if "unreal" in mv else "") if mv else "")
+            ue = sc.get("unreal_vs_blender")
+            ue = f"   ·   Unreal vs Blender: mean {ue['dE_mean']:.2f}, p95 {ue['dE_p95']:.2f}" if ue else ""
             d.text((label_w + 10, y + cell + 6),
-                   f"dE2000 between the tools: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
-                   f"(bar {BAR:g}: {said}){moved}",
+                   f"dE2000 Storm vs Blender: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
+                   f"(bar {BAR:g}: {said}){ue}{moved}",
                    fill=(120, 230, 120) if ok else (255, 140, 120), font=fs)
     p = out / "sheet.png"
     sheet.save(p)
@@ -400,6 +428,14 @@ def main(argv=None) -> int:
     if not args.score_only:
         run_blender(job_path)
     t2 = time.time()
+    if not args.score_only:
+        unreal_skip = run_unreal(job_path)
+        if unreal_skip:
+            print(f"unreal: skipped — {unreal_skip}")
+    else:
+        unreal_skip = None if (out / "unreal" / "defaults.png").is_file() else "not rendered"
+    t3 = time.time()
+    tools = ("storm", "blender") + (("unreal",) if unreal_skip is None else ())
 
     scores, heat = {}, {}
     views = job["views"]
@@ -413,18 +449,22 @@ def main(argv=None) -> int:
             if s["id"] != "defaults":
                 sc["moved"] = {t: compare.moved(out / t / f"{s['id']}{sfx}.png",
                                                 out / t / f"defaults{sfx}.png", mask, colours)
-                               for t in ("storm", "blender")}
+                               for t in tools}
+            if "unreal" in tools:
+                sc["unreal_vs_blender"] = compare.compare(out / "unreal" / f"{s['id']}{sfx}.png",
+                                                          out / "blender" / f"{s['id']}{sfx}.png",
+                                                          mask, colours)[0]["subjects"]
             per_view[v] = sc
             heat[s["id"]][v] = compare.heatmap(dE, BAR, compare.masks(mask, colours)["subjects"])
         scores[s["id"]] = per_view["wide"] | {"views": per_view}
-    sheet = build_sheet(job, scores, heat, args.cell)
+    sheet = build_sheet(job, scores, heat, args.cell, unreal_skip)
     if args.character:
         card = write_character_scorecard(job, scores)
     else:
         checks = {"scale": scale_checks(art, job),
                   "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
         card = write_scorecard(job, scores, checks)
-    print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s")
+    print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s · unreal {t3 - t2:.1f}s")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")
     return 0

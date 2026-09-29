@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "",
+	"Description": "The Matter Library's Unreal test runtime: renders a parity-rig job (tools/parity/drivers/unreal.py) on the library's Unreal masters.",
+	"Modules": [
+		{ "Name": "MatterRuntime", "Type": "Runtime", "LoadingPhase": "Default" }
+	],
+	"Plugins": [
+		{ "Name": "ProceduralMeshComponent", "Enabled": true },
+		{ "Name": "Interchange", "Enabled": true }
+	]
+}
