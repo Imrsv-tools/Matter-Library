@@ -13,7 +13,9 @@
 #include "Engine/Texture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
+#include "ImageCore.h"
 #include "ImageUtils.h"
+#include "Math/Float16Color.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "MaterialShared.h"
 #include "Misc/CommandLine.h"
@@ -49,6 +51,11 @@ namespace
 		const double B = A.Num() > 2 ? A[2]->AsNumber() : R;
 		const double W = A.Num() > 3 ? A[3]->AsNumber() : 1.0;
 		return FLinearColor(R, G, B, W);
+	}
+
+	float SrgbToLinear(float V)
+	{
+		return V <= 0.04045f ? V / 12.92f : FMath::Pow((V + 0.055f) / 1.055f, 2.4f);
 	}
 }
 
@@ -111,6 +118,14 @@ bool AMatterRuntimeGameMode::LoadJob(const FString& Path)
 		return false;
 	}
 	OutDir = Job->GetStringField(TEXT("out_dir"));
+	int32 Format = 0;
+	Job->TryGetNumberField(TEXT("format"), Format);
+	if (Format != JobFormat)
+	{
+		// a pinned package older or newer than the driver: say so rather than misread the buffers
+		Note(FString::Printf(TEXT("MATTER job format %d, this runtime reads format %d (rebuild or re-pin it)"), Format, JobFormat), true);
+		return false;
+	}
 	Width = Job->GetIntegerField(TEXT("width"));
 	Job->TryGetNumberField(TEXT("settle_frames"), SettleFrames);
 	Note(FString::Printf(TEXT("MATTER job=%s width=%d out=%s"), *Path, Width, *OutDir), false);
@@ -229,20 +244,23 @@ bool AMatterRuntimeGameMode::BuildWorld()
 
 bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 {
-	// <file>: float32 positions (3N), normals (3N), tangents (3N), uv0 (2N), then int32 indices (M)
+	// <file>: float32 positions (3N), normals (3N), tangents (3N), uv0 (2N), tangent signs (N),
+	// then int32 indices (M). A sign of -1 flips the binormal, which Unreal builds as
+	// cross(N, T) x sign: the driver chooses it so the binormal is dP/dt, the direction a
+	// MaterialX (+Y up) normal map's green channel follows.
 	const FString Name = Spec->GetStringField(TEXT("name"));
 	const FString File = Spec->GetStringField(TEXT("file"));
 	const int32 N = Spec->GetIntegerField(TEXT("verts"));
 	const int32 M = Spec->GetIntegerField(TEXT("indices"));
 	TArray<uint8> Bytes;
-	const int64 Want = int64(N) * 11 * 4 + int64(M) * 4;
+	const int64 Want = int64(N) * 12 * 4 + int64(M) * 4;
 	if (!FFileHelper::LoadFileToArray(Bytes, *File) || Bytes.Num() != Want)
 	{
 		Note(FString::Printf(TEXT("MATTER mesh %s: %s is %d bytes, want %lld"), *Name, *File, Bytes.Num(), Want), true);
 		return false;
 	}
 	const float* F = reinterpret_cast<const float*>(Bytes.GetData());
-	const int32* I = reinterpret_cast<const int32*>(Bytes.GetData() + int64(N) * 11 * 4);
+	const int32* I = reinterpret_cast<const int32*>(Bytes.GetData() + int64(N) * 12 * 4);
 	TArray<FVector> P, Nrm;
 	TArray<FProcMeshTangent> T;
 	TArray<FVector2D> UV;
@@ -254,7 +272,8 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 	{
 		P[k] = FVector(F[3 * k], F[3 * k + 1], F[3 * k + 2]);
 		Nrm[k] = FVector(F[3 * N + 3 * k], F[3 * N + 3 * k + 1], F[3 * N + 3 * k + 2]);
-		T[k] = FProcMeshTangent(FVector(F[6 * N + 3 * k], F[6 * N + 3 * k + 1], F[6 * N + 3 * k + 2]), false);
+		T[k] = FProcMeshTangent(FVector(F[6 * N + 3 * k], F[6 * N + 3 * k + 1], F[6 * N + 3 * k + 2]),
+			F[11 * N + k] < 0.f);
 		UV[k] = FVector2D(F[9 * N + 2 * k], F[9 * N + 2 * k + 1]);
 	}
 	TArray<int32> Tris(I, M);
@@ -299,27 +318,125 @@ UMaterialInterface* AMatterRuntimeGameMode::LoadMaster(const FString& Token)
 	return Master;
 }
 
-UTexture2D* AMatterRuntimeGameMode::LoadTexture(const FString& File, bool bSRGB)
+UTexture2D* AMatterRuntimeGameMode::LoadTexture(const TSharedPtr<FJsonObject>& Spec)
 {
-	const FString Key = File + (bSRGB ? TEXT("|srgb") : TEXT("|linear"));
-	if (TObjectPtr<UTexture2D>* Hit = Textures.Find(Key))
+	// Every texture reaches its master as LINEAR FLOAT with its own mip chain (Phase06 6.3), so
+	// every master sampler is LinearColor and no colour flag can mismatch the sampler type (a
+	// mismatch draws Unreal's default material with every check green, platform learning).
+	// A colour texture's sRGB encoding is decoded here, on the CPU; a data texture is taken
+	// as stored. A {"constant": [r, g, b, a]} is a 1x1 texture of that exact value.
+	FImage Lin;
+	FString Key, What;
+	const TArray<TSharedPtr<FJsonValue>>* Const = nullptr;
+	if (Spec->TryGetArrayField(TEXT("constant"), Const))
 	{
-		return *Hit;
+		const FLinearColor C = Colour(*Const);
+		Key = What = TEXT("constant ") + C.ToString();
+		if (TObjectPtr<UTexture2D>* Hit = Textures.Find(Key))
+		{
+			return *Hit;
+		}
+		Lin.Init(1, 1, ERawImageFormat::RGBA32F, EGammaSpace::Linear);
+		Lin.AsRGBA32F()[0] = C;
 	}
-	UTexture2D* Tex = FImageUtils::ImportFileAsTexture2D(File);
+	else
+	{
+		const FString File = Spec->GetStringField(TEXT("file"));
+		const bool bSRGB = Spec->GetBoolField(TEXT("srgb"));
+		Key = File + (bSRGB ? TEXT("|srgb") : TEXT("|linear"));
+		What = File;
+		if (TObjectPtr<UTexture2D>* Hit = Textures.Find(Key))
+		{
+			return *Hit;
+		}
+		FImage Raw;
+		if (!FImageUtils::LoadImage(*File, Raw))
+		{
+			Note(FString::Printf(TEXT("MATTER cannot load texture %s"), *File), true);
+			return nullptr;
+		}
+		// the stored values as they are (an 8-bit file loads tagged sRGB); decoded below
+		if (ERawImageFormat::GetFormatNeedsGammaSpace(Raw.Format))
+		{
+			Raw.GammaSpace = EGammaSpace::Linear;
+		}
+		Raw.CopyTo(Lin, ERawImageFormat::RGBA32F, EGammaSpace::Linear);
+		if (bSRGB)
+		{
+			for (FLinearColor& P : Lin.AsRGBA32F())
+			{
+				P.R = SrgbToLinear(P.R);
+				P.G = SrgbToLinear(P.G);
+				P.B = SrgbToLinear(P.B);
+			}
+		}
+	}
+
+	// The mip chain: 2x2 box averages IN LINEAR (a 1 cm grain at a distance must average, not
+	// alias), down to 1x1; an odd edge repeats its last texel.
+	int32 W = Lin.SizeX, H = Lin.SizeY;
+	TArray<FLinearColor> Level(Lin.AsRGBA32F().GetData(), W * H);
+	TArray<TArray<FFloat16Color>> Chain;
+	for (;;)
+	{
+		TArray<FFloat16Color>& Out = Chain.AddDefaulted_GetRef();
+		Out.SetNumUninitialized(W * H);
+		for (int32 k = 0; k < W * H; ++k)
+		{
+			Out[k] = FFloat16Color(Level[k]);
+		}
+		if (W == 1 && H == 1)
+		{
+			break;
+		}
+		const int32 NW = FMath::Max(1, W / 2), NH = FMath::Max(1, H / 2);
+		TArray<FLinearColor> Next;
+		Next.SetNumUninitialized(NW * NH);
+		for (int32 y = 0; y < NH; ++y)
+		{
+			const int32 Y0 = FMath::Min(2 * y, H - 1), Y1 = FMath::Min(2 * y + 1, H - 1);
+			for (int32 x = 0; x < NW; ++x)
+			{
+				const int32 X0 = FMath::Min(2 * x, W - 1), X1 = FMath::Min(2 * x + 1, W - 1);
+				Next[y * NW + x] = (Level[Y0 * W + X0] + Level[Y0 * W + X1] + Level[Y1 * W + X0] + Level[Y1 * W + X1]) * 0.25f;
+			}
+		}
+		Level = MoveTemp(Next);
+		W = NW;
+		H = NH;
+	}
+
+	UTexture2D* Tex = UTexture2D::CreateTransient(Lin.SizeX, Lin.SizeY, PF_FloatRGBA);
 	if (!Tex)
 	{
-		Note(FString::Printf(TEXT("MATTER cannot load texture %s"), *File), true);
+		Note(FString::Printf(TEXT("MATTER cannot create a %dx%d texture for %s"), Lin.SizeX, Lin.SizeY, *What), true);
 		return nullptr;
 	}
-	// The colour flag must match the master's sampler type, or Unreal draws its default
-	// material with every check green (platform learning); the masters sample data as linear.
-	Tex->SRGB = bSRGB;
+	FTexturePlatformData* PD = Tex->GetPlatformData();
+	W = Lin.SizeX;
+	H = Lin.SizeY;
+	for (int32 L = 0; L < Chain.Num(); ++L)
+	{
+		FTexture2DMipMap* Mip = L == 0 ? &PD->Mips[0] : new FTexture2DMipMap(W, H, 1);
+		if (L > 0)
+		{
+			PD->Mips.Add(Mip);
+		}
+		const int64 Size = int64(Chain[L].Num()) * sizeof(FFloat16Color);
+		Mip->BulkData.Lock(LOCK_READ_WRITE);
+		FMemory::Memcpy(Mip->BulkData.Realloc(Size), Chain[L].GetData(), Size);
+		Mip->BulkData.Unlock();
+		W = FMath::Max(1, W / 2);
+		H = FMath::Max(1, H / 2);
+	}
+	Tex->SRGB = false;
+	Tex->CompressionSettings = TC_HDR;
 	Tex->AddressX = TA_Wrap;
 	Tex->AddressY = TA_Wrap;
-	Tex->Filter = TF_Bilinear;
+	Tex->Filter = TF_Trilinear;
 	Tex->UpdateResource();
 	Textures.Add(Key, Tex);
+	Note(FString::Printf(TEXT("MATTER texture %s %dx%d mips=%d"), *What, Lin.SizeX, Lin.SizeY, Chain.Num()), false);
 	return Tex;
 }
 
@@ -363,8 +480,7 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 		{
 			for (const auto& V : (*Obj)->Values)
 			{
-				const TSharedPtr<FJsonObject> Tx = V.Value->AsObject();
-				UTexture2D* Tex = LoadTexture(Tx->GetStringField(TEXT("file")), Tx->GetBoolField(TEXT("srgb")));
+				UTexture2D* Tex = LoadTexture(V.Value->AsObject());
 				if (!Tex)
 				{
 					return false;

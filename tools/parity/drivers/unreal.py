@@ -75,11 +75,18 @@ DOME_K = 1.068
 
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
+JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers carry a tangent sign)
 BUILT_MASTERS = {"Opaque"}
-TEXTURE_ROLES = {"base_color"}
-SLIDERS = {"base_color_tint", "roughness_bias"}
+# the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full)
+IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal")
+LAYER_ROLES = ("maskset", "overlay1", "overlay2", "overlay3")     # tiled, each at its own size
+TEXTURE_ROLES = set(IMAGE_ROLES) | set(LAYER_ROLES)
+COLOUR_ROLES = {"base_color"}          # decoded from sRGB when the article says so; the rest is data
+SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend",
+           "overlay1_density", "overlay2_density", "overlay3_density"}
+FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal map
 # lane-A values passed straight to Epic's OpenPBR function under their own names
-PASS_THROUGH = {"base_weight", "base_metalness", "base_diffuse_roughness", "specular_weight",
+PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
                 "specular_color", "specular_ior", "specular_roughness_anisotropy", "coat_weight",
                 "coat_color", "coat_roughness", "coat_ior", "fuzz_weight", "fuzz_color", "fuzz_roughness"}
 LINEAR_SPACES = {"lin_rec709", "raw", None}
@@ -111,32 +118,45 @@ def triangulate(faces) -> np.ndarray:
     return np.array([(f[0], f[k], f[k + 1]) for f in faces for k in range(1, len(f) - 1)], dtype=np.int64)
 
 
-def tangents(p: np.ndarray, n: np.ndarray, uv: np.ndarray, tris: np.ndarray) -> np.ndarray:
-    """Per-vertex dP/ds, made perpendicular to the normal (the tangent a normal map's X follows)."""
+def tangents(p: np.ndarray, n: np.ndarray, uv: np.ndarray, tris: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Per-vertex dP/ds, made perpendicular to the normal (the tangent a normal map's X
+    follows), and dP/dt (the direction its Y follows: MaterialX normal maps are +Y up)."""
     i0, i1, i2 = tris[:, 0], tris[:, 1], tris[:, 2]
     e1, e2 = p[i1] - p[i0], p[i2] - p[i0]
     d1, d2 = uv[i1] - uv[i0], uv[i2] - uv[i0]
     det = d1[:, 0] * d2[:, 1] - d2[:, 0] * d1[:, 1]
     r = np.where(np.abs(det) > 1e-12, 1.0 / np.where(det == 0, 1, det), 0.0)
     t = (e1 * d2[:, 1:2] - e2 * d1[:, 1:2]) * r[:, None]
-    acc = np.zeros_like(p)
+    b = (e2 * d1[:, 0:1] - e1 * d2[:, 0:1]) * r[:, None]
+    acc, bacc = np.zeros_like(p), np.zeros_like(p)
     for k in (i0, i1, i2):
         np.add.at(acc, k, t)
+        np.add.at(bacc, k, b)
     acc -= n * np.sum(acc * n, axis=1, keepdims=True)
     ln = np.linalg.norm(acc, axis=1, keepdims=True)
     fallback = np.cross(n, np.where(np.abs(n[:, 1:2]) < 0.9, [[0, 1, 0]], [[1, 0, 0]]))
     fallback /= np.linalg.norm(fallback, axis=1, keepdims=True)
-    return np.where(ln > 1e-9, acc / np.maximum(ln, 1e-12), fallback)
+    return np.where(ln > 1e-9, acc / np.maximum(ln, 1e-12), fallback), bacc
+
+
+def tangent_signs(n_ue: np.ndarray, t_ue: np.ndarray, dpdt_ue: np.ndarray) -> np.ndarray:
+    """Unreal builds the binormal as cross(N, T) x sign (LocalVertexFactory.ush; the sign is
+    ProcMesh's bFlipTangentY). Choose the sign that makes it dP/dt, in Unreal's own space: the
+    handedness change flips every cross product, so it is -1 on the plain scene (6.1 read)."""
+    return np.where(np.sum(np.cross(n_ue, t_ue) * dpdt_ue, axis=1) < 0.0, -1.0, 1.0)
 
 
 def write_mesh(folder: Path, name: str, pts, nrm, uvs, faces, material: str) -> dict:
-    """One mesh buffer: float32 positions, normals, tangents (Unreal space), st; int32 triangles."""
+    """One mesh buffer: float32 positions, normals, tangents (Unreal space), st, tangent signs;
+    int32 triangles (the runtime's LoadMesh; job format 2)."""
     p, n = np.asarray(pts, float), np.asarray(nrm, float)
     n /= np.maximum(np.linalg.norm(n, axis=1, keepdims=True), 1e-12)
     uv = np.asarray(uvs, float)
     tris = triangulate(faces)
-    t = tangents(p, n, uv, tris)
-    buf = (np.concatenate([(to_ue(p) * 100.0).ravel(), to_ue(n).ravel(), to_ue(t).ravel(), uv.ravel()])
+    t, dpdt = tangents(p, n, uv, tris)
+    n_ue, t_ue = to_ue(n), to_ue(t)
+    sign = tangent_signs(n_ue, t_ue, to_ue(dpdt))
+    buf = (np.concatenate([(to_ue(p) * 100.0).ravel(), n_ue.ravel(), t_ue.ravel(), uv.ravel(), sign])
            .astype("<f4").tobytes() + tris.astype("<i4").tobytes())
     f = folder / f"{name}.bin"
     f.write_bytes(buf)
@@ -188,11 +208,16 @@ def article_material(path: Path, sliders: dict | None = None) -> dict:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
         ports[k] = list(v) if isinstance(v, (list, tuple)) else [float(v)]
     sh, scalars, vectors, textures = art.shader, {}, {}, {}
+    for role, file_cs in art.textures.items():
+        file, cs = file_cs
+        textures[f"{role}_tex"] = {"file": str(file), "srgb": role in COLOUR_ROLES and cs not in LINEAR_SPACES}
+        if role in LAYER_ROLES:
+            scalars[f"{role}_layer_scale"] = float(art.layer_scale.get(role, 1.0))
+    if "normal" not in art.textures:
+        textures["normal_tex"] = {"constant": FLAT_NORMAL}
     for role, param in (("base_color", "base_color"), ("roughness", "specular_roughness"),
                         ("metalness", "base_metalness")):
         if role in art.textures:
-            file, cs = art.textures[role]
-            textures[f"{role}_tex"] = {"file": str(file), "srgb": cs not in LINEAR_SPACES}
             value = [1.0]                 # the texture carries it; the constant stays neutral
         else:
             value = art.consts.get(role) or sh.get(param)
@@ -207,10 +232,14 @@ def article_material(path: Path, sliders: dict | None = None) -> dict:
             vectors[k] = _vec(sh[k])
         else:
             scalars[k] = float(sh[k][0])
-    if "base_color_tint" in ports:
-        vectors["base_color_tint"] = _vec(ports["base_color_tint"])
-    if "roughness_bias" in ports:
-        scalars["roughness_bias"] = float(ports["roughness_bias"][0])
+    # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
+    for k, v in ports.items():
+        if k in ("base_color_tint",):
+            vectors[k] = _vec(v)
+        elif k in ("uv_scale", "uv_offset"):
+            vectors[k] = [float(v[0]), float(v[-1]), 0.0]
+        else:
+            scalars[k] = float(v[0])
     return {"master": art.master, "scalars": scalars, "vectors": vectors, "textures": textures}
 
 
@@ -218,7 +247,8 @@ def preview_surface(colour: float | None = None, texture: Path | None = None, ro
     """The scene furniture's UsdPreviewSurface (build_scene.preview_material) on the Opaque master."""
     m = {"master": "Opaque", "scalars": {"specular_roughness": roughness, "base_metalness": 0.0,
                                          "specular_ior": 1.5},
-         "vectors": {"base_color": [1.0] * 3 if texture else [colour] * 3}, "textures": {}}
+         "vectors": {"base_color": [1.0] * 3 if texture else [colour] * 3},
+         "textures": {"normal_tex": {"constant": FLAT_NORMAL}}}
     if texture:
         m["textures"]["base_color_tex"] = {"file": str(texture), "srgb": True}
     return m
@@ -291,7 +321,7 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
         views.append(camera_view(pos, rot, spec["suffix"], [p.rsplit("/", 1)[1] for p in spec.get("hide", [])]))
     views += list(extra_views or [])
     sun, sky = lights(sun_k, dome_k)
-    ujob = {"format": 1, "width": int(job["width"]) * SUPERSAMPLE, "out_dir": str(folder / "raw"),
+    ujob = {"format": JOB_FORMAT, "width": int(job["width"]) * SUPERSAMPLE, "out_dir": str(folder / "raw"),
             "settle_frames": SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes,
             "settings": settings, "views": views}
     p = folder / "unreal_job.json"

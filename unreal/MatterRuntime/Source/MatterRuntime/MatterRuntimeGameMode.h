@@ -49,7 +49,7 @@ private:
 	bool LoadMesh(const TSharedPtr<FJsonObject>& Spec);
 	bool ApplySetting(int32 Index);
 	UMaterialInterface* LoadMaster(const FString& Token);
-	UTexture2D* LoadTexture(const FString& File, bool bSRGB);
+	UTexture2D* LoadTexture(const TSharedPtr<FJsonObject>& Spec);
 	bool IsReady() const;
 	bool CaptureSetting();
 	bool CaptureView(const TSharedPtr<FJsonObject>& View, const FString& OutPath);
@@ -65,6 +65,8 @@ private:
 	UPROPERTY() TMap<FString, TObjectPtr<UMaterialInterface>> Masters;
 	UPROPERTY() TMap<FString, TObjectPtr<UTexture2D>> Textures;
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mids;
+
+	static constexpr int32 JobFormat = 2;    // 2 (6.3): mesh buffers carry a tangent sign
 
 	TSharedPtr<FJsonObject> Job;
 	TMap<FString, FString> MeshMaterial;     // mesh name -> the material slot id it takes
