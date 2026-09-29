@@ -115,6 +115,10 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	ADirectionalLight* SunActor = World->SpawnActor<ADirectionalLight>(FVector::ZeroVector, FRotationMatrix::MakeFromX(SunDir).Rotator());
 	SunComp = Cast<UDirectionalLightComponent>(SunActor->GetLightComponent());
 	SunComp->SetMobility(EComponentMobility::Movable);
+	// The spawn rotation did not reach the light (it rendered straight down, the calibration's
+	// first run, 6.1): set it again once the component can move, and log what it points at.
+	SunComp->SetWorldRotation(FRotationMatrix::MakeFromX(SunDir).Rotator());
+	UE_LOG(LogMatter, Display, TEXT("MATTER sun direction job=%s light=%s"), *SunDir.ToString(), *SunComp->GetDirection().ToString());
 	SunIntensity = Sun->GetNumberField(TEXT("intensity"));
 	SunComp->SetIntensity(SunIntensity);
 	SunComp->SetLightColor(FLinearColor::White);

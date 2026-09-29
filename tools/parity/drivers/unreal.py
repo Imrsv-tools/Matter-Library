@@ -64,9 +64,12 @@ TIMEOUT_S = 3600         # a first editor-mode launch compiles shaders for ~12 m
 # The calibration (Phase06 step 6.1, `--calibrate` on the grey card; the value and how it was
 # measured are in the phase doc's execution log). Like Blender's DOME_K / SUN_K: the light a
 # scene value asks for, times the factor that makes Unreal's picture of it agree.
-EXPOSURE_K = 1.0         # Unreal's scene colour for a radiance of 1 (read off the visible dome)
-SUN_K = 1.0
-DOME_K = 1.0
+# Measured 2026-09-29 against Storm (this machine's Blender cannot render parity): the grey card,
+# editor mode; fitted per-pixel error over the subjects median 0.9 %, p95 2.5 %; sphere / cube /
+# floor 1.007 / 1.002 / 0.997 of Storm.
+EXPOSURE_K = 0.999       # Unreal's scene colour for a radiance of 1 (read off the visible dome)
+SUN_K = 1.033
+DOME_K = 1.068
 
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
