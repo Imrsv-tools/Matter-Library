@@ -15,7 +15,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md` · research `docs/Planning/Research/260929_R_UnrealTestRuntimeHere.md`, `260929_R_Spike_UnrealRuntime.md`
 
-### Phase09 — Hair and Eye Masters — ACTIVE *(discovery opened 2026-09-29; seeded the same day, lead: "yes 1, seed the phase", then "make it Phase09")*
+### Phase09 — Hair and Eye Masters — ACTIVE *(discovery done 2026-09-29, the Brief is ready; 9.1–9.2 on this machine, 9.3 on the UE machine after Phase06's 6.5)*
 **Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
 - `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
 
