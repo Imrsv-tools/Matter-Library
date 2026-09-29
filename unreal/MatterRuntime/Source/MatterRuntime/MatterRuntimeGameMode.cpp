@@ -4,6 +4,8 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkyLightComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "DeviceProfiles/DeviceProfile.h"
+#include "DeviceProfiles/DeviceProfileManager.h"
 #include "Dom/JsonObject.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/SceneCapture2D.h"
@@ -11,6 +13,7 @@
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/Texture2D.h"
+#include "Engine/TextureLODSettings.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "HAL/FileManager.h"
 #include "ImageCore.h"
@@ -433,10 +436,16 @@ UTexture2D* AMatterRuntimeGameMode::LoadTexture(const TSharedPtr<FJsonObject>& S
 	Tex->CompressionSettings = TC_HDR;
 	Tex->AddressX = TA_Wrap;
 	Tex->AddressY = TA_Wrap;
-	Tex->Filter = TF_Trilinear;
+	// anisotropic with linear mips, from the group (Config/DefaultDeviceProfiles.ini)
+	Tex->LODGroup = TEXTUREGROUP_Project01;
+	Tex->Filter = TF_Default;
 	Tex->UpdateResource();
 	Textures.Add(Key, Tex);
-	Note(FString::Printf(TEXT("MATTER texture %s %dx%d mips=%d"), *What, Lin.SizeX, Lin.SizeY, Chain.Num()), false);
+	// the filter as the renderer will resolve it (4 = AnisotropicLinear), and the live anisotropy
+	const UTextureLODSettings* LOD = UDeviceProfileManager::Get().GetActiveProfile()->GetTextureLODSettings();
+	static const IConsoleVariable* Aniso = IConsoleManager::Get().FindConsoleVariable(TEXT("r.MaxAnisotropy"));
+	Note(FString::Printf(TEXT("MATTER texture %s %dx%d mips=%d filter=%d aniso=%d"), *What, Lin.SizeX, Lin.SizeY,
+		Chain.Num(), int32(LOD->GetSamplerFilter(Tex)), Aniso ? Aniso->GetInt() : -1), false);
 	return Tex;
 }
 

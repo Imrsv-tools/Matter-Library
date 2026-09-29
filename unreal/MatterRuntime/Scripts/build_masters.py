@@ -100,10 +100,11 @@ class Graph:
         self.link(a, n, "A", a_out)
         return n
 
-    def one(self, cls, a, col, a_out="", **props):
-        """A one-input node (saturate, normalize, sine, a component mask …)."""
+    def one(self, cls, src, col, src_out="", **props):
+        """A one-input node (saturate, normalize, sine, a component mask …). The input is not
+        called ``a``: a component mask's own properties are r, g, b and a."""
         n = self.node(cls, col, **props)
-        self.link(a, n, "", a_out)
+        self.link(src, n, "", src_out)
         return n
 
     def mask(self, a, channels, col, a_out=""):
