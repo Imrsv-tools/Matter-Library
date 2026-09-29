@@ -1,7 +1,7 @@
 # Phase09 — Hair and Eye Masters
 
 **Status:** ACTIVE: discovery complete, **the Brief is ready** (2026-09-29, Passes 1–2). Lane: `build` (verified, §Risk
-lane). One `YOUR CALL` is open (§Discovery Status). **Runs on two machines:** 9.1–9.2 on this one (the library machine),
+lane). No `YOUR CALL` is open (§Discovery Status: 9.3 kept, lead 2026-09-29). **Runs on two machines:** 9.1–9.2 on this one (the library machine),
 9.3 on the UE machine in Phase06's `unreal/` project, after Phase06's 6.5 (Phase06 D13).
 - **Seeded** 2026-09-29 from `docs/Planning/Research/260929_R_CharacterMaps.md` (rulings MAP-RD1–RD6), on the lead's word
   *"yes 1, seed the phase"*; **numbered Phase09** the same day (*"yes push it, make it Phase09"*); discovery opened by the
@@ -149,9 +149,10 @@ The controls, read 2026-09-29:
   first** (LOCAL_DELTAS, the RUN row). `check_asset_library.sh` runs after each Blender library rebuild.
 - **The contract edits are additive:** a new author-tier input (as `cutout_map` was) and a new token (semver-minor,
   `MasterSet.md` §Master tokens); `Hair_Natural` and the new articles are unreleased candidates.
-- **Repository size:** the fit set is Git LFS (`MatterLibrary/textures/**`) in a public repo, the cost Phase06 moved its
-  package off LFS to avoid. Measure the set before committing it; the strand pictures are single-channel structure and may
-  be written smaller.
+- **Repository size is not a concern for the fit set** (lead, 2026-09-29, verbatim: *"not so worries about imagea in our
+  library as that is pretty static... it was the 600 megs for each build of this standalone tool... that has no value once
+  anew one is added"*). The fit set is Git LFS like every library texture; Phase06's concern was a package rebuilt per
+  version.
 - No authorization, secrets, destructive migration or public edge. **The push is the lead's, and it is irreversible.**
 
 ### Step list
@@ -159,7 +160,7 @@ The controls, read 2026-09-29:
 - **9.1 — Any hair colour on any hairstyle, strands kept.**
   - The input through the contract and the tools (RD-P09-1); the Glossary.
   - The fit-set tool and the MakeHuman hair set: 10 styles' strand pictures and cut-outs, brows and lashes (RD-P09-2,
-    RD-P09-6), measured for size.
+    RD-P09-6).
   - `Hair_Natural` reads the picture; the Hair row corrected (RD-P09-5).
   - The rig on `short02`, its hair parts fed from the fit set (RD-P09-4); Blender library rebuilt.
   - **First clickable result:** clicks 1–2.
@@ -181,8 +182,8 @@ The controls, read 2026-09-29:
 it with no new contract; 9.3 needs Unreal and Phase06's column, so it goes last and on the other machine.
 
 **Split signal (raised, not cut):** hair (9.1–9.2's input) and the Unreal eye (9.3) are separately demonstrable, and 9.3
-runs on another machine behind another phase. They stay one phase because 9.3's Eye master is the Outcome's *"in Studio
-shaded by Unreal's own eye model"*; see `YOUR CALL` 1.
+runs on another machine behind another phase. **They stay one phase** (lead, 2026-09-29: *"keep 9.3"*): 9.3's Eye master is
+the Outcome's *"in Studio shaded by Unreal's own eye model"*.
 
 ### Compact build map
 
@@ -291,11 +292,10 @@ built; the one lead call is if the spike fails (RD-P09-7).
 
 - **Passes captured:** 2 (2026-09-29). **The Brief is complete.**
 - **Current working direction:** the Brief above.
-- **Open decisions:** `YOUR CALL` 1 — keep 9.3 (the Unreal eye, on the other machine behind Phase06's 6.5) in this phase,
-  or cut it into a phase of its own. Recommendation: keep it — the Outcome's Unreal eye is its point, and 9.1–9.2 are
-  demonstrable without it. *(Q-P09-1 closed in Pass 2.)*
+- **Open decisions:** none. ~~Keep 9.3 in this phase or cut it~~ **ruled (lead, 2026-09-29): *"keep 9.3"*.** The fit set's
+  size is not a concern (§Risk lane). *(Q-P09-1 closed in Pass 2.)*
 - **Checks to carry forward:** baseline `check_exporter.sh` before touching `tools/conformance/` · the compression lane on
-  the fit set · the fit set's size before its commit · regenerate the Blender library and run `check_asset_library.sh` ·
+  the fit set · regenerate the Blender library and run `check_asset_library.sh` ·
   rebuild the rig's character scene after `MESHES` changes · 9.3 on the UE machine only after Phase06's 6.5.
 
 ## Execution Log
