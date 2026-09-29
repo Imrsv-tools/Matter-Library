@@ -11,9 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (2026-09-28, Phase08 closed).*
-
-*Phase06 runs on the UE machine.*
+### Phase06 — Unreal Test Runtime — ACTIVE *(discovery done 2026-09-29; runs on the UE machine)*
+**Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
+- `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md` · research `docs/Planning/Research/260929_R_UnrealTestRuntimeHere.md`, `260929_R_Spike_UnrealRuntime.md`
 
 ==================================================================================
 ## Future
@@ -31,10 +31,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
-
-### Phase06 — Unreal Test Runtime — SEEDED *(runs on the UE machine, alongside Phase07)*
-**Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
-- `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md`
 
 ### Library Coverage — SEEDED *(un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
