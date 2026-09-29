@@ -409,9 +409,22 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
                        extra_settings, extra_views)
 
 
+WARMUP_ID = "__warmup"
+
+
+def warmup(settings: list) -> dict:
+    """A throwaway first setting, a copy of the job's first: the launch's FIRST material assignment
+    can draw a master as Unreal's default material with the runtime reporting ready (6.5: the
+    character's Subsurface and Hair parts, setting 1 of a launch, every time; the same materials
+    in any later setting rendered right; bisected on the character's own job). Its pictures are
+    written and never read."""
+    return {"id": WARMUP_ID, "materials": settings[0]["materials"]}
+
+
 def _write_ujob(job: dict, folder: Path, meshes: list, names: list, furniture: dict, settings: list,
                 cameras: dict, sun_k: float, dome_k: float, extra_settings, extra_views) -> Path:
-    settings = settings + list(extra_settings or []) + [mask_setting(job, names, furniture)]
+    settings = ([warmup(settings)] + settings + list(extra_settings or [])
+                + [mask_setting(job, names, furniture)])
     views = []
     for spec in job["views"].values():
         if spec["camera"] not in cameras:
@@ -578,7 +591,7 @@ def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
     names = [p.rsplit("/", 1)[1] for p in job["subjects"]]
     mirror = {"master": "Opaque", "scalars": {"specular_roughness": 0.0, "base_metalness": 1.0},
               "vectors": {"base_color": [1.0, 1.0, 1.0]}, "textures": {"normal_tex": {"constant": FLAT_NORMAL}}}
-    spec["settings"] = [{"id": "both", "materials": mats},
+    spec["settings"] = [{"id": WARMUP_ID, "materials": mats}, {"id": "both", "materials": mats},
                         {"id": "sun", "materials": mats, "sky_scale": 0.0},
                         {"id": "dome", "materials": mats, "sun_scale": 0.0},
                         {"id": "mirror", "materials": mats | {n: mirror for n in names}, "sun_scale": 0.0}, mask_s]

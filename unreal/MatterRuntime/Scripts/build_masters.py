@@ -58,9 +58,6 @@ TRANSMISSION = {"transmission_weight": 0.0, "transmission_color": (1.0, 1.0, 1.0
 #   0.999). Measured 2026-09-29 (6.4) on Neon's dim view, float captures: 0.798 on every region,
 #   the same with one call or two and with specular_weight 1 or 0, so it is the function's own.
 SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0, "emission_luminance": 1.0 / 0.798}
-# Hair (MasterSet's Hair row): OpenPBR thin-walled subsurface whose colour is WIRED to the tinted
-# base colour (the Hair graph's rule, so the tint reaches it), not a parameter of its own.
-HAIR_SUBSURFACE = {k: v for k, v in SUBSURFACE.items() if k != "subsurface_color"}
 
 # Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
 #   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
@@ -73,10 +70,9 @@ MASTERS = {
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
     "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True),
     # Hair (Phase06 D12, 6.5): matte on cards, default lit (not Unreal's hair shading model, which
-    # reads a flat card as one glossy sheet); the cut-out as soft coverage, dithered; light through
-    # the card by the thin surface. Hair fibre is dielectric: one call.
-    "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, extra=HAIR_SUBSURFACE,
-                             thin=True, hair=True),
+    # reads a flat card as one glossy sheet); the cut-out as soft coverage, dithered; the light
+    # through the card folded into its colour (build_master's hair part). Dielectric: one call.
+    "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True),
     "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
     "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
@@ -366,9 +362,20 @@ def build_master(token, white, no_wear, flat):
         n_ts = g.one(M.MaterialExpressionNormalize, mix(n_ts, n2), 3)
 
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
-    feed(base, "base_color")
     if spec.get("hair"):
-        feed(base, "subsurface_color")      # the Hair graph's rule: the tinted base colour
+        # The Hair row's light through the card, OpenPBR thin-walled subsurface with its colour c the
+        # tinted base (MaterialX: a reflected lobe c.c(1 - a)/2 and a transmitted one c.c(1 + a)/2,
+        # mixed in by the weight w). Under even light the two sum to mix(c, c.c, w), the anisotropy
+        # cancelling, and that is the card's colour here, matte and default lit (D12). Substrate's
+        # own thin-surface subsurface was tried first and rejected (6.5): in one real-time capture
+        # it draws the card as dark, noisy pixels, solid card or cut. Measured on the character
+        # against Storm, hair dE 4.3 (the plain base 7.4); ~20 % bright, because Storm's rear lobe
+        # sees only the dome, not the sun.
+        w = g.scalar("subsurface_weight", 0.0, col=11)
+        base = g.op(M.MaterialExpressionLinearInterpolate, base,
+                    g.op(M.MaterialExpressionMultiply, base, base, 10), 9)
+        g.link(w, base, "Alpha")
+    feed(base, "base_color")
     if len(calls) == 2:
         for c, m in zip(calls, (0.0, 1.0)):
             g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
