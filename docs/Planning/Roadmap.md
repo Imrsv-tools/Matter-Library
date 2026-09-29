@@ -15,6 +15,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md` · research `docs/Planning/Research/260929_R_UnrealTestRuntimeHere.md`, `260929_R_Spike_UnrealRuntime.md`
 
+### Phase09 — Hair and Eye Masters — ACTIVE *(discovery opened 2026-09-29; seeded the same day, lead: "yes 1, seed the phase", then "make it Phase09")*
+**Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
+- `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
+
 ==================================================================================
 ## Future
 
@@ -23,10 +27,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-09-27 (lead):** Character Materials becomes **Phase07** and runs here straight after Phase05, **at the same time as Phase06** on the UE machine. Its materials ship as candidates (uncalibrated) until the Unreal column exists: *"I would rather have everything in and 'uncalibrated' yet then a bunch of magenta."* Library Coverage becomes Phase08. Why: `docs/Planning/Research/260927_R_CharacterMaterials_MPFB2.md` (CM4).
 >
 > **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
-
-### Phase09 — Hair and Eye Masters — SEEDED *(2026-09-29, lead: "yes 1, seed the phase", then "make it Phase09"; opens only by the lead's `/discovery`)*
-**Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
-- `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
 
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
