@@ -1,0 +1,12 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "",
+	"Description": "Disposable probe for the Matter Library Unreal test runtime (research UR).",
+	"Modules": [
+		{ "Name": "MatterProbe", "Type": "Runtime", "LoadingPhase": "Default" }
+	],
+	"Plugins": [
+		{ "Name": "Interchange", "Enabled": true }
+	]
+}

@@ -10,6 +10,16 @@
 
 ---
 
+## Resolved — lead decisions (2026-09-29)
+
+| # | Decision |
+|---|---|
+| UR-D1 | **Phase06 runs on this machine** (lead: *"yes run it here"*). This is the UE machine; the other machine built everything else (UR-F1, corrected). Answers UR-Q1. |
+| UR-D2 | **Ask before each GPU launch;** the first one was approved at once (*"ask me before GPU launches but now is OK"*). Answers UR-Q5. |
+| UR-D3 | **Everything lives in this repo, the built executable included,** so the other machine pulls and tests it (*"if you keep everything in this repo including the executable, I can pull on the other machine and test"*). This answers UR-Q3 and UR-Q6: git is the delivery, and the other machine is the portability test. |
+
+---
+
 ## The short answer
 
 **Yes, it is possible, and most of what it needs is already on this machine.** The engine installed here can build a small Unreal app of our own and package it for Linux. The package runs on any 64-bit Linux machine with a Vulkan GPU driver and no Unreal install. The agent drives it from the rig with one command and gets pictures back, with no window and no editor.
@@ -24,11 +34,9 @@
 
 **Examined:** the Phase06 stub, BigPicture BP1/BP6/BP7, the engine registry and the engine install on this machine (2026-09-29).
 
-**Finding UR-F1: Unreal 5.8.0 is on this machine.** It is Epic's installed Linux build, version 5.8.0 (changelist 55116800), registered as `UE_5.8`. BP1 ("Unreal runs on another machine") and BP6 (an agent there, git between the two) were written because no Unreal was here. Phase06's stub still says it *"runs on the UE machine"*.
+**Finding UR-F1: Unreal 5.8.0 is on this machine.** It is Epic's installed Linux build, version 5.8.0 (changelist 55116800), registered as `UE_5.8`.
 
-**What that changes:** Phase06 can run **here**, in this clone, with no second machine and no git hand-off. BP7 (a standalone packaged runtime that runs on any Linux GPU machine) is **unchanged**, and it is exactly what the lead asks for now. The "bring it back to another Linux machine" goal is BP7's own promise.
-
-**Open → UR-Q1** (does Phase06 now run here?).
+**Corrected 2026-09-29 (lead):** this machine **is** the "UE machine" the Phase06 stub means. The *other* machine, where Phases 05, 07 and 08 were built, has no Unreal. *(This pass first read BP1 as "no Unreal here", which had the two machines the wrong way round.)* So BP1, BP6 and BP7 stand as written: Phase06 runs here, and the package goes back to the other machine. See UR-D1–D3.
 
 ## Pass 2 — What this engine install can do (read from disk, nothing launched)
 
@@ -46,6 +54,8 @@
 **Unverified until run:** whether a packaged Linux (Vulkan) build with Substrate on renders **headless** (`-RenderOffscreen`), and whether it needs a display server at all. Neither this repo nor the IMRSV platform has ever packaged a full Linux build on this machine; the platform deliberately kept a full package out of its gates because it is heavy here.
 
 ## Pass 3 — Unreal 5.8 speaks OpenPBR
+
+> **Corrected by probe 1 (2026-09-29, spike UR-F4):** the function to wrap is the **core engine's** `/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque` (and `_Translucent`), which outputs a Substrate front material. The Interchange plugin's `MX_OpenPBR_*` named below outputs Unreal's classic pins instead. The rest of this pass stands.
 
 **Examined:** the engine's Interchange plugin (its MaterialX translator source and its content), and the `BaseMaterial` plugin. Input names were read as strings out of the asset files; **the assets were not opened in Unreal.**
 
@@ -93,7 +103,7 @@
 - A **small C++ Unreal 5.8 project** (Substrate on, Adaptive GBuffer, GI and reflections off), plus the **Python scripts that build everything else**: the masters, the imported scene and the level. Ideally no hand-made binary assets live in git at all. Any Linux machine with Unreal 5.8 rebuilds them from the scripts.
 - A **rig driver**, `tools/parity/drivers/unreal.py`, beside `storm.py` and `blender_render.py`, implementing `JOB_FORMAT.md`.
 
-**What does not go in git:** the built package (too large for git). It is delivered as a release download or a copy; that is Phase06's open question, restated as UR-Q3.
+**The built package goes in git too (UR-D3),** so the other machine pulls and runs it. It is too large for plain git, so it goes through Git LFS, as the textures already do. Its size, and whether it fits the repo's LFS quota, are measured by probe 3.
 
 **Two ways to run the same project**, one flag in the driver:
 - **Editor-hosted** on any machine with Unreal 5.8 (`UnrealEditor <project> -game -RenderOffscreen`). This is the development loop, with no packaging step.
@@ -124,27 +134,37 @@ Each probe is small, and each settles one unknown before anything is built on it
 
 **Probes 0–3 are the risky part.** Once they pass, the rest is the master work Phase06 already scopes.
 
+## Pass 7 — Probes 1–3 run (2026-09-29)
+
+**All three held.** The results are in `260929_R_Spike_UnrealRuntime.md`, and the probe sources are committed beside it.
+- **Probe 1:** a script builds a master on Epic's Substrate OpenPBR function in about 6 s, with no GPU. It registers 21 parameters by their OpenPBR names (UR-F4, UR-F5).
+- **Probe 2:** editor mode renders headless. A settled capture is byte-identical from run to run, but a capture taken too early gets Unreal's default material, so readiness must be checked explicitly (UR-F7). The first launch compiled shaders for about 12 minutes; later runs take seconds (UR-F6).
+- **Probe 3:** the package builds with 0 errors. It runs with no display (SDL `dummy`) and gives byte-identical output, in 4 s once warm. It needs about **620 MB** and glibc 2.28 (UR-F8), and agrees with editor mode to 0.9 % (UR-F9).
+- **Not yet calibrated:** the grey sphere reads about 2.5× brighter than a hand estimate. That is probe 4 (UR-F10).
+- **For UR-D3:** about 620 MB per package goes through Git LFS, and every rebuild adds to the history.
+
 ---
 
 ## Open questions
 
 | # | Question | Recommendation |
 |---|---|---|
-| UR-Q1 | Does Phase06 run on **this** machine now, instead of a separate UE machine (BP1, BP6)? | **Yes.** Unreal 5.8 is here (UR-F1). BP7's "runs on any Linux GPU machine" stays the deliverable. |
-| UR-Q2 | Build the Unreal masters by wrapping Epic's `MX_OpenPBR_*` functions? | **Yes, if probe 1 holds**, for Opaque, TwoLayer, Masked, Emissive and both Translucent masters. Subsurface and Hair take Unreal's better model where the LCD ruling's candidates call for it. |
-| UR-Q3 | Where does the package live between machines? *(Phase06's own open question)* | A copy for now; a release asset on this repo once it is worth publishing. |
+| ~~UR-Q1~~ | ~~Does Phase06 run on this machine?~~ **Yes (UR-D1).** | — |
+| UR-Q2 | Build the Unreal masters by wrapping Epic's `MX_OpenPBR_*` functions? | **Yes: probe 1 held** (Pass 7), for Opaque, TwoLayer, Masked, Emissive and both Translucent masters. Subsurface and Hair take Unreal's better model where the LCD ruling's candidates call for it. |
+| ~~UR-Q3~~ | ~~Where does the package live between machines?~~ **In this repo (UR-D3).** Git LFS quota and size are measured by probe 3. | — |
 | UR-Q4 | Real time or Unreal's path tracer for the column? *(Phase06's own)* | **Real time, captured linear** (Pass 5): it is what Studio users see. The path tracer is an optional later check; it is unverified on Linux. |
-| UR-Q5 | When may GPU probes run, given the IMRSV agent? | The lead names a window, or the agent checks for a running Unreal and asks before each first launch. Probes 0–1 need neither. |
-| UR-Q6 | Is there a second Linux machine to prove portability on? | If yes, use it for probe 6. If not, a GPU container on this machine is a fair stand-in (unverified here). |
+| ~~UR-Q5~~ | ~~When may GPU probes run?~~ **Ask before each launch (UR-D2).** | — |
+| ~~UR-Q6~~ | ~~A second Linux machine?~~ **Yes: the machine that built Phases 05–08 (UR-D3).** | — |
 | UR-Q7 | Keep the Unreal project's binary assets out of git by rebuilding them from scripts? | **Yes, as the aim.** Probe 1 shows whether the masters regenerate cleanly. The level may need to be committed if scripting it proves fragile. |
 
-**Unverified (each with the probe that settles it):** a headless packaged Linux build with Substrate (2, 3) · the real inputs of Epic's OpenPBR functions, and whether they survive packaging (1, 3) · linear capture including translucency and refraction (2, 5) · a project-local cache in the installed build (0) · the package's size and portability (3, 6) · how much of our nodegraph Interchange imports (opt).
+**Settled by probes 1–3 (Pass 7):** a headless packaged Linux build with Substrate · the real inputs of Epic's OpenPBR functions, and whether they survive packaging · the package's size (about 620 MB needed). **Still unverified:** linear capture including translucency and refraction (5) · the package on another machine (6) · a project-local cache in the installed build · how much of our nodegraph Interchange imports (opt) · the organisation's Git LFS quota.
 
 ## Status
 
-- **Passes captured:** 6 (2026-09-29). Nothing was launched; everything is read from disk.
+- **Passes captured:** 7 (2026-09-29). Passes 1–6 were read from disk; Pass 7 ran probes 1–3, which all held (`260929_R_Spike_UnrealRuntime.md`).
 - **The answer:** yes. Build a small C++ Unreal 5.8 project in this repo, with its masters built by script, and package it for Linux. The rig drives it through a fourth driver and gets pictures back. It runs editor-hosted on any machine with Unreal, and as a package on any Linux GPU machine without one.
 - **Key finds:** Unreal 5.8 is on this machine (UR-F1). **Epic ships OpenPBR, with our parameter names, and MaterialX's `place2d`** (UR-F2). Epic's own importer splits OpenPBR as our master set does (UR-F3).
 - **The risk:** sharing the machine with the IMRSV agent. It is handled by looking before launching, doing most of the work with no GPU, capping builds and shaders, changing nothing shared, and telling the lead before the first launch (Pass 4). Disk headroom is about 27 GB.
-- **Open:** UR-Q1 to UR-Q7, each with a recommendation. UR-Q1 and UR-Q5 are the lead's to answer first.
-- **Next step:** the lead answers UR-Q1 and UR-Q5, then runs `/discovery Phase06` on this machine, starting from this doc's Pass 6. Probes 0–1 can run any time, since they need no GPU.
+- **Decided (UR-D1–D3):** Phase06 runs here, the lead approves each GPU launch, and everything, the executable included, lives in this repo for the other machine to pull.
+- **Open:** UR-Q2, UR-Q4 and UR-Q7, each with a recommendation.
+- **Next step:** `/discovery Phase06` on this machine, starting from Pass 7 and the spike. The spike lists what is left: calibration, the rest of the masters, the driver and scene, a readiness signal, a Shipping build small enough for the repo, and the run on the other machine.
