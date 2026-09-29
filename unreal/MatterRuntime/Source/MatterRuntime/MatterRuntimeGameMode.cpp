@@ -214,7 +214,11 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	CaptureComp->CaptureSource = ESceneCaptureSource::SCS_SceneColorHDR;
 	CaptureComp->bCaptureEveryFrame = false;
 	CaptureComp->bCaptureOnMovement = false;
-	CaptureComp->bAlwaysPersistRenderingState = true;
+	// No persistent view state: each capture starts at the same frame index, so the renderer's
+	// per-frame dither is the same in every picture and identical values give identical pixels
+	// (6.3 run 3: persisted, the frame index advanced per capture and a no-op slider "moved"
+	// Unreal by ~0.25 dE, zero-mean noise, while Storm moved 0.00).
+	CaptureComp->bAlwaysPersistRenderingState = false;
 	FPostProcessSettings& PP = CaptureComp->PostProcessSettings;
 	PP.bOverride_AutoExposureMethod = true;
 	PP.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
