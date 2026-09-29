@@ -1,6 +1,6 @@
 # Phase06 — Unreal Test Runtime
 
-**Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). One `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
+**Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). No `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
 - **Seeded** 2026-09-26 from `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (Passes 7, 8). Numbered by the lead the same day.
 - **Opened** 2026-09-29 (lead: *"push it and start /discovery Phase06"*), after `260929_R_UnrealTestRuntimeHere.md` (the plan, UR-D1–D3) and `260929_R_Spike_UnrealRuntime.md` (probes 1–3 passed).
 - **Runs on this machine, the UE machine** (UR-D1, lead: *"yes run it here"*). The other machine, where Phases 05, 07 and 08 were built, has no Unreal. It pulls the package and tests it (UR-D3).
@@ -97,6 +97,7 @@ Concretely, at close:
 | D10 | **The dome is not a hand-written flat `.hdr`.** Storm misread one (learning S2), and the probe's own 2.5× over-brightness (UR-F10) may be the same trap. Generate the cubemap from a format read exactly (EXR), and verify its value in Unreal before calibrating. | Storm S2; UR-F10 |
 | D12 | **The Hair master is matte on cards.** It is default lit with no specular sheen, not Unreal's hair shading model, which reads a flat card as one glossy sheet. Its coverage is soft and dithered, per the MasterSet row. The hairstyle's picture shading the article's light colour (modulate) is Phase09's input; the master takes it when Phase09 lands. | MAP-RD3, lead: *"yes on hair"*; *"The matte look the lead approved at the platform's sitting is where card quality stops"* |
 | D13 | **The eye and the hair picture belong to Phase09, including their Unreal side, built in this phase's `unreal/` project.** Phase06 builds the 8 masters and the column that Phase09 then judges on. | Phase09 seed §Scope In: *"The `Eye` token and its settings row; its Unreal side where the library's Unreal masters are built"*; MAP-RD6 |
+| D14 | **A package version goes through LFS twice: at 6.2 and at the close.** A master change in between does not push a package; the other machine renders from the newest pushed one. | Lead, 2026-09-29: *"yes and 6.2 and close (not every master change)"* |
 | D11 | **A capture waits for the material to be ready,** by a signal that works. The probe caught Unreal's default material once, and `IsGameThreadShaderMapComplete` did not work as a signal (UR-F7). The package precompiles its shaders, so the risk is mostly in editor mode. | UR-F7 |
 
 ### Risk lane: `build` (verified)
@@ -107,7 +108,7 @@ Concretely, at close:
   - about 43 GB stored (29–32k GB-hours a month) and 14–15 GB of downloads a month, across the organisation;
   - August went over the included allowance (net $4.29); July and September were $0;
   - one ~620 MB package version adds about $0.04 a month of storage, and each pull about $0.05.
-  - Pushing it is public and irreversible, so each package commit is the lead's call (the YOUR CALL in §Discovery Status).
+  - Pushing it is public and irreversible, so how often a package is pushed is the lead's call: D14.
 - **The test surface:** the existing gate (`run_all.py`), the rig's own runs (the smoke is the sheet), and one check: the shared article reader gives Blender the same values after the move. No new gate.
 
 ### Step list
@@ -122,7 +123,7 @@ Concretely, at close:
 - **6.2 — The package, pulled on the other machine.**
   - The one-command build; a stripped Shipping package in `unreal/package/` through LFS.
   - The driver uses the package by default, and editor mode on request.
-  - **First clickable result:** click 2. *(Early by design: it proves the lead's portability ask before the masters grow. Each later rebuild is another LFS version: the YOUR CALL in §Discovery Status.)*
+  - **First clickable result:** click 2. *(Early by design: it proves the lead's portability ask before the masters grow. The next pushed version is the close's (D14).)*
 - **6.3 — The Opaque master in full, with textures and sliders.**
   - Textures load at run time with the right colour settings; `place2d`; the normal; the three overlays and the mask set, each at its own scale; the roughness bias.
   - Coat, fuzz and specular anisotropy.
@@ -217,8 +218,8 @@ All of it is in the contract docs and `JOB_FORMAT.md`, which this Brief binds to
 
 - **Passes captured:** 2 (2026-09-29).
 - **Current working direction:** the Brief above. The project is in `unreal/`, the masters are Epic's OpenPBR plus our network, the package goes through LFS, and the rig gets its third column and the "Moved" verdict. The Hair master is matte on cards (D12); the Eye master and the hair and eye pictures are Phase09's, built in this project (D13).
-- **Open decisions:**
-  - **YOUR CALL: the package's LFS commits.** How often a package version is pushed: at 6.2 and at the close (recommended), or at every master change. About $0.04 a month each, plus about $0.05 per pull.
+- **Open decisions:** none.
+  - ~~The package's LFS commits~~ **Ruled (lead, 2026-09-29): *"yes and 6.2 and close (not every master change)"*** (D14).
 - **Checks to carry forward:** D1's look-before-launching before every GPU run · D10 before calibrating · D11 in editor mode · `check_exporter.sh` baselined before the reader move touches `blender/`.
 
 ## Execution Log
