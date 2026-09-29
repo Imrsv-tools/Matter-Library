@@ -78,14 +78,22 @@ DOME_K = 1.011
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
 JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers carry a tangent sign)
-BUILT_MASTERS = {"Opaque"}
-# the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full)
-IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal")
+BUILT_MASTERS = {"Opaque", "TwoLayer"}
+# the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
+# 6.4: TwoLayer's layer 2)
+IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
+               "layer2_base_color", "layer2_roughness", "layer2_metalness", "layer2_normal")
 LAYER_ROLES = ("maskset", "overlay1", "overlay2", "overlay3")     # tiled, each at its own size
 TEXTURE_ROLES = set(IMAGE_ROLES) | set(LAYER_ROLES)
-COLOUR_ROLES = {"base_color"}          # decoded from sRGB when the article says so; the rest is data
+COLOUR_ROLES = {"base_color", "layer2_base_color"}   # decoded from sRGB when the article says so
+# each layer's constant: (texture role, the master's parameter); the constant goes neutral (1)
+# where the article binds the texture instead
+LAYER_CONSTANTS = (("base_color", "base_color"), ("roughness", "specular_roughness"),
+                   ("metalness", "base_metalness"), ("layer2_base_color", "layer2_base_color"),
+                   ("layer2_roughness", "layer2_roughness"), ("layer2_metalness", "layer2_metalness"))
 SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend",
-           "overlay1_density", "overlay2_density", "overlay3_density"}
+           "overlay1_density", "overlay2_density", "overlay3_density",
+           "layer_blend_balance", "layer_blend_contrast"}
 FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal map
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
@@ -215,17 +223,17 @@ def article_material(path: Path, sliders: dict | None = None) -> dict:
         textures[f"{role}_tex"] = {"file": str(file), "srgb": role in COLOUR_ROLES and cs not in LINEAR_SPACES}
         if role in LAYER_ROLES:
             scalars[f"{role}_layer_scale"] = float(art.layer_scale.get(role, 1.0))
-    if "normal" not in art.textures:
-        textures["normal_tex"] = {"constant": FLAT_NORMAL}
-    for role, param in (("base_color", "base_color"), ("roughness", "specular_roughness"),
-                        ("metalness", "base_metalness")):
+    for n in ("normal", "layer2_normal"):
+        if n not in art.textures:
+            textures[f"{n}_tex"] = {"constant": FLAT_NORMAL}
+    for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
         else:
             value = art.consts.get(role) or sh.get(param)
         if value is None:
             continue
-        if role == "base_color":
+        if role.endswith("base_color"):
             vectors[param] = _vec(value)
         else:
             scalars[param] = float(value[0])

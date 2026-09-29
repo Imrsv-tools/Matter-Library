@@ -47,6 +47,7 @@ PASS_THROUGH = {
 # MasterSet §Material-settings intent (normative): coverage, shading model, two-sided.
 SETTINGS = {
     "Opaque": ("opaque", False),
+    "TwoLayer": ("opaque", False),      # default lit: two real layers, never a clearcoat
 }
 
 OVERLAYS = (1, 2, 3)
@@ -213,8 +214,10 @@ def texture(g, name, default, uv, col):
     return t
 
 
-def build_opaque_core(token, white, no_wear, flat):
-    """The Opaque core, MaterialX's formulas as in ``blender/masters/build_masters.py`` ``_build``:
+def build_opaque_core(token, white, no_wear, flat, layer2=False):
+    """The Opaque core (and, with ``layer2``, TwoLayer: the same core with a second layer mixed
+    in by the maskset's R before the tint), MaterialX's formulas as in
+    ``blender/masters/build_masters.py`` ``_build``:
 
     * base_color_tinted: base_color x base_color_tex x base_color_tint (the article sets one of
       the two to its value and leaves the other white);
@@ -249,25 +252,57 @@ def build_opaque_core(token, white, no_wear, flat):
 
     placed = place2d(g, 22)
     uv = image_uv(g, placed, 15)
-
-    base = g.op(M.MaterialExpressionMultiply, g.vector("base_color", (0.8, 0.8, 0.8)),
-                texture(g, "base_color_tex", white, uv, 12), 11, b_out="RGB")
-    base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
-    feed(base, "base_color")
-    metal = g.op(M.MaterialExpressionMultiply, g.scalar("base_metalness", 0.0),
-                 texture(g, "metalness_tex", white, uv, 12), 11, b_out="R")
-    for c, m in zip(calls, (0.0, 1.0)):
-        g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
-    rough = g.op(M.MaterialExpressionMultiply, g.scalar("specular_roughness", 0.3),
-                 texture(g, "roughness_tex", white, uv, 12), 11, b_out="R")
-    # the article's normal map; where the article has none the rig's driver sets an exact flat
-    # normal (this 8-bit default's 128 reads 0.502, a 0.2 degree tilt)
-    n_ts = g.op_k(M.MaterialExpressionSubtract,
-                  g.op_k(M.MaterialExpressionMultiply, texture(g, "normal_tex", flat, uv, 12), 2.0, 11, "RGB"),
-                  1.0, 10)
-
     maskset = texture(g, "maskset_tex", white, image_uv(g, placed, 15, "maskset"), 12)
     blend = g.scalar("maskset_blend", 0.0, col=10)
+
+    def layer(names, defaults):
+        """One layer's base colour, roughness, metalness and tangent-space normal: each the
+        article's constant x its texture (the article sets one and leaves the other neutral).
+        Where the article has no normal map the rig's driver sets an exact flat normal (this
+        8-bit default's 128 reads 0.502, a 0.2 degree tilt)."""
+        (b_name, r_name, m_name, prefix), (b_def, r_def, m_def) = names, defaults
+        b = g.op(M.MaterialExpressionMultiply, g.vector(b_name, b_def),
+                 texture(g, f"{prefix}base_color_tex", white, uv, 12), 11, b_out="RGB")
+        r = g.op(M.MaterialExpressionMultiply, g.scalar(r_name, r_def),
+                 texture(g, f"{prefix}roughness_tex", white, uv, 12), 11, b_out="R")
+        m = g.op(M.MaterialExpressionMultiply, g.scalar(m_name, m_def),
+                 texture(g, f"{prefix}metalness_tex", white, uv, 12), 11, b_out="R")
+        n = g.op_k(M.MaterialExpressionSubtract,
+                   g.op_k(M.MaterialExpressionMultiply, texture(g, f"{prefix}normal_tex", flat, uv, 12), 2.0, 11, "RGB"),
+                   1.0, 10)
+        return b, r, m, n
+
+    base, rough, metal, n_ts = layer(("base_color", "specular_roughness", "base_metalness", ""),
+                                     ((0.8, 0.8, 0.8), 0.3, 0.0))
+    if layer2:
+        # MasterSet §TwoLayer blend: t = saturate((maskset.R - balance) / max(1 - contrast, 1e-4)
+        # + 0.5) x maskset_blend; each of layer 1's four values mixes to layer 2's by t, the
+        # mixed normal normalised (then the overlays add to it, normalised once more below).
+        # Layer 2's defaults are Blender's (ML_TwoLayer).
+        b2, r2, m2, n2 = layer(("layer2_base_color", "layer2_roughness", "layer2_metalness", "layer2_"),
+                               ((0.5, 0.5, 0.5), 0.5, 0.0))
+        inv = g.node(M.MaterialExpressionSubtract, 10, const_a=1.0)
+        g.link(g.scalar("layer_blend_contrast", 0.0, col=11), inv, "B")
+        safe = g.op_k(M.MaterialExpressionMax, inv, 1e-4, 9)
+        cen = g.op(M.MaterialExpressionSubtract, maskset, g.scalar("layer_blend_balance", 0.5, col=11), 9, a_out="R")
+        k = g.one(M.MaterialExpressionSaturate,
+                  g.op_k(M.MaterialExpressionAdd, g.op(M.MaterialExpressionDivide, cen, safe, 8), 0.5, 7), 6)
+        t = g.op(M.MaterialExpressionMultiply, k, blend, 5)
+
+        def mix(a, b):
+            n = g.node(M.MaterialExpressionLinearInterpolate, 4)
+            g.link(a, n, "A")
+            g.link(b, n, "B")
+            g.link(t, n, "Alpha")
+            return n
+        base, rough, metal = mix(base, b2), mix(rough, r2), mix(metal, m2)
+        n_ts = g.one(M.MaterialExpressionNormalize, mix(n_ts, n2), 3)
+
+    base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
+    feed(base, "base_color")
+    for c, m in zip(calls, (0.0, 1.0)):
+        g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
+
     for n in OVERLAYS:
         ov = texture(g, f"overlay{n}_tex", no_wear, image_uv(g, placed, 15, f"overlay{n}"), 12)
         gate = g.lerp_from_one(maskset, blend, 9, b_out=GATE_CHANNEL[n])
@@ -339,7 +374,8 @@ def main():
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
-    for mat in (build_opaque_core("Opaque", white, no_wear, flat), build_sky()):
+    for mat in (build_opaque_core("Opaque", white, no_wear, flat),
+                build_opaque_core("TwoLayer", white, no_wear, flat, layer2=True), build_sky()):
         save(mat)
     log("RESULT ok")
 
