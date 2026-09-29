@@ -8,8 +8,9 @@ its ``.mtlx``. The rig writes a render job (``job.py``), runs
 the Storm driver and the Blender driver on it, and writes, into
 ``library/parity/<article>/`` (git-ignored):
 
-* ``sheet.png`` — one row per slider setting: Storm | Blender | Unreal (empty until
-  Phase06) | where they differ (black = same, yellow = at the bar, red = 3x the bar);
+* ``sheet.png`` — one row per slider setting: Storm | Blender | Unreal (Phase06:
+  ``drivers/unreal.py``, when this machine has a runtime; otherwise the sheet says why) |
+  where they differ (black = same, yellow = at the bar, red = 3x the bar);
 * ``scorecard.md`` (and ``scorecard.json``) — ΔE2000 per setting over the subjects, per
   subject, and the verdict against the master's bar.
 
@@ -17,7 +18,10 @@ It prints both paths. ``--sweep`` renders every slider the article declares thro
 range (Phase05 step 5.2); without it, only the article's own settings.
 
 Tools: Storm via ``$USD_TOOLS_ROOT`` (as make_preview.py), Blender as ``$MATTER_BLENDER``
-or ``blender`` on PATH (5.2 LTS).
+or ``blender`` on PATH (5.2 LTS), Unreal as ``drivers/unreal.py`` finds it.
+``--no-blender`` is for a machine whose Blender cannot render parity (Phase06: the UE machine's
+Fedora build has no working Cycles GPU kernels and a colour config its OCIO cannot load): Storm
+is then compared with Unreal, on Unreal's own mask.
 """
 
 from __future__ import annotations
@@ -149,7 +153,13 @@ def _wrap(text: str, width: int) -> str:
     return "\n".join(textwrap.wrap(text, width))
 
 
-def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str | None = None) -> Path:
+def _placeholder(d, x: int, y: int, cell: int, text: str, font) -> None:
+    d.rectangle([x, y, x + cell - 1, y + cell - 1], fill=(40, 40, 40))
+    d.multiline_text((x + 20, y + cell // 2 - 30), text, fill=(150, 150, 150), font=font)
+
+
+def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str | None = None,
+                ref: str = "blender") -> Path:
     out = Path(job["out_dir"])
     cols = ["USDLiveView (Storm)", "Blender (Cycles)", "Unreal", "Where they differ"]
     label_w, head_h, line_h, row_gap = 190, 72, 30, 30
@@ -172,29 +182,27 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str
             sfx = job["views"][v]["suffix"]
             d.text((10, y + 40), f"({job['views'][v].get('label') or VIEW_LABELS.get(v, v)})",
                    fill=(150, 150, 150), font=fs)
-            for i, tool in enumerate(("storm", "blender")):
-                img = Image.open(out / tool / f"{s['id']}{sfx}.png").convert("RGB").resize((cell, cell))
-                sheet.paste(img, (label_w + i * cell, y))
-            upng = out / "unreal" / f"{s['id']}{sfx}.png"
-            if unreal_skip is None and upng.is_file():
-                sheet.paste(Image.open(upng).convert("RGB").resize((cell, cell)), (label_w + 2 * cell, y))
-            else:
-                d.rectangle([label_w + 2 * cell, y, label_w + 3 * cell - 1, y + cell - 1], fill=(40, 40, 40))
-                d.multiline_text((label_w + 2 * cell + 20, y + cell // 2 - 30),
-                                 "Unreal: no picture\n" + _wrap(unreal_skip or "not rendered", 38),
-                                 fill=(150, 150, 150), font=fs)
+            for i, tool in enumerate(("storm", "blender", "unreal")):
+                png = out / tool / f"{s['id']}{sfx}.png"
+                if png.is_file() and not (tool == "unreal" and unreal_skip):
+                    sheet.paste(Image.open(png).convert("RGB").resize((cell, cell)), (label_w + i * cell, y))
+                elif tool == "unreal":
+                    _placeholder(d, label_w + i * cell, y, cell,
+                                 "Unreal: no picture\n" + _wrap(unreal_skip or "not rendered", 38), fs)
+                else:
+                    _placeholder(d, label_w + i * cell, y, cell, f"{tool.title()}: not run here", fs)
             sheet.paste(heat[s["id"]][v].resize((cell, cell)), (label_w + 3 * cell, y))
             sc = scores[s["id"]]["views"][v]
             m = sc["subjects"]
             ok = m["dE_mean"] < BAR or not graded(job["article"]["master"], v)
             said = verdict(job["article"]["master"], v, m["dE_mean"], md=False)
             mv = sc.get("moved")
-            moved = (f"   ·   the slider moved Storm {mv['storm']:.1f}, Blender {mv['blender']:.1f}"
-                     + (f", Unreal {mv['unreal']:.1f}" if "unreal" in mv else "") if mv else "")
+            moved = ("   ·   the slider moved " + ", ".join(f"{t.title()} {x:.1f}" for t, x in mv.items())
+                     if mv else "")
             ue = sc.get("unreal_vs_blender")
             ue = f"   ·   Unreal vs Blender: mean {ue['dE_mean']:.2f}, p95 {ue['dE_p95']:.2f}" if ue else ""
             d.text((label_w + 10, y + cell + 6),
-                   f"dE2000 Storm vs Blender: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
+                   f"dE2000 Storm vs {ref.title()}: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
                    f"(bar {BAR:g}: {said}){ue}{moved}",
                    fill=(120, 230, 120) if ok else (255, 140, 120), font=fs)
     p = out / "sheet.png"
@@ -205,7 +213,7 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str
 SCALE_TOLERANCE = 0.03     # found size within 3 % of the expected one
 
 
-def scale_checks(art: jobmod.Article, job: dict) -> list[dict]:
+def scale_checks(art: jobmod.Article, job: dict, tools=("storm", "blender")) -> list[dict]:
     """The ruler check: does the base texture render at its recorded size, in each tool?
 
     Run on the defaults and on each UV-scale row, where the expected size is the slider's
@@ -226,30 +234,37 @@ def scale_checks(art: jobmod.Article, job: dict) -> list[dict]:
         else:
             continue
         row = {"setting": s["label"], "expected": want}
-        for tool in ("storm", "blender"):
+        for tool in tools:
             r = compare.texture_scale(out / tool / f"{s['id']}.png", tex, art.meters_per_tile)
             row[tool] = r
-        row["ok"] = all(abs(row[t]["size"] / want - 1) <= SCALE_TOLERANCE for t in ("storm", "blender"))
+        row["ok"] = all(abs(row[t]["size"] / want - 1) <= SCALE_TOLERANCE for t in tools)
         rows.append(row)
     return rows
 
 
-def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
+TOOL_NAMES = {"storm": "USDLiveView's renderer (Storm)", "blender": "Blender (Cycles)", "unreal": "Unreal"}
+
+
+def write_scorecard(job: dict, scores: dict, checks: dict, tools=("storm", "blender")) -> Path:
     out = Path(job["out_dir"])
     master = job["article"]["master"]
     is_graded = master in GRADED
+    ref = tools[1]
+    moved_h = " | ".join(f"Moved: {t.title()}" for t in tools)
     lines = [f"# Parity scorecard — {job['article']['name']}", "",
              f"Master **{master}** · bar ΔE2000 < {BAR:g} "
              f"({'graded' + (', except the ' + ' and '.join(sorted(ADVISORY_VIEWS[master])) + ' view (advisory)' if master in ADVISORY_VIEWS else '') if is_graded else 'advisory: judged recognisable by eye'}) · "
              f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
-             "ΔE2000 between USDLiveView's renderer (Storm) and Blender (Cycles), over the "
-             "subjects' pixels (sphere, cube, floor).", "",
+             f"ΔE2000 between {TOOL_NAMES['storm']} and {TOOL_NAMES[ref]}, over the "
+             "subjects' pixels (sphere, cube, floor)."
+             + ("" if "blender" in tools else " *Blender was not run on this machine.*"), "",
              "**Moved** is how far the slider changed each tool's own picture from its defaults "
              "(mean dE2000 on the subjects). A slider that moves one tool and not the other is "
              "**ONE-SIDED**.", "",
-             "| Setting | Between tools: mean | p95 | Sphere | Cube | Floor | SSIM | Moved: Storm | Moved: Blender | Verdict |",
-             "|---|---|---|---|---|---|---|---|---|---|"]
+             f"| Setting | Between tools: mean | p95 | Sphere | Cube | Floor | SSIM | {moved_h} | Verdict |",
+             "|---|---|---|---|---|---|---|" + "---|" * len(tools) + "---|"]
+    none = " | ".join("—" for _ in tools)
     for s in job["settings"]:
         sc = scores[s["id"]]
         m = sc["subjects"]
@@ -257,14 +272,14 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
         mv = sc.get("moved")
         if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
             v += " · **ONE-SIDED**"
-        ms = f"{mv['storm']:.2f} | {mv['blender']:.2f}" if mv else "— | —"
+        ms = " | ".join(f"{mv[t]:.2f}" for t in tools) if mv else none
         lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
                      f"{sc['sphere']['dE_mean']:.2f} | {sc['cube']['dE_mean']:.2f} | "
                      f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {ms} | {v} |")
     for view in [v for v in job["views"] if v != "wide"]:
         lines += ["", f"## The {VIEW_LABELS.get(view, view)} view", "", VIEW_NOTES.get(view, ""), "",
-                  "| Setting | Between tools: mean | p95 | SSIM | Moved: Storm | Moved: Blender | Verdict |",
-                  "|---|---|---|---|---|---|---|"]
+                  f"| Setting | Between tools: mean | p95 | SSIM | {moved_h} | Verdict |",
+                  "|---|---|---|---|" + "---|" * len(tools) + "---|"]
         for s in job["settings"]:
             sc = scores[s["id"]]["views"][view]
             m = sc["subjects"]
@@ -272,7 +287,7 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
             mv = sc.get("moved")
             if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
                 v += " · **ONE-SIDED**"
-            ms = f"{mv['storm']:.2f} | {mv['blender']:.2f}" if mv else "— | —"
+            ms = " | ".join(f"{mv[t]:.2f}" for t in tools) if mv else none
             lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
                          f"{m['ssim']:.3f} | {ms} | {v} |")
     worst = {}
@@ -293,12 +308,12 @@ def write_scorecard(job: dict, scores: dict, checks: dict) -> Path:
         lines += ["The floor is sampled straight down and matched against the article's base "
                   "texture laid at k x its recorded size. **Size found** is the best k "
                   "(1.00 = exactly the recorded size); *match* is the correlation there.", "",
-                  "| Setting | Expected | Storm: size found (match) | Blender: size found (match) | |",
-                  "|---|---|---|---|---|"]
+                  "| Setting | Expected | " + " | ".join(f"{t.title()}: size found (match)" for t in tools) + " | |",
+                  "|---|---|" + "---|" * len(tools) + "---|"]
         for r in checks["scale"]:
-            lines.append(f"| {r['setting']} | {r['expected']:.2f} | {r['storm']['size']:.2f} "
-                         f"({r['storm']['ncc']:.2f}) | {r['blender']['size']:.2f} "
-                         f"({r['blender']['ncc']:.2f}) | {'ok' if r['ok'] else '**OFF**'} |")
+            lines.append(f"| {r['setting']} | {r['expected']:.2f} | "
+                         + " | ".join(f"{r[t]['size']:.2f} ({r[t]['ncc']:.2f})" for t in tools)
+                         + f" | {'ok' if r['ok'] else '**OFF**'} |")
     else:
         lines.append("No base texture: nothing to measure.")
     lines += ["", "## Seams (Phase04's measure, on each texture the article uses)", "",
@@ -402,6 +417,9 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=None, help=f"default: {OUT_ROOT}/<article>")
     ap.add_argument("--score-only", action="store_true",
                     help="re-score the pictures already rendered (no Storm, no Blender)")
+    ap.add_argument("--no-blender", action="store_true",
+                    help="skip Blender (a machine whose Blender cannot render parity: Storm is then "
+                         "compared with Unreal, on Unreal's own mask)")
     args = ap.parse_args(argv)
 
     if args.character:
@@ -425,8 +443,9 @@ def main(argv=None) -> int:
     if not args.score_only:
         storm.run(job_path)
     t1 = time.time()
-    if not args.score_only:
+    if not args.score_only and not args.no_blender:
         run_blender(job_path)
+    blender_on = not args.no_blender and (out / "blender" / "defaults.png").is_file()
     t2 = time.time()
     if not args.score_only:
         unreal_skip = run_unreal(job_path)
@@ -435,7 +454,10 @@ def main(argv=None) -> int:
     else:
         unreal_skip = None if (out / "unreal" / "defaults.png").is_file() else "not rendered"
     t3 = time.time()
-    tools = ("storm", "blender") + (("unreal",) if unreal_skip is None else ())
+    tools = ("storm",) + (("blender",) if blender_on else ()) + (("unreal",) if unreal_skip is None else ())
+    if len(tools) < 2:
+        raise SystemExit(f"nothing to compare Storm with (Blender skipped; Unreal: {unreal_skip})")
+    ref = tools[1]       # Storm is compared with Blender, or with Unreal where Blender is not run
 
     scores, heat = {}, {}
     views = job["views"]
@@ -443,27 +465,29 @@ def main(argv=None) -> int:
         per_view, heat[s["id"]] = {}, {}
         for v, spec in views.items():
             sfx = spec["suffix"]
-            mask = out / f"mask{sfx}.png"
+            mask = out / f"mask{sfx}.png"          # Blender's; else Unreal's own (drivers/unreal.py)
+            if not mask.is_file():
+                mask = out / "unreal" / f"mask{sfx}.png"
             sc, dE = compare.compare(out / "storm" / f"{s['id']}{sfx}.png",
-                                     out / "blender" / f"{s['id']}{sfx}.png", mask, colours)
+                                     out / ref / f"{s['id']}{sfx}.png", mask, colours)
             if s["id"] != "defaults":
                 sc["moved"] = {t: compare.moved(out / t / f"{s['id']}{sfx}.png",
                                                 out / t / f"defaults{sfx}.png", mask, colours)
                                for t in tools}
-            if "unreal" in tools:
+            if "unreal" in tools and "blender" in tools:
                 sc["unreal_vs_blender"] = compare.compare(out / "unreal" / f"{s['id']}{sfx}.png",
                                                           out / "blender" / f"{s['id']}{sfx}.png",
                                                           mask, colours)[0]["subjects"]
             per_view[v] = sc
             heat[s["id"]][v] = compare.heatmap(dE, BAR, compare.masks(mask, colours)["subjects"])
         scores[s["id"]] = per_view["wide"] | {"views": per_view}
-    sheet = build_sheet(job, scores, heat, args.cell, unreal_skip)
+    sheet = build_sheet(job, scores, heat, args.cell, unreal_skip, ref)
     if args.character:
         card = write_character_scorecard(job, scores)
     else:
-        checks = {"scale": scale_checks(art, job),
+        checks = {"scale": scale_checks(art, job, tools),
                   "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
-        card = write_scorecard(job, scores, checks)
+        card = write_scorecard(job, scores, checks, tools)
     print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s · unreal {t3 - t2:.1f}s")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")

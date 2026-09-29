@@ -49,6 +49,7 @@ from PIL import Image
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[2]
+sys.path.insert(0, str(HERE.parent))
 sys.path.insert(0, str(HERE.parent / "scene"))
 sys.path.insert(0, str(REPO / "blender" / "masters"))
 import article  # noqa: E402  (the shared reader: plain XML, no bpy)
@@ -218,6 +219,40 @@ def preview_surface(colour: float | None = None, texture: Path | None = None, ro
     return m
 
 
+# ------------------------------------------------------------------ the mask
+
+MASK_ID = "__mask"
+TEST_MASK = [(1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0)]   # sphere, cube, floor (compare.REGIONS)
+
+
+def mask_colours(job: dict, names: list[str]) -> dict[str, tuple]:
+    given = job.get("mask_colours")
+    if given:
+        return {p.rsplit("/", 1)[1]: tuple(c) for p, c in given.items()}
+    return dict(zip(names, TEST_MASK))
+
+
+def mask_setting(job: dict, names: list[str], furniture: dict) -> dict:
+    """The subjects in flat colours on the unlit Sky master, the furniture black: Unreal's own
+    mask, for a machine where the Blender driver (which writes the rig's mask) is not run."""
+    flat = lambda c: {"master": "Sky", "vectors": {"radiance": list(c)}}  # noqa: E731
+    cols = mask_colours(job, names)
+    return {"id": MASK_ID, "materials": {n: flat(cols[n]) for n in names}
+            | {k: flat((0.0, 0.0, 0.0)) for k in furniture}}
+
+
+def write_mask(raw: Path, png: Path, cols: dict) -> None:
+    """Classify the flat-colour capture into a clean mask: a pixel within 0.1 of a subject's colour
+    is that colour, everything else (the dome, edges) black. Written as the rig's masks are: the
+    colour through a plain sRGB encode."""
+    lin = linear(raw)
+    out = np.zeros(lin.shape, dtype=np.uint8)
+    for c in cols.values():
+        hit = np.all(np.abs(lin - np.array(c)) < 0.1, axis=-1)
+        out[hit] = srgb8(np.array(c, dtype=np.float64))
+    Image.fromarray(out).save(png)
+
+
 # ------------------------------------------------------------------ the Unreal job
 
 def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DOME_K,
@@ -230,19 +265,21 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
     mpt = float(job["article"]["meters_per_tile"])
     makers = {"Sphere": build_scene.sphere, "Cube": build_scene.rounded_cube, "Floor": build_scene.floor}
     meshes = []
-    for prim in job["subjects"]:
-        name = prim.rsplit("/", 1)[1]
+    names = [prim.rsplit("/", 1)[1] for prim in job["subjects"]]
+    for name in names:          # each subject its own slot: the mask colours them apart
         pts, nrm, uvs, idx = makers[name]()
-        meshes.append(write_mesh(meshes_dir, name, pts, nrm, [(s / mpt, t / mpt) for s, t in uvs], idx, "article"))
+        meshes.append(write_mesh(meshes_dir, name, pts, nrm, [(s / mpt, t / mpt) for s, t in uvs], idx, name))
     for name, mesh, mat in (("RulerBlack", build_scene.ruler(True), "ruler_black"),
                             ("RulerWhite", build_scene.ruler(False), "ruler_white"),
                             ("Wall", build_scene.wall(), "wall")):
         meshes.append(write_mesh(meshes_dir, name, *mesh, mat))
     furniture = {"ruler_black": preview_surface(0.02), "ruler_white": preview_surface(0.8),
                  "wall": preview_surface(texture=(build_scene.HERE / build_scene.UVGRID).resolve(), roughness=0.8)}
-    settings = [{"id": s["id"], "materials": {"article": article_material(Path(job["article"]["path"]), s.get("set")),
-                                              **furniture}}
-                for s in job["settings"]] + list(extra_settings or [])
+    settings = []
+    for s in job["settings"]:
+        mat = article_material(Path(job["article"]["path"]), s.get("set"))
+        settings.append({"id": s["id"], "materials": {n: mat for n in names} | furniture})
+    settings += list(extra_settings or []) + [mask_setting(job, names, furniture)]
     views = []
     for spec in job["views"].values():
         pos, rot = TEST_CAMERAS[spec["camera"]]
@@ -321,35 +358,42 @@ def run(job_path: Path) -> None:
             png = out / f"{s['id']}{spec['suffix']}.png"
             Image.fromarray(srgb8(lin)).save(png)
             print(f"unreal: wrote {png}")
+    cols = mask_colours(job, [p.rsplit("/", 1)[1] for p in job["subjects"]])
+    for spec in job["views"].values():
+        write_mask(folder / "raw" / f"{MASK_ID}{spec['suffix']}.pfm", out / f"mask{spec['suffix']}.png", cols)
 
 
 # ------------------------------------------------------------------ calibration
 
-def calibrate(job_path: Path) -> None:
-    """Fit SUN_K and DOME_K on the grey card, against Blender's picture of it.
+def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
+    """Fit SUN_K and DOME_K on the grey card, against a reference tool's picture of it.
 
     One launch renders the job's defaults three ways (sun and dome, sun only, dome only) at
-    factors 1, plus a view straight up into the dome. The dome view gives EXPOSURE_K (an unlit
-    sphere of radiance r reads EXPOSURE_K x r). Unreal's light is linear in each light, so
-    Blender's linear picture over the subjects is fitted as SUN_K x sun-only + DOME_K x dome-only.
+    factors 1, plus a view straight up into the dome and Unreal's own mask. The dome view gives
+    EXPOSURE_K (an unlit sphere of radiance r reads EXPOSURE_K x r). Unreal's light is linear in
+    each light, so the reference's linear picture over the subjects is fitted as
+    SUN_K x sun-only + DOME_K x dome-only. The reference is Storm (USDLiveView's renderer) unless
+    told otherwise: at the Phase05 close Storm and Blender agreed on the grey card to 0.35 dE2000.
     """
     global EXPOSURE_K
+    import compare  # noqa: PLC0415  (tools/parity: the rig's own region reader)
     job = json.loads(job_path.read_text(encoding="utf-8"))
     out = Path(job["out_dir"])
-    ref, mask = out / "blender" / "defaults.png", out / "mask.png"
-    if not ref.is_file() or not mask.is_file():
-        raise SystemExit(f"run the rig on this job first (Blender's {ref.name} and {mask.name})")
+    ref = out / ref_tool / "defaults.png"
+    if not ref.is_file():
+        raise SystemExit(f"run the rig on this job first ({ref} is missing)")
     cmd = find_runtime()
     if cmd is None:
         raise SystemExit("no Unreal runtime (set MATTER_UNREAL_RUNTIME or MATTER_UNREAL_EDITOR)")
     folder = out / TOOL / "calibrate"
     ujob = unreal_job(job, folder, sun_k=1.0, dome_k=1.0)
     spec = json.loads(ujob.read_text(encoding="utf-8"))
-    mats = spec["settings"][0]["materials"]
+    mats, mask_s = spec["settings"][0]["materials"], spec["settings"][-1]
     spec["settings"] = [{"id": "both", "materials": mats},
                         {"id": "sun", "materials": mats, "sky_scale": 0.0},
-                        {"id": "dome", "materials": mats, "sun_scale": 0.0}]
-    spec["views"] = [spec["views"][0], {"suffix": "__sky", "location": [0, 0, 0], "forward": [0, 0, 1],
+                        {"id": "dome", "materials": mats, "sun_scale": 0.0}, mask_s]
+    # the wide view, and one looking straight up from 3 m, where only the dome is in frame
+    spec["views"] = [spec["views"][0], {"suffix": "__sky", "location": [0, 0, 300], "forward": [0, 0, 1],
                                         "up": [1, 0, 0], "fov": 30.0, "near": 2.0, "hide": []}]
     ujob.write_text(json.dumps(spec, indent=1) + "\n", encoding="utf-8")
     run_runtime(cmd, ujob, folder / "unreal.log")
@@ -357,26 +401,30 @@ def calibrate(job_path: Path) -> None:
     raw = folder / "raw"
     sky = read_pfm(raw / "both__sky.pfm")
     EXPOSURE_K = float(sky.mean() / build_scene.DOME_RADIANCE)
+    names = [p.rsplit("/", 1)[1] for p in job["subjects"]]
+    mask = folder / "mask.png"
+    write_mask(raw / f"{MASK_ID}.pfm", mask, mask_colours(job, names))
     both, sun, dome = (linear(raw / f"{k}.pfm") for k in ("both", "sun", "dome"))
-    b8 = np.asarray(Image.open(ref).convert("RGB"), dtype=np.float64) / 255.0
-    blender = np.where(b8 <= 0.04045, b8 / 12.92, ((b8 + 0.055) / 1.055) ** 2.4)
-    m = np.asarray(Image.open(mask).convert("RGB"))
-    on = (m.max(axis=2) > 200) & (blender.max(axis=2) < 0.98)
+    r8 = np.asarray(Image.open(ref).convert("RGB"), dtype=np.float64) / 255.0
+    refl = np.where(r8 <= 0.04045, r8 / 12.92, ((r8 + 0.055) / 1.055) ** 2.4)
+    regions = compare.masks(mask)
+    on = regions["subjects"] & (refl.max(axis=2) < 0.98)
     A = np.stack([sun[on].ravel(), dome[on].ravel()], axis=1)
-    (sun_k, dome_k), *_ = np.linalg.lstsq(A, blender[on].ravel(), rcond=None)
+    (sun_k, dome_k), *_ = np.linalg.lstsq(A, refl[on].ravel(), rcond=None)
     fit = sun_k * sun + dome_k * dome
-    print(f"EXPOSURE_K = {EXPOSURE_K:.5f}   (dome view mean {sky.mean():.5f}, sky spread "
+    print(f"reference  = {ref_tool} ({ref})")
+    print(f"EXPOSURE_K = {EXPOSURE_K:.5f}   (dome view mean {sky.mean():.5f}, spread "
           f"{sky.min():.5f}..{sky.max():.5f})")
     print(f"SUN_K      = {sun_k:.5f}")
     print(f"DOME_K     = {dome_k:.5f}")
-    print(f"at factors 1: Unreal/Blender over the subjects = {both[on].mean() / blender[on].mean():.4f}")
-    for i, name in enumerate(("sphere", "cube", "floor")):
-        sel = m[..., i] > 200
-        sel &= on
+    print(f"subject pixels: {int(on.sum())} of {on.size}")
+    print(f"at factors 1: Unreal / {ref_tool} over the subjects = {both[on].mean() / refl[on].mean():.4f}")
+    for name in ("sphere", "cube", "floor"):
+        sel = regions[name] & on
         if sel.any():
-            print(f"  {name:6s} Blender {blender[sel].mean():.4f}  Unreal fitted {fit[sel].mean():.4f}  "
-                  f"ratio {fit[sel].mean() / blender[sel].mean():.4f}")
-    rel = np.abs(fit[on] - blender[on]) / np.maximum(blender[on], 1e-3)
+            print(f"  {name:6s} {ref_tool} {refl[sel].mean():.4f}  Unreal fitted {fit[sel].mean():.4f}  "
+                  f"ratio {fit[sel].mean() / refl[sel].mean():.4f}")
+    rel = np.abs(fit[on] - refl[on]) / np.maximum(refl[on], 1e-3)
     print(f"fitted relative error over the subjects: median {np.median(rel):.4f}, p95 {np.percentile(rel, 95):.4f}")
 
 
@@ -384,9 +432,11 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("job", type=Path)
     ap.add_argument("--calibrate", action="store_true", help="fit the light factors on this (grey card) job")
+    ap.add_argument("--ref", default="storm", choices=("storm", "blender"),
+                    help="the picture --calibrate fits to (default: storm)")
     a = ap.parse_args(argv)
     try:
-        calibrate(a.job) if a.calibrate else run(a.job)
+        calibrate(a.job, a.ref) if a.calibrate else run(a.job)
     except Unsupported as e:
         raise SystemExit(f"unreal: {e}")
     return 0
