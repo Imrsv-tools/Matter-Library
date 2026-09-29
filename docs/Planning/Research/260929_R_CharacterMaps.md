@@ -1,7 +1,8 @@
 # Research — The maps we have, and how to make characters look their best in Studio (skin, eyes, hair)
 
 **Opened:** 2026-09-29 · **Mode:** research. It gathers and commits to nothing; a phase's discovery rules each question.
-**Mnemonic:** `MAP` (ids `MAP-Fn`, `MAP-Qn`).
+**Mnemonic:** `MAP` (ids `MAP-Fn`, `MAP-Qn`, `MAP-RDn`). **Ruled so far (2026-09-29):** MAP-RD1–RD5 (§Resolved); they
+retire Passes 4–6's picture-per-mesh options for skin and eyes, and contain card hair as the one exception (Pass 7).
 
 **Question (lead, 2026-09-29, verbatim):** *"yesterday phase 66 found issues with hair and shared thoughts... the hair looks
 "OK" now after removing whatever this over specualr thing was .... you need to do soem reserach about the maps we have
@@ -17,6 +18,18 @@ in Matter, fit beside it", Pass 3's inventory, Pass 6b's "neutral-toned albedo-v
 by its paths, issue numbers or commits.
 
 ---
+
+## Resolved — lead decisions (2026-09-29)
+
+Asked and answered in the session that wrote Passes 1–6, after the lead read them. Verbatim.
+
+| # | Decision |
+|---|---|
+| MAP-RD1 | **The library prepares every material and every asset; consumers only consume.** Lead: *"Shouldn't the matter library prepare all materials and Studio just consumes? that way other UE scenarios usig our masters should also be close"*, and *"what needs to travel are parameters.. the libery has all the assets anyone needs"*. An exported character carries **material names and settings only**. This is P20 (Studio adopts the library's Unreal masters) taken to its end: meaning is defined once, by the library, for every renderer. |
+| MAP-RD2 | **No picture that fits only one mesh** (*"no bespoke one image one mesh solutions"*). A library texture that fits any mesh following a known layout, placed by settings, is fine (*"eyes need images to look good"*); a picture painted to one mesh's UV layout is not. This retires, for skin and eyes, every Pass 4–6 option that supplied a mesh's own picture at binding (S-a, S-b, S-c's masks, E-a). |
+| MAP-RD3 | **Card hair is contained as the one exception, and nothing more is invested in cards** (option 1; *"yes 1"*, after *"GAD I hate hair cards... it is like the worst "game engine" fix of all"*). Each hairstyle keeps its own strand picture, as the platform ships it today; the library's hair article stays one general article with the tint. The matte look the lead approved at the platform's sitting is where cards stop. |
+| MAP-RD4 | **Strands are the real hair path, as a phase of their own** (*"and what you say"*, accepting the recommendation). The picture-per-mesh problem does not exist for strands: the hair is geometry and the library ships one material. |
+| MAP-RD5 | **Where the effort goes instead** (the same *"what you say"*): eyes by a **library iris texture placed by the existing `uv_scale` / `uv_offset` settings** (Pass 7); skin stays general and gains what already exists but does not reach Studio (coat, fuzz, glow); the wet eye highlight by **coat first**, not the cornea. |
 
 ## Pass 1 — Where Studio's character stands after the platform's Appearance phase (read 2026-09-29)
 
@@ -116,6 +129,10 @@ Flat 2D swatches, no lighting — a colour-reach test, not a render. Picture: `2
 
 ## Pass 5 — The contract shape these findings point at
 
+> **Retired 2026-09-29 by MAP-RD2 / RD3** (kept for the record). This pass designs a family of maps a mesh supplies at
+> binding. The lead ruled out pictures that fit only one mesh, and contained card hair as the one exception with no
+> further investment, so no such family is built. MAP-F6's fact (a map sampled on `st` outside `place2d`) still holds.
+
 - **MAP-F6 — A mesh-supplied map coexists with the tiled detail on the character's one UV set.** §Cut-out map samples the
   mesh's map **on `st` directly, not through `place2d`**, while the article's tiled textures go through `place2d` and the
   binding's `uv_scale` (≈ 0.0065 on the raw hm08 atlas, the P18 stopgap). So on the Body a hm08 detail map and the 1 cm
@@ -135,6 +152,10 @@ Flat 2D swatches, no lighting — a colour-reach test, not a render. Picture: `2
   raise as an ask, and the same one for every master that takes a map (P20 makes it one master set).
 
 ## Pass 6 — What else would lift each part (by the available maps; options, not decisions)
+
+> **Dispositions 2026-09-29 (§Resolved):** H-a, H-b **retired** (MAP-RD3: no more card work) · H-c kept as recorded ·
+> H-d → strands (MAP-RD4) · S-a, S-b, S-c's masks **retired** (MAP-RD2: hm08-only pictures) · S-d **kept** (MAP-RD5) ·
+> E-a **replaced** by a library iris texture placed by settings (Pass 7) · E-b **kept** (coat first) · E-c answered by Pass 7.
 
 **Hair**
 - **H-a — MODULATE the strand map** (MAP-F2): the library's answer to HS-Q2. Keeps the matte look the lead approved, and
@@ -175,17 +196,66 @@ face and eyes. Phase07 noted the gums read dark maroon in Storm.
 **Outside this library's lane:** Studio's lighting (a character's skin and eyes depend on it as much as on any map) and the
 cards themselves.
 
+## Pass 7 — The direction after the lead's rulings (2026-09-29)
+
+**What separates an allowed image from a bespoke one** (MAP-RD2): not whether there is a picture, but whether it fits
+only one mesh. A **library texture** (the pores, a weave) fits any mesh and ships with the article; only names and settings
+travel (MAP-RD1). A **bespoke picture** is painted to one mesh's UV layout and has to travel with that mesh.
+
+**Eyes: a library iris texture, placed by settings.** An iris is a disc, so one texture fits any eye once two numbers say
+where the disc sits:
+- **The texture:** an iris cut from the CC0 MakeHuman eye pictures (Pass 2: nine colours, CC0 verified in the pack's bytes),
+  centred in a square, in the library's texture tree with provenance, like any other texture. It keeps what the flat
+  article lacks: the radial fibres and the dark limbal ring (Pass 3, MAP-F5).
+- **The placement uses ports the article already has.** `uv_scale` **divides** and `uv_offset` is **subtracted** after it
+  (MaterialX `place2d`, `LCDSchema.md`). For an iris of radius `r` centred at `c` on the eye's UVs, drawn at radius `R`
+  around the texture's centre: **`uv_scale = r ÷ R`**, **`uv_offset = c × R ÷ r − 0.5`**. On MakeHuman's eye (the pupil
+  centres the platform measured, UV `(0.705, 0.700)` and `(0.290, 0.288)`; the iris radius ≈ 0.105 read off the picture,
+  **to be measured at the build**) with `R = 0.45`: `uv_scale ≈ 0.233` for both eyes, `uv_offset ≈ (2.52, 2.50)` and
+  `(0.74, 0.73)`. Each eye is its own mesh (`Iris_L`, `Iris_R`), so each binding carries its own two numbers — the same
+  mechanism as the per-mesh `uv_scale` the platform already writes for the body (P18).
+- **No contract change.** The `Iris` article gains a texture and declares `uv_scale` / `uv_offset`, the ordinary article
+  shape. The **better end state** is an eye mesh whose iris UVs are laid out on the library's disc, so no numbers are needed;
+  until then the settings do it. *(LCDSchema calls the UV ports "a last-mile nudge"; using them as the placement is what P18's
+  stopgap already does. Unverified: that Studio's own masters apply the UV ports as `place2d` does, which LCDSchema requires;
+  checked at the build.)*
+- **The wet look:** coat on `Iris` and `Sclera` (MAP-RD5); it reaches Studio with P16.
+- **Optional, same mechanism:** a sclera texture (veins radiating from the iris), placed by the same two numbers.
+
+**Card hair: contained, as it is** (MAP-RD3). The platform keeps each hairstyle's own picture (it replaces the colour; the
+tint multiplies after). **The known consequence, recorded so it is not later read as a defect:** MAP-F2 stands — on nine
+of ten styles the tint only darkens the painted colour, so blonde and red are out of reach except on `bob02`; and the
+brows and lashes probably do not take the tint (MAP-F3). The HS asks (HS-Q1–Q5: the library declaring the strand map so
+USD viewers and Blender draw it) are **not pursued** under MAP-RD3.
+
+**Strands: the real hair path** (MAP-RD4). What it needs, from the platform's sizing (2026-09-28; recheck when the platform
+next opens hair):
+- **Unreal:** it cannot build a groom from strand data outside the editor, so a **runtime groom builder** (engine pieces
+  exist, unused that way; unproven) — a disposable spike first; a strand source (the CC0 pack has cards only); Stage
+  carrying curves; a VR frame-cost check. All platform-side.
+- **The library:** one strand hair material. Its fibre model (MaterialX `chiang_hair_bsdf`, Blender's Principled Hair,
+  Unreal's strands) is not `open_pbr_surface`, so it needs the lead to reopen Decision of record 1. Storm drawing
+  `chiang_hair_bsdf` is still unverified (CM Pass 4).
+
+**Skin: stays general** (MAP-RD2, RD5): tone, tiled pores, scatter, coat and fuzz, on any body. What lifts it in Studio is
+already authored and does not arrive yet: coat and fuzz (P16), the glow's calibration, and Studio adopting the library's
+masters (P20).
+
 ## Open questions
 
 | # | Question | Why it matters | Research reading |
 |---|---|---|---|
-| MAP-Q1 | **Replace or modulate** for a mesh-supplied colour map (HS-Q2)? | Replace breaks "one hair material, any colour" on 9 of 10 styles (MAP-F2) and would erase the six tones on skin | Modulate, with a normalised map (MAP-F8) |
-| MAP-Q2 | **Who normalises the maps**, and what are the files called? | The graph cannot (MAP-F8); the platform's generator already writes `<mesh>_color.png` | The mesh's writer; names ruled with HS-Q6 |
-| MAP-Q3 | **One input family or one input per role** (hair shade, skin detail, eye structure, thickness, a normal)? | Each input is a contract addition in every tool (the token lived in eight sites, F-P08-2) | One colour-modulating input shared by Hair, Subsurface and Opaque, plus a normal and a scalar later |
-| MAP-Q4 | **Which skin atlas, and at what strength?** | Atlases carry baked shading and, for some, stubble; the body is one hm08 mesh | One neutral atlas per sex; strength judged on the rig's face view |
-| MAP-Q5 | **Eyes: modulate one picture, or choose among nine?** | Any colour vs nine photographed irises | Modulate (keeps the one-article-per-colour model); nine as a mesh-side choice is also cheap |
-| MAP-Q6 | **Coat on the eye parts, or revisit the cornea?** | No wet highlight in Studio today | Coat first (no new geometry) |
-| MAP-Q7 | Brows and lashes: confirm in Studio whether the tint moves them with black colour maps (MAP-F3) | The lead's *"brows and lashes follow the hair tint"* ruling | Resolves with MAP-Q1 |
+| ~~MAP-Q1~~ | ~~Replace or modulate~~ | — | **Retired by MAP-RD3** (no card investment; the platform's replace stays) |
+| ~~MAP-Q2~~ | ~~Who normalises the maps~~ | — | **Retired by MAP-RD2 / RD3** (no mesh-supplied maps are built) |
+| ~~MAP-Q3~~ | ~~One input family or one per role~~ | — | **Retired by MAP-RD2** |
+| ~~MAP-Q4~~ | ~~Which skin atlas, at what strength~~ | — | **Retired by MAP-RD2** (hm08-only pictures) |
+| MAP-Q5 | **The library iris: one light iris the tint takes to each colour, or one article per colour from the nine pictures?** | A light, neutral iris reaches any colour darker than itself (F-P08-1), but real irises differ in **pattern** too: brown is dense, blue shows fibres and crypts, hazel has a ring of a second colour round the pupil | One light iris with the tint (the hair and fabric model, RD-P08-5), plus a second article only where a pattern differs; judged on the rig's face view |
+| ~~MAP-Q6~~ | ~~Coat on the eye parts, or the cornea~~ | — | **Ruled MAP-RD5: coat first** |
+| MAP-Q7 | Brows and lashes: do they take the hair tint in Studio with black pictures (MAP-F3)? | The lead ruled at the platform's sitting that they follow the tint | A platform check; under MAP-RD3 the library builds nothing for it |
+| MAP-Q8 | **Iris placement: two settings per eye now, or an iris UV layout the eye mesh follows?** | Settings work today; a layout needs the platform to re-lay the eye | Settings now, the layout when the platform next rebuilds the eye |
+| MAP-Q9 | **Seed the strands phase, and who runs its first spike** (a runtime groom in Unreal, platform-side)? | MAP-RD4 | The lead's call; the spike decides whether the phase is real |
+| MAP-Q10 | **Reopen Decision of record 1 for a strand hair material?** | A fibre model is not `open_pbr_surface` | The lead's call, at the strands phase |
+| MAP-Q11 | **Matter-Library#3** (declare `strand_color_map`): close as not pursued under MAP-RD3? | The issue is open and public | The lead's call |
 
 ## Reproduction
 
@@ -205,17 +275,21 @@ repo was written by either; the scratch in `/tmp` is torn down.
 ## Status
 
 - **Passes captured (2026-09-29):** 1 — Studio's character after the platform's Appearance phase; 2 — the map inventory;
-  3 — what the pictures carry; 4 — the replace/modulate probe; 5 — the contract shape; 6 — per-part options.
-- **Decided:** nothing.
-- **Current direction (the research's reading, not a ruling):** the maps we have are **pictures**, and the character's
-  best available look comes from supplying them at binding and reading them as **structure that modulates the library's
-  articles** — hair strands, skin detail, the eye's iris and veins — beside the library's tiled detail on the same UVs.
-  That keeps D1 (no mesh pixels in an article), keeps the tint reaching every colour, and answers HS-Q2 and Matter-Library#3
-  in one design.
-- **Unverified, recorded as such:** every probe result is flat 2D colour, not a lit render (the rig and Studio judge the
-  look); MAP-F3's brows in Studio; that a second `filename` input on Subsurface and Opaque reaches Storm as `cutout_map`
-  does on Masked (measured for Masked only, 2026-09-27); Unreal's master accepting a multiply (consumer-side).
-- **Open questions:** MAP-Q1–Q7; HS-Q1–Q6 still open, and MAP-Q1 is HS-Q2's answer if ruled.
-- **Next step:** parked. The sequence it proposes is one phase, unnumbered — **Character Maps**: (1) hair modulate
-  (answers Matter-Library#3), (2) eyes, (3) skin detail, (4) skin thickness — each seen on the rig's character sheet and then
-  in Studio. The lead decides whether to seed it; the Roadmap's *Hair That Reads as Hair* entry is its nearest neighbour.
+  3 — what the pictures carry; 4 — the replace/modulate probe; 5 — the contract shape (retired); 6 — per-part options
+  (dispositioned); 7 — the direction after the lead's rulings.
+- **Decided (lead, 2026-09-29):** **MAP-RD1** the library prepares every material and asset, consumers only consume, and
+  only names and settings travel · **MAP-RD2** no picture that fits only one mesh · **MAP-RD3** card hair contained as the
+  one exception, nothing more invested in cards · **MAP-RD4** strands are the real hair path, as their own phase ·
+  **MAP-RD5** eyes by a library iris texture placed by settings, skin stays general, coat first for the wet eye.
+- **Current direction:** **eyes** — a library iris texture cut from the CC0 pictures, placed on each eye by `uv_scale` /
+  `uv_offset` (Pass 7), with coat on iris and sclera; **skin** — general, lifted by what already exists reaching Studio
+  (P16, P20, the glow's calibration); **hair** — cards stay as they are (with MAP-F2's known limit), strands as a phase.
+- **Unverified, recorded as such:** every probe result is flat 2D colour, not a lit render; MAP-F3's brows in Studio; the
+  iris radius (≈ 0.105, read off the picture, measured at the build); that Studio's own masters apply the UV ports as
+  `place2d` does; a runtime groom in Unreal (platform sizing, 2026-09-28: unproven).
+- **Open questions:** MAP-Q5, Q7–Q11 (Q1–Q4 retired, Q6 ruled). The HS asks (HS-Q1–Q6) are not pursued under MAP-RD3;
+  closing Matter-Library#3 is MAP-Q11.
+- **Next step:** parked. **The eye is buildable in one sitting as a `/quick-fix`:** cut the iris texture from the CC0 pack
+  (with provenance), re-author `Iris_*` with it and the two UV ports plus a coat, add coat to `Sclera_Natural`, and give the
+  rig's character job the two numbers per eye, seen on the rig's face view and in Blender. **Strands** would be a phase
+  (MAP-Q9), seeded only on the lead's word; the Roadmap's *Hair That Reads as Hair* entry points here.
