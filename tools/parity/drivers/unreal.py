@@ -78,11 +78,12 @@ DOME_K = 1.011
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
 JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers carry a tangent sign)
-BUILT_MASTERS = {"Opaque", "TwoLayer"}
+BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
+                 "TranslucentThick"}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
-# 6.4: TwoLayer's layer 2)
+# 6.4: TwoLayer's layer 2, Masked's opacity)
 IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
-               "layer2_base_color", "layer2_roughness", "layer2_metalness", "layer2_normal")
+               "layer2_base_color", "layer2_roughness", "layer2_metalness", "layer2_normal", "opacity")
 LAYER_ROLES = ("maskset", "overlay1", "overlay2", "overlay3")     # tiled, each at its own size
 TEXTURE_ROLES = set(IMAGE_ROLES) | set(LAYER_ROLES)
 COLOUR_ROLES = {"base_color", "layer2_base_color"}   # decoded from sRGB when the article says so
@@ -90,15 +91,19 @@ COLOUR_ROLES = {"base_color", "layer2_base_color"}   # decoded from sRGB when th
 # where the article binds the texture instead
 LAYER_CONSTANTS = (("base_color", "base_color"), ("roughness", "specular_roughness"),
                    ("metalness", "base_metalness"), ("layer2_base_color", "layer2_base_color"),
-                   ("layer2_roughness", "layer2_roughness"), ("layer2_metalness", "layer2_metalness"))
+                   ("layer2_roughness", "layer2_roughness"), ("layer2_metalness", "layer2_metalness"),
+                   ("opacity", "geometry_opacity"))
 SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend",
            "overlay1_density", "overlay2_density", "overlay3_density",
-           "layer_blend_balance", "layer_blend_contrast"}
+           "layer_blend_balance", "layer_blend_contrast", "opacity_cutoff"}
 FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal map
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
                 "specular_color", "specular_ior", "specular_roughness_anisotropy", "coat_weight",
-                "coat_color", "coat_roughness", "coat_ior", "fuzz_weight", "fuzz_color", "fuzz_roughness"}
+                "coat_color", "coat_roughness", "coat_ior", "fuzz_weight", "fuzz_color", "fuzz_roughness",
+                "emission_luminance", "emission_color", "subsurface_weight", "subsurface_color",
+                "subsurface_radius", "subsurface_radius_scale", "subsurface_scatter_anisotropy",
+                "transmission_weight", "transmission_color", "transmission_depth"}
 LINEAR_SPACES = {"lin_rec709", "raw", None}
 
 

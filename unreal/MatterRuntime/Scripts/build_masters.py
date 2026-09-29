@@ -30,6 +30,7 @@ EAL = unreal.EditorAssetLibrary
 TOOLS = unreal.AssetToolsHelpers.get_asset_tools()
 ROOT = "/Game/Masters"
 FN_OPAQUE = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque"
+FN_TRANSLUCENT = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Translucent"
 
 # OpenPBR's defaults (MaterialX open_pbr_surface) for the lane-A inputs a master passes straight
 # through to Epic's function, under their own names. The network's inputs (base colour,
@@ -44,10 +45,35 @@ PASS_THROUGH = {
     "fuzz_weight": 0.0, "fuzz_color": (1.0, 1.0, 1.0), "fuzz_roughness": 0.5,
 }
 
-# MasterSet §Material-settings intent (normative): coverage, shading model, two-sided.
-SETTINGS = {
-    "Opaque": ("opaque", False),
-    "TwoLayer": ("opaque", False),      # default lit: two real layers, never a clearcoat
+# Lane-A inputs a master passes through beyond PASS_THROUGH, at OpenPBR's defaults.
+EMISSION = {"emission_luminance": 0.0, "emission_color": (1.0, 1.0, 1.0)}
+SUBSURFACE = {"subsurface_weight": 0.0, "subsurface_color": (0.8, 0.8, 0.8), "subsurface_radius": 1.0,
+              "subsurface_radius_scale": (1.0, 1.0, 1.0), "subsurface_scatter_anisotropy": 0.0}
+TRANSMISSION = {"transmission_weight": 0.0, "transmission_color": (1.0, 1.0, 1.0), "transmission_depth": 0.0}
+# Inputs the master scales, keeping the article's name and value (D5):
+# * an article's lengths are metres (the rig's scene, JOB_FORMAT §Units); Unreal's are cm;
+# * emission: Epic's function renders emission_luminance x emission_color at 0.798 of the radiance
+#   OpenPBR defines (Storm renders it exactly; the capture reads unlit emission exactly, EXPOSURE_K
+#   0.999). Measured 2026-09-29 (6.4) on Neon's dim view, float captures: 0.798 on every region,
+#   the same with one call or two and with specular_weight 1 or 0, so it is the function's own.
+SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0, "emission_luminance": 1.0 / 0.798}
+
+# Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
+#   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
+#            (OpenPBR's linear metal mix, 6.3), on the masters that carry metal; 1 on the ones
+#            whose articles are dielectric by definition (Epic's single call is exact at metalness
+#            0), which also keeps their Substrate bytes down
+#   thin     geometry_thin_walled, a property of the master (its settings row), not a parameter
+MASTERS = {
+    "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False),
+    "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
+    "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True),
+    "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
+    "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE),
+    "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
+                             extra=TRANSMISSION, thin=True),
+    "TranslucentThick": dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
+                             extra=TRANSMISSION, thin=False),
 }
 
 OVERLAYS = (1, 2, 3)
@@ -214,9 +240,10 @@ def texture(g, name, default, uv, col):
     return t
 
 
-def build_opaque_core(token, white, no_wear, flat, layer2=False):
-    """The Opaque core (and, with ``layer2``, TwoLayer: the same core with a second layer mixed
-    in by the maskset's R before the tint), MaterialX's formulas as in
+def build_master(token, white, no_wear, flat):
+    """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
+    TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
+    the pass-through inputs, the coverage), MaterialX's formulas as in
     ``blender/masters/build_masters.py`` ``_build``:
 
     * base_color_tinted: base_color x base_color_tex x base_color_tint (the article sets one of
@@ -230,9 +257,11 @@ def build_opaque_core(token, white, no_wear, flat, layer2=False):
       maskset_blend) (MasterSet §Overlay semantic, §MaskSet).
     """
     M = unreal
+    spec = MASTERS[token]
+    layer2 = spec.get("layer2", False)
     mat = fresh(f"M_Matter_{token}")
     g = Graph(mat)
-    fn = unreal.load_asset(FN_OPAQUE)
+    fn = unreal.load_asset(spec["fn"])
     # OpenPBR's base is a LINEAR mix of the dielectric and metal lobes by metalness. Epic's
     # function mixes them by blending parameters (its "Is Metal?" mix), which reads 0 < metalness
     # < 1 wrong (Copper's floor x1.16 / x1.31). So: two calls, metalness 0 (dielectric) and 1
@@ -240,7 +269,7 @@ def build_opaque_core(token, white, no_wear, flat, layer2=False):
     # parameter blending off (Phase06 6.3, the lead's ruling "c then b"). It needs Substrate's
     # 160-byte budget (Config/DefaultEngine.ini), or the compiler flattens each coat to fit.
     calls = []
-    for col in (1, 2):
+    for col in range(1, spec["calls"] + 1):
         c = g.node(M.MaterialExpressionMaterialFunctionCall, col)
         c.set_material_function(fn)
         calls.append(c)
@@ -300,8 +329,11 @@ def build_opaque_core(token, white, no_wear, flat, layer2=False):
 
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
     feed(base, "base_color")
-    for c, m in zip(calls, (0.0, 1.0)):
-        g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
+    if len(calls) == 2:
+        for c, m in zip(calls, (0.0, 1.0)):
+            g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
+    else:
+        feed(metal, "base_metalness")
 
     for n in OVERLAYS:
         ov = texture(g, f"overlay{n}_tex", no_wear, image_uv(g, placed, 15, f"overlay{n}"), 12)
@@ -326,27 +358,62 @@ def build_opaque_core(token, white, no_wear, flat, layer2=False):
     feed(normal, "geometry_normal")
 
     missing = []
-    for name, default in PASS_THROUGH.items():
+    for name, default in {**PASS_THROUGH, **spec.get("extra", {})}.items():
         if name not in inputs:
             missing.append(name)
             continue
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
+        if name in SCALED:
+            p = g.op_k(M.MaterialExpressionMultiply, p, SCALED[name], 5)
         feed(p, name)
     if missing:
         raise RuntimeError(f"{token}: Epic's function has no input {missing}")
+    if "thin" in spec:
+        feed(g.node(M.MaterialExpressionConstant, 2, r=1.0 if spec["thin"] else 0.0), "geometry_thin_walled")
 
-    outs = list(MEL.get_material_expression_output_names(calls[0]))
+    outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
     front = next(o for o in outs if "front" in o.lower())
-    mix = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
-    mix.set_editor_property("use_parameter_blending", False)
-    g.link(calls[0], mix, "Background", front)
-    g.link(calls[1], mix, "Foreground", front)
-    g.link(metal, mix, "Mix")
-    if not MEL.connect_material_property(mix, "", unreal.MaterialProperty.MP_FRONT_MATERIAL):
-        raise RuntimeError(f"{token}: cannot connect the metalness mix to the front material")
-    blend, two_sided = SETTINGS[token]
-    mat.set_editor_property("blend_mode", {"opaque": unreal.BlendMode.BLEND_OPAQUE}[blend])
-    mat.set_editor_property("two_sided", two_sided)
+    if spec.get("opacity"):
+        # Masked (MasterSet: alpha-tested at the cutoff): coverage = geometry_opacity x
+        # opacity_tex, through Epic's function; kept where coverage >= opacity_cutoff, which a
+        # fixed clip of 0.5 does on (coverage - cutoff + 0.5). The mesh's cutout_map is 6.5's.
+        cov = g.op(M.MaterialExpressionMultiply, g.scalar("geometry_opacity", 1.0),
+                   texture(g, "opacity_tex", white, uv, 12), 11, b_out="R")
+        feed(cov, "geometry_opacity")
+        clip = g.op_k(M.MaterialExpressionAdd,
+                      g.op(M.MaterialExpressionSubtract, calls[0], g.scalar("opacity_cutoff", 0.5, col=3), 2,
+                           a_out="OpacityMask"), 0.5, 1)
+        if not MEL.connect_material_property(clip, "", unreal.MaterialProperty.MP_OPACITY_MASK):
+            raise RuntimeError(f"{token}: cannot connect the opacity mask")
+        mat.set_editor_property("opacity_mask_clip_value", 0.5)
+    if len(calls) == 2:
+        top = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
+        top.set_editor_property("use_parameter_blending", False)
+        g.link(calls[0], top, "Background", front)
+        g.link(calls[1], top, "Foreground", front)
+        g.link(metal, top, "Mix")
+        top_out = ""
+    else:
+        top, top_out = calls[0], front
+    if not MEL.connect_material_property(top, top_out, unreal.MaterialProperty.MP_FRONT_MATERIAL):
+        raise RuntimeError(f"{token}: cannot connect the front material")
+    if spec["blend"] == "translucent":
+        # refraction by the index of refraction (MasterSet: TranslucentThin / Thick)
+        ior = next(o for o in outs if "refraction" in o.lower())
+        if not MEL.connect_material_property(calls[0], ior, unreal.MaterialProperty.MP_REFRACTION):
+            raise RuntimeError(f"{token}: cannot connect the refraction")
+        mat.set_editor_property("refraction_method", unreal.RefractionMode.RM_INDEX_OF_REFRACTION)
+        # lit per pixel, forward: the default translucency lighting is volumetric and carries no
+        # specular, so glass only darkened what is behind it (6.4: no dome reflection, no glints)
+        mat.set_editor_property("translucency_lighting_mode",
+                                unreal.TranslucencyLightingMode.TLM_SURFACE_PER_PIXEL_LIGHTING)
+    mat.set_editor_property("blend_mode", {
+        "opaque": unreal.BlendMode.BLEND_OPAQUE, "masked": unreal.BlendMode.BLEND_MASKED,
+        # Substrate's translucency with coloured transmittance: green glass filters what is behind
+        "translucent": unreal.BlendMode.BLEND_TRANSLUCENT_COLORED_TRANSMITTANCE}[spec["blend"]])
+    mat.set_editor_property("two_sided", spec["two_sided"])
+    if spec.get("thin"):
+        mat.set_editor_property("is_thin_surface", True)
     return mat
 
 
@@ -374,8 +441,7 @@ def main():
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
-    for mat in (build_opaque_core("Opaque", white, no_wear, flat),
-                build_opaque_core("TwoLayer", white, no_wear, flat, layer2=True), build_sky()):
+    for mat in [build_master(t, white, no_wear, flat) for t in MASTERS] + [build_sky()]:
         save(mat)
     log("RESULT ok")
 
