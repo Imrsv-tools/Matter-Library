@@ -3,7 +3,7 @@
 **Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). No `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
 - **Seeded** 2026-09-26 from `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (Passes 7, 8). Numbered by the lead the same day.
 - **Opened** 2026-09-29 (lead: *"push it and start /discovery Phase06"*), after `260929_R_UnrealTestRuntimeHere.md` (the plan, UR-D1–D3) and `260929_R_Spike_UnrealRuntime.md` (probes 1–3 passed).
-- **Runs on this machine, the UE machine** (UR-D1, lead: *"yes run it here"*). The other machine, where Phases 05, 07 and 08 were built, has no Unreal. It pulls the package and tests it (UR-D3).
+- **Runs on this machine, the UE machine** (UR-D1, lead: *"yes run it here"*). The other machine, where Phases 05, 07 and 08 were built, has no Unreal. It pulls the repo and tests the package, which the repo pins and the driver downloads from a GitHub Release (UR-D3 as amended, D2).
 
 ## Outcome
 
@@ -11,7 +11,7 @@
 
 Concretely, at close:
 - `rig.py <article>` fills the sheet's Unreal column for the 11-article test set and for the character job, and its scorecard reads how each slider moved Unreal.
-- The pictures come from a packaged Unreal 5.8 app (Substrate on) that lives **in this repo**, so the other machine pulls it and renders the column with no Unreal installed.
+- The pictures come from a packaged Unreal 5.8 app (Substrate on) that is **published with this repo as a GitHub Release** and pinned by a small tracked file, so the other machine pulls the repo, the driver downloads the pinned build, and it renders the column with no Unreal installed.
 - Its 8 masters are the ones Studio will adopt (`PlatformDependencies.md` P20).
 
 ## The Brief
@@ -39,13 +39,13 @@ Concretely, at close:
 - **What the lead opens:** `rig.py --character` sheets for two skin tones.
 - **What the lead judges:** skin, eyes, mouth, nails, clothes and hair in Unreal's column, with no default grey and no magenta. The hair is matte and the eyes are today's articles on the rig's eye, which still has its cornea shell (MAP-F12). Both improve in Phase09.
 
-**Click 6 — the close.** The other machine pulls the final package and renders the Unreal column for one sweep sheet and one character sheet.
+**Click 6 — the close.** The other machine pulls the repo (its pin names the final package) and renders the Unreal column for one sweep sheet and one character sheet.
 
 ### In now
 
 - **The Unreal project, in this repo at `unreal/`,** as the peer of `blender/`. It is built from scripts: the C++ runtime, config, and the Python that builds the masters, the scene and the dome. No hand-made `.uasset` is committed; the probe proved every asset regenerates (UR-F5).
 - **One command builds the package from scratch:** the editor target, the masters, the scene, the cook, and a stripped Shipping build. It runs on any machine with Unreal 5.8, with capped jobs and `nice`.
-- **The package, in this repo through Git LFS** (UR-D3). It is the Shipping build, with no debug symbols, no Vulkan debug layers and unused plugins off.
+- **The package, published as a GitHub Release asset on this repo** (D2). It is the Shipping build, with no debug symbols, no Vulkan debug layers and unused plugins off, packed as one archive under GitHub's 2 GiB per-file limit. A tracked pin file, `unreal/RUNTIME.json` (tag, file name, sha256), says which build the repo uses.
 - **The 8 masters** (MasterSet): Opaque, TwoLayer, Masked, Hair, Emissive, TranslucentThin, TranslucentThick and Subsurface. Each wraps Epic's `MF_Substrate_OpenPBR_{Opaque,Translucent}` and is built out with our own network around it (§Decisions that bind, D6).
 - **The Unreal driver,** `tools/parity/drivers/unreal.py`, which implements `JOB_FORMAT.md` for both job shapes (the test scene and the character).
 - **The rig gains its third column:** `rig.py` runs the Unreal driver when a runtime is present. The sheet shows Unreal's pictures, and the scorecard reports how each slider moved Unreal, beside Storm and Blender.
@@ -55,7 +55,8 @@ Concretely, at close:
   - `JOB_FORMAT.md` gains the Unreal driver's notes;
   - MasterSet and Consumers now say where the Unreal masters are built: here (P20);
   - a new `docs/Learnings/Unreal/` domain, from UR-F4–F10;
-  - `PlatformDependencies.md` P20 gets where Studio takes the masters from.
+  - `PlatformDependencies.md` P20 gets where Studio takes the masters from;
+  - `NamingConventions.md` gains the `unreal-runtime-vN` tag series (D2).
 
 ### Not now
 
@@ -86,7 +87,7 @@ Concretely, at close:
 | # | Decision | Source |
 |---|---|---|
 | D1 | Runs on this machine, the UE machine. **Ask the lead before each GPU launch.** Before any launch, check for a running Unreal and name its owner; never touch the IMRSV project. | UR-D1, UR-D2; research Pass 4 |
-| D2 | **Everything lives in this repo, the executable included:** the package goes through Git LFS, so the other machine pulls and tests it. | UR-D3 |
+| D2 | **Everything is in this repo; the executable is published with it as a GitHub Release asset, not committed.** The repo tracks `unreal/RUNTIME.json` (the tag, the asset's name and its sha256). On first use the driver downloads that asset over plain HTTPS (the repo is public, so no login is needed), checks the sha256 and unpacks it into the git-ignored `unreal/package/`. Pulling the repo is still all the other machine does. Tags are their own series, **`unreal-runtime-vN`** (N = 1, 2, …), marked **pre-release** so they never show as the repo's "Latest" and never collide with the library's `matterlib-X.Y.Z` releases. An old build is deleted by deleting its release. | UR-D3 as amended, lead 2026-09-29: *"yes use GitHub Releases"*, after GitHub's docs: LFS objects cannot be deleted without deleting the repository, while releases have *"no limit on the total size of a release, nor bandwidth usage"* |
 | D3 | **A standalone packaged runtime is the deliverable.** Running the same project in the editor is the development loop. | BP7; UR Pass 5 |
 | D4 | **These are Studio's masters.** Build them as the shared masters: Unreal's best feature per master, never a test-only stand-in. | P20, lead 2026-09-28: *"yes, Studio adopts the library masters, record it"* |
 | D5 | **Parameter names are the article's names**: OpenPBR's for lane A, the frozen Creator ports, and the author-tier names (`opacity_cutoff`, `layer2_*`, `layer_blend_*`, `cutout_map`). Studio aligns to them (P20). *(The platform's snake/Pascal split was consumer-side and does not bind the library's masters.)* | LCDSchema: *"Names use OpenPBR-aligned terms so the same word means the same thing in MaterialX, the Unreal instance param, and the Blender node-group input"* |
@@ -97,18 +98,15 @@ Concretely, at close:
 | D10 | **The dome is not a hand-written flat `.hdr`.** Storm misread one (learning S2), and the probe's own 2.5× over-brightness (UR-F10) may be the same trap. Generate the cubemap from a format read exactly (EXR), and verify its value in Unreal before calibrating. | Storm S2; UR-F10 |
 | D12 | **The Hair master is matte on cards.** It is default lit with no specular sheen, not Unreal's hair shading model, which reads a flat card as one glossy sheet. Its coverage is soft and dithered, per the MasterSet row. The hairstyle's picture shading the article's light colour (modulate) is Phase09's input; the master takes it when Phase09 lands. | MAP-RD3, lead: *"yes on hair"*; *"The matte look the lead approved at the platform's sitting is where card quality stops"* |
 | D13 | **The eye and the hair picture belong to Phase09, including their Unreal side, built in this phase's `unreal/` project.** Phase06 builds the 8 masters and the column that Phase09 then judges on. | Phase09 seed §Scope In: *"The `Eye` token and its settings row; its Unreal side where the library's Unreal masters are built"*; MAP-RD6 |
-| D14 | **A package version goes through LFS twice: at 6.2 and at the close.** A master change in between does not push a package; the other machine renders from the newest pushed one. | Lead, 2026-09-29: *"yes and 6.2 and close (not every master change)"* |
+| D14 | **A package is published twice: at 6.2 (`unreal-runtime-v1`) and at the close.** A master change in between publishes nothing; the other machine renders from the build the pin names. | Lead, 2026-09-29: *"yes and 6.2 and close (not every master change)"* |
 | D11 | **A capture waits for the material to be ready,** by a signal that works. The probe caught Unreal's default material once, and `IsGameThreadShaderMapComplete` did not work as a signal (UR-F7). The package precompiles its shaders, so the risk is mostly in editor mode. | UR-F7 |
 
 ### Risk lane: `build` (verified)
 
-- **Controls read.** `tools/validators/run_all.py` and `tools/releases/*` enumerate only their own roots: `MatterLibrary/materials/**/*.mtlx`, `library/releases/*`, `tools/converters/recipes/*.json` and the staged `*.dds`. A new `unreal/` root, and LFS files under it, are in none of them.
+- **Controls read.** `tools/validators/run_all.py` and `tools/releases/*` enumerate only their own roots: `MatterLibrary/materials/**/*.mtlx`, `library/releases/*`, `tools/converters/recipes/*.json` and the staged `*.dds`. A new `unreal/` root is in none of them, and the package is not in the tree at all (D2).
 - **Nothing touches authorization, secrets, data or the public web.** The phase adds tooling and one binary, both under Apache-2.0.
-- **The one account-side entry path is GitHub LFS on the organisation's Team plan,** measured with `gh api orgs/Imrsv-tools/settings/billing/usage` (2026-09-29):
-  - about 43 GB stored (29–32k GB-hours a month) and 14–15 GB of downloads a month, across the organisation;
-  - August went over the included allowance (net $4.29); July and September were $0;
-  - one ~620 MB package version adds about $0.04 a month of storage, and each pull about $0.05.
-  - Pushing it is public and irreversible, so how often a package is pushed is the lead's call: D14.
+- **The one account-side entry path is GitHub Releases on this public repo** (D2). Release assets carry no storage or bandwidth charge (GitHub docs, fetched 2026-09-29), unlike the organisation's LFS, which is metered and went over its allowance in August (net $4.29; `gh api orgs/Imrsv-tools/settings/billing/usage`).
+  - Publishing a release is public (it can be deleted, but may already be downloaded), so how often a package is published is the lead's call: D14. Creating the release needs `gh` with write access on this machine.
 - **The test surface:** the existing gate (`run_all.py`), the rig's own runs (the smoke is the sheet), and one check: the shared article reader gives Blender the same values after the move. No new gate.
 
 ### Step list
@@ -121,8 +119,8 @@ Concretely, at close:
   - `drivers/unreal.py` and the rig's third column.
   - **First clickable result:** click 1.
 - **6.2 — The package, pulled on the other machine.**
-  - The one-command build; a stripped Shipping package in `unreal/package/` through LFS.
-  - The driver uses the package by default, and editor mode on request.
+  - The one-command build; a stripped Shipping package published as `unreal-runtime-v1`, and the pin `unreal/RUNTIME.json` committed.
+  - The driver downloads and verifies the pinned package on first use, then runs it; editor mode on request.
   - **First clickable result:** click 2. *(Early by design: it proves the lead's portability ask before the masters grow. The next pushed version is the close's (D14).)*
 - **6.3 — The Opaque master in full, with textures and sliders.**
   - Textures load at run time with the right colour settings; `place2d`; the normal; the three overlays and the mask set, each at its own scale; the roughness bias.
@@ -134,7 +132,7 @@ Concretely, at close:
   - `bindings`, `cutout_map`, the per-view `hide`, and the setting scene's `st`.
   - The Hair master, matte on cards (D12).
   - **First clickable result:** click 5.
-- **Close.** The final package through LFS (click 6), then the docs listed in §In now.
+- **Close.** The final package published and pinned (click 6), then the docs listed in §In now.
 
 **Reconciled against the test:**
 - Click 1 needs only 6.1: a flat grey card uses no textures and no sliders.
@@ -151,11 +149,11 @@ Concretely, at close:
   - `MatterRuntime.uproject`; `Config/` (Substrate on with Adaptive GBuffer, Vulkan SM6, GI and reflections off, `r.PSOPrecache.ProxyCreationStrategy=0`, shader threads capped);
   - `Source/MatterRuntime/`: the probe's GameMode, grown to read an "Unreal job" JSON (per setting and view: camera, subjects, materials with their master token, parameters and textures, the colour space of each, and `hide`), and to write one float image per setting and view;
   - `Scripts/`: `build_masters.py` (one builder shared by the 8 masters), `build_scene.py` (commandlet USD import of `test_scene.usda` and `character_scene.usda`), `build_env.py` (the dome).
-- **`unreal/build.sh`:** editor target → masters → scene → `BuildCookRun` (Shipping, `-MaxParallelActions=8`, `nice`) → strip → `unreal/package/Linux/`.
-- **`.gitattributes`:** `unreal/package/** filter=lfs`. **`.gitignore`:** the project's `Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/` and its generated `Content/`.
+- **`unreal/build.sh`:** editor target → masters → scene → `BuildCookRun` (Shipping, `-MaxParallelActions=8`, `nice`) → strip → archive `MatterRuntime-Linux-unreal-runtime-vN.tar.gz`. A separate `unreal/publish.sh vN`: `gh release create unreal-runtime-vN --prerelease` with the archive, then write `unreal/RUNTIME.json`. Publishing is its own command, run at 6.2 and at the close (D14).
+- **`.gitignore`:** `unreal/package/` (the downloaded build), and the project's `Binaries/`, `Intermediate/`, `Saved/`, `DerivedDataCache/` and generated `Content/`. No `.gitattributes` change: nothing new goes through LFS.
 - **`tools/parity/drivers/unreal.py`:**
   - turns the job into the Unreal job, using the shared reader;
-  - finds the runtime from `$MATTER_UNREAL_RUNTIME`, then the repo's `unreal/package/Linux/MatterRuntime.sh`, or editor mode from `$MATTER_UNREAL_EDITOR`;
+  - finds the runtime from `$MATTER_UNREAL_RUNTIME`; else the pinned package, downloading it first if `unreal/package/` lacks it or its sha256 differs; or editor mode from `$MATTER_UNREAL_EDITOR`;
   - runs it with `env -u DISPLAY -u WAYLAND_DISPLAY`, then turns each float image into an 8-bit sRGB PNG (exposure applied, box-filtered).
 - **The shared reader:** `read()` / `ArticleData` move out of `blender/masters/load_article.py` into a module that does not import `bpy`. `load_article.py` imports it back. `tools/conformance/check_exporter.sh` is baselined before the edit (the LOCAL_DELTAS "RUN" row) if the move touches `blender/`.
 - **`tools/parity/rig.py`:**
@@ -179,7 +177,7 @@ Concretely, at close:
 - the learnings: MaterialX M1–M4, Blender B6/B7, Storm S1/S2/S4/S5;
 - `ToolingConventions.md` roots;
 - the gates' globs;
-- the organisation's LFS billing.
+- the organisation's LFS billing, and GitHub's docs on LFS deletion and release limits.
 
 **Findings:**
 - **F-P06-1 — The seed's scope is carried, and three facts sharpen it.**
@@ -192,7 +190,7 @@ Concretely, at close:
 - **F-P06-5 — The seed's open questions are closed.**
   - "Is 5.8 available?" Yes (UR-F1).
   - "Real time or the path tracer?" Real time, captured linear (D8).
-  - "Where does the package live?" In this repo (UR-D3).
+  - "Where does the package live?" A GitHub Release on this repo, pinned by a tracked file (D2).
 - **F-P06-6 — The dome may be the over-brightness.** The probe wrote a flat Radiance `.hdr`, the same shape Storm misread (S2). That may be UR-F10's 2.5×; D10 makes 6.1 verify it first.
 
 **The seed's coupling notes, compressed.** Phase07 and Phase08 landed:
@@ -217,9 +215,9 @@ All of it is in the contract docs and `JOB_FORMAT.md`, which this Brief binds to
 ## Discovery Status
 
 - **Passes captured:** 2 (2026-09-29).
-- **Current working direction:** the Brief above. The project is in `unreal/`, the masters are Epic's OpenPBR plus our network, the package goes through LFS, and the rig gets its third column and the "Moved" verdict. The Hair master is matte on cards (D12); the Eye master and the hair and eye pictures are Phase09's, built in this project (D13).
+- **Current working direction:** the Brief above. The project is in `unreal/`, the masters are Epic's OpenPBR plus our network, the package is a GitHub Release pinned in the repo, and the rig gets its third column and the "Moved" verdict. The Hair master is matte on cards (D12); the Eye master and the hair and eye pictures are Phase09's, built in this project (D13).
 - **Open decisions:** none.
-  - ~~The package's LFS commits~~ **Ruled (lead, 2026-09-29): *"yes and 6.2 and close (not every master change)"*** (D14).
+  - ~~The package's LFS commits~~ **Ruled (lead, 2026-09-29): *"yes and 6.2 and close (not every master change)"*** (D14); then **published as GitHub Releases, not LFS** (lead: *"yes use GitHub Releases"*, D2).
 - **Checks to carry forward:** D1's look-before-launching before every GPU run · D10 before calibrating · D11 in editor mode · `check_exporter.sh` baselined before the reader move touches `blender/`.
 
 ## Execution Log

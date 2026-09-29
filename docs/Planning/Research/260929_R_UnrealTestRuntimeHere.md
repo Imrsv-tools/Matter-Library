@@ -16,7 +16,7 @@
 |---|---|
 | UR-D1 | **Phase06 runs on this machine** (lead: *"yes run it here"*). This is the UE machine; the other machine built everything else (UR-F1, corrected). Answers UR-Q1. |
 | UR-D2 | **Ask before each GPU launch;** the first one was approved at once (*"ask me before GPU launches but now is OK"*). Answers UR-Q5. |
-| UR-D3 | **Everything lives in this repo, the built executable included,** so the other machine pulls and tests it (*"if you keep everything in this repo including the executable, I can pull on the other machine and test"*). This answers UR-Q3 and UR-Q6: git is the delivery, and the other machine is the portability test. |
+| UR-D3 | **Everything lives in this repo, the built executable included,** so the other machine pulls and tests it (*"if you keep everything in this repo including the executable, I can pull on the other machine and test"*). This answers UR-Q3 and UR-Q6: git is the delivery, and the other machine is the portability test. **Amended 2026-09-29 (lead: *"yes use GitHub Releases"*):** the executable is published as a GitHub Release asset on this repo and pinned by a tracked file, not committed through LFS, because LFS objects cannot be deleted without deleting the repository (`Phase06_UnrealTestRuntime.md` D2). |
 
 ---
 
