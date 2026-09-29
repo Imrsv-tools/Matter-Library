@@ -1,6 +1,6 @@
 # Phase06 — Unreal Test Runtime
 
-**Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). Two `YOUR CALL` items are open (§Discovery Status).
+**Status:** ACTIVE: discovery complete, the Brief is ready (2026-09-29, Pass 1). Lane: `build` (verified, §Risk lane). One `YOUR CALL` item is open (§Discovery Status). Pass 2 (the same day) folded in the MAP research and Phase09's seed, which decide the hair and eye questions.
 - **Seeded** 2026-09-26 from `docs/Planning/Research/260926_R_BigPicture_NimbleSetup.md` (Passes 7, 8). Numbered by the lead the same day.
 - **Opened** 2026-09-29 (lead: *"push it and start /discovery Phase06"*), after `260929_R_UnrealTestRuntimeHere.md` (the plan, UR-D1–D3) and `260929_R_Spike_UnrealRuntime.md` (probes 1–3 passed).
 - **Runs on this machine, the UE machine** (UR-D1, lead: *"yes run it here"*). The other machine, where Phases 05, 07 and 08 were built, has no Unreal. It pulls the package and tests it (UR-D3).
@@ -37,7 +37,7 @@ Concretely, at close:
 
 **Click 5 — the character** (step 6.5).
 - **What the lead opens:** `rig.py --character` sheets for two skin tones.
-- **What the lead judges:** skin, eyes, mouth, nails, clothes and hair in Unreal's column, with no default grey and no magenta.
+- **What the lead judges:** skin, eyes, mouth, nails, clothes and hair in Unreal's column, with no default grey and no magenta. The hair is matte and the eyes are today's articles on the rig's eye, which still has its cornea shell (MAP-F12). Both improve in Phase09.
 
 **Click 6 — the close.** The other machine pulls the final package and renders the Unreal column for one sweep sheet and one character sheet.
 
@@ -61,9 +61,10 @@ Concretely, at close:
 
 - **Studio adopting the masters (P20).** That is the platform's work. This phase builds the masters Studio will take; *Unreal Reference Masters* publishes them.
 - **Unreal's path tracer as a second Unreal column** (UR-Q4). The real-time column is what Studio users see.
-- **LCD-ruling candidates 4 and 5:** an `Eye` master (D-E stays until someone measures it) and strand hair (grooms). Candidates 2 and 3 (Unreal's skin and cloth) are judged on the column, not built up front (D7).
+- **The `Eye` master, and the hair's and eyes' picture input:** Phase09's (D13). Phase09 builds their Unreal side in this phase's project, and judges them on this phase's column.
+- **Strand hair (grooms):** MAP-RD4, a phase of its own. Candidates 2 and 3 (Unreal's skin and cloth) are judged on the column, not built up front (D7).
 - **Re-judging the character articles** that Phase07 and Phase08 left as candidates. The column makes that possible; it is the next unit, not this one.
-- **New or changed articles**, except the Hair contract change if YOUR CALL 1 picks (a).
+- **New or changed articles.** No contract change is needed: the Hair master is built on today's `Hair` row, read through MAP-RD3 (D12).
 
 ### Reuse check: what the stack already gives us
 
@@ -94,6 +95,8 @@ Concretely, at close:
 | D8 | **Real time, captured linear, encoded in Python.** The app writes linear scene colour (before the tonemapper) with exposure fixed at 1. The driver applies the view's `exposure`, box-filters the supersampling and does the plain sRGB encode. Lighting is matched: no shadows, no GI, no screen-space or Lumen reflections, a constant dome and a sun, calibrated on the grey card as Blender's `DOME_K` / `SUN_K` were. | UR Pass 5; UR-Q4; `JOB_FORMAT.md` |
 | D9 | **The rig's verdict is the "Moved" agreement:** each slider moves every tool the same way. Picture ΔE is a diagnostic that flags real bugs; it is not a bar. | `_Architecture.md` §LCD, *"Todo, make the 'Moved' agreement the criterion and demote picture ΔE to a diagnostic"* |
 | D10 | **The dome is not a hand-written flat `.hdr`.** Storm misread one (learning S2), and the probe's own 2.5× over-brightness (UR-F10) may be the same trap. Generate the cubemap from a format read exactly (EXR), and verify its value in Unreal before calibrating. | Storm S2; UR-F10 |
+| D12 | **The Hair master is matte on cards.** It is default lit with no specular sheen, not Unreal's hair shading model, which reads a flat card as one glossy sheet. Its coverage is soft and dithered, per the MasterSet row. The hairstyle's picture shading the article's light colour (modulate) is Phase09's input; the master takes it when Phase09 lands. | MAP-RD3, lead: *"yes on hair"*; *"The matte look the lead approved at the platform's sitting is where card quality stops"* |
+| D13 | **The eye and the hair picture belong to Phase09, including their Unreal side, built in this phase's `unreal/` project.** Phase06 builds the 8 masters and the column that Phase09 then judges on. | Phase09 seed §Scope In: *"The `Eye` token and its settings row; its Unreal side where the library's Unreal masters are built"*; MAP-RD6 |
 | D11 | **A capture waits for the material to be ready,** by a signal that works. The probe caught Unreal's default material once, and `IsGameThreadShaderMapComplete` did not work as a signal (UR-F7). The package precompiles its shaders, so the risk is mostly in editor mode. | UR-F7 |
 
 ### Risk lane: `build` (verified)
@@ -104,7 +107,7 @@ Concretely, at close:
   - about 43 GB stored (29–32k GB-hours a month) and 14–15 GB of downloads a month, across the organisation;
   - August went over the included allowance (net $4.29); July and September were $0;
   - one ~620 MB package version adds about $0.04 a month of storage, and each pull about $0.05.
-  - Pushing it is public and irreversible, so each package commit is the lead's call (YOUR CALL 2).
+  - Pushing it is public and irreversible, so each package commit is the lead's call (the YOUR CALL in §Discovery Status).
 - **The test surface:** the existing gate (`run_all.py`), the rig's own runs (the smoke is the sheet), and one check: the shared article reader gives Blender the same values after the move. No new gate.
 
 ### Step list
@@ -119,7 +122,7 @@ Concretely, at close:
 - **6.2 — The package, pulled on the other machine.**
   - The one-command build; a stripped Shipping package in `unreal/package/` through LFS.
   - The driver uses the package by default, and editor mode on request.
-  - **First clickable result:** click 2. *(Early by design: it proves the lead's portability ask before the masters grow. Each later rebuild is another LFS version: YOUR CALL 2.)*
+  - **First clickable result:** click 2. *(Early by design: it proves the lead's portability ask before the masters grow. Each later rebuild is another LFS version: the YOUR CALL in §Discovery Status.)*
 - **6.3 — The Opaque master in full, with textures and sliders.**
   - Textures load at run time with the right colour settings; `place2d`; the normal; the three overlays and the mask set, each at its own scale; the roughness bias.
   - Coat, fuzz and specular anisotropy.
@@ -128,7 +131,7 @@ Concretely, at close:
 - **6.4 — The other masters on the test set:** TwoLayer, Masked, Emissive, TranslucentThin, TranslucentThick and Subsurface. That completes the 11 articles. **First clickable result:** click 4.
 - **6.5 — The character job and the Hair master.**
   - `bindings`, `cutout_map`, the per-view `hide`, and the setting scene's `st`.
-  - The Hair master is built as YOUR CALL 1 rules.
+  - The Hair master, matte on cards (D12).
   - **First clickable result:** click 5.
 - **Close.** The final package through LFS (click 6), then the docs listed in §In now.
 
@@ -184,7 +187,7 @@ Concretely, at close:
   - The master count is 8 since Phase08.
 - **F-P06-2 — The rig already reserves the Unreal column** (`rig.py` prints *"Unreal: no pictures yet"*). It compares only Storm with Blender, and its bar is still picture ΔE < 2. The LCD ruling's Todo moves the verdict to "Moved", and a third tool is when a pairwise ΔE bar stops being meaningful (D9).
 - **F-P06-3 — The reader exists; only its home is wrong.** `load_article.read()` is plain XML and already yields everything the Unreal job needs: ports, lane-A values, textures with colour spaces, layer scales and constants. It sits in a module that imports `bpy`.
-- **F-P06-4 — The Hair master has an open contract question upstream.** `260928_R_HairStrandColourMap.md` HS-Q3 asks whether Hair's Unreal realisation should be restated as **matte, coloured by the mesh's own picture** (`strand_color_map`, HS-Q1/Q2). The platform built exactly that after the lead's eyes-on verdict on MakeHuman cards. HS-Q1–Q5 are unruled, and Phase06 builds that master → YOUR CALL 1.
+- **F-P06-4 — The Hair master had an open contract question upstream** (HS-Q3: restate Hair's Unreal realisation as matte, coloured by the mesh's picture). *Answered in Pass 2 by MAP-RD3 (D12).*
 - **F-P06-5 — The seed's open questions are closed.**
   - "Is 5.8 available?" Yes (UR-F1).
   - "Real time or the path tracer?" Real time, captured linear (D8).
@@ -200,13 +203,22 @@ Concretely, at close:
 
 All of it is in the contract docs and `JOB_FORMAT.md`, which this Brief binds to. The LCD candidates 1–5 are dispositioned in D7 and §Not now.
 
+### Pass 2 (2026-09-29): the MAP research and Phase09's seed, pulled from the other machine
+
+**Examined:** `260929_R_CharacterMaps.md` (its rulings MAP-RD1–RD6, Passes 7–8, the open questions and Status, all read); `Phase09_HairAndEyeMasters.md` (the seed); and the engine's Substrate eye BSDF (`MaterialExpressionSubstrate.h`, Unreal 5.8.0).
+
+**Findings:**
+- **F-P06-7 — Hair is decided: matte on cards, with the picture as Phase09's.** MAP-RD3 as amended answers the HS asks the library's way: the hairstyle's picture **shades** a light article (modulate), and *"the matte look … is where card quality stops"*. So Phase06's Hair master is matte, without Unreal's hair model (D12). The picture input and the `Hair` graph change are Phase09's contract work (D13). This retired Pass 1's YOUR CALL 1.
+- **F-P06-8 — The `Eye` master is Phase09's, built in this phase's project.** MAP-RD6 adds a 9th token, and Phase09's seed scopes its Unreal side. MAP-Q13 read "Phase06 / Unreal Reference Masters build it"; the two agree once Phase06 is the project and the column, and Phase09 the eye (D13). Phase06 builds no Eye master.
+- **F-P06-9 — Evidence for MAP-Q12 (for Phase09's discovery).** Unreal 5.8's **Substrate Eye BSDF** takes one surface's `DiffuseColor`, `Roughness`, `CorneaNormal`, `IrisNormal`, `IrisPlaneNormal`, **`IrisMask`**, **`IrisDistance`**, `EmissiveColor` and a Subsurface Profile. The iris is a **masked region of one eyeball material**, not a material of its own. That supports **one `Eye` article bound on all three parts**, with the mask and distance computed from the eye's shared UV layout (the parts share it, MAP-F11). No refraction function ships in engine content; the eye's refraction offset is built in the graph. *(Read from the header, not rendered.)*
+- **F-P06-10 — Click 5 judges today's eye.** The rig's eye still has the cornea shell Studio dropped (MAP-F12). Phase06 renders it as it is; the eye's real judgement is Phase09's.
+
 ## Discovery Status
 
-- **Passes captured:** 1 (2026-09-29).
-- **Current working direction:** the Brief above. The project is in `unreal/`, the masters are Epic's OpenPBR plus our network, the package goes through LFS, and the rig gets its third column and the "Moved" verdict.
+- **Passes captured:** 2 (2026-09-29).
+- **Current working direction:** the Brief above. The project is in `unreal/`, the masters are Epic's OpenPBR plus our network, the package goes through LFS, and the rig gets its third column and the "Moved" verdict. The Hair master is matte on cards (D12); the Eye master and the hair and eye pictures are Phase09's, built in this project (D13).
 - **Open decisions:**
-  - **YOUR CALL 1: the Hair master.** (a) Rule HS-Q3 now: Hair's Unreal row is matte, coloured by the mesh's picture, and Unreal's hair model is kept for strands. `strand_color_map` (HS-Q1, Q2, Q4, Q5) lands as a small unit before 6.5. (b) Build Hair on today's row (the hair model), and rework it when HS is ruled.
-  - **YOUR CALL 2: the package's LFS commits.** How often a package version is pushed: at 6.2 and at the close (recommended), or at every master change. About $0.04 a month each, plus about $0.05 per pull.
+  - **YOUR CALL: the package's LFS commits.** How often a package version is pushed: at 6.2 and at the close (recommended), or at every master change. About $0.04 a month each, plus about $0.05 per pull.
 - **Checks to carry forward:** D1's look-before-launching before every GPU run · D10 before calibrating · D11 in editor mode · `check_exporter.sh` baselined before the reader move touches `blender/`.
 
 ## Execution Log
