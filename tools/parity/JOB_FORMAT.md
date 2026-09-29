@@ -2,7 +2,8 @@
 
 *Written at the Phase05 close (2026-09-27) as the hand-off to Phase06 (the Unreal test runtime).*
 *The code is the authority where this page and it disagree: `tools/parity/job.py` writes a job,
-`drivers/storm.py` and `drivers/blender_render.py` are the two reference drivers.*
+`drivers/storm.py` and `drivers/blender_render.py` are the two reference drivers, and
+`drivers/unreal.py` (Phase06) is the third: §The Unreal driver below.*
 
 A **render job** asks a renderer for pictures of **one material**, under **a list of slider
 settings**, in **one test scene**, from **a few fixed views**. The rig (`rig.py`) writes the job,
@@ -91,7 +92,7 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 ## What a driver writes
 
 - `<out_dir>/<tool>/<setting id><view suffix>.png` — 8-bit sRGB, `width` × `width`, one per setting per view.
-- The masks are written once, by the Blender driver: `<out_dir>/mask<view suffix>.png`, one flat colour per subject (sphere red, cube green, floor blue) on black. Another driver does not need to write them.
+- The masks are written once, by the Blender driver: `<out_dir>/mask<view suffix>.png`, one flat colour per subject (sphere red, cube green, floor blue) on black. Another driver does not need to write them. *(Phase06: the Unreal driver also writes its own, `<out_dir>/unreal/mask<view suffix>.png`, which the rig scores on when Blender is not run, `--no-blender`.)*
 
 ## The scene, and why each number is what it is
 
@@ -118,9 +119,19 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 
 **Start Unreal on the grey card:** it proves the lighting, colour and camera before any material is judged. At the Phase05 close Storm and Blender agreed on it at 0.35 ΔE2000, with linear radiance within 1–2 % everywhere.
 
+## The Unreal driver *(Phase06, 2026-09-30)*
+
+`drivers/unreal.py` renders a job in the library's own Unreal app (`unreal/MatterRuntime`, Unreal 5.8, Substrate on). What it does with each field, and the choices a reader of its column needs:
+
+- **The runtime, first found wins:** `$MATTER_UNREAL_RUNTIME` (a packaged build's `MatterRuntime.sh`); `$MATTER_UNREAL_EDITOR` (an `UnrealEditor`, editor mode on the project: the development loop); else the build **`unreal/RUNTIME.json`** pins, a GitHub pre-release of this repo (`unreal-runtime-vN`), downloaded once into the git-ignored `unreal/package/` and checked by sha256. None: the rig skips the column and says why. No Unreal install is needed to render the column.
+- **The scene is not imported from USD.** Epic's USD importer is editor-only, so a packaged runtime cannot use it, and each setting rescales `st`. The driver converts the rig's meshes and cameras from the same generators that write the USD (`scene/build_scene.py`, `scene/build_character.py`) into an **Unreal job** (`<out_dir>/unreal/job/unreal_job.json`, job format 2: float mesh buffers with a tangent sign per vertex). Metres → centimetres, Y up → Z up, right- → left-handed by `(x, y, z) → 100 (−z, x, y)`, whose determinant −1 keeps USD's front faces as Unreal's; §Units is honoured by construction. A character part's faceVarying `st` becomes one vertex per (point, uv) pair.
+- **The material:** the article is read by the one shared reader (`blender/masters/article.py`), and set on its master (`unreal/MatterRuntime/Scripts/build_masters.py`) under the article's own names. A master or input Unreal does not carry is refused by name, and the sheet shows *"not yet"* instead of a wrong picture. A binding's `cutout_map` is sampled on the mesh's own `st`.
+- **Colour and light:** the app writes linear scene colour (exposure fixed, no tonemapper); the driver applies the view's `exposure`, box-filters the **4× supersampling** (Unreal renders with no anti-aliasing here) and does the plain sRGB encode. No shadows, no GI, no Lumen or screen-space reflections: §Matched lighting. The dome is an unlit sphere of constant radiance that a sky light captures. **The calibration** (`unreal.py --calibrate [--ref storm|blender] <grey card job.json>`): `EXPOSURE_K` from a view of the dome, **`DOME_K` from a white mirror** (which reflects exactly the dome, so no material model is in it), then **`SUN_K` on the grey card with the dome fixed**. The constants in the file were fitted against Storm on the UE machine; Blender is the path-traced reference, so re-fit with `--ref blender` where Blender renders parity.
+- **Each launch opens with a throwaway `__warmup` setting** (a copy of the first). The launch's first material assignment can draw a master as Unreal's default material while the runtime reports ready (seen on the character, every launch); the warm-up absorbs it. Its pictures are written and never read.
+
 ## Open questions Unreal's column should settle
 
 These are recorded in the Phase05 doc as F12 and F16.
 
 - **F12:** Blender renders the wear layers' bump tilt more strongly than Storm (Oak close-up, dust at 1: 1.41 against 0.82). The cause is not established; the suspect is each renderer's tangent frame for normal maps.
-- **F16:** Marble's colour. OpenPBR's graph mixes the base colour towards `subsurface_color` by `subsurface_weight`, and Blender follows that; Storm shows more of the base colour's veins. **Update (2026-09-27, Phase07 7.1): mostly the 1/100-scale bug above, not the colour mix.** At the right scale Marble measures **2.60** (was 3.95), so what is left is small. Unreal's column still settles the remainder. Diamond (absorption depth) was measured at the wrong scale too, and is re-measured in Phase07 7.3.
+- **F16:** Marble's colour. OpenPBR's graph mixes the base colour towards `subsurface_color` by `subsurface_weight`, and Blender follows that; Storm shows more of the base colour's veins. **Update (2026-09-27, Phase07 7.1): mostly the 1/100-scale bug above, not the colour mix.** At the right scale Marble measures **2.60** (was 3.95), so what is left is small. Unreal's column still settles the remainder. *(Phase06, 2026-09-30: Unreal against Storm reads 2.43, and 6.4 measured the difference as a uniform ×1.11 brightness; the three-way reading waits for Blender's column on the other machine.)* Diamond (absorption depth) was measured at the wrong scale too, and is re-measured in Phase07 7.3.

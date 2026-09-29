@@ -105,7 +105,7 @@ What that means here:
 > **Reevaluate (2026-09-28), decisions argued on the superseded wording:**
 > - Phase07 **D-E** (no `Eye` master, because Unreal's eye model has inputs the others lack);
 > - Phase08 **RD-P08-1** (a "settings-only" `Hair` master argued on stock-viewer parity; already reworked on the lead's eye, `260928_R_HairAndNailRendering.md`);
-> - the parity rig's pass/fail bar (`tools/parity/rig.py` `BAR` / `GRADED`, ΔE < 2 between Storm and Blender): **Todo**, make the "Moved" agreement the criterion and demote picture ΔE to a diagnostic;
+> - the parity rig's pass/fail bar (`tools/parity/rig.py` `BAR` / `GRADED`, ΔE < 2 between Storm and Blender): ~~**Todo**, make the "Moved" agreement the criterion and demote picture ΔE to a diagnostic~~ **Shipped (Phase06 close, 2026-09-30):** the scorecard's verdict is the Moved agreement (`moved_verdict`: moved alike · ONE-SIDED · UNEVEN · no change in any tool), and ΔE is a "ΔE diagnostic" column flagged over `BAR`;
 > - the "ΔE < 2" wording in [Glossary](../Glossary.md) *Parity* (updated in the same change) and in [MasterSet](Ontology/MasterSet.md) and [LCDSchema](Contract/LCDSchema.md) (Todo; those two are mid-edit by Phase08 as this is written).
 >
 > *"No new masters are needed for coverage"* (MasterSet) still stands: that is about coverage. A master added to use an engine's best quality is this principle working, not an exception to it.

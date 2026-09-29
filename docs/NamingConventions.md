@@ -38,6 +38,7 @@
 | Series | Form | Assigned by · when | Authoritative artifact |
 |---|---|---|---|
 | **Library release** | `matterlib-X.Y.Z` (semver: MAJOR breaking · MINOR additive · PATCH visual fix) | the maintainer, at promotion | the release's `library/releases/matterlib-X.Y.Z.lock.yaml` |
+| **Unreal runtime build** *(Phase06, 2026-09-29)* | `unreal-runtime-vN` (N = 1, 2, …): a GitHub **pre-release** on this repo, so it never shows as "Latest" and never collides with `matterlib-X.Y.Z`; its asset `MatterRuntime-Linux-unreal-runtime-vN.tar.gz`. A test tool, not a library release | the maintainer, when the lead calls a publish (Phase06 D14); the next free integer | `unreal/RUNTIME.json` (the pin: tag, asset, sha256) |
 | **Material / texture version** | `vNN`, two digits, starting at `v01` | the contributor, at authoring; the next free integer for that asset | the filename (material) · the manifest entry (texture set) |
 | **Catalog schema** | `schema_version: <int>` | a contract phase only | `docs/specs/Contract/RuntimeCatalog.md` |
 | **Phases** | `Phase<NN>` once the lead numbers it; `PhaseTBD_<Name>` until then; steps `<NN>.<n>`, tasks `<NN>.<n>.<m>`, **numeric at every level, never a letter suffix** | the lead | `docs/Planning/Roadmap.md` |
