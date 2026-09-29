@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The parity rig: one material, side by side in USDLiveView's renderer and Blender.
+"""The parity rig: one material, side by side in USDLiveView's renderer, Blender and Unreal.
 
     uv run tools/parity/rig.py <article> [--sweep] [--width 512] [--samples 128]
 
@@ -10,9 +10,10 @@ the Storm driver and the Blender driver on it, and writes, into
 
 * ``sheet.png`` — one row per slider setting: Storm | Blender | Unreal (Phase06:
   ``drivers/unreal.py``, when this machine has a runtime; otherwise the sheet says why) |
-  where they differ (black = same, yellow = at the bar, red = 3x the bar);
-* ``scorecard.md`` (and ``scorecard.json``) — ΔE2000 per setting over the subjects, per
-  subject, and the verdict against the master's bar.
+  where they differ (black = same, yellow = at the flag, red = 3x the flag);
+* ``scorecard.md`` (and ``scorecard.json``) — per setting, how far it moved each tool and
+  THE VERDICT, the Moved agreement (``moved_verdict``; Phase06 D9), beside ΔE2000 between the
+  tools per subject, a diagnostic flagged over ``BAR``.
 
 It prints both paths. ``--sweep`` renders every slider the article declares through its
 range (Phase05 step 5.2); without it, only the article's own settings.
@@ -48,10 +49,15 @@ import unreal as unreal_driver  # noqa: E402  (drivers/unreal.py, Phase06)
 OUT_ROOT = jobmod.REPO / "library" / "parity"
 BLENDER_DRIVER = HERE / "drivers" / "blender_render.py"
 
-# The bar per master (Decision of record 9): ΔE2000 < 2 is graded for these; the others are
-# judged "recognisable" by eye and their numbers are advisory. The first numbers set each
-# master's final bar (Phase05 Brief §Decisions that bind).
+# THE VERDICT is the "Moved" agreement (_Architecture.md §LCD; Phase06 D9): does each slider move
+# every tool the same way, by about the same amount? Picture ΔE2000 between the tools is a
+# DIAGNOSTIC that flags real bugs (wrong units, a lost texture), not a bar that caps the better
+# renderer. BAR is where the diagnostic flags a difference; GRADED names the masters whose ΔE is
+# expected under it (the others are judged "recognisable" by eye, their flag advisory).
 BAR = 2.0
+MOVED_FLOOR = 0.5        # below this (dE2000) a slider moved nothing in that tool
+MOVED_ONE_SIDED = 0.25   # a tool moving under this fraction of the most-moved one: ONE-SIDED
+MOVED_UNEVEN = 0.5       # ... under this fraction: UNEVEN (both moved, by clearly different amounts)
 GRADED = {"Opaque", "Masked", "Hair", "Emissive", "TwoLayer"}
 # Views whose numbers are advisory for a graded master (set from the first numbers, 5.4):
 # on the whole set a cut-out's holes are smaller than a pixel, and a real-time renderer
@@ -75,9 +81,27 @@ def graded(master: str, view: str) -> bool:
 
 
 def verdict(master: str, view: str, de: float, md: bool = True) -> str:
-    """'under' / 'OVER' the bar, marked advisory where this master's view is not graded."""
+    """The ΔE diagnostic's flag: 'under' / 'OVER' BAR, marked advisory where this master's view
+    is not graded. Not the verdict (``moved_verdict``)."""
     word = "under" if de < BAR else ("**OVER**" if md else "OVER")
     return word if graded(master, view) else f"{word} (advisory)"
+
+
+def moved_verdict(mv: dict | None, md: bool = True) -> tuple[str, bool]:
+    """THE verdict of a slider row: how its move compares across the tools (``compare.moved``, each
+    tool's own picture against its own defaults). Returns (the word, passed). A row with no move to
+    compare (the defaults) has no verdict of its own: its ΔE is the diagnostic."""
+    if not mv:
+        return "—", True
+    hi, lo = max(mv.values()), min(mv.values())
+    b = (lambda w: f"**{w}**") if md else (lambda w: w)
+    if hi < MOVED_FLOOR:
+        return "no change in any tool", True
+    if lo < MOVED_ONE_SIDED * hi:
+        return b("ONE-SIDED"), False
+    if lo < MOVED_UNEVEN * hi:
+        return b("UNEVEN"), False
+    return "moved alike", True
 
 
 # The sweep (Phase05 Brief, first human test click 2): each slider the article declares,
@@ -171,7 +195,8 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str
     d = ImageDraw.Draw(sheet)
     f, fs = _font(18), _font(15)
     d.text((10, 10), f"{job['article']['name']}   ·   master {job['article']['master']}   ·   "
-           f"bar dE2000 < {BAR:g}", fill=(235, 235, 235), font=f)
+           f"verdict: each slider moves every tool alike   ·   dE2000 between tools is a diagnostic "
+           f"(flag {BAR:g})", fill=(235, 235, 235), font=f)
     for i, c in enumerate(cols):
         d.text((label_w + i * cell + 10, 42), c, fill=(200, 200, 200), font=f)
     for r, s in enumerate(rows):
@@ -194,17 +219,22 @@ def build_sheet(job: dict, scores: dict, heat: dict, cell: int, unreal_skip: str
             sheet.paste(heat[s["id"]][v].resize((cell, cell)), (label_w + 3 * cell, y))
             sc = scores[s["id"]]["views"][v]
             m = sc["subjects"]
-            ok = m["dE_mean"] < BAR or not graded(job["article"]["master"], v)
             said = verdict(job["article"]["master"], v, m["dE_mean"], md=False)
             mv = sc.get("moved")
-            moved = ("   ·   the slider moved " + ", ".join(f"{t.title()} {x:.1f}" for t, x in mv.items())
-                     if mv else "")
+            # the colour is the verdict: the Moved agreement on a slider row; on the defaults
+            # (nothing moved) the diagnostic, dimmer, since it is not a verdict
+            word, ok = moved_verdict(mv, md=False)
+            moved = ("   ·   moved " + ", ".join(f"{t.title()} {x:.1f}" for t, x in mv.items())
+                     + f": {word.upper()}" if mv else "")
             ue = sc.get("unreal_vs_blender")
             ue = f"   ·   Unreal vs Blender: mean {ue['dE_mean']:.2f}, p95 {ue['dE_p95']:.2f}" if ue else ""
+            if not mv:
+                ok = m["dE_mean"] < BAR or not graded(job["article"]["master"], v)
+            colour = ((120, 230, 120) if ok else (255, 140, 120)) if mv else \
+                     ((150, 200, 150) if ok else (230, 170, 140))
             d.text((label_w + 10, y + cell + 6),
-                   f"dE2000 Storm vs {ref.title()}: mean {m['dE_mean']:.2f}, p95 {m['dE_p95']:.2f}  "
-                   f"(bar {BAR:g}: {said}){ue}{moved}",
-                   fill=(120, 230, 120) if ok else (255, 140, 120), font=fs)
+                   f"dE2000 Storm vs {ref.title()} (diagnostic): mean {m['dE_mean']:.2f}, "
+                   f"p95 {m['dE_p95']:.2f}, flag {BAR:g}: {said}{ue}{moved}", fill=colour, font=fs)
     p = out / "sheet.png"
     sheet.save(p)
     return p
@@ -252,7 +282,9 @@ def write_scorecard(job: dict, scores: dict, checks: dict, tools=("storm", "blen
     ref = tools[1]
     moved_h = " | ".join(f"Moved: {t.title()}" for t in tools)
     lines = [f"# Parity scorecard — {job['article']['name']}", "",
-             f"Master **{master}** · bar ΔE2000 < {BAR:g} "
+             f"Master **{master}** · **verdict: the Moved agreement** (each slider moves every tool "
+             f"the same way, by about the same amount) · ΔE2000 between the tools is a **diagnostic**, "
+             f"flagged over {BAR:g} "
              f"({'graded' + (', except the ' + ' and '.join(sorted(ADVISORY_VIEWS[master])) + ' view (advisory)' if master in ADVISORY_VIEWS else '') if is_graded else 'advisory: judged recognisable by eye'}) · "
              f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
@@ -260,36 +292,33 @@ def write_scorecard(job: dict, scores: dict, checks: dict, tools=("storm", "blen
              "subjects' pixels (sphere, cube, floor)."
              + ("" if "blender" in tools else " *Blender was not run on this machine.*"), "",
              "**Moved** is how far the slider changed each tool's own picture from its defaults "
-             "(mean dE2000 on the subjects). A slider that moves one tool and not the other is "
-             "**ONE-SIDED**.", "",
-             f"| Setting | Between tools: mean | p95 | Sphere | Cube | Floor | SSIM | {moved_h} | Verdict |",
-             "|---|---|---|---|---|---|---|" + "---|" * len(tools) + "---|"]
+             f"(mean dE2000 on the subjects). **Verdict:** *moved alike*; **ONE-SIDED** (a tool moved "
+             f"under {MOVED_ONE_SIDED:g} of the most-moved one); **UNEVEN** (under {MOVED_UNEVEN:g}); "
+             f"*no change in any tool* (all under {MOVED_FLOOR:g}). The defaults row moves nothing: "
+             "its ΔE is the diagnostic only.", "",
+             f"| Setting | Between tools: mean | p95 | Sphere | Cube | Floor | SSIM | ΔE diagnostic | {moved_h} | Verdict (Moved) |",
+             "|---|---|---|---|---|---|---|---|" + "---|" * len(tools) + "---|"]
     none = " | ".join("—" for _ in tools)
     for s in job["settings"]:
         sc = scores[s["id"]]
         m = sc["subjects"]
-        v = verdict(master, "wide", m["dE_mean"])
         mv = sc.get("moved")
-        if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
-            v += " · **ONE-SIDED**"
         ms = " | ".join(f"{mv[t]:.2f}" for t in tools) if mv else none
         lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
                      f"{sc['sphere']['dE_mean']:.2f} | {sc['cube']['dE_mean']:.2f} | "
-                     f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {ms} | {v} |")
+                     f"{sc['floor']['dE_mean']:.2f} | {m['ssim']:.3f} | {verdict(master, 'wide', m['dE_mean'])} | "
+                     f"{ms} | {moved_verdict(mv)[0]} |")
     for view in [v for v in job["views"] if v != "wide"]:
         lines += ["", f"## The {VIEW_LABELS.get(view, view)} view", "", VIEW_NOTES.get(view, ""), "",
-                  f"| Setting | Between tools: mean | p95 | SSIM | {moved_h} | Verdict |",
-                  "|---|---|---|---|" + "---|" * len(tools) + "---|"]
+                  f"| Setting | Between tools: mean | p95 | SSIM | ΔE diagnostic | {moved_h} | Verdict (Moved) |",
+                  "|---|---|---|---|---|" + "---|" * len(tools) + "---|"]
         for s in job["settings"]:
             sc = scores[s["id"]]["views"][view]
             m = sc["subjects"]
-            v = verdict(master, view, m["dE_mean"])
             mv = sc.get("moved")
-            if mv and (max(mv.values()) > 1.0 and min(mv.values()) < 0.25 * max(mv.values())):
-                v += " · **ONE-SIDED**"
             ms = " | ".join(f"{mv[t]:.2f}" for t in tools) if mv else none
             lines.append(f"| {s['label']} | {m['dE_mean']:.2f} | {m['dE_p95']:.2f} | "
-                         f"{m['ssim']:.3f} | {ms} | {v} |")
+                         f"{m['ssim']:.3f} | {verdict(master, view, m['dE_mean'])} | {ms} | {moved_verdict(mv)[0]} |")
     worst = {}
     for s in job["settings"]:
         if s.get("port"):
@@ -298,9 +327,9 @@ def write_scorecard(job: dict, scores: dict, checks: dict, tools=("storm", "blen
                 if d > worst.get(s["port"], (0, "", ""))[0]:
                     worst[s["port"]] = (d, s["label"], view)
     if worst:
-        lines += ["", "**Per slider, the worst difference between the tools (either view):**", ""]
+        lines += ["", "**Per slider, the worst difference between the tools (either view; the diagnostic):**", ""]
         lines += [f"- `{p}`: {d:.2f} at *{lab}*, {view} view "
-                  f"({'under' if d < BAR else 'OVER'} the bar)"
+                  f"({'under' if d < BAR else 'OVER'} the flag)"
                   for p, (d, lab, view) in worst.items()]
     mpt = job["article"]["meters_per_tile"]
     lines += ["", f"## Scale (the ruler check) — recorded size {mpt:g} m per tile", ""]
@@ -387,7 +416,9 @@ def write_character_scorecard(job: dict, scores: dict, ref: str = "blender") -> 
              "", f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
              f"ΔE2000 between {TOOL_NAMES['storm']} and {TOOL_NAMES[ref]}, per bound part, "
-             "per view. Unbound parts are the scene's grey and are not scored.", "",
+             "per view: a diagnostic (the character renders the defaults only, so there is no slider "
+             "to hold to the Moved verdict; sliders are swept on the test scene). Unbound parts are "
+             "the scene's grey and are not scored.", "",
              "| Part | Article (master) | " + " | ".join(
                  job["views"][v].get("label", v) for v in job["views"]) + " |",
              "|---|---|" + "---|" * len(job["views"])]
