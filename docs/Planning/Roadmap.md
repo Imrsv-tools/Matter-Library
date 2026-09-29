@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase06 — Unreal Test Runtime — ACTIVE *(discovery done 2026-09-29; runs on the UE machine)*
+### Phase06 — Unreal Test Runtime — IN EXECUTION *(2026-09-29: 6.1 done, 6.2's package built, not yet published; runs on the UE machine)*
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Future/Phase06_UnrealTestRuntime.md` · research `docs/Planning/Research/260929_R_UnrealTestRuntimeHere.md`, `260929_R_Spike_UnrealRuntime.md`
 
