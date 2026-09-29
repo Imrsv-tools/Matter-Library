@@ -52,6 +52,27 @@ namespace
 	}
 }
 
+void AMatterRuntimeGameMode::Note(const FString& Line, bool bError)
+{
+	// A Shipping build compiles UE_LOG out (UR-F8), so the app keeps its own record beside its
+	// pictures: <out_dir>/matter_runtime.log, appended line by line so a crash leaves it readable.
+	if (bError)
+	{
+		UE_LOG(LogMatter, Error, TEXT("%s"), *Line);
+	}
+	else
+	{
+		UE_LOG(LogMatter, Display, TEXT("%s"), *Line);
+	}
+	if (!OutDir.IsEmpty())
+	{
+		IFileManager::Get().MakeDirectory(*OutDir, true);
+		FFileHelper::SaveStringToFile((bError ? TEXT("ERROR ") : TEXT("")) + Line + TEXT("\n"),
+			*(OutDir / TEXT("matter_runtime.log")), FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM,
+			&IFileManager::Get(), FILEWRITE_Append);
+	}
+}
+
 AMatterRuntimeGameMode::AMatterRuntimeGameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -65,7 +86,7 @@ void AMatterRuntimeGameMode::StartPlay()
 	FString JobPath;
 	if (!FParse::Value(FCommandLine::Get(), TEXT("MatterJob="), JobPath))
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER no -MatterJob=<path>"));
+		Note(FString::Printf(TEXT("MATTER no -MatterJob=<path>")), true);
 		Finish(2);
 		return;
 	}
@@ -80,19 +101,19 @@ bool AMatterRuntimeGameMode::LoadJob(const FString& Path)
 	FString Text;
 	if (!FFileHelper::LoadFileToString(Text, *Path))
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER cannot read job %s"), *Path);
+		Note(FString::Printf(TEXT("MATTER cannot read job %s"), *Path), true);
 		return false;
 	}
 	const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
 	if (!FJsonSerializer::Deserialize(Reader, Job) || !Job.IsValid())
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER job is not JSON: %s"), *Path);
+		Note(FString::Printf(TEXT("MATTER job is not JSON: %s"), *Path), true);
 		return false;
 	}
 	OutDir = Job->GetStringField(TEXT("out_dir"));
 	Width = Job->GetIntegerField(TEXT("width"));
 	Job->TryGetNumberField(TEXT("settle_frames"), SettleFrames);
-	UE_LOG(LogMatter, Display, TEXT("MATTER job=%s width=%d out=%s"), *Path, Width, *OutDir);
+	Note(FString::Printf(TEXT("MATTER job=%s width=%d out=%s"), *Path, Width, *OutDir), false);
 	return true;
 }
 
@@ -118,7 +139,7 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	// The spawn rotation did not reach the light (it rendered straight down, the calibration's
 	// first run, 6.1): set it again once the component can move, and log what it points at.
 	SunComp->SetWorldRotation(FRotationMatrix::MakeFromX(SunDir).Rotator());
-	UE_LOG(LogMatter, Display, TEXT("MATTER sun direction job=%s light=%s"), *SunDir.ToString(), *SunComp->GetDirection().ToString());
+	Note(FString::Printf(TEXT("MATTER sun direction job=%s light=%s"), *SunDir.ToString(), *SunComp->GetDirection().ToString()), false);
 	SunIntensity = Sun->GetNumberField(TEXT("intensity"));
 	SunComp->SetIntensity(SunIntensity);
 	SunComp->SetLightColor(FLinearColor::White);
@@ -133,7 +154,7 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
 	if (!SkyMaster || !Sphere)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER sky master=%d sphere=%d"), SkyMaster != nullptr, Sphere != nullptr);
+		Note(FString::Printf(TEXT("MATTER sky master=%d sphere=%d"), SkyMaster != nullptr, Sphere != nullptr), true);
 		return false;
 	}
 	AStaticMeshActor* SkyActor = World->SpawnActor<AStaticMeshActor>(FVector::ZeroVector, FRotator::ZeroRotator);
@@ -217,7 +238,7 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 	const int64 Want = int64(N) * 11 * 4 + int64(M) * 4;
 	if (!FFileHelper::LoadFileToArray(Bytes, *File) || Bytes.Num() != Want)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER mesh %s: %s is %d bytes, want %lld"), *Name, *File, Bytes.Num(), Want);
+		Note(FString::Printf(TEXT("MATTER mesh %s: %s is %d bytes, want %lld"), *Name, *File, Bytes.Num(), Want), true);
 		return false;
 	}
 	const float* F = reinterpret_cast<const float*>(Bytes.GetData());
@@ -249,7 +270,7 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 	PMC->bVisibleInRealTimeSkyCaptures = false;
 	Meshes.Add(Name, PMC);
 	MeshMaterial.Add(Name, Spec->GetStringField(TEXT("material")));
-	UE_LOG(LogMatter, Display, TEXT("MATTER mesh %s verts=%d tris=%d material=%s"), *Name, N, M / 3, *MeshMaterial[Name]);
+	Note(FString::Printf(TEXT("MATTER mesh %s verts=%d tris=%d material=%s"), *Name, N, M / 3, *MeshMaterial[Name]), false);
 	return true;
 }
 
@@ -263,7 +284,7 @@ UMaterialInterface* AMatterRuntimeGameMode::LoadMaster(const FString& Token)
 	UMaterialInterface* Master = LoadObject<UMaterialInterface>(nullptr, *Path);
 	if (!Master)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER no master %s"), *Path);
+		Note(FString::Printf(TEXT("MATTER no master %s"), *Path), true);
 		return nullptr;
 	}
 #if WITH_EDITOR
@@ -288,7 +309,7 @@ UTexture2D* AMatterRuntimeGameMode::LoadTexture(const FString& File, bool bSRGB)
 	UTexture2D* Tex = FImageUtils::ImportFileAsTexture2D(File);
 	if (!Tex)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER cannot load texture %s"), *File);
+		Note(FString::Printf(TEXT("MATTER cannot load texture %s"), *File), true);
 		return nullptr;
 	}
 	// The colour flag must match the master's sampler type, or Unreal draws its default
@@ -359,8 +380,8 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 		UMaterialInstanceDynamic** Mid = Built.Find(MeshMaterial[Pair.Key]);
 		if (!Mid)
 		{
-			UE_LOG(LogMatter, Error, TEXT("MATTER setting %s has no material %s for mesh %s"),
-				*S->GetStringField(TEXT("id")), *MeshMaterial[Pair.Key], *Pair.Key);
+			Note(FString::Printf(TEXT("MATTER setting %s has no material %s for mesh %s"),
+				*S->GetStringField(TEXT("id")), *MeshMaterial[Pair.Key], *Pair.Key), true);
 			return false;
 		}
 		Pair.Value->SetMaterial(0, *Mid);
@@ -368,7 +389,7 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 	SettingIndex = Index;
 	ReadyFrames = 0;
 	Phase = EPhase::Settle;
-	UE_LOG(LogMatter, Display, TEXT("MATTER setting %d/%d %s"), Index + 1, Settings.Num(), *S->GetStringField(TEXT("id")));
+	Note(FString::Printf(TEXT("MATTER setting %d/%d %s"), Index + 1, Settings.Num(), *S->GetStringField(TEXT("id"))), false);
 	return true;
 }
 
@@ -401,7 +422,7 @@ void AMatterRuntimeGameMode::Tick(float DeltaSeconds)
 	++Frames;
 	if (Frames > MaxFrames)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER not ready after %d frames (setting %d); nothing captured"), Frames, SettingIndex);
+		Note(FString::Printf(TEXT("MATTER not ready after %d frames (setting %d); nothing captured"), Frames, SettingIndex), true);
 		Finish(3);
 		return;
 	}
@@ -479,7 +500,7 @@ bool AMatterRuntimeGameMode::CaptureView(const TSharedPtr<FJsonObject>& View, co
 	TArray<FLinearColor> Px;
 	if (!Res || !Res->ReadLinearColorPixels(Px, FReadSurfaceDataFlags(RCM_MinMax)) || Px.Num() != Width * Width)
 	{
-		UE_LOG(LogMatter, Error, TEXT("MATTER readback failed for %s"), *OutPath);
+		Note(FString::Printf(TEXT("MATTER readback failed for %s"), *OutPath), true);
 		return false;
 	}
 	// Portable float map (PFM): a text header, then bottom-to-top rows of little-endian float RGB.
@@ -499,14 +520,14 @@ bool AMatterRuntimeGameMode::CaptureView(const TSharedPtr<FJsonObject>& View, co
 	}
 	IFileManager::Get().MakeDirectory(*FPaths::GetPath(OutPath), true);
 	const bool bOk = FFileHelper::SaveArrayToFile(Bytes, *OutPath);
-	UE_LOG(LogMatter, Display, TEXT("MATTER wrote=%d %s frame=%d centre=%s"), bOk, *OutPath, Frames,
-		*Px[(Width / 2) * Width + Width / 2].ToString());
+	Note(FString::Printf(TEXT("MATTER wrote=%d %s frame=%d centre=%s"), bOk, *OutPath, Frames,
+		*Px[(Width / 2) * Width + Width / 2].ToString()), false);
 	return bOk;
 }
 
 void AMatterRuntimeGameMode::Finish(int32 Code)
 {
 	Phase = EPhase::Done;
-	UE_LOG(LogMatter, Display, TEXT("MATTER exit=%d"), Code);
+	Note(FString::Printf(TEXT("MATTER exit=%d"), Code), false);
 	FPlatformMisc::RequestExitWithStatus(false, Code);
 }

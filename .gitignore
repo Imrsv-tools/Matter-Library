@@ -22,6 +22,7 @@ library/parity/
 # (no .uasset is committed, UR-F5); the package is a GitHub Release the driver downloads into
 # unreal/package/ (Phase06 D2), never committed and never LFS.
 unreal/package/
+unreal/dist/
 unreal/MatterRuntime/Binaries/
 unreal/MatterRuntime/Intermediate/
 unreal/MatterRuntime/Saved/

@@ -54,6 +54,7 @@ private:
 	bool CaptureSetting();
 	bool CaptureView(const TSharedPtr<FJsonObject>& View, const FString& OutPath);
 	void Finish(int32 Code);
+	void Note(const FString& Line, bool bError = false);
 
 	UPROPERTY() TObjectPtr<USceneCaptureComponent2D> CaptureComp;
 	UPROPERTY() TObjectPtr<UTextureRenderTarget2D> Target;

@@ -29,9 +29,11 @@ applies the view's ``exposure``, box-filters the supersampling and does the plai
 as Storm's and Blender's columns are encoded (Phase06 D8).
 
 Where the runtime comes from, first found wins: ``$MATTER_UNREAL_RUNTIME`` (a packaged build's
-launcher), then editor mode, ``$MATTER_UNREAL_EDITOR`` (an Unreal 5.8 ``UnrealEditor``) on
-``unreal/MatterRuntime``. ``find_runtime()`` returns None when there is none, and the rig then
-skips the column with a notice.
+launcher); editor mode on request, ``$MATTER_UNREAL_EDITOR`` (an Unreal 5.8 ``UnrealEditor``) on
+``unreal/MatterRuntime``; else the build ``unreal/RUNTIME.json`` pins, a GitHub Release asset of
+this repo, downloaded once into the git-ignored ``unreal/package/`` and checked by sha256
+(Phase06 D2), so a machine with no Unreal renders the column. ``find_runtime()`` returns None
+when there is none, and the rig then skips the column with a notice.
 """
 
 from __future__ import annotations
@@ -299,15 +301,61 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
 
 # ------------------------------------------------------------------ running it
 
+PIN = REPO / "unreal" / "RUNTIME.json"
+PACKAGES = REPO / "unreal" / "package"          # git-ignored: downloaded builds, one folder per tag
+RELEASES = "https://github.com/Imrsv-tools/Matter-Library/releases/download"
+
+
 def find_runtime() -> list[str] | None:
-    """The command that starts the runtime, or None (the rig skips the column with a notice)."""
+    """The command that starts the runtime, or None (the rig skips the column with a notice).
+
+    First found wins: ``$MATTER_UNREAL_RUNTIME`` (a launcher), editor mode when asked for by
+    ``$MATTER_UNREAL_EDITOR``, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
+    downloaded and checked on first use.
+    """
     exe = os.environ.get("MATTER_UNREAL_RUNTIME")
     if exe:
         return [exe]
     editor = os.environ.get("MATTER_UNREAL_EDITOR")
     if editor:
         return [editor, str(PROJECT), "-game"]
+    if PIN.is_file():
+        return [str(pinned_package())]
     return None
+
+
+def pinned_package() -> Path:
+    """The pinned build's launcher, downloading the release asset if this machine lacks it."""
+    pin = json.loads(PIN.read_text(encoding="utf-8"))
+    root = PACKAGES / pin["tag"]
+    launcher, stamp = root / "Linux" / "MatterRuntime.sh", root / ".sha256"
+    if launcher.is_file() and stamp.is_file() and stamp.read_text().strip() == pin["sha256"]:
+        return launcher
+    import hashlib  # noqa: PLC0415
+    import shutil  # noqa: PLC0415
+    import tarfile  # noqa: PLC0415
+    import urllib.request  # noqa: PLC0415
+    url = f"{RELEASES}/{pin['tag']}/{pin['asset']}"
+    print(f"unreal: downloading {url} ({pin['size'] / 1e6:.0f} MB, once per machine)")
+    PACKAGES.mkdir(parents=True, exist_ok=True)
+    part = PACKAGES / f"{pin['asset']}.part"
+    h = hashlib.sha256()
+    with urllib.request.urlopen(url) as r, part.open("wb") as f:
+        while chunk := r.read(1 << 20):
+            h.update(chunk)
+            f.write(chunk)
+    if h.hexdigest() != pin["sha256"]:
+        part.unlink()
+        raise SystemExit(f"unreal: {url} has sha256 {h.hexdigest()}, the pin says {pin['sha256']}")
+    shutil.rmtree(root, ignore_errors=True)
+    root.mkdir(parents=True)
+    with tarfile.open(part) as t:
+        t.extractall(root, filter="data")
+    part.unlink()
+    stamp.write_text(pin["sha256"] + "\n")
+    if not launcher.is_file():
+        raise SystemExit(f"unreal: {pin['asset']} has no Linux/MatterRuntime.sh")
+    return launcher
 
 
 def run_runtime(cmd: list[str], ujob: Path, log: Path) -> None:
@@ -318,10 +366,12 @@ def run_runtime(cmd: list[str], ujob: Path, log: Path) -> None:
         env.pop("WAYLAND_DISPLAY", None)
     full = ["nice", "-n", "19", *cmd, f"-MatterJob={ujob}", "-RenderOffscreen", "-unattended",
             "-nosound", "-stdout", "-FullStdOutLogOutput"]
+    record = ujob.parent / "raw" / "matter_runtime.log"     # the app's own record (Shipping has no log)
+    record.unlink(missing_ok=True)
     with log.open("w", encoding="utf-8") as fh:
         rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S).returncode
     if rc != 0:
-        raise SystemExit(f"Unreal runtime failed (exit {rc}); see {log}")
+        raise SystemExit(f"Unreal runtime failed (exit {rc}); see {record} and {log}")
 
 
 def read_pfm(path: Path) -> np.ndarray:
