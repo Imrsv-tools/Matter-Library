@@ -348,7 +348,7 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 			}
 		}
 		Mids.Add(Mid);
-		Built.Add(Pair.Key, Mid);
+		Built.Add(FString(*Pair.Key), Mid);   // 5.8: a JSON key is a TSharedString
 	}
 	for (const auto& Pair : Meshes)
 	{
