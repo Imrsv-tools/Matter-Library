@@ -17,7 +17,9 @@ scene already converted, so a packaged build renders any job without the editor:
   Unreal's front faces with their index order kept (checked against the engine's own
   ``UKismetProceduralMeshLibrary::GenerateBoxMesh``). The subjects' ``st`` is divided by the
   article's ``meters_per_tile``, as the setting scene does (``job.py``); tangents are ``dP/ds``
-  from that ``st``. Metres are honoured by construction (JOB_FORMAT.md §Units).
+  from that ``st``. Metres are honoured by construction (JOB_FORMAT.md §Units). The character
+  (6.5) comes from ``scene/build_character.py`` the same way, one mesh and one material slot per
+  part, its faceVarying ``st`` split into one vertex per (point, uv) pair.
 * **the material** of each setting: the article read by the one shared reader
   (``blender/masters/article.py``), its values set on its master under the article's names
   (Phase06 D5), with the setting's sliders applied as a Creator would.
@@ -79,7 +81,8 @@ DOME_K = 1.011
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
 JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers carry a tangent sign)
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
-                 "TranslucentThick"}
+                 "TranslucentThick", "Hair"}
+CUTOUT_PORT = "cutout_map"   # not a slider: the mesh's map, supplied per binding (LCDSchema §Cut-out map)
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)
 IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
@@ -206,18 +209,25 @@ def _vec(v) -> list[float]:
     return v * 3 if len(v) == 1 else v[:3]
 
 
-def article_material(path: Path, sliders: dict | None = None) -> dict:
-    """The article on its master, by the article's names; raises Unsupported if not yet built."""
+def article_material(path: Path, sliders: dict | None = None, cutout_map: Path | None = None) -> dict:
+    """The article on its master, by the article's names; raises Unsupported if not yet built.
+
+    ``cutout_map`` is a binding's cut-out (a character's hair, brows, lashes: JOB_FORMAT.md
+    ``bindings[].cutout_map``): the master samples it on the mesh's own st, unplaced, as the
+    article's coverage (Masked thresholds it, Hair dithers it). Without one the card is solid.
+    """
     art = article.read(Path(path))
     if art.master not in BUILT_MASTERS:
         raise Unsupported(f"{art.name}: the {art.master} master is not built in Unreal yet")
     extra = sorted(set(art.textures) - TEXTURE_ROLES)
     if extra:
         raise Unsupported(f"{art.name}: textures {extra} are not carried by Unreal's masters yet")
-    unported = sorted(set(art.ports) - SLIDERS)
+    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT})
     if unported:
         raise Unsupported(f"{art.name}: sliders {unported} are not carried by Unreal's masters yet")
-    ports = dict(art.ports)
+    if cutout_map is not None and CUTOUT_PORT not in art.ports:
+        raise KeyError(f"{art.name} does not declare the cut-out input ({CUTOUT_PORT})")
+    ports = {k: v for k, v in art.ports.items() if k != CUTOUT_PORT}
     for k, v in (sliders or {}).items():
         if k not in ports:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
@@ -231,6 +241,8 @@ def article_material(path: Path, sliders: dict | None = None) -> dict:
     for n in ("normal", "layer2_normal"):
         if n not in art.textures:
             textures[f"{n}_tex"] = {"constant": FLAT_NORMAL}
+    if cutout_map is not None:
+        textures["cutout_tex"] = {"file": str(cutout_map), "srgb": False}
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -305,13 +317,77 @@ def write_mask(raw: Path, png: Path, cols: dict) -> None:
 
 # ------------------------------------------------------------------ the Unreal job
 
+def face_varying(points, normals, faces, st) -> tuple[list, list, list, list]:
+    """A faceVarying-st mesh (build_character: faces of (point, uv) index pairs, st per corner)
+    as a per-vertex one: one vertex per distinct (point, uv) pair, keeping the point's normal."""
+    remap, pts, nrm, uvs, out = {}, [], [], [], []
+    corner = 0
+    for f in faces:
+        poly = []
+        for vi, ti in f:
+            key = (vi, ti)
+            if key not in remap:
+                remap[key] = len(pts)
+                pts.append(points[vi])
+                nrm.append(normals[vi])
+                uvs.append(st[corner])
+            poly.append(remap[key])
+            corner += 1
+        out.append(poly)
+    return pts, nrm, uvs, out
+
+
+CHARACTER = "/World/Character/"
+
+
+def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, list, dict, dict]:
+    """The character job (Phase07 7.4; JOB_FORMAT.md §The character job): every part of the scene
+    as its own mesh and its own material slot; a bound part gets its article (one material per
+    binding, its cut-out map with it), an unbound part the scene's grey. Its st is the scene's
+    metres divided by the article's ``meters_per_tile``, except on a cut-out part, whose st stays
+    the atlas its map is drawn on (``job.write_character_scene`` does the same).
+    Returns the meshes, the bound part names, the unbound parts' materials and the cameras."""
+    import build_character  # noqa: PLC0415  (heavy: parses the pinned sources)
+    parts = build_character.load_parts()
+    cutouts = build_character.cutout_maps()
+    bound = {b["subject"].removeprefix(CHARACTER): b for b in job["bindings"]}
+    unknown = sorted(set(bound) - set(parts))
+    if unknown:
+        raise SystemExit(f"the job binds parts the scene does not have: {unknown}")
+    meshes, unbound = [], {}
+    for name, part in parts.items():
+        b = bound.get(name)
+        k = 1.0 if (b is None or CHARACTER + name in cutouts) else float(b["article"]["meters_per_tile"])
+        pts, nrm, uvs, faces = face_varying(part["points"], part["normals"], part["faces"], part["st"])
+        meshes.append(write_mesh(meshes_dir, name, pts, nrm, [(s / k, t / k) for s, t in uvs], faces, name))
+        if b is None:
+            unbound[name] = preview_surface(0.18, roughness=0.6)     # /World/Looks/Unbound
+    for s in settings:
+        for name, b in bound.items():
+            cut = b.get("cutout_map")
+            s["materials"][name] = article_material(Path(b["article"]["path"]), s.get("set"),
+                                                    Path(cut) if cut else None)
+    # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3
+    cams = {}
+    for cam, (pos, target) in build_character.cameras(parts).items():
+        pitch, yaw = build_character._look_at(pos, target)
+        cams[f"/World/{cam}"] = (tuple(round(v, 4) for v in pos), (round(pitch, 3), round(yaw, 3)))
+    return meshes, list(bound), unbound, cams
+
+
 def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DOME_K,
                extra_settings: list | None = None, extra_views: list | None = None) -> Path:
-    """Convert a rig job (test scene) into the runtime's job; returns its path."""
-    if job.get("mode") == "character":
-        raise Unsupported("the character job reaches Unreal at step 6.5")
+    """Convert a rig job (the test scene or the character) into the runtime's job; returns its path."""
     meshes_dir = folder / "meshes"
     meshes_dir.mkdir(parents=True, exist_ok=True)
+    if job.get("mode") == "character":
+        settings = [{"id": s["id"], "set": s.get("set"), "materials": {}} for s in job["settings"]]
+        meshes, names, furniture, cameras = character_scene(job, meshes_dir, settings)
+        for s in settings:
+            s.pop("set")
+            s["materials"] |= furniture
+        return _write_ujob(job, folder, meshes, names, furniture, settings, cameras, sun_k, dome_k,
+                           extra_settings, extra_views)
     mpt = float(job["article"]["meters_per_tile"])
     makers = {"Sphere": build_scene.sphere, "Cube": build_scene.rounded_cube, "Floor": build_scene.floor}
     meshes = []
@@ -329,10 +405,18 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
     for s in job["settings"]:
         mat = article_material(Path(job["article"]["path"]), s.get("set"))
         settings.append({"id": s["id"], "materials": {n: mat for n in names} | furniture})
-    settings += list(extra_settings or []) + [mask_setting(job, names, furniture)]
+    return _write_ujob(job, folder, meshes, names, furniture, settings, TEST_CAMERAS, sun_k, dome_k,
+                       extra_settings, extra_views)
+
+
+def _write_ujob(job: dict, folder: Path, meshes: list, names: list, furniture: dict, settings: list,
+                cameras: dict, sun_k: float, dome_k: float, extra_settings, extra_views) -> Path:
+    settings = settings + list(extra_settings or []) + [mask_setting(job, names, furniture)]
     views = []
     for spec in job["views"].values():
-        pos, rot = TEST_CAMERAS[spec["camera"]]
+        if spec["camera"] not in cameras:
+            raise SystemExit(f"view camera {spec['camera']!r} is not in the scene (have {sorted(cameras)})")
+        pos, rot = cameras[spec["camera"]]
         views.append(camera_view(pos, rot, spec["suffix"], [p.rsplit("/", 1)[1] for p in spec.get("hide", [])]))
     views += list(extra_views or [])
     sun, sky = lights(sun_k, dome_k)

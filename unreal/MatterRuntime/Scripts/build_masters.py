@@ -12,10 +12,11 @@ names each one's source. Parameter names are the article's (D5): OpenPBR's for l
 Creator ports, and the author-tier names. Every master is deleted and rebuilt, so the output
 depends only on this script and the engine.
 
-Built so far: the Opaque core in full (6.3: ``place2d``, the per-article textures, the mask set,
-three overlays each at its own real-world size, the roughness bias and the tangent-space normal;
-coat, fuzz and anisotropy pass straight to Epic's function) and the Sky (the rig's visible
-dome, unlit, which the runtime's sky light captures).
+Built: the 8 masters (``MASTERS``), all on the Opaque core (6.3: ``place2d``, the per-article
+textures, the mask set, three overlays each at its own real-world size, the roughness bias and the
+tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function), each with its
+own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair), and the Sky (the rig's
+visible dome, unlit, which the runtime's sky light captures).
 
 Every texture slot samples as **LinearColor**: the runtime hands every texture over as linear
 float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
@@ -57,6 +58,9 @@ TRANSMISSION = {"transmission_weight": 0.0, "transmission_color": (1.0, 1.0, 1.0
 #   0.999). Measured 2026-09-29 (6.4) on Neon's dim view, float captures: 0.798 on every region,
 #   the same with one call or two and with specular_weight 1 or 0, so it is the function's own.
 SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0, "emission_luminance": 1.0 / 0.798}
+# Hair (MasterSet's Hair row): OpenPBR thin-walled subsurface whose colour is WIRED to the tinted
+# base colour (the Hair graph's rule, so the tint reaches it), not a parameter of its own.
+HAIR_SUBSURFACE = {k: v for k, v in SUBSURFACE.items() if k != "subsurface_color"}
 
 # Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
 #   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
@@ -68,6 +72,11 @@ MASTERS = {
     "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
     "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True),
+    # Hair (Phase06 D12, 6.5): matte on cards, default lit (not Unreal's hair shading model, which
+    # reads a flat card as one glossy sheet); the cut-out as soft coverage, dithered; light through
+    # the card by the thin surface. Hair fibre is dielectric: one call.
+    "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, extra=HAIR_SUBSURFACE,
+                             thin=True, hair=True),
     "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
     "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
@@ -233,6 +242,35 @@ def image_uv(g, placed, col, layer=None):
                 g.node(M.MaterialExpressionConstant2Vector, col - 1, r=0.0, g=1.0), col - 2)
 
 
+def bayer4(g, col):
+    """This pixel's 4x4 ordered-dither threshold, (k + 0.5) / 16, each k in 0..15 once per 4x4
+    tile of pixels. The driver supersamples 4x and box-filters each 4x4 block (drivers/unreal.py
+    SUPERSAMPLE), and the tiles align with the blocks, so a coverage c keeps round-ish(16 c) of a
+    block's 16 samples: soft coverage to 1/16 in the rig's picture, with no noise.
+    k = 4 M2(x mod 2, y mod 2) + M2(floor(x / 2) mod 2, floor(y / 2) mod 2), M2 = [[0, 2], [3, 1]]
+    (M2(a, b) = 2 |a - b| + b), which is a bijection of the four bits onto 0..15."""
+    M = unreal
+    px = g.node(M.MaterialExpressionScreenPosition, col)
+    two = g.node(M.MaterialExpressionConstant, col - 2, r=2.0)
+
+    def bits(axis):
+        p = g.one(M.MaterialExpressionFloor, g.mask(px, axis, col - 1, "PixelPosition"), col - 2)
+        lo = g.op(M.MaterialExpressionFmod, p, two, col - 3)
+        hi = g.op(M.MaterialExpressionFmod,
+                  g.one(M.MaterialExpressionFloor, g.op_k(M.MaterialExpressionMultiply, p, 0.5, col - 3), col - 4),
+                  two, col - 5)
+        return lo, hi
+
+    def m2(a, b):
+        d = g.one(M.MaterialExpressionAbs, g.op(M.MaterialExpressionSubtract, a, b, col - 6), col - 7)
+        return g.op(M.MaterialExpressionAdd, g.op_k(M.MaterialExpressionMultiply, d, 2.0, col - 8), b, col - 9)
+
+    (x0, x1), (y0, y1) = bits("r"), bits("g")
+    k = g.op(M.MaterialExpressionAdd, g.op_k(M.MaterialExpressionMultiply, m2(x0, y0), 4.0, col - 10),
+             m2(x1, y1), col - 11)
+    return g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, k, 0.5, col - 12), 1.0 / 16.0, col - 13)
+
+
 def texture(g, name, default, uv, col):
     t = g.node(unreal.MaterialExpressionTextureSampleParameter2D, col, parameter_name=name, texture=default,
                sampler_type=unreal.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR)
@@ -329,6 +367,8 @@ def build_master(token, white, no_wear, flat):
 
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
     feed(base, "base_color")
+    if spec.get("hair"):
+        feed(base, "subsurface_color")      # the Hair graph's rule: the tinted base colour
     if len(calls) == 2:
         for c, m in zip(calls, (0.0, 1.0)):
             g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
@@ -373,16 +413,28 @@ def build_master(token, white, no_wear, flat):
 
     outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
     front = next(o for o in outs if "front" in o.lower())
+    if spec.get("opacity") or spec.get("hair"):
+        # The mesh's cut-out map (LCDSchema §Cut-out map, supplied per binding): sampled on the
+        # mesh's own st, NOT through the article's placement (its st is the atlas the map is drawn
+        # on); white, so a card, when none is bound.
+        own_st = image_uv(g, g.node(M.MaterialExpressionTextureCoordinate, 16), 15)
+        cov = g.op(M.MaterialExpressionMultiply, g.scalar("geometry_opacity", 1.0),
+                   texture(g, "cutout_tex", white, own_st, 12), 11, b_out="R")
     if spec.get("opacity"):
         # Masked (MasterSet: alpha-tested at the cutoff): coverage = geometry_opacity x
-        # opacity_tex, through Epic's function; kept where coverage >= opacity_cutoff, which a
-        # fixed clip of 0.5 does on (coverage - cutoff + 0.5). The mesh's cutout_map is 6.5's.
-        cov = g.op(M.MaterialExpressionMultiply, g.scalar("geometry_opacity", 1.0),
-                   texture(g, "opacity_tex", white, uv, 12), 11, b_out="R")
+        # opacity_tex x cutout_tex, through Epic's function; kept where coverage >=
+        # opacity_cutoff, which a fixed clip of 0.5 does on (coverage - cutoff + 0.5).
+        cov = g.op(M.MaterialExpressionMultiply, cov, texture(g, "opacity_tex", white, uv, 12), 10, b_out="R")
         feed(cov, "geometry_opacity")
         clip = g.op_k(M.MaterialExpressionAdd,
                       g.op(M.MaterialExpressionSubtract, calls[0], g.scalar("opacity_cutoff", 0.5, col=3), 2,
                            a_out="OpacityMask"), 0.5, 1)
+    elif spec.get("hair"):
+        # Hair (MasterSet: masked, DITHERED): the coverage is soft, never thresholded at a cutoff,
+        # so each pixel keeps it against its own ordered-dither threshold. It is not fed to Epic's
+        # function, whose weight would scale the kept pixels by it a second time.
+        clip = g.op_k(M.MaterialExpressionAdd, g.op(M.MaterialExpressionSubtract, cov, bayer4(g, 10), 2), 0.5, 1)
+    if spec.get("opacity") or spec.get("hair"):
         if not MEL.connect_material_property(clip, "", unreal.MaterialProperty.MP_OPACITY_MASK):
             raise RuntimeError(f"{token}: cannot connect the opacity mask")
         mat.set_editor_property("opacity_mask_clip_value", 0.5)

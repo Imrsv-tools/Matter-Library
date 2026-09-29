@@ -379,14 +379,14 @@ def region_colours(job: dict) -> dict | None:
     return {p.rsplit("/", 1)[1]: c for p, c in mc.items()} if mc else None
 
 
-def write_character_scorecard(job: dict, scores: dict) -> Path:
+def write_character_scorecard(job: dict, scores: dict, ref: str = "blender") -> Path:
     out = Path(job["out_dir"])
     sc = scores["defaults"]["views"]
     parts = {b["subject"].rsplit("/", 1)[1]: b["article"] for b in job["bindings"]}
     lines = [f"# Parity scorecard — the character ({', '.join(f'{p}: {a['name']}' for p, a in parts.items())})",
              "", f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
-             "ΔE2000 between USDLiveView's renderer (Storm) and Blender (Cycles), per bound part, "
+             f"ΔE2000 between {TOOL_NAMES['storm']} and {TOOL_NAMES[ref]}, per bound part, "
              "per view. Unbound parts are the scene's grey and are not scored.", "",
              "| Part | Article (master) | " + " | ".join(
                  job["views"][v].get("label", v) for v in job["views"]) + " |",
@@ -483,7 +483,7 @@ def main(argv=None) -> int:
         scores[s["id"]] = per_view["wide"] | {"views": per_view}
     sheet = build_sheet(job, scores, heat, args.cell, unreal_skip, ref)
     if args.character:
-        card = write_character_scorecard(job, scores)
+        card = write_character_scorecard(job, scores, ref)
     else:
         checks = {"scale": scale_checks(art, job, tools),
                   "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
