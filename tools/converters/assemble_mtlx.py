@@ -180,6 +180,9 @@ class MaterialSpec:
     fuzz_color: Optional[str] = None              # color3
     fuzz_roughness: Optional[float] = None
     specular_roughness_anisotropy: Optional[float] = None  # 0..1 along the UV tangent (7.6, C3)
+    # Phase09 9.1: OpenPBR's specular weight, authored only when set. Card hair is MATTE (the
+    # lead at click 1: the shine "gives away these are flat sheets"), so Hair_Natural sets 0.
+    specular_weight: Optional[float] = None
 
     # --- Author tier, Lane B: no OpenPBR input exists -> named interface inputs ---
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
@@ -768,7 +771,8 @@ def assemble(spec: MaterialSpec) -> str:
                      ("coat_roughness", "float"), ("coat_ior", "float"),
                      ("fuzz_weight", "float"), ("fuzz_color", "color3"),
                      ("fuzz_roughness", "float"),
-                     ("specular_roughness_anisotropy", "float")):
+                     ("specular_roughness_anisotropy", "float"),
+                     ("specular_weight", "float")):
         if getattr(spec, key) is not None:
             _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:

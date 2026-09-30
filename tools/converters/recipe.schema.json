@@ -25,6 +25,7 @@
     "roughness_const": {"type": "number"},
     "metalness_const": {"type": "number"},
     "specular_ior": {"type": "number"},
+    "specular_weight": {"type": "number", "minimum": 0, "maximum": 1, "description": "OpenPBR's own input (lane A; Phase09 9.1): the specular lobe's weight, authored only when set. Card hair sets 0: matte, since a highlight across a card reads as a flat sheet (the lead at Phase09 click 1)."},
     "transmission": {"type": "number"},
     "emission_color": {"$ref": "#/$defs/color3"},
     "emission_luminance": {"type": "number", "minimum": 0},

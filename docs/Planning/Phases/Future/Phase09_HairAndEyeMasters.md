@@ -383,4 +383,8 @@ ruling (RD-P09-8) · *the Hair input only, or every master whose tier gains it* 
 
 ## Execution Log
 
-_(populated during execution)_
+**Run 1 (2026-09-30, the library machine).** The lead drives each click; Blender sittings are built headless and opened in his Blender.
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 9.1 | `dfd89d5` + the matte commit | ✅ **Click 1, the lead (2026-09-30), on four heads in Blender (`short02` untinted blonde, auburn, black; `bob01` untinted):** *"this is looking quite good... in fact the eyelashes and brows also look good. the biggest giveaway right now is eh shine...maybe it is specular...it gives away these are flat sheets"*; then, shown the same heads with the hair's specular off: *"OH! You did it! yes! until we get proper hair... this will need to be the way"*. **RD-P09-5 settled: card hair is matte in every renderer** (`specular_weight = 0`; the field returns to the assembler, which had withdrawn it in Phase08 because no article needed it). **Fit set:** 26 cards; 9 are black paint (95th percentile under 0.004 linear: most brows and every lash card) and are written flat, so they take the article's colour and the tint. **Deviation (small):** the rig's `build_character.py` proxy parser ended a `verts` section at a key line before the first vertex, so `bob01` could not load; fixed. Blender library 56, CONFORMS. | click 2 (the character sheet), then 9.2 |
