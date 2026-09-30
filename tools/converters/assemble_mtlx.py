@@ -758,8 +758,10 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(shader, "subsurface_weight", "float", value=spec.subsurface_weight)
     if spec.subsurface_color is not None:
         _add_input(shader, "subsurface_color", "color3", value=spec.subsurface_color)
-    elif spec.master == "Hair":
-        # the fibre's colour, tint included: what passes through a strand is coloured by it
+    elif spec.master == "Hair" or (spec.base_color_map and spec.subsurface_weight > 0):
+        # Hair: the fibre's colour, tint included: what passes through a strand is coloured by it.
+        # Phase09 (F-P09-5): a Subsurface article taking the mesh's picture scatters the PICTURE's
+        # colour, or the picture keeps only (1 - subsurface_weight) of its strength (learning M4).
         _add_input(shader, "subsurface_color", "color3", nodegraph=ng_name, output="base_color_out")
     if spec.subsurface_radius is not None:
         _add_input(shader, "subsurface_radius", "float", value=spec.subsurface_radius)

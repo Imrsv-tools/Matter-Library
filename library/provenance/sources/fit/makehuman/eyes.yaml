@@ -1,0 +1,31 @@
+# Provenance for one fit set (Phase09 RD-P09-2): pictures on MakeHuman's own UV layouts,
+# supplied when an article is bound, never inside it. Written by the tool named in `evidence`.
+id: fit/makehuman/eyes
+version: v01
+files:
+  - MatterLibrary/textures/fit/makehuman/eyes/Brown_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/BrownLight_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/Blue_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/BlueGreen_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/DeepBlue_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/Green_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/Grey_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/Ice_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/LightBlue_basecolor_sUKN.png
+provenance:
+  source: derived
+  license: CC0-1.0
+  upstream: https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip
+  upstream_sha256: b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107
+  upstream_licence: "CC0 (each file's header: 'explicitly released as CC0 in september 2020')"
+  evidence: tools/converters/fit/gen_fit_makehuman.py
+members:
+  Brown: {member: eyes/materials/brown_eye.png}
+  BrownLight: {member: eyes/materials/brownlight_eye.png}
+  Blue: {member: eyes/materials/blue_eye.png}
+  BlueGreen: {member: eyes/materials/bluegreen_eye.png}
+  DeepBlue: {member: eyes/materials/deepblue_eye.png}
+  Green: {member: eyes/materials/green_eye.png}
+  Grey: {member: eyes/materials/grey_eye.png}
+  Ice: {member: eyes/materials/ice_eye.png}
+  LightBlue: {member: eyes/materials/lightblue_eye.png}

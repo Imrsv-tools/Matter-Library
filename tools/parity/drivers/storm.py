@@ -115,7 +115,10 @@ def run(job_path: Path) -> list[Path]:
                     opinions[v["camera"]] = [f"float exposure = {v['exposure']}"]
                 for prim in v.get("hide", []):
                     opinions.setdefault(prim, []).append('token visibility = "invisible"')
-                wrap = Path(scene).with_name(f"{s['id']}{v['suffix']}.usda")
+                # its own name, never the setting scene's: the wide view's suffix is empty, so
+                # `<id><suffix>.usda` WAS the scene, and a wide view that hides (Phase09: the
+                # cornea, every view) overwrote it with a layer that sublayered itself
+                wrap = Path(scene).with_name(f"{s['id']}{v['suffix']}__view.usda")
                 wrap.write_text("#usda 1.0\n(\n    subLayers = [@./" + Path(scene).name + "@]\n)\n\n"
                                 + _overs(opinions), encoding="utf-8")
                 scene = str(wrap)

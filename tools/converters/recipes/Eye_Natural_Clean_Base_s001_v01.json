@@ -1,0 +1,32 @@
+{
+  "_comment": "The whole eyeball (Phase09 9.2, RD-P09-3): ONE article bound on the sclera, iris and pupil, which share MakeHuman's one eye layout (MAP-F11). The eye's picture is the MESH's (base_color_map, supplied at binding from the library's fit set, textures/fit/makehuman/eyes/<Colour>_basecolor_sUKN.png): it draws the white with its veins, the iris with its fibres and dark limbal ring, and the pupil, so the face-stepped cuts between the parts stop showing. The eye's COLOUR is which picture the binding supplies (F-P09-3; the lead's lean to separate pictures, MAP-Q5), so the article carries no tint port. Its own colour is a near-white: the picture multiplies it, and with no picture supplied it reads as a plain white of the eye, never magenta. On SUBSURFACE until the Eye token exists (9.3); its subsurface colour follows the picture (F-P09-5), with a short 1 mm scatter so the iris fibres survive it. The wet look is a coat (MAP-RD5: the tear film on the cornea, not a cornea shell). Iris_Brown, Sclera_Natural, Pupil_Dark and Cornea_Clear are kept.",
+  "name": "Eye_Natural_Clean_Base_s001_v01",
+  "status": "candidate",
+  "path": "biological/tissue/Eye_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "metalness_const": 0.0,
+  "base_color_const": "0.95, 0.93, 0.92",
+  "roughness_const": 0.3,
+  "specular_ior": 1.4,
+  "subsurface_weight": 0.5,
+  "subsurface_radius": 0.001,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 1.0,
+  "coat_roughness": 0.02,
+  "coat_ior": 1.376,
+  "base_color_map": true,
+  "lcd_ports": [
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "The colour is the picture's (a photograph of an eye, CC0, MakeHuman), so the article's base is a near-white it multiplies (0.95, 0.93, 0.92: a plain white of the eye when no picture is supplied). Scatter as Sclera_Natural (Physically Based Eye (Sclera): the radius scale 1 / 0.351 / 0.226, forward anisotropy 0.8), at half weight and a 1 mm radius (Sclera_Natural's 4.8 mm would blur the iris's fibres and ring across a 12 mm iris). Coat: the tear film over the cornea, clear and near-mirror (roughness 0.02), at the cornea's IOR 1.376. Roughness 0.3 and IOR 1.4 as Sclera_Natural."
+    }
+  ]
+}

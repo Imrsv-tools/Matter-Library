@@ -365,10 +365,12 @@ CHARACTER_SKIN = "Skin_FitzpatrickIII_Clean_Base_s001_v01"
 CHARACTER_CAST = {
     "Lips": "Lips_Natural_Clean_Base_s001_v01",
     "Nails": "Nail_Natural_Clean_Base_s001_v01",
-    "Cornea": "Cornea_Clear_Clean_Base_s001_v01",
-    "Pupil": "Pupil_Dark_Clean_Base_s001_v01",
-    "Iris": "Iris_Brown_Clean_Base_s001_v01",
-    "Sclera": "Sclera_Natural_Clean_Base_s001_v01",
+    # Phase09 9.2 (RD-P09-3, RD-P09-4): one eye article on all three parts, each supplying the
+    # eye's picture from the fit set; the cornea is unbound and hidden, as in Studio
+    # (Cornea_Clear, Iris_Brown, Sclera_Natural and Pupil_Dark are kept)
+    "Pupil": "Eye_Natural_Clean_Base_s001_v01",
+    "Iris": "Eye_Natural_Clean_Base_s001_v01",
+    "Sclera": "Eye_Natural_Clean_Base_s001_v01",
     "Teeth": "Enamel_Natural_Clean_Base_s001_v01",
     "Gums": "Gum_Natural_Clean_Base_s001_v01",
     "Tongue": "Tongue_Natural_Clean_Base_s001_v01",

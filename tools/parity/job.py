@@ -139,6 +139,9 @@ CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFac
                    "waist": ("/World/CamWaist", "waist"), "feet": ("/World/CamFeet", "feet")}
 # prims a view hides (the teeth, gums and tongue sit behind closed lips on MakeHuman's body)
 CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
+# prims every view hides: the high-poly eye's cornea shell, which Studio's eye does not have
+# (Phase09 RD-P09-4, MAP-F12). The split and `Cornea_Clear` stay; the rig's eye matches Studio's.
+CHARACTER_HIDE_ALWAYS = ["/World/Character/Cornea"]
 
 
 def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
@@ -157,7 +160,7 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     """
     import build_character  # noqa: PLC0415 (heavy: parses the pinned sources)
     uvs = build_character.part_uvs()
-    cutouts = build_character.cutout_maps()
+    atlas = build_character.atlas_parts()
     meshmaps = build_character.mesh_maps()
     libs, lib_of = [], {}           # one Library per (article, the mesh's maps)
     for part, art in bindings.items():
@@ -187,7 +190,7 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
         prim = f"/World/Character/{part}"
         if prim not in uvs:
             raise SystemExit(f"no character part {part!r} (have {sorted(p.rsplit('/', 1)[1] for p in uvs)})")
-        k = 1.0 if prim in cutouts else art.meters_per_tile
+        k = 1.0 if prim in atlas else art.meters_per_tile
         st = ", ".join(f"({s / k:.5f}, {t / k:.5f})" for s, t in uvs[prim])
         key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())))
         text.append(f'        over "{part}"\n        {{\n'
@@ -231,7 +234,7 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
         "scene": str(CHARACTER_SCENE),
         "camera": CHARACTER_VIEWS["wide"][0],
         "views": {v: {"camera": c, "suffix": view_suffix(v), "label": label}
-                  | ({"hide": CHARACTER_HIDE[v]} if v in CHARACTER_HIDE else {})
+                  | {"hide": CHARACTER_HIDE.get(v, []) + CHARACTER_HIDE_ALWAYS}
                   for v, (c, label) in CHARACTER_VIEWS.items()},
         "subjects": [f"/World/Character/{p}" for p in bindings],
         # the mask: one flat colour per subject; compare.py scores each colour as a region

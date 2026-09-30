@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_Eye_Natural_Clean_Base_s001_v01">
+    <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="base_color_map" type="filename" value="" uiname="Base Color Map" />
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="0.95, 0.93, 0.92" />
+    </constant>
+    <texcoord name="base_color_map_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <image name="base_color_map_tex" type="color3" colorspace="srgb_texture">
+      <input name="file" type="filename" interfacename="base_color_map" />
+      <input name="default" type="color3" value="1.0, 1.0, 1.0" />
+      <input name="texcoord" type="vector2" nodename="base_color_map_uv" />
+    </image>
+    <multiply name="base_color_mapped" type="color3">
+      <input name="in1" type="color3" nodename="base_color_const" />
+      <input name="in2" type="color3" nodename="base_color_map_tex" />
+    </multiply>
+    <output name="base_color_out" type="color3" nodename="base_color_mapped" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="0.3" />
+    </constant>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_const" />
+      <input name="in2" type="float" interfacename="roughness_bias" />
+    </add>
+    <clamp name="roughness_biased_clamped" type="float">
+      <input name="in" type="float" nodename="roughness_biased" />
+      <input name="low" type="float" value="0.0" />
+      <input name="high" type="float" value="1.0" />
+    </clamp>
+    <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
+  </nodegraph>
+  <open_pbr_surface name="SR_Eye_Natural_Clean_Base_s001_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_Eye_Natural_Clean_Base_s001_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_Eye_Natural_Clean_Base_s001_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.4" />
+    <input name="subsurface_weight" type="float" value="0.5" />
+    <input name="subsurface_color" type="color3" nodegraph="NG_Eye_Natural_Clean_Base_s001_v01" output="base_color_out" />
+    <input name="subsurface_radius" type="float" value="0.001" />
+    <input name="subsurface_radius_scale" type="color3" value="1.0, 0.351, 0.226" />
+    <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
+    <input name="coat_weight" type="float" value="1.0" />
+    <input name="coat_roughness" type="float" value="0.02" />
+    <input name="coat_ior" type="float" value="1.376" />
+  </open_pbr_surface>
+  <surfacematerial name="Eye_Natural_Clean_Base_s001_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_Eye_Natural_Clean_Base_s001_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Subsurface" uniform="true" />
+    <input name="scale_tag" type="string" value="s001" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.01" />
+    <input name="domain" type="string" value="biological" uniform="true" />
+    <input name="class" type="string" value="tissue" uniform="true" />
+  </nodedef>
+</materialx>

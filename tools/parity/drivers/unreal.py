@@ -281,6 +281,11 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
             vectors[k] = _vec(sh[k])
         else:
             scalars[k] = float(sh[k][0])
+    # Phase09 (F-P09-5): a Subsurface article's subsurface_color CONNECTED to its base (no value on
+    # the shader) scatters the base's colour. The v1 masters take it as a parameter, so it is the
+    # article's constant here: a binding's picture reaches the scatter only at 9.3 (F-P09-14).
+    if art.master == "Subsurface" and "subsurface_weight" in sh and "subsurface_color" not in sh:
+        vectors["subsurface_color"] = list(vectors.get("base_color", [0.8, 0.8, 0.8]))
     # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
     for k, v in ports.items():
         if k in ("base_color_tint",):
@@ -371,7 +376,7 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
     Returns the meshes, the bound part names, the unbound parts' materials and the cameras."""
     import build_character  # noqa: PLC0415  (heavy: parses the pinned sources)
     parts = build_character.load_parts()
-    cutouts = build_character.cutout_maps()
+    atlas = build_character.atlas_parts()      # the one copy of the rule (Phase09 F-P09-15)
     bound = {b["subject"].removeprefix(CHARACTER): b for b in job["bindings"]}
     unknown = sorted(set(bound) - set(parts))
     if unknown:
@@ -379,7 +384,7 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
     meshes, unbound = [], {}
     for name, part in parts.items():
         b = bound.get(name)
-        k = 1.0 if (b is None or CHARACTER + name in cutouts) else float(b["article"]["meters_per_tile"])
+        k = 1.0 if (b is None or CHARACTER + name in atlas) else float(b["article"]["meters_per_tile"])
         pts, nrm, uvs, faces = face_varying(part["points"], part["normals"], part["faces"], part["st"])
         meshes.append(write_mesh(meshes_dir, name, pts, nrm, [(s / k, t / k) for s, t in uvs], faces, name))
         if b is None:
@@ -387,7 +392,7 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
     for s in settings:
         for name, b in bound.items():
             cut, pic = b.get("cutout_map"), b.get("base_color_map")
-            if pic and CHARACTER + name not in cutouts:
+            if pic and CHARACTER + name not in atlas:
                 raise Unsupported(f"{name}: a base_color_map on a part whose st is not its atlas")
             s["materials"][name] = article_material(Path(b["article"]["path"]), s.get("set"),
                                                     Path(cut) if cut else None,

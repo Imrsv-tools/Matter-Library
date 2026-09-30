@@ -24,6 +24,9 @@ a picture drawn on a layout has no real-world size, so its scale tag is ``sUKN``
 * ``<Name>_opacity_sUKN.png`` — the picture's alpha, one channel: the card's cut-out
   (``cutout_map``; RD-P09-6: the library prepares it too).
 
+**eyes** (9.2) — the pack's nine eyeball pictures, ``<Colour>_basecolor_sUKN.png``, as they are:
+the eye's colour IS the picture (``write_eyes``).
+
 The source is MakeHuman's system-asset pack (CC0), pinned by URL and sha256 in the rig's character
 builder (``tools/parity/scene/build_character.py`` ``SOURCES``) and fetched once into the
 git-ignored ``library/parity/_sources/``. Deterministic: the same pack gives the same bytes.
@@ -132,7 +135,9 @@ def write_provenance(set_name: str, rows: list[tuple[str, dict]]) -> None:
         "files:",
     ]
     for name, _ in rows:
-        lines += [f"  - {rel}/{name}_basecolor_{TAG}.png", f"  - {rel}/{name}_opacity_{TAG}.png"]
+        lines.append(f"  - {rel}/{name}_basecolor_{TAG}.png")
+        if (FIT / set_name / f"{name}_opacity_{TAG}.png").exists():
+            lines.append(f"  - {rel}/{name}_opacity_{TAG}.png")
     lines += [
         "provenance:",
         "  source: derived",
@@ -144,12 +149,34 @@ def write_provenance(set_name: str, rows: list[tuple[str, dict]]) -> None:
         "members:",
     ]
     for name, r in rows:
-        lines.append(f"  {name}: {{member: {r['member']}, p95_linear: {r['p95_linear']:.5f}, "
-                     f"flat: {'true' if r['flat'] else 'false'}}}")
+        extra = (f", p95_linear: {r['p95_linear']:.5f}, flat: {'true' if r['flat'] else 'false'}"
+                 if "p95_linear" in r else "")
+        lines.append(f"  {name}: {{member: {r['member']}{extra}}}")
     (PROVENANCE / f"{set_name}.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-SETS = {"hair": write_hair}
+EYE_NAMES = {"brown": "Brown", "brownlight": "BrownLight", "blue": "Blue", "bluegreen": "BlueGreen",
+             "deepblue": "DeepBlue", "green": "Green", "grey": "Grey", "ice": "Ice", "lightblue": "LightBlue"}
+
+
+def write_eyes() -> list[tuple[str, dict]]:
+    """The nine eyeball pictures, as they are (RGB, sRGB): the eye's COLOUR is which picture the
+    binding supplies (Phase09 RD-P09-3, F-P09-3; the lead's lean to separate pictures, MAP-Q5).
+    Each draws the sclera with its veins, the iris with its fibres and dark limbal ring, and the
+    pupil, on MakeHuman's one eye layout (MAP-F11). Their alpha is all opaque, so no cut-out."""
+    out_dir = FIT / "eyes"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    rows = []
+    for key, name in EYE_NAMES.items():
+        member = f"eyes/materials/{key}_eye.png"
+        im = Image.open(io.BytesIO(build_character.source(PACK, member))).convert("RGB")
+        im.save(out_dir / f"{name}_basecolor_{TAG}.png", optimize=True)
+        rows.append((name, {"member": member}))
+        print(f"fit/eyes {name}: {im.size[0]}x{im.size[1]}")
+    return rows
+
+
+SETS = {"hair": write_hair, "eyes": write_eyes}
 
 
 def main(argv=None) -> int:

@@ -166,6 +166,21 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         L(mul.outputs["Result"], sock)
         y -= 300
 
+    # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base
+    # (no value on the shader: the assembler wires it to base_color_out) scatters the base's own
+    # colour, the picture included. ML_Subsurface blends the TINTED base toward an UNTINTED
+    # Subsurface Color, so this is exact only without a tint port; a tinted one is refused.
+    if (art.master == "Subsurface" and "subsurface_weight" in art.shader
+            and "subsurface_color" not in art.shader and "Subsurface Color" in master.inputs):
+        if "base_color_tint" in ports:
+            raise NotImplementedError(f"{art.name}: a subsurface colour following a TINTED base "
+                                      "is not mapped in Blender yet")
+        bsock, ssock = master.inputs["Base Color"], master.inputs["Subsurface Color"]
+        if bsock.is_linked:
+            L(bsock.links[0].from_socket, ssock)
+        else:
+            ssock.default_value = tuple(bsock.default_value)
+
     # shared layers: data textures (never colour), each at its own real-world size
     for role, socket in [("maskset", "Maskset")] + [(f"overlay{n}", f"Overlay {n}")
                                                    for n in build_masters.OVERLAYS]:
