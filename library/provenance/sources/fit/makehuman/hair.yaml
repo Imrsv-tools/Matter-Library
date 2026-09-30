@@ -1,0 +1,91 @@
+# Provenance for one fit set (Phase09 RD-P09-2): pictures on MakeHuman's own UV layouts,
+# supplied when an article is bound, never inside it. Written by the tool named in `evidence`.
+id: fit/makehuman/hair
+version: v01
+files:
+  - MatterLibrary/textures/fit/makehuman/hair/Afro01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Afro01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Bob01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Bob01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Bob02_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Bob02_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Braid01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Braid01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow001_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow001_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow002_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow002_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow003_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow003_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow004_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow004_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow005_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow005_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow006_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow006_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow007_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow007_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow008_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow008_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow009_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow009_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow010_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow010_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow011_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow011_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow012_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyebrow012_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes02_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes02_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes03_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes03_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes04_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Eyelashes04_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Long01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Long01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Ponytail01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Ponytail01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short01_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short01_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short02_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short02_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short03_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short03_opacity_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short04_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/hair/Short04_opacity_sUKN.png
+provenance:
+  source: derived
+  license: CC0-1.0
+  upstream: https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip
+  upstream_sha256: b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107
+  upstream_licence: "CC0 (each file's header: 'explicitly released as CC0 in september 2020')"
+  evidence: tools/converters/fit/gen_fit_makehuman.py
+members:
+  Afro01: {member: hair/afro01/afro_diffuse.png, p95_linear: 0.01179, flat: false}
+  Bob01: {member: hair/bob01/bob01_diffuse.png, p95_linear: 0.05797, flat: false}
+  Bob02: {member: hair/bob02/bob02_diffuse.png, p95_linear: 0.73972, flat: false}
+  Braid01: {member: hair/braid01/braid01_diffuse.png, p95_linear: 0.04885, flat: false}
+  Eyebrow001: {member: eyebrows/eyebrow001/eyebrow001.png, p95_linear: 0.00816, flat: false}
+  Eyebrow002: {member: eyebrows/eyebrow002/eyebrow002.png, p95_linear: 0.00945, flat: false}
+  Eyebrow003: {member: eyebrows/eyebrow003/eyebrow003.png, p95_linear: 0.00693, flat: false}
+  Eyebrow004: {member: eyebrows/eyebrow004/eyebrow004.png, p95_linear: 0.00737, flat: false}
+  Eyebrow005: {member: eyebrows/eyebrow005/eyebrow005.png, p95_linear: 0.00685, flat: false}
+  Eyebrow006: {member: eyebrows/eyebrow006/eyebrow006.png, p95_linear: 0.00000, flat: true}
+  Eyebrow007: {member: eyebrows/eyebrow007/eyebrow007.png, p95_linear: 0.00000, flat: true}
+  Eyebrow008: {member: eyebrows/eyebrow008/eyebrow008.png, p95_linear: 0.00685, flat: false}
+  Eyebrow009: {member: eyebrows/eyebrow009/eyebrow009.png, p95_linear: 0.01486, flat: false}
+  Eyebrow010: {member: eyebrows/eyebrow010/eyebrow010.png, p95_linear: 0.00291, flat: true}
+  Eyebrow011: {member: eyebrows/eyebrow011/eyebrow011.png, p95_linear: 0.00000, flat: true}
+  Eyebrow012: {member: eyebrows/eyebrow012/eyebrow012.png, p95_linear: 0.00224, flat: true}
+  Eyelashes01: {member: eyelashes/eyelashes01/eyelashes01.png, p95_linear: 0.00125, flat: true}
+  Eyelashes02: {member: eyelashes/eyelashes02/eyelashes02.png, p95_linear: 0.00125, flat: true}
+  Eyelashes03: {member: eyelashes/eyelashes03/eyelashes03.png, p95_linear: 0.00125, flat: true}
+  Eyelashes04: {member: eyelashes/eyelashes04/eyelashes04.png, p95_linear: 0.00000, flat: true}
+  Long01: {member: hair/long01/long01_diffuse.png, p95_linear: 0.07507, flat: false}
+  Ponytail01: {member: hair/ponytail01/ponytail01_diffuse.png, p95_linear: 0.16975, flat: false}
+  Short01: {member: hair/short01/short01_diffuse.png, p95_linear: 0.02732, flat: false}
+  Short02: {member: hair/short02/short02_diffuse.png, p95_linear: 0.09476, flat: false}
+  Short03: {member: hair/short03/short03_diffuse.png, p95_linear: 0.12623, flat: false}
+  Short04: {member: hair/short04/short04_diffuse.png, p95_linear: 0.04092, flat: false}

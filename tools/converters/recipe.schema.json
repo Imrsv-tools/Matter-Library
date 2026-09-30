@@ -49,6 +49,7 @@
 
     "opacity_cutoff": {"type": "number"},
     "cutout_map": {"type": "boolean", "description": "Masked and Hair (Phase07 7.6, L2; Phase08 8.1): the article declares the cutout_map input, the mesh's own cut-out supplied when the article is bound (LCDSchema §Cut-out map). Masked needs opacity_cutoff (a hard cut-out); Hair refuses it (soft coverage). Excludes opacity_tex."},
+    "base_color_map": {"type": "boolean", "description": "Opaque, Masked, Hair and Subsurface (Phase09 9.1, RD-P09-1): the article declares the base_color_map input, the mesh's own picture (a hairstyle's strands, an eye) supplied when the article is bound (LCDSchema §Base colour map), multiplied into the base colour before the tint and sampled on the mesh's own UVs, outside place2d. Empty, it reads white: the article's own colour."},
     "layer_blend_balance": {"type": "number"},
     "layer_blend_contrast": {"type": "number"},
     "layer2_base_color_tex": {"type": "string"},

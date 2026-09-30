@@ -1,7 +1,7 @@
 # Phase09 — Hair and Eye Masters
 
-**Status:** ACTIVE: discovery complete, **the Brief is ready** (2026-09-29, Passes 1–2; re-checked against Phase06's
-execution 2026-09-30, Pass 3). Lane: `build` (verified, §Risk lane). No `YOUR CALL` is open (§Discovery Status: 9.3 kept,
+**Status:** IN EXECUTION (2026-09-30, `/execute 9`). Discovery complete (2026-09-29, Passes 1–2; re-checked against
+Phase06's execution 2026-09-30, Pass 3). Lane: `build` (verified, §Risk lane). No `YOUR CALL` is open (§Discovery Status: 9.3 kept,
 lead 2026-09-29). **Runs on two machines:** 9.1–9.2 on this one (the library machine), with Unreal's column rendered here
 from the pinned package; 9.3's master building on the UE machine in Phase06's `unreal/` project (Phase06 D13; Phase06
 closed 2026-09-30).

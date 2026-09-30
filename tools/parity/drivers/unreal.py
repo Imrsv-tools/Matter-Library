@@ -83,6 +83,8 @@ JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers c
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
 CUTOUT_PORT = "cutout_map"   # not a slider: the mesh's map, supplied per binding (LCDSchema §Cut-out map)
+BASE_MAP_PORT = "base_color_map"   # not a slider: the mesh's picture, per binding (Phase09 RD-P09-1)
+PLACE_DEFAULTS = {"uv_scale": [1.0, 1.0], "uv_offset": [0.0, 0.0], "uv_rotation": [0.0]}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)
 IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
@@ -209,12 +211,20 @@ def _vec(v) -> list[float]:
     return v * 3 if len(v) == 1 else v[:3]
 
 
-def article_material(path: Path, sliders: dict | None = None, cutout_map: Path | None = None) -> dict:
+def article_material(path: Path, sliders: dict | None = None, cutout_map: Path | None = None,
+                     base_color_map: Path | None = None) -> dict:
     """The article on its master, by the article's names; raises Unsupported if not yet built.
 
     ``cutout_map`` is a binding's cut-out (a character's hair, brows, lashes: JOB_FORMAT.md
     ``bindings[].cutout_map``): the master samples it on the mesh's own st, unplaced, as the
     article's coverage (Masked thresholds it, Hair dithers it). Without one the card is solid.
+
+    ``base_color_map`` is a binding's picture (Phase09 RD-P09-1). **Until the masters carry it
+    (9.3), it rides the masters' ``base_color_tex``** (Phase09 F-P09-14): every master computes
+    ``base_color x base_color_tex x base_color_tint`` with the texture on the PLACED st, which is
+    exactly RD-P09-1's product when the placement is at its defaults and the part's st is its
+    atlas (the caller's check), and the article has no base texture of its own. Anything else is
+    refused, never approximated.
     """
     art = article.read(Path(path))
     if art.master not in BUILT_MASTERS:
@@ -222,12 +232,22 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     extra = sorted(set(art.textures) - TEXTURE_ROLES)
     if extra:
         raise Unsupported(f"{art.name}: textures {extra} are not carried by Unreal's masters yet")
-    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT})
+    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT, BASE_MAP_PORT})
     if unported:
         raise Unsupported(f"{art.name}: sliders {unported} are not carried by Unreal's masters yet")
     if cutout_map is not None and CUTOUT_PORT not in art.ports:
         raise KeyError(f"{art.name} does not declare the cut-out input ({CUTOUT_PORT})")
-    ports = {k: v for k, v in art.ports.items() if k != CUTOUT_PORT}
+    if base_color_map is not None:
+        if BASE_MAP_PORT not in art.ports:
+            raise KeyError(f"{art.name} does not declare the picture input ({BASE_MAP_PORT})")
+        placed = {k: v for k, v in {**art.ports, **(sliders or {})}.items()
+                  if k in ("uv_scale", "uv_offset", "uv_rotation")}
+        at_default = all(list(map(float, v if isinstance(v, (list, tuple)) else [v])) == PLACE_DEFAULTS[k]
+                         for k, v in placed.items())
+        if "base_color" in art.textures or not at_default:
+            raise Unsupported(f"{art.name}: its picture needs the masters' own base_color_map input "
+                              "(a base texture or a moved placement; Phase09 9.3)")
+    ports = {k: v for k, v in art.ports.items() if k not in (CUTOUT_PORT, BASE_MAP_PORT)}
     for k, v in (sliders or {}).items():
         if k not in ports:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
@@ -243,6 +263,8 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
             textures[f"{n}_tex"] = {"constant": FLAT_NORMAL}
     if cutout_map is not None:
         textures["cutout_tex"] = {"file": str(cutout_map), "srgb": False}
+    if base_color_map is not None:        # the v1 bridge (F-P09-14): the picture on base_color_tex
+        textures["base_color_tex"] = {"file": str(base_color_map), "srgb": True}
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -364,9 +386,12 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
             unbound[name] = preview_surface(0.18, roughness=0.6)     # /World/Looks/Unbound
     for s in settings:
         for name, b in bound.items():
-            cut = b.get("cutout_map")
+            cut, pic = b.get("cutout_map"), b.get("base_color_map")
+            if pic and CHARACTER + name not in cutouts:
+                raise Unsupported(f"{name}: a base_color_map on a part whose st is not its atlas")
             s["materials"][name] = article_material(Path(b["article"]["path"]), s.get("set"),
-                                                    Path(cut) if cut else None)
+                                                    Path(cut) if cut else None,
+                                                    Path(pic) if pic else None)
     # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3
     cams = {}
     for cam, (pos, target) in build_character.cameras(parts).items():

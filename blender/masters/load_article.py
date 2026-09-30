@@ -40,12 +40,15 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
 
 
 def build(path: Path, sliders: dict | None = None, name: str | None = None,
-          cutout_map: Path | None = None):
+          cutout_map: Path | None = None, base_color_map: Path | None = None):
     """A new material for ``path`` with ``sliders`` applied; returns the material.
 
     ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
     a USD writer sets the Material's ``inputs:cutout_map``. It is sampled on the mesh's own UVs
     (not the article's placement); with none, the master's Opacity stays 1 (opaque).
+    ``base_color_map`` is the mesh's picture (LCDSchema §Base colour map, Phase09), supplied the
+    same way and sampled the same way; it multiplies the article's base colour ahead of the
+    master, whose own tint (and Hair's light through the card) then acts on the product.
     """
     build_masters.ensure_all()
     art = read(path)
@@ -135,6 +138,32 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         tex.location = (-300, y)
         L(uv.outputs["UV"], tex.inputs["Vector"])     # the mesh's UVs, unplaced
         L(tex.outputs["Color"], master.inputs["Opacity"])
+        y -= 300
+
+    if base_color_map is not None:
+        if "base_color_map" not in art.ports:
+            raise KeyError(f"{art.name} does not declare the picture input (base_color_map)")
+        img = bpy.data.images.load(str(base_color_map), check_existing=True)
+        img.colorspace_settings.name = "sRGB"
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(uv.outputs["UV"], tex.inputs["Vector"])     # the mesh's UVs, unplaced
+        sock = master.inputs["Base Color"]
+        mul = nt.nodes.new("ShaderNodeMix")           # base_color_mapped: article base x picture
+        mul.data_type = "RGBA"
+        mul.blend_type = "MULTIPLY"
+        mul.clamp_result = False
+        mul.inputs["Factor"].default_value = 1.0
+        mul.location = (100, y)
+        if sock.is_linked:                            # the article's own base texture
+            L(sock.links[0].from_socket, mul.inputs["A"])
+        else:
+            mul.inputs["A"].default_value = tuple(sock.default_value)
+        L(tex.outputs["Color"], mul.inputs["B"])
+        L(mul.outputs["Result"], sock)
         y -= 300
 
     # shared layers: data textures (never colour), each at its own real-world size

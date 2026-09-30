@@ -1,5 +1,5 @@
 {
-  "_comment": "Hair fibre, untinted (Phase08 8.1, RD-P08-2): keratin with the least melanin, so its own look is a pale platinum blonde, and every natural hair colour is a base_color_tint BELOW it (the tint is a 0-1 multiply: LCDSchema). INTERIM (the lead, 2026-09-28: light through the strands, soft edges, much less gloss): the real fix is card maps (root-to-tip, strand variation, depth) and strands, research 260928_R_HairAndNailRendering H4/H5. On the HAIR master: the mesh's cut-out as SOFT coverage (no cutoff), and OpenPBR thin-walled subsurface whose colour is the tinted base colour, so light passes through the card coloured by the fibre, and the tint reaches it. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V. Hair_DarkBrown (on Masked) is kept.",
+  "_comment": "Hair fibre, untinted (Phase08 8.1, RD-P08-2): keratin with the least melanin, so its own look is a pale platinum blonde, and every natural hair colour is a base_color_tint BELOW it (the tint is a 0-1 multiply: LCDSchema). INTERIM (the lead, 2026-09-28: light through the strands, soft edges, much less gloss): the real fix is card maps (root-to-tip, strand variation, depth) and strands, research 260928_R_HairAndNailRendering H4/H5. On the HAIR master: the mesh's cut-out as SOFT coverage (no cutoff), and OpenPBR thin-walled subsurface whose colour is the tinted base colour, so light passes through the card coloured by the fibre, and the tint reaches it. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V. Hair_DarkBrown (on Masked) is kept. Phase09 9.1 (RD-P09-1, MAP-RD3 as amended): the hairstyle's PICTURE is the mesh's too (base_color_map, supplied at binding from the library's fit set, textures/fit/makehuman/hair/<Style>_basecolor_sUKN.png): its normalised strand structure (brightest strand ~1) multiplies this light base before the tint, so every style keeps its strands, gaps and root-to-tip in any colour, and the brows and lashes follow the tint. With no picture supplied the base reads as before.",
   "name": "Hair_Natural_Clean_Base_s001_v01",
   "status": "candidate",
   "path": "biological/keratin/Hair_Natural_Clean_Base_s001_v01.mtlx",
@@ -17,6 +17,7 @@
   "subsurface_weight": 0.6,
   "subsurface_scatter_anisotropy": 0.5,
   "cutout_map": true,
+  "base_color_map": true,
   "lcd_ports": [
     "base_color_tint",
     "roughness_bias"

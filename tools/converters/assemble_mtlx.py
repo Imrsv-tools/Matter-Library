@@ -73,6 +73,10 @@ AUTHOR_TIER_PORTS = {
     # Phase07 7.6 (L2): the MESH's cut-out, supplied when the article is bound (LCDSchema
     # §Cut-out map). Empty here: with no map supplied the image's default (1) is opaque.
     "cutout_map": ("filename", "", "Cut-out Map", {}),
+    # Phase09 9.1 (RD-P09-1): the MESH's picture (a hairstyle's strands, an eye), supplied when
+    # the article is bound (LCDSchema §Base colour map) and MULTIPLIED into the base colour.
+    # Empty here: with no map supplied the image's default (1) leaves the article's own colour.
+    "base_color_map": ("filename", "", "Base Color Map", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -91,6 +95,11 @@ KNOWN_MASTERS = {
 # `opacity_cutoff`; Hair (Phase08 8.1) takes it as SOFT coverage, unthresholded, and lets light
 # through the card: thin-walled subsurface whose colour is the (tinted) base colour.
 CUTOUT_MASTERS = {"Masked", "Hair"}
+
+# Masters that take the mesh's picture, `base_color_map` (Phase09 RD-P09-1; LCDSchema §Author
+# tier). The picture shades the article's base colour; the masters whose base is layered
+# (TwoLayer), light (Emissive) or seen through (Translucent*) do not take it.
+BASE_COLOR_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
@@ -175,6 +184,7 @@ class MaterialSpec:
     # --- Author tier, Lane B: no OpenPBR input exists -> named interface inputs ---
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
     cutout_map: bool = False                      # Masked; declares the mesh-supplied cut-out input
+    base_color_map: bool = False                  # declares the mesh-supplied picture (Phase09)
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -279,6 +289,9 @@ def _check_spec(spec: MaterialSpec) -> None:
                              "of the substance, like lace) or the mesh's cutout_map, not both")
         if spec.master == "Masked" and spec.opacity_cutoff is None:
             raise ValueError("cutout_map needs opacity_cutoff: Masked thresholds its source")
+    if spec.base_color_map and spec.master not in BASE_COLOR_MAP_MASTERS:
+        raise ValueError("base_color_map is an input of the masters "
+                         f"{sorted(BASE_COLOR_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
     if spec.master == "Hair":
         # Phase08 8.1 (the lead's interim hair: light through the strands, soft edges)
         if not spec.cutout_map or spec.opacity_cutoff is not None:
@@ -326,6 +339,7 @@ def assemble(spec: MaterialSpec) -> str:
     author_values = {
         "opacity_cutoff": spec.opacity_cutoff,
         "cutout_map": None,                  # the binding supplies it; the article's is empty
+        "base_color_map": None,              # the binding supplies it; the article's is empty
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -337,6 +351,8 @@ def assemble(spec: MaterialSpec) -> str:
         author_ports.append("opacity_cutoff")
     if spec.cutout_map:
         author_ports.append("cutout_map")
+    if spec.base_color_map:
+        author_ports.append("base_color_map")
     if has_layer2:
         author_ports += ["layer_blend_balance", "layer_blend_contrast"]
         if not spec.layer2_base_color_tex:
@@ -504,6 +520,21 @@ def assemble(spec: MaterialSpec) -> str:
                          bg=("color3", "nodename", base_src),
                          fg=("color3", "nodename", l2_src),
                          mix=("float", "nodename", t_src))
+
+    # Phase09 (RD-P09-1): base = base_color_const x base_color_map x base_color_tint. The mesh's
+    # picture is sampled on texcoord 0 directly, not `uv_place` (like `cutout_map`: drawn on the
+    # mesh's own UVs, so the Creator's placement never moves it). With no map supplied the file
+    # is empty and the image returns its `default`, white: the article's own colour, never magenta.
+    if spec.base_color_map:
+        _node("texcoord", "base_color_map_uv", "vector2", index=("integer", "value", 0))
+        img = ng.addNode("image", "base_color_map_tex", "color3")
+        img.setColorSpace("srgb_texture")
+        _add_input(img, "file", "filename", interfacename="base_color_map")
+        _add_input(img, "default", "color3", value="1.0, 1.0, 1.0")
+        _add_input(img, "texcoord", "vector2", nodename="base_color_map_uv")
+        base_src = _node("multiply", "base_color_mapped", "color3",
+                         in1=("color3", "nodename", base_src),
+                         in2=("color3", "nodename", "base_color_map_tex"))
 
     if "base_color_tint" in spec.lcd_ports:
         tint = ng.addNode("multiply", "base_color_tinted", "color3")

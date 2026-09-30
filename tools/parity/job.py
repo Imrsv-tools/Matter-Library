@@ -149,33 +149,37 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     and its st divided by that article's ``meters_per_tile`` (the scene's st is in metres, as the
     test scene's is). An unbound part keeps the scene's grey ``Unbound`` look.
 
-    A cut-out part (hair, brows, lashes: ``build_character.cutout_maps``) bound to an article
-    that declares ``cutout_map`` gets the mesh's map on a Material instance of its own, by the
-    carrier rule (LCDSchema §Cut-out map: a value on the Material, connected into the article);
-    its st is the atlas the map is drawn on, so it is not rescaled.
+    A fit part (hair, brows, lashes: ``build_character.mesh_maps``) bound to an article that
+    declares ``cutout_map`` or ``base_color_map`` gets the mesh's maps on a Material instance of
+    its own, by the carrier rule (LCDSchema §Cut-out map, §Base colour map: a value on the
+    Material, connected into the article); its st is the atlas the maps are drawn on, so it is
+    not rescaled.
     """
     import build_character  # noqa: PLC0415 (heavy: parses the pinned sources)
     uvs = build_character.part_uvs()
     cutouts = build_character.cutout_maps()
-    libs, lib_of = [], {}           # one Library per (article, cut-out map)
+    meshmaps = build_character.mesh_maps()
+    libs, lib_of = [], {}           # one Library per (article, the mesh's maps)
     for part, art in bindings.items():
-        key = (art.name, cutout_for(part, art, cutouts))
+        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())))
         if key not in lib_of:
             lib_of[key] = len(libs)
             libs.append(key + (art,))
     text = ["#usda 1.0\n(\n    subLayers = [@" + CHARACTER_SCENE.as_posix() + "@]\n"
             f'    upAxis = "{build_scene.UP_AXIS}"\n    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
             'over "World"\n{\n']
-    for i, (name, cut, art) in enumerate(libs):
+    for i, (name, maps, art) in enumerate(libs):
         body = ""
-        if cut is not None:
+        if maps:
             mat = f"/World/Library_{i}/Materials/{name}"
             body = ('        over "Materials"\n        {\n'
                     f'            over "{name}"\n            {{\n'
-                    f'                asset inputs:cutout_map = @{cut.as_posix()}@\n'
-                    f'                over "NG_{name}"\n                {{\n'
-                    f'                    asset inputs:cutout_map.connect = <{mat}.inputs:cutout_map>\n'
-                    '                }\n            }\n        }\n')
+                    + "".join(f'                asset inputs:{port} = @{path.as_posix()}@\n'
+                              for port, path in maps)
+                    + f'                over "NG_{name}"\n                {{\n'
+                    + "".join(f'                    asset inputs:{port}.connect = <{mat}.inputs:{port}>\n'
+                              for port, _ in maps)
+                    + '                }\n            }\n        }\n')
         text.append(f'    def "Library_{i}" (\n        prepend references = @{art.path.as_posix()}@</MaterialX>\n'
                     '    )\n    {\n' + body + '    }\n')
     text.append('    over "Character"\n    {\n')
@@ -185,11 +189,11 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
             raise SystemExit(f"no character part {part!r} (have {sorted(p.rsplit('/', 1)[1] for p in uvs)})")
         k = 1.0 if prim in cutouts else art.meters_per_tile
         st = ", ".join(f"({s / k:.5f}, {t / k:.5f})" for s, t in uvs[prim])
-        cut = cutout_for(part, art, cutouts)
+        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())))
         text.append(f'        over "{part}"\n        {{\n'
                     f'            texCoord2f[] primvars:st = [{st}] (\n'
                     '                interpolation = "faceVarying"\n            )\n'
-                    f'            rel material:binding = </World/Library_{lib_of[(art.name, cut)]}/Materials/{art.name}>\n'
+                    f'            rel material:binding = </World/Library_{lib_of[key]}/Materials/{art.name}>\n'
                     '        }\n')
     text.append('    }\n}\n')
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -197,9 +201,11 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     return out
 
 
-def cutout_for(part: str, art: "Article", cutouts: dict[str, Path]) -> Path | None:
-    """The mesh's cut-out map for this binding: the part has one and the article declares the input."""
-    return cutouts.get(f"/World/Character/{part}") if "cutout_map" in art.ports else None
+def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) -> dict[str, Path]:
+    """The mesh's maps for this binding (``cutout_map``, ``base_color_map``): each one the part
+    has and the article declares as an input."""
+    return {port: path for port, path in meshmaps.get(f"/World/Character/{part}", {}).items()
+            if port in art.ports}
 
 
 def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:
@@ -207,7 +213,7 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
     import build_character  # noqa: PLC0415
     out_dir.mkdir(parents=True, exist_ok=True)
     scene = write_character_scene(bindings, out_dir / "scenes" / "defaults.usda")
-    cutouts = build_character.cutout_maps()
+    meshmaps = build_character.mesh_maps()
     first = next(iter(bindings.values()))
     job = {
         "format": 1,
@@ -215,11 +221,12 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
         "article": {"name": first.name, "path": str(first.path), "master": first.master,
                     "meters_per_tile": first.meters_per_tile},
         # one entry per bound part: the driver builds the article on its master and assigns it;
-        # `cutout_map` (a cut-out part) is the mesh's map, supplied as the binding's input
+        # `cutout_map` / `base_color_map` (a fit part) are the mesh's maps, supplied as the
+        # binding's inputs
         "bindings": [{"subject": f"/World/Character/{p}", "article":
                       {"name": a.name, "path": str(a.path), "master": a.master,
                        "meters_per_tile": a.meters_per_tile}}
-                     | ({"cutout_map": str(c)} if (c := cutout_for(p, a, cutouts)) else {})
+                     | {port: str(path) for port, path in maps_for(p, a, meshmaps).items()}
                      for p, a in bindings.items()],
         "scene": str(CHARACTER_SCENE),
         "camera": CHARACTER_VIEWS["wide"][0],

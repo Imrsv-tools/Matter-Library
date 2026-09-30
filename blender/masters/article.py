@@ -50,8 +50,8 @@ def read(path: Path) -> ArticleData:
             art.ports[i.get("name")] = _floats(i.get("value"))
         for node in ng:
             name = node.get("name", "")
-            if name == "cutout_tex":
-                continue        # its file is the binding's cut-out map (build's `cutout_map`)
+            if name in ("cutout_tex", "base_color_map_tex"):
+                continue        # its file is the binding's map (build's `cutout_map` / `base_color_map`)
             if name.endswith("_tex") and node.tag in ("image", "tiledimage"):
                 f = node.find("input[@name='file']")
                 cs = node.get("colorspace", doc_cs if node.get("type", "").startswith("color") else None)
