@@ -44,8 +44,8 @@
     <input name="subsurface_radius" type="float" value="0.001" />
     <input name="subsurface_radius_scale" type="color3" value="1.0, 0.351, 0.226" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
-    <input name="coat_weight" type="float" value="1.0" />
-    <input name="coat_roughness" type="float" value="0.02" />
+    <input name="coat_weight" type="float" value="0.5" />
+    <input name="coat_roughness" type="float" value="0.1" />
     <input name="coat_ior" type="float" value="1.376" />
   </open_pbr_surface>
   <surfacematerial name="Eye_Natural_Clean_Base_s001_v01" type="material">

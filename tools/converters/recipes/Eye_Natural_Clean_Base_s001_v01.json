@@ -16,8 +16,8 @@
   "subsurface_radius": 0.001,
   "subsurface_radius_scale": "1.0, 0.351, 0.226",
   "subsurface_scatter_anisotropy": 0.8,
-  "coat_weight": 1.0,
-  "coat_roughness": 0.02,
+  "coat_weight": 0.5,
+  "coat_roughness": 0.1,
   "coat_ior": 1.376,
   "base_color_map": true,
   "lcd_ports": [
@@ -26,7 +26,7 @@
   "sources": [
     {
       "kind": "judgement",
-      "why": "The colour is the picture's (a photograph of an eye, CC0, MakeHuman), so the article's base is a near-white it multiplies (0.95, 0.93, 0.92: a plain white of the eye when no picture is supplied). Scatter as Sclera_Natural (Physically Based Eye (Sclera): the radius scale 1 / 0.351 / 0.226, forward anisotropy 0.8), at half weight and a 1 mm radius (Sclera_Natural's 4.8 mm would blur the iris's fibres and ring across a 12 mm iris). Coat: the tear film over the cornea, clear and near-mirror (roughness 0.02), at the cornea's IOR 1.376. Roughness 0.3 and IOR 1.4 as Sclera_Natural."
+      "why": "The colour is the picture's (a photograph of an eye, CC0, MakeHuman), so the article's base is a near-white it multiplies (0.95, 0.93, 0.92: a plain white of the eye when no picture is supplied). Scatter as Sclera_Natural (Physically Based Eye (Sclera): the radius scale 1 / 0.351 / 0.226, forward anisotropy 0.8), at half weight and a 1 mm radius (Sclera_Natural's 4.8 mm would blur the iris's fibres and ring across a 12 mm iris). Coat: the tear film, at the cornea's IOR 1.376, thin and soft (weight 0.5, roughness 0.1). First authored as a near-mirror (weight 1, roughness 0.02); the lead at Phase09 click 3: 'there is an un natural about of \"mirror\" going on... these highlight aboultly reflect and blow out the eyes'. With no cornea bulge (MAP-RD6), a mirror over the whole eyeball stretches the reflection across it; a real eye's sharp highlight is the cornea's alone. Softened, the lead: 'That helps... I think it will be something to kep an eye on... it might still be too much but will not know until we work with it a bit'. Roughness 0.3 and IOR 1.4 as Sclera_Natural."
     }
   ]
 }
