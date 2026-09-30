@@ -66,7 +66,9 @@ private:
 	UPROPERTY() TMap<FString, TObjectPtr<UTexture2D>> Textures;
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mids;
 
-	static constexpr int32 JobFormat = 2;    // 2 (6.3): mesh buffers carry a tangent sign
+	// 2 (6.3): mesh buffers carry a tangent sign; 3 (Phase09 9.3): the masters' own
+	// base_color_map_tex, which an older master would silently leave white
+	static constexpr int32 JobFormat = 3;
 
 	TSharedPtr<FJsonObject> Job;
 	TMap<FString, FString> MeshMaterial;     // mesh name -> the material slot id it takes

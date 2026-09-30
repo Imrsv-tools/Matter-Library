@@ -15,7 +15,8 @@ depends only on this script and the engine.
 Built: the 8 masters (``MASTERS``), all on the Opaque core (6.3: ``place2d``, the per-article
 textures, the mask set, three overlays each at its own real-world size, the roughness bias and the
 tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function), each with its
-own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair), and the Sky (the rig's
+own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair; Phase09: the mesh's
+picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the Sky (the rig's
 visible dome, unlit, which the runtime's sky light captures).
 
 Every texture slot samples as **LinearColor**: the runtime hands every texture over as linear
@@ -65,21 +66,26 @@ SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0, "emission_lum
 #            whose articles are dielectric by definition (Epic's single call is exact at metalness
 #            0), which also keeps their Substrate bytes down
 #   thin     geometry_thin_walled, a property of the master (its settings row), not a parameter
+#   base_map the mesh's picture, base_color_map_tex (LCDSchema §Base colour map, Phase09 RD-P09-1),
+#            on the masters whose author tier carries it
 MASTERS = {
-    "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False),
+    "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
-    "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True),
+    "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True, base_map=True),
     # Hair (Phase06 D12, 6.5): matte on cards, default lit (not Unreal's hair shading model, which
     # reads a flat card as one glossy sheet); the cut-out as soft coverage, dithered; the light
     # through the card folded into its colour (build_master's hair part). Dielectric: one call.
-    "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True),
+    "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True, base_map=True),
     "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
-    "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE),
+    "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE,
+                             base_map=True),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
                              extra=TRANSMISSION, thin=True),
     "TranslucentThick": dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
                              extra=TRANSMISSION, thin=False),
 }
+
+SUBSURFACE_FLOOR = 1e-4     # the scattered colour's floor (sRGB ~0.3/255: invisible)
 
 OVERLAYS = (1, 2, 3)
 GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
@@ -280,8 +286,9 @@ def build_master(token, white, no_wear, flat):
     the pass-through inputs, the coverage), MaterialX's formulas as in
     ``blender/masters/build_masters.py`` ``_build``:
 
-    * base_color_tinted: base_color x base_color_tex x base_color_tint (the article sets one of
-      the two to its value and leaves the other white);
+    * base_color_tinted: base_color x base_color_tex x base_color_map_tex x base_color_tint (the
+      article sets one of the first two to its value and leaves the other white; the third is the
+      mesh's picture, on the mesh's own st, where the master has it: Phase09 RD-P09-1);
     * roughness: specular_roughness x roughness_tex, + each overlay's B x effect, then
       roughness_biased_clamped = saturate(+ roughness_bias);
     * metalness: base_metalness x metalness_tex, the Mix of the two calls (metalness 0 and 1);
@@ -361,6 +368,16 @@ def build_master(token, white, no_wear, flat):
         base, rough, metal = mix(base, b2), mix(rough, r2), mix(metal, m2)
         n_ts = g.one(M.MaterialExpressionNormalize, mix(n_ts, n2), 3)
 
+    # The mesh's own st, NOT the article's placement: the atlas a mesh-supplied map is drawn on
+    # (the cut-out, the picture), so a Creator's UV nudge never moves it.
+    own_st = (image_uv(g, g.node(M.MaterialExpressionTextureCoordinate, 16), 15)
+              if spec.get("base_map") or spec.get("opacity") or spec.get("hair") else None)
+    base_map = None
+    if spec.get("base_map"):
+        # The mesh's picture (LCDSchema §Base colour map, Phase09 RD-P09-1), supplied per binding:
+        # base = base_color_const x base_color_map x base_color_tint; white when none is bound.
+        base_map = texture(g, "base_color_map_tex", white, own_st, 12)
+        base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
     if spec.get("hair"):
         # The Hair row's light through the card, OpenPBR thin-walled subsurface with its colour c the
@@ -412,6 +429,16 @@ def build_master(token, white, no_wear, flat):
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
         if name in SCALED:
             p = g.op_k(M.MaterialExpressionMultiply, p, SCALED[name], 5)
+        if name == "subsurface_color" and base_map is not None:
+            # Phase09 F-P09-5: an article taking the picture scatters the PICTURE's colour (its
+            # subsurface_color is connected to base_color_out), or the picture keeps only
+            # 1 - subsurface_weight of its strength (the white Unreal eye of 9.2). The driver sets
+            # this parameter to the article's base constant then; with no picture bound it is x 1.
+            p = g.op(M.MaterialExpressionMultiply, p, base_map, 5, b_out="RGB")
+            # A black texel (the eye picture's pupil) would scatter a colour of exactly 0, which
+            # HANGS THE GPU (learning U11: Xid 109 in SubsurfaceScattering, 9.3; the floor alone
+            # cleared it, the job otherwise identical)
+            p = g.op_k(M.MaterialExpressionMax, p, SUBSURFACE_FLOOR, 4)
         feed(p, name)
     if missing:
         raise RuntimeError(f"{token}: Epic's function has no input {missing}")
@@ -421,11 +448,9 @@ def build_master(token, white, no_wear, flat):
     outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
     front = next(o for o in outs if "front" in o.lower())
     if spec.get("opacity") or spec.get("hair"):
-        # The mesh's cut-out map (LCDSchema §Cut-out map, supplied per binding): sampled on the
-        # mesh's own st, NOT through the article's placement (its st is the atlas the map is drawn
-        # on); white, so a card, when none is bound.
-        own_st = image_uv(g, g.node(M.MaterialExpressionTextureCoordinate, 16), 15)
-        cov = g.op(M.MaterialExpressionMultiply, g.scalar("geometry_opacity", 1.0),
+        # The mesh's cut-out map (LCDSchema §Cut-out map, supplied per binding), on the mesh's own
+        # st; white, so a card, when none is bound.
+        cov =g.op(M.MaterialExpressionMultiply, g.scalar("geometry_opacity", 1.0),
                    texture(g, "cutout_tex", white, own_st, 12), 11, b_out="R")
     if spec.get("opacity"):
         # Masked (MasterSet: alpha-tested at the cutoff): coverage = geometry_opacity x

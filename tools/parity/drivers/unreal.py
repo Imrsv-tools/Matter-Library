@@ -79,12 +79,14 @@ DOME_K = 1.011
 
 # The masters this runtime has, and what of an article each one can carry so far. An article
 # needing more is refused by name, so the rig shows "not yet" instead of a wrong picture.
-JOB_FORMAT = 2           # the runtime refuses any other (2, 6.3: mesh buffers carry a tangent sign)
+# The runtime refuses any other job format (2, 6.3: mesh buffers carry a tangent sign; 3, Phase09
+# 9.3: the picture is the masters' own base_color_map_tex, which a v1-v2 master would silently drop).
+JOB_FORMAT = 3
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
+BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
 CUTOUT_PORT = "cutout_map"   # not a slider: the mesh's map, supplied per binding (LCDSchema §Cut-out map)
 BASE_MAP_PORT = "base_color_map"   # not a slider: the mesh's picture, per binding (Phase09 RD-P09-1)
-PLACE_DEFAULTS = {"uv_scale": [1.0, 1.0], "uv_offset": [0.0, 0.0], "uv_rotation": [0.0]}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)
 IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
@@ -219,12 +221,11 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     ``bindings[].cutout_map``): the master samples it on the mesh's own st, unplaced, as the
     article's coverage (Masked thresholds it, Hair dithers it). Without one the card is solid.
 
-    ``base_color_map`` is a binding's picture (Phase09 RD-P09-1). **Until the masters carry it
-    (9.3), it rides the masters' ``base_color_tex``** (Phase09 F-P09-14): every master computes
-    ``base_color x base_color_tex x base_color_tint`` with the texture on the PLACED st, which is
-    exactly RD-P09-1's product when the placement is at its defaults and the part's st is its
-    atlas (the caller's check), and the article has no base texture of its own. Anything else is
-    refused, never approximated.
+    ``base_color_map`` is a binding's picture (Phase09 RD-P09-1): the master's own
+    ``base_color_map_tex``, sampled on the mesh's st, unplaced (the caller checks the part's st is
+    its atlas), multiplied into the base (9.3; it rode ``base_color_tex`` on the v1 masters). On
+    Subsurface it scales ``subsurface_color`` too, which is exact where the article connects its
+    subsurface colour to an untinted, untextured base (F-P09-5); anything else is refused.
     """
     art = article.read(Path(path))
     if art.master not in BUILT_MASTERS:
@@ -240,13 +241,16 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     if base_color_map is not None:
         if BASE_MAP_PORT not in art.ports:
             raise KeyError(f"{art.name} does not declare the picture input ({BASE_MAP_PORT})")
-        placed = {k: v for k, v in {**art.ports, **(sliders or {})}.items()
-                  if k in ("uv_scale", "uv_offset", "uv_rotation")}
-        at_default = all(list(map(float, v if isinstance(v, (list, tuple)) else [v])) == PLACE_DEFAULTS[k]
-                         for k, v in placed.items())
-        if "base_color" in art.textures or not at_default:
-            raise Unsupported(f"{art.name}: its picture needs the masters' own base_color_map input "
-                              "(a base texture or a moved placement; Phase09 9.3)")
+        if art.master not in BASE_MAP_MASTERS:
+            raise Unsupported(f"{art.name}: the {art.master} master has no base_color_map input")
+        if art.master == "Subsurface" and "subsurface_weight" in art.shader:
+            # the master scatters subsurface_color x the picture (F-P09-5): exact only for a
+            # subsurface colour CONNECTED to a base that is the constant x the picture alone
+            why = ("its subsurface colour is its own value" if "subsurface_color" in art.shader else
+                   "its base has a texture" if "base_color" in art.textures else
+                   "its base is tinted" if "base_color_tint" in art.ports else None)
+            if why:
+                raise Unsupported(f"{art.name}: a picture on Unreal's Subsurface master, but {why}")
     ports = {k: v for k, v in art.ports.items() if k not in (CUTOUT_PORT, BASE_MAP_PORT)}
     for k, v in (sliders or {}).items():
         if k not in ports:
@@ -263,8 +267,8 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
             textures[f"{n}_tex"] = {"constant": FLAT_NORMAL}
     if cutout_map is not None:
         textures["cutout_tex"] = {"file": str(cutout_map), "srgb": False}
-    if base_color_map is not None:        # the v1 bridge (F-P09-14): the picture on base_color_tex
-        textures["base_color_tex"] = {"file": str(base_color_map), "srgb": True}
+    if base_color_map is not None:
+        textures["base_color_map_tex"] = {"file": str(base_color_map), "srgb": True}
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -282,8 +286,8 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         else:
             scalars[k] = float(sh[k][0])
     # Phase09 (F-P09-5): a Subsurface article's subsurface_color CONNECTED to its base (no value on
-    # the shader) scatters the base's colour. The v1 masters take it as a parameter, so it is the
-    # article's constant here: a binding's picture reaches the scatter only at 9.3 (F-P09-14).
+    # the shader) scatters the base's colour: the article's constant here, which the master
+    # multiplies by the binding's picture (base_color_map_tex, white when none is bound).
     if art.master == "Subsurface" and "subsurface_weight" in sh and "subsurface_color" not in sh:
         vectors["subsurface_color"] = list(vectors.get("base_color", [0.8, 0.8, 0.8]))
     # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
