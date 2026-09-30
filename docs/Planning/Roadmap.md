@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase09 — Hair and Eye Masters — ACTIVE *(discovery done 2026-09-29, the Brief is ready; 9.1–9.2 on this machine, 9.3 on the UE machine after Phase06's 6.5)*
-**Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
-- `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`
+*No active phase (2026-09-30, Phase09 closed).*
 
 ==================================================================================
 ## Future
@@ -118,3 +116,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the test rig's picture sheet gains an Unreal column, rendered by a small Unreal app of our own that runs on any Linux machine with a GPU.
 - `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
 *Closed 2026-09-30; the pinned build is `unreal-runtime-v1`.*
+
+### Phase09 — Hair and Eye Masters — COMPLETE
+**Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
+- `docs/Planning/Phases/Complete/Phase09_HairAndEyeMasters.md`
+*Closed 2026-09-30; the Unreal eye model did not fit (the eye is on Subsurface), and Studio's check is the platform's.*

@@ -293,7 +293,7 @@ iris and sclera recipes, the platform's character recipe (its per-mesh `uv_scale
   carries coat, or with the `Eye` master.
 
 **Routed:** the eye picture joins the hair picture and the `Eye` master in one phase, seeded 2026-09-29 on the lead's word
-(*"yes 1, seed the phase"*): `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`.
+(*"yes 1, seed the phase"*): `docs/Planning/Phases/Complete/Phase09_HairAndEyeMasters.md`.
 
 ## Open questions
 
@@ -348,8 +348,15 @@ repo was written by either; the scratch in `/tmp` is torn down.
 - **Unverified, recorded as such:** every probe result is flat 2D colour, not a lit render; how Unreal's eye model wants
   the eye bound (MAP-Q12, from knowledge); a runtime groom in Unreal (platform sizing, 2026-09-28: unproven).
 - **Open questions:** MAP-Q5, Q9–Q13 (Q1–Q3, Q7 and Q8 answered, Q4 retired, Q6 ruled).
+- **Built by Phase09 (closed 2026-09-30):** MAP-RD1/RD3 (the fit set; the hairstyle's picture shades a light, now matte,
+  `Hair_Natural`), MAP-RD5 (`Eye_Natural`, the whole eyeball picture, with coat). **MAP-RD6 tried and not built:** the
+  `Eye` master's spike failed on MakeHuman's plain eyeball (Learnings Unreal U12); the eye is on Subsurface, the `Eye`
+  token *(planned)*, Reevaluate with eye geometry. **Answered there:** MAP-Q5 (a picture per colour: the nine, the
+  eye's colour is the picture bound) · MAP-Q11 (Matter-Library#3: `base_color_map`, modulate) · MAP-Q12 (one article on
+  all three parts) · MAP-Q13 (Phase09 9.3 built the Unreal side; Studio's is `PlatformDependencies.md` P20/P21).
+  **Still open:** MAP-Q9, MAP-Q10 (strands).
 - **Next step:** parked; the work is routed.
-  - **Seeded 2026-09-29 (lead: *"yes 1, seed the phase"*), numbered Phase09 the same day (*"make it Phase09"*): `docs/Planning/Phases/Future/Phase09_HairAndEyeMasters.md`** —
+  - **Seeded 2026-09-29 (lead: *"yes 1, seed the phase"*), numbered Phase09 the same day (*"make it Phase09"*): `docs/Planning/Phases/Complete/Phase09_HairAndEyeMasters.md`** —
     the one picture input kind (hair and eyes), the hair picture read as modulate, the eye picture, and the `Eye` token with
     its settings row; the Unreal sides with Phase06 / Unreal Reference Masters (P20). It opens by the lead's `/discovery`.
   - **Strands:** a phase of its own (MAP-Q9), seeded only on the lead's word; the Roadmap's *Hair That Reads as Hair*

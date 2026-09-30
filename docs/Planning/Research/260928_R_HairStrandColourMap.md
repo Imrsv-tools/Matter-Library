@@ -75,3 +75,16 @@ A **second mesh-supplied map**, beside the cut-out, by the same carrier:
 
 - **HS-Q6** — Does the strand colour belong in the card-maps family of HR-Q4 (root-to-tip, strand-ID, depth)? The platform
   treats it as the first of those maps; the naming is provisional (`strand_color_map`) until the library rules.
+
+## Answered — by Phase09 (closed 2026-09-30)
+
+The library answered every ask its own way (research `260929_R_CharacterMaps.md` MAP-RD3 as amended; `LCDSchema.md`
+§Base colour map); Studio's side is `PlatformDependencies.md` P21.
+- **HS-Q1 / HS-Q6:** the input is **`base_color_map`** (OpenPBR-aligned, LCDSchema §Notes), on Opaque, Masked, Hair and
+  Subsurface; not a hair-only card map, since the eye takes it too.
+- **HS-Q2:** it **multiplies** (`base_color_const × base_color_map × base_color_tint`), never replaces, so the tint
+  reaches every colour on every style; unsupplied reads white.
+- **HS-Q3:** card hair is **matte, default lit** in Unreal and matte everywhere (`specular_weight = 0`); the hair
+  shading model is kept for strands.
+- **HS-Q4 / HS-Q5:** the Blender loader, the rig and the validator read it as they read `cutout_map`. The library also
+  prepares each hairstyle's picture and cut-out (the fit set).
