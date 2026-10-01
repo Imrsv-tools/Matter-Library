@@ -26,9 +26,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Library Coverage — SEEDED *(un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
+### Phase10 — Library Coverage — SEEDED *(numbered Phase10 by the lead 2026-10-01; un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
 **Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Phases/Future/PhaseTBD_LibraryCoverage.md`
+- `docs/Planning/Phases/Future/Phase10_LibraryCoverage.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
