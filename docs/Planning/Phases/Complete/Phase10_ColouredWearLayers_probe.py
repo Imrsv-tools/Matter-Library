@@ -1,6 +1,6 @@
 """Phase10 discovery Pass 2 — the dust probe. Disposable: nothing in the library uses it.
 
-    uv run docs/Planning/Phases/Future/Phase10_ColouredWearLayers_probe.py [out_dir]
+    uv run docs/Planning/Phases/Complete/Phase10_ColouredWearLayers_probe.py [out_dir]
 
 Writes scratch copies of two articles (texture paths made absolute) with the dust layer drawn
 four ways, renders each through the rig's own job writer and Storm driver at dust 0, 0.5 and 1,

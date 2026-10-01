@@ -47,7 +47,7 @@ The `<surfacematerial>` **name is the qualified Matter identity** ([Identity](..
 
 > **Reevaluate (2026-09-23):** measured on the live articles, the `<surfacematerial>`, `NG_` and `SR_` names are the full filename stem **including** `_vNN` (e.g. `Copper_Verdigris_Aged_Base_s01_v01`), whereas the manifest/catalog `id` ends at the `sNN` scale tag — whether the resolved identity includes the material version needs one stated rule in [Identity](../Ontology/Identity.md).
 
-The overlay and maskset textures inside the nodegraph use the fixed [render-role texture](LCDSchema.md#render-role-texture-nodes--assembler-owned-node-name-contract) node names (`overlay1_tex` / `overlay2_tex` / `maskset_tex`), load `lin_rec709`, and **modulate** normal and roughness — they are never mixed over base colour ([MasterSet](../Ontology/MasterSet.md) §Overlay/MaskSet model). The [reference example](examples/Reference_Copper_Verdigris_Aged_Base_s01_v01.mtlx) shows the full shape.
+The overlay and maskset textures inside the nodegraph use the fixed [render-role texture](LCDSchema.md#render-role-texture-nodes--assembler-owned-node-name-contract) node names (`overlay1_tex` / `overlay2_tex` / `maskset_tex`), load `lin_rec709`, and **modulate** normal and roughness — they are never mixed over base colour ([MasterSet](../Ontology/MasterSet.md) §Overlay/MaskSet model). *(Refined 2026-10-01, Phase10: a **deposit** overlay covers the base colour with its declared `overlayN_color`, never with its packed channels.)* The [reference example](examples/Reference_Copper_Verdigris_Aged_Base_s01_v01.mtlx) shows the full shape.
 
 ## Validation
 

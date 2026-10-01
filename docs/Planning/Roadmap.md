@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase10 — Coloured Wear Layers — ACTIVE *(seeded and opened 2026-10-01, lead: "If 2 then we need to do that phase now instead")*
-**Outcome:** a Creator who turns up a wear layer such as dust or grime sees it in its own colour, not only as a change in shine, and it looks that way in Blender, a USD viewer and Unreal.
-- `docs/Planning/Phases/Future/Phase10_ColouredWearLayers.md`
+*No active phase.*
 
 ==================================================================================
 ## Future
@@ -125,3 +123,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a Creator's character has hair that keeps its strands and takes any colour on any hairstyle, and eyes that look real (a photographed iris in the colour they pick, wet, and in Studio shaded by Unreal's own eye model), the same in Blender, a USD viewer and Studio.
 - `docs/Planning/Phases/Complete/Phase09_HairAndEyeMasters.md`
 *Closed 2026-09-30; the Unreal eye model did not fit (the eye is on Subsurface), and Studio's check is the platform's.*
+
+### Phase10 — Coloured Wear Layers — COMPLETE
+**Outcome:** a Creator who turns up a wear layer such as dust or grime sees it in its own colour, not only as a change in shine, and it looks that way in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Complete/Phase10_ColouredWearLayers.md`
+*Closed 2026-10-01; the pinned build is `unreal-runtime-v3`, and Studio's side is the platform's.*
