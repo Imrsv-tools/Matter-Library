@@ -10,6 +10,7 @@
     <input name="overlay3_density" type="float" value="0.0" uiname="Overlay 3 Density" />
     <input name="maskset_blend" type="float" value="0.0" uiname="Maskset Blend" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="overlay2_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 2 Color" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -113,7 +114,12 @@
       <input name="in1" type="color3" nodename="base_color_const" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <mix name="base_color_deposit2" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" interfacename="overlay2_color" />
+      <input name="mix" type="float" nodename="overlay2_effect" />
+    </mix>
+    <output name="base_color_out" type="color3" nodename="base_color_deposit2" />
     <constant name="roughness_const" type="float">
       <input name="value" type="float" value="0" />
     </constant>
@@ -292,6 +298,12 @@
       <input name="in" type="vector3" nodename="normal_ts_encoded" />
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
+    <mix name="transmission_weight_deposit2" type="float">
+      <input name="bg" type="float" value="1" />
+      <input name="fg" type="float" value="0.0" />
+      <input name="mix" type="float" nodename="overlay2_effect" />
+    </mix>
+    <output name="transmission_weight_out" type="float" nodename="transmission_weight_deposit2" />
   </nodegraph>
   <open_pbr_surface name="SR_Glass_Green_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -301,7 +313,7 @@
     <input name="specular_ior" type="float" value="1.52" />
     <input name="geometry_normal" type="vector3" nodegraph="NG_Glass_Green_Clean_Base_s01_v01" output="normal_out" />
     <input name="geometry_thin_walled" type="boolean" value="true" />
-    <input name="transmission_weight" type="float" value="1" />
+    <input name="transmission_weight" type="float" nodegraph="NG_Glass_Green_Clean_Base_s01_v01" output="transmission_weight_out" />
     <input name="transmission_color" type="color3" value="0.35, 0.70, 0.30" />
   </open_pbr_surface>
   <surfacematerial name="Glass_Green_Clean_Base_s01_v01" type="material">

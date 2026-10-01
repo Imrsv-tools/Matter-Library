@@ -13,10 +13,10 @@
   "normal_tex": "../../../textures/base/engineered/metal/Copper_Verdigris_normal_s01.png",
   "maskset_tex": "../../../textures/shared/masks/Verdigris01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density", "color_port": "overlay1_color"},
     {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
   ],
   "specular_ior": 1.5,
   "lcd_defaults": {"base_color_tint": "0.95, 0.64, 0.54", "maskset_blend": "0.35", "overlay1_density": "0.45", "overlay2_density": "0.30"},
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"]
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay1_color"]
 }

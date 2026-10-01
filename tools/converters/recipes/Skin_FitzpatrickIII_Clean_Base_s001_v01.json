@@ -26,9 +26,9 @@
   "fuzz_roughness": 0.5,
   "overlays": [
     {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
-    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density"}
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
   ],
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "roughness_bias"],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "roughness_bias", "overlay2_color"],
   "sources": [
     {"kind": "physicallybased", "entry": "Skin III", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
      "used": {"base_color_const": "0.623, 0.433, 0.343", "metalness_const": 0, "roughness_const": 0.5, "specular_ior": 1.4, "subsurface_radius": 0.00482, "subsurface_radius_scale": "1, 0.351, 0.226"},

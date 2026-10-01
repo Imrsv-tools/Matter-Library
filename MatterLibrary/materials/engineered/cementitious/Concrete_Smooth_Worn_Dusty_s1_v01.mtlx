@@ -8,6 +8,7 @@
     <input name="overlay1_density" type="float" value="0.0" uiname="Overlay 1 Density" />
     <input name="overlay2_density" type="float" value="0.0" uiname="Overlay 2 Density" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="overlay1_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 1 Color" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -53,7 +54,12 @@
       <input name="in1" type="color3" nodename="base_color_tex" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <mix name="base_color_deposit1" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" interfacename="overlay1_color" />
+      <input name="mix" type="float" nodename="overlay1_effect_raw" />
+    </mix>
+    <output name="base_color_out" type="color3" nodename="base_color_deposit1" />
     <image name="roughness_tex" type="float">
       <input name="file" type="filename" value="../../../textures/base/engineered/cementitious/Concrete_Smooth_Worn_roughness_s1.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />

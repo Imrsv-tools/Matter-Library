@@ -8,6 +8,7 @@
     <input name="overlay1_density" type="float" value="0.0" uiname="Overlay 1 Density" />
     <input name="overlay2_density" type="float" value="0.0" uiname="Overlay 2 Density" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="overlay2_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 2 Color" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -52,7 +53,12 @@
       <input name="in1" type="color3" nodename="base_color_const" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <mix name="base_color_deposit2" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" interfacename="overlay2_color" />
+      <input name="mix" type="float" nodename="overlay2_effect_raw" />
+    </mix>
+    <output name="base_color_out" type="color3" nodename="base_color_deposit2" />
     <image name="roughness_tex" type="float">
       <input name="file" type="filename" value="../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
@@ -192,6 +198,24 @@
       <input name="in" type="vector3" nodename="normal_ts_encoded" />
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
+    <mix name="subsurface_weight_deposit2" type="float">
+      <input name="bg" type="float" value="1.0" />
+      <input name="fg" type="float" value="0.0" />
+      <input name="mix" type="float" nodename="overlay2_effect_raw" />
+    </mix>
+    <output name="subsurface_weight_out" type="float" nodename="subsurface_weight_deposit2" />
+    <mix name="coat_weight_deposit2" type="float">
+      <input name="bg" type="float" value="0.1" />
+      <input name="fg" type="float" value="0.0" />
+      <input name="mix" type="float" nodename="overlay2_effect_raw" />
+    </mix>
+    <output name="coat_weight_out" type="float" nodename="coat_weight_deposit2" />
+    <mix name="fuzz_weight_deposit2" type="float">
+      <input name="bg" type="float" value="0.1" />
+      <input name="fg" type="float" value="0.0" />
+      <input name="mix" type="float" nodename="overlay2_effect_raw" />
+    </mix>
+    <output name="fuzz_weight_out" type="float" nodename="fuzz_weight_deposit2" />
   </nodegraph>
   <open_pbr_surface name="SR_Skin_FitzpatrickIV_Clean_Base_s001_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -200,15 +224,15 @@
     <input name="specular_roughness" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.4" />
     <input name="geometry_normal" type="vector3" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="normal_out" />
-    <input name="subsurface_weight" type="float" value="1.0" />
+    <input name="subsurface_weight" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="subsurface_weight_out" />
     <input name="subsurface_color" type="color3" value="0.436, 0.227, 0.131" />
     <input name="subsurface_radius" type="float" value="0.00367" />
     <input name="subsurface_radius_scale" type="color3" value="1, 0.373, 0.185" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
-    <input name="coat_weight" type="float" value="0.1" />
+    <input name="coat_weight" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="coat_weight_out" />
     <input name="coat_roughness" type="float" value="0.3" />
     <input name="coat_ior" type="float" value="1.5" />
-    <input name="fuzz_weight" type="float" value="0.1" />
+    <input name="fuzz_weight" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="fuzz_weight_out" />
     <input name="fuzz_color" type="color3" value="0.436, 0.227, 0.131" />
     <input name="fuzz_roughness" type="float" value="0.5" />
   </open_pbr_surface>

@@ -10,6 +10,7 @@
     <input name="overlay3_density" type="float" value="0.0" uiname="Overlay 3 Density" />
     <input name="maskset_blend" type="float" value="0.0" uiname="Maskset Blend" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="overlay3_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 3 Color" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -113,7 +114,12 @@
       <input name="in1" type="color3" nodename="base_color_const" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <output name="base_color_out" type="color3" nodename="base_color_tinted" />
+    <mix name="base_color_deposit3" type="color3">
+      <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" interfacename="overlay3_color" />
+      <input name="mix" type="float" nodename="overlay3_effect" />
+    </mix>
+    <output name="base_color_out" type="color3" nodename="base_color_deposit3" />
     <constant name="roughness_const" type="float">
       <input name="value" type="float" value="0.15" />
     </constant>

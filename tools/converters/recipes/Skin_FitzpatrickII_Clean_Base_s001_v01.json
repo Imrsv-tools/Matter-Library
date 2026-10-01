@@ -31,7 +31,8 @@
     },
     {
       "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
-      "density_port": "overlay2_density"
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
     }
   ],
   "lcd_ports": [
@@ -41,7 +42,8 @@
     "uv_rotation",
     "overlay1_density",
     "overlay2_density",
-    "roughness_bias"
+    "roughness_bias",
+    "overlay2_color"
   ],
   "sources": [
     {
