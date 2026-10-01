@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (2026-09-30, Phase09 closed).*
+### Phase10 — Library Coverage — ACTIVE *(discovery opened 2026-10-01; numbered Phase10 by the lead the same day; un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
+**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+- `docs/Planning/Phases/Future/Phase10_LibraryCoverage.md`
 
 ==================================================================================
 ## Future
@@ -25,10 +27,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
-
-### Phase10 — Library Coverage — SEEDED *(numbered Phase10 by the lead 2026-10-01; un-numbered 2026-09-28, lead: other smaller work comes before the full library build; it was Phase08, and Phase07 before that; its character classes moved to Phase07)*
-**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Phases/Future/Phase10_LibraryCoverage.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
