@@ -89,6 +89,10 @@ SUBSURFACE_FLOOR = 1e-4     # the scattered colour's floor (sRGB ~0.3/255: invis
 
 OVERLAYS = (1, 2, 3)
 GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
+# Phase10: a deposit's default colour (the Creator port overlayN_color, LCDSchema; Sand
+# desaturated halfway, as the assembler's and Blender's) and the weights a deposit hides
+DUST_COLOR = (0.413, 0.386, 0.308)
+COVERED = {"transmission_weight", "subsurface_weight", "coat_weight", "fuzz_weight"}
 
 # The space Epic's function reads ``geometry_normal`` in. Substrate's slab takes the material's
 # normal basis, which is tangent space (the material's default), so the combined tangent-space
@@ -295,7 +299,10 @@ def build_master(token, white, no_wear, flat):
     * the normal, in TANGENT space: normal_tex x 2 - 1, + each overlay's (RG x 2 - 1, 0) x effect,
       normalised ONCE (MasterSet, since 5.3);
     * an overlay's effect = overlayN_density x overlay.A x gate, gate = mix(1, maskset[G|B|A],
-      maskset_blend) (MasterSet §Overlay semantic, §MaskSet).
+      maskset_blend) (MasterSet §Overlay semantic, §MaskSet);
+    * a deposit overlay (Phase10) covers: cover = effect x overlayN_deposit, the tinted base mixed
+      to overlayN_color by it, and metalness, transmission, subsurface, coat and fuzz weights x
+      (1 - cover), before the Hair part reads them.
     """
     M = unreal
     spec = MASTERS[token]
@@ -379,26 +386,8 @@ def build_master(token, white, no_wear, flat):
         base_map = texture(g, "base_color_map_tex", white, own_st, 12)
         base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
-    if spec.get("hair"):
-        # The Hair row's light through the card, OpenPBR thin-walled subsurface with its colour c the
-        # tinted base (MaterialX: a reflected lobe c.c(1 - a)/2 and a transmitted one c.c(1 + a)/2,
-        # mixed in by the weight w). Under even light the two sum to mix(c, c.c, w), the anisotropy
-        # cancelling, and that is the card's colour here, matte and default lit (D12). Substrate's
-        # own thin-surface subsurface was tried first and rejected (6.5): in one real-time capture
-        # it draws the card as dark, noisy pixels, solid card or cut. Measured on the character
-        # against Storm, hair dE 4.3 (the plain base 7.4); ~20 % bright, because Storm's rear lobe
-        # sees only the dome, not the sun.
-        w = g.scalar("subsurface_weight", 0.0, col=11)
-        base = g.op(M.MaterialExpressionLinearInterpolate, base,
-                    g.op(M.MaterialExpressionMultiply, base, base, 10), 9)
-        g.link(w, base, "Alpha")
-    feed(base, "base_color")
-    if len(calls) == 2:
-        for c, m in zip(calls, (0.0, 1.0)):
-            g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
-    else:
-        feed(metal, "base_metalness")
 
+    keep = None     # Phase10: 1 - each deposit's cover, multiplied: what the deposits leave visible
     for n in OVERLAYS:
         ov = texture(g, f"overlay{n}_tex", no_wear, image_uv(g, placed, 15, f"overlay{n}"), 12)
         gate = g.lerp_from_one(maskset, blend, 9, b_out=GATE_CHANNEL[n])
@@ -410,6 +399,42 @@ def build_master(token, white, no_wear, flat):
                     g.op_k(M.MaterialExpressionMultiply, g.mask(ov, "rg", 10, "RGBA"), 2.0, 9), 1.0, 8)
         delta = g.op(M.MaterialExpressionAppendVector, rg, g.node(M.MaterialExpressionConstant, 8, r=0.0), 7)
         n_ts = g.op(M.MaterialExpressionAdd, n_ts, g.op(M.MaterialExpressionMultiply, delta, eff, 6), 5)
+        # Phase10 (MasterSet §Overlay semantic): a deposit COVERS: cover = effect x deposit; the
+        # base colour goes to the deposit's colour (after the tint), and every layer under it is
+        # hidden by (1 - cover). overlayN_deposit is 0 on a damage or gloss slot (the driver sets 1
+        # on a deposit's), so with no deposit every master renders as v2 did.
+        cover = g.op(M.MaterialExpressionMultiply, eff, g.scalar(f"overlay{n}_deposit", 0.0, col=8), 7)
+        base = g.op(M.MaterialExpressionLinearInterpolate, base,
+                    g.vector(f"overlay{n}_color", DUST_COLOR, col=7), 6)
+        g.link(cover, base, "Alpha")
+        left = g.one(M.MaterialExpressionOneMinus, cover, 6)
+        keep = left if keep is None else g.op(M.MaterialExpressionMultiply, keep, left, 5)
+
+    def hidden(src):
+        """A weight under the deposits: weight x keep (= mix(weight, 0, cover), per deposit)."""
+        return g.op(M.MaterialExpressionMultiply, src, keep, 4)
+
+    metal = hidden(metal)
+    if spec.get("hair"):
+        # The Hair row's light through the card, OpenPBR thin-walled subsurface with its colour c the
+        # tinted base (MaterialX: a reflected lobe c.c(1 - a)/2 and a transmitted one c.c(1 + a)/2,
+        # mixed in by the weight w). Under even light the two sum to mix(c, c.c, w), the anisotropy
+        # cancelling, and that is the card's colour here, matte and default lit (D12). Substrate's
+        # own thin-surface subsurface was tried first and rejected (6.5): in one real-time capture
+        # it draws the card as dark, noisy pixels, solid card or cut. Measured on the character
+        # against Storm, hair dE 4.3 (the plain base 7.4); ~20 % bright, because Storm's rear lobe
+        # sees only the dome, not the sun.
+        # The light through is the covered colour's, and a deposit hides it as Blender's master does.
+        w = hidden(g.scalar("subsurface_weight", 0.0, col=11))
+        base = g.op(M.MaterialExpressionLinearInterpolate, base,
+                    g.op(M.MaterialExpressionMultiply, base, base, 5), 4)
+        g.link(w, base, "Alpha")
+    feed(base, "base_color")
+    if len(calls) == 2:
+        for c, m in zip(calls, (0.0, 1.0)):
+            g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
+    else:
+        feed(metal, "base_metalness")
 
     # roughness_biased_clamped (LCDSchema): the bias is added, then clamped to 0..1
     rough = g.op(M.MaterialExpressionAdd, rough, g.scalar("roughness_bias", 0.0, col=4), 3)
@@ -429,6 +454,8 @@ def build_master(token, white, no_wear, flat):
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
         if name in SCALED:
             p = g.op_k(M.MaterialExpressionMultiply, p, SCALED[name], 5)
+        if name in COVERED:
+            p = hidden(p)
         if name == "subsurface_color" and base_map is not None:
             # Phase09 F-P09-5: an article taking the picture scatters the PICTURE's colour (its
             # subsurface_color is connected to base_color_out), or the picture keeps only
