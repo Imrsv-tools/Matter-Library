@@ -1,6 +1,6 @@
 # Phase10 — Coloured Wear Layers
 
-**Status:** DISCOVERY — **Brief written (Pass 2, 2026-10-01); lane `build`; one lead call open (Q-P10-1).** **Numbered Phase10 by the lead's ruling, 2026-10-01**, verbatim: *"If 2 then we need to do that phase now instead."* ("2" was Library Coverage's Pass 1 proposal to give colour on wear layers a phase of its own.) Library Coverage, which held Phase10 for part of that day, is un-numbered again (`PhaseTBD_LibraryCoverage.md`). That follows the lead's own precedent of 2026-09-28: *"make this Phase 8, mark the current Phase8 as TBD"*.
+**Status:** IN EXECUTION (2026-10-01; lane `build`). Brief written at discovery Pass 2; Q-P10-1 ruled (b), RD-P10-1. **Numbered Phase10 by the lead's ruling, 2026-10-01**, verbatim: *"If 2 then we need to do that phase now instead."* ("2" was Library Coverage's Pass 1 proposal to give colour on wear layers a phase of its own.) Library Coverage, which held Phase10 for part of that day, is un-numbered again (`PhaseTBD_LibraryCoverage.md`). That follows the lead's own precedent of 2026-09-28: *"make this Phase 8, mark the current Phase8 as TBD"*.
 - **Seeded from:** Library Coverage's seed question 10 and F-LC-7 · Phase07's ruling L3 (*"by L3's default the colour channel goes to Phase08 with dust"*, its close) · research `260927_R_CharacterMaterials_MPFB2.md` CM-Q5 · Phase05 step 5.2's finding F11 (the wear layers are too faint to see).
 
 ## Outcome
@@ -26,7 +26,7 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
 | 1 | 10.1 | **Oak's** sheet, the dust row at 0 → 0.5 → 1, Storm and Blender columns | the dust reads as dust, in its own colour, growing with the slider, alike in both. The Unreal column is still `v2` and shows colourless dust (F-P10-14) |
 | 2 | 10.1 | **Glass_Clear's** sheet, its dust row | the dust is visible on the pane in both columns (a cover alone would not be: F-P10-13) |
 | 3 | 10.1 | Blender: Oak on the default cube from the Asset Browser, framed close; the lead drags **Overlay 3 Density** 0 → 1 | the dust appears in its colour as a Creator would see it |
-| 4 | 10.2 | *(only if Q-P10-1 is (b))* the same scene; the lead sets the **dust colour** to a soot black | the dust turns dark; the agent then shows the value travelling in the exported USD |
+| 4 | 10.2 | the same scene; the lead sets the **dust colour** to a soot black | the dust turns dark; the agent then shows the value travelling in the exported USD |
 | 5 | 10.3 | Sheets of **Concrete_Smooth_Worn_Dusty** (its dusty defaults), **Copper_Verdigris** (a metal), **Skin_FitzpatrickIII** (scattering and coat) | dust covers each the same way: no shiny metallic dust on copper, no glowing scattered dust on skin |
 | 6 | 10.4 | Oak's and Glass_Clear's sheets **with the Unreal column from `unreal-runtime-v3`** | the dust matches in all three tools |
 
@@ -35,7 +35,7 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
 ### In now / not now
 
 **In now:**
-- **The contract:** `MasterSet.md` §Overlay/MaskSet model (the modulator rule refined, the deposit formula, a Change-log line) · `LCDSchema.md` (the author input `overlayN_color`; under Q-P10-1 (b), also a Creator port) · `AuthoringHarness.md` where it restates the overlay.
+- **The contract:** `MasterSet.md` §Overlay/MaskSet model (the modulator rule refined, the deposit formula, a Change-log line) · `LCDSchema.md` (the input `overlayN_color`, a Creator port by RD-P10-1) · `AuthoringHarness.md` where it restates the overlay.
 - **The tools:** the recipe schema (an optional `color` on an overlay entry) and its validator · the assembler · the Blender masters and `load_article.py` · the Unreal masters and the rig's Unreal driver · the Asset-Browser library rebuilt.
 - **Every article that carries dust (13)** given its colour and re-assembled in place (`v01` kept, pre-release; the Phase05 5.3 precedent).
 - **The pilot re-frozen:** `matterlib-0.1.0` carries three of the 13 (Concrete_Smooth_Worn_Dusty, Copper_Verdigris, Glass_Clear). The maintainer's promote command is handed over at the start of the close (`LOCAL_DELTAS.md`, the publishing row).
@@ -56,7 +56,7 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
 *What does the stack already provide, and which standards does this touch?*
 - **OpenPBR's fuzz** (its own definition: *"…microfibers … as well as dust grains"*) was the first candidate, and **it was measured and fails the Outcome face-on** (F-P10-12): fuzz alone moved Oak's close-up 4.5 levels at full dust, against 4.2 for today's colourless dust. The gap that justifies the cover is measured, not hypothetical.
 - **The cover is no new BSDF.** It is a `mix` of existing inputs, by the overlay effect every tool already computes. MaterialX has `mix` natively, Blender has Mix nodes, and Unreal has Lerp. The Blender masters already lerp base colour by a weight (transmission, subsurface).
-- **Standards touched:** MasterSet's modulator rule (refined, its reason kept: packed data never becomes colour) · the LCD vocabulary (only under Q-P10-1 (b): additive, library semver-minor, the `overlay3_density` precedent) · the `determinism` lane (articles without a deposit colour must assemble byte-identically) · the linear colour-space rule (the declared colour is `lin_rec709`, like every library constant).
+- **Standards touched:** MasterSet's modulator rule (refined, its reason kept: packed data never becomes colour) · the LCD vocabulary (RD-P10-1: additive, library semver-minor, the `overlay3_density` precedent) · the `determinism` lane (articles without a deposit colour must assemble byte-identically) · the linear colour-space rule (the declared colour is `lin_rec709`, like every library constant).
 
 ### Decisions that bind
 
@@ -72,14 +72,14 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
   ```
   The normal and roughness parts of the overlay are unchanged. Deposits apply in slot order. The cover comes **after `base_color_tint`**, so a Creator who tints a car red does not tint its dust. **In Blender it comes before the master's own transmission and subsurface base-colour lerps**, because they read the covered weights.
 - **Which layer is a deposit:** the recipe's overlay entry carries an optional `color` (linear `color3`). Its presence makes the slot a deposit. The colour is per slot, because Dust01 sits in slot 1, 2 or 3 depending on the article (measured: all three occur).
-- **The input's name** follows the slot grammar: `overlay1_color` / `overlay2_color` / `overlay3_color`, declared on an article only for a deposit slot (as `overlayN_density` is only for a carried slot). An **author-tier** input (lane B, the `layer_blend_balance` path through `load_article.py` and the Unreal driver). Under Q-P10-1 (b) it is also a Creator port.
+- **The input's name** follows the slot grammar: `overlay1_color` / `overlay2_color` / `overlay3_color`, declared on an article only for a deposit slot (as `overlayN_density` is only for a carried slot). An **author-tier** input (lane B, the `layer_blend_balance` path through `load_article.py` and the Unreal driver). It is also a Creator port (RD-P10-1), from 10.2.
 - **The modulator rule, refined:** *"An overlay's packed channels never become colour. A deposit overlay covers the surface with its declared colour, weighted by its effect."* The 2026-07 history line stays; a Change-log line is added.
 - **No bridge for the Unreal column before `v3`** (F-P10-14, taken).
 - **The character uses stay out**, by CM2 (F-P10-4).
 
 ### Risk lane — `build`, controls read
 
-- **Contract:** the same shape as Phase09's `base_color_map` and Phase04's `overlay3_density`, both of which ran in `build`. **Read:** `assemble_mtlx.py` (the `Overlay` dataclass, the effect, the base-colour chain), `recipe.schema.json` (overlay items are `additionalProperties: false`, so `color` must be added there), `LCD_PORTS` (defined in `assemble_mtlx.py` and `blender/addons/imrsv_lcd_export/lcd_usd_edit.py`, read by `validate_recipe.py`, `validate_material.py`, `check_lcd_carrier.py`, `verify_asset_library.py`, `matter_proxy.py`, `make_preview.py`, the rig and its Unreal driver). Under (a), `LCD_PORTS` is not touched.
+- **Contract:** the same shape as Phase09's `base_color_map` and Phase04's `overlay3_density`, both of which ran in `build`. **Read:** `assemble_mtlx.py` (the `Overlay` dataclass, the effect, the base-colour chain), `recipe.schema.json` (overlay items are `additionalProperties: false`, so `color` must be added there), `LCD_PORTS` (defined in `assemble_mtlx.py` and `blender/addons/imrsv_lcd_export/lcd_usd_edit.py`, read by `validate_recipe.py`, `validate_material.py`, `check_lcd_carrier.py`, `verify_asset_library.py`, `matter_proxy.py`, `make_preview.py`, the rig and its Unreal driver). `LCD_PORTS` gains the port at 10.2 (RD-P10-1).
 - **What enumerates the trees this phase changes:** the pilot's freeze hashes its payload, and **3 of the 13 re-assembled articles are in it**, so a re-freeze and the maintainer's promote are scheduled. The `determinism` lane re-assembles every article, which is the guard that nothing else moved. **No gate globs `docs/`** (read: `run_all.py`, `validate_recipe.py`, `check_fixture_sync.py` mention it only in comments), so the probe files beside this doc are inert.
 - **`check_exporter.sh`:** runs only if 10.2 lands (a change under `blender/addons/`), **baselined before the edit** (`LOCAL_DELTAS.md`).
 - **The public edge:** none in the repo. Publishing `unreal-runtime-v3` and pushing are public and the lead's, at named points.
@@ -88,7 +88,7 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
 ### Step list
 
 - **10.1 — Dust covers in its colour, in the article and Blender.** The contract text; the recipe `color` and its validator; the assembler; the Blender masters and `load_article.py`; Oak and Glass_Clear given the colour and re-assembled; the Blender library rebuilt and installed. *First clickable result: clicks 1–3.*
-- **10.2 — The Creator picks the dust colour.** *(Only under Q-P10-1 (b).)* `overlayN_color` joins `LCD_PORTS` and the exporter; the rig sweeps it. *Click 4.*
+- **10.2 — The Creator picks the dust colour.** *(RD-P10-1.)* `overlayN_color` joins `LCD_PORTS` and the exporter; the rig sweeps it. *Click 4.*
 - **10.3 — Every dusty article.** The other 11 given the colour and re-assembled (Concrete_Smooth_Worn_Dusty, Copper_Verdigris, ABS_Glossy, Earthenware_Natural, Glass_Green and the 6 skins); the Blender library rebuilt; the pilot re-frozen. *Click 5.*
 - **10.4 — Unreal.** On the UE machine: the masters take the cover, `unreal-runtime-v3` built and published by the lead, then pinned here. *Click 6.* Then the hand-off row and the close.
 
@@ -102,9 +102,11 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`, the
 - **Docs:** `MasterSet.md` (§Overlay semantic, the rule, Change log) · `LCDSchema.md` · `AuthoringHarness.md` · `PlatformDependencies.md` (the row) · `Glossary.md` (*deposit layer*).
 - **Test surface (the `build` ceiling):** the existing `run_all.py` lanes (the `determinism` lane is the main guard), unit tests beside the assembler's for the deposit and no-deposit cases, and **one real-path smoke: the rig sheets of the first human test.** No new gate.
 
-### Open — lead calls
+### Lead calls
 
-**Q-P10-1 [lead] — Who picks the dust colour?** *(Four tests run at Pass 1: no ruling answers it; necessary, since the Outcome says "in its own colour"; both options deliverable in all three tools; both admissible. Pass 2 measured the cost.)*
+**RD-P10-1 — answers Q-P10-1: the Creator can change the dust colour, (b).** The lead, 2026-10-01, verbatim: *"b, go ahead with /execute Phase 10"*. Step 10.2 runs.
+
+**Q-P10-1 [lead] — Who picks the dust colour?** → RD-P10-1 *(Four tests run at Pass 1: no ruling answers it; necessary, since the Outcome says "in its own colour"; both options deliverable in all three tools; both admissible. Pass 2 measured the cost.)*
 - **(a) The article sets it.** An author value (`overlayN_color`, lane B), like `fuzz_color` today. A Creator turns the dust up but not recolours it, at least not in Studio: in Blender the value is a socket on the master and can be changed locally, but it **does not travel**, because only Creator ports are exported. **Cost:** none beyond 10.1.
 - **(b) The Creator can change it.** The same input, also a Creator port, carried from Blender to Studio, so desert dust or soot is one setting away. **Cost: step 10.2.** `LCD_PORTS` in its two definitions and the 7 readers above; the exporter under `blender/addons/` (so `check_exporter.sh`); a frozen-vocabulary evolution (semver-minor, as `overlay3_density`); Studio's Creator controls in the hand-off row.
 - **(a) is a strict subset of (b)**, so (b) can also come later, additively.
@@ -158,7 +160,7 @@ One contract change carries it. `MasterSet.md` §Overlay/MaskSet model says, as 
 
 | # | Question | Where it stands |
 |---|---|---|
-| 1 | Where the colour comes from | **A declared colour on a deposit slot, drawn as a cover** (F-P10-12, F-P10-13). Who may change it: **Q-P10-1**. |
+| 1 | Where the colour comes from | **A declared colour on a deposit slot, drawn as a cover** (F-P10-12, F-P10-13). Who may change it: **the Creator** (RD-P10-1). |
 | 2 | The character uses | **Out, by CM2** (F-P10-4). |
 | 3 | Wear you can see | **Dust: the cover, this phase. `Scuffs01` / `Fingerprints01`: Library Coverage** (F-P10-5). |
 | 4 | Which masters | **One edit per tool, every master** (F-P10-6). |
@@ -181,9 +183,9 @@ One contract change carries it. `MasterSet.md` §Overlay/MaskSet model says, as 
 
 ## Discovery Status
 
-- **Passes captured:** 2 (2026-10-01). **The Brief is complete** apart from Q-P10-1, which only decides whether step 10.2 runs.
+- **Passes captured:** 2 (2026-10-01). **The Brief is complete**; Q-P10-1 was ruled at the start of execution (RD-P10-1).
 - **Working direction:** a deposit layer covers the surface in its declared colour; fuzz is not used; the character uses are out (CM2); the faint damage layers stay with Library Coverage.
-- **Open decisions:** **Q-P10-1** (who picks the dust colour; recommended: the Creator, now).
+- **Open decisions:** none. Q-P10-1 was ruled (b) at the start of execution (RD-P10-1).
 - **Checks carried to execute:** the dust colour's value and source (10.1) · the Unreal translucent masters with a per-pixel transmission weight (10.4) · the U11 floor still holding where `subsurface_color` reads the covered base colour (10.4).
 
 ## Execution Log
