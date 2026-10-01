@@ -190,4 +190,14 @@ One contract change carries it. `MasterSet.md` §Overlay/MaskSet model says, as 
 
 ## Execution Log
 
-_(populated during execution)_
+**Run 1 (2026-10-01, the library machine).** The lead drives each click; Blender sittings are built headless and opened in his Blender.
+
+**Deviations from the Brief (2026-10-01):**
+- **The recipe names the port, not a bare `color`:** an overlay entry carries `"color_port": "overlayN_color"` beside `density_port`, and the start value is the port's default (`DUST_COLOR`) or the recipe's `lcd_defaults`. Since RD-P10-1 makes the colour a Creator port, this is the grammar `density_port` already uses; a bare `color` would have been a second place to hold one value.
+- **The ports joined `LCD_PORTS` at 10.1, not 10.2:** the assembler's vocabulary is where the article declares them. 10.2 keeps what makes them TRAVEL: the exporter, the Blender wrapper's travel ports, the rig's colour row.
+- **Fixed in 10.1, a defect of 10.1's own (CAUGHT by the first rig run, not a gate):** a deposit routes a covered weight (`transmission_weight`, …) through the graph, so it is no longer a value on the shader, and the one shared reader (`blender/masters/article.py`) dropped it: Blender would have shaded Glass_Clear opaque. The reader now takes the weight's own value from the first deposit mix. The rig's mask row also turned every `overlay*` port to 1.0, the colour port included; it now selects `*_density`.
+- **The Unreal driver passes the deposit now** (`overlayN_color`, `overlayN_deposit = 1`): Unreal ignores a parameter a master lacks, so `v2` draws today's colourless dust (F-P10-14) and 10.4's masters take the same names.
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 10.1 | the 10.1 commit | **▶ SCAFFOLD COMPLETE — sitting owed (clicks 1–3).** Built: the Creator ports `overlay1_color`…`overlay3_color` (default Sand desaturated halfway: `0.413, 0.386, 0.308`); the deposit cover in the assembler; Blender masters v8 (`overlayN_color`, `Overlay N Deposit`); the loader; the recipe lane's G7 rules and the RED fixture `deposit_wrong_slot.json`; MasterSet, LCDSchema, Glossary, Experience. Oak and Glass_Clear re-assembled in place. **Rig (Storm vs Blender, dust at 1, close-up):** Oak moved 9.35 / 8.28, between the tools 1.14 (under the flag); Glass_Clear moved 8.54 / 6.81, between 7.61 (advisory: Glass_Clear sat at 10.9–11.1 before this phase, Phase05/06). Unreal (`v2`) ONE-SIDED on the dust rows, as F-P10-14 says. **Gate:** 13 PASS, 2 SKIP, 2 FAIL: `approval_binds_freeze` (inherited since Phase04) and `release_verify` (Glass_Clear is in the pilot; re-freeze at 10.3). Determinism byte-stable for every other article. **Blender library:** rebuilt, 57 articles, `check_asset_library.sh` PASS. **`check_exporter.sh` baseline before 10.2:** three carrier steps red, `check_lcd_carrier.py` imports the assembler under a `pxr` Python with no MaterialX (the same import at `HEAD`, so inherited); every other step PASS. | Clicks 1–3 |

@@ -17,9 +17,9 @@
   "overlays": [
     {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"},
-    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density"}
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
   ],
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
   "sources": [
     {"kind": "ambientcg", "asset": "Wood049", "url": "https://ambientcg.com/view?id=Wood049", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/wood/Oak_Natural.yaml"},
     {"kind": "judgement", "why": "specular_ior 1.5, a generic dielectric: Physically Based has no wood entry."}

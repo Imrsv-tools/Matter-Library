@@ -138,6 +138,7 @@ RECIPE_FIXTURES = {
     "too_many_overlays.json": "G7",
     "dead_mask.json": "G7",
     "virtual_with_layers.json": "G7",
+    "deposit_wrong_slot.json": "G7",     # Phase10: a deposit's colour is its own slot's port
 }
 
 

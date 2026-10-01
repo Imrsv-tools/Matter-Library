@@ -49,6 +49,8 @@ DOC_COLORSPACE = "lin_rec709"
 # (LCDSchema.md §Render-role texture nodes; MasterSet.md §Overlay/MaskSet model.)
 DATA_COLORSPACE = "lin_rec709"
 
+DUST_COLOR = "0.413, 0.386, 0.308"   # linear; see overlayN_color below
+
 # Frozen LCD interface-input vocabulary (LCDSchema.md, Phase 53 D3):
 #   port name -> (type, default value string, uiname, extra-attrs dict)
 LCD_PORTS = {
@@ -62,6 +64,12 @@ LCD_PORTS = {
     "overlay3_density": ("float", "0.0", "Overlay 3 Density", {}),   # added 2026-09-25 (cap 2 -> 3)
     "maskset_blend": ("float", "0.0", "Maskset Blend", {}),
     "roughness_bias": ("float", "0.0", "Roughness Bias", {}),
+    # Phase10 (RD-P10-1): a DEPOSIT overlay's colour (dust), which the Creator may change. The
+    # start value is Physically Based's Sand (CC0; 0.44, 0.386, 0.231) desaturated halfway to its
+    # own luminance, since household dust is greyer than sand. MasterSet §Overlay semantic.
+    "overlay1_color": ("color3", DUST_COLOR, "Overlay 1 Color", {}),
+    "overlay2_color": ("color3", DUST_COLOR, "Overlay 2 Color", {}),
+    "overlay3_color": ("color3", DUST_COLOR, "Overlay 3 Color", {}),
 }
 
 # Author-tier interface inputs — Lane B ONLY (LCDSchema.md §Author tier): the values
@@ -130,10 +138,13 @@ RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources", "status"}
 class Overlay:
     """A tiling packed-data overlay (dust, scratches), gated by an adjustable density port.
 
-    Perturbs normal + roughness only — an overlay never tints (MasterSet.md).
+    Perturbs normal + roughness. A DEPOSIT overlay (one with a ``color_port``, Phase10) also
+    covers the surface with that port's colour, weighted by its effect; its packed channels
+    never become colour (MasterSet.md §Overlay semantic).
     """
     texture: str            # relative path to the packed overlay data texture (RGBA)
     density_port: str       # which LCD port drives the effect (overlay1_density / overlay2_density / overlay3_density)
+    color_port: Optional[str] = None   # a deposit's colour (overlayN_color, the same N); None = not a deposit
 
 
 @dataclass
@@ -271,6 +282,19 @@ def _check_spec(spec: MaterialSpec) -> None:
             raise ValueError(
                 f"overlay density port {ov.density_port!r} is not exposed in lcd_ports — "
                 "the overlay would have no control and no effect")
+        if ov.color_port is not None:
+            slot = ov.density_port.removesuffix("_density")
+            if ov.color_port != f"{slot}_color":
+                raise ValueError(f"a deposit's colour port is its own slot's: {slot}_color, "
+                                 f"not {ov.color_port!r}")
+            if ov.color_port not in spec.lcd_ports:
+                raise ValueError(f"deposit colour port {ov.color_port!r} is not exposed in "
+                                 "lcd_ports — the Creator could not change it (RD-P10-1)")
+    for port in spec.lcd_ports:
+        if port.endswith("_color") and port.startswith("overlay") and not any(
+                ov.color_port == port for ov in spec.overlays):
+            raise ValueError(f"{port!r} is exposed but no overlay is a deposit with that "
+                             "colour port: a dead port")
     if spec.has_layer2() and not spec.maskset_tex:
         raise ValueError(
             "a layer-2 set requires a maskset: maskset.R IS the layer-2 coverage (MasterSet.md). "
@@ -500,7 +524,23 @@ def assemble(spec: MaterialSpec) -> str:
                         in2=("float", "nodename", gate_src))
         ov_effect.append(eff)
 
-    # --- Base color: source -> [layer-2 blend] -> tint -> out ---
+    # --- Deposits (Phase10, MasterSet §Overlay semantic): a deposit overlay COVERS the surface
+    # where it lies. Its declared colour (a Creator port, never its packed channels) replaces the
+    # base colour, and every layer it hides (metal, transmission, subsurface, coat, fuzz) goes to
+    # none, all by the overlay's effect. In slot order; an article with no deposit is unchanged.
+    deposits = [(i, eff, ov.color_port) for i, (ov, eff)
+                in enumerate(zip(spec.overlays, ov_effect), start=1) if ov.color_port]
+
+    def _covered(name: str, typ: str, src_kind: str, src) -> str:
+        """``src`` mixed toward 0 by every deposit's effect; returns the last node's name."""
+        for i, eff, _ in deposits:
+            src = _node("mix", f"{name}_deposit{i}", typ,
+                        bg=(typ, src_kind, src), fg=(typ, "value", 0.0),
+                        mix=("float", "nodename", eff))
+            src_kind = "nodename"
+        return src
+
+    # --- Base color: source -> [layer-2 blend] -> tint -> [deposits] -> out ---
     # The layer blend happens BEFORE base_color_tint, so the Creator tint stays a
     # whole-material control rather than tinting layer 1 only.
     if spec.base_color_tex:
@@ -544,6 +584,13 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(tint, "in1", "color3", nodename=base_src)
         _add_input(tint, "in2", "color3", interfacename="base_color_tint")
         base_src = "base_color_tinted"
+
+    # After the tint (a Creator who tints a car red does not tint its dust) and the mesh's picture.
+    for i, eff, port in deposits:
+        base_src = _node("mix", f"base_color_deposit{i}", "color3",
+                         bg=("color3", "nodename", base_src),
+                         fg=("color3", "interfacename", port),
+                         mix=("float", "nodename", eff))
 
     ng.addOutput("base_color_out", "color3").setNodeName(base_src)
 
@@ -595,11 +642,13 @@ def assemble(spec: MaterialSpec) -> str:
     ng.addOutput("roughness_out", "float").setNodeName(rough_src)
 
     # --- Metalness: a graph output whenever a texture OR a second layer exists ---
-    has_metal_out = bool(spec.metalness_tex) or has_layer2
+    # A deposit hides metal (Phase10): a metal under dust is no longer seen as metal.
+    cover_metal = bool(deposits) and bool(spec.metalness_tex or has_layer2 or spec.metalness_const > 0)
+    has_metal_out = bool(spec.metalness_tex) or has_layer2 or cover_metal
     if spec.metalness_tex:
         _image("metalness_tex", "float", spec.metalness_tex)
         metal_src = "metalness_tex"
-    elif has_layer2:
+    elif has_layer2 or cover_metal:
         const = ng.addNode("constant", "metalness_const", "float")
         _add_input(const, "value", "float", value=spec.metalness_const)
         metal_src = "metalness_const"
@@ -618,6 +667,8 @@ def assemble(spec: MaterialSpec) -> str:
                           fg=("float", "nodename", m2_src),
                           mix=("float", "nodename", t_src))
 
+    if cover_metal:
+        metal_src = _covered("metalness", "float", "nodename", metal_src)
     if has_metal_out:
         ng.addOutput("metalness_out", "float").setNodeName(metal_src)
 
@@ -730,6 +781,25 @@ def assemble(spec: MaterialSpec) -> str:
                            in2=("float", "value", 0.0))
         ng.addOutput("opacity_out", "float").setNodeName(op_src)
 
+    # --- The layers a deposit hides (Phase10): each authored weight above 0 reaches the shader
+    # through the graph, mixed toward 0 by every deposit's effect (light no longer passes
+    # through, scatters in, or reflects off a coat or fibres under dust).
+    covered_out = {}
+    if deposits:
+        for name, val in (("transmission_weight", spec.transmission),
+                          ("subsurface_weight", spec.subsurface_weight),
+                          ("coat_weight", spec.coat_weight), ("fuzz_weight", spec.fuzz_weight)):
+            if val:                                   # None or 0: nothing to hide
+                src = _covered(name, "float", "value", val)
+                ng.addOutput(f"{name}_out", "float").setNodeName(src)
+                covered_out[name] = f"{name}_out"
+
+    def _weight(name: str, value) -> None:
+        if name in covered_out:
+            _add_input(shader, name, "float", nodegraph=ng_name, output=covered_out[name])
+        else:
+            _add_input(shader, name, "float", value=value)
+
     # --- OpenPBR surface shader ---
     shader = doc.addNode("open_pbr_surface", sr_name, "surfaceshader")
     _add_input(shader, "base_weight", "float", value=1.0)
@@ -749,13 +819,13 @@ def assemble(spec: MaterialSpec) -> str:
         # at the producer. Without it the two masters are the same material described twice.
         _add_input(shader, "geometry_thin_walled", "boolean", value=_mx_bool(spec.thin_walled))
     if spec.transmission > 0:
-        _add_input(shader, "transmission_weight", "float", value=spec.transmission)
+        _weight("transmission_weight", spec.transmission)
     if spec.transmission_color is not None:
         _add_input(shader, "transmission_color", "color3", value=spec.transmission_color)
     if spec.transmission_depth is not None:
         _add_input(shader, "transmission_depth", "float", value=spec.transmission_depth)
     if spec.subsurface_weight > 0:
-        _add_input(shader, "subsurface_weight", "float", value=spec.subsurface_weight)
+        _weight("subsurface_weight", spec.subsurface_weight)
     if spec.subsurface_color is not None:
         _add_input(shader, "subsurface_color", "color3", value=spec.subsurface_color)
     elif spec.master == "Hair" or (spec.base_color_map and spec.subsurface_weight > 0):
@@ -776,7 +846,10 @@ def assemble(spec: MaterialSpec) -> str:
                      ("specular_roughness_anisotropy", "float"),
                      ("specular_weight", "float")):
         if getattr(spec, key) is not None:
-            _add_input(shader, key, typ, value=getattr(spec, key))
+            if key in covered_out:
+                _weight(key, getattr(spec, key))
+            else:
+                _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:
         _add_input(shader, "emission_luminance", "float", value=spec.emission_luminance)
         _add_input(shader, "emission_color", "color3", value=spec.emission_color)

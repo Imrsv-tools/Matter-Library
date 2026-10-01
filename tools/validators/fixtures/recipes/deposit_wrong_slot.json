@@ -1,0 +1,20 @@
+{
+  "_comment": "RED fixture (Phase10): the dust deposit on overlay 3 takes overlay 1's colour port. A deposit's colour is its own slot's Creator port (MasterSet §Overlay semantic). Must be REJECTED by the recipe lane (G7).",
+  "name": "Oak_Natural_Clean_Base_s1_v01",
+  "path": "natural/wood/Oak_Natural_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "wood",
+  "scale_tag": "s1",
+  "meters_per_tile": 0.8,
+  "base_color_tex": "../../../textures/base/natural/wood/Oak_Natural_basecolor_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay1_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "overlay1_color"]
+}

@@ -132,7 +132,8 @@ def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
                    .replace("-", "m").replace(".", ""))
             setting = {port: list(value) if isinstance(value, tuple) else value}
             if port == "maskset_blend":
-                setting.update({p: 1.0 for p in art.ports if p.startswith("overlay")})
+                setting.update({p: 1.0 for p in art.ports
+                                if p.startswith("overlay") and p.endswith("_density")})
             s.append({"id": sid, "label": label, "port": port, "set": setting})
     return s
 

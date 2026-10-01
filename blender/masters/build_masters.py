@@ -63,7 +63,8 @@ import math
 
 import bpy
 
-VERSION = 7     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 8     # bump when a group's contents change; ensure_*() rebuilds an older one
+#               (8: Phase10, a deposit overlay covers the surface in its colour)
                 # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
                 # 6 (Phase07 7.6): specular anisotropy (carrier C3) on the UV tangent
                 # 7 (Phase08 8.1): ML_Hair's own part (soft coverage, light through)
@@ -77,6 +78,7 @@ SUBSURFACE_METHOD = "RANDOM_WALK_SKIN"
 
 OVERLAYS = (1, 2, 3)
 GATE_CHANNEL = {1: "G", 2: "B", 3: "A"}     # MasterSet §MaskSet channel contract
+DUST_RGBA = (0.413, 0.386, 0.308, 1.0)       # the assembler's DUST_COLOR (linear), Phase10
 
 # master -> the parts it switches on over the Opaque core
 MASTER_PARTS = {
@@ -215,7 +217,11 @@ def _sockets(parts: set) -> list:
     for n in OVERLAYS:
         s += [(f"Overlay {n}", "NodeSocketColor", (0.5, 0.5, 0.0, 1.0)),
               (f"Overlay {n} Alpha", "NodeSocketFloat", 0.0),
-              (f"overlay{n}_density", "NodeSocketFloat", 0.0)]
+              (f"overlay{n}_density", "NodeSocketFloat", 0.0),
+              # Phase10: the Creator's deposit colour, and whether this slot IS a deposit (set by
+              # the loader from the article; 0 = a damage or gloss layer, which never covers)
+              (f"overlay{n}_color", "NodeSocketColor", DUST_RGBA),
+              (f"Overlay {n} Deposit", "NodeSocketFloat", 0.0)]
     if "layer2" in parts:
         s += [("Layer 2 Base Color", "NodeSocketColor", (0.5, 0.5, 0.5, 1.0)),
               ("Layer 2 Roughness", "NodeSocketFloat", 0.5),
@@ -302,13 +308,13 @@ def _build(name: str, parts: set):
         nn = _vmath(ng, "NORMALIZE", -800, -800)
         L(nb, nn.inputs[0])
         n_ts = nn.outputs[0]
-    L(metal, bsdf.inputs["Metallic"])
 
     tint = _vmath(ng, "MULTIPLY", -300, 600)                  # base_color_tinted (after layer 2)
     L(base, tint.inputs[0])
     L(gi.outputs["base_color_tint"], tint.inputs[1])
     base = tint.outputs[0]
 
+    keep = None    # Phase10: 1 - each deposit's cover, multiplied: what a deposit leaves visible
     for n in OVERLAYS:
         y = -300 - 350 * n
         gm = _math(ng, "SUBTRACT", -1100, y)                   # gate = mix(1, mask, blend)
@@ -345,6 +351,32 @@ def _build(name: str, parts: set):
         L(n_ts, add.inputs[0])
         L(sc.outputs[0], add.inputs[1])
         n_ts = add.outputs[0]
+        # Phase10 (MasterSet §Overlay semantic): a deposit COVERS: cover = effect x deposit;
+        # the base colour goes to the deposit's colour (after the tint), and every layer under
+        # it is hidden by (1 - cover). A slot that is not a deposit has cover 0: unchanged.
+        cov = _math(ng, "MULTIPLY", -450, y + 220)
+        L(eff.outputs[0], cov.inputs[0])
+        L(gi.outputs[f"Overlay {n} Deposit"], cov.inputs[1])
+        base = _lerp_color(ng, base, gi.outputs[f"overlay{n}_color"], cov.outputs[0], -300, y + 300)
+        left = _math(ng, "SUBTRACT", -300, y + 220)
+        left.inputs[0].default_value = 1.0
+        L(cov.outputs[0], left.inputs[1])
+        if keep is None:
+            keep = left.outputs[0]
+        else:
+            k2 = _math(ng, "MULTIPLY", -150, y + 220)
+            L(keep, k2.inputs[0])
+            L(left.outputs[0], k2.inputs[1])
+            keep = k2.outputs[0]
+
+    def hidden(sock, x, y):
+        """A weight under the deposits: weight x keep (= mix(weight, 0, cover), per deposit)."""
+        m = _math(ng, "MULTIPLY", x, y)
+        L(sock, m.inputs[0])
+        L(keep, m.inputs[1])
+        return m.outputs[0]
+
+    L(hidden(metal, 0, 300), bsdf.inputs["Metallic"])
 
     rc = _math(ng, "ADD", 200, 200, clamp=True)                # roughness_biased_clamped
     L(rough, rc.inputs[0])
@@ -407,7 +439,10 @@ def _build(name: str, parts: set):
                       ("Coat Roughness", "Coat Roughness"), ("Coat IOR", "Coat IOR"),
                       ("Fuzz Weight", "Sheen Weight"), ("Fuzz Color", "Sheen Tint"),
                       ("Fuzz Roughness", "Sheen Roughness")):
-        L(gi.outputs[sock], bsdf.inputs[pin])
+        src = gi.outputs[sock]
+        if sock in ("Coat Weight", "Fuzz Weight"):             # a deposit hides coat and fibres
+            src = hidden(src, 600, -350 if sock == "Coat Weight" else -450)
+        L(src, bsdf.inputs[pin])
 
     if "opacity" in parts:
         # the article's ifgreatereq: opacity >= cutoff -> 1, else 0  (== 1 - (opacity < cutoff))
@@ -422,23 +457,23 @@ def _build(name: str, parts: set):
         L(gi.outputs["Emission Color"], bsdf.inputs["Emission Color"])
         L(gi.outputs["Emission Luminance"], bsdf.inputs["Emission Strength"])
     if "transmission" in parts:
-        L(gi.outputs["Transmission Weight"], bsdf.inputs["Transmission Weight"])
+        tw = hidden(gi.outputs["Transmission Weight"], -150, 900)   # dust lets no light through
+        L(tw, bsdf.inputs["Transmission Weight"])
         bsdf.inputs["Thin Wall"].default_value = "thick" not in parts
-        base = _lerp_color(ng, base, gi.outputs["Transmission Color"],
-                           gi.outputs["Transmission Weight"], 0, 800)
+        base = _lerp_color(ng, base, gi.outputs["Transmission Color"], tw, 0, 800)
     if "thick" in parts:
         vol = _node(ng, "ShaderNodeVolumeCoefficients", 850, -500)
         L(gi.outputs["Absorption"], vol.inputs["Absorption Coefficients"])
         vol.inputs["Scatter Coefficients"].default_value = (0.0, 0.0, 0.0)
         L(vol.outputs[0], go.inputs["Volume"])
     if "subsurface" in parts:
-        L(gi.outputs["Subsurface Weight"], bsdf.inputs["Subsurface Weight"])
+        sw = hidden(gi.outputs["Subsurface Weight"], -150, 900)    # dust does not scatter light in
+        L(sw, bsdf.inputs["Subsurface Weight"])
         L(gi.outputs["Subsurface Radius Scale"], bsdf.inputs["Subsurface Radius"])
         L(gi.outputs["Subsurface Radius"], bsdf.inputs["Subsurface Scale"])
         L(gi.outputs["Subsurface Anisotropy"], bsdf.inputs["Subsurface Anisotropy"])
         bsdf.subsurface_method = SUBSURFACE_METHOD
-        base = _lerp_color(ng, base, gi.outputs["Subsurface Color"],
-                           gi.outputs["Subsurface Weight"], 0, 800)
+        base = _lerp_color(ng, base, gi.outputs["Subsurface Color"], sw, 0, 800)
     if "hair" in parts:
         # OpenPBR thin-walled subsurface (MaterialX open_pbr_surface.mtlx, "Subsurface
         # (thin-walled)"): mix(reflection, transmission, 0.5), each lobe coloured c and

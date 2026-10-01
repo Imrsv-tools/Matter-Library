@@ -70,14 +70,15 @@
         "required": ["texture", "density_port"],
         "properties": {
           "texture": {"type": "string"},
-          "density_port": {"type": "string", "enum": ["overlay1_density", "overlay2_density", "overlay3_density"]}
+          "density_port": {"type": "string", "enum": ["overlay1_density", "overlay2_density", "overlay3_density"]},
+          "color_port": {"type": "string", "enum": ["overlay1_color", "overlay2_color", "overlay3_color"], "description": "Phase10: makes the overlay a DEPOSIT (dust) that covers the surface in this port's colour; the same slot as density_port, and listed in lcd_ports."}
         }
       }
     },
     "maskset_tex": {"type": "string"},
     "lcd_ports": {
       "type": "array",
-      "items": {"type": "string", "enum": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias"]}
+      "items": {"type": "string", "enum": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay1_color", "overlay2_color", "overlay3_color"]}
     },
     "lcd_defaults": {
       "type": "object",
@@ -91,7 +92,10 @@
         "overlay2_density": {"type": "string"},
         "overlay3_density": {"type": "string"},
         "maskset_blend": {"type": "string"},
-        "roughness_bias": {"type": "string"}
+        "roughness_bias": {"type": "string"},
+        "overlay1_color": {"$ref": "#/$defs/color3"},
+        "overlay2_color": {"$ref": "#/$defs/color3"},
+        "overlay3_color": {"$ref": "#/$defs/color3"}
       }
     },
     "include_metadata": {"type": "boolean"},

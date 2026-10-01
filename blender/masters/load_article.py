@@ -207,6 +207,12 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     for port in ("maskset_blend",) + tuple(f"overlay{n}_density" for n in build_masters.OVERLAYS):
         if port in ports:
             master.inputs[port].default_value = ports[port][0]
+    # Phase10: a slot is a DEPOSIT exactly when the article declares its colour port; its cover
+    # is switched on and the Creator's colour set (MasterSet §Overlay semantic)
+    for n in build_masters.OVERLAYS:
+        if f"overlay{n}_color" in ports:
+            master.inputs[f"overlay{n}_color"].default_value = _rgba(ports[f"overlay{n}_color"])
+            master.inputs[f"Overlay {n} Deposit"].default_value = 1.0
 
     if "base_color_tint" in ports:
         master.inputs["base_color_tint"].default_value = _rgba(ports["base_color_tint"])

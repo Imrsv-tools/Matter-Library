@@ -130,7 +130,9 @@ Overlay/mask **intensities are Creator-adjustable** — surfaced as the layered-
 
 ### ⭐ Both are MODULATORS. Neither is ever albedo. *(normative)*
 
-Both overlays and masksets are **data textures**: they may bend a normal, bias a roughness, or gate a layer — they may **never** contribute colour. Mixing either bitmap *over base colour* paints packed data on as if it were paint. A "did the pixels change?" check passes on that bug, so a gate for this rule must check *what* changed, not *whether* something did.
+Both overlays and masksets are **data textures**: they may bend a normal, bias a roughness, or gate a layer — **their packed channels** may **never** contribute colour. Mixing either bitmap *over base colour* paints packed data on as if it were paint. A "did the pixels change?" check passes on that bug, so a gate for this rule must check *what* changed, not *whether* something did.
+
+*(Refined 2026-10-01, Phase10 Coloured Wear Layers.)* **A deposit overlay covers the surface in a DECLARED colour.** Dust is a deposit: where it lies it hides what is underneath, and a colourless dust only roughened the surface, invisibly on a rough article (Phase05 F11). So an overlay may be declared a **deposit** with a colour, `overlayN_color`, a Creator port (`LCDSchema.md`), and it covers by its effect (the formula below). **The colour is a declared value, never the layer's packed channels**, so the reason for this rule stands: packed data still never becomes colour. Damage and gloss layers (scratches, scuffs, edge wear, fingerprints) are not deposits. Was, until 2026-10-01: *"an overlay never tints"*. Why a cover and not OpenPBR's fuzz, measured: `Phase10_ColouredWearLayers.md` F-P10-12, F-P10-13.
 
 *(2026-09-30, Phase09 9.1)* **The mesh's picture, `base_color_map`, is neither an overlay nor a maskset, and this rule does not govern it.** It is colour drawn on the mesh's own layout (a hairstyle's strands, an eye), supplied at binding and multiplied into the base colour on purpose ([LCDSchema §Base colour map](../Contract/LCDSchema.md#base-colour-map-the-meshs-picture-supplied-at-binding)). Overlays and masksets stay data on the article's own tile.
 
@@ -151,8 +153,18 @@ Both overlays and masksets are **data textures**: they may bend a normal, bias a
 effect_N   = overlayN_density * overlayN_tex.A * lerp(1, maskset.<G|B|A>, maskset_blend)
 normal    += (overlayN_tex.RG * 2 - 1) * effect_N        # TANGENT space; then renormalize
 roughness += overlayN_tex.B_bias       * effect_N
-base_color: UNTOUCHED                                     # an overlay never tints
+base_color: UNTOUCHED by a damage or gloss overlay
+
+# a DEPOSIT overlay (declares overlayN_color; Phase10, 2026-10-01), in slot order:
+base_color          = mix(base_color, overlayN_color, effect_N)   # AFTER base_color_tint
+base_metalness      = mix(base_metalness,      0, effect_N)       # and the mesh's picture
+transmission_weight = mix(transmission_weight, 0, effect_N)
+subsurface_weight   = mix(subsurface_weight,   0, effect_N)
+coat_weight         = mix(coat_weight,         0, effect_N)
+fuzz_weight         = mix(fuzz_weight,         0, effect_N)
 ```
+
+The cover follows the tint, so a Creator who tints a car red does not tint its dust. Each target applies it before anything that reads those weights (Blender's masters fold the transmission and subsurface weights into the base colour, so the weights are covered first). An article with no deposit assembles byte-identically to before (the `determinism` lane).
 
 **The normal is combined in tangent space and converted to world space once** *(stated 2026-09-27, Phase05 step 5.3)*. The article's normal map is decoded (`2c − 1`), or taken as flat `(0, 0, 1)` where it has none; the layer-2 blend and every overlay's `(RG·2 − 1, 0) · effect` are added there; the sum is renormalized and passed through ONE MaterialX `normalmap`, whose output is world space. *(Before 5.3 the assembler combined on the output of `normalmap`, which MaterialX 1.39 defines as world space. So overlay bumps were added along world X/Y, and an article with overlays but no normal map, Glass_Clear, Glass_Green and ABS_Glossy, shaded with one fixed world +Z normal. Measured in USDLiveView's renderer: ABS_Glossy rendered flat white until fixed. The formula above was always meant in tangent space; it now says so.)*
 
@@ -247,14 +259,14 @@ A translucent master that derives coverage as `Opacity = Opacity × (1 − Trans
 **The author tier is specified**, with these parts owned here:
 1. **TwoLayer = two real layers**, not a clearcoat — and the layer-2 maps + blend scalars are part of the contract.
 2. **The MaskSet channel contract** (R = layer-2 coverage · G/B = overlay gates · A reserved).
-3. **Overlays and masksets are MODULATORS, never albedo**, and load **linear**, never sRGB.
+3. **Overlays and masksets are MODULATORS, never albedo**, and load **linear**, never sRGB. *(Refined 2026-10-01: a **deposit** overlay covers in its declared colour, never its packed channels; §Overlay / MaskSet model.)*
 4. **The `rust → TwoLayer` name exception**, without which the TwoLayer master is unreachable. *(Superseded 2026-09-23: articles declare their master, so a rust-on-metal article declares TwoLayer and no exception is needed; see §Master resolution.)*
 5. **The material-settings intent** per master (coverage · shading model · two-sided · refraction).
 6. **The opacity floor** (`MIN_TRANSMISSIVE_OPACITY = 0.05`) as a normative part of the translucent contract.
 
 **Where each target's masters are built** *(2026-09-30)*: Blender's in `blender/masters/build_masters.py` (Phase05); **Unreal's here too**, in `unreal/MatterRuntime/Scripts/build_masters.py` (Phase06: Epic's Substrate OpenPBR function plus this spec's network, one builder for all 8, parameter names the article's). Studio adopts the Unreal ones ([PlatformDependencies](../../Planning/PlatformDependencies.md) P20, open); the parity rig's Unreal column renders them today.
 
-The per-master **author-tier** carriers (the values that make each master *be* that master) are tabled in [LCDSchema §Author tier](../Contract/LCDSchema.md); the Creator-adjustable vocabulary stays **FROZEN and unchanged**. Each master has a real, Creator-selectable example article in this repo (table [above](#v1-baseline--7-masters--1-system-material)).
+The per-master **author-tier** carriers (the values that make each master *be* that master) are tabled in [LCDSchema §Author tier](../Contract/LCDSchema.md); the Creator-adjustable vocabulary stays **FROZEN and unchanged**. *(Evolved additively twice: `overlay3_density`, 2026-09-25; `overlay1_color`…`overlay3_color`, 2026-10-01, Phase10. No existing name, type or range moved.)* Each master has a real, Creator-selectable example article in this repo (table [above](#v1-baseline--7-masters--1-system-material)).
 
 ## History
 
@@ -274,3 +286,4 @@ The per-master **author-tier** carriers (the values that make each master *be* t
 - 2026-09-28 — **`Hair` reworked** (Phase08 8.1, before any push or release): settings-only rendered as *"a thick solid"* everywhere but Unreal (the lead, in Blender). Hair now has its own graph: **soft coverage** (the cut-out map unthresholded; `opacity_cutoff` is Masked's alone) and **thin-walled translucency** (`geometry_thin_walled`, `subsurface_weight`, forward `subsurface_scatter_anisotropy`, `subsurface_color` connected to the tinted base). The settings row's coverage becomes *masked, dithered*. Marked **interim**; card maps and strands are the real fix (research H4/H5).
 - 2026-09-30 — **Hair takes its hairstyle's picture and goes matte** (Phase09 9.1): `base_color_map` (LCDSchema) shades the light article, and `specular_weight = 0` on the article removes the sheet-like shine (the lead at click 1). The mesh's picture is recorded as outside the modulator rule. Strands stay *planned* (MAP-RD4).
 - 2026-09-30 — **The `Eye` master tried and not built** (Phase09 9.3, RD-P09-7): Unreal's eye shading does not fit MakeHuman's plain eyeball (U12). `Eye_Natural` is on **Subsurface**, whose colour and scatter colour both follow the eye's picture in every renderer. The `Eye` token is recorded **(planned)** under §Master tokens, not added. The Unreal masters Opaque, Masked, Hair and Subsurface take `base_color_map` as their own input (`unreal-runtime-v2`).
+- 2026-10-01 — **Dust shows its colour** (Phase10): a colourless dust only roughened the surface and could not be seen on a rough article (Phase05 F11). OpenPBR's fuzz, which its specification describes for dust grains, was measured first and barely moved the picture face-on. So an overlay may be a **deposit** with a declared colour, `overlayN_color` (a new Creator port, additive), that **covers** the surface: the base colour goes to it, and metal, transmission, subsurface, coat and fuzz go to none, by the overlay's effect. The modulator rule is refined, not dropped: packed channels still never become colour. Built in the assembler and Blender's masters; Unreal's follow in `unreal-runtime-v3` *(planned, Phase10 10.4)*.

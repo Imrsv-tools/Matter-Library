@@ -185,6 +185,16 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
             errs.append(f"G7 overlay {i} is driven by {ov['density_port']!r}; expected overlay{i}_density")
         if ov["density_port"] not in d["lcd_ports"]:
             errs.append(f"G7 overlay {i}: {ov['density_port']} is not in lcd_ports (no control, no effect)")
+        # Phase10: a deposit's colour is its own slot's Creator port (MasterSet §Overlay semantic)
+        if "color_port" in ov:
+            if ov["color_port"] != f"overlay{i}_color":
+                errs.append(f"G7 overlay {i}'s deposit colour is {ov['color_port']!r}; expected overlay{i}_color")
+            if ov["color_port"] not in d["lcd_ports"]:
+                errs.append(f"G7 overlay {i}: {ov['color_port']} is not in lcd_ports (the Creator could not change it)")
+    deposit_ports = {ov.get("color_port") for ov in overlays}
+    for port in d["lcd_ports"]:
+        if port.endswith("_color") and port.startswith("overlay") and port not in deposit_ports:
+            errs.append(f"G7 {port} is in lcd_ports but no overlay is a deposit with it (a dead control)")
     if len(overlays) > MAX_OVERLAYS:
         errs.append(f"G7 {len(overlays)} overlays; the cap is {MAX_OVERLAYS} (MAX_OVERLAYS, MasterSet.md)")
     has_layer2 = any(k.startswith("layer2_") for k in d)

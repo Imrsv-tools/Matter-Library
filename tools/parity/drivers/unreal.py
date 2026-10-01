@@ -102,7 +102,11 @@ LAYER_CONSTANTS = (("base_color", "base_color"), ("roughness", "specular_roughne
                    ("opacity", "geometry_opacity"))
 SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend",
            "overlay1_density", "overlay2_density", "overlay3_density",
-           "layer_blend_balance", "layer_blend_contrast", "opacity_cutoff"}
+           "layer_blend_balance", "layer_blend_contrast", "opacity_cutoff",
+           # Phase10: a deposit's colour, with overlayN_deposit = 1 on its slot. unreal-runtime-v2's
+           # masters have neither parameter and Unreal ignores a parameter a master lacks, so v2
+           # draws today's colourless dust (F-P10-14); the masters take them at 10.4.
+           "overlay1_color", "overlay2_color", "overlay3_color"}
 FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal map
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
@@ -292,8 +296,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         vectors["subsurface_color"] = list(vectors.get("base_color", [0.8, 0.8, 0.8]))
     # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
     for k, v in ports.items():
-        if k in ("base_color_tint",):
+        if k in ("base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color"):
             vectors[k] = _vec(v)
+            if k.startswith("overlay"):
+                scalars[k.replace("_color", "_deposit")] = 1.0
         elif k in ("uv_scale", "uv_offset"):
             vectors[k] = [float(v[0]), float(v[-1]), 0.0]
         else:

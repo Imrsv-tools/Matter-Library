@@ -71,4 +71,14 @@ def read(path: Path) -> ArticleData:
             if i.get("value") is not None:
                 art.shader[i.get("name")] = _floats(i.get("value")) if i.get("type") != "boolean" \
                     else [1.0 if i.get("value") == "true" else 0.0]
+            elif ng is not None and i.get("output") == f"{i.get('name')}_out":
+                # Phase10: a weight a deposit covers (transmission, subsurface, coat, fuzz) reaches
+                # the shader through the graph, a chain of <name>_depositN mixes toward 0. Its OWN
+                # value is the first mix's bg; each target's master applies the cover itself.
+                chain = sorted((m for m in ng.findall("mix")
+                                if m.get("name", "").startswith(f"{i.get('name')}_deposit")),
+                               key=lambda m: m.get("name"))
+                bg = chain[0].find("input[@name='bg']") if chain else None
+                if bg is not None and bg.get("value") is not None:
+                    art.shader[i.get("name")] = _floats(bg.get("value"))
     return art
