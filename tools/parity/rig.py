@@ -115,6 +115,11 @@ SWEEP = [
     # the mask only GATES wear, so its rows turn every declared wear layer up to 1 (on an
     # article whose wear starts at 0, a bare mask row moves nothing: Oak, 5.2)
     ("maskset_blend", [("mask blend 0, wear at 1", 0.0), ("mask blend 1, wear at 1", 1.0)]),
+    # a deposit's colour (Phase10): its row sets that slot's wear to 1 as well, or a colour on
+    # dust at its start (0 on Oak) would move nothing
+    ("overlay1_color", [("wear 1 at 1, soot", (0.04, 0.035, 0.03))]),
+    ("overlay2_color", [("wear 2 at 1, soot", (0.04, 0.035, 0.03))]),
+    ("overlay3_color", [("wear 3 at 1, soot", (0.04, 0.035, 0.03))]),
     ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
     ("uv_rotation", [("UV rotation 90", 90.0)]),
 ]
@@ -131,6 +136,8 @@ def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
             sid = (label.replace(",", "").replace(" ", "_").replace("+", "p")
                    .replace("-", "m").replace(".", ""))
             setting = {port: list(value) if isinstance(value, tuple) else value}
+            if port.startswith("overlay") and port.endswith("_color"):
+                setting[port.replace("_color", "_density")] = 1.0
             if port == "maskset_blend":
                 setting.update({p: 1.0 for p in art.ports
                                 if p.startswith("overlay") and p.endswith("_density")})

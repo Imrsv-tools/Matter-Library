@@ -61,6 +61,7 @@ Contract (LCDSchema.md, Phase 53 D3 — the travel scalars (6 since 2026-09-25);
     overlay3_density    float   range [0,1]          -> float   inputs:overlay3_density   (added 2026-09-25)
     maskset_blend       float   range [0,1]          -> float   inputs:maskset_blend
     roughness_bias      float   range [-0.5,+0.5]    -> float   inputs:roughness_bias
+    overlayN_color      color3  range [0,1]^3        -> color3f inputs:overlayN_color   (N = 1..3, added 2026-10-01)
 
 Rules (Phase 60 §11):
   * REJECT — an out-of-range or malformed LCD value fails the whole export (never clamped).
@@ -84,6 +85,9 @@ LCD_PORTS = {
     "overlay3_density": ("float", 0.0, 1.0),
     "maskset_blend": ("float", 0.0, 1.0),
     "roughness_bias": ("float", -0.5, 0.5),
+    "overlay1_color": ("color3", 0.0, 1.0),     # a deposit's colour (added 2026-10-01, Phase10)
+    "overlay2_color": ("color3", 0.0, 1.0),
+    "overlay3_color": ("color3", 0.0, 1.0),
 }
 
 USERPROP_PREFIX = "userProperties:"

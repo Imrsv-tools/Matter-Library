@@ -29,7 +29,9 @@ ROLES = (("base_color", "Base Color"), ("roughness", "Roughness"), ("metalness",
 # The Creator ports that travel Blender -> USD as material inputs (the exporter's
 # LCD_TRAVEL_PORTS); the UV ports travel as geometry and are fixed inside the group.
 TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
-                "maskset_blend", "roughness_bias")
+                "maskset_blend", "roughness_bias",
+                "overlay1_color", "overlay2_color", "overlay3_color")    # Phase10, RD-P10-1
+COLOR_TRAVEL_PORTS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color"}
 DATA_ROLES = ("roughness", "metalness", "normal", "layer2_roughness", "layer2_metalness",
               "layer2_normal", "opacity")
 
@@ -264,7 +266,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     # the Creator travel ports: exposed on the wrapper, defaulting to the ARTICLE's values
     travel = [p for p in TRAVEL_PORTS if p in art.ports and p in master.inputs]
     for p in travel:
-        is_color = p == "base_color_tint"
+        is_color = p in COLOR_TRAVEL_PORTS
         s = wrap.interface.new_socket(name=p, in_out="INPUT",
                                       socket_type="NodeSocketColor" if is_color else "NodeSocketFloat")
         s.default_value = _rgba(art.ports[p]) if is_color else art.ports[p][0]
@@ -281,5 +283,5 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     if thick:
         mnt.links.new(node.outputs["Volume"], mout.inputs["Volume"])
     for p in travel:
-        node.inputs[p].default_value = _rgba(ports[p]) if p == "base_color_tint" else ports[p][0]
+        node.inputs[p].default_value = _rgba(ports[p]) if p in COLOR_TRAVEL_PORTS else ports[p][0]
     return mat
