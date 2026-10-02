@@ -32,7 +32,7 @@ Read what you need, then tell the maintainer your plan in a short block and cont
 | **Lane** | **L1 param-only** (constants from Physically Based), **L3 an ambientCG scan** (§2a), or **L2 generated base textures** (§2b), when no scan fits. |
 | **Wear layers** | §3 below |
 
-`docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md` has a draft list of ~170 articles with a master, lane and layer set per row. **Use it as a reference, not an authority** — it is research, and nothing in it is committed. If your plan differs from its row, say why.
+`library/wishlist.yaml` (Phase11) is the working list of every material the library wants, each with a master, lane and layer set, seeded from `docs/Planning/Research/260925_R_LibraryCoverage_FirstRelease.md`; `/matter-batch` works it. **Use a row as a reference, not an authority** — it is research, and nothing in it is committed. If your plan differs from its row, say why.
 
 ## 2. Ground the values in Physically Based
 
@@ -75,7 +75,8 @@ Every article carries **all the wear layers relevant to its matter**, up to the 
 - **One mask** gates where the overlays may appear (`G`/`B`/`A` gate overlays 1/2/3). A mask on an article with no overlays and no second layer does nothing: don't add one.
 - **Reference articles in `utility/virtual` carry none.** A calibration target stays pure.
 - **Available layers** are the files in `MatterLibrary/textures/shared/overlays/` and `MatterLibrary/textures/shared/masks/`. If a relevant layer is not there, **make it** (§3a) before writing the recipe.
-- In the recipe: `overlays: [{"texture": "../../../textures/shared/overlays/<File>", "density_port": "overlayN_density"}, …]`, `maskset_tex`, and add every `overlayN_density` you use plus `maskset_blend` (if a mask) to `lcd_ports`. Their schema default is already 0, so add no `lcd_defaults` for them. **TwoLayer** is the one exception: its `maskset_blend` must be non-zero, because layer 2 *is* the material.
+- In the recipe: `overlays: [{"texture": "../../../textures/shared/overlays/<File>", "density_port": "overlayN_density"}, …]`, `maskset_tex`, and add every `overlayN_density` you use plus `maskset_blend` (if a mask) to `lcd_ports`.
+- **A deposit covers in its own colour** (Phase10; `MasterSet.md` §Overlay semantic). **`Dust01` is always a deposit:** its entry also carries `"color_port": "overlayN_color"` (N = its slot), and that port goes into `lcd_ports`; its start colour is the port's default, so add no `lcd_defaults` for it. Damage and gloss layers (scratches, scuffs, edge wear, fingerprints) are never deposits. A new deposit layer (dirt, soot, pollen) takes the same shape. Copy `Oak_Natural_Clean_Base_s1_v01.json`. Their schema default is already 0, so add no `lcd_defaults` for them. **TwoLayer** is the one exception: its `maskset_blend` must be non-zero, because layer 2 *is* the material.
 
 ## 3a. Make a missing wear layer
 
