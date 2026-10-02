@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/environmental/sand/BeachSand_Dry
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Ground055S
+    sha256_scope: shipped_source_set
+    sha256: 4354dfbfa5a6ea62a39cf2c84c557c0f2321f764714d58c3cdc974783be34fa0
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Ground055S_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_basecolor_s1.png
+      sha256: 2a167bb04fddedd3daff4bb393f1dfcd4e0db10cd5353faf3e9b14a70bf5f77f
+    - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_normal_s1.png
+      sha256: 38154c8bf84610bc56a694bf60e3f9cd8ecda4e6f0c4deb9a89b49802205d1bf
+    - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_roughness_s1.png
+      sha256: 823956f5ba7114c25e6089f67e8feb68682f3b51b475bcc53fd6e7989f3ca1fc
