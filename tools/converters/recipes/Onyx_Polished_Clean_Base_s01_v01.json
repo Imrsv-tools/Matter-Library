@@ -1,0 +1,31 @@
+{
+  "_comment": "Polished onyx: honey-banded calcite onyx (the stone sold as onyx marble), cut and polished, its wavy amber, orange and cream bands glowing where light gets in (ambientCG Onyx007, CC0, tagged onyx and honey; roughness map mean 0.04, so polished). SUBSURFACE: onyx's look is light scattering through it, more than marble's (backlit onyx panels glow through 2 cm). subsurface_color is ONE constant, the texture's mean linear albedo: the library cannot drive a textured article's scatter colour from its texture, so at subsurface_weight 0.5 the bands keep about half their contrast (a judgement between the glow and the banding). subsurface_radius 0.015 m (red), a judgement for a far clearer calcite than marble's 0.0085. The source states no physical size: meters_per_tile 0.3 is a judgement (bands a few mm wide, waves of 5-10 cm). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Onyx_Polished_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "natural/stone/Onyx_Polished_Clean_Base_s01_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.3,
+  "base_color_tex": "../../../textures/base/natural/stone/Onyx_Polished_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Onyx_Polished_roughness_s01.png",
+  "normal_tex": "../../../textures/base/natural/stone/Onyx_Polished_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.57,
+  "subsurface_weight": 0.5,
+  "subsurface_color": "0.573, 0.319, 0.147",
+  "subsurface_radius": 0.015,
+  "subsurface_radius_scale": "1.0, 0.75, 0.45",
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Onyx007", "url": "https://ambientcg.com/view?id=Onyx007", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/stone/Onyx_Polished.yaml"},
+    {"kind": "judgement", "why": "specular_ior 1.57, the mean of calcite's two indices (1.486, 1.658; onyx marble is banded calcite). subsurface_weight 0.5, subsurface_color the texture's mean linear albedo (0.573, 0.319, 0.147), subsurface_radius 0.015 m with a warm per-channel scale (1.0, 0.75, 0.45): onyx is far more translucent than marble (0.0085 m). meters_per_tile 0.3 from the band size, since the source states no physical size. Physically Based has no onyx or calcite entry."}
+  ]
+}

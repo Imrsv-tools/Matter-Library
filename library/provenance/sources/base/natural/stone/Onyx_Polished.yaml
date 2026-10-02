@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/stone/Onyx_Polished
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Onyx007
+    sha256_scope: shipped_source_set
+    sha256: a1ca9806f7ece7287b92c3805b55638e38c350fd51cbebcdf42c47768fd0049a
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Onyx007_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/natural/stone/Onyx_Polished_basecolor_s01.png
+      sha256: 7c52c9372dff9f919cf52154ae3fa4d08c87958abce410303e4fbc253ddd307a
+    - path: MatterLibrary/textures/base/natural/stone/Onyx_Polished_normal_s01.png
+      sha256: 1effcf865543177f68888a9fac178c8d6b461ed01bff9c27fe3ecfeac35c0ec5
+    - path: MatterLibrary/textures/base/natural/stone/Onyx_Polished_roughness_s01.png
+      sha256: e84fff5cc780ec3162d0bd01b45d1fe7c7aa47a7d7663fbe292cfc5728fa8ac4
