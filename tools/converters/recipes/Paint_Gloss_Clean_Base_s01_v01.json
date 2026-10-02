@@ -1,0 +1,31 @@
+{
+  "_comment": "Gloss paint: a white high-gloss enamel or alkyd, as on doors, trim, railings and appliances, authored white so a Creator tints it to any colour (author light). OPAQUE with the OpenPBR coat (Phase07; MasterSet row 1 lists clearcoat as an Opaque param): the pigmented paint film is a satin body under a smooth, clear binder-rich surface, so the paint shows a broad soft sheen with a sharp mirror highlight on top, the wet look that makes gloss paint read as gloss. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, placed by the Edges mask, whose channels fit the row's order (G damage along borders, B deposit in corners, A handling on open faces). Built by the Phase11 batch.",
+  "name": "Paint_Gloss_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/coating/Paint_Gloss_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "coating",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.869, 0.867, 0.771",
+  "roughness_const": 0.3,
+  "metalness_const": 0,
+  "specular_ior": 1.5,
+  "coat_weight": 1.0,
+  "coat_roughness": 0.05,
+  "coat_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Whiteboard", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.869, 0.867, 0.771", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.5},
+     "note": "A whiteboard is a white gloss coating on steel: its colour is taken as the paint's and its IOR 1.5 as the coat's (coat_ior). Its roughness 0 is not taken: see the judgement below."},
+    {"kind": "judgement", "why": "roughness_const 0.3 for the pigmented film under the gloss surface (a satin body), with coat_weight 1 for a full gloss finish; coat_roughness 0.05, since a brushed or sprayed gloss enamel is not optically flat (orange peel, micro-roughness; at 0 the rig's light reflected as an unresolved point and the gloss did not read); Physically Based's Car Paint gives the same IOR 1.5 for an acrylic enamel's clear top."}
+  ]
+}
