@@ -101,7 +101,9 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 - **Current working direction:** the build loop, proven on about 30 rows; the rest of the list fills after the close (F-LC-1).
 - **Paused (2026-10-01)** for Phase10 Coloured Wear Layers (F-LC-7). Resume at Pass 2 after Phase10 closes, and re-read what Phase10 changed in the overlay contract first: every article this loop builds carries those layers.
 - **Open decisions:** the Outcome, restated (asked 2026-10-01, unanswered; re-raise on resuming).
-- **Checks to carry forward:** the three-tool `--sweep` time per article · **a doc correction for this phase's close:** `_Architecture.md` §Governance says the parity render *"Running it automatically (nightly or per PR) is still (planned), owned by Library Coverage"*. The nightly half is struck (F-LC-8, BP10); the per-PR half belongs to Contribution Path. Annotate with a date; do not delete.
+- **Measured after Phase10's close (2026-10-01, the library machine, Unreal from the downloaded `unreal-runtime-v3`):** a three-tool `--sweep` took **Oak 6.4 min** (Storm 201 s · Blender 81 s · Unreal 100 s) and **Glass_Clear 7.2 min** (204 · 84 · 147 s), so a batch of 5 is about half an hour. Two articles, both on the test scene: a hypothesis for sizing a batch, not a constant.
+- **Suggested at Phase10's close (agent, not ruled):** hold F82 / thin film (F-LC-6) until the proving batch's sheets show metals reading wrong; if they do, that is a contract phase in Phase10's shape. More deposits (dirt, soot, pollen) take Phase10's `overlayN_color` shape and need no new LCD input.
+- **Checks to carry forward:** the three-tool `--sweep` time per article (first measured above) · **a doc correction for this phase's close:** `_Architecture.md` §Governance says the parity render *"Running it automatically (nightly or per PR) is still (planned), owned by Library Coverage"*. The nightly half is struck (F-LC-8, BP10); the per-PR half belongs to Contribution Path. Annotate with a date; do not delete.
 
 ## Execution Log
 
