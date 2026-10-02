@@ -1,0 +1,28 @@
+{
+  "_comment": "Warm-white LED: the lit, diffused face of an LED panel, strip or bulb at about 3000 K. Emissive: its defining observable is that it glows, warm. The matter under the glow is the milky polycarbonate diffuser (its colour and gloss show only where the glow is dimmed). Param-only. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Grime mask; the master's emission is a constant the layers do not reach, so wear shows only on the diffuser's reflection, not in the glow. Built by the Phase11 batch.",
+  "name": "LED_WarmWhite_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "utility/emissive/LED_WarmWhite_Clean_Base_s01_v01.mtlx",
+  "master": "Emissive",
+  "domain": "utility",
+  "class": "emissive",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.80, 0.80, 0.78",
+  "roughness_const": 0.3,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5848,
+  "emission_color": "1.0, 0.456, 0.147",
+  "emission_luminance": 12.0,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Plastic (PC)", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal", "used": {"base_color_const": "1, 1, 1", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.5848, "transmission": 1}, "not_carried": ["transmissionDispersion"], "note": "Only specular_ior is taken, for the polycarbonate diffuser: the entry is the clear resin, not a milky diffuser."},
+    {"kind": "judgement", "why": "emission_color 1.0, 0.456, 0.147 is a 3000 K blackbody in linear sRGB (sRGB about 255, 180, 107), the common warm-white LED; emission_luminance 12 matches the library's other emitter (Neon_Signage) on the rig's relative scale, not measured nits. The diffuser under it is a milky polycarbonate (base 0.80, 0.80, 0.78, roughness 0.3). Physically Based's materials list has no LED or light entry."}
+  ]
+}
