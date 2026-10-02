@@ -1,16 +1,16 @@
 # Phase11 — Library Coverage
 
-**Status:** DISCOVERY, **Brief written** at Pass 2 (2026-10-02); lane `build`; two lead calls open (Q-P11-1, Q-P11-2). **Numbered Phase11 by the lead, 2026-10-02** (`/discovery P11`, the head of the Roadmap's `## Future` once Phase10 closed). Discovery was paused after Pass 1 (2026-10-01): **un-numbered again the same day it was numbered Phase10**, because its Pass 1 proposed colour on wear layers as a phase of its own (F-LC-7), and the lead ruled, verbatim: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers took Phase10** (`../Complete/Phase10_ColouredWearLayers.md`, closed 2026-10-01). **Id scope:** the ids minted while unnumbered keep `LC` (`F-LC-n`; minted as `F-P10-n` and renamed 2026-10-01); **new ids take `P11`** (`NamingConventions.md` §Planning ids).
+**Status:** IN EXECUTION (2026-10-02; lane `build`). Brief written at Pass 2; Q-P11-1 and Q-P11-2 ruled at the hand-off (RD-P11-1, RD-P11-2), and the per-row review moved to one review at the end (RD-P11-3). **Numbered Phase11 by the lead, 2026-10-02** (`/discovery P11`, the head of the Roadmap's `## Future` once Phase10 closed). Discovery was paused after Pass 1 (2026-10-01): **un-numbered again the same day it was numbered Phase10**, because its Pass 1 proposed colour on wear layers as a phase of its own (F-LC-7), and the lead ruled, verbatim: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers took Phase10** (`../Complete/Phase10_ColouredWearLayers.md`, closed 2026-10-01). **Id scope:** the ids minted while unnumbered keep `LC` (`F-LC-n`; minted as `F-P10-n` and renamed 2026-10-01); **new ids take `P11`** (`NamingConventions.md` §Planning ids).
 - **Its numbers, oldest first** (anything older that names one of them about this work means this phase): seeded as **Phase05** on 2026-09-25 (*"i and then seed phase 5 and that will be building materials"*); **Phase07** from 2026-09-26 (the test rig and the Unreal runtime first, so every material is checked in all three tools); **Phase08** from 2026-09-27 (research `260927_R_CharacterMaterials_MPFB2.md` CM4: Character Materials first); **un-numbered** on 2026-09-28 (*"make this Phase 8, mark the current Phase8 as TBD - we have many other little things to get in here befoer we build out the full library."*); **Phase10** for part of 2026-10-01 (*"/discovery … as Phase10"*), then **un-numbered** again the same day; **Phase11** from 2026-10-02.
 - **Why it exists:** *"we have 200 materials to build and test before we have our first versionable library"* (lead, 2026-09-25, `260925_R_DraftsInUSDLiveView.md` Pass 5).
 - **Re-cut at Pass 1 (2026-10-01)** from "build ~162 articles" to "build the loop that builds them, and prove it", as the seed's own `Reevaluate (2026-09-26)` anticipated (F-LC-1). The seed's scope is kept below, marked with where it now lives.
 
 ## Outcome
 
-**The Roadmap's, kept until the lead restates it:** *Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).*
-- **Reevaluate (2026-09-27):** skin, hair and the character side of cloth went to Phase07 Character Materials (CM4) and Phase08.
+**The maintainer runs a batch and gets new materials, each already built and checked side by side in USDLiveView's renderer, Blender and Unreal, and keeps or sends back each one from its picture sheet. The library fills toward its full list this way, without a phase per batch.** *(RD-P11-1, 2026-10-02.)*
 
-**Proposed for the Roadmap (F-LC-1), under test as Q-P11-1:** **the maintainer runs a batch and gets new materials, each already built and checked side by side in USDLiveView's renderer, Blender and Unreal, and keeps or sends back each one from its picture sheet. The library fills toward its full list this way, without a phase per batch.** Restating it is the lead's call (the Roadmap's rule). Asked at Pass 1's handback (2026-10-01) and not answered; re-raised at the Brief.
+**The loop's long-run aim (the Roadmap's Outcome until 2026-10-02):** *Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).*
+- **Reevaluate (2026-09-27):** skin, hair and the character side of cloth went to Phase07 Character Materials (CM4) and Phase08.
 
 ---
 
@@ -23,6 +23,8 @@ A **wish list** in the repo (every material the library wants, each with its sta
 ### First human test
 
 Reached in the batch summary (a tracked file, `.claude/CLAUDE.md` §The deliverable surface) and in each row's rig sheet, which the agent opens. **The lead looks and judges, and says keep or redo in chat; the agent records it. The lead types no command.**
+
+**Cadence changed by RD-P11-3 (2026-10-02):** the clicks below are not driven one by one as each step lands. The loop builds the whole proving set first, and the lead judges every row **in one review at the end**: clicks 1–4 become one sitting over all the summaries and sheets. Redo notes from that review go back on the list for the loop's next batches.
 
 | # | Step | What the lead looks at | Passes when |
 |---|---|---|---|
@@ -92,6 +94,13 @@ Reached in the batch summary (a tracked file, `.claude/CLAUDE.md` §The delivera
 | 9 | **No versioning:** every row is `v01`, and a redo is rebuilt in place | the lead, 2026-09-25 (*"Make a material, serve it to stage. no versioning"*) |
 | 10 | **The review surface is the tracked summary and the sheets the agent opens.** USDLiveView stays available for a closer look at any one row | `.claude/CLAUDE.md` §The deliverable surface · BigPicture Pass 9 |
 | 11 | **The push is the lead's** (a public repo) | `LOCAL_DELTAS.md` §Weighting |
+| 12 | **A built row is committed as `draft`, locally, with its batch** | RD-P11-2 |
+| 13 | **The lead reviews once, at the end of the proving set**, not row by row | RD-P11-3 |
+
+**Rulings at the hand-off (lead, 2026-10-02), verbatim:** *"yes to 1 and 2... I do not need to review each one so if you just want to start building and cranking through them... we can review at the end.... go ahead with /execute P11"*
+- **RD-P11-1 — answers Q-P11-1:** the Outcome is restated as proposed (§Outcome; the Roadmap's sentence kept as the loop's long-run aim).
+- **RD-P11-2 — answers Q-P11-2:** commit each built row as `draft`, locally, with the batch.
+- **RD-P11-3 — the review moves to the end:** build and run through the proving set without a per-row sitting; one review of every row at the end.
 
 ### Risk lane — `build` (verified against the tree, 2026-10-02)
 
@@ -166,8 +175,8 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 ## Open questions
 
-- **Q-P11-1 [lead] — The Outcome, restated.** The Roadmap's *"Creators find materials for every class of matter in the taxonomy"* is where the loop ends up, not what this phase closes on. The close reads the Outcome verbatim, and a proving set of 30 cannot claim *"every class"*. **Recommended:** the wording proposed under §Outcome, with the Roadmap's sentence kept as the loop's long-run aim. *(Four tests: no ruling answers it, since the Roadmap rule makes the wording the lead's; necessary, as above; deliverable either way; both admissible.)*
-- **Q-P11-2 [lead] — A built row in the shared tree: committed as `draft`, or left uncommitted until the keep?** `/matter-generate` never commits (Phase03, a design choice, not a quoted ruling). At batch scale, in a tree other sessions share by design (`.claude/CLAUDE.md` §Git), uncommitted drafts sit in every sibling's `git status`, and a wildcard stage by any session would sweep them up. **Recommended: commit each built row as `draft`, locally, with the batch** (the push stays the lead's). A keep is then a one-line status commit, and a redo is rebuilt in place. *(Four tests: unanswered; necessary from batch 2; both deliverable; both admissible.)* (F-LC-4)
+- **Q-P11-1 [lead] — The Outcome, restated.** → RD-P11-1 The Roadmap's *"Creators find materials for every class of matter in the taxonomy"* is where the loop ends up, not what this phase closes on. The close reads the Outcome verbatim, and a proving set of 30 cannot claim *"every class"*. **Recommended:** the wording proposed under §Outcome, with the Roadmap's sentence kept as the loop's long-run aim. *(Four tests: no ruling answers it, since the Roadmap rule makes the wording the lead's; necessary, as above; deliverable either way; both admissible.)*
+- **Q-P11-2 [lead] — A built row in the shared tree: committed as `draft`, or left uncommitted until the keep?** → RD-P11-2 `/matter-generate` never commits (Phase03, a design choice, not a quoted ruling). At batch scale, in a tree other sessions share by design (`.claude/CLAUDE.md` §Git), uncommitted drafts sit in every sibling's `git status`, and a wildcard stage by any session would sweep them up. **Recommended: commit each built row as `draft`, locally, with the batch** (the push stays the lead's). A keep is then a one-line status commit, and a redo is rebuilt in place. *(Four tests: unanswered; necessary from batch 2; both deliverable; both admissible.)* (F-LC-4)
 
 ## Discovery Log
 
@@ -204,7 +213,7 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 - **Passes captured:** 2 (2026-10-01, 2026-10-02). **The Brief is complete.**
 - **Working direction:** the build loop, proven on about 30 rows; the rest of the list fills after the close (F-LC-1).
-- **Open decisions:** Q-P11-1 (the Outcome's wording) · Q-P11-2 (drafts committed or not). Neither blocks 11.1: click 1 is one row, and Q-P11-2's default (commit as `draft`) is reversible before batch 2.
+- **Open decisions:** none. Q-P11-1 and Q-P11-2 were ruled at the hand-off (RD-P11-1, RD-P11-2).
 - **Checks to carry forward:** the review time per article (click 4) · whether metals read wrong without F82 (the proving set's three metals; the suggestion under §Not now) · the `_Architecture.md` §Governance annotation at the close.
 
 ## Execution Log

@@ -11,8 +11,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase11 — Library Coverage — ACTIVE *(numbered Phase11 and opened by the lead 2026-10-02; discovery Pass 1 captured 2026-10-01, then paused for Phase10; it was Phase10 for part of that day, Phase08 and Phase07 before that; its character classes moved to Phase07)*
-**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+### Phase11 — Library Coverage — ACTIVE *(numbered Phase11 and opened by the lead 2026-10-02; Outcome restated by the lead the same day, the old one kept as the loop's long-run aim; discovery Pass 1 captured 2026-10-01, then paused for Phase10; it was Phase10 for part of that day, Phase08 and Phase07 before that; its character classes moved to Phase07)*
+**Outcome:** the maintainer runs a batch and gets new materials, each already built and checked side by side in USDLiveView's renderer, Blender and Unreal, and keeps or sends back each one from its picture sheet. The library fills toward its full list this way, without a phase per batch. *(Was: "Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair)", now the loop's long-run aim.)*
 - `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md`
 
 ==================================================================================
