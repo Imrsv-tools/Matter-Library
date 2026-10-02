@@ -1,0 +1,26 @@
+{
+  "_comment": "Cleft (riven) slate: a fine-grained, dark blue-grey metamorphic stone split along its cleavage, so its face is a set of shallow, ragged terraces with a faint ripple and the odd rusty iron stain: a roofing or flooring slate as split, not honed. Opaque: a solid, dull dielectric. Base textures are generated (L2, tools/converters/base/gen_slate_cleft.py), not scanned: ambientCG has no asset that names slate as a stone surface (only slate roofing tiles, an assembly, and a gravel), and the library names only what a source states. Carries every relevant wear layer at 0 (C1): edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Slate_Cleft_Clean_Base_s1_v01",
+  "status": "draft",
+  "path": "natural/stone/Slate_Cleft_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 0.5,
+  "base_color_tex": "../../../textures/base/natural/stone/Slate_Cleft_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Slate_Cleft_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Slate_Cleft_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.55,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.065, 0.072, 0.085), about sRGB 72, 76, 82, for a dark blue-grey roofing slate; roughness about 0.63 for a split face with a faint mica sheen; specular_ior 1.55 for slate's mica, chlorite and quartz (about 1.54-1.6). Physically Based has no slate entry."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_slate_cleft.py", "provenance": "library/provenance/sources/base/natural/stone/Slate_Cleft.yaml"}
+  ]
+}
