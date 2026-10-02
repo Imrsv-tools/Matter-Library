@@ -53,7 +53,7 @@ uv run tools/converters/wishlist.py verdict <stem>
 uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # the sheet's rows, readable
 ```
 
-**Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read the crops** of the rows that matter (the defaults, every layer at 1, any row `verdict` flags). Judge:
+**Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read the crops** of the rows that matter (the defaults, every layer at 1, any row `verdict` flags); add `--full` to judge a gloss, a coat or a polish, whose small sharp highlight can vanish at half size. Judge:
 - **Does it read as the matter?** Colour, gloss, translucency, texture size against the floor's ruler.
 - **The verdict per slider:** *moved alike* in all three is the bar. **ONE-SIDED** or **UNEVEN** names a tool that disagrees: find whether the material (fix it) or a renderer's known limit (report it) is the cause.
 - **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**. A seam flag the render does not show (a generator that tiles by construction, a ratio just over the check's threshold) is reported as a **flag, not confirmed**, with what you looked at; never shift a texture to pass the check.
