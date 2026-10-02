@@ -1,0 +1,26 @@
+{
+  "_comment": "Loam: a dark brown, crumbly topsoil, the ground of a garden bed or a forest path (ambientCG Ground048, CC0; tagged soil, dirt, ground; 140 x 140 cm). Opaque: soil is a matte, rough solid at any viewing distance. The source says soil, not loam (loam is a soil texture class); the name keeps the wish list's word for an ordinary garden topsoil. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage; Cracks01 draws a dried-mud network, the right shape for soil), pitting (overlay 2, rain-pocked or crumbled ground), gated by the Patches mask. Built by the Phase11 batch.",
+  "name": "Loam_Natural_Clean_Base_s1_v01",
+  "status": "draft",
+  "path": "natural/soil/Loam_Natural_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "soil",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.4,
+  "base_color_tex": "../../../textures/base/natural/soil/Loam_Natural_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/soil/Loam_Natural_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/soil/Loam_Natural_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Patches01_s1.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Cracks01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay2_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Ground048", "url": "https://ambientcg.com/view?id=Ground048", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/soil/Loam_Natural.yaml"},
+    {"kind": "judgement", "why": "specular_ior 1.5 for the mineral grains and organic matter of soil; Physically Based has no soil entry. The scan's mean linear albedo (about 0.089, 0.049, 0.033) is a dark, moist brown topsoil, left as scanned."}
+  ]
+}

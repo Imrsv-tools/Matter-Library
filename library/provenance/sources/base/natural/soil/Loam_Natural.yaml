@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/soil/Loam_Natural
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Ground048
+    sha256_scope: shipped_source_set
+    sha256: cdb6979e5fe6dc7248349f9127bc30b065b76611da36a52ee9cb079e83fe03d8
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Ground048_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_basecolor_s1.png
+      sha256: 6e24580b495fbb006bfaeb9261cf3ef093ff20147a984cc1fedea328b33406ec
+    - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_normal_s1.png
+      sha256: 1eee1b97886083e6cb5c22aa7b10c2295260efbe0545024432ec4cb2f1cea274
+    - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_roughness_s1.png
+      sha256: 3525f5ba02b709e65e5236201b8ac8d4a9a9221165764762fe08857bb08653d3
