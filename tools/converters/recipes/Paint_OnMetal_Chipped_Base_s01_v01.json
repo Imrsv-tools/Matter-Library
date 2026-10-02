@@ -1,0 +1,33 @@
+{
+  "_comment": "Paint on metal, chipped: a white semi-gloss enamel on steel (railings, machinery, lockers, tool cabinets) that has flaked off in small sharp-edged chips to show bare steel. TWOLAYER (MasterSet: two real opaque layers, the mask choosing where layer 2 sits): layer 1 is the paint (param-only: ambientCG's painted-steel scans Metal027-029 declare metalness 1 everywhere, which is not paint), layer 2 the bare steel substrate (the library's existing Metal002 scan, the MildSteel_Raw set, reused rather than imported twice), placed by the PaintChip01 mask (R = where the coat has chipped off). meters_per_tile 0.3 is the steel scan's judged size; the chips are sampled at the mask's own 10 cm size (1-12 mm flakes). maskset_blend MUST be non-zero (it defaults to 1 here) or the steel never shows. The Creator tint is a whole-material control (the blend happens before it), so it tints the bare steel as well as the paint. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage, gated by PaintChip01's G, the cracked halo round each chip) and dust as a deposit (overlay 2, gated by its B, settled in the chips); overlay 3 is empty, as the row has it. Built by the Phase11 batch.",
+  "name": "Paint_OnMetal_Chipped_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/coating/Paint_OnMetal_Chipped_Base_s01_v01.mtlx",
+  "master": "TwoLayer",
+  "domain": "synthetic",
+  "class": "coating",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.3,
+  "base_color_const": "0.869, 0.867, 0.771",
+  "roughness_const": 0.35,
+  "metalness_const": 0,
+  "specular_ior": 1.5,
+  "layer2_base_color_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_basecolor_s01.png",
+  "layer2_roughness_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_roughness_s01.png",
+  "layer2_metalness_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_metalness_s01.png",
+  "layer2_normal_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_normal_s01.png",
+  "maskset_tex": "../../../textures/shared/masks/PaintChip01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_defaults": {"maskset_blend": "1.0"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Whiteboard", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.869, 0.867, 0.771", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.5},
+     "note": "Layer 1, the paint: a whiteboard is a white enamel on steel, so its colour and IOR are taken; its roughness 0 is not (a semi-gloss enamel, see the judgement)."},
+    {"kind": "ambientcg", "asset": "Metal002", "url": "https://ambientcg.com/view?id=Metal002", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/engineered/metal/MildSteel_Raw.yaml", "note": "Layer 2, the bare steel: the MildSteel_Raw set, reused."},
+    {"kind": "judgement", "why": "roughness_const 0.35 for a semi-gloss industrial enamel; meters_per_tile 0.3, the steel scan's judged size (MildSteel_Raw); maskset_blend 1 so the chips show the steel fully at the defaults."}
+  ]
+}
