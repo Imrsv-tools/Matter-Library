@@ -210,6 +210,7 @@ def main(argv=None) -> int:
     p = sub.add_parser("show"); p.add_argument("name")
     p = sub.add_parser("mark"); p.add_argument("name"); p.add_argument("state", choices=STATES)
     p.add_argument("--why"); p.add_argument("--batch"); p.add_argument("--name", dest="new_name")
+    p.add_argument("--lane", choices=("L1", "L2", "L3"), help="the way it was actually made, when it differs")
     p = sub.add_parser("verdict"); p.add_argument("name")
     p = sub.add_parser("keep"); p.add_argument("name")
     p = sub.add_parser("redo"); p.add_argument("name"); p.add_argument("--note", required=True)
@@ -229,8 +230,17 @@ def main(argv=None) -> int:
         for x in v["rows"]:
             print(f"{x['setting']:<34} {x['view']:<6} {x['verdict']:<22} "
                   + " ".join(f"{t} {m:.2f}" for t, m in sorted(x["moved"].items())))
+        ports = {}
+        for x in v["rows"]:                       # per slider: did it move anything in any view?
+            ports[x["setting"]] = ports.get(x["setting"], False) or x["verdict"] != "no change in any tool"
+        silent = sorted(s for s, moved in ports.items() if not moved and not s.endswith(" at 0"))
         print(f"tools: {', '.join(v['tools'])} · all moved alike: {v['all_alike']} · seams ok: "
               f"{v['seams_ok']} · scale ok: {v['scale_ok']} · a keep would set: {v['status'] or 'candidate'}")
+        print(f"moved nothing in any tool: {', '.join(silent) if silent else 'none'}")
+        if not (v["seams_ok"] and v["scale_ok"]) or silent:
+            print("REVIEW: say so on the summary's Verdict line. A seam, a failed ruler or a slider that moves "
+                  "nothing does not change the status word (the Glossary's is about the tools agreeing); "
+                  "whether to keep over it is the maintainer's call.")
         return 0
     if a.cmd == "counts":
         for k in KINDS:
@@ -246,6 +256,8 @@ def main(argv=None) -> int:
             r.batch = a.batch
         if a.new_name:
             r.name = a.new_name
+        if a.lane:
+            r.lane = a.lane
     elif a.cmd == "keep":
         print(f"{a.name}: kept, recipe status {keep(rows, a.name)}")
     elif a.cmd == "redo":

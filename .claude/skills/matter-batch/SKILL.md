@@ -35,7 +35,7 @@ Run `/matter-generate` §1–5 with **the row as the brief**: its name, slot, ma
 
 - **Wear layers:** the row's four columns are overlays 1 · 2 · 3 · mask. A layer not in `MatterLibrary/textures/shared/` is made first (`/matter-generate` §3a), once, and shown dialled up on the rig's sheet (the sweep does this). **`Dust01` is a deposit** (`color_port`; `/matter-generate` §3).
 - **The recipe carries `"status": "draft"`** (after `name`).
-- **A planned name that differs from the row's** (the skill's §1 re-plans it): `wishlist.py mark <old> queued --name <new>` before you continue.
+- **A planned name that differs from the row's** (the skill's §1 re-plans it): `wishlist.py mark <old> queued --name <new>` before you continue. **A different way of making it** (no scan names the matter, so L3 becomes L2): `--lane L2`, and say why on the summary.
 - **The gate:** `uv run tools/validators/validate_recipe.py <recipe>` per row; the full `run_all.py` once before the batch's last commit (§6).
 
 A **`rejudge`** row skips this step: the article on disk is the subject.
@@ -43,14 +43,16 @@ A **`rejudge`** row skips this step: the article on disk is the subject.
 ## 3. Rig it, read it
 
 ```sh
-uv run tools/parity/rig.py <stem> --sweep        # ~7 minutes, three tools: run it in the background and wait
+uv run tools/parity/rig.py <stem> --sweep        # 4–10 minutes, three tools, ONE rig at a time (one GPU)
 uv run tools/converters/wishlist.py verdict <stem>
+uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # the sheet's rows, readable
 ```
 
-Then **Read `library/parity/<stem>/sheet.png` and look at it.** Judge:
+**Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read the crops** of the rows that matter (the defaults, every layer at 1, any row `verdict` flags). Judge:
 - **Does it read as the matter?** Colour, gloss, translucency, texture size against the floor's ruler.
 - **The verdict per slider:** *moved alike* in all three is the bar. **ONE-SIDED** or **UNEVEN** names a tool that disagrees: find whether the material (fix it) or a renderer's known limit (report it) is the cause.
-- **Seams and scale:** `verdict` prints both.
+- **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**.
+- **None of these changes the status word** (`approved` = the three tools agree, the Glossary's), but each goes on the summary's **Verdict** line, plainly: a seam, a failed ruler, a declared slider that does nothing (a damage layer on matte matter: overlays can only roughen), a renderer that draws the matter differently (see-through matter). **Whether to keep over it is the maintainer's call;** your job is that they cannot miss it.
 
 ## 4. Fix and re-run — at most 3 rig runs per row
 
@@ -62,11 +64,13 @@ Fix the **recipe** (or the layer you made) and re-assemble (`build_proof_subset.
 uv run tools/converters/wishlist.py mark <stem> built --batch <batch>     # or: stuck --why "…"
 ```
 
+A **re-judge** row is marked `built` too (ready for review) once its sheet is read.
+
 Commit **this row's files and the list**, explicit paths: the recipe, the `.mtlx`, any base textures, a layer's script, PNG and provenance record, a scan's provenance and `CREDITS.md` row, `library/wishlist.yaml`. Message: `Batch <batch>: <stem> built as draft (<one-line verdict>)`. A `rejudge` row commits only the list. A `stuck` row commits its files too, as a draft, so the maintainer can see what failed.
 
 ## 6. The batch summary
 
-Run `uv run tools/validators/run_all.py` (0 FAIL; the SKIPs are reported). Then write **`library/batches/<batch>.md`** and commit it with the list:
+Run `uv run tools/validators/run_all.py` (0 FAIL; the SKIPs are reported; its activation lane prints intended `[FAIL]` lines from negative controls, so read the SUMMARY line). Then write **`library/batches/<batch>.md`** and commit it with the list. **A batch touches no planning doc;** a phase running the loop records its own ledger.
 
 ```markdown
 # Batch <batch> — <date>
