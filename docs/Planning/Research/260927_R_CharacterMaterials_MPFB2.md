@@ -4,7 +4,7 @@
 
 **Question (lead, 2026-09-27, condensed):** the IMRSV platform is starting on characters, using MPFB2 (the MakeHuman plugin for Blender) and its asset library to seed and test. "We need to convert those materials into our library concept, find a home for them in the ontology… these will be different than the other materials, as they will likely be more complex, especially with skins. That is OK… if you have a better solution for anything that fits with our matter philosophy and still ends up with great results, I'm up for it."
 
-**Extends, does not replace:** `260925_R_LibraryCoverage_FirstRelease.md` (§Not in the list: biological matter, O9), `260923_R_AgenticMaterialGeneration.md` (D1 "matter only, never assemblies", D2 "no new masters", O9, carriers C1–C3), `260923_R_StandaloneSetup.md` (Q9), `PhaseTBD_LibraryCoverage.md` (seed questions 1 and 10; it was Phase07 until CM4, un-numbered 2026-09-28, briefly Phase10 on 2026-10-01; CM-Q5's colour on layers is now `Phase10_ColouredWearLayers.md`), `PlatformDependencies.md` (M1).
+**Extends, does not replace:** `260925_R_LibraryCoverage_FirstRelease.md` (§Not in the list: biological matter, O9), `260923_R_AgenticMaterialGeneration.md` (D1 "matter only, never assemblies", D2 "no new masters", O9, carriers C1–C3), `260923_R_StandaloneSetup.md` (Q9), `Phase11_LibraryCoverage.md` (seed questions 1 and 10; it was Phase07 until CM4, un-numbered 2026-09-28, briefly Phase10 on 2026-10-01, Phase11 from 2026-10-02; CM-Q5's colour on layers is now `Phase10_ColouredWearLayers.md`), `PlatformDependencies.md` (M1).
 
 **Public-repo note.** The platform's own planning is private. It is summarised here by what it needs from the library, never by its paths, phase numbers or code.
 

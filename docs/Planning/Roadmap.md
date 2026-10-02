@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase.*
+### Phase11 — Library Coverage — ACTIVE *(numbered Phase11 and opened by the lead 2026-10-02; discovery Pass 1 captured 2026-10-01, then paused for Phase10; it was Phase10 for part of that day, Phase08 and Phase07 before that; its character classes moved to Phase07)*
+**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
+- `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md`
 
 ==================================================================================
 ## Future
@@ -22,11 +24,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 >
 > **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
 
-> **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Future/PhaseTBD_LibraryCoverage.md` (F-LC-7, F-LC-8).
-
-### Library Coverage — SEEDED *(discovery Pass 1 captured 2026-10-01, then paused for Phase10; it was Phase10 for part of that day, Phase08 and Phase07 before that; its character classes moved to Phase07)*
-**Outcome:** Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair).
-- `docs/Planning/Phases/Future/PhaseTBD_LibraryCoverage.md`
+> **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md` (F-LC-7, F-LC-8; numbered Phase11 on 2026-10-02).
 
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.

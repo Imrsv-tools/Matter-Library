@@ -26,7 +26,7 @@
 | BP7 | **The UE leg is a standalone packaged runtime,** not an editor-driven project. It is built on the UE machine, then runs headless on any Linux machine with a GPU, this one included (Pass 7). |
 | BP8 | **"You build them."** The agent makes the materials by whatever works: measured values, free scans, code-generated textures, image-generation models. **Licensing and provenance do not block the seed library** (lead, 2026-09-26: "we are trying to prove a concept"). The tools keep noting where each texture came from automatically; nothing is added on top. This unparks what earlier docs called "generative imagery". |
 | BP9 | **Phase05 and Phase06 are seeded, and they run one after the other, not in parallel** (lead, 2026-09-26: *"we can do all of Phase 5 here, commit and push, then I can move to the other system for Phase 6, and once we have the UE runtime we can move back here for phase 7 and on"*). Library Coverage is renumbered Phase05 → Phase07. |
-| BP10 | **No fixed times** (lead, 2026-10-01, verbatim: *"The fixed times was ONE session... remove taht thought."*). The build loop runs a batch in a session; nothing runs on a schedule. This strikes Pass 9's *"at fixed times"* and *"nightly"* and Pass 12's nightly batch sizing. *(Recorded from Library Coverage's discovery Pass 1, `PhaseTBD_LibraryCoverage.md` F-LC-8.)* |
+| BP10 | **No fixed times** (lead, 2026-10-01, verbatim: *"The fixed times was ONE session... remove taht thought."*). The build loop runs a batch in a session; nothing runs on a schedule. This strikes Pass 9's *"at fixed times"* and *"nightly"* and Pass 12's nightly batch sizing. *(Recorded from Library Coverage's discovery Pass 1, `Phase11_LibraryCoverage.md` F-LC-8.)* |
 
 ---
 
