@@ -1,0 +1,29 @@
+{
+  "_comment": "Translucent silicone rubber (cured PDMS, uncoloured): the milky, soft, slightly tacky moulded rubber of kitchen utensils and bakeware, baby-bottle teats, seals and phone cases. SUBSURFACE: its look is light passing into it and spreading, so thin parts glow and edges soften; it is not see-through like a clear plastic. Satin moulded finish. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints (silicone picks up grease), and dust as a deposit (Phase10; silicone is notorious for holding lint), gated by the Grime mask in the row's order. Built by the Phase11 batch.",
+  "name": "Silicone_Translucent_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/polymer/Silicone_Translucent_Clean_Base_s01_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "synthetic",
+  "class": "polymer",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.82, 0.82, 0.80",
+  "roughness_const": 0.4,
+  "metalness_const": 0.0,
+  "specular_ior": 1.41,
+  "subsurface_weight": 1.0,
+  "subsurface_color": "0.86, 0.86, 0.84",
+  "subsurface_radius": 0.01,
+  "subsurface_radius_scale": "1.0, 1.0, 0.95",
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "judgement", "why": "specular_ior 1.41 (PDMS silicone is 1.40-1.43); a milky near-neutral body (base 0.82, 0.82, 0.80; subsurface colour 0.86, 0.86, 0.84), author-light so a Creator can tint it; subsurface_weight 1 and subsurface_radius 0.01 m with a near-neutral scale (1.0, 1.0, 0.95): uncoloured translucent silicone diffuses light about a centimetre, so thin parts glow but nothing is seen through; roughness 0.4 for a satin moulded finish. Physically Based has no silicone entry."}
+  ]
+}
