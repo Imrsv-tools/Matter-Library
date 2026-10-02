@@ -1,0 +1,28 @@
+{
+  "_comment": "Polished stainless steel: austenitic (304-type) stainless sheet polished to a bright, near-mirror finish, as on sink fronts, appliance trim, cutlery and fittings. Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. Base colour from Physically Based 'Stainless Steel'. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6), so the reflectance toward grazing angles is the base colour's Schlick fade, not steel's measured one. Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the broad corner band meant for a deposit, its A the open faces meant for handling marks, so dust takes slot 2 and fingerprints slot 3). Built by the Phase11 batch.",
+  "name": "StainlessSteel_Polished_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/metal/StainlessSteel_Polished_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.669, 0.639, 0.598",
+  "roughness_const": 0.1,
+  "metalness_const": 1,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Stainless Steel", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.669, 0.639, 0.598", "metalness_const": 1, "roughness_const": 0},
+     "not_carried": ["specularColor", "complexIor"],
+     "note": "roughness_const is not taken (the entry is an ideal mirror); the polish is the judgement below."},
+    {"kind": "judgement", "why": "roughness 0.1 for a bright polished (No. 8-like) sheet finish: a clear reflection with a faint micro-haze, a little softer than a buffed jewellery polish."}
+  ]
+}
