@@ -199,7 +199,7 @@ rows:
   - {name: Nail_FitzpatrickVI_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Nail_FitzpatrickV_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Nail_Natural_Clean_Base_s001_v01, slot: biological/keratin, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Neon_Signage_Clean_Base_s01_v01, slot: utility/emissive, master: Emissive, kind: rejudge, state: queued, proving: 3, note: "on disk, status approved"}
+  - {name: Neon_Signage_Clean_Base_s01_v01, slot: utility/emissive, master: Emissive, kind: rejudge, state: built, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Oak_Natural_Clean_Base_s1_v01, slot: natural/wood, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Pupil_Dark_Clean_Base_s001_v01, slot: biological/tissue, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Rubber_Natural_Clean_Base_s001_v01, slot: synthetic/polymer, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
