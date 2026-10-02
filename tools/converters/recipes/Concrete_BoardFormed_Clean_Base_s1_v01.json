@@ -1,0 +1,29 @@
+{
+  "_comment": "Board-formed concrete: cast-in-place concrete poured against rough-sawn timber boards, so the face keeps each board's imprint: vertical strips about 10 cm wide, their joints, the wood grain and knots, and the form-tie holes (ambientCG Concrete045, CC0; tagged concrete, industrial, modern, pattern; 200 x 200 cm, so meters_per_tile 2 and tag s1, from the source). The source does not say board-formed; the maps show it plainly. It is one substance carrying an imprint, not an assembly (D1). Opaque: a matte, porous solid. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage; Cracks01 draws a crazing network, the right shape for concrete), scratches, dust as a deposit (Phase10), gated by the Grime mask. Not carried: the wet look and efflorescence the wish list also wants. Built by the Phase11 batch.",
+  "name": "Concrete_BoardFormed_Clean_Base_s1_v01",
+  "status": "draft",
+  "path": "engineered/cementitious/Concrete_BoardFormed_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "cementitious",
+  "scale_tag": "s1",
+  "meters_per_tile": 2.0,
+  "base_color_tex": "../../../textures/base/engineered/cementitious/Concrete_BoardFormed_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/engineered/cementitious/Concrete_BoardFormed_roughness_s1.png",
+  "normal_tex": "../../../textures/base/engineered/cementitious/Concrete_BoardFormed_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Cracks01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Concrete045", "url": "https://ambientcg.com/view?id=Concrete045", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/engineered/cementitious/Concrete_BoardFormed.yaml"},
+    {"kind": "physicallybased", "entry": "Concrete", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"specular_ior": 1.5, "metalness_const": 0},
+     "note": "only the IOR and metalness are taken; colour and roughness are the scan's. The scan's mean linear albedo (about 0.65, 0.60, 0.46) is a light, warm concrete, lighter than the entry's 0.51 grey, and is left as scanned."}
+  ]
+}
