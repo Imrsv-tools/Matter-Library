@@ -35,6 +35,7 @@ Run `/matter-generate` §1–5 with **the row as the brief**: its name, slot, ma
 
 - **Wear layers:** the row's four columns are overlays 1 · 2 · 3 · mask. A layer not in `MatterLibrary/textures/shared/` is made first (`/matter-generate` §3a), once, and shown dialled up on the rig's sheet (the sweep does this). **`Dust01` is a deposit** (`color_port`; `/matter-generate` §3).
 - **The recipe carries `"status": "draft"`** (after `name`).
+- **A scan with no physical size** (`import_ambientcg.py` prints `meters_per_tile 0`; common for stone): set `meters_per_tile` by judgement from the feature size (grain, bands), record it as a `judgement` source, and say so on the summary.
 - **A planned name that differs from the row's** (the skill's §1 re-plans it): `wishlist.py mark <old> queued --name <new>` before you continue. **A different way of making it** (no scan names the matter, so L3 becomes L2): `--lane L2`, and say why on the summary.
 - **The gate:** `uv run tools/validators/validate_recipe.py <recipe>` per row; the full `run_all.py` once before the batch's last commit (§6).
 
@@ -51,7 +52,7 @@ uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # 
 **Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read the crops** of the rows that matter (the defaults, every layer at 1, any row `verdict` flags). Judge:
 - **Does it read as the matter?** Colour, gloss, translucency, texture size against the floor's ruler.
 - **The verdict per slider:** *moved alike* in all three is the bar. **ONE-SIDED** or **UNEVEN** names a tool that disagrees: find whether the material (fix it) or a renderer's known limit (report it) is the cause.
-- **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**.
+- **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**. A seam flag the render does not show (a generator that tiles by construction, a ratio just over the check's threshold) is reported as a **flag, not confirmed**, with what you looked at; never shift a texture to pass the check.
 - **None of these changes the status word** (`approved` = the three tools agree, the Glossary's), but each goes on the summary's **Verdict** line, plainly: a seam, a failed ruler, a declared slider that does nothing (a damage layer on matte matter: overlays can only roughen), a renderer that draws the matter differently (see-through matter). **Whether to keep over it is the maintainer's call;** your job is that they cannot miss it.
 
 ## 4. Fix and re-run — at most 3 rig runs per row
@@ -66,7 +67,7 @@ uv run tools/converters/wishlist.py mark <stem> built --batch <batch>     # or: 
 
 A **re-judge** row is marked `built` too (ready for review) once its sheet is read.
 
-Commit **this row's files and the list**, explicit paths: the recipe, the `.mtlx`, any base textures, a layer's script, PNG and provenance record, a scan's provenance and `CREDITS.md` row, `library/wishlist.yaml`. Message: `Batch <batch>: <stem> built as draft (<one-line verdict>)`. A `rejudge` row commits only the list. A `stuck` row commits its files too, as a draft, so the maintainer can see what failed.
+**One row at a time, through its commit.** While a rig runs you may read and plan the next row, but **write nothing for it** (no `mark`, no import, no `CREDITS.md` row) until this row is committed: `library/wishlist.yaml` and `CREDITS.md` are shared by every row, and an early edit rides into this row's commit. **New files are `git add`-ed by path first** (`git commit -- <paths>` refuses untracked files). Commit **this row's files and the list**, explicit paths: the recipe, the `.mtlx`, any base textures, a layer's script, PNG and provenance record, a scan's provenance and `CREDITS.md` row, `library/wishlist.yaml`. Message: `Batch <batch>: <stem> built as draft (<one-line verdict>)`. A `rejudge` row commits only the list. A `stuck` row commits its files too, as a draft, so the maintainer can see what failed.
 
 ## 6. The batch summary
 
