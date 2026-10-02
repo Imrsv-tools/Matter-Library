@@ -1,0 +1,31 @@
+{
+  "_comment": "Clear acrylic (PMMA, sold as Plexiglas or Perspex): the water-clear cast or extruded sheet of display cases, sneeze guards, signs and picture glazing. TranslucentThin: a sheet is a thin shell seen through, the same master as the glass panes (Glass_Clear, Glass_Frosted). Polished and colourless, with a lower index than glass (1.49), so its reflections are a little weaker. Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage: acrylic is soft and scratches finely with cleaning), fingerprints, and dust as a deposit (Phase10), gated by the Grime mask in the row's order. Built by the Phase11 batch.",
+  "name": "Acrylic_Clear_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/plastic/Acrylic_Clear_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThin",
+  "domain": "synthetic",
+  "class": "plastic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "1, 1, 1",
+  "roughness_const": 0,
+  "metalness_const": 0,
+  "specular_ior": 1.4905,
+  "transmission": 1,
+  "transmission_color": "0.99, 0.99, 0.99",
+  "thin_walled": true,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Plastic (Acrylic)", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "1, 1, 1", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.4905, "transmission": 1},
+     "not_carried": ["transmissionDispersion"]},
+    {"kind": "judgement", "why": "transmission_color 0.99, 0.99, 0.99: optical acrylic is water-clear (about 92 % luminous transmission, nearly all of the loss being its two surface reflections), with none of soda-lime glass's green edge."}
+  ]
+}
