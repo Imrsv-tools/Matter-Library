@@ -7,7 +7,7 @@
 
 rows:
   - {name: CarraraMarble_Honed_Clean_Base_s1_v01, slot: natural/stone, master: Subsurface, lane: L3, scale: s1, layers: [Scratches01, Dust01, WaterSpots01, Crevice01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: ~Wet"}
-  - {name: Granite_Polished_Clean_Base_s1_v01, slot: natural/stone, master: Opaque, lane: L3, scale: s1, layers: [Scratches01, Dust01, WaterSpots01, Crevice01], kind: build, state: queued, proving: 3, note: "research 2026-09-25: Now; also wanted: ~Wet"}
+  - {name: Granite_Polished_Clean_Base_s1_v01, slot: natural/stone, master: Opaque, lane: L3, scale: s1, layers: [Scratches01, Dust01, WaterSpots01, Crevice01], kind: build, state: built, proving: 3, batch: "261002-3", note: "research 2026-09-25: Now; also wanted: ~Wet"}
   - {name: Granite_Weathered_Clean_Base_s1_v01, slot: natural/stone, master: Opaque, lane: L3, scale: s1, layers: [EdgeWear01, Dust01, null, Crevice01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: ~Wet · ~Moss"}
   - {name: Sandstone_Weathered_Clean_Base_s1_v01, slot: natural/stone, master: Opaque, lane: L3, scale: s1, layers: [EdgeWear01, Dust01, null, Crevice01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: ~Wet · ~Moss"}
   - {name: Slate_Cleft_Clean_Base_s1_v01, slot: natural/stone, master: Opaque, lane: L3, scale: s1, layers: [EdgeWear01, Dust01, null, Crevice01], kind: build, state: queued, proving: 3, note: "research 2026-09-25: Now; also wanted: ~Wet · ~Moss"}

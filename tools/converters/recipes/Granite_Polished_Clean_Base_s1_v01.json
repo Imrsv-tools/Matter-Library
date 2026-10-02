@@ -1,0 +1,27 @@
+{
+  "_comment": "Polished granite: a speckled grey, pink and white coarse-grained igneous stone, ground and polished to a near-mirror countertop finish (ambientCG Granite001A, CC0, its polished 'A' variant; roughness map mean 0.05). Opaque: a solid dielectric; granite does not scatter light through like marble. The source states no physical size: meters_per_tile 0.4 is a judgement from the grain size (crystals of about 3-5 mm span 7-13 px of the 1024 px tile). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Granite_Polished_Clean_Base_s1_v01",
+  "status": "draft",
+  "path": "natural/stone/Granite_Polished_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 0.4,
+  "base_color_tex": "../../../textures/base/natural/stone/Granite_Polished_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Granite_Polished_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Granite_Polished_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.54,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Granite001A", "url": "https://ambientcg.com/view?id=Granite001A", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/stone/Granite_Polished.yaml"},
+    {"kind": "judgement", "why": "specular_ior 1.54, that of quartz (Physically Based 'Quartz'), granite's main mineral with feldspar (about 1.52-1.53); Physically Based has no granite entry. meters_per_tile 0.4 from the grain size, since the source states no physical size."}
+  ]
+}

@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/stone/Granite_Polished
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Granite001A
+    sha256_scope: shipped_source_set
+    sha256: eeb7519327783f94277ceb0c99cffdaefd5095e86c6801f282bcbb6f8b17f435
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Granite001A_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_basecolor_s1.png
+      sha256: e1fef2019a79371b89df03cc5f16d153228d223c774d12d878892eb56e5aa7f6
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_normal_s1.png
+      sha256: 1f6f01b779741029d7a6cfcaef47798a7142eef6740db767d5fa0b28afd4f975
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_roughness_s1.png
+      sha256: 7d79dd5667e99e57fbabb3e9a819a5e0451e85552550e38e0126c99000e7b85e
