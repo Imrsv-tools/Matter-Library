@@ -1,0 +1,32 @@
+{
+  "_comment": "Frosted glass: clear soda-lime glass whose surface is acid-etched or sandblasted, so light passes but blurs (shower screens, office partitions, lamp shades). TranslucentThin: a pane is a thin shell seen through, the same master as Glass_Clear and Glass_Green. The frost is the surface roughness, nothing else: the same glass as Glass_Clear with a rough face. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article. Built by the Phase11 batch.",
+  "name": "Glass_Frosted_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/glass/Glass_Frosted_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThin",
+  "domain": "engineered",
+  "class": "glass",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.984, 0.995, 0.995",
+  "roughness_const": 0.45,
+  "metalness_const": 0,
+  "specular_ior": 1.52,
+  "transmission": 1,
+  "transmission_color": "0.94, 0.97, 0.95",
+  "thin_walled": true,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Glass (Soda-lime)", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.984, 0.995, 0.995", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.52, "transmission": 1},
+     "not_carried": ["transmissionDispersion", "volumeCoefficients"],
+     "note": "roughness_const is not taken (the entry is polished glass); the frost is the judgement below."},
+    {"kind": "judgement", "why": "roughness 0.45 for an acid-etched or sandblasted face (light passes but blurs); transmission_color 0.94, 0.97, 0.95, the faint green of ordinary clear soda-lime pane glass."}
+  ]
+}
