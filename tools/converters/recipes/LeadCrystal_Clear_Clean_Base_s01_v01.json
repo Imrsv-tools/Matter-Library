@@ -1,0 +1,29 @@
+{
+  "_comment": "Clear lead crystal: lead-oxide glass (24-30 % PbO), cast or cut and polished, the glass of decanters, tumblers, bowls and chandelier drops. TRANSLUCENTTHICK, unlike a pane (Glass_Clear is Thin): crystal is a solid, heavy body seen through, and what makes it crystal and not ordinary glass is its higher IOR (about 1.56 against soda-lime's 1.52), so it bends what is seen through it more and its facets throw brighter reflections. Param-only: a clear glass has no albedo texture. Physically Based has no lead-crystal entry, so the values are judgement. APPROXIMATE: dispersion, the rainbow fire of cut crystal, is not carried. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints (handled glassware), gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article. Built by the Phase11 batch.",
+  "name": "LeadCrystal_Clear_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/glass/LeadCrystal_Clear_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThick",
+  "domain": "engineered",
+  "class": "glass",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "1, 1, 1",
+  "roughness_const": 0,
+  "metalness_const": 0,
+  "specular_ior": 1.56,
+  "transmission": 1,
+  "transmission_color": "0.98, 0.98, 0.97",
+  "transmission_depth": 0.1,
+  "thin_walled": false,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Physically Based has no lead-crystal entry. specular_ior 1.56, the refractive index of full lead crystal (about 24-30 % PbO; 1.545-1.57). base_color 1, roughness 0 and transmission 1 for a clear, polished glass, as Physically Based gives for its soda-lime and borosilicate glasses. transmission_color 0.98, 0.98, 0.97 at a 0.1 m path (transmission_depth): crystal is very nearly colourless, with a faint warm-grey cast in a thick piece; a tumbler's 5-10 cm of glass reads clear."}
+  ]
+}
