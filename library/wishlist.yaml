@@ -168,7 +168,7 @@ rows:
   - {name: Denim_Indigo_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Denim_LightWash_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Diagnostic_UVGrid_Clean_Base_s1_v01, slot: utility/virtual, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
-  - {name: Diamond_Brilliant_Clean_Base_s01_v01, slot: natural/mineral, master: TranslucentThick, kind: rejudge, state: queued, proving: 3, note: "on disk, status approved"}
+  - {name: Diamond_Brilliant_Clean_Base_s01_v01, slot: natural/mineral, master: TranslucentThick, kind: rejudge, state: built, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Earthenware_Natural_Clean_Base_s01_v01, slot: engineered/ceramic, master: Opaque, kind: rejudge, state: queued, note: "on disk, status draft"}
   - {name: Enamel_Natural_Clean_Base_s001_v01, slot: biological/bone, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Eye_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
