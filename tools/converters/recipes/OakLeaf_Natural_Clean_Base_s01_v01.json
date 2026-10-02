@@ -1,0 +1,30 @@
+{
+  "_comment": "One fresh green oak leaf's upper surface on a card, cut out by its own opacity map: MASKED, the master for a leaf card (MasterSet; grass ground cover is Opaque). The two-sided, thin-transmission foliage variant is (planned) in MasterSet, so light through the leaf is not carried; Masked is today's master. Generated (L2), not scanned: no ambientCG source names oak (its single-leaf sets Leaf001-003 say only green, leaf, single, tree), so the oak outline is drawn by judgement and the colour anchored to Physically Based Grass. One leaf per tile, about 12 cm. Carries every relevant wear layer at 0 (C1): pitting (overlay 1, damage: small holes and spotting), dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit the row's order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. Built by the Phase11 batch.",
+  "name": "OakLeaf_Natural_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "environmental/vegetation/OakLeaf_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "Masked",
+  "domain": "environmental",
+  "class": "vegetation",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.12,
+  "base_color_tex": "../../../textures/base/environmental/vegetation/OakLeaf_Natural_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/environmental/vegetation/OakLeaf_Natural_roughness_s01.png",
+  "normal_tex": "../../../textures/base/environmental/vegetation/OakLeaf_Natural_normal_s01.png",
+  "opacity_tex": "../../../textures/base/environmental/vegetation/OakLeaf_Natural_opacity_s01.png",
+  "opacity_cutoff": 0.5,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Patches01_s1.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Grass", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.105, 0.133, 0.041", "metalness_const": 0, "roughness_const": 0.5, "specular_ior": 1.5},
+     "note": "The nearest measured green foliage (Physically Based has no leaf entry). The generated texture's mean linear albedo over the leaf is this entry's colour exactly, and its mean roughness over the leaf is this entry's 0.5; veins and mottling vary around them."},
+    {"kind": "judgement", "why": "The oak outline (obovate, five rounded lobes a side, sinuses about halfway to the midrib, auricles at the base, a short stalk), the pinnate veins and the 0.12 m tile (a ~10 cm blade) are drawn by tools/converters/base/gen_oakleaf_natural.py, since no scan names oak. Cut-out threshold 0.5, as Lace."}
+  ]
+}
