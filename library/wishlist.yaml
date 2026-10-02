@@ -180,7 +180,7 @@ rows:
   - {name: Hair_DarkBrown_Clean_Base_s001_v01, slot: biological/keratin, master: Masked, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Hair_Natural_Clean_Base_s001_v01, slot: biological/keratin, master: Hair, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Iris_Brown_Clean_Base_s001_v01, slot: biological/tissue, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lace_Floral_Clean_Base_s01_v01, slot: synthetic/textile, master: Masked, kind: rejudge, state: queued, proving: 3, note: "on disk, status approved"}
+  - {name: Lace_Floral_Clean_Base_s01_v01, slot: synthetic/textile, master: Masked, kind: rejudge, state: built, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Leather_Brown_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Leather_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Limestone_Veined_Clean_Base_s01_v01, slot: natural/stone, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
