@@ -1,0 +1,26 @@
+{
+  "_comment": "Raw mild steel: bare, uncoated carbon-steel sheet or plate as it comes from the stockholder, light grey, unpolished, with faint handling scratches and a few small spots of fresh oxide (ambientCG Metal002, CC0; tagged steel, scratches, silver, bumpy). Opaque: a solid metal; the scan's metalness map is 1 except in the oxide spots. The source says steel, not mild steel; ordinary bare structural steel is mild steel, so the name keeps the wish list's word. The source states no physical size: meters_per_tile 0.3 is a judgement from the oxide spots (2-5 mm). APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), pitting (overlay 2, corrosion pits), dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
+  "name": "MildSteel_Raw_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/metal/MildSteel_Raw_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.3,
+  "base_color_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_normal_s01.png",
+  "metalness_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_metalness_s01.png",
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Metal002", "url": "https://ambientcg.com/view?id=Metal002", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/engineered/metal/MildSteel_Raw.yaml"},
+    {"kind": "judgement", "why": "meters_per_tile 0.3 from the oxide spots (2-5 mm, 7-15 px of the 1024 px tile), since the source states no physical size. The scan's mean linear albedo (about 0.31, 0.32, 0.33) is left as scanned; it is darker than Physically Based 'Iron' (0.53, 0.513, 0.494), whose F82 tint and complex IOR the library does not carry either."}
+  ]
+}

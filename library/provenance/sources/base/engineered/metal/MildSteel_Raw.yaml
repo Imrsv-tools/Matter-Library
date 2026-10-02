@@ -1,0 +1,21 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/engineered/metal/MildSteel_Raw
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Metal002
+    sha256_scope: shipped_source_set
+    sha256: 901b22121af8eb3dd55076b6f0faeb3f7ac76d88022618d3025d0b49dd45dcb0
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Metal002_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_basecolor_s01.png
+      sha256: bce2d7d65c5083dc4a071681a3edc34ade398544c82651921feab0b325697043
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_metalness_s01.png
+      sha256: ee6f32c7c88f4592b3cb18e7f90bdd8e2102cc0656c41cbad0a1347cc7bb1695
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_normal_s01.png
+      sha256: d82268e4079a36b0bc403545eae88c70d3be01e9773db013776dc1d3695bf321
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_roughness_s01.png
+      sha256: a97df5e449b57348e63793ea2d195a849fccd3504247c4f8b8e56a6630a2bd4b
