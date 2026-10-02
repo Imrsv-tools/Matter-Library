@@ -91,8 +91,9 @@ def main() -> int:
     present = [t for t in FORBIDDEN_TOKENS if t in nocomment]
     check(not present, "no UsdPreviewSurface / Light / Camera in the asset", f"found {present}")
 
-    # 6b. no absolute author-machine paths anywhere.
-    abs_paths = re.findall(r'(?:@|value=")(/[^@"\s]+)', nocomment)
+    # 6b. no absolute author-machine paths anywhere: an asset path, or ANY quoted string value
+    # (a custom string attribute carried one past the old `value="` form: F-P10-17, 2026-10-02).
+    abs_paths = re.findall(r'(?:@|")(/[^@"\s]+)', nocomment)
     check(not abs_paths, "no absolute author-machine paths", f"found {abs_paths[:3]}")
 
     # 7. directory-level material-payload asserts (the NEGATIVE spec-derived guard).

@@ -58,6 +58,8 @@ def Xform "root" (
             custom double3 userProperties:base_color_tint = (0.2, 0.8, 0.4)
             custom string userProperties:blender:data_name = "Copper_Verdigris_Aged_Base_s01_v01"
             custom string userProperties:imrsv_matter_identity = "Copper_Verdigris_Aged_Base_s01_v01"
+            custom string userProperties:ml_article = "/home/author/Matter-Library/MatterLibrary/materials/Copper_Verdigris_Aged_Base_s01_v01.mtlx"
+            custom string userProperties:ml_master = "Opaque"
             custom double userProperties:roughness_bias = 0.1
             token outputs:surface.connect = </root/_materials/Copper_Verdigris_Aged_Base_s01_v01/Principled_BSDF.outputs:surface>
 
@@ -210,6 +212,8 @@ def test_transform_text():
           "the blender:data_name bridge is consumed + stripped (was previously left untouched)")
     check("userProperties:imrsv_matter_identity" not in new_text,
           "the durable identity carrier is consumed into assetInfo + stripped from the body (§1)")
+    check("userProperties:ml_" not in new_text and "/home/author/" not in new_text,
+          "the loader's ml_* bookkeeping (once an author-machine path) is stripped (F-P10-17)")
     check("Principled_BSDF" not in new_text and "UsdPreviewSurface" not in new_text
           and "outputs:surface" not in new_text,
           "the exporter's shader network + surface plug are stripped (material IS the .mtlx)")

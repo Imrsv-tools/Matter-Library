@@ -63,7 +63,9 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         ports[k] = list(v) if isinstance(v, (list, tuple)) else [float(v)]
 
     mat = bpy.data.materials.new(name or art.name)
-    mat["ml_article"] = str(path)
+    # The article's id, never its path: a path is the author machine's, and these properties
+    # ride into the committed library .blend (F-P10-17). The exporter strips `ml_*` too.
+    mat["ml_article"] = art.name
     mat["ml_master"] = art.master
     thick = "thick" in build_masters.MASTER_PARTS[art.master]
 

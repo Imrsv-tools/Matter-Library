@@ -307,13 +307,16 @@ def _maybe_rewrite_userprop_line(line):
 
 def _is_material_junk(stripped):
     """A Material-body line stripped by the reshape: the exporter's surface output plug, the
-    `userProperties:blender:*` bridge (data_name/etc.), and the durable `imrsv_matter_identity`
-    carrier (consumed into `assetInfo:identifier` by the pre-scan — it is a bridge, not spec)."""
+    `userProperties:blender:*` bridge (data_name/etc.), the durable `imrsv_matter_identity`
+    carrier (consumed into `assetInfo:identifier` by the pre-scan — it is a bridge, not spec),
+    and the library loader's own `userProperties:ml_*` bookkeeping (`ml_article`, `ml_master`;
+    authoring-side only, and once an author-machine path: F-P10-17, 2026-10-02)."""
     if stripped.startswith("token outputs:surface"):
         return True
     if "=" in stripped:
         lhs = stripped.partition("=")[0].split()
         if lhs and (lhs[-1].startswith("userProperties:blender:")
+                    or lhs[-1].startswith("userProperties:ml_")
                     or lhs[-1] == IDENTITY_USERPROP):
             return True
     return False
