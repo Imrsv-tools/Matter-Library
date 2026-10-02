@@ -7,7 +7,7 @@ description: Work the next rows of the Matter Library wish list (library/wishlis
 
 You are running **one batch** of the build loop (Phase11 Library Coverage). The argument is how many rows (default **5**) or the row names to take. Rows come from `library/wishlist.yaml`, worked by `tools/converters/wishlist.py`.
 
-**The loop:** take a row → build it → rig it → read the sheet → fix and re-run (up to 3 rig runs) → mark it → commit it → next row. Then write the batch summary. **The maintainer judges sheets, not scenes,** and says keep or redo; you record it.
+**The loop:** take a row → build it → rig it → read the sheet → **refine what is fixable and re-run (up to 3 rig runs; §4)** → mark it → commit it → next row. Then write the batch summary. **The maintainer judges sheets, not scenes,** and says keep or redo; you record it.
 
 ## Hard rules
 
@@ -59,9 +59,22 @@ uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # 
 - **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**. A seam flag the render does not show (a generator that tiles by construction, a ratio just over the check's threshold) is reported as a **flag, not confirmed**, with what you looked at; never shift a texture to pass the check. **The ruler cannot measure a near-flat or cut-out base texture** (a leaf, lace): a ruler OFF on one is a flag, not a finding. **A re-judge changes no files:** what it finds missing (C1 layers, a deposit's `color_port`) goes on its Verdict line as what a redo would add.
 - **None of these changes the status word** (`approved` = the three tools agree, the Glossary's), but each goes on the summary's **Verdict** line, plainly: a seam, a failed ruler, a declared slider that does nothing (a damage layer on matte matter: overlays can only roughen), a renderer that draws the matter differently (see-through matter). **Whether to keep over it is the maintainer's call;** your job is that they cannot miss it.
 
-## 4. Fix and re-run — at most 3 rig runs per row
+## 4. Refine and re-run — at most 3 rig runs per row
 
-Fix the **recipe** (or the layer you made) and re-assemble (`build_proof_subset.py <recipe>`), then re-rig. After the third rig run, stop: mark the row `stuck` with why, in one sentence a person can act on.
+**A row is not `built` because it rendered once. It is `built` when nothing FIXABLE is left wrong, or after 3 rig runs.** *(Lead, 2026-10-02, RD-P11-4: the proving set went set-up → one render → report → next, 28 of 30 rows on one try, with fixable faults only reported; F-P11-19.)*
+
+**Sort every problem you see into one of two kinds, and write which on the summary:**
+
+| Kind | Examples | What you do |
+|---|---|---|
+| **Fixable in the material** | the colour is off (too sage, too pale, the wrong hue) · the gloss is wrong for the matter · the texture size is wrong against the ruler · the relief is too timid or too strong · a scan or generated texture does not read as the matter (one leaf visibly repeating, a speckle that should be flakes) · a layer in the wrong slot or a missing relevant layer | **Fix it, re-assemble, re-rig.** Not optional, and not "reported for the review". |
+| **A renderer's or the library's limit** | see-through matter drawn differently per tool · a mirror with nothing to reflect · an input the library has no carrier for (F82, a coat the wear cannot reach) · a shared layer that is faint or flawed | **Report it**; never fudge the recipe toward the tools agreeing. |
+
+**When unsure, it is fixable:** try the fix; the next rig run tells you.
+
+**Check against a reference where one exists:** the Physically Based entry's colour and roughness (`lookup_physically_based.py show`), the scan's own preview image (ambientCG), the generator's stated anchor. Say what you compared against, and how far off the render is.
+
+Fix the **recipe** (or the texture or layer you made in this row) and re-assemble (`build_proof_subset.py <recipe>`), then re-rig. After the third rig run, stop: mark the row `built` if what is left is only limits, or `stuck` with why, in one sentence a person can act on. The summary's **Tries** line says what each run changed and what the render showed.
 
 ## 5. Mark and commit the row
 
@@ -93,7 +106,7 @@ Run `uv run tools/validators/run_all.py` (0 FAIL; the SKIPs are reported; its ac
 
 ## 7. The review (the maintainer's)
 
-Open each summary and each sheet for the maintainer. **They look and say keep or redo; they type no command.** Record each verdict:
+Build the batch's review page (`uv run tools/parity/review_pages.py <batch>`, one image per batch) and open it and the summary for the maintainer. **They look and say keep or redo; they type no command.** Record each verdict:
 
 ```sh
 uv run tools/converters/wishlist.py keep <stem>                  # recipe status: approved (all three alike) or candidate

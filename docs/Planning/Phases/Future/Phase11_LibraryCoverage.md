@@ -1,6 +1,6 @@
 # Phase11 — Library Coverage
 
-**Status:** IN EXECUTION (2026-10-02; lane `build`). Brief written at Pass 2; Q-P11-1 and Q-P11-2 ruled at the hand-off (RD-P11-1, RD-P11-2), and the per-row review moved to one review at the end (RD-P11-3). **Numbered Phase11 by the lead, 2026-10-02** (`/discovery P11`, the head of the Roadmap's `## Future` once Phase10 closed). Discovery was paused after Pass 1 (2026-10-01): **un-numbered again the same day it was numbered Phase10**, because its Pass 1 proposed colour on wear layers as a phase of its own (F-LC-7), and the lead ruled, verbatim: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers took Phase10** (`../Complete/Phase10_ColouredWearLayers.md`, closed 2026-10-01). **Id scope:** the ids minted while unnumbered keep `LC` (`F-LC-n`; minted as `F-P10-n` and renamed 2026-10-01); **new ids take `P11`** (`NamingConventions.md` §Planning ids).
+**Status:** IN EXECUTION, **paused by the lead after 11.3 (2026-10-02)**; lane `build`. Brief written at Pass 2; Q-P11-1 and Q-P11-2 ruled at the hand-off (RD-P11-1, RD-P11-2), the per-row review moved to one review at the end (RD-P11-3), and the loop made to refine what is fixable before a row counts as built (RD-P11-4). **Resume at 11.4** (§Execution Log, *Resume*). **Numbered Phase11 by the lead, 2026-10-02** (`/discovery P11`, the head of the Roadmap's `## Future` once Phase10 closed). Discovery was paused after Pass 1 (2026-10-01): **un-numbered again the same day it was numbered Phase10**, because its Pass 1 proposed colour on wear layers as a phase of its own (F-LC-7), and the lead ruled, verbatim: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers took Phase10** (`../Complete/Phase10_ColouredWearLayers.md`, closed 2026-10-01). **Id scope:** the ids minted while unnumbered keep `LC` (`F-LC-n`; minted as `F-P10-n` and renamed 2026-10-01); **new ids take `P11`** (`NamingConventions.md` §Planning ids).
 - **Its numbers, oldest first** (anything older that names one of them about this work means this phase): seeded as **Phase05** on 2026-09-25 (*"i and then seed phase 5 and that will be building materials"*); **Phase07** from 2026-09-26 (the test rig and the Unreal runtime first, so every material is checked in all three tools); **Phase08** from 2026-09-27 (research `260927_R_CharacterMaterials_MPFB2.md` CM4: Character Materials first); **un-numbered** on 2026-09-28 (*"make this Phase 8, mark the current Phase8 as TBD - we have many other little things to get in here befoer we build out the full library."*); **Phase10** for part of 2026-10-01 (*"/discovery … as Phase10"*), then **un-numbered** again the same day; **Phase11** from 2026-10-02.
 - **Why it exists:** *"we have 200 materials to build and test before we have our first versionable library"* (lead, 2026-09-25, `260925_R_DraftsInUSDLiveView.md` Pass 5).
 - **Re-cut at Pass 1 (2026-10-01)** from "build ~162 articles" to "build the loop that builds them, and prove it", as the seed's own `Reevaluate (2026-09-26)` anticipated (F-LC-1). The seed's scope is kept below, marked with where it now lives.
@@ -96,11 +96,13 @@ Reached in the batch summary (a tracked file, `.claude/CLAUDE.md` §The delivera
 | 11 | **The push is the lead's** (a public repo) | `LOCAL_DELTAS.md` §Weighting |
 | 12 | **A built row is committed as `draft`, locally, with its batch** | RD-P11-2 |
 | 13 | **The lead reviews once, at the end of the proving set**, not row by row | RD-P11-3 |
+| 14 | **A row is built when nothing fixable is left wrong, or after 3 rig runs:** every problem is sorted fixable-in-the-material (fix, re-render) or a renderer's or library's limit (report) | RD-P11-4 · `/matter-batch` §4 |
 
 **Rulings at the hand-off (lead, 2026-10-02), verbatim:** *"yes to 1 and 2... I do not need to review each one so if you just want to start building and cranking through them... we can review at the end.... go ahead with /execute P11"*
 - **RD-P11-1 — answers Q-P11-1:** the Outcome is restated as proposed (§Outcome; the Roadmap's sentence kept as the loop's long-run aim).
 - **RD-P11-2 — answers Q-P11-2:** commit each built row as `draft`, locally, with the batch.
 - **RD-P11-3 — the review moves to the end:** build and run through the proving set without a per-row sitting; one review of every row at the end.
+- **RD-P11-4 — the loop refines, not only reports (lead, 2026-10-02, after 11.3).** Asked *"Are you rendering, testing, refining, rerendering... or setting things then rendering and gong to the next?"*, told the honest answer (the latter: 28 of 30 rows on one render, fixable faults reported, not fixed; F-P11-19) and offered the change, the lead, verbatim: *"Yes.. make that change... update the docs with any findings but we will pause here"*. `/matter-batch` §4 now sorts every problem into fixable (fix and re-render, up to 3 runs) or a limit (report), and checks against a reference where one exists. **The refine pass over the 30 is step 11.4, owed; the run paused before it.**
 
 ### Risk lane — `build` (verified against the tree, 2026-10-02)
 
@@ -115,6 +117,7 @@ Reached in the batch summary (a tracked file, `.claude/CLAUDE.md` §The delivera
 | **11.1** | The list file (seeded in full, the proving rows marked) · the helper · the batch skill · the skill's deposit line (F-P11-2) · **one row built, rigged, summarised, and the keep or redo recorded** | clicks 1–2 |
 | **11.2** | A batch of 5 (§The proving set, batch 2), including a rig-only re-judge and a redo carried forward with its note | click 3 |
 | **11.3** | The rest of the proving set, batch by batch over several sessions, **including the 7 new wear layers**; the review time per article measured | click 4 |
+| **11.4** | *(Added 2026-10-02, RD-P11-4.)* **The proving set refined under `/matter-batch` §4:** each of the 30 rows re-read, every fixable fault fixed and re-rendered (up to 3 runs), each summary's Tries line rewritten; the review pages rebuilt. Then the end review (clicks 1–4 as one sitting, RD-P11-3) | the end review |
 | **Close** | The Blender library rebuilt once with every kept article · docs conformed (§Build map) · the next batches left queued on the list | — |
 
 ### The proving set (the default; the lead may edit the list)
@@ -218,6 +221,8 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 ## The end review (RD-P11-3) — the sitting script
 
+> **Held until 11.4 (RD-P11-4):** the pages and table below are of the one-try builds. Rebuild both after the refine pass; the order and the questions stand.
+
 **The proving set is built: 30 rows in 7 batches** (26 built, 4 re-judged, none stuck; about 4 hours of rig, one try per row but two). The lead judges each row and says **keep** or **redo, with a note**; the agent records it (`wishlist.py keep` / `redo`) and commits. **The lead types nothing.**
 
 **What to open:** `library/parity/_review/261002-<n>.png` (git-ignored; one page per batch): per row, the close-up at its defaults in Storm | Blender | Unreal, then its dust row at 1 (an emitter at −4 stops). Each row's full story is its summary, `library/batches/261002-<n>.md`; its whole sweep is `library/parity/<row>/sheet.png`.
@@ -267,6 +272,8 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 ## Execution Log
 
+**Resume (paused by the lead, 2026-10-02, after 11.3):** next is **11.4, the refine pass** over the 30 proving rows under `/matter-batch` §4 (RD-P11-4), in batches by a fresh agent each, one rig at a time, starting with the faults F-P11-19 names. Rebuild the review pages after (`uv run tools/parity/review_pages.py 261002-1 … 261002-7`), refresh the review table from the scorecards (`wishlist.py verdict` per row), then the end review. **State at pause:** 26 rows built and 4 re-judged, all `draft` (nothing kept), 7 new layers, gate 15 PASS / 2 SKIP / 0 FAIL at `aa23deb`; **nothing pushed** (the push is the lead's). Still for the end review: the four flawed layers (F-P11-14, F-P11-12) and the library limits (F-P11-9, -16, -17), which are later phases' work.
+
 **Run 1 (2026-10-02, the library machine).** Tree at start: `main`, `ed9242a`, clean. Gate baseline: `run_all.py` 15 PASS / 2 SKIP (compression, staging: no encoder) / 0 FAIL; the inherited `approval_binds_freeze` red is gone (the pilot was re-approved after Phase10).
 
 **Findings in execution:**
@@ -288,6 +295,7 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
   - **The tint is dead on a fully subsurface article.** `subsurface_color` takes the tinted base colour only for Hair and `base_color_map` articles; at subsurface weight 1 (Silicone) the base colour is hidden.
   - **On TwoLayer the tint colours both layers** (it follows the blend), so a red paint turns its bare steel red.
   - *Also:* Paint_OnMetal_Chipped reuses MildSteel_Raw's Metal002 textures, so a redo of MildSteel_Raw with another scan changes it too.
+- **F-P11-19 — The loop reported fixable faults instead of fixing them.** Over the proving set, **28 of 30 rows took one render**; the two second runs were Slate (relief deepened) and Paint_Gloss (coat roughness 0 → 0.05, no visible change). Faults the agents saw and only reported, each fixable in the material: NephriteJade reads sage, not jade · OakLeaf a dull olive with one leaf visibly repeating · Terracotta could pass for painted clay · Rust_OnSteel reads as a blocky speckle, not flaking rust (a re-judge: a redo) · Glass_Reeded does not read as reeded (a limit, F-P11-16) · Gold reads flat and pale (mostly the rig's grey surround, F-P11-15). **Why:** the skill's §4 fired only on the tools disagreeing, and nearly every disagreement was a renderer's limit; nothing made "it does not look like the matter" send a row back. The run's own prompts to each batch agent ("report, never fudge", a list of known limits) pushed the same way, and the run accepted one-try batches without challenge. → RD-P11-4, `/matter-batch` §4, step 11.4.
 - **F-P11-18 — Masked articles take no soft coverage today (answers seed question 11).** Lace_Floral's and OakLeaf's cut-out edges are hard and alike in all three tools, by construction: the article thresholds its own opacity map at `opacity_cutoff` 0.5, so the map's soft ramp (11 % of Lace's pixels) never reaches coverage. Soft coverage would be a master change (only Hair passes its map through unthresholded), not a recipe change.
 
 | Step | Commits | Result | Next |
