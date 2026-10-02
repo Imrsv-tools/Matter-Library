@@ -1,0 +1,26 @@
+{
+  "_comment": "Unglazed fireclay: a refractory clay fired hot (firebricks, kiln furniture, the bare body of fireclay sinks), denser and paler than earthenware: a buff-cream body with coarse grog and dark iron specks, matte and porous. Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_fireclay_natural.py) with their MEAN albedo anchored to a judgement, since Physically Based has no fireclay (its Clay is modelling clay, its Brick is red). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant. Built by the Phase11 batch.",
+  "name": "Fireclay_Natural_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/ceramic/Fireclay_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "ceramic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/ceramic/Fireclay_Natural_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/ceramic/Fireclay_Natural_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/ceramic/Fireclay_Natural_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.60, 0.48, 0.31), about sRGB 205, 185, 150, for a buff unglazed fireclay body; roughness about 0.88 for a matte porous fired surface; specular_ior 1.5 as for Physically Based Clay and Brick, neither of which is a fireclay."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_fireclay_natural.py", "provenance": "library/provenance/sources/base/engineered/ceramic/Fireclay_Natural.yaml"}
+  ]
+}
