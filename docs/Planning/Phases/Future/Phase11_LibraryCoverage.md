@@ -216,6 +216,55 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 - **Open decisions:** none. Q-P11-1 and Q-P11-2 were ruled at the hand-off (RD-P11-1, RD-P11-2).
 - **Checks to carry forward:** the review time per article (click 4) · whether metals read wrong without F82 (the proving set's three metals; the suggestion under §Not now) · the `_Architecture.md` §Governance annotation at the close.
 
+## The end review (RD-P11-3) — the sitting script
+
+**The proving set is built: 30 rows in 7 batches** (26 built, 4 re-judged, none stuck; about 4 hours of rig, one try per row but two). The lead judges each row and says **keep** or **redo, with a note**; the agent records it (`wishlist.py keep` / `redo`) and commits. **The lead types nothing.**
+
+**What to open:** `library/parity/_review/261002-<n>.png` (git-ignored; one page per batch): per row, the close-up at its defaults in Storm | Blender | Unreal, then its dust row at 1 (an emitter at −4 stops). Each row's full story is its summary, `library/batches/261002-<n>.md`; its whole sweep is `library/parity/<row>/sheet.png`.
+
+**The order, and the question at each:**
+1. **Page 1 and 2** (polypropylene; walnut, frosted glass, fireclay, LED, the rust re-judge). *Does each read as its matter, alike in the three tools?* A miss: the wrong matter, or one tool plainly different (frosted glass is: F-P11-10).
+2. **Pages 3 to 6** (stone, metals, glass, paint, sand). The same question. **The metals look flat and pale:** the rig has nothing for a mirror to reflect (F-P11-15). That is the scene, not the metal.
+3. **Page 7** (the oak leaf; Diamond, Lace, Neon re-judged). Lace answers seed question 11: masked cut-outs are hard in all three tools.
+4. **The layers, by name** (say keep or redo per layer, not per article): **HairlineScratches01** and **Pitting01** show a 1 cm grid on highlights, **Edges01** reads as a lace of cells (F-P11-14); **Cracks01** is crazing, wrong for wood (F-P11-12); WaterSpots01, Patches01 and PaintChip01 read as meant.
+
+**The subjective clause:** *does it read as its matter?* Everything else is in the table below.
+
+| Batch | Row | Kind · master · lane | Tools alike? | Seams · ruler | Moved nothing | A keep sets |
+|---|---|---|---|---|---|---|
+| 1 | `Polypropylene_Natural` | build · Opaque · L1 | no: scratches at 1 (F-P11-7) | ok · ok | 7 of 18 | `candidate` |
+| 2 | `BlackWalnut_Natural` | build · Opaque · L2 | yes | ok · ok | 4 of 18 | `approved` |
+| 2 | `Glass_Frosted` | build · TranslucentThin · L1 | no: most wear, roughness, mask, soot (three looks) | ok · ok | 5 of 18 | `candidate` |
+| 2 | `Fireclay_Natural` | build · Opaque · L2 | yes | ok · ok | 3 of 15 | `approved` |
+| 2 | `LED_WarmWhite` | build · Emissive · L1 | yes | ok · ok | **11 of 18** | `approved` |
+| 2 | `Rust_OnSteel_Flaking` | re-judge · TwoLayer | yes | **seam flag · ruler off** | 0 of 8 | `approved` |
+| 3 | `Granite_Polished` | build · Opaque · L3 | yes | ok · ok | 4 of 18 | `approved` |
+| 3 | `Slate_Cleft` | build · Opaque · L2 | yes | ok · ok | 2 of 15 | `approved` |
+| 3 | `Onyx_Polished` | build · Subsurface · L3 | no: water spots | ok · ok | 3 of 18 | `candidate` |
+| 3 | `NephriteJade_Polished` | build · Subsurface · L2 | no: water spots at 0.5 | ok · ok | 3 of 18 | `candidate` |
+| 3 | `WhiteOak_Weathered` | build · Opaque · L2 | no: cracks at 1 | seam flag · ok | 1 of 15 | `candidate` |
+| 4 | `Loam_Natural` | build · Opaque · L3 | yes | **seam flag** · ok | 1 of 14 | `approved` |
+| 4 | `Sapphire_Natural` | build · TranslucentThick · L1 | no: most wear, roughness, mask (three looks) | ok · ok | 5 of 18 | `candidate` |
+| 4 | `Gold_Polished` | build · Opaque · L1 | no: hairline scratches | ok · ok | 6 of 18 | `candidate` |
+| 4 | `Aluminium_Brushed` | build · Opaque · L2 | no: roughness ±0.5, hairline scratches | ok · ok | 2 of 18 | `candidate` |
+| 4 | `StainlessSteel_Polished` | build · Opaque · L1 | no: hairline scratches | ok · ok | 6 of 18 | `candidate` |
+| 5 | `MildSteel_Raw` | build · Opaque · L3 | no: scratches | ok · ok | 0 of 18 | `candidate` |
+| 5 | `Glass_Reeded` | build · TranslucentThin · L2 | no: roughness, scratches, dust | seam flag · ok | 3 of 18 | `candidate` |
+| 5 | `LeadCrystal_Clear` | build · TranslucentThick · L1 | no: most wear, roughness, mask (Cycles alone refracts) | ok · ok | 5 of 18 | `candidate` |
+| 5 | `Concrete_BoardFormed` | build · Opaque · L3 | yes | **seam flag** · ok | 4 of 18 | `approved` |
+| 5 | `Terracotta_Unglazed` | build · Opaque · L1 | yes | ok · ok | 6 of 15 | `approved` |
+| 6 | `Acrylic_Clear` | build · TranslucentThin · L1 | no: roughness, hairline scratches, fingerprints | ok · ok | 6 of 18 | `candidate` |
+| 6 | `Silicone_Translucent` | build · Subsurface · L1 | no: scratches, dust, mask, soot | ok · ok | 6 of 18 | `candidate` |
+| 6 | `Paint_Gloss` | build · Opaque · L1 | no: roughness ±0.5 (the coat, F-P11-17) | ok · ok | 7 of 18 | `candidate` |
+| 6 | `Paint_OnMetal_Chipped` | build · TwoLayer · L3 | yes | ok · ok | 2 of 15 | `approved` |
+| 6 | `BeachSand_Dry` | build · Opaque · L3 | no: pitting | ok · ok | 0 of 15 | `candidate` |
+| 7 | `OakLeaf_Natural` | build · Masked · L2 | yes | ok · **ruler off** | 1 of 15 | `approved` |
+| 7 | `Diamond_Brilliant` | re-judge · TranslucentThick | no: roughness +0.5 | ok · ok | 2 of 3 | `candidate` |
+| 7 | `Lace_Floral` | re-judge · Masked | yes | **seam flag · ruler off** | 1 of 6 | `approved` |
+| 7 | `Neon_Signage` | re-judge · Emissive | yes | ok · ok | **3 of 3** | `approved` |
+
+*Compiled from each row's scorecard by `wishlist.py`'s verdict (2026-10-02). "Moved nothing" counts the declared sliders that changed no tool's picture; a high count means controls a Creator would find dead (the LED's wear: F-P11-9). The three re-judges carry no wear layers (against C1): a redo would add them.*
+
 ## Execution Log
 
 **Run 1 (2026-10-02, the library machine).** Tree at start: `main`, `ed9242a`, clean. Gate baseline: `run_all.py` 15 PASS / 2 SKIP (compression, staging: no encoder) / 0 FAIL; the inherited `approval_binds_freeze` red is gone (the pilot was re-approved after Phase10).
@@ -239,6 +288,7 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
   - **The tint is dead on a fully subsurface article.** `subsurface_color` takes the tinted base colour only for Hair and `base_color_map` articles; at subsurface weight 1 (Silicone) the base colour is hidden.
   - **On TwoLayer the tint colours both layers** (it follows the blend), so a red paint turns its bare steel red.
   - *Also:* Paint_OnMetal_Chipped reuses MildSteel_Raw's Metal002 textures, so a redo of MildSteel_Raw with another scan changes it too.
+- **F-P11-18 — Masked articles take no soft coverage today (answers seed question 11).** Lace_Floral's and OakLeaf's cut-out edges are hard and alike in all three tools, by construction: the article thresholds its own opacity map at `opacity_cutoff` 0.5, so the map's soft ramp (11 % of Lace's pixels) never reaches coverage. Soft coverage would be a master change (only Hair passes its map through unthresholded), not a recipe change.
 
 | Step | Commits | Result | Next |
 |---|---|---|---|
@@ -248,4 +298,5 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 | 11.3 (batch 4) | `475b9c0`…`4555420` (batch `261002-4`) · the skill fix | ▶ **Review owed (RD-P11-3).** 5 built, 1 try each, 34.2 min; gate 15/2/0. Loam_Natural (ambientCG Ground048, "soil": a rename to `Soil_Natural` is flagged), Sapphire_Natural (three renderers, three looks: F-P11-10), Gold_Polished and StainlessSteel_Polished (no F82: F-LC-6), Aluminium_Brushed (L2, anisotropy 0.8: **the brushed highlight reads alike in all three**). Loam would keep `approved`, the rest `candidate`. **First renders:** HairlineScratches01 and Edges01 fail as designed (F-P11-14); Pitting01 and Patches01 gate correctly but cannot be judged on soil. Skill: the mask's channel design wins over slot order; judging a near-invisible layer | next batch |
 | 11.3 (batch 5) | `447e601`…`fa88ca6` (batch `261002-5`) · the skill fix | ▶ **Review owed (RD-P11-3).** 5 built, 1 try each, 37.6 min; gate 15/2/0. MildSteel_Raw (ambientCG Metal002, "steel": name flagged), Glass_Reeded (L2, a normal alone: **the reeds cannot show**, F-P11-16), LeadCrystal_Clear (only Cycles refracts, F-P11-10), Concrete_BoardFormed (Concrete045, 2 m), Terracotta_Unglazed (Physically Based). Concrete and Terracotta would keep `approved`, the rest `candidate`. Pitting01 shows the same 1 cm grid on a highlight as HairlineScratches01 (F-P11-14). Seam flags on smooth maps are rounding (the check compares against a near-zero interior) | next batch |
 | 11.3 (batch 6) | `bd6fe1b`…`7996fb4` (batch `261002-6`) · `crop_sheet.py --full` | ▶ **Review owed (RD-P11-3).** 5 built, 6 rig runs, 36.8 min; gate 15/2/0. Acrylic_Clear (Physically Based), Silicone_Translucent (judgement; no entry), Paint_Gloss (**the coat reads**, 2 tries), Paint_OnMetal_Chipped (TwoLayer: param-only enamel over the Metal002 steel MildSteel_Raw already carries, by **PaintChip01: reads as chipped paint up close, a speckle from afar**), BeachSand_Dry (ambientCG Ground055S). Paint_OnMetal_Chipped would keep `approved`, the rest `candidate`. Three library limits (F-P11-17) | the last proving rows |
+| 11.3 (batch 7) | `21886bf`…`aa23deb` (batch `261002-7`) | ▶ **Review owed (RD-P11-3).** OakLeaf_Natural built (L2: no source names oak), Lace_Floral, Diamond_Brilliant and Neon_Signage re-judged; 12.8 min; gate 15/2/0. **Seed question 11 answered (F-P11-18).** **The proving set is complete: 30 rows, none stuck.** Review pages built; the sitting is §The end review | the end review |
 | 11.3 (layers) | `98f2ae9` `9e1e780` `d1d31f2` `f4cb2f2` `5bc067e` `7202c48` `18a40a6` | **The 7 new layers**, by a parallel agent (CPU only): WaterSpots01 (s01), Cracks01 (s01), Pitting01 (s001), HairlineScratches01 (s001), Edges01 (mask, s01), Patches01 (mask, s1), PaintChip01 (TwoLayer mask, s01); seamless, byte-reproducible, provenance, LFS. Not yet rendered: the proving rows show them dialled up | the proving rows |
