@@ -1,0 +1,31 @@
+{
+  "_comment": "Brushed aluminium: rolled aluminium sheet finished with an abrasive belt or pad, a dense field of fine parallel grooves (appliance fronts, laptop lids, trim, nameplates). Opaque, a solid metal, with SPECULAR ANISOTROPY (OpenPBR's own input, Phase07 7.6): the grooves run along V in the generated maps, and the anisotropy stretches the highlight along U, across the grooves, as a brushed face does. The maps are generated (L2, gen_aluminium_brushed.py), the mean colour anchored to Physically Based 'Aluminum'. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the corner band meant for a deposit, its A the open faces meant for handling marks). Built by the Phase11 batch.",
+  "name": "Aluminium_Brushed_Clean_Base_s001_v01",
+  "status": "draft",
+  "path": "engineered/metal/Aluminium_Brushed_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_tex": "../../../textures/base/engineered/metal/Aluminium_Brushed_basecolor_s001.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/Aluminium_Brushed_roughness_s001.png",
+  "normal_tex": "../../../textures/base/engineered/metal/Aluminium_Brushed_normal_s001.png",
+  "metalness_const": 1,
+  "specular_roughness_anisotropy": 0.8,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Aluminum", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.916, 0.923, 0.924", "metalness_const": 1, "roughness_const": 0},
+     "not_carried": ["specularColor", "complexIor"],
+     "note": "base_color_const is the generated basecolor's MEAN (re-anchored exactly); roughness_const is not taken (the entry is an ideal mirror); the brushing is the judgement below."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_aluminium_brushed.py", "provenance": "library/provenance/sources/base/engineered/metal/Aluminium_Brushed.yaml"},
+    {"kind": "judgement", "why": "roughness about 0.34 in the map and anisotropy 0.8 for a fine satin brush (a soft highlight stretched across the grooves); no measured value."}
+  ]
+}
