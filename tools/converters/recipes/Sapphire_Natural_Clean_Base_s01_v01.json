@@ -1,0 +1,33 @@
+{
+  "_comment": "Natural blue sapphire: gem corundum (aluminium oxide) coloured blue by iron and titanium, cut and polished. TRANSLUCENTTHICK, like Diamond_Brilliant: a gem is a solid body seen through, and the defining observable is absorption with depth (the blue deepens through the body) and a high IOR (1.77) that bends what is seen through it. Param-only: a gem has no albedo texture. The blue is transmission_color, because the Creator tint does not reach what is seen through (E2), so a see-through colour is its own article. Physically Based 'Sapphire' gives the colour, the IOR and transmission 1; its colour is taken as the see-through colour at a 2 cm path (transmission_depth, judgement, Diamond's), so a gem of a few millimetres reads a pale-to-mid blue and a thick body a deep one. Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage; scratches on a gem's facets), dust as a deposit (Phase10), fingerprints (a handled stone), gated by the Edges mask (facet borders; its B channel is the corner band meant for a deposit, its A the open faces meant for handling). Built by the Phase11 batch.",
+  "name": "Sapphire_Natural_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "natural/mineral/Sapphire_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "TranslucentThick",
+  "domain": "natural",
+  "class": "mineral",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.67, 0.764, 0.855",
+  "roughness_const": 0,
+  "metalness_const": 0,
+  "specular_ior": 1.7682,
+  "transmission": 1,
+  "transmission_color": "0.67, 0.764, 0.855",
+  "transmission_depth": 0.02,
+  "thin_walled": false,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Sapphire", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.67, 0.764, 0.855", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.7682, "transmission": 1},
+     "not_carried": ["transmissionDispersion"],
+     "note": "the entry's colour is also used as transmission_color: for a see-through gem it is the colour seen through it."},
+    {"kind": "judgement", "why": "transmission_depth 0.02 m, the path at which the entry's colour is reached (as Diamond_Brilliant): a gem's own scale, so a stone of a few millimetres reads pale-to-mid blue. No measured absorption spectrum is carried; natural sapphires range from near-colourless to inky blue."}
+  ]
+}
