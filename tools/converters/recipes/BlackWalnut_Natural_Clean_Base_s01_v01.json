@@ -1,0 +1,27 @@
+{
+  "_comment": "Natural black walnut: unfinished (sanded, no oil or lacquer), flat-sawn chocolate-brown heartwood with darker latewood bands and fine open pores. Opaque: a solid, diffuse-dominant dielectric. Base textures are generated (L2, tools/converters/base/gen_blackwalnut_natural.py), not scanned: ambientCG has no asset that says walnut, and the library names only what a source states. Carries every relevant wear layer at 0 (C1): scuffs (overlay 1, damage), scratches, and dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
+  "name": "BlackWalnut_Natural_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "natural/wood/BlackWalnut_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "wood",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/natural/wood/BlackWalnut_Natural_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/natural/wood/BlackWalnut_Natural_roughness_s01.png",
+  "normal_tex": "../../../textures/base/natural/wood/BlackWalnut_Natural_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.16, 0.085, 0.05), about sRGB 112, 82, 63, for unfinished black walnut heartwood; roughness about 0.67 for sanded bare wood; specular_ior 1.5, a generic dielectric. Physically Based has no wood entry."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_blackwalnut_natural.py", "provenance": "library/provenance/sources/base/natural/wood/BlackWalnut_Natural.yaml"}
+  ]
+}
