@@ -203,7 +203,7 @@ rows:
   - {name: Oak_Natural_Clean_Base_s1_v01, slot: natural/wood, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Pupil_Dark_Clean_Base_s001_v01, slot: biological/tissue, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Rubber_Natural_Clean_Base_s001_v01, slot: synthetic/polymer, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Rust_OnSteel_Flaking_Base_s01_v01, slot: engineered/metal, master: TwoLayer, kind: rejudge, state: queued, proving: 2, note: "on disk, status approved"}
+  - {name: Rust_OnSteel_Flaking_Base_s01_v01, slot: engineered/metal, master: TwoLayer, kind: rejudge, state: built, proving: 2, batch: "261002-2", note: "on disk, status approved"}
   - {name: Satin_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Sclera_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Skin_FitzpatrickIII_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
