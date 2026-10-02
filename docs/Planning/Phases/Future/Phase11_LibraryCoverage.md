@@ -218,4 +218,11 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 ## Execution Log
 
-_(populated during execution)_
+**Run 1 (2026-10-02, the library machine).** Tree at start: `main`, `ed9242a`, clean. Gate baseline: `run_all.py` 15 PASS / 2 SKIP (compression, staging: no encoder) / 0 FAIL; the inherited `approval_binds_freeze` red is gone (the pilot was re-approved after Phase10).
+
+**Findings in execution:**
+- **F-P11-7 — The faint scratch layer trips the Moved floor in Blender alone.** On Polypropylene, *wear 1 at 1* (Scratches01) moved Blender 0.52 against the floor of 0.5, Storm and Unreal 0.03: **ONE-SIDED**, on a layer nobody can see in any tool. Expect it on every article carrying Scratches01 (and possibly Fingerprints01) until those layers are strengthened, which is the loop's work after the proof (§After the proof). The rig's rule is not loosened; such a row keeps as `candidate`, and the summary says why.
+
+| Step | Commits | Result | Next |
+|---|---|---|---|
+| 11.1 | `c7be9d4` (list, helper, units 11/11, skills) · the batch commit | ▶ **SCAFFOLD COMPLETE, review owed (RD-P11-3: at the end).** Batch `261002-1`: Polypropylene built, all three tools alike but F-P11-7's flag; 5.8 min of rig | 11.2 |

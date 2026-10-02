@@ -1,0 +1,26 @@
+{
+  "_comment": "Natural (uncoloured) polypropylene: the milky, waxy-feeling moulded plastic of food tubs, bottle caps and storage boxes. Opaque: a solid dielectric; real natural PP is faintly translucent in thin walls, which this master does not carry (a surface reads opaque at tile scale). Satin rather than glossy, the moulded finish PP usually leaves. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints, and dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
+  "name": "Polypropylene_Natural_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/plastic/Polypropylene_Natural_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "plastic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.78, 0.78, 0.75",
+  "roughness_const": 0.32,
+  "metalness_const": 0.0,
+  "specular_ior": 1.492,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Plastic (PP)", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal", "used": {"base_color_const": "1, 1, 1", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.492, "transmission": 1}, "note": "Only specular_ior is taken: the entry is the clear resin (white, transmission 1), not a moulded natural part."},
+    {"kind": "judgement", "why": "Natural moulded PP reads milky off-white with a faint warm cast (base 0.78, 0.78, 0.75) and a satin moulded finish (roughness 0.32)."}
+  ]
+}
