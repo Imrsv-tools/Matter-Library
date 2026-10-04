@@ -10,9 +10,13 @@ e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementit
 04cf9d02-7bbc-54c8-adb2-e6878ff7e727:engineered/ceramic:engineered-ceramic
 3f33cced-4f95-545a-88e2-2b5f70082073:engineered/glass:engineered-glass
 1d4eba5e-8429-54a4-811a-42e7056b20ee:engineered/metal:engineered-metal
+e51f86a9-5e66-59e6-a6ae-cd46b6d37b03:environmental/sand:environmental-sand
+fd47a487-0aeb-5bd3-8bd7-be6d2644c0e9:environmental/vegetation:environmental-vegetation
 0c85cfcc-f203-5a18-902c-a152b6f2f966:natural/mineral:natural-mineral
+c9f79144-b109-5043-bd3c-1e1c5fafb145:natural/soil:natural-soil
 57771307-e81e-5a87-966e-482639f264bd:natural/stone:natural-stone
 10c839d1-df8d-563b-bde4-ea627a5a6eee:natural/wood:natural-wood
+b198e183-a29e-579f-b086-4c9990b25a65:synthetic/coating:synthetic-coating
 62f8858f-976a-5243-9508-b37fab10a81e:synthetic/plastic:synthetic-plastic
 6fd533b6-b083-5084-9dd1-f33b2266d520:synthetic/polymer:synthetic-polymer
 196a75d2-9441-501c-b2b0-f1430ea50a41:synthetic/textile:synthetic-textile
