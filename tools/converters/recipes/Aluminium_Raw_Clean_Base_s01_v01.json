@@ -1,0 +1,28 @@
+{
+  "_comment": "Raw aluminium: mill-finish aluminium sheet, plate or extrusion as it leaves the rolls or the die, with no brushing, polishing or anodising: a bright, pale silver with a soft, hazy reflection (structural sections, posts, trims, thresholds, flashings). Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. Base colour from Physically Based 'Aluminum'. The plain sibling of Aluminium_Brushed: it has no specular anisotropy, so it renders the same in a tool that does not carry anisotropy. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6), so the reflectance toward grazing angles is the base colour's Schlick fade, not aluminium's measured one. Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the broad corner band meant for a deposit, its A the open faces meant for handling marks, so dust takes slot 2 and fingerprints slot 3). Not carried: the tarnish colour the wish list also wants. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A1 and SM-Q1).",
+  "name": "Aluminium_Raw_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/metal/Aluminium_Raw_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.916, 0.923, 0.924",
+  "roughness_const": 0.3,
+  "metalness_const": 1,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Aluminum", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.916, 0.923, 0.924", "metalness_const": 1, "roughness_const": 0},
+     "not_carried": ["specularColor", "complexIor"],
+     "note": "roughness_const is not taken (the entry is an ideal mirror); the mill finish is the judgement below."},
+    {"kind": "judgement", "why": "roughness 0.3 for a mill finish: the rolled or extruded face reflects a bright sky as a soft glow with no readable image, clearly metal and not a mirror; between a polished sheet (0.1, StainlessSteel_Polished) and the brushed sibling's 0.34. No measured value."}
+  ]
+}
