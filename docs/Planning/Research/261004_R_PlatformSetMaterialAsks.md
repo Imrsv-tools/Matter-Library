@@ -123,10 +123,25 @@ Every article is a `draft`. The name in the second column is the one to bind.
 
 ---
 
+## Pass 3 — The Set is built; one more ask for the gate
+
+*The platform's side, 2026-10-05. Measured at this repo's `89e4fc8`.*
+
+- **SM-F20 — The Set is built on the names in Pass 2's table.** It is 27 part files, each one mesh bound to one article by bare name: the powder coat (white, and tinted dark through `base_color_tint`), the polished concrete (tinted a little darker), the terrazzo, the brushed aluminium, the cool-white LED, and `Oak_Natural_Clean_Base_s1_v01` for the benches and plinths. The frosted glass (A6) is not used. Every part file conforms, 9 of 9, lightweight — A7 at work. It records `matterlib-0.1.0`, so SM-Q5 stands as asked.
+- **SM-F21 — The profile gate cannot pass a Set's root file.** A Set made of several files has a root that holds no mesh: it places its part files by relative reference (`./geo/<Part>.usda`). `assert_profile.py lightweight` on that root gives 6 PASS and 3 FAIL:
+  - *each Mesh has one material:binding (>=1 region)* — `0 meshes vs 0 bindings`;
+  - *each Mesh has texCoord2f[] primvars:st* — `0 st-primvars vs 0 meshes`;
+  - *lightweight: bare @Name.mtlx@ library references only* — the references to the part files are read as material references.
+
+  The parts are what the profile's rules are about, and each passes on its own; the root fails by construction. Today the Set's own check runs the profile on every part and holds the root to the other six.
+  - **A8 — a form of the gate for an asset whose root assembles part files.** Either the gate follows a root's references and judges the meshes it finds, so the whole asset is one run; or it accepts a root with no mesh whose only non-library references are relative paths to files inside the asset's own folder. The rule stays as it is: every mesh has exactly one binding and one `st`, and no material data is in the asset.
+
+---
+
 ## Status
 
-- **Passes captured:** 2 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-04).
-- **Asks:** A1 – A4 (materials), A5 – A6 (nice to have), A7 (the gate). **All seven are delivered** (Pass 2): seven draft articles, A1 as both a brushed and a raw aluminium, and the gate fix.
+- **Passes captured:** 3 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-04; Pass 3 the platform's, 2026-10-05).
+- **Asks:** A1 – A4 (materials), A5 – A6 (nice to have), A7 (the gate). **All seven are delivered** (Pass 2): seven draft articles, A1 as both a brushed and a raw aluminium, and the gate fix. **Open:** A8 (Pass 3) — a form of the gate for an asset whose root assembles part files.
 - **Open questions:** SM-Q1 … SM-Q4 are answered in Pass 2. **Open now:** SM-Q5 (what a Set records while it uses drafts) and SM-Q6 (whether the brushed aluminium needs its anisotropy), plus the brighter-strip half of SM-Q3.
 - **What was added, and what was not.** Pass 1 added nothing. The builds Pass 2 reports were made at the lead's direction, outside this doc: seven articles on `main`, the gate fix, the rebuilt Blender library. **Not added:** no release. *(Updated 2026-10-04: the ledger row is recorded, `PlatformDependencies.md` M5, at the lead's direction. It also notes P16's second Opaque user; the P16 row itself is unchanged. Was: "and no ledger row".)*
 - **Nothing is ruled.** The articles are drafts: no maintainer review has kept any of the seven. *(Updated 2026-10-04: the slider sweep SM-F16 calls not run has since run on the five new ones, batch `261004-1`, summary in `library/batches/261004-1.md`. Every slider that moved, moved alike in Storm, Blender and Unreal, and no article changed. Scratches, scuffs and fingerprints moved nothing on any of them, which is the shared layers' faintness. At −4 stops Unreal draws the white LED's emission at 0.75 of the other two, as SM-F15 saw at defaults; not run to ground.)*
