@@ -10,7 +10,7 @@
 
 **Public-repo note.** The platform's planning is private. It is summarised here by what it needs from the library — no platform paths, code or ruling ids.
 
-**Measured at:** `610243e` (2026-10-04).
+**Measured at:** `610243e` (2026-10-04). **Pass 2** (the library's side) is measured at `194031d` (2026-10-04).
 
 ---
 
@@ -20,6 +20,7 @@
 - **All six are already rows in the Library Coverage draft list,** with a name, a master and a lane. The ask is to bring those rows forward, not to invent anything.
 - **One tooling need:** the Creator Asset Profile gate cannot pass an asset that holds a single mesh.
 - **The Set already exists as a sketch** in the released materials, so the library can see exactly where each new one goes and at what size.
+- **Update 2026-10-04 (Pass 2):** all six materials now exist as drafts, plus a raw aluminium, and the gate passes a one-mesh asset. The names and tile sizes are in Pass 2's table. None of them is in a release: a consumer reaches them through the dev install.
 
 ---
 
@@ -74,11 +75,62 @@ For `PlatformDependencies.md`, *From IMRSV to the Matter Library*, when the libr
 
 ---
 
+## Pass 2 — The library's review: the asks built, the questions answered
+
+*Written from the library's side, 2026-10-04, at the lead's direction (the lead asked for the materials to be built and pushed, then for this pass).*
+
+**Examined:** the wish list's rows for A1 – A6 · the tree at Pass 1's `610243e` against local `main` · ambientCG's concrete and terrazzo scans (ten concretes downloaded and measured) · Physically Based's entries · the parity rig's sheets for the five new articles, at default settings · `tools/conformance/assert_profile.py` against Creator Asset Profile rule 1 · `tools/releases/serve_to_stage.py` and `PlatformDependencies.md` P4, P16 and P19.
+
+### What the platform needs back: the names and the tile sizes
+
+Every article is a `draft`. The name in the second column is the one to bind.
+
+| Ask | Article | Master | `meters_per_tile` | Made from | Commit |
+|---|---|---|---|---|---|
+| A1 | `Aluminium_Brushed_Clean_Base_s001_v01` | Opaque | 0.01 | generated maps; colour from Physically Based `Aluminum`; anisotropy 0.8 | `15546cb` |
+| A1 | `Aluminium_Raw_Clean_Base_s01_v01` | Opaque | 0.1 | values only; colour from Physically Based `Aluminum`; roughness 0.3 | `b1e6765` |
+| A2 | `LED_CoolWhite_Clean_Base_s01_v01` | Emissive | 0.1 | values only | `d32245c` |
+| A3 | `Concrete_Polished_Clean_Base_s1_v01` | Opaque | **3.0** | generated maps; mean colour Physically Based `Concrete` | `d32245c` |
+| A4 | `PowderCoat_Textured_Clean_Base_s001_v01` | Opaque | 0.01 | generated maps; white by judgement | `d32245c` |
+| A5 | `Terrazzo_Polished_Clean_Base_s1_v01` | Opaque | **0.8** | ambientCG `Terrazzo019L` (CC0) | `d32245c` |
+| A6 | `Glass_Frosted_Clean_Base_s01_v01` | TranslucentThin | 0.1 | values only; Physically Based `Glass (Soda-lime)` | `6aa7048` |
+
+### Findings
+
+- **SM-F9 — Two of the six already existed, unpushed.** Pass 1 was measured at the remote's tip. Local `main` was 56 commits ahead of it (Phase11's proving set) and already held `Aluminium_Brushed` (batch 261002-4) and `Glass_Frosted` (batch 261002-2) as drafts. They are pushed now.
+- **SM-F10 — Five articles were built for this doc,** each by `/matter-generate` with its row of Pass 1's table as the brief: the cool-white LED, the polished concrete, the powder coat, the terrazzo, and the raw aluminium. The gate (`run_all.py`) is 15 PASS, 2 SKIP, 0 FAIL with them in.
+- **SM-F11 — The floor is generated, not scanned (A3, lane L2 against the row's L3).** ambientCG has no concrete tagged polished. The ten clean or smooth ones measure a mean roughness of 0.49 to 0.78, where a polished floor wants about 0.2. Only one of them states a physical size (`Concrete046`, 2.4 m, a stained wall), and the cleanest carry single scratches and specks that would show as a repeat over 2,500 m². The generated set has a mean roughness of 0.22, a mean colour anchored to Physically Based `Concrete` (0.51), and **a 3 m tile with no landmark in it**: no stain, crack or single scratch, and its slowest feature is a fifth of the tile. A texel is about 3 mm.
+- **SM-F12 — The terrazzo's name changed (A5).** The scan states 80 cm, so the article is `…_s1_v01`, not the row's `…_s01_v01`. It is a warm beige with chips from under 1 cm to about 6 cm, and polished (roughness map mean 0.28).
+- **SM-F13 — The powder coat reads as an even white satin, with no texture you can see from where a Set is viewed (A4).** Its bumps are about 0.2 mm on a 1 cm tile, so they are below a pixel beyond arm's length. That is by design: the tile holds nothing slower than the bumps, so a 7 m panel has no mottle to repeat, and the satin is in the roughness itself (mean 0.55), so it holds at any distance. It is authored white (linear albedo 0.82) for `base_color_tint`. It has no coat, which is what separates it from `Paint_Gloss`.
+- **SM-F14 — The LED is a neutral white, a hair blue (A2).** Its emission colour is the centre of the 6500 K cool-white LED bin, (0.993, 0.992, 1.0) in linear sRGB. A 6500 K blackbody was not used: it reads faintly pink. Its `emission_luminance` is 12, as `Neon_Signage` and `LED_WarmWhite`.
+- **SM-F15 — At default settings the five new articles render alike in Storm, Blender and Unreal** (mean ΔE2000 between Storm and Blender 0.36 to 0.76, under the rig's flag of 2). The ruler finds the concrete and the terrazzo at exactly their recorded size in all three tools. It cannot match the near-flat powder coat, which is a limit of the ruler. **One difference:** at −4 stops Storm and Blender draw the cool LED at 229 of 255 and Unreal at 201, while Unreal draws the warm LED brighter than the other two. That is on the Unreal side, not in the recipe, and is not run to ground.
+- **SM-F16 — The slider sweep was not run.** The rig ran at defaults only, so the wear layers are not judged on these five. Their wish-list rows are queued as re-judge rows, not `built`. Each carries its row's layers at zero (SM-F7). On the two metals and the powder coat, dust takes slot 2 and fingerprints slot 3, to fit the `Edges01` mask's channels.
+- **SM-F17 — A7 is done** (`4135e25`). `assert_profile.py` checks 2 and 3 now need at least one mesh, not two. Creator Asset Profile rule 1 sets no minimum. Every mesh must still have exactly one binding and one `primvars:st`. A one-mesh module conforms, the two-mesh golden table still conforms, and an asset with no mesh, a mesh with no binding, or a mesh with no `st` still fails. SM-F8's line numbers (`:62`, `:67`) are Pass 1's and have moved.
+- **SM-F18 — The Blender library holds all of them.** `blender/asset_library/MatterLibrary.blend` was rebuilt from the working tree: 88 articles (57 at Pass 1), each tagged with its status, every texture path relative to the repo.
+- **SM-F19 — None of the seven is in a release, and none can be yet.** `matterlib-0.1.0` holds 11 selectable articles and the missing-material fallback. A release takes approved articles only (P19: *"No release can hold candidates"*), and these are drafts.
+
+### The open questions, answered
+
+- **SM-Q1 — Brushed or raw first? Both exist; the choice is per piece and is the platform's.** `Aluminium_Raw` has no anisotropy, so it renders the same in every tool today. `Aluminium_Brushed` sets `specular_roughness_anisotropy` 0.8, which P16 records as not yet carried on Opaque by the platform. Where it is not carried, the brushed article draws as a plain satin metal at roughness about 0.34: still a metal, without the stretched highlight. **P16 gains a second Opaque user** (after `Satin_Natural`).
+- **SM-Q2 — The floor's tile size: 3 m, from a generated set (SM-F11).** No CC0 scan gave a larger real tile. The tag stays `s1`, the nearest of the closed set, so the name is unchanged. A 5 m floor tile holds 1.67 repeats each way, not 25, and because that is not a whole number the pattern does not lock to the floor's own module.
+- **SM-Q3 — How bright is a light strip: 12, the library's emitter convention, and it is a relative number.** It is not measured nits. In the rig, where a lit white surface renders near 1.0, the strip is about 3.6 stops over it and clips to white at normal exposure in all three tools (SM-F15). Whether that reads as a light beside sunlit concrete depends on the Set's exposure, which the library cannot see. **Still open:** emission is not a Creator port (SM-F5; M2), so a brighter strip is a second article or a contract change, not a slider.
+- **SM-Q4 — Drafts before a release: yes, the dev install (P19) is the intended way.** `serve_to_stage.py --runtime <the consumer's Matter install>` serves the working tree as `matterlib-dev`. Measured here: its catalog projects 89 entries, the seven above among them, each with `status: draft` and its `master` token (P4). It reports release `0.1.0`, so a Set that records `matterlib-0.1.0` keeps working, and that is the string the profile gate pins. **Two limits:** the install is symlinks into a checkout, so the checkout must be on the consumer's machine (a copy mode is *planned*, P19); and a new article needs one re-run, because the catalog is projected when the command runs. **The second half of the question is not answered** and becomes SM-Q5.
+
+### New open questions
+
+- **SM-Q5 — What does a Set record while it uses drafts?** Recording `matterlib-0.1.0` passes the gate and matches what the dev install reports, but that release does not hold these seven, so the Set cannot be rebuilt from the release it names. This is the lead's call, and it belongs with the release-bundle work.
+- **SM-Q6 — Does the brushed aluminium need its anisotropy on the Set?** If the stretched highlight matters on a 25 m ring, P16 has to land on Opaque first. If not, either article serves.
+
+---
+
 ## Status
 
-- **Passes captured:** 1 (the platform's side).
-- **Asks:** A1 – A4 (materials), A5 – A6 (nice to have), A7 (the gate).
-- **Open questions:** SM-Q1 … SM-Q4, for the library.
-- **Nothing is ruled.** No article, recipe, texture, release or ledger row was added by this doc.
+- **Passes captured:** 2 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-04).
+- **Asks:** A1 – A4 (materials), A5 – A6 (nice to have), A7 (the gate). **All seven are delivered** (Pass 2): seven draft articles, A1 as both a brushed and a raw aluminium, and the gate fix.
+- **Open questions:** SM-Q1 … SM-Q4 are answered in Pass 2. **Open now:** SM-Q5 (what a Set records while it uses drafts) and SM-Q6 (whether the brushed aluminium needs its anisotropy), plus the brighter-strip half of SM-Q3.
+- **What was added, and what was not.** Pass 1 added nothing. The builds Pass 2 reports were made at the lead's direction, outside this doc: seven articles on `main`, the gate fix, the rebuilt Blender library. **Not added:** no release, and no ledger row (M5 above is still a suggestion; P16's second Opaque user is not recorded in `PlatformDependencies.md` either).
+- **Nothing is ruled.** The articles are drafts: the slider sweep is not run on the five new ones (SM-F16), and no maintainer review has kept any of the seven.
 
-▶ **Next:** the library reviews Pass 1 against its tree, records the ledger row, and — for each of A1 – A4 — runs `/matter-generate` with that row of the table as the brief.
+▶ **Next:** the platform binds the Set to the names in Pass 2's table through the dev install. On the library's side: record the ledger row, sweep and review the five re-judge rows (`/matter-batch`), and rule SM-Q5.
+
+*(Superseded 2026-10-04 by Pass 2. Was: "the library reviews Pass 1 against its tree, records the ledger row, and — for each of A1 – A4 — runs `/matter-generate` with that row of the table as the brief.")*
