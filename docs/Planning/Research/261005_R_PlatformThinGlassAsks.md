@@ -22,6 +22,7 @@
 - **The platform will fix its own thin master on that basis.** This doc is so the same rule lands in the library's contract and its Unreal masters, and the two do not drift apart.
 - **Three questions for the library's Unreal masters** follow from the same reading: whether its thin master bends in a live view, why its solid master bends nothing in its pictures, and whether its rig can show either.
 - **Update 2026-10-05 (Pass 2, the library's side):** in the library's Unreal pictures **neither** see-through master shifts the wall, measured to the pixel, while frosted glass does blur it. The two masters are wired alike, so whatever removes the bend is common to both. That leaves three possible states, and in two of them one master is wrong; one throwaway master on the machine with Unreal decides which. The rule itself (A1) has a home in `MasterSet.md`, whose settings table today gives thin and solid the same refraction cell. A5 is confirmed as described. Nothing was built or changed.
+- **Update 2026-10-05 (after Pass 2): the rule is written.** At the lead's word, a quick fix put it into `MasterSet.md` §Material-settings intent and recorded the ledger row, `PlatformDependencies.md` M6 (§Resolved). The masters, the rig and the Blender driver are unchanged.
 
 ---
 
@@ -134,7 +135,7 @@ for a in ARTS:
 
 | # | State after this pass |
 |---|---|
-| A1 | **Agreed, not written.** The rule is OpenPBR's and the library's Blender master and its Storm pictures already follow it. Its home is `MasterSet.md` §Material-settings intent (TG-F16): the TranslucentThin row's refraction cell, and a note beside the rough-transmission one. `LCDSchema.md`'s *"at the producer"* line would point there. A contract edit is not research's to make. |
+| A1 | **Written 2026-10-05 (§Resolved, TG-RD1).** *Was, at Pass 2:* **Agreed, not written.** The rule is OpenPBR's and the library's Blender master and its Storm pictures already follow it. Its home is `MasterSet.md` §Material-settings intent (TG-F16): the TranslucentThin row's refraction cell, and a note beside the rough-transmission one. `LCDSchema.md`'s *"at the producer"* line would point there. A contract edit is not research's to make. |
 | A2 | **Half answered.** In the capture the thin master does not shift (TG-F10). In a live view: not run, and it cannot be on this machine. |
 | A3 | **Not run to ground; narrowed.** Both masters bend nothing, they are wired alike (TG-F12), nothing in the runtime turns the bend off (TG-F13), and the frost points away from the capture (TG-F14). Three states remain (TG-F15). |
 | A4 | **Agreed, and it waits for A3** (TG-F18). |
@@ -144,7 +145,7 @@ for a in ARTS:
 
 - **TG-Q1 — Does the thin master shift the view from the side today?** In the rig's capture, no. In a live view, unknown. The quickest answer is on the platform's side: `build_masters.py` writes the masters into any Unreal 5.8 project with Substrate on (P20), so the platform can put `M_Matter_TranslucentThin` on its own cube and look from the side.
 - **TG-Q2 — Is the solid master's missing bend the master, or the capture?** Open. One throwaway master decides it, on the machine with Unreal: the solid master's settings, with a plain number (2.4) wired straight to Refraction in place of the function's output, captured on the rig's ball. If the ball bends, the capture is sound and the function's output is the cause (TG-F15, first row). If it does not, the capture drops the shift, and the two masters must be judged live.
-- **TG-Q3 — Where does the rule live?** `MasterSet.md` §Material-settings intent is the candidate (TG-F16). The choice is the lead's.
+- **TG-Q3 — Where does the rule live?** `MasterSet.md` §Material-settings intent is the candidate (TG-F16). The choice is the lead's. **Ruled 2026-10-05: there** (TG-RD1).
 - **TG-Q4 — Does reflection keep the article's index on a thin wall?** Yes (TG-F17). The platform's assumption matches the library's masters.
 
 ### New questions
@@ -154,15 +155,25 @@ for a in ARTS:
 
 ---
 
+## Resolved
+
+- **TG-RD1 — The consumer rule lives in `MasterSet.md` §Material-settings intent, and the ledger row is recorded (the lead, 2026-10-05).** Pass 2's handback offered both as one quick fix, naming `MasterSet.md`; the lead, verbatim: *"Yep... go ahead and do it"*. Done the same day, as a quick fix outside this doc:
+  - `MasterSet.md`: the TranslucentThin refraction cell reads *"no deflection"* (it was *"index of refraction"*, as TranslucentThick), with a note stating the rule for every consumer: no shift at any angle, the rough blur and the tint kept, the reflection still by the article's index, and a solid article bends. The note carries a dated `Drift` line: the library's own Unreal masters are not yet shown to follow it.
+  - `LCDSchema.md`: the `geometry_thin_walled` line points to that rule.
+  - `PlatformDependencies.md` **M6**: the ask, with A1 written and A2 – A5 open.
+  - OpenPBR's wording (TG-F1) was checked against the published specification before it was quoted in the spec: *"an infinitesimally thin sheet of dielectric"*, *"a reflected lobe and un-deflected refracted lobe"*.
+
+---
+
 ## Status
 
 - **Passes captured:** 2 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-05).
-- **Asks:** all five stand, none built. A1 agreed, with a candidate home (`MasterSet.md` §Material-settings intent). A2 half answered: no shift in the rig's capture, a live view not run. A3 narrowed to three states (TG-F15), not run to ground. A4 agreed, waits for A3. A5 confirmed.
-- **Questions:** TG-Q4 is answered (yes). TG-Q3 has a candidate and is the lead's to choose. **Open:** TG-Q1 (live view), TG-Q2 (master or capture), TG-Q5 (what Epic's function returns), TG-Q6 (textured thin glass, with F-P11-16).
+- **Asks:** **A1 is written** (2026-10-05, TG-RD1). The other four stand, none built. A2 half answered: no shift in the rig's capture, a live view not run. A3 narrowed to three states (TG-F15), not run to ground. A4 agreed, waits for A3. A5 confirmed.
+- **Questions:** TG-Q4 is answered (yes). TG-Q3 is ruled (`MasterSet.md`, TG-RD1). **Open:** TG-Q1 (live view), TG-Q2 (master or capture), TG-Q5 (what Epic's function returns), TG-Q6 (textured thin glass, with F-P11-16).
 - **Current direction.** The library's Unreal masters cannot be called adoptable as they stand: in two of the three states that fit the pictures, one of the two see-through masters is wrong. The frost in the capture leans to the state where the thin master is right and the solid one bends nothing.
-- **What was added, and what was not.** This doc only. No article, master, tool, spec or ledger row is changed by it. The suggested ledger row is not recorded: no `PlatformDependencies.md` row covers this yet (the next free id there is M6).
+- **What was added, and what was not.** The two passes added this doc only. *(Updated 2026-10-05: the rule and the ledger row are written, at the lead's direction and outside this doc — `MasterSet.md`, `LCDSchema.md`, `PlatformDependencies.md` M6; TG-RD1. Was: "No article, master, tool, spec or ledger row is changed by it. The suggested ledger row is not recorded".)* **Not changed:** any article, master or tool.
 - **Not run:** TG-F6 – TG-F9 are read from the engine source, by the platform; Pass 2 had no engine to check them against, and TG-F14 rests on TG-F7. The platform's corrected master has not been built or seen. TG-F3's Blender pictures are for the shape of light only — that machine's Blender colour setup does not load. Pass 2 rendered nothing; TG-F10 measures the rig's stored pictures of 1 – 2 October.
 
-▶ **Next:** three things, each small. (1) The rule goes into `MasterSet.md` (A1, TG-Q3) and the ledger row is recorded, at the lead's word. (2) The Blender driver's CPU fallback (A5). (3) On the machine with Unreal, TG-Q2's throwaway master, which decides which see-through master to fix; the rig's angled view (A4) follows it.
+▶ **Next:** two things. (1) The Blender driver's CPU fallback (A5), small and buildable on any machine with Blender. (2) On the machine with Unreal, TG-Q2's throwaway master, which decides which see-through master to fix; the rig's angled view (A4) follows it. *(The rule and the ledger row, listed here first until 2026-10-05, are done: TG-RD1.)*
 
 *(Superseded 2026-10-05 by Pass 2. Was: "the library reviews Pass 1 against its tree — A2 and A3 first, since they decide whether its Unreal masters can be adopted as they stand — and records the ledger row or declines it.")*
