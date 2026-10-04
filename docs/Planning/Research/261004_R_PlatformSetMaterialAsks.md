@@ -6,7 +6,7 @@
 
 **Question:** which materials does a large, clean, architectural Set need that the library does not have yet, and what must each one do?
 
-**Extends, does not replace:** `260925_R_LibraryCoverage_FirstRelease.md` (every material asked for here is already a row in its draft list), `Phases/Future/PhaseTBD_LibraryCoverage.md` (the phase those rows belong to), `PlatformDependencies.md` (*From IMRSV to the Matter Library*: no row covers these yet).
+**Extends, does not replace:** `260925_R_LibraryCoverage_FirstRelease.md` (every material asked for here is already a row in its draft list), `Phases/Future/PhaseTBD_LibraryCoverage.md` (the phase those rows belong to), `PlatformDependencies.md` (*From IMRSV to the Matter Library*: no row covers these yet; row M5 since 2026-10-04).
 
 **Public-repo note.** The platform's planning is private. It is summarised here by what it needs from the library — no platform paths, code or ruling ids.
 
@@ -69,7 +69,7 @@
 
 ### A suggested ledger row
 
-For `PlatformDependencies.md`, *From IMRSV to the Matter Library*, when the library takes this up:
+For `PlatformDependencies.md`, *From IMRSV to the Matter Library*, when the library takes this up *(recorded 2026-10-04 as row M5, with a status and the Pass 2 delivery; the text below is Pass 1's suggestion, kept)*:
 
 > **M5 — Materials for a generated architectural Set** (2026-10-04): brushed (or raw) aluminium, a cool-white LED, polished concrete and a fine powder coat, each already a Library Coverage draft row; terrazzo and frosted glass after them. And the profile gate passing a one-mesh asset. · *Why:* the platform's first script-generated Set binds every piece to a Matter article by name, and the library has no clean metal, no white emissive and no large clean floor. · *Owner:* Matter Library (Library Coverage). · *Pairs with:* `261004_R_PlatformSetMaterialAsks.md`.
 
@@ -128,9 +128,9 @@ Every article is a `draft`. The name in the second column is the one to bind.
 - **Passes captured:** 2 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-04).
 - **Asks:** A1 – A4 (materials), A5 – A6 (nice to have), A7 (the gate). **All seven are delivered** (Pass 2): seven draft articles, A1 as both a brushed and a raw aluminium, and the gate fix.
 - **Open questions:** SM-Q1 … SM-Q4 are answered in Pass 2. **Open now:** SM-Q5 (what a Set records while it uses drafts) and SM-Q6 (whether the brushed aluminium needs its anisotropy), plus the brighter-strip half of SM-Q3.
-- **What was added, and what was not.** Pass 1 added nothing. The builds Pass 2 reports were made at the lead's direction, outside this doc: seven articles on `main`, the gate fix, the rebuilt Blender library. **Not added:** no release, and no ledger row (M5 above is still a suggestion; P16's second Opaque user is not recorded in `PlatformDependencies.md` either).
+- **What was added, and what was not.** Pass 1 added nothing. The builds Pass 2 reports were made at the lead's direction, outside this doc: seven articles on `main`, the gate fix, the rebuilt Blender library. **Not added:** no release. *(Updated 2026-10-04: the ledger row is recorded, `PlatformDependencies.md` M5, at the lead's direction. It also notes P16's second Opaque user; the P16 row itself is unchanged. Was: "and no ledger row".)*
 - **Nothing is ruled.** The articles are drafts: the slider sweep is not run on the five new ones (SM-F16), and no maintainer review has kept any of the seven.
 
-▶ **Next:** the platform binds the Set to the names in Pass 2's table through the dev install. On the library's side: record the ledger row, sweep and review the five re-judge rows (`/matter-batch`), and rule SM-Q5.
+▶ **Next:** the platform binds the Set to the names in Pass 2's table through the dev install. On the library's side: sweep and review the five re-judge rows (`/matter-batch`), and rule SM-Q5. *(The ledger row, listed here until 2026-10-04, is recorded: M5.)*
 
 *(Superseded 2026-10-04 by Pass 2. Was: "the library reviews Pass 1 against its tree, records the ledger row, and — for each of A1 – A4 — runs `/matter-generate` with that row of the table as the brief.")*
