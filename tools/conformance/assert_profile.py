@@ -57,14 +57,16 @@ def main() -> int:
           f"got {m.group(1) if m else 'ABSENT'}")
 
     # 2. every material-addressable region is a separate Mesh, each with exactly one binding.
+    # One region is a valid asset (profile rule 1 sets no minimum): a single-mesh module
+    # passes. The count was >= 2 until 2026-10-04, shaped by the two-mesh golden table.
     n_mesh = len(re.findall(r'\bdef Mesh\b', text))
     n_bind = len(re.findall(r'\brel material:binding\b', text))
-    check(n_mesh >= 2 and n_mesh == n_bind, "each Mesh has one material:binding (>=2 regions)",
+    check(n_mesh >= 1 and n_mesh == n_bind, "each Mesh has one material:binding (>=1 region)",
           f"{n_mesh} meshes vs {n_bind} bindings")
 
     # 3. every mesh carries geometry-authored UVs.
     n_st = len(re.findall(r'texCoord2f\[\]\s+primvars:st', text))
-    check(n_st == n_mesh and n_st >= 2, "each Mesh has texCoord2f[] primvars:st",
+    check(n_st == n_mesh and n_st >= 1, "each Mesh has texCoord2f[] primvars:st",
           f"{n_st} st-primvars vs {n_mesh} meshes")
 
     # 3b. every mesh declares subdivisionScheme="none" (polygon, not a catmullClark cage).
