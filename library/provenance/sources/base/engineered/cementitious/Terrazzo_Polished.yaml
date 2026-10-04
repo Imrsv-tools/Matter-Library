@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/engineered/cementitious/Terrazzo_Polished
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Terrazzo019L
+    sha256_scope: shipped_source_set
+    sha256: a92674e62c2bc5a15ed7e0dc9311c4020b21c2a453ddf6bab6f30d2045d84d91
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Terrazzo019L_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_basecolor_s1.png
+      sha256: f6246ffb159478149cae5c39938a72f384e21e32792107176e0db0bec757f68d
+    - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_normal_s1.png
+      sha256: 2393af98b76948cb0371e6c5907d2b398f66176a14519d57ee439c045b290a1d
+    - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_roughness_s1.png
+      sha256: 3f6ce6803e84de15d85fc3fa3390a7bd9e7741ef718e23c093015ae9c788fd1f

@@ -1,0 +1,30 @@
+{
+  "_comment": "Polished concrete: a cast slab ground flat, densified and polished, the clean floor of a gallery or a showroom. Opaque: a solid dielectric with a flat, glossy face. The maps are generated (L2, gen_concrete_polished.py), not scanned as the wish list planned: ambientCG has no concrete tagged polished (its clean, smooth ones measure a mean roughness of 0.49 to 0.78), and none states a floor's physical size. The mean colour is anchored to Physically Based 'Concrete'. BUILT FOR LARGE FLOORS: the tile is 3 m, and it carries no landmark (no stain, crack or single scratch) for the eye to count repeats by; a 5 m floor tile holds 1.67 repeats, so the pattern does not lock to the floor's own module. It is one substance, not an assembly (D1): joints and floor tiles are geometry. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), scuffs, dust as a deposit (Phase10), gated by the Grime mask. Not carried: the wet look. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A3).",
+  "name": "Concrete_Polished_Clean_Base_s1_v01",
+  "status": "draft",
+  "path": "engineered/cementitious/Concrete_Polished_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "cementitious",
+  "scale_tag": "s1",
+  "meters_per_tile": 3.0,
+  "base_color_tex": "../../../textures/base/engineered/cementitious/Concrete_Polished_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/engineered/cementitious/Concrete_Polished_roughness_s1.png",
+  "normal_tex": "../../../textures/base/engineered/cementitious/Concrete_Polished_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Concrete", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.51, 0.51, 0.51", "metalness_const": 0, "roughness_const": 0.5, "specular_ior": 1.5},
+     "note": "base_color_const is the generated basecolor's MEAN (re-anchored exactly); specular_ior and metalness are taken as given. roughness_const 0.5 is not taken: the entry is a cast face, and the polish is the judgement below."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_concrete_polished.py", "provenance": "library/provenance/sources/base/engineered/cementitious/Concrete_Polished.yaml"},
+    {"kind": "judgement", "why": "roughness about 0.22 in the map (0.14 to 0.58, the high end only in sparse pinholes) for a densified floor polished to a clear, slightly soft reflection; no measured value. meters_per_tile 3.0 is the generator's own design size (a texel of about 3 mm), chosen as the largest tile that still holds up at eye height; the tag s1 is the nearest of the closed set."}
+  ]
+}
