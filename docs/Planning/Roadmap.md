@@ -15,10 +15,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the maintainer runs a batch and gets new materials, each already built and checked side by side in USDLiveView's renderer, Blender and Unreal, and keeps or sends back each one from its picture sheet. The library fills toward its full list this way, without a phase per batch. *(Was: "Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair)", now the loop's long-run aim.)*
 - `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md`
 
-### Phase12 — Glass and Light Colour — ACTIVE *(seeded and discovered 2026-10-05; numbered Phase12 and opened by the lead the same day, "/execute Phase12"; it reverses the 2026-09-25 ruling that a see-through or emitted colour is its own article; Phase11 stays paused at its refine pass)*
-**Outcome:** a Creator sets the colour of glass and other see-through matter, and the colour and brightness of a light, with a control, in Blender and in Studio; the library then carries one clear glass and one light, not an article per colour.
-- `docs/Planning/Phases/Phase12_GlassAndLightColour.md`
-
 ==================================================================================
 ## Future
 
@@ -130,3 +126,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a Creator who turns up a wear layer such as dust or grime sees it in its own colour, not only as a change in shine, and it looks that way in Blender, a USD viewer and Unreal.
 - `docs/Planning/Phases/Complete/Phase10_ColouredWearLayers.md`
 *Closed 2026-10-01; the pinned build is `unreal-runtime-v3`, and Studio's side is the platform's.*
+
+### Phase12 — Glass and Light Colour — COMPLETE
+**Outcome:** a Creator sets the colour of glass and other see-through matter, and the colour and brightness of a light, with a control, in Blender and in Studio; the library then carries one clear glass and one light, not an article per colour.
+- `docs/Planning/Phases/Complete/Phase12_GlassAndLightColour.md`
+*Closed 2026-10-05 on the library side; the two colour-only articles are kept and marked, and Studio's side is the platform's.*

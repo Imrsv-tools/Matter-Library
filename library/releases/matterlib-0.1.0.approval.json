@@ -1,12 +1,12 @@
 {
-  "approved_at": "2026-10-01T17:52:11Z",
+  "approved_at": "2026-10-05T10:10:37Z",
   "approver": "peter@imrsv.tools",
   "freeze_record": "matterlib-0.1.0.freeze.json",
-  "payload_digest": "78617e6197574ab336ed027dd71af9793a598386fa2d3e629fad89120615353b",
+  "payload_digest": "cb2d380d1df64510cbdf36ac937854bf71d26703562f85a4e2469ba2595eee1a",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
     "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
-    "mtlx_set": "a6991eb0eeefa0c2f84b71939121649d8a003a21532320606351a4db4daf4f44",
+    "mtlx_set": "da6b2561f89492a19cde672994026cad86098fe07da20262d45f7e1c23ee3830",
     "source_textures_set": "39bc67dbb3f0947a358e034f37bf421872b87f2756b8809474f8d5bc4ed63c5e"
   },
   "release": "0.1.0"

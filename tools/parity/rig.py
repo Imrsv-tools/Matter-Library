@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -149,8 +150,10 @@ def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
         for label, value, *only in rows:
             if only and art.master not in only[0]:
                 continue
-            sid = (label.replace(",", "").replace(" ", "_").replace("+", "p")
-                   .replace("-", "m").replace(".", ""))
+            # a minus sign before a number reads "m" ("roughness -0.5" -> roughness_m05); a hyphen
+            # inside a word is dropped ("see-through" was "seemthrough" until Phase12's close)
+            sid = (re.sub(r"-(?=\d)", "m", label).replace("-", "").replace(",", "")
+                   .replace(" ", "_").replace("+", "p").replace(".", ""))
             setting = {port: list(value) if isinstance(value, tuple) else value}
             if port.startswith("overlay") and port.endswith("_color"):
                 setting[port.replace("_color", "_density")] = 1.0

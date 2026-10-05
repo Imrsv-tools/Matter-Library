@@ -33,6 +33,8 @@ Four independent records, never conflated:
 
 *(Updated 2026-09-27, Phase05 close: `matterlib-0.1.0` re-frozen again, still without `.dds`. Five of its articles moved: Concrete, Copper, Glass_Clear and Rust because their normal is now combined in tangent space (MasterSet §Overlay semantic), and Marble because its `subsurface_radius` was a fudge in the wrong unit. Only the `mtlx_set` hash changed; the catalog, manifest and source textures are byte-identical. One maintainer re-approval covers this and the Phase04 re-freeze.)*
 
+*(Updated 2026-10-05, Phase12 close: `matterlib-0.1.0` re-frozen in place again, still without `.dds`. Three of its articles moved, each gaining the Creator ports that phase added: Glass_Clear and Diamond_Brilliant the see-through colour, Neon_Signage a light's colour and brightness. Only the `mtlx_set` hash changed. The maintainer re-approved it against the new freeze the same day. Pre-release, the pilot is re-frozen in place when its articles change, `AI_WorkingAgreement.md` §Project practices; Phase10's re-freeze of 2026-10-01 went the same way and has no note here.)*
+
 **Approval ≠ activation.** Promotion creates the approval artifact (the sole promotion flip). Activation
 writes the selector. Rollback re-points the selector; it never revokes or rewrites approval.
 
