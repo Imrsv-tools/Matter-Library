@@ -202,18 +202,74 @@
 
 ---
 
+## Pass 7 — The library's reply to Passes 5 and 6 (2026-10-05)
+
+*Written from the library's side, at `c40a9bc`. The lead's question, verbatim: "should we do anything and push anything back to them?" This machine has no Unreal, so nothing in Passes 5 and 6 was re-run; it has the USD toolchain, so MA-R17 was. **Nothing was built or changed in this pass.***
+
+**Examined:** Passes 5 and 6 · `tools/conformance/check_lcd_carrier.py` and its self-test · `tools/conformance/check_exporter.sh` · `tools/conformance/build_portable.py` · `tools/converters/assemble_mtlx.py` (its imports and `LCD_PORTS`) · the library's open issue #2 · `PlatformDependencies.md` P23, M6, M7 · `unreal/build.sh`.
+
+### The answer to the lead's question
+
+**Yes: one fault of the library's own to repair, four small things to tidy, and one question to send back.**
+
+| # | What | Whose | Can it be proven here |
+|---|---|---|---|
+| 1 | **The carrier check refuses every asset** (MA-R17, MA-F19 – MA-F21) | the library's, from Phase12 | **yes**, with the USD toolchain |
+| 2 | `unreal/build.sh masters` reports success when the builder raised (MA-R11) | the library's | no; the platform has run the flag |
+| 3 | P23 says *refresh the copy*; a consumer whose reader looks on the shader must change the reader too (MA-R12) | the ledger | docs only |
+| 4 | Three places still say no switch has been run: the builder's head, `ToolingConventions.md`, M7 (MA-F25) | the library's | docs only |
+| 5 | `MATTER_MASTERS_ROOT`'s wording says `/Game/<path>`; a plugin's content path works (MA-R7) | the library's | docs only |
+| 6 | **The diamond's bend, in words that settle it** (MA-Q7) | the platform's to answer | no |
+
+### Findings
+
+- **MA-F19 — MA-R17 holds here, and it is wider than reported.** With the pinned toolchain (OpenUSD 26.03), four articles referenced with **no override authored**: Copper, Glass_Clear, Neon_Signage, Diamond. On each, the Material carries `inputs:transmission_color`, `inputs:emission_color` and `inputs:emission_luminance`; each has no authored value, and its only spec is in the article's own `.mtlx`. The check counts three overrides on each and refuses all three.
+  - **An article that declares a port does not escape.** Glass_Clear declares `transmission_color`, and is refused for it in different words: *"NG_Glass_Clear….inputs:transmission_color is not connected to it"*. Neon_Signage the same for its emission pair. So Pass 6's *"unless its article declares all three"* is not the limit: no article declares all three, and **every Material on every asset is refused three times.**
+  - **A correct override does not help.** Copper with `base_color_tint` set and connected: four counted, three refused.
+  - The script is `261005_R_PlatformMasterAdoptionAsks_carrier_repro.py`, beside this doc.
+- **MA-F20 — The library did not see it because its own carrier check has not run since before Phase05.** The check imports `LCD_PORTS` from the assembler; the assembler imports MaterialX; the Python the gate runs the check with has `pxr` and no MaterialX. That is the library's issue #2, open since Phase05. Each phase since has recorded the red line as inherited (Phase12's log: *"five carrier checks that all stop at one import"*). Phase12 then gave three Creator ports OpenPBR's own names, which are the names usdMtlx puts on every Material, and the one check that would have gone red could not start. The reproduction above stands a placeholder in for the MaterialX import; nothing in the check calls it.
+- **MA-F21 — The repair's shape is measured, not built.** What tells an asset's override from the article's own input is who wrote it: on all four articles the three inputs carry no authored value and no spec outside the `.mtlx`. Both forms of a Creator asset keep the article as a `.mtlx` file (the lightweight form references it; the portable form carries a copy, `build_portable.py`), so *"the asset has a spec on this input, outside the article's `.mtlx`"* separates the two in both. It agrees with the check's own header (*"a value on the bound Material's `inputs:<port>`"*) and with its self-test's *"connect only, no value"* case, which the asset authors. The same change wants issue #2's second option with it, the port list in a module that needs no MaterialX, or the repaired check still cannot run where the library gates. The self-test gains the cases MA-F19 lists. `tools/conformance/` is baselined with `check_exporter.sh` before it is edited.
+- **MA-F22 — MA-R11 is taken as an ask, not a suggestion.** A build that prints success after the builder raised is the failure the builder's own refusals were written to prevent: a mistyped switch stops the script, and `build.sh` reports the commandlet's 0. The repair is the flag the platform names and a look for the builder's *"RESULT ok"* line. Not runnable here.
+- **MA-F23 — MA-R12 is the reader fault the library met twice itself.** The library's shared reader dropped a graph-routed value at Phase10, and Phase12 repaired it again for these three (*"a shader input connected to a port's output takes the port's value"*). A consumer's reader has the same seam. P23's third clause should say so.
+- **MA-F24 — MA-R8 and MA-R13 retire MA-F18's caution for five switches.** `used_with_skeletal_mesh` and `used_with_morph_targets` take, shown both ways; every master compiles with its textures bound and on a skinned mesh; `MaterialExpressionConstant3Vector`'s `constant` compiles and a bump reads as a bump (MA-R14). **Still on trust:** `SAMPLERTYPE_COLOR` and the sRGB default, which nobody has built.
+- **MA-F25 — Where the switches stand after Passes 5 and 6.**
+
+  | Switch | State |
+  |---|---|
+  | `MATTER_MASTERS_ROOT` | run; takes a plugin's content path (MA-R6, MA-R7) |
+  | `MATTER_MASTERS_SKINNED=1` | run, shown both ways, drawn on a character (MA-R8, MA-R13) |
+  | `MATTER_MASTERS_MESH_V=unreal` | run and looked at (MA-R13) |
+  | `MATTER_MASTERS_MESH_BINORMAL=unreal` | run and **seen** (MA-R14). MA-F8 is no longer worked out only |
+  | `MATTER_MASTERS_SKY=0` | run (MA-R6) |
+  | `MATTER_MASTERS_REFRACTION=index` | compiles; the thin master is right under it; **the solid master's bend is not settled** (MA-R15) |
+  | `MATTER_MASTERS_COLOUR_SAMPLER=srgb` | **never built.** The platform serves no block-compressed colour picture, so MA-Q1 has no one waiting on it |
+
+  The builder's head, `ToolingConventions.md` and M7 still say none has been run.
+- **MA-F26 — The skin has an answer for now.** The looker, on the Subsurface master under real light: *"it's not shiney but I think it is fine and good place to keep refning from (later)."* That agrees with the ruling of 2026-09-30. MA-Q5 is closed as *later*, with nothing to build.
+- **MA-F27 — The default build is still unproven in Unreal.** Pass 4's fourth step, `unreal/build.sh masters` with no switch set, has not been run by anyone. Passes 5 and 6 ran the switches on; the stand-in (MA-F18) is still the only evidence that the unset build is unchanged.
+
+### One question for the platform
+
+- **MA-Q7 [platform] — Does the cone's grid sit in a different place behind the diamond under `MATTER_MASTERS_REFRACTION=index` than under `function`?** Two builds, one cube, one view from the side, the diamond only. *Yes* makes `index` the repair for M6 and the solid master's default, at a new runtime build. *No* means the cause is elsewhere (the blend mode is the other suspect, MA-F12), and the switch stays a candidate. *"Strange, but fine"* does not say which.
+
+---
+
 ## Status
 
-- **Passes captured:** 4 (Pass 1 the platform's asks; Pass 2 the platform's look, run; Pass 3 the library's review; Pass 4 what was built; all 2026-10-05).
-- **Current direction.** Not Phase12's work. The three asks, the two things the library added, and two candidates are in the library's builder as switches, each off unless told; the ledger carries the ask as M7. **All of it is built and none of it is run:** this machine has no Unreal. What is owed now is on the system that has it (Pass 4's list). The two things the platform saw are older than this doc: the solid master's missing bend is M6's, now known to be the master and not the capture (MA-F12), with a candidate repair behind a switch; the skin is a look, not a parity fault (MA-F9).
-- **Asks:** A1, A2, A3 **built, not run** (`a66377c`). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). *(Was, at Pass 3: "A1, A2, A3 agreed, none built … The ledger row agreed, not written".)*
-- **Questions:** MA-Q2 answered (one builder). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; a candidate is built) · MA-Q3 (a new runtime publish or not, now that the builder has changed; `git log e1fc83e..HEAD -- unreal/MatterRuntime` is no longer empty) · MA-Q4 (the platform's binormal; Pass 4's second step answers it) · MA-Q5 (the skin, against the 2026-09-30 ruling).
+- **Passes captured:** 7 (Passes 1, 2, 5 and 6 from the platform's side; Passes 3, 4 and 7 from the library's; all 2026-10-05).
+- **Current direction.** The platform now builds from the library's builder and has retired its patched copy. The three asks and the two things the library added are **run in Unreal and looked at**, by the platform (Passes 5 and 6; MA-F25). Of the two candidates, the refraction one compiles and leaves the thin master right, with the solid master's bend unsettled (MA-Q7); the colour-sampler one has never been built. **What the look turned up is a fault of the library's own, not in the masters:** the carrier check has refused every asset since Phase12, and the library could not see it because that check has not run on its own machine since before Phase05 (MA-F19, MA-F20). *(Was, at Pass 4: "All of it is built and none of it is run … What is owed now is on the system that has it".)*
+- **Asks:** A1, A2, A3 **built (`a66377c`) and run by the platform** (MA-R6 – MA-R14). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). **New, from the platform:** the carrier check (MA-R17), `build.sh`'s false success (MA-R11), a sentence on P23 (MA-R12), the root's wording (MA-R7). None built in Pass 7. *(Was, at Pass 4: "built, not run".)*
+- **Questions:** MA-Q2 answered (one builder). MA-Q4 answered (along Unreal's V, MA-R10). MA-Q5 closed as *later* (MA-F26). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; the candidate is unbuilt and nobody is waiting on it) · MA-Q3 (a new runtime publish or not, now that the builder has changed) · **MA-Q7 (the platform's: the diamond's bend, in words that settle it).**
 - **What was added, and what was not.** Passes 3 and 4, this footer, the check beside this doc, and a dated line in the thin-glass doc's Status. Outside this doc, at the lead's direction: the builder, `unreal/build.sh`'s header, `ToolingConventions.md`, and the ledger. **Not changed:** any article, any spec, the Roadmap, the pinned runtime (`unreal/RUNTIME.json`).
-- **Not run.** Everything in Pass 3 is read from the tree. MA-F8 is derived, not seen. MA-F10's sampler rule is Unreal's known behaviour, not tried here. Pass 2 is the platform's look, taken as written. Pass 4's switches have met a stand-in only (MA-F18).
+- **Not run.** Everything in Pass 3 is read from the tree. MA-F10's sampler rule is Unreal's known behaviour, not tried by anyone. Passes 2, 5 and 6 are the platform's, taken as written. **The unset build has met a stand-in only** (MA-F18, MA-F27): nobody has run `unreal/build.sh masters` with no switch set. Pass 7 ran MA-R17 here and nothing else. *(MA-F8 was "derived, not seen" until Pass 6's MA-R14.)*
 - **Pushed** to the public remote up to `a66377c` (the lead, 2026-10-05: *"push it"*).
 - **Pass 5, added from the platform's side (2026-10-05; the lines above are the library's and are not edited):** the consumer switches and `MATTER_MASTERS_REFRACTION=index` are now **run** in a second project on Unreal 5.8 — built, the skinned usages shown both ways, all eight compiled for a static mesh (MA-R6 – MA-R9). **MA-Q4 is answered** (MA-R10: along Unreal's V, so the binormal switch is set). Two notes for the library: the builder's result lines do not reach a caller reading `-stdout` (MA-R11), and P23 needs a consumer's reader to change, not only its copy (MA-R12). **Still owed by the platform:** the look. **Still the library's:** Pass 4's step 4, and MA-Q1, MA-Q3, MA-Q5.
 - **Pass 6, added from the platform's side (2026-10-05; the lines above are not edited):** **the look is run**, Desktop, on the library's own builder at `707200d` — Pass 4's steps 1 – 3. Everything drew and compiled, the character included (MA-R13); a bump reads as a bump with the binormal switch (MA-R14, so MA-F8 is seen); the thin master is right under `REFRACTION=index` and the solid one was called *"strange, but … fine"*, its bend not settled (MA-R15); skin is still not right and is left for later by the looker (MA-R16). **One thing for the library to act on: `check_lcd_carrier.py` refuses every asset since Phase12** (MA-R17). **Still owed by the platform:** the headset. **Still the library's:** Pass 4's step 4, MA-R17, and MA-Q1, MA-Q3, MA-Q5.
 
-▶ **Next:** on the system with Unreal, Pass 4's four steps. Here, nothing until that look comes back. The solid master's faint, flat colour (MA-F13) and the skin (MA-Q5) wait on the lead.
+- **Pass 7, the library's (2026-10-05):** MA-R17 is reproduced here and is wider than reported: every Material on every asset, whatever its article declares (MA-F19). Its cause on the library's side is issue #2 (MA-F20), and the repair's shape is measured (MA-F21). Nothing built.
+
+▶ **Next:** here, one quick fix: the carrier check counts only what an asset authored, the port list moves where the check can import it (closing issue #2), and the self-test gains the cases; with it the small things of Pass 7's table (rows 2 – 5). Then push, so the platform can drop its workaround. **From the platform:** MA-Q7. **On the machine that builds the library's runtime:** the unset build (MA-F27). The solid master's faint, flat colour (MA-F13) waits on the lead.
+
+*(Superseded 2026-10-05 by Pass 7. Was: "on the system with Unreal, Pass 4's four steps. Here, nothing until that look comes back. The solid master's faint, flat colour (MA-F13) and the skin (MA-Q5) wait on the lead.")*
 
 *(Superseded 2026-10-05 by Pass 4. Was: "two quick fixes, either order. (1) Here: the ledger row, M6 brought up to date, P11 and P17 as reported, the schema line dated. (2) On the machine with Unreal, or written here and proven by the platform's re-run: the switches in the builder. The solid master (M6) and the skin (MA-Q5) wait on the lead.")*
