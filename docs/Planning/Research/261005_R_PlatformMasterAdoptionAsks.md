@@ -295,24 +295,52 @@
   - **So `build.sh` did fail, which is what matters, and not by the route its comment describes.** It stopped at its `pipefail`, on the commandlet's own exit code. Its look for the result line was never reached: the *"masters: FAILED"* line was not printed, and the temporary log it makes was left behind.
   - **This differs from what the platform saw in its project** (MA-R11: exit 0 and *"executed successfully"* whatever the script did). Why the two differ is not known. Here the refusal is raised as the script is first read, before `main()`; whether a raise later in the build behaves the same was not tried.
   - **The result-line check is not shown wrong. It is shown unreached on this machine.** It stays the guard for the case the platform met.
-  - **A tidy, not built:** take the pipeline's exit code into the same test as the result line, so one message and one clean-up cover both routes. Today a failure of the first kind leaves a temporary file per run.
+  - **A tidy, not built:** take the pipeline's exit code into the same test as the result line, so one message and one clean-up cover both routes. Today a failure of the first kind leaves a temporary file per run. *(Built and run the same day: Pass 10, MA-R22.)*
 - **MA-R21 — The flag is needed, as the platform said.** Run 4, a good build with `-stdout` alone: exit 0, *"Python script executed successfully"*, and **none** of the builder's eleven lines on the output; all eleven are in the project's log. Run 2, with the flag, printed all eleven. **A trap for whoever compares next:** the project's log file ends each line with a carriage return and the console output does not, so a plain `diff` of one against the other calls every line different.
 - **A small thing met on the way.** The docs write the command as `unreal/build.sh masters`. Neither that script nor `unreal/publish.sh` is executable in the repo (both have been mode 644 since Phase06), so it is run as `bash unreal/build.sh masters`.
 
 **What follows.**
-- **MA-Q3 has the proof its leaning named** (*"the default build's parameter list unchanged on the machine with Unreal"*). The ruling, publish a new runtime or not, is still the lead's.
+- **MA-Q3 has the proof its leaning named** (*"the default build's parameter list unchanged on the machine with Unreal"*). The ruling, publish a new runtime or not, is still the lead's. *(Ruled the same day: no. MA-RD1.)*
 - **Pass 4's four steps are all run.** Steps 1 – 3 by the platform (Passes 5 and 6), step 4 here.
 
 **Not done.** A packaged runtime from today's sources. Anything drawn. The solid see-through master's two faults (M6), which also need this machine and wait on the lead. `MATTER_MASTERS_COLOUR_SAMPLER=srgb`, still never built.
 
 ---
 
+## Pass 10 — A ruling on the runtime, and `build.sh` takes the exit code (2026-10-05)
+
+*Written from the library's side, on its machine with Unreal, at `69db42d`. The lead, to Pass 9's handback, verbatim: "2) no 3)yes 4)ok 5)ok Push". Item 2 there was MA-Q3, put as: does a builder change that alters nothing at its defaults need a new runtime published? Item 3 was the tidy of MA-R20. The ruling is MA-RD1, under §Resolved. The tidy was built as a quick fix outside this doc and is run.*
+
+- **MA-R22 — `build.sh masters` takes the commandlet's exit code into the same test as the result line. Built, and run in Unreal.** A good build is now both an exit code of 0 and the builder's *"RESULT ok"*; anything else ends in one *"masters: FAILED"* line that says what the commandlet exited with and whether the builder reported, and the script's temporary log is removed.
+  - **Against a stand-in engine, four cases, the script before and after** (a test fixture, not Unreal: it prints and exits as each case says):
+
+    | The engine | Before | After |
+    |---|---|---|
+    | prints *"RESULT ok"*, exits 0 | passes | passes |
+    | no result line, exits 0 (what the platform saw) | fails with its message | fails with its message |
+    | no result line, exits 255 (what this machine does) | exits 255, **no message, log left** | fails with its message, log removed |
+    | prints *"RESULT ok"*, then exits 139 | exits 139, **no message, log left** | fails with its message, log removed |
+
+  - **In Unreal 5.8.0, the library's own project.** `MATTER_MASTERS_MESH_V=bogus`: exit 1, *"masters: FAILED. The commandlet exited 255 and the builder did not report 'MATTER RESULT ok'"*, no log left, and the seventeen files in the masters folder kept their hashes. Nothing set: exit 0, *"masters: ok. MATTER told root=/Game/Masters …"*, the builder's ten lines once more those of 1 October byte for byte, and every asset the same size.
+  - **The last row is a case nobody has met.** It is there because the old script would have let the exit code speak alone, and the new one must not let the result line speak alone.
+
+---
+
+## Resolved
+
+- **MA-RD1 — A builder change that alters nothing at its defaults needs no new runtime published (the lead, 2026-10-05).** This is MA-Q3. It was put to the lead with Pass 9's result in hand, as *"does a builder change that alters nothing at its defaults need a new runtime published? The evidence the other machine asked for is now in, and its leaning was no"*; the lead, verbatim: *"no"*.
+  - **What it settles.** The pinned runtime stays `unreal-runtime-v3`, built from `e1fc83e` (`unreal/RUNTIME.json`), although the builder and `build.sh` have changed since. Phase06's rule, *no second publish while nothing under `unreal/` has changed*, is read by what the default build makes, not by whether a file moved.
+  - **What it rests on.** MA-R18: with nothing set, the builder's lines are those of the build the pinned runtime came from, byte for byte.
+  - **What it does not settle.** A change that alters what the default build makes. Making `MATTER_MASTERS_REFRACTION=index` the solid master's default (M6, waiting on MA-Q7) would be one, and is a new runtime build.
+
+---
+
 ## Status
 
-- **Passes captured:** 9 (Passes 1, 2, 5 and 6 from the platform's side; Passes 3, 4, 7, 8 and 9 from the library's, Pass 9 on its machine with Unreal; all 2026-10-05).
+- **Passes captured:** 10 (Passes 1, 2, 5 and 6 from the platform's side; Passes 3, 4, 7, 8, 9 and 10 from the library's, the last two on its machine with Unreal; all 2026-10-05).
 - **Current direction.** The platform now builds from the library's builder and has retired its patched copy. The three asks and the two things the library added are **run in Unreal and looked at**, by the platform (Passes 5 and 6; MA-F25). Of the two candidates, the refraction one compiles and leaves the thin master right, with the solid master's bend unsettled (MA-Q7); the colour-sampler one has never been built. **What the look turned up is a fault of the library's own, not in the masters:** the carrier check has refused every asset since Phase12, and the library could not see it because that check has not run on its own machine since before Phase05 (MA-F19, MA-F20). *(Was, at Pass 4: "All of it is built and none of it is run … What is owed now is on the system that has it".)*
-- **Asks:** A1, A2, A3 **built (`a66377c`) and run by the platform** (MA-R6 – MA-R14). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). **New, from the platform, all done in Pass 8:** the carrier check (MA-R17; repaired and proven here), `build.sh`'s false success (MA-R11; built, not run in Unreal), a sentence on P23 (MA-R12), the root's wording (MA-R7). *(Was, at Pass 4: "built, not run".)*
-- **Questions:** MA-Q2 answered (one builder). MA-Q4 answered (along Unreal's V, MA-R10). MA-Q5 closed as *later* (MA-F26). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; the candidate is unbuilt and nobody is waiting on it) · MA-Q3 (a new runtime publish or not, now that the builder has changed; the proof its leaning named is in, Pass 9, and the ruling is the lead's) · **MA-Q7 (the platform's: the diamond's bend, in words that settle it).**
+- **Asks:** A1, A2, A3 **built (`a66377c`) and run by the platform** (MA-R6 – MA-R14). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). **New, from the platform, all done in Pass 8:** the carrier check (MA-R17; repaired and proven here), `build.sh`'s false success (MA-R11; built, not run in Unreal; *run the same day and widened to the exit code, Passes 9 and 10*), a sentence on P23 (MA-R12), the root's wording (MA-R7). *(Was, at Pass 4: "built, not run".)*
+- **Questions:** MA-Q2 answered (one builder). MA-Q4 answered (along Unreal's V, MA-R10). MA-Q5 closed as *later* (MA-F26). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; the candidate is unbuilt and nobody is waiting on it) · ~~MA-Q3~~ **ruled 2026-10-05: no new runtime publish** (MA-RD1; was open until Pass 10, with the proof its leaning named in from Pass 9) · **MA-Q7 (the platform's: the diamond's bend, in words that settle it).**
 - **What was added, and what was not.** Passes 3 and 4, this footer, the check beside this doc, and a dated line in the thin-glass doc's Status. Outside this doc, at the lead's direction: the builder, `unreal/build.sh`'s header, `ToolingConventions.md`, and the ledger. **Not changed:** any article, any spec, the Roadmap, the pinned runtime (`unreal/RUNTIME.json`).
 - **Not run.** Everything in Pass 3 is read from the tree. MA-F10's sampler rule is Unreal's known behaviour, not tried by anyone. Passes 2, 5 and 6 are the platform's, taken as written. **The unset build is run in Unreal** (Pass 9, MA-R18): its builder lines are those of 1 October, byte for byte. Nothing was drawn from it. *(Was, until Pass 9: "The unset build has met a stand-in only (MA-F18, MA-F27): nobody has run `unreal/build.sh masters` with no switch set".)* Pass 7 ran MA-R17 here and nothing else. *(MA-F8 was "derived, not seen" until Pass 6's MA-R14.)*
 - **Pushed** to the public remote up to `a66377c` (the lead, 2026-10-05: *"push it"*).
@@ -325,7 +353,11 @@
 
 - **Pass 9, the library's, on its machine with Unreal (2026-10-05):** `unreal/build.sh masters` with no switch set is run, on Unreal 5.8.0, in the library's own project. **The unset build is unchanged** (MA-R18: the builder's nine *"built …"* lines and its result line are those of 1 October, byte for byte; the twelve assets are the same sizes), so MA-F27 is closed and MA-Q3 has the proof its leaning named. `build.sh` reports a good build from the builder's own line (MA-R19), and the flag it now passes is needed (MA-R21). **One thing differs from what the platform saw:** on this machine a refused switch makes the commandlet itself fail, so `build.sh` stops at its `pipefail` and never reaches its own check (MA-R20). It still fails. Nothing was drawn, and no code was changed.
 
-▶ **Next:** nothing is owed by the machine with Unreal. **From the platform:** take the repaired carrier check and drop the workaround; answer MA-Q7 (the diamond, with the switch and without). **Waiting on the lead:** MA-Q3 (a new runtime publish or not; the proof is in, Pass 9), MA-Q1, and the solid master's two faults (M6, MA-F13), which need the machine with Unreal when they are taken up. **Small and unbuilt:** `build.sh` taking the commandlet's exit code into its own test (MA-R20).
+- **Pass 10, the library's, on its machine with Unreal (2026-10-05):** **the lead ruled MA-Q3: no new runtime publish** for a builder change that alters nothing at its defaults (MA-RD1, §Resolved). `build.sh masters` now takes the commandlet's exit code into the same test as the result line, so every failure ends in one message and leaves no log behind (MA-R22): four cases against a stand-in, then a refused switch and a default build in Unreal 5.8.0.
+
+▶ **Next:** nothing is owed by the machine with Unreal. **From the platform:** take the repaired carrier check and drop the workaround; answer MA-Q7 (the diamond, with the switch and without). **Waiting on the lead:** MA-Q1, and the solid master's two faults (M6, MA-F13), which need the machine with Unreal when they are taken up.
+
+*(Superseded 2026-10-05 by Pass 10. Was: "nothing is owed by the machine with Unreal. From the platform: take the repaired carrier check and drop the workaround; answer MA-Q7 (the diamond, with the switch and without). Waiting on the lead: MA-Q3 (a new runtime publish or not; the proof is in, Pass 9), MA-Q1, and the solid master's two faults (M6, MA-F13), which need the machine with Unreal when they are taken up. Small and unbuilt: `build.sh` taking the commandlet's exit code into its own test (MA-R20).")*
 
 *(Superseded 2026-10-05 by Pass 9. Was: "nothing here. From the platform: take the repaired carrier check and drop the workaround; answer MA-Q7 (the diamond, with the switch and without). On the machine that builds the library's runtime: `unreal/build.sh masters` with no switch set, which proves the unset build (MA-F27) and the script's new result check in one run. The solid master's faint, flat colour (MA-F13), and MA-Q1 and MA-Q3, wait on the lead.")*
 

@@ -31,19 +31,24 @@ editor() {
 }
 
 masters() {
-  # The result is read from the builder's own last line, never from the exit code: the
-  # commandlet exits 0 and prints "Python script executed successfully" even when the script
-  # raised, and the builder's lines ("told …", "built …", "RESULT ok") reach the output only with
-  # -FullStdOutLogOutput. Both seen in a second project on Unreal 5.8 (2026-10-05); without them a
-  # mistyped switch, which the builder refuses, would pass here as a good build.
-  local log
+  # A good build is BOTH an exit code of 0 and the builder's own last line. Neither alone is
+  # enough, and which one catches a refused switch depends on the project:
+  #   - In a second project on Unreal 5.8 the commandlet exited 0 and printed "Python script
+  #     executed successfully" after the script raised (2026-10-05). Only the result line saw it.
+  #   - In this project on Unreal 5.8.0 the same refusal made the commandlet exit 255
+  #     (2026-10-05). Only the exit code saw it.
+  # The builder's lines ("told …", "built …", "RESULT ok") reach the output only with
+  # -FullStdOutLogOutput (seen in both). The exit code is taken here, not left to `set -e`, so
+  # that both routes end in one message and the log is removed.
+  local log status=0 result="did not report"
   log="$(mktemp)"
   nice -n 19 "$UE/Engine/Binaries/Linux/UnrealEditor-Cmd" "$PROJECT" -run=pythonscript \
     -script="$HERE/MatterRuntime/Scripts/build_masters.py" \
     -EnablePlugins=PythonScriptPlugin,EditorScriptingUtilities -unattended -nullrhi -stdout \
-    -FullStdOutLogOutput | tee "$log"
-  if ! grep -q "MATTER RESULT ok" "$log"; then
-    echo "masters: FAILED. The builder did not report 'MATTER RESULT ok' (its output is above)." >&2
+    -FullStdOutLogOutput | tee "$log" || status=$?
+  if grep -q "MATTER RESULT ok" "$log"; then result="reported"; fi
+  if [ "$status" -ne 0 ] || [ "$result" != "reported" ]; then
+    echo "masters: FAILED. The commandlet exited $status and the builder $result 'MATTER RESULT ok' (its output is above)." >&2
     rm -f "$log"
     exit 1
   fi
