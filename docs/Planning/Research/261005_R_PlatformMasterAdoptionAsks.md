@@ -132,13 +132,46 @@
 
 ---
 
+## Pass 4 — What was built from this, and what the system with Unreal does next (2026-10-05)
+
+*The lead, after Pass 3, verbatim: "Build everything we can build here please so we can get it over to the other system". Done as two quick fixes outside this doc, the same day, and pushed. **Nothing below has been run in Unreal.***
+
+- **The ledger** (`228bb2f`): `PlatformDependencies.md` **M7** is these asks; M6 says the solid master's missing bend is the master; P11 and P17 are marked as reported; P20 records what is owed at its close. The schema's naming line was **not** edited: the platform asked for that *"not before"* P20 closes, so it is recorded on P20 as owed.
+- **The builder** (`a66377c`): `build_masters.py` is told what it is building for by environment variable. Its head lists them, and `docs/ToolingConventions.md` repeats the list.
+
+  | Switch | Answers | State |
+  |---|---|---|
+  | `MATTER_MASTERS_ROOT=/Game/<path>` | A1 | built, not run |
+  | `MATTER_MASTERS_SKINNED=1` | A2 | built, not run |
+  | `MATTER_MASTERS_MESH_V=unreal` | A3, the placement (MA-F7) | built, not run |
+  | `MATTER_MASTERS_MESH_BINORMAL=unreal` | A3's other half, the normal's green (MA-F8) | built, not run, **and worked out, not seen** |
+  | `MATTER_MASTERS_SKY=0` | MA-F11 | built, not run |
+  | `MATTER_MASTERS_COLOUR_SAMPLER=srgb` | a **candidate** for MA-Q1; the ruling is still the lead's | built, not run |
+  | `MATTER_MASTERS_REFRACTION=index` | a **candidate** repair for M6 (MA-F12): the article's index on the solid master, 1.0 on the thin one | built, not run |
+
+- **MA-Q6 is answered by the build: separate switches,** one thing each, so that a mesh with Unreal's V and a carried-in binormal can be told as it is (MA-Q4).
+- **MA-F18 — What was checked here, and what that is worth.** `261005_R_PlatformMasterAdoptionAsks_check.py`, beside this doc, runs the builder against a stand-in for Unreal's Python that records every call. With no switch set the builder makes the same 4,436 calls as the builder before the switches, call for call, plus one log line saying what it was told. Each switch changes only its own thing. A value the builder does not know stops it before any asset is made. **That is what the script asks for. It says nothing about what the engine compiles or draws:** the property and enum names (`used_with_skeletal_mesh`, `used_with_morph_targets`, `SAMPLERTYPE_COLOR`, `MaterialExpressionConstant3Vector`'s `constant`) are Unreal's as read, not as run.
+
+### What the system with Unreal does
+
+1. **Build with the switches a consumer needs, and repeat the look of Pass 2** from the library's builder in place of the patched copy:
+   `MATTER_MASTERS_ROOT=/Game/<its path> MATTER_MASTERS_SKINNED=1 MATTER_MASTERS_MESH_V=unreal MATTER_MASTERS_MESH_BINORMAL=unreal MATTER_MASTERS_SKY=0`
+2. **Look at the normal map's green** on a mesh with a strong one-way bump, lit from the side. If bumps lean the wrong way up and down, build without `MATTER_MASTERS_MESH_BINORMAL`; that answers MA-Q4.
+3. **Try the two candidates one at a time.** `MATTER_MASTERS_REFRACTION=index`: diamond on the cube, from the side, should bend, and clear glass should not. `MATTER_MASTERS_COLOUR_SAMPLER=srgb`: a block-compressed colour picture should bind and read the right brightness.
+4. **On the machine that builds the library's runtime:** `unreal/build.sh masters` with no switch set, and the *"built …"* log lines' parameter lists unchanged. That is the half of the proof the stand-in cannot give.
+
+---
+
 ## Status
 
-- **Passes captured:** 3 (Pass 1 the platform's asks; Pass 2 the platform's look, run; Pass 3 the library's review, 2026-10-05).
-- **Current direction.** Not Phase12's work. The three asks are agreed and small, and the platform has already run them; what the library owes is the same three in its own builder, off by default, plus two things the asks did not name (the normal's green, MA-F8; no Sky, MA-F11). None of it can be run on this machine. The two things the platform saw are older than this doc: the solid master's missing bend is M6's, now known to be the master and not the capture (MA-F12); the skin is a look, not a parity fault (MA-F9).
-- **Asks:** A1, A2, A3 agreed, none built. The correction agreed for P20's close. The ledger row agreed, not written.
-- **Questions:** MA-Q2 answered (one builder). **Open:** MA-Q1 (a ruling; the library leans to a colour sampler behind a switch) · MA-Q3 (a new publish or not) · MA-Q4 (the platform's binormal) · MA-Q5 (the skin, against the 2026-09-30 ruling) · MA-Q6 (three switches or one).
-- **What was added, and what was not.** This pass added Pass 3 and this footer, and a dated line in the thin-glass doc's Status. **Not changed:** the builder, any master, any article, any spec, the ledger, the Roadmap.
-- **Not run.** Everything in Pass 3 is read from the tree. MA-F8 is derived, not seen. MA-F10's sampler rule is Unreal's known behaviour, not tried here. Pass 2 is the platform's look, taken as written.
+- **Passes captured:** 4 (Pass 1 the platform's asks; Pass 2 the platform's look, run; Pass 3 the library's review; Pass 4 what was built; all 2026-10-05).
+- **Current direction.** Not Phase12's work. The three asks, the two things the library added, and two candidates are in the library's builder as switches, each off unless told; the ledger carries the ask as M7. **All of it is built and none of it is run:** this machine has no Unreal. What is owed now is on the system that has it (Pass 4's list). The two things the platform saw are older than this doc: the solid master's missing bend is M6's, now known to be the master and not the capture (MA-F12), with a candidate repair behind a switch; the skin is a look, not a parity fault (MA-F9).
+- **Asks:** A1, A2, A3 **built, not run** (`a66377c`). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). *(Was, at Pass 3: "A1, A2, A3 agreed, none built … The ledger row agreed, not written".)*
+- **Questions:** MA-Q2 answered (one builder). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; a candidate is built) · MA-Q3 (a new runtime publish or not, now that the builder has changed; `git log e1fc83e..HEAD -- unreal/MatterRuntime` is no longer empty) · MA-Q4 (the platform's binormal; Pass 4's second step answers it) · MA-Q5 (the skin, against the 2026-09-30 ruling).
+- **What was added, and what was not.** Passes 3 and 4, this footer, the check beside this doc, and a dated line in the thin-glass doc's Status. Outside this doc, at the lead's direction: the builder, `unreal/build.sh`'s header, `ToolingConventions.md`, and the ledger. **Not changed:** any article, any spec, the Roadmap, the pinned runtime (`unreal/RUNTIME.json`).
+- **Not run.** Everything in Pass 3 is read from the tree. MA-F8 is derived, not seen. MA-F10's sampler rule is Unreal's known behaviour, not tried here. Pass 2 is the platform's look, taken as written. Pass 4's switches have met a stand-in only (MA-F18).
+- **Pushed** to the public remote up to `a66377c` (the lead, 2026-10-05: *"push it"*).
 
-▶ **Next:** two quick fixes, either order. (1) Here: the ledger row, M6 brought up to date, P11 and P17 as reported, the schema line dated. (2) On the machine with Unreal, or written here and proven by the platform's re-run: the switches in the builder. The solid master (M6) and the skin (MA-Q5) wait on the lead.
+▶ **Next:** on the system with Unreal, Pass 4's four steps. Here, nothing until that look comes back. The solid master's faint, flat colour (MA-F13) and the skin (MA-Q5) wait on the lead.
+
+*(Superseded 2026-10-05 by Pass 4. Was: "two quick fixes, either order. (1) Here: the ledger row, M6 brought up to date, P11 and P17 as reported, the schema line dated. (2) On the machine with Unreal, or written here and proven by the platform's re-run: the switches in the builder. The solid master (M6) and the skin (MA-Q5) wait on the lead.")*
