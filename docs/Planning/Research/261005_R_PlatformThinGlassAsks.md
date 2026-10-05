@@ -138,8 +138,8 @@ for a in ARTS:
 | A1 | **Written 2026-10-05 (§Resolved, TG-RD1).** *Was, at Pass 2:* **Agreed, not written.** The rule is OpenPBR's and the library's Blender master and its Storm pictures already follow it. Its home is `MasterSet.md` §Material-settings intent (TG-F16): the TranslucentThin row's refraction cell, and a note beside the rough-transmission one. `LCDSchema.md`'s *"at the producer"* line would point there. A contract edit is not research's to make. |
 | A2 | **Half answered.** In the capture the thin master does not shift (TG-F10). In a live view: not run, and it cannot be on this machine. |
 | A3 | **Not run to ground; narrowed.** Both masters bend nothing, they are wired alike (TG-F12), nothing in the runtime turns the bend off (TG-F13), and the frost points away from the capture (TG-F14). Three states remain (TG-F15). |
-| A4 | **Agreed, and it waits for A3** (TG-F18). |
-| A5 | **Confirmed** (TG-F19). A small change to one driver. |
+| A4 | **Agreed, and it waits for A3** (TG-F18). *(Built 2026-10-05, once A3 was answered: Pass 3, TG-F21.)* |
+| A5 | **Confirmed** (TG-F19). A small change to one driver. *(Built 2026-10-05: Pass 3, TG-F23.)* |
 
 ### The questions, as far as this pass takes them
 
@@ -155,6 +155,27 @@ for a in ARTS:
 
 ---
 
+## Pass 3 — The side view and the driver's fallback, built (2026-10-05)
+
+*Written from the library's side. The lead, verbatim: "yes, do 1 and 2 and push", where 1 was A5 and 2 was A4. Built as a quick fix outside this doc. A4 no longer waited: the platform's look had shown the missing bend is the master and not the capture (the Status update below), so the rig's Unreal column can be trusted to show bend or its absence.*
+
+- **TG-F21 — A4 is built: the rig has a `side` view.** A third camera, `/World/CamSide`, at (0.96, 0.29, 0.74), pitched −8° and yawed 50°: the cube's flat front face from its right, 0.95 m away, 50° off the face's normal at its centre and 43° to 55° across it, with the grid wall behind. Every ray through the face meets the wall, undeflected, inside the wall's width. A job renders it for the two see-through masters only, with the sphere hidden, since from there it sits behind the cube's far edge. All three drivers draw it; the Unreal driver sends the camera with the job, so the pinned runtime is unchanged. The numbers are in `tools/parity/JOB_FORMAT.md`.
+- **TG-F22 — What the view shows today** (Glass_Clear and Diamond_Brilliant at their own values, this machine; looked at by the agent, the lead's look not yet taken):
+
+  | Article | Storm | Blender | Unreal |
+  |---|---|---|---|
+  | Glass_Clear (thin) | the wall's lines run straight through the cube | straight | straight |
+  | Diamond_Brilliant (solid) | straight, grey | **moved:** the wall is displaced and repeated inside a blue stone | **straight,** through a pale cube |
+
+  So the thin article is drawn un-deflected by all three, as the rule asks, and the library's own sheet now shows both of the solid master's faults in Unreal in one picture: it bends nothing, and its colour is faint (M6).
+  - **The two views that already existed are unchanged:** for both articles, Storm's and Unreal's pictures are the same bytes as before the change, and Blender's are within one 8-bit code.
+- **TG-F23 — A5 is built: the Blender driver renders on the first device that can.** It tries OptiX, then CUDA, then the CPU, and the test of each graphics device is a 16-pixel, one-sample render of the job's own scene, because a listed device is not a device that can render (TG-F19). It names its choice in the job's `blender.log`. `MATTER_BLENDER_DEVICE=cpu` or `=gpu` forces it.
+  - **Run here, on Glass_Clear's job:** this machine's card: OptiX chosen. Forced to the CPU: it renders, and its three pictures differ from the card's by noise (0.07 to 0.41 of an 8-bit code on average). **Every graphics device made to fail its test render, a stand-in for the platform's card:** the log names OptiX and CUDA as listed and unable to render, the job completes on the CPU, and the pictures are the forced-CPU ones. The same, told it must use the card: it stops and says why. A value it does not know: refused.
+  - **Not run on a card that really cannot render.** The stand-in fails the driver's own test, not Cycles. That Cycles reports such a card as a failed render, or writes no picture, is what the test relies on; the platform's machine is where that is shown.
+  - **The cost of the CPU here:** about a minute for the three pictures, against about ten seconds.
+
+---
+
 ## Resolved
 
 - **TG-RD1 — The consumer rule lives in `MasterSet.md` §Material-settings intent, and the ledger row is recorded (the lead, 2026-10-05).** Pass 2's handback offered both as one quick fix, naming `MasterSet.md`; the lead, verbatim: *"Yep... go ahead and do it"*. Done the same day, as a quick fix outside this doc:
@@ -167,14 +188,16 @@ for a in ARTS:
 
 ## Status
 
-- **Passes captured:** 2 (Pass 1 the platform's side; Pass 2 the library's, 2026-10-05).
-- **Asks:** **A1 is written** (2026-10-05, TG-RD1). The other four stand, none built. A2 half answered: no shift in the rig's capture, a live view not run. A3 narrowed to three states (TG-F15), not run to ground. A4 agreed, waits for A3. A5 confirmed.
+- **Passes captured:** 3 (Pass 1 the platform's side; Passes 2 and 3 the library's; all 2026-10-05).
+- **Asks:** **A1 is written** (TG-RD1). **A2 is answered:** the thin master draws un-deflected, live in the platform's renderer and in the rig's side view (TG-F22). **A3 is answered as to where, not repaired:** the missing bend is the solid master's (the update below), and the rig now shows it (TG-F22). **A4 and A5 are built** (Pass 3). *(Was, at Pass 2: "The other four stand, none built. A2 half answered … A3 narrowed to three states … A4 agreed, waits for A3. A5 confirmed".)*
 - **Questions:** TG-Q4 is answered (yes). TG-Q3 is ruled (`MasterSet.md`, TG-RD1). **Open:** TG-Q1 (live view), TG-Q2 (master or capture), TG-Q5 (what Epic's function returns), TG-Q6 (textured thin glass, with F-P11-16).
 - **Current direction.** The library's Unreal masters cannot be called adoptable as they stand: in two of the three states that fit the pictures, one of the two see-through masters is wrong. The frost in the capture leans to the state where the thin master is right and the solid one bends nothing.
 - **What was added, and what was not.** The two passes added this doc only. *(Updated 2026-10-05: the rule and the ledger row are written, at the lead's direction and outside this doc — `MasterSet.md`, `LCDSchema.md`, `PlatformDependencies.md` M6; TG-RD1. Was: "No article, master, tool, spec or ledger row is changed by it. The suggested ledger row is not recorded".)* **Not changed:** any article, master or tool.
 - **Update 2026-10-05 (from the platform's look, `261005_R_PlatformMasterAdoptionAsks.md` Pass 2 and its MA-F12):** the questions listed open above have moved. **TG-Q2 is answered: it is the master, not the capture.** The library's solid master bends nothing in a live view in the platform's renderer, where the platform's own solid master bends on the same cube. Of TG-F15's three states only the first is left: the thin master right, the solid one wrong, the rig's Unreal column truthful. **TG-Q1 is answered by eye, not by ruler:** the library's thin master read right in that live view. **TG-F7 holds when run:** an index of 1.0 on the Refraction input removes the bend and keeps the rough blur (the platform's own corrected thin master, Unreal 5.8 with Substrate). **Still open:** TG-Q5, what Epic's function puts on its refraction output, which is now the question the solid master's repair starts from; and TG-Q6.
 - **Not run:** TG-F6 – TG-F9 are read from the engine source, by the platform; Pass 2 had no engine to check them against, and TG-F14 rests on TG-F7. The platform's corrected master has not been built or seen. TG-F3's Blender pictures are for the shape of light only — that machine's Blender colour setup does not load. Pass 2 rendered nothing; TG-F10 measures the rig's stored pictures of 1 – 2 October.
 
-▶ **Next:** two things. (1) The Blender driver's CPU fallback (A5), small and buildable on any machine with Blender. (2) On the machine with Unreal, TG-Q2's throwaway master, which decides which see-through master to fix; the rig's angled view (A4) follows it. *(The rule and the ledger row, listed here first until 2026-10-05, are done: TG-RD1.)*
+▶ **Next:** the solid master's repair, on the machine with Unreal: it bends nothing and shows its colour faint and flat (M6). A candidate for the bend is in the builder (`MATTER_MASTERS_REFRACTION=index`, `261005_R_PlatformMasterAdoptionAsks.md`), waiting on the platform's answer about the diamond; the rig's side view is where a repair will be judged here. **From the platform:** run the Blender column on its own machine, which is A5's real test.
+
+*(Superseded 2026-10-05 by Pass 3. Was: "two things. (1) The Blender driver's CPU fallback (A5), small and buildable on any machine with Blender. (2) On the machine with Unreal, TG-Q2's throwaway master, which decides which see-through master to fix; the rig's angled view (A4) follows it. (The rule and the ledger row, listed here first until 2026-10-05, are done: TG-RD1.)")*
 
 *(Superseded 2026-10-05 by Pass 2. Was: "the library reviews Pass 1 against its tree — A2 and A3 first, since they decide whether its Unreal masters can be adopted as they stand — and records the ledger row or declines it.")*

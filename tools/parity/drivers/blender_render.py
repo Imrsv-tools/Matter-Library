@@ -24,6 +24,10 @@ has none of the three), so a difference between the columns is the material's.
 
 Colour: the Standard view transform (a plain sRGB encode, no tone curve), like usdrecord's
 ``sRGB`` colour correction.
+
+The device: the first that can actually RENDER, tried in the order OptiX, CUDA, CPU, and named in
+the log (``pick_device``). A listed graphics device that cannot render is passed over, where
+before it failed the job. ``MATTER_BLENDER_DEVICE=cpu`` or ``=gpu`` forces the choice.
 """
 
 from __future__ import annotations
@@ -31,7 +35,10 @@ from __future__ import annotations
 import contextlib
 import json
 import math
+import os
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import bpy
@@ -48,19 +55,82 @@ DOME_K = 1.0     # measured against Storm, Phase05 5.1 (see the phase doc's exec
 SUN_K = 1.0
 
 
-def _gpu() -> str:
+GPU_KINDS = ("OPTIX", "CUDA")
+DEVICE_ENV = "MATTER_BLENDER_DEVICE"      # cpu | gpu; unset: the first device that can render
+
+
+def _select(kind: str) -> bool:
+    """Turn on every listed device of this kind (and no other). False when none is listed."""
     prefs = bpy.context.preferences.addons["cycles"].preferences
-    for kind in ("OPTIX", "CUDA"):
-        try:
-            prefs.compute_device_type = kind
-        except TypeError:
+    try:
+        prefs.compute_device_type = kind
+    except TypeError:
+        return False
+    prefs.get_devices()
+    if not [d for d in prefs.devices if d.type == kind]:
+        return False
+    for d in prefs.devices:
+        d.use = d.type == kind
+    return True
+
+
+def _renders(scn) -> tuple[bool, str]:
+    """Draw one tiny picture on the device as it is set. (True, "") when Cycles drew it.
+
+    A LISTED device is not a device that can render: a CUDA card whose kernels cannot be built is
+    listed like any other, and the first real render then fails (seen on a second machine,
+    2026-10-05; the thin-glass asks, A5). The only test is to render. This is the job's own scene
+    at 16 px and one sample, so a working device loads here the kernels the job needs anyway.
+    """
+    keep = (scn.render.resolution_x, scn.render.resolution_y, scn.cycles.samples, scn.render.filepath)
+    probe = Path(tempfile.mkdtemp(prefix="matter-blender-probe-")) / "probe.png"
+    scn.render.resolution_x = scn.render.resolution_y = 16
+    scn.cycles.samples = 1
+    scn.render.filepath = str(probe)
+    why = ""
+    try:
+        bpy.ops.render.render(write_still=True)
+        if not probe.is_file():
+            why = "the render wrote no picture"
+    except Exception as e:      # Cycles reports a device failure as an operator error
+        why = " ".join(str(e).split()) or type(e).__name__
+    finally:
+        scn.render.resolution_x, scn.render.resolution_y, scn.cycles.samples, scn.render.filepath = keep
+        shutil.rmtree(probe.parent, ignore_errors=True)
+    return (not why), why
+
+
+def pick_device(scn) -> str:
+    """Set Cycles to the first device that RENDERS, and say which: OptiX, then CUDA, then the CPU.
+
+    ``MATTER_BLENDER_DEVICE=cpu`` skips the graphics devices; ``=gpu`` refuses the CPU, so a
+    machine that must render on its card fails instead of quietly taking minutes per picture.
+    Call it once the scene and every render setting are in place: the test is a render.
+    """
+    want = os.environ.get(DEVICE_ENV, "").strip().lower()
+    if want not in ("", "cpu", "gpu"):
+        raise SystemExit(f"{DEVICE_ENV}={want!r}: want cpu or gpu (or leave it unset)")
+    tried = []
+    for kind in (() if want == "cpu" else GPU_KINDS):
+        if not _select(kind):
+            tried.append(f"{kind}: no device listed")
             continue
-        prefs.get_devices()
-        devs = [d for d in prefs.devices if d.type == kind]
-        if devs:
-            for d in prefs.devices:
-                d.use = d.type == kind
+        scn.cycles.device = "GPU"
+        ok, why = _renders(scn)
+        if ok:
+            print(f"blender: rendering on GPU ({kind})")
             return kind
+        tried.append(f"{kind}: listed, and cannot render ({why})")
+        print(f"blender: a {kind} device is listed and cannot render: {why}")
+    if want == "gpu":
+        raise SystemExit(f"{DEVICE_ENV}=gpu, and no graphics device can render: " + "; ".join(tried))
+    scn.cycles.device = "CPU"
+    ok, why = _renders(scn)
+    if not ok:
+        raise SystemExit("blender: cannot render on the CPU either: " + why
+                         + ("; " + "; ".join(tried) if tried else ""))
+    print("blender: rendering on CPU ("
+          + (f"{DEVICE_ENV}=cpu" if want == "cpu" else "; ".join(tried) or "no graphics device") + ")")
     return "CPU"
 
 
@@ -104,7 +174,6 @@ def setup_scene(job: dict) -> None:
     scn.world = world
 
     scn.render.engine = "CYCLES"
-    scn.cycles.device = "GPU" if _gpu() != "CPU" else "CPU"
     scn.cycles.samples = int(job.get("samples", 128))
     scn.cycles.use_denoising = True
     scn.render.resolution_x = scn.render.resolution_y = int(job["width"])
@@ -118,6 +187,7 @@ def setup_scene(job: dict) -> None:
     scn.render.image_settings.file_format = "PNG"
     scn.render.image_settings.color_mode = "RGB"
     scn.render.image_settings.color_depth = "8"
+    pick_device(scn)        # last: it renders, so every setting above must be in place
 
 
 def subjects(job: dict) -> list:

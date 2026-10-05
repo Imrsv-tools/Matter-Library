@@ -29,7 +29,8 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
   "views": {
     "wide":  {"camera": "/World/Cam",      "suffix": ""},
     "close": {"camera": "/World/CamClose", "suffix": "__close"},
-    "dim":   {"camera": "/World/Cam",      "suffix": "__dim", "exposure": -4.0}
+    "dim":   {"camera": "/World/Cam",      "suffix": "__dim", "exposure": -4.0},
+    "side":  {"camera": "/World/CamSide",  "suffix": "__side", "hide": ["/World/Subjects/Sphere"]}
   },
   "subjects": ["/World/Subjects/Sphere", "/World/Subjects/Cube", "/World/Subjects/Floor"],
   "width": 512,
@@ -48,10 +49,10 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 |---|---|
 | `article.path` | The article to render. A driver that cannot evaluate MaterialX directly (Blender, Unreal) builds the material on its own master for `article.master`, from the `.mtlx` (Blender: `blender/masters/load_article.py`). |
 | `article.meters_per_tile` | Already applied: each setting's scene rescales the subjects' `st` by it. A driver does nothing with it. |
-| `views` | Render **every setting from every view**. The `dim` view exists only for an **Emissive** article: the same camera at `exposure` stops (a multiply by 2^exposure in linear light, before the display encode). |
+| `views` | Render **every setting from every view**. The `dim` view exists only for an **Emissive** article: the same camera at `exposure` stops (a multiply by 2^exposure in linear light, before the display encode). The `side` view *(added 2026-10-05)* exists only for a **see-through** article (TranslucentThin, TranslucentThick): the cube's flat front face from the side, the wall behind it, with the prims in its `hide` left out of the picture and of its mask, as a character view's are. It is the view that shows whether what is seen through the article is moved: a thin wall must leave the wall's lines straight, a solid must move them ([MasterSet](../../docs/specs/Ontology/MasterSet.md) §Material-settings intent). |
 | `subjects` | The three meshes the article is bound to. Everything else (the ruler, the UV-grid wall) is scene furniture with UsdPreviewSurface materials. |
 | `width` | Square output, `width` × `width`. |
-| `samples` | A path tracer's samples per pixel (Blender: Cycles, denoised). |
+| `samples` | A path tracer's samples per pixel (Blender: Cycles, denoised). The Blender driver renders on the first device that can actually render, OptiX, then CUDA, then the CPU, and names it in `blender.log`; a listed graphics device that cannot render is passed over *(2026-10-05; before it, the job failed)*. `MATTER_BLENDER_DEVICE=cpu` or `=gpu` forces the choice. The CPU's pictures differ from the card's by noise only (measured on Glass_Clear: under half an 8-bit code on average). |
 | `storm_supersample` | Storm only: it renders at `width × n` and is box-filtered down, because `usdrecord` has no anti-aliasing. A real-time renderer with its own anti-aliasing can ignore it; one without should do the same. |
 | `settings[].set` | The Creator sliders to move from the article's own values, by frozen port name (LCDSchema §Creator subset): floats, `[x, y]` for `uv_scale`/`uv_offset`, `[r, g, b]` for `base_color_tint`. |
 | `settings[].scene` | A USD file per setting that sublayers the test scene and adds the article (referenced at `/World/Library`, bound to the subjects), the subjects' rescaled `st`, and each moved slider **by the carrier rule** (a value on the bound Material's `inputs:<port>`, connected from `NG_<stem>`). A driver that imports USD can load this file; one that cannot reads `set` instead. |
@@ -113,6 +114,7 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 - **Cameras:** 50 mm focal length, 36 mm square aperture.
   - `/World/Cam` at (0, 0.48, 1.95), pitched −11°.
   - `/World/CamClose` at (0.10, 0.34, 0.58), pitched −20.2° and yawed −12.5° (rotateXYZ: X, then Y).
+  - `/World/CamSide` *(2026-10-05)* at (0.96, 0.29, 0.74), pitched −8° and yawed 50°: 0.95 m from the cube's front face, 50° off that face's normal at its centre (43° to 55° across it). Every ray through the face meets the wall undeflected, inside the wall's width. Through 0.30 m of solid glass at this angle the wall should move about 12 cm sideways; through a thin wall, not at all. The other two views see this face too nearly head-on to show it (the close-up is 24° off).
 
 ## The test set (11 articles)
 

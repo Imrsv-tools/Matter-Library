@@ -18,7 +18,9 @@ What is in it (Y up, metres, 1 unit = 1 m):
 * ``/World/Lights/{Dome,Sun}`` — a white dome (no texture) and one distant light.
 * ``/World/Cam`` — the fixed square camera on the whole set (the "wide" view), and
   ``/World/CamClose`` — a close-up on the cube's front face and the floor (the "close"
-  view), where wear layers are big enough to see.
+  view), where wear layers are big enough to see; and ``/World/CamSide`` — the cube's front
+  face from the side with the wall behind it (the "side" view), where a see-through
+  material shows whether it bends what is seen through it.
 
 The furniture (ruler, wall) uses ``UsdPreviewSurface``, which every tool imports natively.
 """
@@ -57,6 +59,20 @@ CAM_FOCAL, CAM_APERTURE = 50.0, 36.0
 CLOSE_POS = (0.10, 0.34, 0.58)
 CLOSE_ROT = (-20.2, -12.5)
 CAMERAS = {"wide": "/World/Cam", "close": "/World/CamClose"}
+
+# The side view (2026-10-05; the thin-glass asks, A4): the cube's flat front face seen from its
+# right, 50 degrees off the face's normal at its centre (43 at its near edge, 55 at its far one),
+# from 0.95 m, with the grid wall behind it. It is the one view that tells a THIN wall from a
+# SOLID: a thin wall must leave the grid's lines running straight through the cube, and a solid
+# must move them (through 0.30 m of glass at this angle, about 12 cm sideways). The ball cannot
+# tell the two apart in a renderer that bends both, and both other views see this face too nearly
+# head-on, where nothing bends (the close-up is 24 degrees off). Every ray through the face meets
+# the wall, undeflected, between x = -0.96 and -0.30, inside its 2.4 m. A job renders this view
+# for the see-through masters only, with the sphere hidden: it sits behind the cube's far edge
+# from here (job.py views_for).
+SIDE_POS = (0.96, 0.29, 0.74)
+SIDE_ROT = (-8.0, 50.0)
+SIDE_CAMERA = "/World/CamSide"
 
 # Light values are the Storm (USD) values. The Blender driver maps them with measured
 # factors (drivers/blender_render.py); the scene is the single source of the numbers.
@@ -312,6 +328,7 @@ def build() -> str:
         mesh_block("Wall", wall(), "/World/Looks/UVGrid", indent="    "),
         camera_block("Cam", CAM_POS, (CAM_PITCH, 0.0)),
         camera_block("CamClose", CLOSE_POS, CLOSE_ROT),
+        camera_block("CamSide", SIDE_POS, SIDE_ROT),
         '}\n',
     ]
     return "".join(parts)

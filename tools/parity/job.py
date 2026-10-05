@@ -251,7 +251,8 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
 
 
 def views_for(master: str) -> dict:
-    """The views a job renders. An Emissive article adds the whole set at -4 stops.
+    """The views a job renders. An Emissive article adds the whole set at -4 stops; a
+    see-through one adds the cube from the side.
 
     Emission is judged unclipped: Neon's luminance 12 x its pink is over display white in
     every channel, so at exposure 0 both tools draw it pure white and "agree" on nothing
@@ -261,7 +262,17 @@ def views_for(master: str) -> dict:
     views = {v: {"camera": c, "suffix": view_suffix(v)} for v, c in build_scene.CAMERAS.items()}
     if master == "Emissive":
         views["dim"] = {"camera": build_scene.CAMERAS["wide"], "suffix": "__dim", "exposure": -4.0}
+    if master in SEE_THROUGH:
+        # A see-through article adds the cube's flat face from the side, the wall behind it: the
+        # view that shows whether what is seen through it is moved (build_scene.SIDE_POS). A thin
+        # wall must not move it and a solid must (MasterSet §Material-settings intent). The
+        # sphere is hidden: from here it sits behind the cube's far edge.
+        views["side"] = {"camera": build_scene.SIDE_CAMERA, "suffix": "__side",
+                         "hide": [build_scene.SUBJECTS[0]]}
     return views
+
+
+SEE_THROUGH = {"TranslucentThin", "TranslucentThick"}
 
 
 def view_suffix(view: str) -> str:

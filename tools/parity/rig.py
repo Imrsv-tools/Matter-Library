@@ -19,7 +19,8 @@ It prints both paths. ``--sweep`` renders every slider the article declares thro
 range (Phase05 step 5.2); without it, only the article's own settings.
 
 Tools: Storm via ``$USD_TOOLS_ROOT`` (as make_preview.py), Blender as ``$MATTER_BLENDER``
-or ``blender`` on PATH (5.2 LTS), Unreal as ``drivers/unreal.py`` finds it.
+or ``blender`` on PATH (5.2 LTS), Unreal as ``drivers/unreal.py`` finds it. Blender renders on
+the first device that can (``$MATTER_BLENDER_DEVICE`` = ``cpu`` or ``gpu`` forces it).
 ``--no-blender`` is for a machine whose Blender cannot render parity (Phase06: the UE machine's
 Fedora build has no working Cycles GPU kernels and a colour config its OCIO cannot load): Storm
 is then compared with Unreal, on Unreal's own mask.
@@ -68,8 +69,14 @@ GRADED = {"Opaque", "Masked", "Hair", "Emissive", "TwoLayer"}
 ADVISORY_VIEWS = {"Masked": {"wide"}, "Hair": {"wide"}}   # Hair: a cut-out too (Phase08 8.1)
 
 
-VIEW_LABELS = {"wide": "whole set", "close": "close-up", "dim": "whole set, -4 stops"}
+VIEW_LABELS = {"wide": "whole set", "close": "close-up", "dim": "whole set, -4 stops",
+               "side": "cube from the side"}
 VIEW_NOTES = {
+    "side": "The cube's flat front face, 50 degrees off its normal, the grid wall behind it and "
+            "the sphere hidden. A thin-walled article must leave the wall's lines running straight "
+            "through the cube; a solid must move them (MasterSet, Material-settings intent). Storm "
+            "cannot bend at all, so its column is straight for both; judge this view by eye, on "
+            "Blender and Unreal.",
     "close": "The cube's front face and the floor in front: wear layers are big enough to "
              "see here (a 1 cm grain is ~15 px).",
     "dim": "The whole set at exposure -4 (1/16): emission is judged here, unclipped (at "

@@ -207,7 +207,8 @@ def camera_view(pos, rot, suffix: str, hide=()) -> dict:
 
 
 TEST_CAMERAS = {"/World/Cam": (build_scene.CAM_POS, (build_scene.CAM_PITCH, 0.0)),
-                "/World/CamClose": (build_scene.CLOSE_POS, build_scene.CLOSE_ROT)}
+                "/World/CamClose": (build_scene.CLOSE_POS, build_scene.CLOSE_ROT),
+                build_scene.SIDE_CAMERA: (build_scene.SIDE_POS, build_scene.SIDE_ROT)}
 
 
 def lights(sun_k: float = SUN_K, dome_k: float = DOME_K) -> tuple[dict, dict]:
