@@ -58,6 +58,15 @@
 - `MATTER_PREVIEW_DIR` — where `make_preview.py` writes preview scenes and renders (default `<tmp>/matter-preview/`; never the repo).
 - `MATTER_UNREAL_RUNTIME` — a packaged Unreal runtime's `MatterRuntime.sh`, used instead of the pinned download; `MATTER_UNREAL_EDITOR` — an Unreal 5.8 `UnrealEditor`, to run `unreal/MatterRuntime` in editor mode (the development loop). Neither set: the build `unreal/RUNTIME.json` pins. `MATTER_BLENDER` — the Blender the rig runs.
 
+**What a second project tells the Unreal master builder (environment variables, all optional; 2026-10-05, `PlatformDependencies.md` M7):** `unreal/MatterRuntime/Scripts/build_masters.py` reads them, and its head is the owner of what each does. Unset, the build is the library's own runtime's, and the runtime published from here is built with none set. A value the builder does not know stops the build.
+- `MATTER_MASTERS_ROOT` — where the masters and their default textures are written (default `/Game/Masters`).
+- `MATTER_MASTERS_SKINNED=1` — the masters also draw on a skinned mesh with morph targets.
+- `MATTER_MASTERS_MESH_V=unreal` — the meshes' UVs are Unreal's (`v = 1 − t`), not USD's `st`.
+- `MATTER_MASTERS_MESH_BINORMAL=unreal` — the meshes' binormal runs along `+v`, so the normal map's green is turned.
+- `MATTER_MASTERS_SKY=0` — leave out the rig's Sky.
+- **Candidates, each for an open question:** `MATTER_MASTERS_COLOUR_SAMPLER=srgb` (the colour slots sample an sRGB texture) and `MATTER_MASTERS_REFRACTION=index` (the Refraction input takes the article's index on the solid see-through master and 1.0 on the thin one; M6).
+- **None of these has been run in Unreal** (2026-10-05). The check that the unset build is unchanged was made against a stand-in for Unreal's Python, which shows what the script asks for and nothing about what the engine draws.
+
 Every script finds the repo from its own location; none assumes a checkout path. *(Phase02, 2026-09-23. Before it, `run_all.py` failed at import for want of MaterialX, several tools hardcoded a retired checkout path, and there was no pinned environment and no CI.)*
 
 ## Gates and CI

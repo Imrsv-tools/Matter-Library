@@ -23,14 +23,59 @@ Every texture slot samples as **LinearColor**: the runtime hands every texture o
 float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
 (``MatterRuntimeGameMode::LoadTexture``). The slots' defaults are neutral: white, and an
 overlay's alpha 0 (no wear).
+
+A second project (PlatformDependencies M7, P20) tells the build what it is building for, by
+environment variable. Unset, every one leaves the build exactly the library's own runtime's:
+
+  MATTER_MASTERS_ROOT=/Game/<path>      where the masters and the default textures are written
+                                        (default /Game/Masters)
+  MATTER_MASTERS_SKINNED=1              the masters also draw on a skinned mesh with morph
+                                        targets (a character). Without the usages a packaged run
+                                        draws Unreal's default material there, reporting nothing
+  MATTER_MASTERS_MESH_V=unreal          the meshes' UVs are Unreal's (v = 1 - t, as its importers
+                                        leave them), not USD's st (default st)
+  MATTER_MASTERS_MESH_BINORMAL=unreal   the meshes' binormal runs along +v, as Unreal builds it
+                                        from such UVs, not along +t (default st)
+  MATTER_MASTERS_SKY=0                  leave out M_Matter_Sky, which is the rig's dome, not a master
+
+Two more are CANDIDATES, each for a question that is still open, built so that a project with a
+renderer can try them. Neither has been run:
+
+  MATTER_MASTERS_COLOUR_SAMPLER=srgb    the colour slots sample an sRGB texture (a block-compressed
+                                        colour picture carries its decode in its own flag, which a
+                                        linear sampler refuses). Default linear
+  MATTER_MASTERS_REFRACTION=index       the Refraction input takes the article's index on the solid
+                                        see-through master and 1.0 on the thin one, in place of
+                                        the output of Epic's function, which bends nothing on
+                                        either (M6). Default function
 """
 
+import os
+
 import unreal
+
+
+def _told(name, default, allowed=None):
+    """What the build is told by one environment variable. A value it does not know stops the
+    build: a mistyped switch must not build the default and report success."""
+    value = os.environ.get(name, "").strip() or default
+    if allowed is not None and value not in allowed:
+        raise RuntimeError(f"{name}={value!r}: want one of {sorted(allowed)}")
+    return value
+
 
 MEL = unreal.MaterialEditingLibrary
 EAL = unreal.EditorAssetLibrary
 TOOLS = unreal.AssetToolsHelpers.get_asset_tools()
-ROOT = "/Game/Masters"
+ROOT = _told("MATTER_MASTERS_ROOT", "/Game/Masters")
+if not ROOT.startswith("/") or ROOT.endswith("/"):
+    raise RuntimeError(f"MATTER_MASTERS_ROOT={ROOT!r}: want a package path such as /Game/Masters")
+SKINNED = _told("MATTER_MASTERS_SKINNED", "0", {"0", "1"}) == "1"
+MESH_V = _told("MATTER_MASTERS_MESH_V", "st", {"st", "unreal"})
+MESH_BINORMAL = _told("MATTER_MASTERS_MESH_BINORMAL", "st", {"st", "unreal"})
+SKY = _told("MATTER_MASTERS_SKY", "1", {"0", "1"}) == "1"
+COLOUR_SAMPLER = _told("MATTER_MASTERS_COLOUR_SAMPLER", "linear", {"linear", "srgb"})
+REFRACTION = _told("MATTER_MASTERS_REFRACTION", "function", {"function", "index"})
 FN_OPAQUE = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque"
 FN_TRANSLUCENT = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Translucent"
 
@@ -213,13 +258,29 @@ def default_texture(name, rgba, srgb=False):
     return tex
 
 
+def mesh_st(g, col):
+    """The mesh's st (t up), which everything downstream is written for. A mesh carrying USD's st
+    hands it over as it is. A mesh carrying Unreal's V (MATTER_MASTERS_MESH_V=unreal: v = 1 - t)
+    is turned back first, (u, 1 - v), so placement and sampling give the picture they give on st:
+    without it ``image_uv``'s flip is a second one, and a rotation or an offset turns the wrong
+    way."""
+    M = unreal
+    uv = g.node(M.MaterialExpressionTextureCoordinate, col)
+    if MESH_V == "st":
+        return uv
+    flip = g.op(M.MaterialExpressionMultiply, uv,
+                g.node(M.MaterialExpressionConstant2Vector, col, r=1.0, g=-1.0), col)
+    return g.op(M.MaterialExpressionAdd, flip,
+                g.node(M.MaterialExpressionConstant2Vector, col, r=0.0, g=1.0), col)
+
+
 def place2d(g, col):
     """MaterialX ``ND_place2d_vector2`` at its defaults (pivot 0, operation order 0), on the
     mesh's st (t up): ``uv / scale``, then ``rotate2d`` (MaterialX's mx_rotate_vector2 turns the
     COORDINATE clockwise by ``uv_rotation`` degrees: (c x + s y, -s x + c y)), then ``- offset``.
     The same formula as Blender's ML_Place2D (build_masters.py)."""
     M = unreal
-    st = g.node(M.MaterialExpressionTextureCoordinate, col)
+    st = mesh_st(g, col)
     scale = g.mask(g.vector("uv_scale", (1.0, 1.0, 1.0), col=col), "rg", col - 1)
     q = g.op(M.MaterialExpressionDivide, st, scale, col - 1)
     x, y = g.mask(q, "r", col - 2), g.mask(q, "g", col - 2)
@@ -277,14 +338,19 @@ def bayer4(g, col):
     return g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, k, 0.5, col - 12), 1.0 / 16.0, col - 13)
 
 
-def texture(g, name, default, uv, col):
-    t = g.node(unreal.MaterialExpressionTextureSampleParameter2D, col, parameter_name=name, texture=default,
-               sampler_type=unreal.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR)
+def texture(g, name, default, uv, col, colour=None):
+    """A texture slot, sampled as linear. ``colour`` is given for a colour slot only, and only
+    under MATTER_MASTERS_COLOUR_SAMPLER=srgb (a CANDIDATE, not run): the slot's sRGB default, which
+    makes the slot sample an sRGB texture, decoded by the sampler."""
+    t = g.node(unreal.MaterialExpressionTextureSampleParameter2D, col, parameter_name=name,
+               texture=default if colour is None else colour,
+               sampler_type=(unreal.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR if colour is None
+                             else unreal.MaterialSamplerType.SAMPLERTYPE_COLOR))
     g.link(uv, t, "UVs")
     return t
 
 
-def build_master(token, white, no_wear, flat):
+def build_master(token, white, no_wear, flat, white_colour=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -339,7 +405,7 @@ def build_master(token, white, no_wear, flat):
         8-bit default's 128 reads 0.502, a 0.2 degree tilt)."""
         (b_name, r_name, m_name, prefix), (b_def, r_def, m_def) = names, defaults
         b = g.op(M.MaterialExpressionMultiply, g.vector(b_name, b_def),
-                 texture(g, f"{prefix}base_color_tex", white, uv, 12), 11, b_out="RGB")
+                 texture(g, f"{prefix}base_color_tex", white, uv, 12, colour=white_colour), 11, b_out="RGB")
         r = g.op(M.MaterialExpressionMultiply, g.scalar(r_name, r_def),
                  texture(g, f"{prefix}roughness_tex", white, uv, 12), 11, b_out="R")
         m = g.op(M.MaterialExpressionMultiply, g.scalar(m_name, m_def),
@@ -377,13 +443,13 @@ def build_master(token, white, no_wear, flat):
 
     # The mesh's own st, NOT the article's placement: the atlas a mesh-supplied map is drawn on
     # (the cut-out, the picture), so a Creator's UV nudge never moves it.
-    own_st = (image_uv(g, g.node(M.MaterialExpressionTextureCoordinate, 16), 15)
+    own_st = (image_uv(g, mesh_st(g, 16), 15)
               if spec.get("base_map") or spec.get("opacity") or spec.get("hair") else None)
     base_map = None
     if spec.get("base_map"):
         # The mesh's picture (LCDSchema §Base colour map, Phase09 RD-P09-1), supplied per binding:
         # base = base_color_const x base_color_map x base_color_tint; white when none is bound.
-        base_map = texture(g, "base_color_map_tex", white, own_st, 12)
+        base_map = texture(g, "base_color_map_tex", white, own_st, 12, colour=white_colour)
         base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
 
@@ -439,6 +505,15 @@ def build_master(token, white, no_wear, flat):
     # roughness_biased_clamped (LCDSchema): the bias is added, then clamped to 0..1
     rough = g.op(M.MaterialExpressionAdd, rough, g.scalar("roughness_bias", 0.0, col=4), 3)
     feed(g.one(M.MaterialExpressionSaturate, rough, 2), "specular_roughness")
+    if MESH_BINORMAL == "unreal":
+        # The library's normal maps are +Y up (MaterialX): green follows dP/dt, which is where the
+        # runtime's meshes point their binormal (drivers/unreal.py tangent_signs). A mesh whose
+        # binormal Unreal built from flipped UVs points it along +v = -dP/dt, so every bump would
+        # lean the wrong way up and down. Negate Y once, on the sum (the article's map, the second
+        # layer's and the three overlays'), before it is normalised. WORKED OUT, NOT YET SEEN.
+        n_ts = g.op(M.MaterialExpressionMultiply, n_ts,
+                    g.node(M.MaterialExpressionConstant3Vector, 4,
+                           constant=unreal.LinearColor(1.0, -1.0, 1.0, 0.0)), 4)
     normal = g.one(M.MaterialExpressionNormalize, n_ts, 3)
     if NORMAL_SPACE == "world":
         normal = g.one(M.MaterialExpressionTransform, normal, 2,
@@ -447,11 +522,13 @@ def build_master(token, white, no_wear, flat):
     feed(normal, "geometry_normal")
 
     missing = []
+    params = {}     # each pass-through parameter as the article sets it, before any scaling
     for name, default in {**PASS_THROUGH, **spec.get("extra", {})}.items():
         if name not in inputs:
             missing.append(name)
             continue
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
+        params[name] = p
         if name in SCALED:
             p = g.op_k(M.MaterialExpressionMultiply, p, SCALED[name], 5)
         if name in COVERED:
@@ -510,8 +587,17 @@ def build_master(token, white, no_wear, flat):
         raise RuntimeError(f"{token}: cannot connect the front material")
     if spec["blend"] == "translucent":
         # refraction by the index of refraction (MasterSet: TranslucentThin / Thick)
-        ior = next(o for o in outs if "refraction" in o.lower())
-        if not MEL.connect_material_property(calls[0], ior, unreal.MaterialProperty.MP_REFRACTION):
+        if REFRACTION == "index":
+            # A CANDIDATE for M6, not run. Seen live in a second project (2026-10-05): with the
+            # function's output here, neither see-through master bends, so the solid one is wrong.
+            # MasterSet's rule, wired directly: a solid bends by the article's index; a thin wall
+            # is not deflected, and an index of 1.0 removes the bend while the distortion pass
+            # still blurs by roughness.
+            ior_src, ior = (g.node(M.MaterialExpressionConstant, 2, r=1.0) if spec.get("thin")
+                            else params["specular_ior"]), ""
+        else:
+            ior_src, ior = calls[0], next(o for o in outs if "refraction" in o.lower())
+        if not MEL.connect_material_property(ior_src, ior, unreal.MaterialProperty.MP_REFRACTION):
             raise RuntimeError(f"{token}: cannot connect the refraction")
         mat.set_editor_property("refraction_method", unreal.RefractionMode.RM_INDEX_OF_REFRACTION)
         # lit per pixel, forward: the default translucency lighting is volumetric and carries no
@@ -525,6 +611,11 @@ def build_master(token, white, no_wear, flat):
     mat.set_editor_property("two_sided", spec["two_sided"])
     if spec.get("thin"):
         mat.set_editor_property("is_thin_surface", True)
+    if SKINNED:
+        # A character is a skinned mesh with morph targets. The editor adds a missing usage by
+        # itself; a packaged or -game run cannot, and draws Unreal's default material instead.
+        mat.set_editor_property("used_with_skeletal_mesh", True)
+        mat.set_editor_property("used_with_morph_targets", True)
     return mat
 
 
@@ -549,10 +640,15 @@ def save(mat):
 
 
 def main():
+    log(f"told root={ROOT} skinned={int(SKINNED)} mesh_v={MESH_V} mesh_binormal={MESH_BINORMAL} "
+        f"sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} refraction={REFRACTION}")
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
-    for mat in [build_master(t, white, no_wear, flat) for t in MASTERS] + [build_sky()]:
+    white_colour = (default_texture("T_Matter_WhiteColour", (255, 255, 255, 255), srgb=True)
+                    if COLOUR_SAMPLER == "srgb" else None)
+    for mat in ([build_master(t, white, no_wear, flat, white_colour) for t in MASTERS]
+                + ([build_sky()] if SKY else [])):
         save(mat)
     log("RESULT ok")
 

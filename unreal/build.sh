@@ -9,6 +9,10 @@
 #            unreal/dist/MatterRuntime-Linux.tar.gz                        — CPU
 #   all      editor, masters, package (default)
 #
+# The masters step reads the MATTER_MASTERS_* switches (the head of Scripts/build_masters.py
+# lists them). They are for a SECOND project building the masters for its own meshes. The
+# runtime packaged and published from here is built with none of them set.
+#
 # Every Unreal asset is generated here; none is committed (UR-F5). Publishing the archive is
 # its own command, unreal/publish.sh (Phase06 D2, D14).
 set -euo pipefail
