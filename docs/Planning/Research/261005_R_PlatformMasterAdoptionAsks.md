@@ -180,6 +180,28 @@
 
 ---
 
+## Pass 6 — The look on the library's own builder, and a fault in the carrier check (2026-10-05)
+
+*Written from the platform's side. The masters of Pass 5 (the library's builder, unchanged, with the switches listed there), fed by the platform's own reader from the library as it stands at `707200d`, in the platform's app on Unreal 5.8.0, Vulkan, Substrate at 160 bytes. Desktop only. One person looked, beside Storm pictures of the same bench made from the same library. **This is Pass 4's steps 1 – 3.***
+
+**What was looked at.** A bench of 27 upright panels, one article each, across the opaque classes; a ball and a cube in polished stainless steel and in glossy plastic; a 2 m cube with a gridded cone behind it for the see-through articles; a character in skin, cloth, hair, brows and lashes; a small animated prop. 93 material instances, every one on one of the library's eight masters.
+
+- **MA-R13 — Everything drew on the library's masters, and none failed to compile, the character included.** The engine reported no failed shader compile at the open or after it. That closes two of MA-R9's three gaps: the masters with their textures bound, and the skinned-mesh and morph-target permutations (the character is a skinned mesh with morph targets). The wall of 27, in the looker's words: *"looks good."* The panels were answered as a whole, not one by one.
+- **MA-R14 — `MATTER_MASTERS_MESH_BINORMAL=unreal` is seen: a bump reads as a bump.** Slate, leather and rusted steel from a glancing angle, asked whether the bumps read as raised, like the picture, and not dented: *"Good."* So MA-F8 holds on a mesh whose binormal runs along Unreal's V, and the switch does what it says. It is no longer *worked out, not yet seen*.
+- **MA-R15 — `MATTER_MASTERS_REFRACTION=index`: the thin master is right; the solid one was not called wrong, and was not called bent.** Frosted glass on the cube from the side, asked whether the cone's grid ran straight and soft: *"yes."* Clear glass: *"glass is great."* Diamond: *"Diamond is strange, but it is fine."* Whether the cone bent behind the diamond was asked and not answered in those words, so the candidate is neither confirmed nor refuted as a repair for the missing bend (MA-R3, MA-F12). It compiles, a thin wall fed 1.0 draws straight, and nothing was said against it. The platform keeps it built.
+- **MA-R16 — Two more answers from the same look.** A neon article is lit (the emission pair read off the interface, MA-R12): *"yes."* Skin on the Subsurface master, a second time and in different words from MA-R5: *"there is a silicon doll look to it, it's not shiney but I think it is fine and good place to keep refning from (later)."* An input for MA-Q5, not a new ask. A textured panel from about ten metres does not shimmer.
+- **MA-R17 — `tools/conformance/check_lcd_carrier.py` has refused every asset since Phase12, on inputs no asset authored.** Run on four generated assets that reference articles by bare name (stainless steel, glossy plastic, rust, concrete and others), one of which passed this same check at `d9f7eb9`: every Material is refused three times — *"the article declares no NG_\*.inputs:emission_color"*, and the same for `emission_luminance` and `transmission_color` — unless its article declares all three. Two of the four assets author no override of any kind.
+  - **What was measured.** On each refused Material, the input has no authored value, its only opinion comes from the article's own `.mtlx`, and no nodegraph declares it. The one override the assets do author (`base_color_tint`, connected, with the `over` on the nodegraph) draws no refusal: it passes all four of the check's rules.
+  - **Why, as far as the check's own header says.** The check takes *"every Material input named in the frozen Creator vocabulary"*, and the header notes that usdMtlx *"exposes only the surface shader's inputs on the Material"*. Phase12 added three names to `LCD_PORTS` that are also surface-shader inputs, so every Material now carries those three inputs whether or not anyone overrode them. The header's own definition of an override is *"a value on the bound Material's `inputs:<port>`"*; these carry no value.
+  - **What it costs a consumer.** Any gate that runs this check on an asset stops, for most of the library's articles. The platform's own gate now counts a refusal only on a port the asset itself authors, and says how many it set aside; that is a workaround on the platform's side, not a repair.
+  - **Not done here.** The check's self-test (`test_check_lcd_carrier.py`) was not run, so whether it sees this is not known. No repair is proposed beyond the observation above: rule 1 fires on an input that is not an override by the header's own words.
+
+**Not the library's, said so that nobody chases it there.** In the platform's app a polished metal reflects the sky and no object in the scene. It is the same on every polished article and it is being looked for in the platform's own renderer. Nothing is asked of the library.
+
+**Not done.** The headset. The solid master's bend, in words that settle it. `MATTER_MASTERS_COLOUR_SAMPLER=srgb`, for the reason Pass 5 gives.
+
+---
+
 ## Status
 
 - **Passes captured:** 4 (Pass 1 the platform's asks; Pass 2 the platform's look, run; Pass 3 the library's review; Pass 4 what was built; all 2026-10-05).
@@ -190,6 +212,7 @@
 - **Not run.** Everything in Pass 3 is read from the tree. MA-F8 is derived, not seen. MA-F10's sampler rule is Unreal's known behaviour, not tried here. Pass 2 is the platform's look, taken as written. Pass 4's switches have met a stand-in only (MA-F18).
 - **Pushed** to the public remote up to `a66377c` (the lead, 2026-10-05: *"push it"*).
 - **Pass 5, added from the platform's side (2026-10-05; the lines above are the library's and are not edited):** the consumer switches and `MATTER_MASTERS_REFRACTION=index` are now **run** in a second project on Unreal 5.8 — built, the skinned usages shown both ways, all eight compiled for a static mesh (MA-R6 – MA-R9). **MA-Q4 is answered** (MA-R10: along Unreal's V, so the binormal switch is set). Two notes for the library: the builder's result lines do not reach a caller reading `-stdout` (MA-R11), and P23 needs a consumer's reader to change, not only its copy (MA-R12). **Still owed by the platform:** the look. **Still the library's:** Pass 4's step 4, and MA-Q1, MA-Q3, MA-Q5.
+- **Pass 6, added from the platform's side (2026-10-05; the lines above are not edited):** **the look is run**, Desktop, on the library's own builder at `707200d` — Pass 4's steps 1 – 3. Everything drew and compiled, the character included (MA-R13); a bump reads as a bump with the binormal switch (MA-R14, so MA-F8 is seen); the thin master is right under `REFRACTION=index` and the solid one was called *"strange, but … fine"*, its bend not settled (MA-R15); skin is still not right and is left for later by the looker (MA-R16). **One thing for the library to act on: `check_lcd_carrier.py` refuses every asset since Phase12** (MA-R17). **Still owed by the platform:** the headset. **Still the library's:** Pass 4's step 4, MA-R17, and MA-Q1, MA-Q3, MA-Q5.
 
 ▶ **Next:** on the system with Unreal, Pass 4's four steps. Here, nothing until that look comes back. The solid master's faint, flat colour (MA-F13) and the skin (MA-Q5) wait on the lead.
 
