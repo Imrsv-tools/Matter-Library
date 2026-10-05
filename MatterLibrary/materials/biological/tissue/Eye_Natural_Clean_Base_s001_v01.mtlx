@@ -39,9 +39,9 @@
     <input name="base_metalness" type="float" value="0.0" />
     <input name="specular_roughness" type="float" nodegraph="NG_Eye_Natural_Clean_Base_s001_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.4" />
-    <input name="subsurface_weight" type="float" value="0.5" />
+    <input name="subsurface_weight" type="float" value="1.0" />
     <input name="subsurface_color" type="color3" nodegraph="NG_Eye_Natural_Clean_Base_s001_v01" output="base_color_out" />
-    <input name="subsurface_radius" type="float" value="0.001" />
+    <input name="subsurface_radius" type="float" value="0.002" />
     <input name="subsurface_radius_scale" type="color3" value="1.0, 0.351, 0.226" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
     <input name="coat_weight" type="float" value="0.5" />
