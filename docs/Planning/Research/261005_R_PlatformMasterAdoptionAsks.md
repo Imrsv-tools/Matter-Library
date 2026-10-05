@@ -297,7 +297,7 @@
   - **The result-line check is not shown wrong. It is shown unreached on this machine.** It stays the guard for the case the platform met.
   - **A tidy, not built:** take the pipeline's exit code into the same test as the result line, so one message and one clean-up cover both routes. Today a failure of the first kind leaves a temporary file per run. *(Built and run the same day: Pass 10, MA-R22.)*
 - **MA-R21 — The flag is needed, as the platform said.** Run 4, a good build with `-stdout` alone: exit 0, *"Python script executed successfully"*, and **none** of the builder's eleven lines on the output; all eleven are in the project's log. Run 2, with the flag, printed all eleven. **A trap for whoever compares next:** the project's log file ends each line with a carriage return and the console output does not, so a plain `diff` of one against the other calls every line different.
-- **A small thing met on the way.** The docs write the command as `unreal/build.sh masters`. Neither that script nor `unreal/publish.sh` is executable in the repo (both have been mode 644 since Phase06), so it is run as `bash unreal/build.sh masters`.
+- **A small thing met on the way.** The docs write the command as `unreal/build.sh masters`. Neither that script nor `unreal/publish.sh` is executable in the repo (both have been mode 644 since Phase06), so it is run as `bash unreal/build.sh masters`. *(Fixed the same day, on the lead's word: both are marked executable, so the command runs as the docs write it.)*
 
 **What follows.**
 - **MA-Q3 has the proof its leaning named** (*"the default build's parameter list unchanged on the machine with Unreal"*). The ruling, publish a new runtime or not, is still the lead's. *(Ruled the same day: no. MA-RD1.)*
