@@ -9,8 +9,19 @@ CONNECTS to it. Without the connection the override is inert in every stock USD 
 usdMtlx exposes only the surface shader's inputs on the Material; and it is not INVALID, so none
 of the stock `UsdValidation` validators sees it. This check has to be ours.
 
-For every Material prim on the composed stage, every Material input named in the frozen Creator
-vocabulary (`LCD_PORTS`) must:
+WHAT COUNTS AS AN OVERRIDE: a Material input, named in the frozen Creator vocabulary
+(`LCD_PORTS`), that THE ASSET authored: it has a spec in a layer other than an article's own
+`.mtlx`. The name alone is not enough. Three Creator ports carry OpenPBR's own input names
+(`transmission_color`, `emission_color`, `emission_luminance`, Phase12), and usdMtlx puts every
+surface-shader input on every Material, so each Material carries those three inputs whether or
+not anyone set them: no value, and no spec outside the article. Those are the article's own, not
+overrides, and are passed over. *(Until 2026-10-05 the check took the name alone, and so refused
+every Material on every asset three times from the day Phase12 added the ports.)* Both forms of a
+Creator asset keep the article as a `.mtlx` file, so this holds for both. It does NOT hold on a
+FLATTENED copy, where every spec is in one layer and who wrote what is gone: run the check on the
+asset as authored.
+
+For every Material prim on the composed stage, every such override must:
   1. be DECLARED by the article: a child `NG_*` nodegraph carries `inputs:<port>` with a value
      (the article's start value). An override on an undeclared port is inert, so it is refused;
   2. be the connected source of that nodegraph input;
@@ -32,7 +43,17 @@ from pxr import Usd, UsdShade
 
 _REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_REPO / "tools" / "converters"))
-from assemble_mtlx import LCD_PORTS  # noqa: E402  the frozen Creator vocabulary, one source
+# the frozen Creator vocabulary, one source. From lcd_ports, not assemble_mtlx: the assembler
+# imports MaterialX, which the USD toolchain's Python does not have (Matter-Library#2).
+from lcd_ports import LCD_PORTS  # noqa: E402
+
+
+def asset_authored(inp: UsdShade.Input) -> bool:
+    """True when the ASSET has an opinion on this Material input: a value or a bare declaration,
+    in any layer that is not an article's own `.mtlx`. An input whose every spec comes from the
+    article is the article's, exposed by usdMtlx, and is not an override (the module docstring)."""
+    return any(spec.layer.GetFileFormat().formatId != "mtlx"
+               for spec in inp.GetAttr().GetPropertyStack())
 
 
 def check_stage(stage: Usd.Stage) -> tuple[int, list[str]]:
@@ -42,7 +63,7 @@ def check_stage(stage: Usd.Stage) -> tuple[int, list[str]]:
         if not prim.IsA(UsdShade.Material):
             continue
         mat_inputs = [i for i in UsdShade.Material(prim).GetInputs()
-                      if i.GetBaseName() in LCD_PORTS]
+                      if i.GetBaseName() in LCD_PORTS and asset_authored(i)]
         if not mat_inputs:
             continue
         graphs = [c for c in prim.GetChildren() if c.GetName().startswith("NG_")]

@@ -7,7 +7,10 @@ search path is needed), so the `NG_<id>` nodegraph is the one usdMtlx actually c
   * the check: RED for the unconnected override (the pre-#1 carrier), an undeclared port and a
     `float3` tint; GREEN for connect + value and for connect only;
   * the premise, measured with plain UsdShade: `GetValueProducingAttributes()` on the nodegraph
-    input reaches the Material value ONLY when connected, and the article default otherwise.
+    input reaches the Material value ONLY when connected, and the article default otherwise;
+  * the ports named as OpenPBR's own inputs (Phase12), against Glass_Clear and Neon_Signage too:
+    the inputs usdMtlx puts on every Material are passed over, and an asset's override of one is
+    still checked.
 
 Run under the USD toolchain python (pxr + MaterialX):
     <pxr-python> tools/conformance/test_check_lcd_carrier.py
@@ -28,6 +31,12 @@ MTLX = _REPO / "MatterLibrary" / "materials" / "engineered" / "metal" / f"{ID}.m
 MAT = "/root/_materials/Copper_Inst"
 UVGRID_ID = "Diagnostic_UVGrid_Clean_Base_s1_v01"
 UVGRID = _REPO / "MatterLibrary" / "materials" / "utility" / "virtual" / f"{UVGRID_ID}.mtlx"
+GLASS_ID = "Glass_Clear_Clean_Base_s01_v01"          # declares transmission_color (Phase12)
+GLASS = _REPO / "MatterLibrary" / "materials" / "engineered" / "glass" / f"{GLASS_ID}.mtlx"
+NEON_ID = "Neon_Signage_Clean_Base_s01_v01"          # declares the emission pair (Phase12)
+NEON = _REPO / "MatterLibrary" / "materials" / "utility" / "emissive" / f"{NEON_ID}.mtlx"
+# the Creator ports that carry OpenPBR's own input names, which usdMtlx puts on every Material
+SHADER_NAMED = ("transmission_color", "emission_color", "emission_luminance")
 
 _fails = []
 
@@ -103,6 +112,44 @@ def test_check():
         check(any("declares no" in m for m in p), "RED: an override on undeclared port %r" % port)
 
 
+def test_shader_named_ports():
+    """Phase12 gave three Creator ports OpenPBR's own input names, and usdMtlx puts every
+    surface-shader input on every Material. So a Material carries those three inputs with nobody
+    having set them. They are the article's, not overrides: the check must pass them over, on an
+    article that declares the port and on one that does not, and must still check the asset's own
+    override of such a port. *(Until 2026-10-05 it refused every Material three times; this test
+    could not say so, because it could not start: Matter-Library#2.)*"""
+    for ident, mtlx, declares in ((ID, MTLX, "none of them"),
+                                  (GLASS_ID, GLASS, "transmission_color"),
+                                  (NEON_ID, NEON, "the emission pair")):
+        st = _stage("", ident=ident, mtlx=mtlx)
+        mat = UsdShade.Material(st.GetPrimAtPath(MAT))
+        # the premise first, so GREEN below cannot come from the inputs simply not being there
+        present = [p for p in SHADER_NAMED if mat.GetInput(p)]
+        check(present == list(SHADER_NAMED),
+              "%s: with nothing authored, the Material carries all three shader-named inputs (%r)"
+              % (ident, present))
+        check(not any(C.asset_authored(mat.GetInput(p)) for p in present),
+              "%s: none of them is the asset's (every spec is the article's own)" % ident)
+        n, p = C.check_stage(st)
+        check(n == 0 and p == [],
+              "GREEN: %s (declares %s), no override: nothing counted, nothing refused (got %d, %r)"
+              % (ident, declares, n, p))
+
+    amber = "            color3f inputs:transmission_color = (1, 0.6, 0.1)"
+    n, p = C.check_stage(_stage(amber, _connect("transmission_color", ident=GLASS_ID), GLASS_ID, GLASS))
+    check(n == 1 and p == [], "GREEN: transmission_color set and connected on Glass_Clear (got %d, %r)" % (n, p))
+    n, p = C.check_stage(_stage(amber, ident=GLASS_ID, mtlx=GLASS))
+    check(n == 1 and any("not connected" in m for m in p),
+          "RED: transmission_color set on Glass_Clear and not connected (got %d, %r)" % (n, p))
+    n, p = C.check_stage(_stage(amber, _connect("transmission_color")))
+    check(n == 1 and any("declares no" in m for m in p),
+          "RED: transmission_color set on Copper, which does not declare it (got %d, %r)" % (n, p))
+    # an ordinary override beside the three: counted alone
+    n, p = C.check_stage(_stage(TINT, _connect("base_color_tint")))
+    check(n == 1 and p == [], "GREEN: a tint on Copper counts as ONE override, not four (got %d, %r)" % (n, p))
+
+
 def test_premise():
     """The measured reason the rule exists, with plain UsdShade (no check code involved)."""
     def resolved(stage):
@@ -123,6 +170,7 @@ def main():
     print("=== check_lcd_carrier self-test (article: %s) ===" % MTLX.name)
     check(MTLX.exists(), "the Copper article exists")
     test_check()
+    test_shader_named_ports()
     test_premise()
     print("=== %d checks failed ===" % len(_fails))
     return 1 if _fails else 0
