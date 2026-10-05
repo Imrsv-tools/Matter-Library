@@ -40,8 +40,9 @@ environment variable. Unset, every one leaves the build exactly the library's ow
   MATTER_MASTERS_SKY=0                  leave out M_Matter_Sky, which is the rig's dome, not a master
 
 Those five were run in a second project on Unreal 5.8 and looked at there (2026-10-05): all eight
-masters compile with them, on a skinned mesh too, and a bump reads as a bump. NOT yet run by
-anyone: this script with nothing set, since the switches were added.
+masters compile with them, on a skinned mesh too, and a bump reads as a bump. With nothing set the
+script was run in the library's own project the same day: its "built ..." lines are those of the
+build before the switches, byte for byte.
 
 Two more are CANDIDATES, each for a question that is still open. The refraction one compiles and
 leaves the thin master right; whether the solid one then bends is not settled. The colour-sampler
