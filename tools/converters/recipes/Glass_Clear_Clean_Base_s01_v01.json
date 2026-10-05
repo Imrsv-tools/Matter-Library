@@ -20,5 +20,5 @@
     {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
   ],
   "lcd_defaults": {"maskset_blend": "0.6", "overlay1_density": "0.25", "overlay2_density": "0.35"},
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay1_color"]
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay1_color", "transmission_color"]
 }

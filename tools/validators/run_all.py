@@ -139,6 +139,7 @@ RECIPE_FIXTURES = {
     "dead_mask.json": "G7",
     "virtual_with_layers.json": "G7",
     "deposit_wrong_slot.json": "G7",     # Phase10: a deposit's colour is its own slot's port
+    "set_port_wrong_master.json": "G7",  # Phase12: the see-through colour port off its masters
 }
 
 

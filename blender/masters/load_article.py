@@ -30,8 +30,10 @@ ROLES = (("base_color", "Base Color"), ("roughness", "Roughness"), ("metalness",
 # LCD_TRAVEL_PORTS); the UV ports travel as geometry and are fixed inside the group.
 TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
                 "maskset_blend", "roughness_bias",
-                "overlay1_color", "overlay2_color", "overlay3_color")    # Phase10, RD-P10-1
-COLOR_TRAVEL_PORTS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color"}
+                "overlay1_color", "overlay2_color", "overlay3_color",    # Phase10, RD-P10-1
+                "transmission_color")                                    # Phase12, RD-GLC-2
+COLOR_TRAVEL_PORTS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color",
+                      "transmission_color"}
 DATA_ROLES = ("roughness", "metalness", "normal", "layer2_roughness", "layer2_metalness",
               "layer2_normal", "opacity")
 
@@ -236,7 +238,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     sh = art.shader
     lane_a = {"emission_color": ("Emission Color", _rgba), "emission_luminance": ("Emission Luminance", None),
               "transmission_weight": ("Transmission Weight", None),
-              "transmission_color": ("Transmission Color", _rgba),
+              "transmission_color": ("transmission_color", _rgba),
               "subsurface_weight": ("Subsurface Weight", None), "subsurface_color": ("Subsurface Color", _rgba),
               "subsurface_radius": ("Subsurface Radius", None),
               "subsurface_radius_scale": ("Subsurface Radius Scale", tuple),
@@ -257,7 +259,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         depth = sh.get("transmission_depth", [0.0])[0]
         sigma = [(-math.log(max(c, 1e-4)) / depth) if depth > 0 else 0.0 for c in tc]
         master.inputs["Absorption"].default_value = tuple(sigma)
-        master.inputs["Transmission Color"].default_value = (1.0, 1.0, 1.0, 1.0)
+        master.inputs["transmission_color"].default_value = (1.0, 1.0, 1.0, 1.0)
         L(master.outputs["Volume"], out.inputs["Volume"])
     if "geometry_thin_walled" in sh:
         thin = sh["geometry_thin_walled"][0] > 0.5

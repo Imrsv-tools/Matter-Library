@@ -63,7 +63,7 @@ import math
 
 import bpy
 
-VERSION = 8     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 9     # bump when a group's contents change; ensure_*() rebuilds an older one
 #               (8: Phase10, a deposit overlay covers the surface in its colour)
                 # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
                 # 6 (Phase07 7.6): specular anisotropy (carrier C3) on the UV tangent
@@ -241,7 +241,9 @@ def _sockets(parts: set) -> list:
               ("Emission Luminance", "NodeSocketFloat", 0.0)]
     if "transmission" in parts:
         s += [("Transmission Weight", "NodeSocketFloat", 0.0),
-              ("Transmission Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0))]
+              # Phase12: a Creator port (the colour seen through it), so the socket takes the
+              # port's name, as every Creator port's does (was "Transmission Color")
+              ("transmission_color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0))]
     if "thick" in parts:
         s += [("Absorption", "NodeSocketVector", (0.0, 0.0, 0.0))]
     if "subsurface" in parts:
@@ -460,7 +462,7 @@ def _build(name: str, parts: set):
         tw = hidden(gi.outputs["Transmission Weight"], -150, 900)   # dust lets no light through
         L(tw, bsdf.inputs["Transmission Weight"])
         bsdf.inputs["Thin Wall"].default_value = "thick" not in parts
-        base = _lerp_color(ng, base, gi.outputs["Transmission Color"], tw, 0, 800)
+        base = _lerp_color(ng, base, gi.outputs["transmission_color"], tw, 0, 800)
     if "thick" in parts:
         vol = _node(ng, "ShaderNodeVolumeCoefficients", 850, -500)
         L(gi.outputs["Absorption"], vol.inputs["Absorption Coefficients"])

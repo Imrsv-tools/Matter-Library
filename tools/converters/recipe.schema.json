@@ -78,7 +78,7 @@
     "maskset_tex": {"type": "string"},
     "lcd_ports": {
       "type": "array",
-      "items": {"type": "string", "enum": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay1_color", "overlay2_color", "overlay3_color"]}
+      "items": {"type": "string", "enum": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay1_color", "overlay2_color", "overlay3_color", "transmission_color"]}
     },
     "lcd_defaults": {
       "type": "object",

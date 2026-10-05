@@ -120,6 +120,8 @@ SWEEP = [
     ("overlay1_color", [("wear 1 at 1, soot", (0.04, 0.035, 0.03))]),
     ("overlay2_color", [("wear 2 at 1, soot", (0.04, 0.035, 0.03))]),
     ("overlay3_color", [("wear 3 at 1, soot", (0.04, 0.035, 0.03))]),
+    # the colour seen through see-through matter (Phase12): Glass_Green's own, a bottle green
+    ("transmission_color", [("see-through green", (0.35, 0.70, 0.30))]),
     ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
     ("uv_rotation", [("UV rotation 90", 90.0)]),
 ]

@@ -192,4 +192,12 @@ One contract change carries it. The Creator vocabulary gains ports for values th
 
 ## Execution Log
 
-_(populated during execution)_
+**Run 1 (2026-10-05, the library machine; the lead present).** Tree at the start: `main` at `3fac681`, clean, two commits ahead of the remote, no other session. **Gate baseline before any code change** (`run_all.py`): 17 lanes, 15 PASS, 2 SKIP (compression, staging), 0 FAIL.
+
+**Corrected facts (the Brief):**
+- **The article validator needed no change for the see-through colour.** Its check is that the shader *has* the input, which a port-driven input satisfies. The Emissive check reads `emission_luminance`'s *value* on the shader, so 12.4 still owes that edit.
+- **F-GLC-6 is confirmed by the clean test** (click 1's row, one article, one value moved): Storm takes the see-through colour as darkness and shows no hue. Learnings Storm S7's *"tinted per channel"* is wrong on hue; its correction is the close's.
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 12.1 | the 12.1 commit | ▶ **SCAFFOLD COMPLETE — sitting owed (click 1).** Built: the Creator port `transmission_color` (`LCD_PORTS`, 13; `SET_PORTS` names the field that holds its start value and the masters that may declare it); the assembler passes a declared port to the shader through a pass-through node and a nodegraph output; the recipe schema, a G7 rule and the RED fixture `set_port_wrong_master.json`; the shared reader; Blender masters v9 (the socket takes the port's name) and the loader's travel ports; the Unreal driver (`unreal-runtime-v3` untouched); the rig's row; LCDSchema, Identity, Glossary. Glass_Clear re-assembled in place: three lines differ (the interface input, the pass-through and its output, the shader's connection). **Rig, Glass_Clear, the row *see-through green*, moved Storm / Blender / Unreal:** whole set 11.4 / 18.3 / 20.0, close-up 14.8 / 20.3 / 20.3, *moved alike*. Looked at: green in Blender and Unreal, the wall still seen through; Storm darker and grey. Unreal against Blender on that row: 7.2 (9.8 close-up), nearer than at defaults (12.0). **Gate:** 14 PASS, 2 SKIP, 1 FAIL `release_verify`, the predicted one (Glass_Clear is in the pilot; the re-freeze is 12.5); the new fixture is rejected by G7; `determinism` PASS. | click 1; then 12.2 (baseline `check_exporter.sh` first) |

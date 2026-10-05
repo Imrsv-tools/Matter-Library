@@ -34,7 +34,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 CONVERTERS = ROOT / "tools" / "converters"
 sys.path.insert(0, str(CONVERTERS))
-from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, MaterialSpec  # noqa: E402
+from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, MaterialSpec, SET_PORTS  # noqa: E402
 
 SCHEMA_PATH = CONVERTERS / "recipe.schema.json"
 MATERIALS = ROOT / "MatterLibrary" / "materials"
@@ -195,6 +195,16 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
     for port in d["lcd_ports"]:
         if port.endswith("_color") and port.startswith("overlay") and port not in deposit_ports:
             errs.append(f"G7 {port} is in lcd_ports but no overlay is a deposit with it (a dead control)")
+    # Phase12: a port that SETS an author value is declared only on its masters, and starts at
+    # the recipe's own field (LCDSchema §Creator-adjustable subset)
+    for port in d["lcd_ports"]:
+        if port in SET_PORTS:
+            fld, masters = SET_PORTS[port]
+            if d["master"] not in masters:
+                errs.append(f"G7 {port} is in lcd_ports but is a port of {sorted(masters)}, "
+                            f"not {d['master']} (a dead control)")
+            elif fld not in d:
+                errs.append(f"G7 {port} is in lcd_ports but the recipe authors no {fld} (no start value)")
     if len(overlays) > MAX_OVERLAYS:
         errs.append(f"G7 {len(overlays)} overlays; the cap is {MAX_OVERLAYS} (MAX_OVERLAYS, MasterSet.md)")
     has_layer2 = any(k.startswith("layer2_") for k in d)

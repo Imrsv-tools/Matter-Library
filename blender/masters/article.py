@@ -81,4 +81,8 @@ def read(path: Path) -> ArticleData:
                 bg = chain[0].find("input[@name='bg']") if chain else None
                 if bg is not None and bg.get("value") is not None:
                     art.shader[i.get("name")] = _floats(bg.get("value"))
+                elif not chain and i.get("name") in art.ports:
+                    # Phase12: a value the Creator may SET (transmission_color) reaches the shader
+                    # straight from its port; the article's own value is the port's start value
+                    art.shader[i.get("name")] = list(art.ports[i.get("name")])
     return art

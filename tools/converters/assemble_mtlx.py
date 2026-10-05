@@ -70,6 +70,18 @@ LCD_PORTS = {
     "overlay1_color": ("color3", DUST_COLOR, "Overlay 1 Color", {}),
     "overlay2_color": ("color3", DUST_COLOR, "Overlay 2 Color", {}),
     "overlay3_color": ("color3", DUST_COLOR, "Overlay 3 Color", {}),
+    # Phase12 (RD-GLC-2): the colour seen THROUGH see-through matter, which the Creator may set.
+    # OpenPBR's own name, type and range; the default here is OpenPBR's, and an article's start
+    # value is its own authored `transmission_color` (SET_PORTS below).
+    "transmission_color": ("color3", "1.0, 1.0, 1.0", "Transmission Color", {}),
+}
+
+# Phase12: the Creator ports that SET an OpenPBR input an author otherwise fixes on the shader
+# (LCDSchema.md §Creator-adjustable subset): port -> (the spec field that holds the article's own
+# value, which is the port's start value; the masters whose articles may declare it). The value
+# lives in ONE place, the spec field: never in `lcd_defaults` too.
+SET_PORTS = {
+    "transmission_color": ("transmission_color", {"TranslucentThin", "TranslucentThick"}),
 }
 
 # Author-tier interface inputs — Lane B ONLY (LCDSchema.md §Author tier): the values
@@ -295,6 +307,19 @@ def _check_spec(spec: MaterialSpec) -> None:
                 ov.color_port == port for ov in spec.overlays):
             raise ValueError(f"{port!r} is exposed but no overlay is a deposit with that "
                              "colour port: a dead port")
+    for port in spec.lcd_ports:
+        if port not in SET_PORTS:
+            continue
+        fld, masters = SET_PORTS[port]
+        if spec.master not in masters:
+            raise ValueError(f"{port!r} is a Creator port of the masters {sorted(masters)} "
+                             f"(LCDSchema.md); this article is {spec.master}")
+        if getattr(spec, fld) is None:
+            raise ValueError(f"{port!r} is exposed but the article authors no {fld}: the port "
+                             "would have no start value of the article's own")
+        if port in spec.lcd_defaults:
+            raise ValueError(f"{port!r} starts at the article's own {fld}; do not repeat it in "
+                             "lcd_defaults (one place holds the value)")
     if spec.has_layer2() and not spec.maskset_tex:
         raise ValueError(
             "a layer-2 set requires a maskset: maskset.R IS the layer-2 coverage (MasterSet.md). "
@@ -356,6 +381,8 @@ def assemble(spec: MaterialSpec) -> str:
     for port in spec.lcd_ports:
         typ, default, uiname, extra = LCD_PORTS[port]
         value = spec.lcd_defaults.get(port, default)   # per-material authored start, else schema default
+        if port in SET_PORTS:                          # Phase12: the article's own authored value
+            value = getattr(spec, SET_PORTS[port][0])
         attrs = {"uiname": uiname}
         attrs.update(extra)
         _add_input(ng, port, typ, value=value, attrs=attrs)
@@ -800,6 +827,23 @@ def assemble(spec: MaterialSpec) -> str:
         else:
             _add_input(shader, name, "float", value=value)
 
+    # --- The SET ports (Phase12): a declared port reaches its shader input through the graph,
+    # with nothing in between (a pass-through `dot`), so the Creator's value on the bound Material
+    # replaces the article's by the Carrier rule. Undeclared, the value stays on the shader.
+    set_out = {}
+    for port in spec.lcd_ports:
+        if port in SET_PORTS:
+            typ = LCD_PORTS[port][0]
+            _node("dot", f"{port}_port", typ, **{"in": (typ, "interfacename", port)})
+            ng.addOutput(f"{port}_out", typ).setNodeName(f"{port}_port")
+            set_out[port] = f"{port}_out"
+
+    def _settable(name: str, typ: str, value) -> None:
+        if name in set_out:
+            _add_input(shader, name, typ, nodegraph=ng_name, output=set_out[name])
+        else:
+            _add_input(shader, name, typ, value=value)
+
     # --- OpenPBR surface shader ---
     shader = doc.addNode("open_pbr_surface", sr_name, "surfaceshader")
     _add_input(shader, "base_weight", "float", value=1.0)
@@ -821,7 +865,7 @@ def assemble(spec: MaterialSpec) -> str:
     if spec.transmission > 0:
         _weight("transmission_weight", spec.transmission)
     if spec.transmission_color is not None:
-        _add_input(shader, "transmission_color", "color3", value=spec.transmission_color)
+        _settable("transmission_color", "color3", spec.transmission_color)
     if spec.transmission_depth is not None:
         _add_input(shader, "transmission_depth", "float", value=spec.transmission_depth)
     if spec.subsurface_weight > 0:
