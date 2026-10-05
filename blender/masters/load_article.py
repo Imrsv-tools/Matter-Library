@@ -11,7 +11,6 @@ interface inputs; ``sliders`` overrides them, as a Creator would.
 
 from __future__ import annotations
 
-import math
 from pathlib import Path
 
 import bpy
@@ -251,15 +250,13 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     for key, (socket, conv) in lane_a.items():
         if key in sh and socket in master.inputs:
             master.inputs[socket].default_value = conv(sh[key]) if conv else sh[key][0]
-    if "Absorption" in master.inputs:
-        # OpenPBR thick: transmission_color is what is left after transmission_depth of
-        # travel (Beer-Lambert), so sigma = -ln(color) / depth, per channel; the SURFACE is
-        # untinted (the colour lives in the volume)
-        tc = sh.get("transmission_color", [1.0, 1.0, 1.0])
-        depth = sh.get("transmission_depth", [0.0])[0]
-        sigma = [(-math.log(max(c, 1e-4)) / depth) if depth > 0 else 0.0 for c in tc]
-        master.inputs["Absorption"].default_value = tuple(sigma)
-        master.inputs["transmission_color"].default_value = (1.0, 1.0, 1.0, 1.0)
+    if "Transmission Depth" in master.inputs:
+        # OpenPBR thick: transmission_color is what is left after transmission_depth of travel
+        # (Beer-Lambert). ML_TranslucentThick works the absorption out itself from its
+        # `transmission_color` socket (set above, and a Creator port where the article declares
+        # it) and this depth (Phase12 12.3, masters v10; it was summed here until then, which
+        # left the socket white and the colour fixed at load).
+        master.inputs["Transmission Depth"].default_value = sh.get("transmission_depth", [0.0])[0]
         L(master.outputs["Volume"], out.inputs["Volume"])
     if "geometry_thin_walled" in sh:
         thin = sh["geometry_thin_walled"][0] > 0.5

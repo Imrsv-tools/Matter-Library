@@ -39,7 +39,10 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
   TranslucentThin           + transmission, Thin Wall on; the tint of what shows through
                             is ``transmission_color``
   TranslucentThick          + transmission, Thin Wall off, and absorption inside the
-                            volume: sigma = -ln(transmission_color) / transmission_depth
+                            volume: sigma = -ln(transmission_color) / transmission_depth,
+                            worked out in the group from the ``transmission_color`` socket
+                            (Phase12 12.3), so a Creator's colour moves it; the surface
+                            itself is untinted
   Subsurface                + subsurface weight, radius, radius scale and scatter
                             anisotropy; the Cycles method is ``SUBSURFACE_METHOD``
   ========================  ==========================================================
@@ -63,8 +66,10 @@ import math
 
 import bpy
 
-VERSION = 9     # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 10    # bump when a group's contents change; ensure_*() rebuilds an older one
 #               (8: Phase10, a deposit overlay covers the surface in its colour)
+#               (9: Phase12 12.1, the see-through colour's socket takes its port's name)
+#               (10: Phase12 12.3, the solid master works its absorption out from that socket)
                 # 5 (Phase07 7.3): coat, fuzz, subsurface anisotropy and method
                 # 6 (Phase07 7.6): specular anisotropy (carrier C3) on the UV tangent
                 # 7 (Phase08 8.1): ML_Hair's own part (soft coverage, light through)
@@ -245,7 +250,9 @@ def _sockets(parts: set) -> list:
               # port's name, as every Creator port's does (was "Transmission Color")
               ("transmission_color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0))]
     if "thick" in parts:
-        s += [("Absorption", "NodeSocketVector", (0.0, 0.0, 0.0))]
+        # Phase12 12.3: the depth, not a ready-made absorption (was "Absorption", worked out by
+        # the loader), so the absorption follows the `transmission_color` socket
+        s += [("Transmission Depth", "NodeSocketFloat", 0.0)]
     if "subsurface" in parts:
         s += [("Subsurface Weight", "NodeSocketFloat", 0.0),
               ("Subsurface Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
@@ -462,10 +469,47 @@ def _build(name: str, parts: set):
         tw = hidden(gi.outputs["Transmission Weight"], -150, 900)   # dust lets no light through
         L(tw, bsdf.inputs["Transmission Weight"])
         bsdf.inputs["Thin Wall"].default_value = "thick" not in parts
-        base = _lerp_color(ng, base, gi.outputs["transmission_color"], tw, 0, 800)
+        if "thick" in parts:
+            # a solid's SURFACE is untinted: its colour lives in the volume (below)
+            white = _node(ng, "ShaderNodeCombineXYZ", -150, 760)
+            for axis in ("X", "Y", "Z"):
+                white.inputs[axis].default_value = 1.0
+            base = _lerp_color(ng, base, white.outputs[0], tw, 0, 800)
+        else:
+            base = _lerp_color(ng, base, gi.outputs["transmission_color"], tw, 0, 800)
     if "thick" in parts:
+        # OpenPBR thick: transmission_color is what is left after transmission_depth of travel
+        # (Beer-Lambert), so sigma = -ln(colour) / depth per channel (Learnings Blender B5).
+        # Worked out HERE since Phase12 12.3 (in the loader's Python until then), so a Creator's
+        # colour on the socket moves it. A depth of 0 means no absorption.
+        tc = _sep(ng, 250, -500)
+        L(gi.outputs["transmission_color"], tc.inputs["Color"])
+        logs = _node(ng, "ShaderNodeCombineXYZ", 550, -500)
+        for axis, ch in (("X", "Red"), ("Y", "Green"), ("Z", "Blue")):
+            floor = _math(ng, "MAXIMUM", 350, -500)
+            L(tc.outputs[ch], floor.inputs[0])
+            floor.inputs[1].default_value = 1e-4
+            ln = _math(ng, "LOGARITHM", 450, -500)
+            L(floor.outputs[0], ln.inputs[0])
+            ln.inputs[1].default_value = math.e
+            L(ln.outputs[0], logs.inputs[axis])
+        dsafe = _math(ng, "MAXIMUM", 350, -700)
+        L(gi.outputs["Transmission Depth"], dsafe.inputs[0])
+        dsafe.inputs[1].default_value = 1e-9
+        inv = _math(ng, "DIVIDE", 450, -700)                    # -1 / depth
+        inv.inputs[0].default_value = -1.0
+        L(dsafe.outputs[0], inv.inputs[1])
+        has = _math(ng, "GREATER_THAN", 350, -850)              # depth > 0, else no absorption
+        L(gi.outputs["Transmission Depth"], has.inputs[0])
+        has.inputs[1].default_value = 0.0
+        k = _math(ng, "MULTIPLY", 550, -700)
+        L(inv.outputs[0], k.inputs[0])
+        L(has.outputs[0], k.inputs[1])
+        sigma = _vmath(ng, "SCALE", 700, -500)
+        L(logs.outputs[0], sigma.inputs[0])
+        L(k.outputs[0], sigma.inputs["Scale"])
         vol = _node(ng, "ShaderNodeVolumeCoefficients", 850, -500)
-        L(gi.outputs["Absorption"], vol.inputs["Absorption Coefficients"])
+        L(sigma.outputs[0], vol.inputs["Absorption Coefficients"])
         vol.inputs["Scatter Coefficients"].default_value = (0.0, 0.0, 0.0)
         L(vol.outputs[0], go.inputs["Volume"])
     if "subsurface" in parts:

@@ -3,6 +3,7 @@
   <nodegraph name="NG_Diamond_Brilliant_Clean_Base_s01_v01">
     <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="transmission_color" type="color3" value="0.75, 0.90, 1.0" uiname="Transmission Color" />
     <constant name="base_color_const" type="color3">
       <input name="value" type="color3" value="1.0, 1.0, 1.0" />
     </constant>
@@ -24,6 +25,10 @@
       <input name="high" type="float" value="1.0" />
     </clamp>
     <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
+    <dot name="transmission_color_port" type="color3">
+      <input name="in" type="color3" interfacename="transmission_color" />
+    </dot>
+    <output name="transmission_color_out" type="color3" nodename="transmission_color_port" />
   </nodegraph>
   <open_pbr_surface name="SR_Diamond_Brilliant_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -33,7 +38,7 @@
     <input name="specular_ior" type="float" value="2.417" />
     <input name="geometry_thin_walled" type="boolean" value="false" />
     <input name="transmission_weight" type="float" value="1.0" />
-    <input name="transmission_color" type="color3" value="0.75, 0.90, 1.0" />
+    <input name="transmission_color" type="color3" nodegraph="NG_Diamond_Brilliant_Clean_Base_s01_v01" output="transmission_color_out" />
     <input name="transmission_depth" type="float" value="0.02" />
   </open_pbr_surface>
   <surfacematerial name="Diamond_Brilliant_Clean_Base_s01_v01" type="material">

@@ -15,5 +15,5 @@
   "transmission_color": "0.75, 0.90, 1.0",
   "transmission_depth": 0.02,
   "thin_walled": false,
-  "lcd_ports": ["base_color_tint", "roughness_bias"]
+  "lcd_ports": ["base_color_tint", "roughness_bias", "transmission_color"]
 }

@@ -121,7 +121,12 @@ SWEEP = [
     ("overlay2_color", [("wear 2 at 1, soot", (0.04, 0.035, 0.03))]),
     ("overlay3_color", [("wear 3 at 1, soot", (0.04, 0.035, 0.03))]),
     # the colour seen through see-through matter (Phase12): Glass_Green's own, a bottle green
-    ("transmission_color", [("see-through green", (0.35, 0.70, 0.30))]),
+    # ... and a pale one on SOLID matter only (a third element names the masters a row is for):
+    # a solid absorbs with depth, and the rig's 0.30 m cube is 15 of Diamond's 2 cm depths
+    # across, where a bottle green leaves no light at all (Blender draws it black, correctly;
+    # Phase12 12.3). The pale green leaves about (0.21, 0.74, 0.21) through the cube.
+    ("transmission_color", [("see-through green", (0.35, 0.70, 0.30)),
+                            ("see-through pale green", (0.90, 0.98, 0.90), {"TranslucentThick"})]),
     ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
     ("uv_rotation", [("UV rotation 90", 90.0)]),
 ]
@@ -134,7 +139,9 @@ def settings_for(art: jobmod.Article, sweep: bool) -> list[dict]:
     for port, rows in SWEEP:
         if port not in art.ports:
             continue
-        for label, value in rows:
+        for label, value, *only in rows:
+            if only and art.master not in only[0]:
+                continue
             sid = (label.replace(",", "").replace(" ", "_").replace("+", "p")
                    .replace("-", "m").replace(".", ""))
             setting = {port: list(value) if isinstance(value, tuple) else value}
