@@ -30,9 +30,10 @@ ROLES = (("base_color", "Base Color"), ("roughness", "Roughness"), ("metalness",
 TRAVEL_PORTS = ("base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
                 "maskset_blend", "roughness_bias",
                 "overlay1_color", "overlay2_color", "overlay3_color",    # Phase10, RD-P10-1
-                "transmission_color")                                    # Phase12, RD-GLC-2
+                "transmission_color",                                    # Phase12, RD-GLC-2
+                "emission_color", "emission_luminance")                  # Phase12 12.4
 COLOR_TRAVEL_PORTS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color",
-                      "transmission_color"}
+                      "transmission_color", "emission_color"}
 DATA_ROLES = ("roughness", "metalness", "normal", "layer2_roughness", "layer2_metalness",
               "layer2_normal", "opacity")
 
@@ -235,7 +236,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         if port in ports and port in master.inputs:
             master.inputs[port].default_value = ports[port][0]
     sh = art.shader
-    lane_a = {"emission_color": ("Emission Color", _rgba), "emission_luminance": ("Emission Luminance", None),
+    lane_a = {"emission_color": ("emission_color", _rgba), "emission_luminance": ("emission_luminance", None),
               "transmission_weight": ("Transmission Weight", None),
               "transmission_color": ("transmission_color", _rgba),
               "subsurface_weight": ("Subsurface Weight", None), "subsurface_color": ("Subsurface Color", _rgba),

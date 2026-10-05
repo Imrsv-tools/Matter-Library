@@ -112,6 +112,17 @@ def test_pure_see_through_colour():
           "per-channel precision noise on the see-through colour is NOT a delta")
 
 
+def test_pure_light():
+    """Phase12 12.4: a light's colour and brightness travel, each measured against the ARTICLE's."""
+    base = dict(_BASE, emission_color=(0.993, 0.992, 1.0, 1.0), emission_luminance=12.0)
+    check(S.sparse_deltas(dict(base), base) == {}, "an untouched light carries no override")
+    out = S.sparse_deltas(dict(base, emission_luminance=24.0), base)
+    check(out == {"emission_luminance": 24.0},
+          "a brightness moved off the article's -> only that port, over 1 allowed (got %r)" % out)
+    out = S.sparse_deltas(dict(base, emission_color=(1.0, 0.456, 0.147, 1.0)), base)
+    check(list(out) == ["emission_color"], "a light's colour moved -> only that port (got %r)" % list(out))
+
+
 def test_pure_no_baseline_is_delta():
     out = S.sparse_deltas({"maskset_blend": 0.3}, {})  # no interface default known
     check(out.get("maskset_blend") == 0.3, "a port with no known baseline counts as a delta")
@@ -251,6 +262,7 @@ def main():
     test_pure_explicit_prop_wins_and_drops()
     test_pure_unknown_port_ignored()
     test_pure_see_through_colour()
+    test_pure_light()
     test_pure_no_baseline_is_delta()
     test_bpy_end_to_end()
     print("=== %d checks failed ===" % len(_fails))

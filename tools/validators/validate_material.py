@@ -202,7 +202,12 @@ def check_master_conformance(doc) -> list:
     elif master == "Emissive":
         need_shader("emission_color", "emission colour IS this master's defining property")
         lum = _shader_input(doc, "emission_luminance")
-        if lum is None or _as_float(lum.getValueString()) <= 0:
+        # Phase12 12.4: where brightness is a Creator port the shader input is driven by the
+        # graph, and the article's own value is the port's start value on the interface. A
+        # Creator may take it to 0; an ARTICLE must still start above it.
+        start = iface.get("emission_luminance") if _is_graph_driven(lum) else \
+            (lum.getValueString() if lum is not None else None)
+        if start is None or _as_float(start) <= 0:
             errs.append("Emissive: emission_luminance is absent or 0 — it would not glow")
 
     elif master == "TwoLayer":

@@ -3,6 +3,8 @@
   <nodegraph name="NG_Neon_Signage_Clean_Base_s01_v01">
     <input name="base_color_tint" type="color3" value="1.0, 1.0, 1.0" uiname="Base Color Tint" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
+    <input name="emission_color" type="color3" value="1.0, 0.15, 0.75" uiname="Emission Color" />
+    <input name="emission_luminance" type="float" value="12.0" uiname="Emission Luminance" />
     <constant name="base_color_const" type="color3">
       <input name="value" type="color3" value="0.05, 0.02, 0.05" />
     </constant>
@@ -24,6 +26,14 @@
       <input name="high" type="float" value="1.0" />
     </clamp>
     <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
+    <dot name="emission_color_port" type="color3">
+      <input name="in" type="color3" interfacename="emission_color" />
+    </dot>
+    <output name="emission_color_out" type="color3" nodename="emission_color_port" />
+    <dot name="emission_luminance_port" type="float">
+      <input name="in" type="float" interfacename="emission_luminance" />
+    </dot>
+    <output name="emission_luminance_out" type="float" nodename="emission_luminance_port" />
   </nodegraph>
   <open_pbr_surface name="SR_Neon_Signage_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -31,8 +41,8 @@
     <input name="base_metalness" type="float" value="0.0" />
     <input name="specular_roughness" type="float" nodegraph="NG_Neon_Signage_Clean_Base_s01_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.5" />
-    <input name="emission_luminance" type="float" value="12.0" />
-    <input name="emission_color" type="color3" value="1.0, 0.15, 0.75" />
+    <input name="emission_luminance" type="float" nodegraph="NG_Neon_Signage_Clean_Base_s01_v01" output="emission_luminance_out" />
+    <input name="emission_color" type="color3" nodegraph="NG_Neon_Signage_Clean_Base_s01_v01" output="emission_color_out" />
   </open_pbr_surface>
   <surfacematerial name="Neon_Signage_Clean_Base_s01_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_Neon_Signage_Clean_Base_s01_v01" />

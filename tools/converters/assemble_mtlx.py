@@ -74,6 +74,11 @@ LCD_PORTS = {
     # OpenPBR's own name, type and range; the default here is OpenPBR's, and an article's start
     # value is its own authored `transmission_color` (SET_PORTS below).
     "transmission_color": ("color3", "1.0, 1.0, 1.0", "Transmission Color", {}),
+    # Phase12 12.4: the colour a light emits and how bright it glows, which the Creator may set.
+    # OpenPBR's own names, types and defaults; `emission_luminance` is radiance, as OpenPBR's
+    # input is (Learnings MaterialX M3), from 0 with no maximum. An article starts at its own.
+    "emission_color": ("color3", "1.0, 1.0, 1.0", "Emission Color", {}),
+    "emission_luminance": ("float", "0.0", "Emission Luminance", {}),
 }
 
 # Phase12: the Creator ports that SET an OpenPBR input an author otherwise fixes on the shader
@@ -82,6 +87,8 @@ LCD_PORTS = {
 # lives in ONE place, the spec field: never in `lcd_defaults` too.
 SET_PORTS = {
     "transmission_color": ("transmission_color", {"TranslucentThin", "TranslucentThick"}),
+    "emission_color": ("emission_color", {"Emissive"}),
+    "emission_luminance": ("emission_luminance", {"Emissive"}),
 }
 
 # Author-tier interface inputs — Lane B ONLY (LCDSchema.md §Author tier): the values
@@ -838,7 +845,10 @@ def assemble(spec: MaterialSpec) -> str:
             ng.addOutput(f"{port}_out", typ).setNodeName(f"{port}_port")
             set_out[port] = f"{port}_out"
 
+    set_used = set()
+
     def _settable(name: str, typ: str, value) -> None:
+        set_used.add(name)
         if name in set_out:
             _add_input(shader, name, typ, nodegraph=ng_name, output=set_out[name])
         else:
@@ -895,8 +905,14 @@ def assemble(spec: MaterialSpec) -> str:
             else:
                 _add_input(shader, key, typ, value=getattr(spec, key))
     if spec.emission_color is not None:
-        _add_input(shader, "emission_luminance", "float", value=spec.emission_luminance)
-        _add_input(shader, "emission_color", "color3", value=spec.emission_color)
+        _settable("emission_luminance", "float", spec.emission_luminance)
+        _settable("emission_color", "color3", spec.emission_color)
+    dead = sorted(set(set_out) - set_used)
+    if dead:
+        # a declared SET port whose shader input this article never authors (the emission pair
+        # is written only when the article authors an emission colour) would drive nothing
+        raise ValueError(f"{dead} exposed in lcd_ports, but the article authors no such shader "
+                         "input: a dead port")
 
     # --- Material: the name IS the qualified Matter identity ---
     surfmat = doc.addNode("surfacematerial", spec.name, "material")

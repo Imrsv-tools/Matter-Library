@@ -63,6 +63,8 @@ Contract (LCDSchema.md, Phase 53 D3 — the travel scalars (6 since 2026-09-25);
     roughness_bias      float   range [-0.5,+0.5]    -> float   inputs:roughness_bias
     overlayN_color      color3  range [0,1]^3        -> color3f inputs:overlayN_color   (N = 1..3, added 2026-10-01)
     transmission_color  color3  range [0,1]^3        -> color3f inputs:transmission_color   (added 2026-10-05)
+    emission_color      color3  range [0,1]^3        -> color3f inputs:emission_color       (added 2026-10-05)
+    emission_luminance   float  range [0, no max)    -> float   inputs:emission_luminance   (added 2026-10-05)
 
 Rules (Phase 60 §11):
   * REJECT — an out-of-range or malformed LCD value fails the whole export (never clamped).
@@ -90,6 +92,10 @@ LCD_PORTS = {
     "overlay2_color": ("color3", 0.0, 1.0),
     "overlay3_color": ("color3", 0.0, 1.0),
     "transmission_color": ("color3", 0.0, 1.0),  # the see-through colour (added 2026-10-05, Phase12)
+    "emission_color": ("color3", 0.0, 1.0),      # the colour a light emits (Phase12 12.4)
+    # how bright it glows: OpenPBR's radiance, from 0 with NO maximum (a light is as bright as
+    # the Creator makes it), so only a negative value is out of range
+    "emission_luminance": ("float", 0.0, float("inf")),
 }
 
 USERPROP_PREFIX = "userProperties:"

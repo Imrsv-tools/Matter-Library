@@ -66,7 +66,8 @@ import math
 
 import bpy
 
-VERSION = 10    # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 11    # bump when a group's contents change; ensure_*() rebuilds an older one
+#               (11: Phase12 12.4, the emission sockets take their ports' names)
 #               (8: Phase10, a deposit overlay covers the surface in its colour)
 #               (9: Phase12 12.1, the see-through colour's socket takes its port's name)
 #               (10: Phase12 12.3, the solid master works its absorption out from that socket)
@@ -242,8 +243,10 @@ def _sockets(parts: set) -> list:
               ("Subsurface Weight", "NodeSocketFloat", 0.0),
               ("Subsurface Anisotropy", "NodeSocketFloat", 0.0)]
     if "emission" in parts:
-        s += [("Emission Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
-              ("Emission Luminance", "NodeSocketFloat", 0.0)]
+        # Phase12 12.4: Creator ports (a light's colour and brightness), so the sockets take the
+        # ports' names (were "Emission Color", "Emission Luminance")
+        s += [("emission_color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
+              ("emission_luminance", "NodeSocketFloat", 0.0)]
     if "transmission" in parts:
         s += [("Transmission Weight", "NodeSocketFloat", 0.0),
               # Phase12: a Creator port (the colour seen through it), so the socket takes the
@@ -463,8 +466,8 @@ def _build(name: str, parts: set):
         L(lt.outputs[0], a.inputs[1])
         L(a.outputs[0], bsdf.inputs["Alpha"])
     if "emission" in parts:
-        L(gi.outputs["Emission Color"], bsdf.inputs["Emission Color"])
-        L(gi.outputs["Emission Luminance"], bsdf.inputs["Emission Strength"])
+        L(gi.outputs["emission_color"], bsdf.inputs["Emission Color"])
+        L(gi.outputs["emission_luminance"], bsdf.inputs["Emission Strength"])
     if "transmission" in parts:
         tw = hidden(gi.outputs["Transmission Weight"], -150, 900)   # dust lets no light through
         L(tw, bsdf.inputs["Transmission Weight"])

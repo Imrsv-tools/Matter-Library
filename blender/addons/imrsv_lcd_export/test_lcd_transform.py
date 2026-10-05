@@ -316,6 +316,32 @@ def test_see_through_colour():
         check(layer.ImportFromString(new_text), "the reshaped glass parses as USD")
 
 
+def test_light():
+    """Phase12 12.4: a light's colour and brightness convert and connect; brightness has NO
+    maximum (24 passes, as would any value from 0 up), and a negative one rejects."""
+    light = (FIXTURE_GLASS.replace("Glass_Clear_Clean_Base_s01_v01", "LED_CoolWhite_Clean_Base_s01_v01")
+             .replace("custom double3 userProperties:transmission_color = (1, 0.6, 0.1)",
+                      "custom double3 userProperties:emission_color = (1, 0.456, 0.147)\n"
+                      "            custom double userProperties:emission_luminance = 24"))
+    mat = "/root/_materials/LED_CoolWhite_Clean_Base_s01_v01"
+    new_text, converted = L.transform_text(light)
+    check(sorted(p for (_, p, _) in converted) == ["emission_color", "emission_luminance"],
+          "a set light converts both ports (got %r)" % converted)
+    check("float inputs:emission_luminance = 24.0" in new_text, "brightness 24 passes: no maximum")
+    check("color3f inputs:emission_color.connect = <%s.inputs:emission_color>" % mat in new_text
+          and "float inputs:emission_luminance.connect = <%s.inputs:emission_luminance>" % mat in new_text,
+          "both are connected from the article's nodegraph (Carrier rule)")
+    raised = False
+    try:
+        L.transform_text(light.replace("emission_luminance = 24", "emission_luminance = -1"))
+    except L.LcdRejected as e:
+        raised = "emission_luminance" in str(e)
+    check(raised, "a negative brightness REJECTs")
+    if HAVE_PXR:
+        layer = Sdf.Layer.CreateAnonymous(".usda")
+        check(layer.ImportFromString(new_text), "the reshaped light parses as USD")
+
+
 def test_idempotent():
     once, _ = L.transform_text(FIXTURE_MULTI)
     twice, conv2 = L.transform_text(once)
@@ -440,6 +466,7 @@ def main():
     print("=== Phase 60sq1 Step-1 LCD transform / Creator-reshape tests (pxr=%s) ===" % HAVE_PXR)
     test_transform_text()
     test_see_through_colour()
+    test_light()
     test_idempotent()
     test_identity_from_property()
     test_blender52_header()

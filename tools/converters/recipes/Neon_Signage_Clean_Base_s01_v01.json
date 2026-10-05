@@ -13,5 +13,5 @@
   "specular_ior": 1.5,
   "emission_color": "1.0, 0.15, 0.75",
   "emission_luminance": 12.0,
-  "lcd_ports": ["base_color_tint", "roughness_bias"]
+  "lcd_ports": ["base_color_tint", "roughness_bias", "emission_color", "emission_luminance"]
 }

@@ -29,9 +29,11 @@ LCD_TRAVEL_PORTS = (
     "overlay2_color",    # color3
     "overlay3_color",    # color3
     "transmission_color",  # color3, the see-through colour (added 2026-10-05, Phase12 RD-GLC-2)
+    "emission_color",      # color3, the colour a light emits (added 2026-10-05, Phase12 12.4)
+    "emission_luminance",  # float, how bright it glows: 0 and up, no maximum
 )
 _COLOR3_PORTS = frozenset({"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color",
-                           "transmission_color"})
+                           "transmission_color", "emission_color"})
 
 # Float tolerance for "differs from baseline". Blender stores socket values as 32-bit floats,
 # so a value round-tripped through the UI carries precision noise (e.g. 0.2 -> 0.20000000298);

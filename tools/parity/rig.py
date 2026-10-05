@@ -127,6 +127,13 @@ SWEEP = [
     # Phase12 12.3). The pale green leaves about (0.21, 0.74, 0.21) through the cube.
     ("transmission_color", [("see-through green", (0.35, 0.70, 0.30)),
                             ("see-through pale green", (0.90, 0.98, 0.90), {"TranslucentThick"})]),
+    # a light's colour and brightness (Phase12 12.4), judged on the dim view. The warm colour is
+    # LED_WarmWhite's own (a 3000 K blackbody); the library's lights all author a brightness of
+    # 12. The dim view (-4 stops) shows 16 as display white, so the brighter row is 15, a
+    # quarter up: at double (24) every tool clips to the same white and the row measures only
+    # how far each tool's default was from white (seen at 12.4: 5.4 / 5.6 / 12.0, "uneven")
+    ("emission_color", [("emission warm", (1.0, 0.456, 0.147))]),
+    ("emission_luminance", [("brightness half", 6.0), ("brightness up a quarter", 15.0)]),
     ("uv_scale", [("UV scale 0.5", (0.5, 0.5)), ("UV scale 2", (2.0, 2.0))]),
     ("uv_rotation", [("UV rotation 90", 90.0)]),
 ]

@@ -109,9 +109,13 @@ SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rot
            "overlay1_color", "overlay2_color", "overlay3_color",
            # Phase12: a value the Creator may SET, under the article's (and OpenPBR's) own name.
            # Every runtime's see-through masters already carry it as a parameter (F-GLC-4).
-           "transmission_color"}
+           "transmission_color",
+           # Phase12 12.4: a light's colour and brightness, the Emissive master's own parameters.
+           # The master multiplies the brightness by 1/0.798 itself (Learnings Unreal U4), so a
+           # Creator's value gets the same correction as the article's.
+           "emission_color", "emission_luminance"}
 COLOUR_SLIDERS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color",
-                  "transmission_color"}
+                  "transmission_color", "emission_color"}
 FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal map
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
