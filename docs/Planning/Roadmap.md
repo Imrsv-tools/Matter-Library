@@ -15,6 +15,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the maintainer runs a batch and gets new materials, each already built and checked side by side in USDLiveView's renderer, Blender and Unreal, and keeps or sends back each one from its picture sheet. The library fills toward its full list this way, without a phase per batch. *(Was: "Creators find materials for every class of matter in the taxonomy, including the classes IMRSV's character work needs (skin, cloth, hair)", now the loop's long-run aim.)*
 - `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md`
 
+### Phase12 — Glass and Light Colour — ACTIVE *(seeded and discovered 2026-10-05; numbered Phase12 and opened by the lead the same day, "/execute Phase12"; it reverses the 2026-09-25 ruling that a see-through or emitted colour is its own article; Phase11 stays paused at its refine pass)*
+**Outcome:** a Creator sets the colour of glass and other see-through matter, and the colour and brightness of a light, with a control, in Blender and in Studio; the library then carries one clear glass and one light, not an article per colour.
+- `docs/Planning/Phases/Phase12_GlassAndLightColour.md`
+
 ==================================================================================
 ## Future
 
@@ -25,10 +29,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-09-28 (lead):** Character Appearance for Studio becomes **Phase08** and runs next on this machine. Library Coverage is **un-numbered**: *"we have many other little things to get in here befoer we build out the full library."* Before 2026-09-28, "Phase08" means Library Coverage. Why: `docs/Planning/Research/260928_R_PlatformAppearanceAsks.md`.
 
 > **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Future/Phase11_LibraryCoverage.md` (F-LC-7, F-LC-8; numbered Phase11 on 2026-10-02).
-
-### Glass and Light Colour — SEEDED *(un-numbered; seeded 2026-10-05 by the lead's `/discovery`, which reverses the 2026-09-25 ruling that a see-through or emitted colour is its own article)*
-**Outcome:** a Creator sets the colour of glass and other see-through matter, and the colour and brightness of a light, with a control, in Blender and in Studio; the library then carries one clear glass and one light, not an article per colour.
-- `docs/Planning/Phases/Future/PhaseTBD_GlassAndLightColour.md`
 
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.

@@ -1,7 +1,7 @@
-# PhaseTBD — Glass and Light Colour
+# Phase12 — Glass and Light Colour
 
-**Status:** DISCOVERY — Brief written at Pass 1 (2026-10-05); lane `build`. Not numbered; numbering is the lead's (Q-GLC-10). Seeded and opened by the lead's invocation, verbatim: *"/discovery Expose see-through colour, emission colour and emission brightness as Creator ports.. As normal, don;t hold everything else back just because of storm..."*
-**Mnemonic:** `GLC` (ids `Q-GLC-n`, `F-GLC-n`, `RD-GLC-n`; kept if the phase is numbered).
+**Status:** IN EXECUTION (2026-10-05; lane `build`). Brief written at discovery Pass 1 the same day. **Numbered Phase12 by the lead, 2026-10-05:** the invocation *"/execute Phase12"* (RD-P12-1). Seeded and opened by the lead's invocation, verbatim: *"/discovery Expose see-through colour, emission colour and emission brightness as Creator ports.. As normal, don;t hold everything else back just because of storm..."*
+**Mnemonic:** `GLC` (ids `Q-GLC-n`, `F-GLC-n`, `RD-GLC-n`, minted while the phase was un-numbered and kept; ids minted from execution on are `P12`).
 - **Seeded from:** the thin-glass thread of 2026-10-05 (`docs/Planning/Research/261005_R_PlatformThinGlassAsks.md`), and the lead's thought in that sitting, verbatim: *"I don't think we should bother with a 'colored' version of something unless it is adding a new texture that is truly needed to the equations... like clear glass and glass green... What is being added to glass to make it green?"*, then *"we could expose that as LCD I assume"*.
 
 ## Outcome
@@ -24,13 +24,13 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`; the
 
 | # | Step | What the lead looks at | Passes when |
 |---|---|---|---|
-| 1 | 1 | **Glass_Clear's** sheet, a new row *"see-through green"*, in Storm, Blender and Unreal | the glass turns green in Blender and Unreal, the wall still seen through it. Storm darkens and does not turn green (F-GLC-6; it gates nothing, RD-GLC-1) |
-| 2 | 2 | Blender: Glass_Clear from the Asset Browser on the default cube, the grid wall behind; the lead changes the **see-through colour** swatch to amber | the glass turns amber as a Creator would see it; the agent then shows the value in the exported USD |
-| 3 | 3 | **Diamond's** sheet, the same row | the body of the stone takes the colour in Blender and Unreal |
-| 4 | 4 | **LED_CoolWhite's** sheet, the dim view: rows *"emission warm"*, *"brightness half"*, *"brightness double"*; then in Blender the lead drags the brightness | every row moves all three tools alike; the light dims and brightens under the lead's hand |
-| 5 | 5 | One sheet: **Glass_Clear set to Glass_Green's colour** beside **Glass_Green** itself; and **LED_CoolWhite set to the warm colour** beside **LED_WarmWhite** | the lead judges whether the set one stands in for the authored one. That judgement decides the mark the colour-only articles take |
+| 1 | 12.1 | **Glass_Clear's** sheet, a new row *"see-through green"*, in Storm, Blender and Unreal | the glass turns green in Blender and Unreal, the wall still seen through it. Storm darkens and does not turn green (F-GLC-6; it gates nothing, RD-GLC-1) |
+| 2 | 12.2 | Blender: Glass_Clear from the Asset Browser on the default cube, the grid wall behind; the lead changes the **see-through colour** swatch to amber | the glass turns amber as a Creator would see it; the agent then shows the value in the exported USD |
+| 3 | 12.3 | **Diamond's** sheet, the same row | the body of the stone takes the colour in Blender and Unreal |
+| 4 | 12.4 | **LED_CoolWhite's** sheet, the dim view: rows *"emission warm"*, *"brightness half"*, *"brightness double"*; then in Blender the lead drags the brightness | every row moves all three tools alike; the light dims and brightens under the lead's hand |
+| 5 | 12.5 | One sheet: **Glass_Clear set to Glass_Green's colour** beside **Glass_Green** itself; and **LED_CoolWhite set to the warm colour** beside **LED_WarmWhite** | the lead judges whether the set one stands in for the authored one. That judgement decides the mark the colour-only articles take |
 
-**Reconciled click by click:** click 1 needs only step 1 (the port in the assembler, the reader, Blender's thin master, the Unreal driver, the rig's row; Glass_Clear re-assembled). Click 2 needs step 2 (the exporter and the rebuilt, installed library). Click 3 needs step 3 (Blender's solid master). Click 4 needs step 4 (the emission pair; the library rebuilt). Click 5 needs nothing beyond steps 1 and 4 in the tools, and runs in step 5 because that is where its verdict is applied. No click reaches past its step.
+**Reconciled click by click:** click 1 needs only 12.1 (the port in the assembler, the reader, Blender's thin master, the Unreal driver, the rig's row; Glass_Clear re-assembled). Click 2 needs 12.2 (the exporter and the rebuilt, installed library). Click 3 needs 12.3 (Blender's solid master). Click 4 needs 12.4 (the emission pair; the library rebuilt). Click 5 needs nothing beyond 12.1 and 12.4 in the tools, and runs in 12.5 because that is where its verdict is applied. No click reaches past its step.
 
 ### In now / not now
 
@@ -88,21 +88,19 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`; the
 
 - **Contract:** the same shape as Phase04's `overlay3_density` and Phase10's `overlayN_color`, both of which ran in `build`. **Read:** `assemble_mtlx.py` (`LCD_PORTS`, the interface-input loop, the shader inputs, Phase10's graph outputs) · `recipe.schema.json` (`lcd_ports` is a closed enum, so the three names must be added) · `validate_recipe.py` (its G7 rules name the pattern a new rule follows) · `validate_material.py` (it requires `transmission_color` and `emission_color` **as values on the shader**, and reads `emission_luminance`'s value there, so it must follow a port-driven input) · `blender/masters/article.py` (it reads lane-A values from the shader only) · `lcd_usd_edit.LCD_PORTS` (it rejects a value over a port's maximum, so brightness takes an open maximum) · the four copies of the travel-port list (`lcd_sparse.py`, `load_article.py`, `verify_asset_library.py`, `matter_proxy.py`).
 - **What enumerates the trees this phase changes:** the pilot's freeze hashes its payload, and **3 of the 12 re-assembled articles are in it**, so a re-freeze and the maintainer's promote are scheduled. The `determinism` lane re-assembles every article, which is the guard that nothing else moved. No gate globs `docs/`.
-- **`check_exporter.sh`:** runs at step 2 (a change under `blender/addons/`), **baselined before the edit** (`LOCAL_DELTAS.md`).
+- **`check_exporter.sh`:** runs at 12.2 (a change under `blender/addons/`), **baselined before the edit** (`LOCAL_DELTAS.md`).
 - **The public edge:** none. No runtime is published (F-GLC-4). Pushing is the lead's.
 - No sign-in, secret, destructive migration or data loss.
 
 ### Step list
 
-*Un-numbered until the lead numbers the phase; the steps then read `<NN>.1` … `<NN>.5`.*
+- **12.1 — Glass takes its colour from a control.** The contract text; `transmission_color` as a port in the schema, the validators, the assembler and the reader; Blender's thin see-through master and the loader; the Unreal driver; the rig's row; Glass_Clear re-assembled. *First clickable result: click 1.*
+- **12.2 — The colour travels from Blender.** The exporter and the travel-port lists; the Blender library rebuilt and installed. *Click 2.*
+- **12.3 — Solid see-through matter.** Blender's solid master works its absorption out from the port, inside the master; Diamond re-assembled. *Click 3.*
+- **12.4 — A light's colour and brightness.** `emission_color` and `emission_luminance` through the same places; the rig's rows on the dim view; Neon_Signage and LED_CoolWhite re-assembled; the library rebuilt. *Click 4.*
+- **12.5 — Every article, and the colour-only ones judged.** The other eight re-assembled; the pilot re-frozen; click 5's sheet; the marks; the skill's line; the hand-off row. *Click 5.* Then the close.
 
-- **Step 1 — Glass takes its colour from a control.** The contract text; `transmission_color` as a port in the schema, the validators, the assembler and the reader; Blender's thin see-through master and the loader; the Unreal driver; the rig's row; Glass_Clear re-assembled. *First clickable result: click 1.*
-- **Step 2 — The colour travels from Blender.** The exporter and the travel-port lists; the Blender library rebuilt and installed. *Click 2.*
-- **Step 3 — Solid see-through matter.** Blender's solid master works its absorption out from the port, inside the master; Diamond re-assembled. *Click 3.*
-- **Step 4 — A light's colour and brightness.** `emission_color` and `emission_luminance` through the same places; the rig's rows on the dim view; Neon_Signage and LED_CoolWhite re-assembled; the library rebuilt. *Click 4.*
-- **Step 5 — Every article, and the colour-only ones judged.** The other eight re-assembled; the pilot re-frozen; click 5's sheet; the marks; the skill's line; the hand-off row. *Click 5.* Then the close.
-
-**A split signal, surfaced early and not cut:** glass (steps 1 – 3) and lights (step 4) can each be shown on their own. They stay one phase because they are one contract change through the same files. If execution drags, step 4 is the cut.
+**A split signal, surfaced early and not cut:** glass (12.1 – 12.3) and lights (12.4) can each be shown on their own. They stay one phase because they are one contract change through the same files. If execution drags, 12.4 is the cut.
 
 ### Compact build map
 
@@ -120,7 +118,9 @@ Reached in the rig's sheets (`uv run tools/parity/rig.py <article> --sweep`; the
 
 ### Lead calls
 
-**Q-GLC-10 [lead] — The phase's number.** Phase11 (Library Coverage) holds the Active slot, paused since 2026-10-02 with its refine pass owed. The next free number is 12. *Recommendation: number this Phase12 as work starts, the lead's usual practice; Phase11 keeps its number and its pause.*
+**RD-P12-1 — answers Q-GLC-10: this is Phase12 (the lead, 2026-10-05).** The invocation *"/execute Phase12"*, against the recommendation below. Phase11 keeps its number and its pause.
+
+**Q-GLC-10 [lead] — The phase's number.** → RD-P12-1. Phase11 (Library Coverage) holds the Active slot, paused since 2026-10-02 with its refine pass owed. The next free number is 12. *Recommendation: number this Phase12 as work starts, the lead's usual practice; Phase11 keeps its number and its pause.*
 
 ---
 
@@ -135,7 +135,7 @@ One contract change carries it. The Creator vocabulary gains ports for values th
 - **F-GLC-1 — USD already exposes these values on the Material, and that is not the carrier.** `usdcat --flatten` of Glass_Clear's `.mtlx` (OpenUSD 26.03, the pinned toolchain): the Material prim carries `color3f inputs:transmission_color = (0.82, 0.95, 0.88)`, and the shader's input connects to it. A shader input the graph drives is different: the Material carries `float inputs:transmission_weight` with no value and nothing reading it, and the shader connects to the nodegraph's output. So the native exposure exists only while a value sits on the shader. → §Reuse check; §Decisions that bind.
 - **F-GLC-2 — The spec answers where a Creator port lives.** LCDSchema: *"Every adjustable … is a standard `inputs:<port>` value on the bound material prim, connected from the article's nodegraph interface input"*, and *"An article declares the Creator ports it uses"*. Lane A (*"authored on the shader node"*) is the author tier. A value that becomes a Creator port moves to the interface. Answers Q-GLC-1.
 - **F-GLC-3 — Twelve articles, three masters, nothing outside them.** Nine recipes author `transmission_color`: six on TranslucentThin, three on TranslucentThick. Three Creator-selectable recipes author emission, all on Emissive (Neon_Signage, LED_WarmWhite, LED_CoolWhite). The fourth is the system fallback `IMRSV_MissingMaterial`, which declares no port and is not touched. No article on another master authors either. Answers Q-GLC-3.
-- **F-GLC-4 — The pinned Unreal runtime already renders all three, so no new build and no Unreal machine.** `unreal/MatterRuntime/Scripts/build_masters.py` gives the see-through masters the parameter `transmission_color` and the Emissive master `emission_color` and `emission_luminance`, under the article's names, and nothing under `unreal/MatterRuntime` has changed since the source `unreal-runtime-v3` was built from (`git log e1fc83e..HEAD`: empty). The parameters are live in the pictures: the same master draws Glass_Clear grey-white and Glass_Green green (F-GLC-6's table). What blocks a moved value today is the rig's driver alone: it refuses an article whose ports it does not know, and it would send a colour port as a single number. Answers Q-GLC-4. *Not yet seen:* a moved `emission_luminance`; the parameter is multiplied inside the master, so step 4's row is its first proof.
+- **F-GLC-4 — The pinned Unreal runtime already renders all three, so no new build and no Unreal machine.** `unreal/MatterRuntime/Scripts/build_masters.py` gives the see-through masters the parameter `transmission_color` and the Emissive master `emission_color` and `emission_luminance`, under the article's names, and nothing under `unreal/MatterRuntime` has changed since the source `unreal-runtime-v3` was built from (`git log e1fc83e..HEAD`: empty). The parameters are live in the pictures: the same master draws Glass_Clear grey-white and Glass_Green green (F-GLC-6's table). What blocks a moved value today is the rig's driver alone: it refuses an article whose ports it does not know, and it would send a colour port as a single number. Answers Q-GLC-4. *Not yet seen:* a moved `emission_luminance`; the parameter is multiplied inside the master, so 12.4's row is its first proof.
 - **F-GLC-5 — Blender's solid master takes its colour at load time, not from a socket.** `load_article.py` turns `transmission_color` and `transmission_depth` into absorption coefficients in Python, and sets the master's Transmission Color to white. A live port needs that sum inside the master. It is the one piece of new node work in the phase, which is why the solid master has a step of its own.
 - **F-GLC-6 — Storm shows the see-through colour as darkness, not as hue.** Mean colour inside the cube, the rig's stored pictures at defaults:
 
@@ -148,10 +148,10 @@ One contract change carries it. The Creator vocabulary gains ports for values th
   | Glass_Green | Unreal | 92 | 106 | 88 | 1.15 |
   | Glass_Green | Blender | 79 | 107 | 74 | 1.36 |
 
-  Storm's green glass is darker than its clear glass and no greener. The two articles also differ in roughness, transmission weight and layers, so this is an indication, not a clean test; step 1's row is the clean one. **It disagrees with Learnings Storm S7** (*"tinted per channel by `transmission_color`"*) and agrees with Phase06 6.4 (*"it renders Glass_Green grey"*). Whichever the row shows, RD-GLC-1 applies. A correction to S7, if the row confirms this, is the close's.
+  Storm's green glass is darker than its clear glass and no greener. The two articles also differ in roughness, transmission weight and layers, so this is an indication, not a clean test; 12.1's row is the clean one. **It disagrees with Learnings Storm S7** (*"tinted per channel by `transmission_color`"*) and agrees with Phase06 6.4 (*"it renders Glass_Green grey"*). Whichever the row shows, RD-GLC-1 applies. A correction to S7, if the row confirms this, is the close's.
 - **F-GLC-7 — The pilot carries three of the twelve** (`matterlib-0.1.0.lock.yaml`: Glass_Clear, Diamond_Brilliant, Neon_Signage). Re-assembling them invalidates the freeze. Answers Q-GLC-6.
-- **F-GLC-8 — What is colour-only today is small, and the list ahead is where the saving is.** On disk: `Glass_Green` against `Glass_Clear` (it also differs in roughness, 0 against 0.02, transmission weight, 1 against 0.95, and a fingerprints layer), and `LED_WarmWhite` against `LED_CoolWhite` (the emission colour is the only difference). On the wish list, 34 rows sit on the three masters (9 thin, 16 solid, 9 emissive). Which of the queued ones are colour-only (`Glass_Amber` and `Phosphor_Green` look it; `Ruby`, `Honey`, `Lava_Molten` carry their own index, depth or textures) is judged row by row at step 5, not here. Answers Q-GLC-8.
-- **F-GLC-9 — Two durable docs restate the old rule and one says the opposite of this phase.** `Identity.md`: *"A see-through colour is its own authored article"*. The matter-generate skill repeats it. `LCDSchema.md`: *"emissive COLOUR is authored on the article, and is not a Creator control … it stays an open product question"*. All three are step 1's and step 5's to mark, dated, with the old text kept.
+- **F-GLC-8 — What is colour-only today is small, and the list ahead is where the saving is.** On disk: `Glass_Green` against `Glass_Clear` (it also differs in roughness, 0 against 0.02, transmission weight, 1 against 0.95, and a fingerprints layer), and `LED_WarmWhite` against `LED_CoolWhite` (the emission colour is the only difference). On the wish list, 34 rows sit on the three masters (9 thin, 16 solid, 9 emissive). Which of the queued ones are colour-only (`Glass_Amber` and `Phosphor_Green` look it; `Ruby`, `Honey`, `Lava_Molten` carry their own index, depth or textures) is judged row by row at 12.5, not here. Answers Q-GLC-8.
+- **F-GLC-9 — Two durable docs restate the old rule and one says the opposite of this phase.** `Identity.md`: *"A see-through colour is its own authored article"*. The matter-generate skill repeats it. `LCDSchema.md`: *"emissive COLOUR is authored on the article, and is not a Creator control … it stays an open product question"*. All three are 12.1's and 12.5's to mark, dated, with the old text kept.
 - **F-GLC-10 — Lane `build`,** verified against the tree (§Risk lane). Answers Q-GLC-9.
 
 ## Seed questions — where each stands
@@ -165,9 +165,9 @@ One contract change carries it. The Creator vocabulary gains ports for values th
 | Q-GLC-5 | Deposits | **Nothing new** (§Decisions that bind). |
 | Q-GLC-6 | The pilot | **Three articles; re-freeze and promote at the close** (F-GLC-7). |
 | Q-GLC-7 | The tint on these articles | **Stays** (§Decisions that bind). |
-| Q-GLC-8 | The colour-only articles and rows | **Two pairs on disk; the rows judged at step 5; marked, never deleted** (F-GLC-8). |
+| Q-GLC-8 | The colour-only articles and rows | **Two pairs on disk; the rows judged at 12.5; marked, never deleted** (F-GLC-8). |
 | Q-GLC-9 | The risk lane | **`build`, verified** (F-GLC-10). |
-| Q-GLC-10 | The phase's number **[lead]** | **Open** (§Lead calls). |
+| Q-GLC-10 | The phase's number **[lead]** | **Phase12** (RD-P12-1). |
 
 ## Sources (pointers, not copies)
 
@@ -187,8 +187,8 @@ One contract change carries it. The Creator vocabulary gains ports for values th
 
 - **Passes captured:** 1 (2026-10-05). **The Brief is complete**; lane `build`.
 - **Current working direction:** three *set* ports under OpenPBR's names, carried as every Creator port is; five steps, glass first; no Unreal build.
-- **Open decisions:** Q-GLC-10, the phase's number (the lead's).
-- **Checks to carry forward:** Storm's row at step 1 (hue or darkness: F-GLC-6, and Learnings Storm S7 if it needs correcting) · a moved `emission_luminance` in Unreal at step 4 (F-GLC-4) · the U4 emission scale still applied when brightness is a port (step 4) · `check_exporter.sh` baselined before step 2.
+- **Open decisions:** none. Q-GLC-10 was ruled at the start of execution (RD-P12-1).
+- **Checks to carry forward:** Storm's row at 12.1 (hue or darkness: F-GLC-6, and Learnings Storm S7 if it needs correcting) · a moved `emission_luminance` in Unreal at 12.4 (F-GLC-4) · the U4 emission scale still applied when brightness is a port (12.4) · `check_exporter.sh` baselined before 12.2.
 
 ## Execution Log
 
