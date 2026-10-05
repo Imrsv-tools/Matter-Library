@@ -17,7 +17,8 @@
   "thin_walled": true,
   "lcd_ports": [
     "base_color_tint",
-    "roughness_bias"
+    "roughness_bias",
+    "transmission_color"
   ],
   "sources": [
     {

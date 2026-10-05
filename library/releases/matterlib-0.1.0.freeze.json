@@ -19,7 +19,7 @@
       },
       {
         "path": "MatterLibrary/materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
-        "sha256": "7b757d7b8a4361c907c2d9b06ef1492839f326f3f278783567aabea8196bfc2a"
+        "sha256": "086a1e9660620fa92e1c25d5213abd068d83d08da2df4a7b750047930d1c06b7"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
@@ -31,7 +31,7 @@
       },
       {
         "path": "MatterLibrary/materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
-        "sha256": "1002b045120d0f57b3b0696f98bbc41ea49b598991c3013dbd731554afe1885b"
+        "sha256": "389c643aaa627a767d3d02d71bf9cd303f0646bc89d9411d71590ab857a66f8e"
       },
       {
         "path": "MatterLibrary/materials/natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
@@ -51,7 +51,7 @@
       },
       {
         "path": "MatterLibrary/materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx",
-        "sha256": "26baf956656184da73acad33198d1b9426c7ae34961faea9164600258229d201"
+        "sha256": "0e1cbab32d9a92e88d1e96ed5b65b89d5d18c6bfcd01caf8b64b7bae3989cc78"
       },
       {
         "path": "MatterLibrary/materials/utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
@@ -185,11 +185,11 @@
       }
     ]
   },
-  "payload_digest": "78617e6197574ab336ed027dd71af9793a598386fa2d3e629fad89120615353b",
+  "payload_digest": "cb2d380d1df64510cbdf36ac937854bf71d26703562f85a4e2469ba2595eee1a",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
     "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
-    "mtlx_set": "a6991eb0eeefa0c2f84b71939121649d8a003a21532320606351a4db4daf4f44",
+    "mtlx_set": "da6b2561f89492a19cde672994026cad86098fe07da20262d45f7e1c23ee3830",
     "source_textures_set": "39bc67dbb3f0947a358e034f37bf421872b87f2756b8809474f8d5bc4ed63c5e"
   },
   "release": "0.1.0"

@@ -26,7 +26,7 @@ Read what you need, then tell the maintainer your plan in a short block and cont
 | **Matter** — one substance, not an assembly (no planks, tiles, walls: D1) | the brief |
 | **Taxonomy slot** `<domain>/<class>` | `docs/specs/Ontology/Taxonomy.md` — the class must be listed there |
 | **Declared master** + one-line reason | `docs/specs/Ontology/MasterSet.md` — **the material decides**; the class column is only a typical default |
-| **Name** `Material_Variant_Condition_Detail_sNN_vNN` — exactly six tokens | `docs/specs/Ontology/Identity.md`. Material = the matter/species · Variant = the look (default `Natural`) · Condition = damage (overlay 1; `Clean` for a new draft) · Detail = other layers (overlays 2–3; `Base` for a new draft). ≤63 chars, `[A-Za-z0-9_]`. A see-through colour is its own article (`Glass_Green`). |
+| **Name** `Material_Variant_Condition_Detail_sNN_vNN` — exactly six tokens | `docs/specs/Ontology/Identity.md`. Material = the matter/species · Variant = the look (default `Natural`) · Condition = damage (overlay 1; `Clean` for a new draft) · Detail = other layers (overlays 2–3; `Base` for a new draft). ≤63 chars, `[A-Za-z0-9_]`. **A see-through colour or a light's colour is a Creator setting, not its own article** (Phase12, 2026-10-05; `Identity.md`): a brief that differs from an article on disk only by that colour or by a light's brightness is not a new article; say so, and name the article and the value to set (§4 declares the control). *(Was: "A see-through colour is its own article (`Glass_Green`)".)* |
 | **Scale tag** | the closed set in `docs/NamingConventions.md`; param-only articles use `s01` |
 | **Version** `vNN` | the next free integer for that stem: look in `tools/converters/recipes/` and `MatterLibrary/materials/` |
 | **Lane** | **L1 param-only** (constants from Physically Based), **L3 an ambientCG scan** (§2a), or **L2 generated base textures** (§2b), when no scan fits. |
@@ -99,7 +99,7 @@ A layer is shared by many articles, so it is made once, carefully, and judged on
 - `_comment` — why this master, and what the article is for (a sentence or two);
 - `name` (= the stem), `path` (`<domain>/<class>/<Stem>.mtlx`), `master`, `domain`, `class`, `scale_tag`, `meters_per_tile`;
 - the constants from §2, and any author-tier values the master needs (e.g. `thin_walled` + `transmission_color` for TranslucentThin);
-- `lcd_ports` — the Creator controls that make sense for this article (`base_color_tint`, `roughness_bias`, the UV ports when it has textures, and the layer ports from §3);
+- `lcd_ports` — the Creator controls that make sense for this article (`base_color_tint`, `roughness_bias`, the UV ports when it has textures, and the layer ports from §3). **Always `transmission_color` on TranslucentThin and TranslucentThick, and `emission_color` + `emission_luminance` on Emissive** (Phase12): the recipe's own value is where the control starts, so add no `lcd_defaults` for them; the assembler refuses them on any other master;
 - `sources` — the §2 records.
 
 ## 5. Assemble and gate

@@ -22,7 +22,7 @@
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
     {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
   ],
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color", "transmission_color"],
   "sources": [
     {"kind": "judgement", "why": "Physically Based has no lead-crystal entry. specular_ior 1.56, the refractive index of full lead crystal (about 24-30 % PbO; 1.545-1.57). base_color 1, roughness 0 and transmission 1 for a clear, polished glass, as Physically Based gives for its soda-lime and borosilicate glasses. transmission_color 0.98, 0.98, 0.97 at a 0.1 m path (transmission_depth): crystal is very nearly colourless, with a faint warm-grey cast in a thick piece; a tumbler's 5-10 cm of glass reads clear."}
   ]

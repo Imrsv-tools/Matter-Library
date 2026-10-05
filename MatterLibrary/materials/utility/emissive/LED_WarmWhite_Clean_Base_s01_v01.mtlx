@@ -11,6 +11,8 @@
     <input name="maskset_blend" type="float" value="0.0" uiname="Maskset Blend" />
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
     <input name="overlay2_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 2 Color" />
+    <input name="emission_color" type="color3" value="1.0, 0.456, 0.147" uiname="Emission Color" />
+    <input name="emission_luminance" type="float" value="12.0" uiname="Emission Luminance" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -298,6 +300,14 @@
       <input name="in" type="vector3" nodename="normal_ts_encoded" />
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
+    <dot name="emission_color_port" type="color3">
+      <input name="in" type="color3" interfacename="emission_color" />
+    </dot>
+    <output name="emission_color_out" type="color3" nodename="emission_color_port" />
+    <dot name="emission_luminance_port" type="float">
+      <input name="in" type="float" interfacename="emission_luminance" />
+    </dot>
+    <output name="emission_luminance_out" type="float" nodename="emission_luminance_port" />
   </nodegraph>
   <open_pbr_surface name="SR_LED_WarmWhite_Clean_Base_s01_v01" type="surfaceshader">
     <input name="base_weight" type="float" value="1.0" />
@@ -306,8 +316,8 @@
     <input name="specular_roughness" type="float" nodegraph="NG_LED_WarmWhite_Clean_Base_s01_v01" output="roughness_out" />
     <input name="specular_ior" type="float" value="1.5848" />
     <input name="geometry_normal" type="vector3" nodegraph="NG_LED_WarmWhite_Clean_Base_s01_v01" output="normal_out" />
-    <input name="emission_luminance" type="float" value="12.0" />
-    <input name="emission_color" type="color3" value="1.0, 0.456, 0.147" />
+    <input name="emission_luminance" type="float" nodegraph="NG_LED_WarmWhite_Clean_Base_s01_v01" output="emission_luminance_out" />
+    <input name="emission_color" type="color3" nodegraph="NG_LED_WarmWhite_Clean_Base_s01_v01" output="emission_color_out" />
   </open_pbr_surface>
   <surfacematerial name="LED_WarmWhite_Clean_Base_s01_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_LED_WarmWhite_Clean_Base_s01_v01" />
