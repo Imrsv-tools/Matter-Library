@@ -97,6 +97,21 @@ def test_pure_unknown_port_ignored():
     check(out == {}, "a non-LCD port is never emitted (got %r)" % out)
 
 
+def test_pure_see_through_colour():
+    """Phase12: the see-through colour travels as a colour port, measured against the ARTICLE's
+    colour (the interface default), never against white."""
+    base = dict(_BASE, transmission_color=(0.82, 0.95, 0.88, 1.0))      # Glass_Clear's own
+    out = S.sparse_deltas(dict(base), base)
+    check(out == {}, "an untouched see-through colour carries no override (got %r)" % out)
+    inst = dict(base, transmission_color=(1.0, 0.6, 0.1, 1.0))          # the Creator sets amber
+    out = S.sparse_deltas(inst, base)
+    check(list(out) == ["transmission_color"],
+          "a see-through colour moved off the article's -> only that port (got %r)" % list(out))
+    noise = dict(base, transmission_color=(0.82 + 3e-8, 0.95, 0.88, 1.0))
+    check(S.sparse_deltas(noise, base) == {},
+          "per-channel precision noise on the see-through colour is NOT a delta")
+
+
 def test_pure_no_baseline_is_delta():
     out = S.sparse_deltas({"maskset_blend": 0.3}, {})  # no interface default known
     check(out.get("maskset_blend") == 0.3, "a port with no known baseline counts as a delta")
@@ -235,6 +250,7 @@ def main():
     test_pure_precision_noise_not_delta()
     test_pure_explicit_prop_wins_and_drops()
     test_pure_unknown_port_ignored()
+    test_pure_see_through_colour()
     test_pure_no_baseline_is_delta()
     test_bpy_end_to_end()
     print("=== %d checks failed ===" % len(_fails))

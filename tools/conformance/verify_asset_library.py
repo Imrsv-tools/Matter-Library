@@ -29,7 +29,8 @@ RECIPES = os.path.join(REPO, "tools/converters/recipes")
 IDENTITY_PROP = "imrsv_matter_identity"
 LCD_TRAVEL_PORTS = {"base_color_tint", "overlay1_density", "overlay2_density", "overlay3_density",
                     "maskset_blend", "roughness_bias",
-                    "overlay1_color", "overlay2_color", "overlay3_color"}    # Phase10
+                    "overlay1_color", "overlay2_color", "overlay3_color",    # Phase10
+                    "transmission_color"}                                    # Phase12
 fails = []
 
 

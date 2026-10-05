@@ -34,7 +34,8 @@ Phase 60 §9 piece 2 (60.3.3) — the export is SPARSE and non-duplicating:
 LCD travel set (LCDSchema.md, Phase 53 D3 — current/evolving, not frozen):
 base_color_tint (color3), and the floats overlay1_density, overlay2_density, overlay3_density,
 maskset_blend, roughness_bias; since 2026-10-01 a deposit's colour, overlay1_color,
-overlay2_color, overlay3_color (color3, Phase10). UV placement (uv_scale/uv_offset/uv_rotation) is
+overlay2_color, overlay3_color (color3, Phase10); since 2026-10-05 the see-through colour,
+transmission_color (color3, Phase12). UV placement (uv_scale/uv_offset/uv_rotation) is
 Studio-side only (S3) and NOT exported.
 """
 from pathlib import Path

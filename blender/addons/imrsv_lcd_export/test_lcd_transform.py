@@ -160,7 +160,44 @@ def Xform "root"
 }
 '''
 
+# Phase12: the see-through colour is a Creator port. A glass a Creator set to amber rides out as
+# `custom double3 userProperties:transmission_color`; a second, untouched glass carries nothing.
+FIXTURE_GLASS = '''#usda 1.0
+(
+    defaultPrim = "root"
+)
+
+def Xform "root"
+{
+    def Scope "_materials"
+    {
+        def Material "Glass_Clear_Clean_Base_s01_v01"
+        {
+            custom string userProperties:imrsv_matter_identity = "Glass_Clear_Clean_Base_s01_v01"
+            custom double3 userProperties:transmission_color = (1, 0.6, 0.1)
+            token outputs:surface.connect = </root/_materials/Glass_Clear_Clean_Base_s01_v01/Principled_BSDF.outputs:surface>
+
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+            }
+        }
+
+        def Material "Glass_Clear_Clean_Base_s01_v01_001"
+        {
+            custom string userProperties:imrsv_matter_identity = "Glass_Clear_Clean_Base_s01_v01"
+
+            def Shader "Principled_BSDF"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+            }
+        }
+    }
+}
+'''
+
 _COPPER = "/root/_materials/Copper_Verdigris_Aged_Base_s01_v01"
+_GLASS = "/root/_materials/Glass_Clear_Clean_Base_s01_v01"
 
 _fails = []
 
@@ -252,6 +289,31 @@ def test_blender52_header():
     if HAVE_PXR:
         layer = Sdf.Layer.CreateAnonymous(".usda")
         check(layer.ImportFromString(new_text), "5.2 form: the reshaped text parses as USD")
+
+
+def test_see_through_colour():
+    """Phase12: `transmission_color` converts as a colour port and is connected (Carrier rule);
+    the untouched glass authors nothing; a channel over 1 rejects the export."""
+    new_text, converted = L.transform_text(FIXTURE_GLASS)
+    check([(p, v) for (_, p, v) in converted] == [("transmission_color", (1.0, 0.6, 0.1))],
+          "the set see-through colour is the one conversion (got %r)" % converted)
+    check("color3f inputs:transmission_color = (1.0, 0.6, 0.1)" in new_text,
+          "transmission_color -> color3f inputs:")
+    check("color3f inputs:transmission_color.connect = <%s.inputs:transmission_color>" % _GLASS
+          in new_text, "NG_<id>.inputs:transmission_color connects to the Material's input")
+    check(new_text.count('over "NG_') == 1
+          and new_text.count("color3f inputs:transmission_color") == 2,   # one value, one connection
+          "the untouched glass authors no value and no connection (sparse)")
+    check("userProperties:transmission_color" not in new_text, "the bridge attr is stripped")
+    raised = False
+    try:
+        L.transform_text(FIXTURE_GLASS.replace("(1, 0.6, 0.1)", "(1.2, 0.6, 0.1)"))
+    except L.LcdRejected as e:
+        raised = "transmission_color" in str(e)
+    check(raised, "a see-through colour channel over 1 REJECTs (never clamped)")
+    if HAVE_PXR:
+        layer = Sdf.Layer.CreateAnonymous(".usda")
+        check(layer.ImportFromString(new_text), "the reshaped glass parses as USD")
 
 
 def test_idempotent():
@@ -377,6 +439,7 @@ def test_semantic_equivalence():
 def main():
     print("=== Phase 60sq1 Step-1 LCD transform / Creator-reshape tests (pxr=%s) ===" % HAVE_PXR)
     test_transform_text()
+    test_see_through_colour()
     test_idempotent()
     test_identity_from_property()
     test_blender52_header()
