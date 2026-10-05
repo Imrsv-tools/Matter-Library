@@ -27,7 +27,8 @@ overlay's alpha 0 (no wear).
 A second project (PlatformDependencies M7, P20) tells the build what it is building for, by
 environment variable. Unset, every one leaves the build exactly the library's own runtime's:
 
-  MATTER_MASTERS_ROOT=/Game/<path>      where the masters and the default textures are written
+  MATTER_MASTERS_ROOT=<package path>    where the masters and the default textures are written:
+                                        /Game/<path>, or a plugin's content mount point
                                         (default /Game/Masters)
   MATTER_MASTERS_SKINNED=1              the masters also draw on a skinned mesh with morph
                                         targets (a character). Without the usages a packaged run
@@ -38,8 +39,13 @@ environment variable. Unset, every one leaves the build exactly the library's ow
                                         from such UVs, not along +t (default st)
   MATTER_MASTERS_SKY=0                  leave out M_Matter_Sky, which is the rig's dome, not a master
 
-Two more are CANDIDATES, each for a question that is still open, built so that a project with a
-renderer can try them. Neither has been run:
+Those five were run in a second project on Unreal 5.8 and looked at there (2026-10-05): all eight
+masters compile with them, on a skinned mesh too, and a bump reads as a bump. NOT yet run by
+anyone: this script with nothing set, since the switches were added.
+
+Two more are CANDIDATES, each for a question that is still open. The refraction one compiles and
+leaves the thin master right; whether the solid one then bends is not settled. The colour-sampler
+one has never been built:
 
   MATTER_MASTERS_COLOUR_SAMPLER=srgb    the colour slots sample an sRGB texture (a block-compressed
                                         colour picture carries its decode in its own flag, which a
@@ -510,7 +516,8 @@ def build_master(token, white, no_wear, flat, white_colour=None):
         # runtime's meshes point their binormal (drivers/unreal.py tangent_signs). A mesh whose
         # binormal Unreal built from flipped UVs points it along +v = -dP/dt, so every bump would
         # lean the wrong way up and down. Negate Y once, on the sum (the article's map, the second
-        # layer's and the three overlays'), before it is normalised. WORKED OUT, NOT YET SEEN.
+        # layer's and the three overlays'), before it is normalised. Seen in a second project
+        # (2026-10-05): slate, leather and rusted steel at a glancing angle read as raised.
         n_ts = g.op(M.MaterialExpressionMultiply, n_ts,
                     g.node(M.MaterialExpressionConstant3Vector, 4,
                            constant=unreal.LinearColor(1.0, -1.0, 1.0, 0.0)), 4)
@@ -588,8 +595,9 @@ def build_master(token, white, no_wear, flat, white_colour=None):
     if spec["blend"] == "translucent":
         # refraction by the index of refraction (MasterSet: TranslucentThin / Thick)
         if REFRACTION == "index":
-            # A CANDIDATE for M6, not run. Seen live in a second project (2026-10-05): with the
-            # function's output here, neither see-through master bends, so the solid one is wrong.
+            # A CANDIDATE for M6. Seen live in a second project (2026-10-05): with the function's
+            # output here, neither see-through master bends, so the solid one is wrong. With this
+            # switch it compiles and the thin master is right; the solid one's bend is not settled.
             # MasterSet's rule, wired directly: a solid bends by the article's index; a thin wall
             # is not deflected, and an index of 1.0 removes the bend while the distortion pass
             # still blurs by roughness.

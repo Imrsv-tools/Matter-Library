@@ -31,9 +31,24 @@ editor() {
 }
 
 masters() {
+  # The result is read from the builder's own last line, never from the exit code: the
+  # commandlet exits 0 and prints "Python script executed successfully" even when the script
+  # raised, and the builder's lines ("told …", "built …", "RESULT ok") reach the output only with
+  # -FullStdOutLogOutput. Both seen in a second project on Unreal 5.8 (2026-10-05); without them a
+  # mistyped switch, which the builder refuses, would pass here as a good build.
+  local log
+  log="$(mktemp)"
   nice -n 19 "$UE/Engine/Binaries/Linux/UnrealEditor-Cmd" "$PROJECT" -run=pythonscript \
     -script="$HERE/MatterRuntime/Scripts/build_masters.py" \
-    -EnablePlugins=PythonScriptPlugin,EditorScriptingUtilities -unattended -nullrhi -stdout
+    -EnablePlugins=PythonScriptPlugin,EditorScriptingUtilities -unattended -nullrhi -stdout \
+    -FullStdOutLogOutput | tee "$log"
+  if ! grep -q "MATTER RESULT ok" "$log"; then
+    echo "masters: FAILED. The builder did not report 'MATTER RESULT ok' (its output is above)." >&2
+    rm -f "$log"
+    exit 1
+  fi
+  echo "masters: ok. $(grep -o 'MATTER told .*' "$log" | tail -1)"
+  rm -f "$log"
 }
 
 package() {

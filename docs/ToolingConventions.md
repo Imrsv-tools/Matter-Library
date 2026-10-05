@@ -59,13 +59,14 @@
 - `MATTER_UNREAL_RUNTIME` — a packaged Unreal runtime's `MatterRuntime.sh`, used instead of the pinned download; `MATTER_UNREAL_EDITOR` — an Unreal 5.8 `UnrealEditor`, to run `unreal/MatterRuntime` in editor mode (the development loop). Neither set: the build `unreal/RUNTIME.json` pins. `MATTER_BLENDER` — the Blender the rig runs.
 
 **What a second project tells the Unreal master builder (environment variables, all optional; 2026-10-05, `PlatformDependencies.md` M7):** `unreal/MatterRuntime/Scripts/build_masters.py` reads them, and its head is the owner of what each does. Unset, the build is the library's own runtime's, and the runtime published from here is built with none set. A value the builder does not know stops the build.
-- `MATTER_MASTERS_ROOT` — where the masters and their default textures are written (default `/Game/Masters`).
+- `MATTER_MASTERS_ROOT` — where the masters and their default textures are written: a package path, `/Game/<path>` or a plugin's content mount point (default `/Game/Masters`).
 - `MATTER_MASTERS_SKINNED=1` — the masters also draw on a skinned mesh with morph targets.
 - `MATTER_MASTERS_MESH_V=unreal` — the meshes' UVs are Unreal's (`v = 1 − t`), not USD's `st`.
 - `MATTER_MASTERS_MESH_BINORMAL=unreal` — the meshes' binormal runs along `+v`, so the normal map's green is turned.
 - `MATTER_MASTERS_SKY=0` — leave out the rig's Sky.
 - **Candidates, each for an open question:** `MATTER_MASTERS_COLOUR_SAMPLER=srgb` (the colour slots sample an sRGB texture) and `MATTER_MASTERS_REFRACTION=index` (the Refraction input takes the article's index on the solid see-through master and 1.0 on the thin one; M6).
-- **None of these has been run in Unreal** (2026-10-05). The check that the unset build is unchanged was made against a stand-in for Unreal's Python, which shows what the script asks for and nothing about what the engine draws.
+- **Run in Unreal by the platform, in its own project (2026-10-05; `261005_R_PlatformMasterAdoptionAsks.md` Passes 5 and 6):** the five above, all eight masters compiling and drawing with them, a character included, and a bump reading as a bump. `MATTER_MASTERS_REFRACTION=index` compiles and leaves the thin master right; the solid master's bend under it is not settled. `MATTER_MASTERS_COLOUR_SAMPLER=srgb` has never been built. **The unset build has not been run in Unreal since the switches were added:** that it is unchanged was checked against a stand-in for Unreal's Python, which shows what the script asks for and nothing about what the engine draws. *(Was, earlier the same day: "None of these has been run in Unreal".)*
+- **`unreal/build.sh masters` reads the result from the builder's own line** (`MATTER RESULT ok`), not from the exit code: the commandlet exits 0 even when the script raised, and the builder's lines reach the output only with `-FullStdOutLogOutput` (seen by the platform, 2026-10-05). A caller of its own should do the same, and compare the builder's `told …` line with what it set.
 
 Every script finds the repo from its own location; none assumes a checkout path. *(Phase02, 2026-09-23. Before it, `run_all.py` failed at import for want of MaterialX, several tools hardcoded a retired checkout path, and there was no pinned environment and no CI.)*
 

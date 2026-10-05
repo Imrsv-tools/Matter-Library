@@ -254,11 +254,28 @@
 
 ---
 
+## Pass 8 — What the library repaired from Pass 7 (2026-10-05)
+
+*The lead, after Pass 7, verbatim: "yes, fix it all and push". Done as quick fixes outside this doc, the same day.*
+
+- **MA-R17 is repaired, and the library's own carrier check runs again** (`c7b963e`, which closes issue #2). The check counts a Material input only where the **asset** authored it: a spec in a layer that is not an article's own `.mtlx`. The port list moved to `tools/converters/lcd_ports.py`, plain data, so the gate's Python can import it.
+  - **`check_exporter.sh`, baselined before the edit:** it was FAIL with five lines dead at the import, and is PASS. The four real exports report 1, 0, 0 and 1 overrides, each conforming, and no other line differs.
+  - **The self-test** passes under the gate's own Python (23 checks), with new cases against Copper, Glass_Clear and Neon_Signage. Run against the old rule, 12 of them fail, the two original GREEN cases among them: so the test would have gone red at Phase12 had it been able to start.
+  - **`run_all.py`:** the summary is the baseline's (15 PASS, 2 SKIP), `determinism` among them, so no article moved.
+  - **The rule is in the contract:** `LCDSchema.md` §Carrier rule, *"a Material input is an override only where the asset authored it"*.
+  - **One limit, stated in the check's header:** on a flattened copy every spec is in one layer, so the check cannot tell who wrote what. It is run on the asset as authored.
+  - **The platform can drop its workaround** and take the check as it now stands. Its own rule (*"a refusal only on a port the asset itself authors"*) and the library's are the same rule.
+- **MA-R11:** `unreal/build.sh masters` passes `-FullStdOutLogOutput` and fails unless the builder printed *"MATTER RESULT ok"*. **Not run in Unreal.** Tried against a stand-in engine in three cases: a good build passes; a build whose script raised while the commandlet exits 0 fails; a crashed engine fails.
+- **MA-R12:** P23 says a reader that looks on the shader must change, and that a gate going by name finds three overrides on every Material.
+- **MA-R7, MA-F25:** the builder's head, `ToolingConventions.md`, M7 and M6 say what has been run, by whom, and what has not. The builder's code is unchanged: the stand-in check beside this doc still passes.
+
+---
+
 ## Status
 
-- **Passes captured:** 7 (Passes 1, 2, 5 and 6 from the platform's side; Passes 3, 4 and 7 from the library's; all 2026-10-05).
+- **Passes captured:** 8 (Passes 1, 2, 5 and 6 from the platform's side; Passes 3, 4, 7 and 8 from the library's; all 2026-10-05).
 - **Current direction.** The platform now builds from the library's builder and has retired its patched copy. The three asks and the two things the library added are **run in Unreal and looked at**, by the platform (Passes 5 and 6; MA-F25). Of the two candidates, the refraction one compiles and leaves the thin master right, with the solid master's bend unsettled (MA-Q7); the colour-sampler one has never been built. **What the look turned up is a fault of the library's own, not in the masters:** the carrier check has refused every asset since Phase12, and the library could not see it because that check has not run on its own machine since before Phase05 (MA-F19, MA-F20). *(Was, at Pass 4: "All of it is built and none of it is run … What is owed now is on the system that has it".)*
-- **Asks:** A1, A2, A3 **built (`a66377c`) and run by the platform** (MA-R6 – MA-R14). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). **New, from the platform:** the carrier check (MA-R17), `build.sh`'s false success (MA-R11), a sentence on P23 (MA-R12), the root's wording (MA-R7). None built in Pass 7. *(Was, at Pass 4: "built, not run".)*
+- **Asks:** A1, A2, A3 **built (`a66377c`) and run by the platform** (MA-R6 – MA-R14). The correction recorded on P20 as owed at its close. The ledger row written (M7, `228bb2f`). **New, from the platform, all done in Pass 8:** the carrier check (MA-R17; repaired and proven here), `build.sh`'s false success (MA-R11; built, not run in Unreal), a sentence on P23 (MA-R12), the root's wording (MA-R7). *(Was, at Pass 4: "built, not run".)*
 - **Questions:** MA-Q2 answered (one builder). MA-Q4 answered (along Unreal's V, MA-R10). MA-Q5 closed as *later* (MA-F26). MA-Q6 answered (separate switches). **Open:** MA-Q1 (a ruling; the candidate is unbuilt and nobody is waiting on it) · MA-Q3 (a new runtime publish or not, now that the builder has changed) · **MA-Q7 (the platform's: the diamond's bend, in words that settle it).**
 - **What was added, and what was not.** Passes 3 and 4, this footer, the check beside this doc, and a dated line in the thin-glass doc's Status. Outside this doc, at the lead's direction: the builder, `unreal/build.sh`'s header, `ToolingConventions.md`, and the ledger. **Not changed:** any article, any spec, the Roadmap, the pinned runtime (`unreal/RUNTIME.json`).
 - **Not run.** Everything in Pass 3 is read from the tree. MA-F10's sampler rule is Unreal's known behaviour, not tried by anyone. Passes 2, 5 and 6 are the platform's, taken as written. **The unset build has met a stand-in only** (MA-F18, MA-F27): nobody has run `unreal/build.sh masters` with no switch set. Pass 7 ran MA-R17 here and nothing else. *(MA-F8 was "derived, not seen" until Pass 6's MA-R14.)*
@@ -268,7 +285,11 @@
 
 - **Pass 7, the library's (2026-10-05):** MA-R17 is reproduced here and is wider than reported: every Material on every asset, whatever its article declares (MA-F19). Its cause on the library's side is issue #2 (MA-F20), and the repair's shape is measured (MA-F21). Nothing built.
 
-▶ **Next:** here, one quick fix: the carrier check counts only what an asset authored, the port list moves where the check can import it (closing issue #2), and the self-test gains the cases; with it the small things of Pass 7's table (rows 2 – 5). Then push, so the platform can drop its workaround. **From the platform:** MA-Q7. **On the machine that builds the library's runtime:** the unset build (MA-F27). The solid master's faint, flat colour (MA-F13) waits on the lead.
+- **Pass 8, the library's (2026-10-05):** everything in Pass 7's table that is the library's is done (`c7b963e` and the commit that carries this line). The carrier check is repaired and proven on this machine; the exporter gate passes, having been red since at least Phase05's close, when issue #2 was filed; issue #2 is closed. `build.sh`'s change is not run in Unreal.
+
+▶ **Next:** nothing here. **From the platform:** take the repaired carrier check and drop the workaround; answer MA-Q7 (the diamond, with the switch and without). **On the machine that builds the library's runtime:** `unreal/build.sh masters` with no switch set, which proves the unset build (MA-F27) and the script's new result check in one run. The solid master's faint, flat colour (MA-F13), and MA-Q1 and MA-Q3, wait on the lead.
+
+*(Superseded 2026-10-05 by Pass 8. Was: "here, one quick fix: the carrier check counts only what an asset authored, the port list moves where the check can import it (closing issue #2), and the self-test gains the cases; with it the small things of Pass 7's table (rows 2 – 5). Then push, so the platform can drop its workaround. From the platform: MA-Q7. On the machine that builds the library's runtime: the unset build (MA-F27). The solid master's faint, flat colour (MA-F13) waits on the lead.")*
 
 *(Superseded 2026-10-05 by Pass 7. Was: "on the system with Unreal, Pass 4's four steps. Here, nothing until that look comes back. The solid master's faint, flat colour (MA-F13) and the skin (MA-Q5) wait on the lead.")*
 
