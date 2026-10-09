@@ -12,8 +12,9 @@
 # consumer's build. Whether the library's baseline leads and consumers declare a match, or the
 # reverse, is open: docs/specs/Tooling/USDValidationToolchain.md (Drift, 2026-09-23).
 #
-# Run from INSIDE the host conda env (see environment.yml):
-#   conda activate imrsv-usd-tools && bash build-usd-tools.sh
+# Run from INSIDE the host env (run-all.sh makes it: the conda env from environment.yml,
+# or a uv venv where there is no conda):
+#   conda activate imrsv-usd-tools && bash build-usd-tools.sh   (or: bash run-all.sh)
 #
 # Idempotent: re-running resumes (clone + build_usd.py both skip done work; the GLSL fix
 # below is grep-guarded). Reversible: rm -rf "$USD_TOOLS_ROOT".
@@ -42,19 +43,42 @@ fi
 # Stage vendors MaterialX 1.39.5; build_usd.py defaults to 1.39.3, whose
 # MaterialXGenShader/HwShaderGenerator.cpp fails under gcc 16 ('Classification::BSDF
 # is not a member' — that file was refactored into MaterialXGenHw in 1.39.4+).
-# Idempotent: no-ops once already 1.39.5.
-sed -i 's#MaterialX/archive/v1\.39\.3\.zip#MaterialX/archive/v1.39.5.zip#' \
-  "${SRC}/build_scripts/build_usd.py"
+# Grep-guarded => idempotent. (-i.bak, then remove it: the one in-place form GNU and
+# BSD/macOS sed both accept.)
+if grep -q 'MaterialX/archive/v1\.39\.3\.zip' "${SRC}/build_scripts/build_usd.py"; then
+  sed -i.bak 's#MaterialX/archive/v1\.39\.3\.zip#MaterialX/archive/v1.39.5.zip#' \
+    "${SRC}/build_scripts/build_usd.py"
+  rm -f "${SRC}/build_scripts/build_usd.py.bak"
+fi
 echo "[usd-tools] MaterialX pin: $(grep -o 'MaterialX/archive/v[0-9.]*\.zip' "${SRC}/build_scripts/build_usd.py")"
+
+# --- 1c. Metal render fix: glslfx primvar type names (source patch) ------------------
+# On macOS v26.03 writes a <texcoord>'s `st` primvar into the generated glslfx as MSL's
+# `float2`, which the glslfx parser rejects, so Storm draws every such article as its
+# fallback. patches/hdSt-glslfx-primvar-type.patch backports OpenUSD dev's fix (the type
+# comes from the MaterialX type name); drop it when the baseline moves past v26.03.
+# docs/specs/Tooling/USDValidationToolchain.md, fix 3. Idempotent: skipped once applied.
+PATCH="$(cd "$(dirname "$0")" && pwd)/patches/hdSt-glslfx-primvar-type.patch"
+if ! git -C "${SRC}" apply --reverse --check "${PATCH}" 2>/dev/null; then
+  echo "[usd-tools] applying ${PATCH##*/}"
+  git -C "${SRC}" apply "${PATCH}"
+fi
 
 # --- 2. Build USD + deps + tools via USD's own orchestrator ------------------------
 # build_usd.py fetches+builds boost/tbb/opensubdiv/etc, then USD itself. --usdview
-# implies --python --imaging. PySide6 + PyOpenGL come from the conda env.
-# Conda's python ships only the SHARED libpython (.so), but build_usd.py introspects
+# implies --python --imaging. PySide6 + PyOpenGL come from the host env.
+# The host python (conda's, or uv's) ships only the SHARED libpython, but build_usd.py introspects
 # sysconfig and forces Python3_LIBRARY=libpython3.12.a (static, absent) -> FindPython3
-# fails. Override with the real shared lib, derived from the active env (reproducible).
-PYLIB="$(python -c 'import sysconfig,glob,os; d=sysconfig.get_config_var("LIBDIR"); print(sorted(glob.glob(os.path.join(d,"libpython3.*.so")))[0])')"
+# fails. Override with the real shared lib, derived from the active env (reproducible;
+# .dylib on macOS).
+PYLIB="$(python -c 'import sysconfig,glob,os; d=sysconfig.get_config_var("LIBDIR"); print(sorted(glob.glob(os.path.join(d,"libpython3.*.so"))+glob.glob(os.path.join(d,"libpython3.*.dylib")))[0])')"
 echo "[usd-tools] forcing shared Python lib: ${PYLIB}"
+# Linking the modules against that lib is right on Linux. On macOS it is not: uv's python
+# has libpython built into the executable, so a module that also loads the .dylib puts two
+# Pythons in one process and `import pxr` segfaults. There the modules leave the Python
+# symbols to the running interpreter (dynamic lookup, USD's own macOS default).
+PYLOOKUP=OFF
+if [ "$(uname -s)" = "Darwin" ]; then PYLOOKUP=ON; fi
 
 echo "[usd-tools] building into ${INST} (jobs=${JOBS}) ..."
 python "${SRC}/build_scripts/build_usd.py" \
@@ -67,7 +91,7 @@ python "${SRC}/build_scripts/build_usd.py" \
   --no-tutorials \
   --no-tests \
   --no-docs \
-  --build-args "USD,-DPython3_LIBRARY=${PYLIB} -DPXR_PY_UNDEFINED_DYNAMIC_LOOKUP=OFF" \
+  --build-args "USD,-DPython3_LIBRARY=${PYLIB} -DPXR_PY_UNDEFINED_DYNAMIC_LOOKUP=${PYLOOKUP}" \
   -j "${JOBS}" \
   "${INST}"
 

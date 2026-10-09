@@ -49,8 +49,9 @@ any consumer), so it lives beside the harness:
 
 | Path (in `tools/usd-toolchain/`) | Role |
 |---|---|
-| `environment.yml` | conda host env (python 3.12, cmake 3.28, pyside6/pyopengl/numpy, **PyMaterialX 1.39.5** via pip) — isolates the host's system python/cmake/gcc |
-| `build-usd-tools.sh` | clone v26.03 · pin MaterialX 1.39.5 · `build_usd.py` · apply the GLSL render fix |
+| `environment.yml` | conda host env (python 3.12, cmake 3.28, pyside6/pyopengl/numpy, **PyMaterialX 1.39.5** via pip) — isolates the host's system python/cmake/gcc; without conda, `run-all.sh` makes a uv venv with the same pins |
+| `build-usd-tools.sh` | clone v26.03 · pin MaterialX 1.39.5 · apply `patches/` · `build_usd.py` · apply the GLSL render fix |
+| `patches/` | source patches applied before the build (the Metal render fix, fix 3 below) |
 | `run-all.sh` | create env from `environment.yml` → build (idempotent, backgroundable) |
 | `activate-usd-tools.sh` | PATH/PYTHONPATH/LD_LIBRARY_PATH/`PXR_MTLX_STDLIB_SEARCH_PATHS` + the Linux render fix |
 | `README.md` | recipe usage |
@@ -58,21 +59,23 @@ any consumer), so it lives beside the harness:
 *(Updated 2026-09-23, measured: `ls tools/usd-toolchain/`; python/cmake pins in `environment.yml`.)*
 
 The **built install** (`inst/usd-26.03/` under `$USD_TOOLS_ROOT`, which has a per-user default in the scripts) is a multi-GB artifact and is **never committed** (generated output). Reversible:
-`rm -rf "$USD_TOOLS_ROOT"` and remove the conda env named in `environment.yml` (`imrsv-usd-tools`, a historical name kept).
+`rm -rf "$USD_TOOLS_ROOT"` (which holds the uv venv, where there was no conda) and remove the conda env named in `environment.yml` (`imrsv-usd-tools`, a historical name kept) where conda made it.
 
 ## Five build fixes (captured in the recipe, reproducible)
 
 `--imaging`→`--usd-imaging`; MaterialX `1.39.3`→`1.39.5` (the 1.39.3 default fails to compile
 under gcc 16, and 1.39.5 is the baseline pin anyway); conda static→shared libpython override
 (`-DPython3_LIBRARY=…so`, since conda ships only the shared lib but `build_usd.py` asks for the
-static); `-DPXR_PY_UNDEFINED_DYNAMIC_LOOKUP=OFF` (link libpython into the C++ tools). PyMaterialX
+static); `-DPXR_PY_UNDEFINED_DYNAMIC_LOOKUP=OFF` (link libpython into the C++ tools; Linux only:
+on macOS the recipe passes `ON`, USD's own macOS default, because uv's python has libpython built
+into the executable and a module that also loads the `.dylib` segfaults on `import pxr`). PyMaterialX
 is a pip wheel — `--materialx` builds only USD's MaterialX C++ libs, not the importable module.
 
-## The live render path (two gotchas — durable)
+## The live render path (three gotchas — durable)
 
 The headless **data** path (`usdcat --flatten`, `usdchecker`, PyMaterialX, UsdMtlx) worked
-immediately. The **live Storm GL render** took two fixes; both are baked into the recipe so a
-fresh build renders correctly. (The full diagnostic trail is in `tools/usd-toolchain/README.md`.)
+immediately. The **live Storm render** took two fixes on Linux GL and one on macOS Metal; all
+are baked into the recipe so a fresh build renders correctly. (The full diagnostic trail is in `tools/usd-toolchain/README.md`.)
 
 1. **Qt picks the wrong GL platform.** Both `usdview` *and* `usdrecord` build their GL context
    through **Qt (PySide6 `QOpenGLContext`)**. On a **Wayland** session (e.g. KDE Plasma 6) Qt
@@ -98,7 +101,21 @@ not OS-specific, but macOS Storm uses the **MSL** generator, so if a Metal build
 white-material symptom, apply the analogous define in the `genmsl` lib (the MaterialX MSL
 generator emits it; USD's MSL `emitPixelStage` may omit it the same way).
 
-> **Reevaluate (2026-09-23):** the macOS path has not been built or measured.
+> **macOS, built and measured (2026-10-09):** on Apple Silicon, with no conda, `run-all.sh` made
+> its uv venv (the same pins) and built the install in ~11 min. Storm on Metal needed one more fix,
+> now in the recipe (fix 3 below); with it the parity rig reads Storm vs Blender ΔE2000 0.33 on the
+> grey card (Phase05's figure: 0.35) and 0.46 on StainlessSteel_Polished. Apple's own
+> `/usr/bin/usdrecord` is not a stand-in: it rendered the grey card ~12 ΔE lighter.
+
+3. **Storm on Metal draws every article that uses `<texcoord>` as its grey fallback** (macOS
+   only), silently but for one parser line: `Invalid type and no default value for st`.
+   v26.03's `HdStMaterialXShaderGen` writes the `st` primvar into the generated glslfx's
+   configuration under the shading language's type name. That is MSL's `float2` on Metal, and
+   `HioGlslfxConfig` knows only `float`/`int`/`vec2`/`vec3`/`vec4`, so the glslfx is invalid. Linux's
+   GLSL says `vec2`, and an untextured network declares no primvar. **Fix (source patch, before
+   the build):** `patches/hdSt-glslfx-primvar-type.patch` backports OpenUSD dev's
+   `_GetGlslfxPrimvarTypeName`, which takes the type from the MaterialX type name instead; the
+   patch drops out when the baseline moves past v26.03.
 
 ## Checks run on this toolchain
 

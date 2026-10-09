@@ -10,6 +10,9 @@
 #   conda activate imrsv-usd-tools
 #   bash run-all.sh                               # build (~30-50 min, idempotent)
 #
+# Where there is no conda, run-all.sh makes a uv venv with the same pins, listed in its
+# venv branch: change a pin in both places.
+#
 # System prerequisites (NOT conda — install with the OS package manager):
 #   Fedora/Linux:  sudo dnf install gcc-c++ libXt-devel libXrandr-devel \
 #                       libXinerama-devel libXcursor-devel libXi-devel mesa-libGL-devel
