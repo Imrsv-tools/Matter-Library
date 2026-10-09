@@ -1,0 +1,64 @@
+{
+  "_comment": "Satin paint: the low-sheen finish of painted cabinets, trim, walls and furniture, authored white so a Creator tints it to any colour. Opaque, a dielectric film; the substance is the paint, not what it covers (D1). Param-only (L1). The satin sibling of Paint_Gloss: the same white, without the gloss coat. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, placed by the Edges mask (G damage along borders, B deposit in corners, A handling on open faces). Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "Paint_Satin_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "synthetic/coating/Paint_Satin_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "coating",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.869, 0.867, 0.771",
+  "roughness_const": 0.35,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png",
+      "density_port": "overlay3_density"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "overlay3_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Whiteboard",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.869, 0.867, 0.771",
+        "metalness_const": 0,
+        "roughness_const": 0,
+        "specular_ior": 1.5
+      },
+      "note": "A whiteboard is a white gloss coating on steel: its colour is taken as the paint's, as on Paint_Gloss. Its roughness 0 is not taken: see the judgement below."
+    },
+    {
+      "kind": "judgement",
+      "why": "Roughness 0.35: satin, between matte (~0.7) and Paint_Gloss's body under its coat (0.3, with a gloss coat on top); no coat, so the sheen is soft and broad. IOR 1.5: an alkyd or acrylic binder."
+    }
+  ]
+}

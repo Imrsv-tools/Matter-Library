@@ -1,0 +1,56 @@
+{
+  "_comment": "Raw cast iron: bare grey iron with a fine cast grain and small pits, the matter of stove grates, pans, hinges, hooks and hardware. Opaque, a conductor, from an ambientCG scan (L3, Metal052C). Raw, not seasoned: a seasoned pan or a blackened grate is the Creator's dark tint, or a later sibling. APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), pitting (overlay 2, corrosion pits), dust as a deposit (Phase10), gated by the Grime mask, as on MildSteel_Raw. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "CastIron_Raw_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/metal/CastIron_Raw_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/metal/CastIron_Raw_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/CastIron_Raw_roughness_s01.png",
+  "metalness_tex": "../../../textures/base/engineered/metal/CastIron_Raw_metalness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/metal/CastIron_Raw_normal_s01.png",
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png",
+      "density_port": "overlay2_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay3_density",
+      "color_port": "overlay3_color"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "overlay3_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay3_color"
+  ],
+  "sources": [
+    {
+      "kind": "ambientcg",
+      "asset": "Metal052C",
+      "url": "https://ambientcg.com/view?id=Metal052C",
+      "license": "CC0-1.0",
+      "provenance": "library/provenance/sources/base/engineered/metal/CastIron_Raw.yaml"
+    },
+    {
+      "kind": "judgement",
+      "why": "ambientCG gives no physical size for Metal052C; a 0.1 m tile puts its pits at ~1 mm, a cast surface's grain. The scan's mean linear albedo (~0.52) sits on Physically Based `Iron` (0.53); its `Cast Iron` entry (0.027, a metal at 2.7%) describes seasoned cookware, not bare iron, so it is not used."
+    }
+  ]
+}

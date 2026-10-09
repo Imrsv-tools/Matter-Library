@@ -1,0 +1,72 @@
+{
+  "_comment": "Brushed stainless steel: the satin, belt-grained finish of appliance fronts, range hoods and sinks. Opaque, a conductor, with specular anisotropy: the grooves (the article's own normal and roughness, L2, gen_stainlesssteel_brushed.py) run along V, so the highlight stretches along U, as on Aluminium_Brushed. Colour is the Physically Based constant, as on StainlessSteel_Polished. APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (B the corner band for a deposit, A the open faces for handling marks, so dust takes slot 2 and fingerprints slot 3). Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "StainlessSteel_Brushed_Clean_Base_s001_v01",
+  "status": "draft",
+  "path": "engineered/metal/StainlessSteel_Brushed_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_const": "0.669, 0.639, 0.598",
+  "roughness_tex": "../../../textures/base/engineered/metal/StainlessSteel_Brushed_roughness_s001.png",
+  "normal_tex": "../../../textures/base/engineered/metal/StainlessSteel_Brushed_normal_s001.png",
+  "metalness_const": 1.0,
+  "specular_roughness_anisotropy": 0.8,
+  "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png",
+      "density_port": "overlay3_density"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "overlay3_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Stainless Steel",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609302132,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.669, 0.639, 0.598",
+        "metalness_const": 1,
+        "roughness_const": 0
+      },
+      "not_carried": [
+        "specularColor",
+        "complexIor"
+      ]
+    },
+    {
+      "kind": "judgement",
+      "why": "Physically Based gives roughness 0 (a mirror). Roughness ~0.30 in the map (0.25-0.35): a satin brushed finish. Anisotropy 0.8: long, continuous parallel grooves (no measured value; Satin's floats are 0.7)."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_stainlesssteel_brushed.py",
+      "provenance": "library/provenance/sources/base/engineered/metal/StainlessSteel_Brushed.yaml"
+    }
+  ]
+}
