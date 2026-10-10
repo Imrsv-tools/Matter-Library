@@ -120,7 +120,7 @@ FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal ma
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
                 "specular_color", "specular_ior", "specular_roughness_anisotropy", "coat_weight",
-                "coat_color", "coat_roughness", "coat_ior", "fuzz_weight", "fuzz_color", "fuzz_roughness",
+                "coat_color", "coat_roughness", "coat_ior", "coat_darkening", "fuzz_weight", "fuzz_color", "fuzz_roughness",
                 "emission_luminance", "emission_color", "subsurface_weight", "subsurface_color",
                 "subsurface_radius", "subsurface_radius_scale", "subsurface_scatter_anisotropy",
                 "transmission_weight", "transmission_color", "transmission_depth"}
