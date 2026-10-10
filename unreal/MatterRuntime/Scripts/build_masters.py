@@ -34,6 +34,9 @@ environment variable. Unset, every one leaves the build exactly the library's ow
   MATTER_MASTERS_SKINNED=1              the masters also draw on a skinned mesh with morph
                                         targets (a character). Without the usages a packaged run
                                         draws Unreal's default material there, reporting nothing
+  MATTER_MASTERS_INSTANCED=1            the masters also draw on an instanced static mesh (one
+                                        mesh drawn many times, as a USD prototype is). Without the
+                                        usage a packaged run draws Unreal's default material there
   MATTER_MASTERS_MESH_V=unreal          the meshes' UVs are Unreal's (v = 1 - t, as its importers
                                         leave them), not USD's st (default st)
   MATTER_MASTERS_MESH_BINORMAL=unreal   the meshes' binormal runs along +v, as Unreal builds it
@@ -43,7 +46,8 @@ environment variable. Unset, every one leaves the build exactly the library's ow
 Those five were run in a second project on Unreal 5.8 and looked at there (2026-10-05): all eight
 masters compile with them, on a skinned mesh too, and a bump reads as a bump. With nothing set the
 script was run in the library's own project the same day: its "built ..." lines are those of the
-build before the switches, byte for byte.
+build before the switches, byte for byte. MATTER_MASTERS_INSTANCED came later (2026-10-10) and
+sets one usage only, as the skinned switch does.
 
 Two more are CANDIDATES, each for a question that is still open. The refraction one compiles and
 leaves the thin master right; whether the solid one then bends is not settled. The colour-sampler
@@ -79,6 +83,7 @@ ROOT = _told("MATTER_MASTERS_ROOT", "/Game/Masters")
 if not ROOT.startswith("/") or ROOT.endswith("/"):
     raise RuntimeError(f"MATTER_MASTERS_ROOT={ROOT!r}: want a package path such as /Game/Masters")
 SKINNED = _told("MATTER_MASTERS_SKINNED", "0", {"0", "1"}) == "1"
+INSTANCED = _told("MATTER_MASTERS_INSTANCED", "0", {"0", "1"}) == "1"
 MESH_V = _told("MATTER_MASTERS_MESH_V", "st", {"st", "unreal"})
 MESH_BINORMAL = _told("MATTER_MASTERS_MESH_BINORMAL", "st", {"st", "unreal"})
 SKY = _told("MATTER_MASTERS_SKY", "1", {"0", "1"}) == "1"
@@ -679,6 +684,10 @@ def build_master(token, white, no_wear, flat, white_colour=None):
         # itself; a packaged or -game run cannot, and draws Unreal's default material instead.
         mat.set_editor_property("used_with_skeletal_mesh", True)
         mat.set_editor_property("used_with_morph_targets", True)
+    if INSTANCED:
+        # The same holds for an instanced static mesh: the editor adds the usage at load and
+        # recompiles it every launch; a packaged run draws Unreal's default material.
+        mat.set_editor_property("used_with_instanced_static_meshes", True)
     return mat
 
 
@@ -703,8 +712,8 @@ def save(mat):
 
 
 def main():
-    log(f"told root={ROOT} skinned={int(SKINNED)} mesh_v={MESH_V} mesh_binormal={MESH_BINORMAL} "
-        f"sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} refraction={REFRACTION}")
+    log(f"told root={ROOT} skinned={int(SKINNED)} instanced={int(INSTANCED)} mesh_v={MESH_V} "
+        f"mesh_binormal={MESH_BINORMAL} sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} refraction={REFRACTION}")
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
