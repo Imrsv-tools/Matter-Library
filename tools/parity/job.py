@@ -214,6 +214,7 @@ def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) ->
 def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:
     """A character job: the defaults only (sliders are swept on the test scene), every view."""
     import build_character  # noqa: PLC0415
+    out_dir = out_dir.resolve()          # JOB_FORMAT.md: absolute (a driver runs in its own cwd)
     out_dir.mkdir(parents=True, exist_ok=True)
     scene = write_character_scene(bindings, out_dir / "scenes" / "defaults.usda")
     meshmaps = build_character.mesh_maps()
@@ -282,6 +283,7 @@ def view_suffix(view: str) -> str:
 
 def write_job(art: Article, settings: list[dict], out_dir: Path, width: int, samples: int) -> Path:
     """Write every setting's scene and the job.json that names them."""
+    out_dir = out_dir.resolve()          # JOB_FORMAT.md: absolute (a driver runs in its own cwd)
     out_dir.mkdir(parents=True, exist_ok=True)
     for s in settings:
         s["scene"] = str(write_setting_scene(art, s, out_dir / "scenes" / f"{s['id']}.usda"))
