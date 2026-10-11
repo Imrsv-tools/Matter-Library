@@ -1,7 +1,7 @@
 # Research — Which side of a face is drawn: what IMRSV's asset tooling found, and what it asks of the library
 
 **Opened:** 2026-10-11 · **Mode:** research. It gathers and commits to nothing; the library's own discovery rules each ask.
-**Mnemonic:** `AT` (ids `AT-Qn`, `AT-Fn`). **Pass 1** is written from the asset tooling's side. The library's review of it against its own tree is **Pass 2** (the same day), as in `261005_R_PlatformThinGlassAsks.md`.
+**Mnemonic:** `AT` (ids `AT-Qn`, `AT-Fn`). **Pass 1** is written from the asset tooling's side. The library's review of it against its own tree is **Pass 2** (the same day), as in `261005_R_PlatformThinGlassAsks.md`. **Pass 3** (the same day) is what the library then built.
 **Requested by:** IMRSV's work on the tools that make a model ready for Studio: how an asset is built, checked and pictured before anyone opens Studio. The lead, 2026-10-11, verbatim: *"Go ahead and ask Matter library whatever you need"*.
 
 **Questions:** (1) what should the library's Blender route and its Creator Asset Profile say about which side of a face is drawn? (2) may a second project call the rig's Unreal driver and app, to picture an asset?
@@ -126,7 +126,7 @@ The scripts behind AT-F5 and AT-F6 are the asset tooling's and are not public ye
   - **This answers what AT-F4 left untried:** Cycles would not show it. The rig's Blender column is Cycles, so A1 changes a builder's viewport and never the rig's sheet.
   - **It corrects AT-F4 on Storm.** Storm does not hide a backward face whatever the flag says; the flag changes how the face is lit. So the hope in A1, *"a viewer that reads the flag can show it too"*, is weaker than written: in Storm a backward face on a `doubleSided = 0` mesh turns dark under a light in front of it, and is not missing. *Not measured: the same under the rig's even dome, where a face turned away is lit from its other side and should hardly differ.*
   - **The rig's own scenes already agree with the masters.** The test scene authors no `doubleSided` (USD's default, one side), and the character's three cut-out cards, which are on two-sided masters, carry `1`.
-- **AT-F14 — A1 has one home.** `build_matter_proxy` in `tools/generators/matter_proxy.py` creates each article's material in the asset file and already reads the recipe's master to set the look. `check_asset_library.sh` generates a library into scratch and checks its structure with `verify_asset_library.py`, which is where a check of the switch would fit. The exporter's gate is separate: it exports from a scaffold file, `blender/MatterMaterials.blend`, whose Copper has the switch off, so it goes on writing `doubleSided = 1` until that scaffold and the golden are changed with A3.
+- **AT-F14 — A1 has one home.** `load_article.build` in `blender/masters/load_article.py` creates each article's material, for the asset file and for the rig's Blender column alike. *(Corrected 2026-10-11, in Pass 3. Was: "`build_matter_proxy` in `tools/generators/matter_proxy.py` creates each article's material in the asset file and already reads the recipe's master to set the look". That file is the look-alike the generator used until Phase05 and is retired; Pass 2 read it and not the generator's own header, which says so.)* `check_asset_library.sh` generates a library into scratch and checks its structure with `verify_asset_library.py`, which is where a check of the switch would fit. The exporter's gate is separate: it exports from a scaffold file, `blender/MatterMaterials.blend`, whose Copper has the switch off, so it goes on writing `doubleSided = 1` until that scaffold and the golden are changed with A3.
 - **AT-F15 — The tracked asset file is six articles behind the tree.** `Cardboard_Kraft`, `CastIron_Raw`, `Paint_Satin`, `Paper_Natural`, `Porcelain_Glazed` and `StainlessSteel_Brushed`, added on 9 and 10 October, have recipes and are not in `MatterLibrary.blend`. No lane of `run_all.py` names the file. A regeneration is owed with or without A1.
 - **AT-F16 — A1 will be seen first on sheets.** With the switch on, a mesh that is one layer of faces disappears from behind in Blender's viewport, as it already does in Unreal. That is the truth A1 is for. Twelve of the 75 one-sided articles are sheet matter, all on Opaque: ten textiles (`Canvas_Natural`, `Cotton_Jersey`, `Denim_Indigo`, `Denim_LightWash`, `Felt_Natural`, `Leather_Brown`, `Leather_Natural`, `Satin_Natural`, `StretchKnit_Natural`, `WoolSuiting_Natural`), `Paper_Natural` and `Cardboard_Kraft`. A builder who hangs a curtain as one sheet will see it from one side only, in every scene that takes the next asset file.
 
@@ -163,11 +163,11 @@ The scripts behind AT-F5 and AT-F6 are the asset tooling's and are not public ye
 
 | # | State after this pass |
 |---|---|
-| A1 | **Agreed in substance, not built.** It makes Blender's viewport and Eevee say what MasterSet says (AT-F12), through one function (AT-F14), and the export then writes the flag with no change to the add-on (AT-F10), so the alternative Pass 1 offers (the add-on writing the flag from the master) is not needed. Two things to know first: it does nothing for Cycles or the rig's sheet, and little for Storm (AT-F13); and it shows on 75 articles, sheets first (AT-F16). **One sitting.** |
-| A2 | **Agreed, not written.** A contract edit is not research's to make (the precedent is the thin-glass rule, written on the lead's word). The sentence needs one thing Pass 1's wording leaves out: USD's `orientation` (AT-F11). |
-| A3 | **A ruling, the lead's.** What bears on it: the golden says `1` on a one-sided master (AT-F11); Blender's default writes `1`; MasterSet and LCDSchema give a per-mesh value nowhere to land; Storm reads the flag for shading only (AT-F13). **The library's leaning: free.** The profile says the flag never makes a face show and is not a conformance rule, and the library's own route and golden write it in agreement with the master, so that no file the library makes says the opposite of its contract. A rule that it *must* agree would fail every stock Blender export until its builder flips a viewport switch, and would not have caught the prop: its fault was the winding, which a check of the geometry finds (AT-Q3). |
-| A4 | **Confirmed, and wider than asked.** Nothing names the surface (AT-F17). It held across the merge (AT-F18). The masters behind the pinned build did move (AT-F19). Three parts: a section in `JOB_FORMAT.md` naming the Unreal job's fields and the functions a second project may call (**one sitting**); `sun_scale`, `sky_scale` and `Sky` among them or not (they are the calibration's and the mask's, unchanged since Phase06, so cheap to promise); and a new runtime for the coat change (AT-Q5). |
-| A5 | **Confirmed** (AT-F20). **One sitting:** a way to ask that never fetches. The rig's own skip-or-run test wants the same answer. |
+| A1 | **Built 2026-10-11 (Pass 3, AT-F23); the tracked asset file is still to be regenerated.** *Was, at Pass 2:* **Agreed in substance, not built.** It makes Blender's viewport and Eevee say what MasterSet says (AT-F12), through one function (AT-F14), and the export then writes the flag with no change to the add-on (AT-F10), so the alternative Pass 1 offers (the add-on writing the flag from the master) is not needed. Two things to know first: it does nothing for Cycles or the rig's sheet, and little for Storm (AT-F13); and it shows on 75 articles, sheets first (AT-F16). **One sitting.** |
+| A2 | **Written 2026-10-11 (Pass 3, AT-F28): the profile's rule 10.** *Was, at Pass 2:* **Agreed, not written.** A contract edit is not research's to make (the precedent is the thin-glass rule, written on the lead's word). The sentence needs one thing Pass 1's wording leaves out: USD's `orientation` (AT-F11). |
+| A3 | **Taken as *free* 2026-10-11 (§Resolved, AT-RD2; Pass 3, AT-F28).** *Was, at Pass 2:* **A ruling, the lead's.** What bears on it: the golden says `1` on a one-sided master (AT-F11); Blender's default writes `1`; MasterSet and LCDSchema give a per-mesh value nowhere to land; Storm reads the flag for shading only (AT-F13). **The library's leaning: free.** The profile says the flag never makes a face show and is not a conformance rule, and the library's own route and golden write it in agreement with the master, so that no file the library makes says the opposite of its contract. A rule that it *must* agree would fail every stock Blender export until its builder flips a viewport switch, and would not have caught the prop: its fault was the winding, which a check of the geometry finds (AT-Q3). |
+| A4 | **The page is written 2026-10-11 (Pass 3, AT-F27), and a runtime with the moved masters is built and not published (AT-F26).** *Was, at Pass 2:* **Confirmed, and wider than asked.** Nothing names the surface (AT-F17). It held across the merge (AT-F18). The masters behind the pinned build did move (AT-F19). Three parts: a section in `JOB_FORMAT.md` naming the Unreal job's fields and the functions a second project may call (**one sitting**); `sun_scale`, `sky_scale` and `Sky` among them or not (they are the calibration's and the mask's, unchanged since Phase06, so cheap to promise); and a new runtime for the coat change (AT-Q5). |
+| A5 | **Built 2026-10-11 (Pass 3, AT-F22).** *Was, at Pass 2:* **Confirmed** (AT-F20). **One sitting:** a way to ask that never fetches. The rig's own skip-or-run test wants the same answer. |
 
 ### The questions, as far as this pass takes them
 
@@ -291,12 +291,124 @@ def Mesh "Square"
 
 ---
 
+## Pass 3 — What the library built (2026-10-11)
+
+*Written from the library's side, on the machine with Unreal. The lead, to Pass 2's handback, verbatim: "yes, lets do it all... prep the work needed. or do it.. wither way" (§Resolved, AT-RD1). Built as six quick fixes outside this doc, each its own commit so that any one reverts alone. The other Unreal application had closed by then, so the runtime was launched.*
+
+**Baseline first.** Before any edit: `run_all.py` 15 lanes pass and two fail (`approval_binds_freeze`, `release_verify`: red on this machine for a local reason, an old staging folder); `check_asset_library.sh`, `check_exporter.sh` and `check_conformance.sh` pass. After every edit: the same, lane for lane.
+
+- **AT-F22 — A5 is built** (`b2d2ae6`). `find_runtime(fetch=False)` answers from the machine as it is and never downloads; the default is unchanged, so the rig behaves as before. With the download call replaced by one that raises: on this machine the answer is the unpacked build's launcher, the same as the default gives; on an empty package folder it is `None` and nothing is written, and the default still tries to download.
+- **AT-F23 — A1 is built, in the loader** (`fc21616`). `blender/masters/build_masters.py` names the four two-sided masters, and `load_article.build` turns *Backface Culling* on for an article on any other. `verify_asset_library.py` asserts the switch per article, reading the master from the recipe.
+  - **The check fails when it should:** run on a library generated before the change, it refuses exactly the 81 articles on a one-sided master and passes the 13 on a two-sided one. After the change `check_asset_library.sh` passes all 94.
+  - **Through the add-on, from that generated library:** Copper (Opaque) writes `doubleSided = 0`; Lace (Masked) and Glass_Clear (thin) write `1`.
+  - **The rig's Blender column does not move:** Cycles gives the same pixels with the switch on and off, on a cube and a square seen from behind.
+  - **⚠ Not done: the tracked `blender/asset_library/MatterLibrary.blend` is not regenerated.** It has only ever been regenerated on the library machine. On this one Blender's colour configuration does not load, and the generator bakes each article's preview. So a Creator's installed library does not carry the switch yet. It is one command there, and it also brings in the six articles of AT-F15: `blender --background --factory-startup --python tools/generators/gen_asset_library.py`.
+- **AT-F24 — AT-F7 is measured again, with the numbers kept. This answers AT-Q6.** The Emissive master alone, on `unreal-runtime-v3`: Neon_Signage with a black base and `base_weight` 0, `emission_luminance` 1, the sun and the sky scaled to zero, one setting per colour, the cube's 3,485 pixels read off the float capture (median, ÷ the driver's exposure constant).
+
+  | `emission_color` asked | Its length | v3: read ÷ asked | v3: that × the length | The rebuilt runtime: read ÷ asked |
+  |---|---|---|---|---|
+  | (1, 0.15, 0.75) — Neon_Signage's own | 1.259 | 0.9961 | 1.2540 | 1.0008 |
+  | (1, 1, 1) | 1.732 | 0.7239 | 1.2538 | 1.0005 |
+  | (0.993, 0.992, 1) — LED_CoolWhite's own | 1.723 | 0.7277 | 1.2541 | 1.0008 |
+  | (1, 0.456, 0.147) — LED_WarmWhite's own | 1.109 | 1.1308 | 1.2539 | 1.0008 |
+  | (0, 0, 1) | 1.000 | 1.2542 | 1.2542 | 1.0010 |
+  | (0, 0, 0.3333) | 0.333 | 3.7626 | 1.2542 | 1.0008 |
+  | (0, 0.6667, 0.3333) | 0.745 | 1.6819 | 1.2536 | 1.0008 |
+  | (0.3333, 0.3333, 0.6667) | 0.817 | 1.5352 | 1.2535 | 1.0008 |
+  | (0.5, 0.5, 0.5) | 0.866 | 1.4477 | 1.2538 | 1.0005 |
+  | (0.2, 0.2, 0.2) | 0.346 | 3.6193 | 1.2538 | 1.0008 |
+  | (1, 0, 0) | 1.000 | 1.2542 | 1.2542 | 1.0010 |
+  | (1, 1, 0) | 1.414 | 0.8866 | 1.2539 | 1.0005 |
+
+  - **The fourth column is one number, 1.2535 to 1.2542.** So Epic's function draws the brightness × the colour's direction, the colour over its own length, and nothing of the colour's size: white, a 0.5 grey and a 0.2 grey all read 0.7239.
+  - **1.2542 is 1.0008 ÷ 0.798.** The 0.08 % is the capture's own scale, not the master's.
+- **AT-F25 — The Emissive master is repaired in the builder** (`51d2424`). `unreal/MatterRuntime/Scripts/build_masters.py` gives Epic's function `emission_luminance` × the length of `emission_color`, in place of × 1 ÷ 0.798. A black colour gives no light. On the rebuilt runtime every one of the twelve reads 1.0005 to 1.0010 of what was asked (the table's last column). Learnings Unreal U4 carries the cause.
+- **AT-F26 — A runtime with both master changes is built, and is not published. It pictures AT-F19.** `unreal/build.sh masters`, then `package`, on Unreal 5.8.0. The rig run on three articles at 256 pixels, Storm and Unreal, once on the pinned v3 and once on the build:
+
+  | Article | Storm against Unreal on v3 (mean ΔE76 over the subjects; L\*) | On the build | Float captures, v3 against the build |
+  |---|---|---|---|
+  | `Porcelain_Glazed` (a coat) | 6.7 wide, 7.2 close; L\* 78.8 against Storm's 72.1 | 1.3 wide, 1.3 close; L\* 73.2 | differ |
+  | `GreyCard_Neutral18` | 0.72 | 0.72 | **the same bytes** |
+  | `Copper_Verdigris` | 1.46 wide, 1.48 close | 1.46, 1.48 | **the same bytes** |
+
+  - So the pinned v3 was drawing a coat the old way, as AT-F19 read from the tree; the build draws it as the coat change of 10 October meant; and an article with neither a coat nor a light is untouched.
+  - **The archive is `unreal/dist/MatterRuntime-Linux.tar.gz` on this machine.** `unreal/RUNTIME.json` still pins v3. Publishing is the lead's: push, then `unreal/publish.sh 4`, then commit and push `RUNTIME.json`. **This is AT-Q5, half done.**
+- **AT-F27 — A4's page is written** (`7c7ee66`): `tools/parity/JOB_FORMAT.md` §The Unreal job, and what a second project may call. The app's job file as a field table read off its reader, `sun_scale`, `sky_scale` and the `Sky` master among them; the ten functions and five names of AT-F6 as what a caller may lean on, each signature read back from the module; and how to tell which masters a pinned runtime carries. Two things the page says that nothing said before:
+  - **A parameter name the master does not have is ignored, and nothing says so.** The app sets parameters by name and Unreal drops an unknown one silently. `article_material()` refuses what it knows the masters lack; a name written by hand is checked by nobody.
+  - **The first setting of a launch may be drawn as Unreal's default material**, which is what `warmup()` is for.
+- **AT-F28 — A2 and A3 are written** (`2b5d79e`). `CreatorAssetProfile.md` rule 10: faces are wound counter-clockwise seen from outside, at USD's default `orientation`; whether a face's back is drawn belongs to the material's master; a mesh's `doubleSided` is free and never makes a face show; and which tools show a backward face and which do not (AT-F13). The golden's two Copper meshes carry `doubleSided = 0`; both boxes hold a positive volume, so every face is wound outward, and Storm's pictures of both golden forms are the same pixel for pixel as before. `assert_profile.py` refuses `orientation = "leftHanded"`, the one part of the rule a text check can hold, and fails the golden with one mesh made left-handed.
+  - **Known and left:** the exporter's gate exports from a scaffold file whose Copper has the switch off, so its output still says `doubleSided = 1`. It conforms.
+- **AT-Q3, as it stands.** The profile carries a dated `Todo` for the face-direction check and names the asset tooling's as the one on offer. **The library wants it** (AT-RD1). It is the asset tooling's to hand over, under this repository's licence; nothing of it was copied here.
+
+### Reproduction (AT-F24)
+
+One launch, about eight seconds on this machine. `MATTER_UNREAL_RUNTIME=<a launcher>` points it at another build.
+
+```python
+# uv run python <this> <out dir> [label]      (from the repo root)
+# The Emissive master alone: black base, sun and sky scaled to zero, emission_luminance 1,
+# one setting per emission_color. Reads the cube's pixels off the float captures.
+import json, sys
+from pathlib import Path
+import numpy as np
+sys.path.insert(0, "tools/parity/drivers"); sys.path.insert(0, "tools/parity")
+import unreal as U
+
+out = Path(sys.argv[1]).resolve()
+ART = Path("MatterLibrary/materials/utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx").resolve()
+COLOURS = [(1, 0.15, 0.75), (1, 1, 1), (0.993, 0.992, 1), (1, 0.456, 0.147), (0, 0, 1), (0, 0, 1 / 3),
+           (0, 2 / 3, 1 / 3), (1 / 3, 1 / 3, 2 / 3), (0.5, 0.5, 0.5), (0.2, 0.2, 0.2), (1, 0, 0), (1, 1, 0)]
+job = {"article": {"path": str(ART), "meters_per_tile": 1.0}, "width": 64, "out_dir": str(out),
+       "subjects": ["/World/Subjects/Sphere", "/World/Subjects/Cube", "/World/Subjects/Floor"],
+       "settings": [{"id": "defaults", "set": {}}], "views": {"wide": {"camera": "/World/Cam", "suffix": ""}}}
+folder = out / "unreal" / "job"
+ujob = U.unreal_job(job, folder)
+spec = json.loads(ujob.read_text())
+first, mask_s = spec["settings"][1]["materials"], spec["settings"][-1]
+names = ["Sphere", "Cube", "Floor"]
+settings = [{"id": U.WARMUP_ID, "materials": first}]
+for i, c in enumerate(COLOURS):
+    m = U.article_material(ART, {"emission_color": list(c), "emission_luminance": 1.0})
+    m["vectors"]["base_color"] = [0.0, 0.0, 0.0]
+    m["scalars"]["base_weight"] = 0.0
+    settings.append({"id": f"c{i}", "materials": first | {n: m for n in names}, "sun_scale": 0.0, "sky_scale": 0.0})
+spec["settings"] = settings + [mask_s]
+ujob.write_text(json.dumps(spec, indent=1) + "\n")
+cmd = U.find_runtime()
+print("runtime:", cmd)
+U.run_runtime(cmd, ujob, out / "unreal.log")
+raw = folder / "raw"
+mask = U.read_pfm(raw / f"{U.MASK_ID}.pfm")
+cube = (mask[..., 1] > 0.9) & (mask[..., 0] < 0.1) & (mask[..., 2] < 0.1)
+print("cube pixels:", int(cube.sum()))
+rows = []
+for i, c in enumerate(COLOURS):
+    px = U.read_pfm(raw / f"c{i}.pfm")[cube] / U.EXPOSURE_K
+    read = np.median(px, axis=0)
+    c = np.array(c, float); length = float(np.linalg.norm(c))
+    k = [read[j] / c[j] for j in range(3) if c[j] > 0]
+    rows.append({"colour": [round(float(x), 4) for x in c], "length": round(length, 4),
+                 "read": [round(float(x), 4) for x in read], "read_over_colour": round(float(np.mean(k)), 4),
+                 "times_length": round(float(np.mean(k)) * length, 4)})
+    print(rows[-1])
+(out / "emission.json").write_text(json.dumps(rows, indent=1) + "\n")
+```
+
+---
+
+## Resolved
+
+- **AT-RD1 — Build all of it (the lead, 2026-10-11).** Pass 2's handback listed six next steps: A5, A1 with the asset file regenerated, A4's page, the ruling on `doubleSided`, one runtime build carrying the coat change and the emission repair, and a ledger row with the face-direction check. The lead, verbatim: *"yes, lets do it all... prep the work needed. or do it.. wither way"*. Done the same day, as quick fixes outside this doc (Pass 3), short of three things that are not this machine's or not an agent's: regenerating the tracked Blender asset file, publishing the runtime, and handing over the asset tooling's check.
+- **AT-RD2 — A mesh's `doubleSided` is free in a conforming asset (taken 2026-10-11, on AT-RD1).** It is not a conformance rule and never makes a face show; the library's own route and golden write it in agreement with the master. This was the library's recommendation in Pass 2's handback, and the lead's go-ahead named no other option. **It was not ruled on by itself.** It is one commit (`2b5d79e`) and reverts as one, if the lead wants *"must agree with the master"* instead.
+
+---
+
 ## Status
 
-- **Passes captured:** 2, both 2026-10-11. Pass 1 is the asset tooling's side; Pass 2 is the library's review. *(Was, at Pass 1: "Pass 1 only … Nothing here is reviewed against the library's tree by the library".)*
-- **Nothing is ruled, and nothing is built.** Pass 2 added to this doc only: no article, master, tool, spec or ledger row is changed by it.
-- **Asks:** A1 agreed in substance, one sitting. A2 agreed, a contract edit that waits for the lead's word, and needs `orientation` named. A3 is a ruling; the library leans to *free*. A4 confirmed and wider than asked: the masters moved under the pinned build on 10 October (AT-F19). A5 confirmed, one sitting.
-- **Questions:** AT-Q1 answered by precedent (passes here and a ledger row, on the lead's word). AT-Q2 answered: no (AT-F21). AT-Q3 leans yes, the lead's call. **Open:** AT-Q4 (sheets on a one-sided master) · AT-Q5 (a new runtime for the coat change) · AT-Q6 (what Epic's function does with the emission colour).
-- **Current direction.** Pass 1 holds, with two corrections. Storm does not hide a backward face whatever `doubleSided` says, and Cycles does not read *Backface Culling* (AT-F13), so of the library's own renderers only Eevee can be made to show the fault, and a check of the geometry is the one thing that catches it from the file (AT-Q3). And the brightness rule of AT-F7 fits the library's own Phase12 numbers, which makes the master's 0.798 a property of one colour and not of Epic's function (AT-F21).
-- **Measured in Pass 2:** AT-F9, AT-F10, AT-F13 (§Reproduction, Pass 2). **Read from the tree:** AT-F11, AT-F12, AT-F14 – AT-F20. **Worked out from recorded numbers, not measured:** AT-F21. **Not run:** the Unreal runtime, so AT-F6 is not repeated, AT-F7 is not re-measured, and AT-F19's difference is not pictured. **Still the asset tooling's reading:** how Studio treats `doubleSided` (AT-F1). *(Pass 1's own: measured AT-F2, AT-F3, AT-F6, AT-F8; measured once, captures not kept, AT-F7.)*
-- **▶ Next:** the lead's word on the three one-sitting builds (A5, A1 with the asset file regenerated, A4's page), and the ruling on A3, which A2 and the golden follow. After them: one runtime build that carries the coat change and, if AT-Q6 confirms it, the emission repair.
+- **Passes captured:** 3, all 2026-10-11. Pass 1 is the asset tooling's side; Pass 2 is the library's review; Pass 3 is what the library built. *(Was, at Pass 2: "2 … Nothing is ruled, and nothing is built".)*
+- **Asks:** **A1 built** in the loader; the tracked Blender asset file is not regenerated, so an installed library does not carry it yet (AT-F23). **A2 and A3 written:** the profile's rule 10, with `doubleSided` taken as free (AT-RD2). **A4's page written**, and a runtime carrying the moved masters built and not published (AT-F26, AT-F27). **A5 built** (AT-F22).
+- **Questions:** AT-Q1 answered: passes here and ledger row **M8**, written. AT-Q2 answered: no, and repaired (AT-F25). AT-Q3: the library wants the check; it is the asset tooling's to hand over. AT-Q6 answered: the colour's direction only (AT-F24). **Open:** AT-Q4 (sheets on a one-sided master: twelve articles, and nobody has ruled) · AT-Q5, half done (the build exists; publishing it is the lead's).
+- **Owed, in order.** (1) The lead: push, `unreal/publish.sh 4`, commit and push `unreal/RUNTIME.json`. Until then the rig and the asset tooling draw coats and lights the old way. (2) The library machine: regenerate `MatterLibrary.blend`. (3) The asset tooling: pass `fetch=False` where it only asks; hand over its face-direction check; expect its pictures of coated and emissive assets to change at the new runtime. (4) A ruling on AT-Q4, whenever a sheet first looks wrong.
+- **What changed outside this doc** (Pass 3, six commits): `tools/parity/drivers/unreal.py`, `tools/parity/JOB_FORMAT.md`, `blender/masters/build_masters.py` and `load_article.py`, `tools/conformance/verify_asset_library.py` and `assert_profile.py`, the lightweight golden, `unreal/MatterRuntime/Scripts/build_masters.py`, `docs/specs/Ontology/MasterSet.md`, `docs/specs/Contract/CreatorAssetProfile.md`, `docs/Learnings/Unreal/Unreal.md`, `docs/Planning/PlatformDependencies.md`. **Not changed:** any article, any texture, the add-on, the app's source, `unreal/RUNTIME.json`, the tracked asset file.
+- **Measured in Pass 3:** AT-F22 – AT-F26 and AT-F28's checks. **Still not run:** AT-F6 is not repeated on the asset tooling's own prop (its scripts are private). **Still the asset tooling's reading:** how Studio treats `doubleSided` (AT-F1). **Pass 2's standing corrections:** AT-F14 named a retired file and is corrected in place; AT-F21's rule, worked out from records, is now measured (AT-F24).
+- **▶ Next:** the lead's push and publish (the first item owed).
