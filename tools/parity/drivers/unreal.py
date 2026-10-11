@@ -114,8 +114,9 @@ SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rot
            # Every runtime's see-through masters already carry it as a parameter (F-GLC-4).
            "transmission_color",
            # Phase12 12.4: a light's colour and brightness, the Emissive master's own parameters.
-           # The master multiplies the brightness by 1/0.798 itself (Learnings Unreal U4), so a
-           # Creator's value gets the same correction as the article's.
+           # The master corrects the brightness itself (x the colour's length, Learnings Unreal
+           # U4; x 1/0.798 through unreal-runtime-v3), so a Creator's value gets the same
+           # correction as the article's.
            "emission_color", "emission_luminance"}
 COLOUR_SLIDERS = {"base_color_tint", "overlay1_color", "overlay2_color", "overlay3_color",
                   "transmission_color", "emission_color"}

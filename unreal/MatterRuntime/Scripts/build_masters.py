@@ -107,11 +107,11 @@ SUBSURFACE = {"subsurface_weight": 0.0, "subsurface_color": (0.8, 0.8, 0.8), "su
 TRANSMISSION = {"transmission_weight": 0.0, "transmission_color": (1.0, 1.0, 1.0), "transmission_depth": 0.0}
 # Inputs the master scales, keeping the article's name and value (D5):
 # * an article's lengths are metres (the rig's scene, JOB_FORMAT §Units); Unreal's are cm;
-# * emission: Epic's function renders emission_luminance x emission_color at 0.798 of the radiance
-#   OpenPBR defines (Storm renders it exactly; the capture reads unlit emission exactly, EXPOSURE_K
-#   0.999). Measured 2026-09-29 (6.4) on Neon's dim view, float captures: 0.798 on every region,
-#   the same with one call or two and with specular_weight 1 or 0, so it is the function's own.
-SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0, "emission_luminance": 1.0 / 0.798}
+# * emission is not here: the master gives Epic's function emission_luminance x the LENGTH of
+#   emission_color (build_master, "the light"). It was x 1 / 0.798 until 2026-10-11, a constant
+#   measured 2026-09-29 (6.4) on Neon's dim view and read as the function's own scale; it is
+#   1 / the length of Neon's magenta, and was wrong for every other colour.
+SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
 
 # Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
 #   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
@@ -553,7 +553,9 @@ def build_master(token, white, no_wear, flat, white_colour=None):
             # cleared it, the job otherwise identical)
             p = g.op_k(M.MaterialExpressionMax, p, SUBSURFACE_FLOOR, 4)
         fed[name] = p
-        if name != "subsurface_color":      # fed below, darkened by the coat as the base is
+        # subsurface_color is fed below, darkened by the coat as the base is; emission_luminance
+        # below too, times the length of its colour
+        if name not in ("subsurface_color", "emission_luminance"):
             feed(p, name)
     if "coat_darkening" not in inputs:
         missing.append("coat_darkening")
@@ -595,6 +597,17 @@ def build_master(token, white, no_wear, flat, white_colour=None):
     if "subsurface_color" in fed:
         feed(g.op(M.MaterialExpressionMultiply, fed["subsurface_color"], factor, 1), "subsurface_color")
     feed(g.node(M.MaterialExpressionConstant, 2, r=0.0), "coat_darkening")
+    if "emission_luminance" in fed:
+        # The light. OpenPBR's radiance is emission_luminance x emission_color. Epic's function
+        # draws emission_luminance x the colour's DIRECTION, the colour over its own length:
+        # white, a 0.5 grey and a 0.2 grey read alike, and over twelve colours the reading x the
+        # colour's length is one number to 5 parts in 10,000 (2026-10-11: float captures, black
+        # base, sun and sky scaled to zero, Storm renders the product exactly). So the luminance
+        # is given the colour's length, and a black colour gives no light.
+        colour = params["emission_color"]
+        length = g.one(M.MaterialExpressionSquareRoot,
+                       g.op(M.MaterialExpressionDotProduct, colour, colour, 4), 3)
+        feed(g.op(M.MaterialExpressionMultiply, fed["emission_luminance"], length, 2), "emission_luminance")
     if "thin" in spec:
         feed(g.node(M.MaterialExpressionConstant, 2, r=1.0 if spec["thin"] else 0.0), "geometry_thin_walled")
 
