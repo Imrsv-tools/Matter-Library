@@ -37,7 +37,8 @@ this repo, downloaded once into the git-ignored ``unreal/package/`` and checked 
 (Phase06 D2), so a machine with no Unreal renders the column. That build is Linux-only: on a Mac,
 with neither variable set, the driver runs editor mode on the Unreal 5.8 under ``$UE_ROOT``
 (default ``/Users/Shared/Epic Games/UE_5.8``). ``find_runtime()`` returns None when there is
-none, and the rig then skips the column with a notice.
+none, and the rig then skips the column with a notice. ``find_runtime(fetch=False)`` only asks:
+it answers from this machine as it is and never downloads (2026-10-11).
 """
 
 from __future__ import annotations
@@ -500,13 +501,16 @@ PACKAGES = REPO / "unreal" / "package"          # git-ignored: downloaded builds
 RELEASES = "https://github.com/Imrsv-tools/Matter-Library/releases/download"
 
 
-def find_runtime() -> list[str] | None:
+def find_runtime(fetch: bool = True) -> list[str] | None:
     """The command that starts the runtime, or None (the rig skips the column with a notice).
 
     First found wins: ``$MATTER_UNREAL_RUNTIME`` (a launcher), editor mode when asked for by
     ``$MATTER_UNREAL_EDITOR``, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
     downloaded and checked on first use. The pinned build is Linux-only, so a Mac runs editor
     mode on the Unreal 5.8 under ``$UE_ROOT`` instead, or has no runtime.
+
+    ``fetch=False`` only asks: a pinned build that is not unpacked here is None, and nothing is
+    downloaded (a caller that wants to know whether a runtime is present, and to launch nothing).
     """
     exe = os.environ.get("MATTER_UNREAL_RUNTIME")
     if exe:
@@ -521,17 +525,21 @@ def find_runtime() -> list[str] | None:
     if editor:
         return [editor, str(PROJECT), "-game"]
     if PIN.is_file():
-        return [str(pinned_package())]
+        launcher = pinned_package(fetch)
+        return [str(launcher)] if launcher else None
     return None
 
 
-def pinned_package() -> Path:
-    """The pinned build's launcher, downloading the release asset if this machine lacks it."""
+def pinned_package(fetch: bool = True) -> Path | None:
+    """The pinned build's launcher, downloading the release asset if this machine lacks it; with
+    ``fetch`` off, None where it would have downloaded."""
     pin = json.loads(PIN.read_text(encoding="utf-8"))
     root = PACKAGES / pin["tag"]
     launcher, stamp = root / "Linux" / "MatterRuntime.sh", root / ".sha256"
     if launcher.is_file() and stamp.is_file() and stamp.read_text().strip() == pin["sha256"]:
         return launcher
+    if not fetch:
+        return None
     import hashlib  # noqa: PLC0415
     import shutil  # noqa: PLC0415
     import tarfile  # noqa: PLC0415
