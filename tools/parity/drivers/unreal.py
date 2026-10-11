@@ -39,6 +39,10 @@ with neither variable set, the driver runs editor mode on the Unreal 5.8 under `
 (default ``/Users/Shared/Epic Games/UE_5.8``). ``find_runtime()`` returns None when there is
 none, and the rig then skips the column with a notice. ``find_runtime(fetch=False)`` only asks:
 it answers from this machine as it is and never downloads (2026-10-11).
+
+A second project calls some of this from outside the rig. The names it may lean on, and the
+runtime's job file field by field, are in ``tools/parity/JOB_FORMAT.md`` (The Unreal job, and what
+a second project may call): change one of them only with a dated line there.
 """
 
 from __future__ import annotations

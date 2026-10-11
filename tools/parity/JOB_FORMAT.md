@@ -132,6 +132,60 @@ uv run tools/parity/rig.py <article> [--sweep]      # writes the job, runs the d
 - **Colour and light:** the app writes linear scene colour (exposure fixed, no tonemapper); the driver applies the view's `exposure`, box-filters the **4× supersampling** (Unreal renders with no anti-aliasing here) and does the plain sRGB encode. No shadows, no GI, no Lumen or screen-space reflections: §Matched lighting. The dome is an unlit sphere of constant radiance that a sky light captures. **The calibration** (`unreal.py --calibrate [--ref storm|blender] <grey card job.json>`): `EXPOSURE_K` from a view of the dome, **`DOME_K` from a white mirror** (which reflects exactly the dome, so no material model is in it), then **`SUN_K` on the grey card with the dome fixed**. The constants in the file were fitted against Storm on the UE machine; Blender is the path-traced reference, so re-fit with `--ref blender` where Blender renders parity.
 - **Each launch opens with a throwaway `__warmup` setting** (a copy of the first). The launch's first material assignment can draw a master as Unreal's default material while the runtime reports ready (seen on the character, every launch); the warm-up absorbs it. Its pictures are written and never read.
 
+## The Unreal job, and what a second project may call *(2026-10-11)*
+
+A second project now calls the driver from outside the rig, to picture its own assets in the library's Unreal app (research `261011_R_AssetToolingAsks.md`, ask A4). **What is named in this section stays put:** a name, its arguments and what it returns change only with a dated line here, and a change to the job file comes with a new `format` number, which an older app refuses. **What the pictures look like is not promised:** the masters change as the library improves them (§Which masters a runtime carries, below).
+
+### The file the app reads
+
+`unreal_job.json`, format 3, handed to the app as `-MatterJob=<path>`. The reader is `unreal/MatterRuntime/Source/MatterRuntime/MatterRuntimeGameMode.cpp`; where this table and it disagree, it is the authority. Lengths are **centimetres**, Z up, left-handed (the driver converts from the rig's metres by `(x, y, z) → 100 (−z, x, y)`).
+
+| Field | Meaning |
+|---|---|
+| `format` | Must equal the app's own number (3). Any other is refused by name, never misread. |
+| `width` | Each capture is `width` × `width`. The driver sends the picture's width × `SUPERSAMPLE` and box-filters down, because the app renders with no anti-aliasing. |
+| `out_dir` | Where the app writes `<setting id><view suffix>.pfm`, one per setting per view (linear scene colour, float RGB, before any tone curve), and its own record, `matter_runtime.log`. |
+| `settle_frames` | Optional. Frames drawn before a setting is captured (the driver sends `SETTLE_FRAMES`, 120). |
+| `sun` | `direction` (the way the light travels), `intensity`, `angle` (degrees). |
+| `sky` | `intensity`, and optionally `radiance` `[r, g, b]`: the dome is an unlit sphere of that radiance, which a sky light captures. |
+| `meshes[]` | `name` · `file` · `verts` (N) · `indices` (M) · `material` (the slot a setting's `materials` is keyed by). `file` is little-endian: float32 positions (3N), normals (3N), tangents (3N), `st` (2N), tangent signs (N), then int32 triangle indices (M). A sign below 0 flips the binormal. `write_mesh()` writes it. |
+| `settings[]` | `id` · `materials` · optionally `sun_scale` and `sky_scale`. |
+| `settings[].materials` | One entry per `material` slot a mesh names: `master` · `scalars` · `vectors` · `textures`. |
+| `…master` | A master token: the app loads `/Game/Masters/M_Matter_<token>`. The eight masters, and **`Sky`**: unlit and two-sided, drawing its `radiance` vector as a flat colour. The driver's mask uses it, and a caller may use it to draw a mesh in a flat colour seen from both sides. |
+| `…scalars`, `…vectors` | Parameter name → a number, or `[r, g, b]`. **A name the master has no parameter for is ignored, and nothing says so.** `article_material()` refuses what it knows the masters do not carry; a hand-written name is not checked by anyone. |
+| `…textures` | Parameter name → `{"file": <abs path>, "srgb": true or false}`, or `{"constant": [r, g, b, a]}` for a flat value. Every texture reaches its master as linear float; `srgb` says whether the file's pixels are decoded first. |
+| `sun_scale`, `sky_scale` | A multiplier on that setting's sun and sky, 1 when absent. 0 turns the light off for that setting (the calibration reads the sun and the dome apart with them; a caller can read emission alone the same way). |
+| `views[]` | `suffix` · `location` · `forward` · `up` · `fov` (degrees) · `near` · `hide` (mesh names left out of that view). `camera_view()` writes one. |
+
+**The first setting of a launch may be drawn wrong.** The launch's first material assignment can draw a master as Unreal's default material while the app reports ready, so a job opens with a throwaway setting, as `warmup()` makes, and its pictures are never read.
+
+### What a second project may call in `drivers/unreal.py`
+
+| Name | What it gives |
+|---|---|
+| `find_runtime(fetch=True)` | The command that starts the app, or `None`. `fetch=False` only asks and never downloads. |
+| `run_runtime(cmd, ujob, log)` | Runs the app on a job file; raises `SystemExit` when it fails. |
+| `write_mesh(folder, name, pts, nrm, uvs, faces, material)` | One mesh buffer and its `meshes[]` entry. Points and normals in the rig's space (metres, Y up, right-handed); faces keep their winding, so a face wound counter-clockwise seen from outside is a front face in Unreal. |
+| `camera_view(pos, rot, suffix, hide=())` | A `views[]` entry, from a position and a pitch and yaw in the rig's space. |
+| `lights(sun_k, dome_k)` | The rig's `sun` and `sky`, calibrated. |
+| `article_material(path, sliders=None, cutout_map=None, base_color_map=None)` | An article as a `materials` entry, its values under its own names; raises `Unsupported` for a master or an input Unreal's masters do not carry. |
+| `warmup(settings)` | The throwaway first setting. |
+| `read_pfm(path)` · `linear(path, exposure=0.0)` · `srgb8(lin)` | A capture as an array; as the rig's linear picture, supersampling filtered; and the plain sRGB encode. |
+| `JOB_FORMAT` · `SUPERSAMPLE` · `SETTLE_FRAMES` · `FLAT_NORMAL` · `Unsupported` | The job's format number, the supersampling factor, the settle count, the flat normal's exact texel, and the refusal's type. |
+
+Everything else in the module is the rig's own and may change with it: `unreal_job()`, `character_scene()`, `calibrate()`, the calibration constants, anything with a leading underscore. **A tool built on these calls is defined and tested by the project that builds it.**
+
+### Which masters a runtime carries
+
+A packaged runtime carries the masters as `build_masters.py` built them at the commit `unreal/RUNTIME.json` names as `source`. A change to the builder reaches a caller of the pinned build only when a new build is published and pinned. To see what a pinned build does not have:
+
+```
+git log <the "source" in unreal/RUNTIME.json>..HEAD -- unreal/MatterRuntime/Scripts/build_masters.py
+```
+
+- **Since `unreal-runtime-v3` (source `e1fc83e`, 1 October), two changes alter pictures** *(as of 2026-10-11)*: the coat darkens the base as OpenPBR does (10 October: every article with a coat), and a light's brightness no longer depends on its colour (11 October: every Emissive article but Neon). A build with both is made on the machine with Unreal and is **not yet published**; until it is, the pinned build draws both the old way.
+- **A builder change that alters nothing at its defaults needs no new build** (the lead, 2026-10-05). One that does alter them needs one before the rig's Unreal column, or a second caller's pictures, show it.
+
 ## Open questions Unreal's column should settle
 
 These are recorded in the Phase05 doc as F12 and F16.
