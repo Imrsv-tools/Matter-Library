@@ -8,6 +8,8 @@
 #   2. usdchecker Success + usdcat --flatten composes  — lightweight (WITH library search
 #      path) AND portable (with NO search path -> proves independent open)
 #   3. assert_profile.py — profile SHAPE + the spec-derived NEGATIVE guards, both forms
+#   3b. check_facing.py — rule 10's geometry: no face of a closed piece looks inward, both forms,
+#       after its own self-test has shown it can refuse
 #   4. usdrecord eyes-on render of BOTH forms (DomeLight harness kept OUT of the golden)
 #
 # Exit 0 iff every check passes. See Contract/CreatorAssetProfile.md.
@@ -58,6 +60,16 @@ echo "-- lightweight --"
 "$PY" "$CONF/assert_profile.py" lightweight "$GOLDEN/creator_table_lightweight.usda" || rc=1
 echo "-- portable --"
 "$PY" "$CONF/assert_profile.py" portable "$GOLDEN/creator_table_portable/creator_table_portable.usda" || rc=1
+
+echo ""
+echo "### 3b. Faces look outward (rule 10: the check's self-test, then both forms)"
+"$PY" "$CONF/test_check_facing.py" 2>/dev/null || rc=1
+echo "-- lightweight --"
+"$PY" "$CONF/check_facing.py" "$GOLDEN/creator_table_lightweight.usda" 2>/dev/null | tail -2 || rc=1
+[ "${PIPESTATUS[0]}" -eq 0 ] || rc=1
+echo "-- portable --"
+"$PY" "$CONF/check_facing.py" "$GOLDEN/creator_table_portable/creator_table_portable.usda" 2>/dev/null | tail -2 || rc=1
+[ "${PIPESTATUS[0]}" -eq 0 ] || rc=1
 
 echo ""
 echo "### 4. usdrecord eyes-on render (both forms)"
