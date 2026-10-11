@@ -274,7 +274,7 @@ One page in the phase doc. Discovery still happens and still earns its cost — 
 
 **⛔ ONE REAL-PATH SMOKE IS THE ORDINARY MAXIMUM, BY DEFAULT — and it is a ceiling, not a requirement to author a new gate.** RED demonstrations, discriminator design, gate-readiness matrices and premise-proof gates are **HIGH-RIGOR only.** Anticipated edge cases, coverage, symmetry and *"proving the assertion is capable of failing"* are **not** reasons to write anything.
 
-**⛔ GATES ARE FROZEN** *(lead ruling, 2026-08-29)* — author **no** new `scripts/check-*.ts`. Thirty already exist, and measured on 2026-08-29 they carry **13,751 lines of real gate code against 11,048 lines of real application code — 1.24 : 1, more test than product.** Not one of them asks the only question that has ever caught a user-facing defect here: *can a person load the page and use it?* The existing suite keeps running; **pruning it is the lead's call on a reviewed proposal.** If you believe question 3 genuinely requires a new gate, **say so in the handback and let the lead rule. Do not write it.**
+**⛔ A NEW STANDING GATE IS THE LEAD'S CALL.** A gate suite can outgrow the product it guards: before proposing one, measure the gate code against the application code, and ask whether it tests the one question that has ever caught a user-facing defect — *can a person load the thing and use it?* The existing suite keeps running; **pruning it is the lead's call on a reviewed proposal.** If you believe question 3 genuinely requires a new gate, **say so in the handback and let the lead rule. Do not write it.**
 
 **Tests accumulate from observed failures.** That is the only way a suite stays proportional to the product it protects.
 

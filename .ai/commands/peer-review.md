@@ -16,7 +16,6 @@ Work from the **immediate doc + the durable docs as written** — that grounding
 
 1. The target doc — a phase doc in **any state** (raw discovery / hardened / post-`/plan`) **or a research doc**.
 2. The full durable standards set: `docs/{Glossary,NamingConventions,CodingStandards}.md`; the project `.ai/AI_WorkingAgreement.md` (its hard platform agreements, No Workarounds, Don't-Delete-Spec, Spec-Driven); `Methodology/AgenticEngineering_Workflow.md` Process Agreements (numbering, phase shapes, gate-class tags, test-strategy / doc-only requirements) + `AgenticEngineering_DocumentationMap.md` (doc ownership); the relevant `Learnings/<Domain>/` docs; the folder-layout conventions. **Cite durable docs, not memories.**
-3. The primary submodule's `.ai/AI_WorkingAgreement.md` if the doc is code-domain-specific.
 
 **Bash-less search only** (Grep/Glob/Read or the Bash-less locator agents — never `Explore`). You're reviewing the doc, not re-running the discovery — don't deep-trace code; but DO spot-flag a claim that looks stale ("verify this carry-forward") without verifying it yourself.
 

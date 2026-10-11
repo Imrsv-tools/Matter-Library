@@ -71,7 +71,7 @@ Walk these in order. Each row exists because reactive per-control patching ran p
 | **A 2nd distinct failure in the SAME subsystem that the 1st fix didn't predict** | **STOP per-control fixing. Do ONE systematic layer-trace** — enumerate the pipeline the data crosses (write → store → read → transport → render) and find which *layer* drops each attribute. Many controls failing "randomly" in one subsystem ⇒ a **completeness/contract break at a shared layer**, not N independent bugs. |
 | **You have completed a layer-trace** | **⛔ It establishes WHICH LAYER is unowned/incomplete — it does NOT establish WHY any individual symptom occurs.** Two claims, two evidence bars: tag the **class** `confirmed` once the layer is shown unowned; tag **each per-symptom mechanism** `hypothesis` until **measured in the real artifact**. The trap is that a layer-trace *feels* like it has produced an explanation. |
 | **A 2nd eyes-on failure survives a green verified-repair in the same subsystem** | **Invert to a bottom-up per-layer PROOF ladder** — drive each layer in isolation with hardcoded inputs, lead verdict per layer, fix at-layer with its own guard, **promote only on visual green**. |
-| **≈3 consecutive eyes-on hypotheses fail to fix it** | **STOP-LOSS. Present derail-vs-spike-vs-continue as ONE numbered `YOUR CALL` item, with your recommendation** (`AI_WorkingAgreement.md` §Working With the Lead). Each hypothesis on a no-headless-seam defect costs a rebuild + a lead-driven smoke. **Never silently start hypothesis N+1** — a ~13-cycle ladder once ran until the *lead* called the derail. |
+| **≈3 consecutive eyes-on hypotheses fail to fix it** | **STOP-LOSS. Present derail-vs-spike-vs-continue as ONE numbered `Blockers` item, with your recommendation** (`AI_WorkingAgreement.md` §Working With the Lead). Each hypothesis on a no-headless-seam defect costs a rebuild + a lead-driven smoke. **Never silently start hypothesis N+1** — a ~13-cycle ladder once ran until the *lead* called the derail. |
 | **The layer-trace shows the defect sits in a subsystem the phase ASSUMED working** (a Discovery "never-exercised E2E" carry-forward) — especially a **SECOND** deep defect in that same subsystem | **Escalate to Derailed / spike: the phase premise is invalid.** Don't keep repairing on top of an unproven foundation. |
 
 ## Co-drive and suspend mechanics
@@ -82,4 +82,4 @@ Walk these in order. Each row exists because reactive per-control patching ran p
 
 ---
 
-**Back to [`execute.md`](execute.md):** a re-greened repair continues to the **success handback** (`execute.md` §Handback); a derail hands back per the **three-beat handback format**.
+**Back to [`execute.md`](execute.md):** a re-greened repair continues to the **success handback** (`execute.md` §Handback); a derail hands back in the same five beats, the derail as a `Blockers` item.

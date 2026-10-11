@@ -27,4 +27,4 @@ Prefer the session's own **Grep / Glob / Read** tools; they never prompt. For bi
 
 ## Heritage
 
-Methodology carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering) on 2026-09-23 (upstream `9f52c7f`); re-synced 2026-09-27 to upstream `c723ba4`. Local divergences are recorded in `.ai/commands/LOCAL_DELTAS.md`. Frictions with the *portable methodology itself* are filed upstream; project-internal retros stay in `docs/Planning/Support/WorkflowFeedback/`.
+Methodology carried from [`PeteSmalls/agentic-engineering`](https://github.com/PeteSmalls/agentic-engineering) on 2026-09-23 (upstream `9f52c7f`); re-synced 2026-10-11 to upstream `996437d`. *(The 2026-09-27 re-sync recorded `c723ba4`, a commit that never reached upstream; its content was re-landed there as `691f3df`.)* Local divergences are recorded in `.ai/commands/LOCAL_DELTAS.md`. Frictions with the *portable methodology itself* are filed upstream; project-internal retros stay in `docs/Planning/Support/WorkflowFeedback/`.

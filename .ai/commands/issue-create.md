@@ -35,8 +35,11 @@ is not approval to *fire* — confirm the command itself.
 **One case IS the confirmation: a lead directive naming already-drafted issues** ("file
 them", "file both") **whose titles/labels/content were already shown** — fire, showing the
 literal commands in the same firing turn, and report the URLs; re-asking there is the
-banned process check-in. The extra round-trip is owed only when the content or labels
-were never shown.
+banned process check-in. **So is a directive that states the issue's whole content in one
+clause** ("add an issue to move storage to a bigger bucket later") **and needs no label or
+taxonomy choice:** file it in the same turn, showing the literal command in the report. The
+extra round-trip is owed only when the content or labels were never shown and the lead did
+not state them.
 
 ## Procedure
 
@@ -59,11 +62,10 @@ were never shown.
      earlier pass is a hypothesis, and one filed against another project's tracker is the
      most expensive place for it to be wrong. *(A "missing field" drafted as a defect was
      by design: the code comment at the cited site said so, and was read only while drafting);*
-   - **labels — auto-suggest, show in the confirm step, fire with `--label`.** The platform
+   - **labels — auto-suggest, show in the confirm step, fire with `--label`.** The project
      tracker's label vocabulary is **`docs/ToolingConventions.md`
-     §Issue tracker conventions** (the 4 axes `type:`/`area:`/`status:`/`source:` — NOT the
-     Stage `…/agent-skills/triage-labels.md`, which is *Stage's* tracker + an uncustomized
-     template). Default **`status:defined`** (a Claude-drafted ticket *is* defined) + infer
+     §Issue tracker conventions** (the 4 axes `type:`/`area:`/`status:`/`source:`).
+     Default **`status:defined`** (a Claude-drafted ticket *is* defined) + infer
      **`type:`** (bug/feature/techdebt) and **`area:`** (the touched surface) from the
      request; add `source:deferred` if this came off the old backlog / a mid-run defer. Labels
      must **pre-exist** (`gh` errors on an absent `--label`), so **⛔ CHECK — `gh label list

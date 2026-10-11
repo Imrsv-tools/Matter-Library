@@ -66,6 +66,14 @@ Shallow is the default for small; ballooning kicks it up a tier. There's no thre
 memorize — surface the signal ("this is reading bigger than a quick fix — promote to an Issue?")
 and let the lead decide with the picture in front of them.
 
+## Throwaway prototypes — a lead-walked build
+
+A wireframe set or clickable mockup the lead will **walk**, then delete or promote. Three things differ from an ordinary Quick Fix:
+
+- **The gate counts blast radius, not files.** When every file sits in one self-contained folder that nothing else imports, "many files" is not the signal — it fits here.
+- **Commit each round once you have verified it yourself** (open every screen; headless is fine). A prototype has no "fixed completely" verdict — the lead's walk produces the *next* round's input, so it cannot gate the commit, and an uncommitted multi-day prototype in a shared tree is exposed the whole time.
+- **The walk is a loop, and its findings go back to the originating research doc:** each round, capture the lead's feedback there (verbatim; an `RD-` id only where the lead actually rules), then build the next round. That capture is lead-directed research work — say so in the commit. The brief names how the lead's notes reach you (`research.md` §Landing).
+
 ## Procedure (light by design)
 
 1. **Orient — Fundamentals (carried) + a thin slice of Focus.** You already carry the
@@ -88,7 +96,8 @@ and let the lead decide with the picture in front of them.
 4. **Do it, then VERIFY — proportional to what a user can OBSERVE, and BEFORE the commit**
  (the commit is the record; don't record an unverified behavior claim). Inline mini-plan in
  your head (no plan doc), make the change, then:
- - **⛔ INFRASTRUCTURE / BUILD-PATH CHANGE — a third branch, and neither of the two below fits it.** Nothing is visible in a UI, and **a green compile proves nothing whatsoever, because the pipeline IS the subject**: the build succeeding is the thing under test, not evidence about it. **Assert the ARTIFACT AND THE EFFECT** — what the built artifact *contains*, what the running thing *answers*, and that **the path you did NOT intend to change is byte-for-byte unaffected.** Then **name the command that would have caught it.** ⚠ Read literally without this branch, such a change routes to *"non-observable ⇒ the compile IS sufficient"* — **which is exactly the state in which a silently repointed production image is live and invisible.**
+ - **⛔ INFRASTRUCTURE / BUILD-PATH CHANGE — a third branch, and neither of the two below fits it.** Nothing is visible in a UI, and **a green compile proves nothing whatsoever, because the pipeline IS the subject**: the build succeeding is the thing under test, not evidence about it. **Assert the ARTIFACT AND THE EFFECT** — what the built artifact *contains*, what the running thing *answers*, and that **the path you did NOT intend to change is byte-for-byte unaffected.** Then **name the command that would have caught it.** **When the effect is a live machine** (a server, DNS, a firewall), write the acceptance evidence — what exists, where, verified how and when — to the project's live-state home (`LOCAL_DELTAS.md` names it), not only to the commit message. ⚠ Read literally without this branch, such a change routes to *"non-observable ⇒ the compile IS sufficient"* — **which is exactly the state in which a silently repointed production image is live and invisible.**
+ - **⛔ THE TARGET CANNOT RUN ON THIS MACHINE** (an engine, a device, a consumer's app) — a fourth branch. **(a)** Prove structurally that the path you did NOT mean to change is unchanged (a recorded call trace, a generated artifact diffed). **(b)** Write **built, not run** in the commit subject and in every doc line that describes the change. **(c)** Name the exact run, and the machine, that proves the rest — and if that run publishes something others pin, record it as owed where that machine will look. A stand-in proves what your code asks for and nothing about what the absent system does: it is built from somebody's report, so give it a case for each behaviour the report does not settle, the opposite of the report included.
  - **User-observable change** (visible / clickable / runtime — and **most Quick Fixes are
  visual in-app issues**): a green build is necessary but **NOT sufficient.** Build, then
  **open the page yourself and click the thing**, and **hand the lead the exact steps** ("open

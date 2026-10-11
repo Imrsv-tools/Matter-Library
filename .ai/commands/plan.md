@@ -7,6 +7,7 @@ Ordinary work runs `/discovery` → `/execute`; the Brief's step list and build 
 ## Before you start
 
 - **Prerequisite:** a Brief exists in the phase doc and names this lane.
+- **Fetch first** — `git fetch`, then `git rev-list --count HEAD..origin/<trunk>`. A fetch writes no tracked file, so plan mode allows it; a plan traced against a stale checkout cites a tree that no longer exists.
 - **The argument** is a phase (`17`, `43`) resolved to `docs/Planning/Phases/Phase<ARG>_*.md`, or an Issue (`#<n>`). Missing, but this session's own Brief routed exactly one unit here? Take it and say so in your first line. Otherwise ask. **No phase doc for the arg? Do NOT create one** — confirm with the lead whether it is a phase at all: a merge, reconciliation or branch-integration task is a `Support/Troubleshooting/` runbook driven by lead-gated git, not a phase. **Never number a new phase yourself** — numbering is the lead's (Workflow §Phase Numbering).
 - **Issue mode (`/plan #<n>`)** — same discipline, lighter dial (Workflow §The Issue lane): the plan is appended to the issue's workbench, often as an inline mini-plan; a non-trivial issue gets the lifecycle *plan-ready* comment. Snapshot and execution belong to `/execute #<n>`.
 - **Resume from doc state.** The phase doc carries the Brief and any appended plan; a fresh session continues from it rather than re-deriving finished analysis.
@@ -19,7 +20,7 @@ Ordinary work runs `/discovery` → `/execute`; the Brief's step list and build 
 **Plan mode is read-only and cannot write `## Resolved`, so the order is: rulings first, then plan mode.**
 
 - **A ruling already in hand** — produced earlier this session, or carried by the lead's invoking message — lands in the research thread's `## Resolved` **before** you enter plan mode.
-- **A ruling that is due** — the Brief closed with open `YOUR CALL` items — **ask them now**, land what they produce, commit, then enter.
+- **A ruling that is due** — the Brief closed with open `Blockers` items — **ask them now**, land what they produce, commit, then enter.
 - **⛔ A lift of a standing prohibition is a ruling too** — a gate-freeze lift, a push grant, a scope exception. It is the easiest to lose because it *authorises* rather than decides, and it is the one your plan will **depend on**. If a step does something a standing rule forbids, the executor must be able to read the permission **from a tracked file** — your plan's silence is not permission and your retro is deleted on drain. *(A lost freeze lift made an executor suspend half a phase.)*
 - **A ruling you landed earlier this session that planning now shows is wrong:** ask the lead from inside plan mode, carry the corrected bound in the plan file, and amend the entry **in place with a dated correction note** in the first turn after `ExitPlanMode`. Never silently overwrite it.
 
@@ -168,7 +169,7 @@ Acceptance over two or more instances of one type is not covered by a single-ins
 A `⚠human` step that turns out to be automatable needs a capability this table cannot contain — that is a one-off ask at the moment of discovery, not a plan violation.
 
 #### Ownership
-**⛔ Every step must name only files this phase owns.** A durable spec this phase changes is yours. **An upstream decision record is not** — the research thread's `## Resolved`, the product overview, a sibling phase doc, a central registry — because the lanes that write them run concurrently with execution by design. **A step that needs one becomes a numbered `⛔ YOUR CALL` naming the rulings owed, with your recommendation.** This is what lets research on future phases proceed without stopping execution of planned ones.
+**⛔ Every step must name only files this phase owns.** A durable spec this phase changes is yours. **An upstream decision record is not** — the research thread's `## Resolved`, the product overview, a sibling phase doc, a central registry — because the lanes that write them run concurrently with execution by design. **A step that needs one becomes a numbered `Blockers` item naming the rulings owed, with your recommendation.** This is what lets research on future phases proceed without stopping execution of planned ones.
 
 #### Fallbacks
 When a proof must *write*, plan mode cannot run it:
