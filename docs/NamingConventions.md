@@ -53,7 +53,7 @@
 
 | Segment | What it is | Values |
 |---|---|---|
-| `KIND` | what the thing is | `Q` open question · `F` finding · `RD` recorded decision (a lead ruling) |
+| `KIND` | what the thing is | `Q` open question · `F` finding · `RD` recorded decision — a lead ruling, or a call an agent closed by recommendation, which says whose call it is on its line until the lead acts on it |
 | `SCOPE` | **which file to open** | `P<NN>` phase (`P07`) · `I<n>` Issue workbench (`I1`) · a 2–4 letter uppercase mnemonic for a research doc or an unnumbered `PhaseTBD_` doc, declared once in that doc's header |
 | `n` | ordinal within that scope, from 1, in the order raised — no zero-padding | `1`, `4`, `12` |
 

@@ -17,6 +17,8 @@ Create a domain the first time it earns an entry — never in advance.
 - **Costly to rediscover** — it cost real debugging time, and would cost it again.
 - **Specific** — a concrete pattern, not a general principle.
 
+**And every claim in an entry was MEASURED in the run that paid for it** — a cause you inferred is written as inferred, or left out. These entries are force-read as fact.
+
 **A note that fails any one of the four belongs in the phase doc, not here.** If nothing
 qualifies at the end of a piece of work, the honest answer is *"no new learnings"* — write that
 and move on.

@@ -25,7 +25,7 @@ both passages quoted. Everything else is one tally line.
 
 ## Absorbed
 
-*Drain 2 (2026-10-11): the 18 retros of 2026-09-28 → 10-11. Portable items are upstream `996437d`.*
+*Drain 2 (2026-10-11): the 18 retros of 2026-09-28 → 10-11. Portable items are upstream `996437d`; `d271d0c` restores a sibling drain's commit that the re-landing overwrote.*
 
 | Item | Landed in |
 |---|---|
@@ -140,7 +140,7 @@ A rule is cut when the flags say it is dead weight *across runs* — not on one 
 
 ## Open — needs a lead ruling, not a refiner tweak
 
-1. **Push the upstream clone.** `PeteSmalls/agentic-engineering` holds two unpushed commits in its local clone: `691f3df` (drain 1's portable half, re-landed) and `996437d` (drain 2). Drain 1's original commit was lost exactly this way: made, recorded here as the sync SHA, never pushed. **Recommendation:** push both before the next session on either repo.
+1. *(Closed 2026-10-11: both repos were pushed on the lead's word. Upstream is at `d271d0c`.)*
 2. **A streamlining pass is overdue** on `execute.md` (43.5 KB), `discovery.md` (28.1 KB) and `.claude/CLAUDE.md` (17.4 KB, loaded into every session). It needs the lead in the room (`workflow-refiner.md` §3). With it, the web-service framing: **recommendation** — upstream moves the stack-shaped paragraphs into a sibling that `execute.md` sends only a project with a web surface to, so a project with none never reads them.
 3. **Should the refiner run the way the IMRSV refiner reports it does?** Its note upstream (`NOTE_FROM_IMRSV.md`, A and B): triage in batches of about twenty, default to decline, three bars, every wave ending at or below the bytes it started with, the lead picking from one screen. Drain 2 used the three bars and still grew every doc. **Recommendation:** adopt it into `workflow-refiner.md` upstream, with the byte rule as written — it is the only counter-force on record that held. Its C to F and H were not taken.
 4. **This machine's gate is permanently red on two lanes** (`approval_binds_freeze`, `release_verify`; measured 2026-10-11). The cause is a git-ignored `library/staging/` from 2026-09-24. Three runs asked whether to rebuild or delete it; nobody has said. **Recommendation:** rebuild it (`stage_release.py build`) or delete it, so that a FAIL on this machine means something.
@@ -159,7 +159,8 @@ the recorded SHA in `AGENTS.md` §Heritage — **and treat an unpushed upstream 
 landed: check `git merge-base --is-ancestor <sha> origin/main` in the upstream clone at the
 start of each drain.**
 
-- `691f3df` and `996437d` await the lead's push (Open 1).
+- Nothing awaits a push (2026-10-11).
+- **The upstream clone is a shared tree too.** Another project's refiner committed into it mid-drain on 2026-10-11, and files prepared from the earlier tip were written over three of its changes and pushed; `d271d0c` restored them. **`git rev-parse HEAD` in the clone immediately before writing any file prepared from an earlier read of it** — `git status` cannot show a commit that has already landed.
 
 ## Recurring themes
 
