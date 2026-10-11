@@ -69,6 +69,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     # ride into the committed library .blend (F-P10-17). The exporter strips `ml_*` too.
     mat["ml_article"] = art.name
     mat["ml_master"] = art.master
+    mat.use_backface_culling = art.master not in build_masters.TWO_SIDED
     thick = "thick" in build_masters.MASTER_PARTS[art.master]
 
     # The whole article network lives in ONE per-article group, MatterLCD_<name>, whose inputs

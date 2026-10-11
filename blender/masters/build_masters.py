@@ -107,6 +107,12 @@ MASTER_PARTS = {
     "TranslucentThick": {"transmission", "thick"},
     "Subsurface": {"subsurface"},
 }
+# The masters that draw BOTH sides of a face (MasterSet §Material-settings intent, the Two-sided
+# column); every other master draws a face's front only. The loader turns Backface Culling on
+# for those others, so the viewport and Eevee stop drawing a face Unreal will not, and Blender's
+# USD export, which writes ``doubleSided`` from that switch, writes 0 for their meshes
+# (2026-10-11). Cycles does not read the switch, so the parity rig's pictures do not change.
+TWO_SIDED = {"Masked", "Hair", "TranslucentThin", "TranslucentThick"}
 
 
 def _group(name: str, sockets_in, sockets_out):

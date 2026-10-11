@@ -14,7 +14,9 @@ port it declares, not at least one port (Phase07 7.2).
 Opens the generated MatterLibrary.blend and asserts, for every creator_selectable catalog
 article (RD-5): the proxy material is present + asset-marked with a catalog, carries the durable
 identity carrier, and keeps its `MatterLCD_<id>` node-group exposing the article's LCD travel-port
-subset (from its recipe) as interface sockets. Also verifies IMRSV_MissingMaterial is ABSENT
+subset (from its recipe) as interface sockets. Since 2026-10-11 also: Backface Culling is on for an
+article on a one-sided master and off for one on a two-sided master (MasterSet §Material-settings
+intent), read from the recipe's `master`, not from what the loader wrote. Also verifies IMRSV_MissingMaterial is ABSENT
 (system material, not Creator-selectable) and the sibling blender_assets.cats.txt covers every
 catalog path. Structure only — the browse/assign UX + colour are the §6 human sitting.
 
@@ -31,6 +33,8 @@ LCD_TRAVEL_PORTS = {"base_color_tint", "overlay1_density", "overlay2_density", "
                     "maskset_blend", "roughness_bias",
                     "overlay1_color", "overlay2_color", "overlay3_color",    # Phase10
                     "transmission_color", "emission_color", "emission_luminance"}    # Phase12
+# MasterSet §Material-settings intent, the Two-sided column: these draw both sides of a face
+TWO_SIDED_MASTERS = {"Masked", "Hair", "TranslucentThin", "TranslucentThick"}
 fails = []
 
 
@@ -52,6 +56,15 @@ def travel_ports_for(identity):
         return set()
     with open(rp) as f:
         return set(json.load(f).get("lcd_ports", [])) & LCD_TRAVEL_PORTS
+
+
+def master_for(identity):
+    """The article's master, from its recipe (the assembler's default is Opaque)."""
+    rp = os.path.join(RECIPES, identity + ".json")
+    if not os.path.isfile(rp):
+        return None
+    with open(rp) as f:
+        return json.load(f).get("master", "Opaque")
 
 
 sys.path.insert(0, os.path.join(REPO, "tools/converters"))
@@ -89,6 +102,12 @@ for m in selectable:
     tags = {t.name for t in mat.asset_data.tags} if mat.asset_data else set()
     check(m["status"] in tags, "%s: tagged with its status (%s)" % (identity, m["status"]),
           "tags %s" % sorted(tags))
+    master = master_for(identity)
+    one_sided = master not in TWO_SIDED_MASTERS
+    check(master is not None and mat.use_backface_culling == one_sided,
+          "%s: Backface Culling %s (%s draws %s)"
+          % (identity, "on" if one_sided else "off", master, "one side" if one_sided else "both sides"),
+          "the switch is %s" % ("on" if mat.use_backface_culling else "off"))
     cid = mat.asset_data.catalog_id if mat.asset_data else ""
     check(bool(cid) and cid != "00000000-0000-0000-0000-000000000000",
           "%s: catalog assigned" % identity, cid)
