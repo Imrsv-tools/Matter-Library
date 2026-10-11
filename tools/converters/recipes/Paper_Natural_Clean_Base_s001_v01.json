@@ -1,0 +1,70 @@
+{
+  "_comment": "Plain white paper: printer and writing paper, book pages, notes, paper towel. Opaque, a matte dielectric fibre sheet, from an ambientCG scan (L3). Placed in engineered/composite as the wish list does: the class's boundary is not written yet (O11), so the home is provisional. The scan's albedo is brighter than Physically Based `Office Paper`; the authored tint brings its mean onto that entry. Carries the row's wear layers at 0 (C1): scuffs (overlay 1, damage) and dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit that order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. The row's damage layer, Creases01, is not made yet; Scuffs01 stands in for it in slot 1. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "Paper_Natural_Clean_Base_s001_v01",
+  "status": "draft",
+  "path": "engineered/composite/Paper_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "composite",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_tex": "../../../textures/base/engineered/composite/Paper_Natural_basecolor_s001.png",
+  "roughness_tex": "../../../textures/base/engineered/composite/Paper_Natural_roughness_s001.png",
+  "normal_tex": "../../../textures/base/engineered/composite/Paper_Natural_normal_s001.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Patches01_s1.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    }
+  ],
+  "lcd_defaults": {
+    "base_color_tint": "0.873, 0.927, 0.999"
+  },
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "ambientcg",
+      "asset": "Paper001",
+      "url": "https://ambientcg.com/view?id=Paper001",
+      "license": "CC0-1.0",
+      "provenance": "library/provenance/sources/base/engineered/composite/Paper_Natural.yaml"
+    },
+    {
+      "kind": "physicallybased",
+      "entry": "Office Paper",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609302132,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.794, 0.834, 0.884",
+        "metalness_const": 0,
+        "roughness_const": 0.8,
+        "specular_ior": 1.5
+      },
+      "note": "the scan's mean linear albedo (0.909, 0.900, 0.885) is tinted onto this entry's colour by the authored base_color_tint; its roughness map (mean ~0.63) is kept"
+    },
+    {
+      "kind": "judgement",
+      "why": "ambientCG gives no physical size for Paper001; a 1 cm tile puts its grain at a few hundredths of a millimetre, a paper's fibre."
+    }
+  ]
+}

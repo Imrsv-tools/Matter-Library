@@ -1,0 +1,52 @@
+{
+  "_comment": "Brown kraft cardboard: the unbleached board of boxes, cartons and paper bags. Opaque, a matte dielectric fibre sheet, from an ambientCG scan (L3). Placed in engineered/composite as the wish list does: the class's boundary is not written yet (O11), so the home is provisional. Carries the row's wear layers at 0 (C1): scuffs (overlay 1, damage) and dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit that order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. The row's damage layer, Creases01, is not made yet; Scuffs01 stands in for it in slot 1. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "Cardboard_Kraft_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/composite/Cardboard_Kraft_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "composite",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/composite/Cardboard_Kraft_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/composite/Cardboard_Kraft_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/composite/Cardboard_Kraft_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Patches01_s1.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "ambientcg",
+      "asset": "Cardboard002",
+      "url": "https://ambientcg.com/view?id=Cardboard002",
+      "license": "CC0-1.0",
+      "provenance": "library/provenance/sources/base/engineered/composite/Cardboard_Kraft.yaml"
+    },
+    {
+      "kind": "judgement",
+      "why": "Physically Based has no cardboard entry; the scan's mean linear albedo (0.49, 0.28, 0.07) is a plausible unbleached kraft and is kept. ambientCG gives no physical size for Cardboard002; a 0.1 m tile (its sibling Paper004, a kraft paper, is 0.3 m) keeps its fibre mottling at a few millimetres. specular_ior 1.5, a generic cellulose dielectric."
+    }
+  ]
+}

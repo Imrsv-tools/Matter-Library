@@ -18,7 +18,8 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
                             (LCDSchema); metalness; up to three wear layers gated by the
                             maskset (MasterSet §Overlay semantic); the normal combined in
                             TANGENT space and converted once (MasterSet, since 5.3);
-                            OpenPBR coat (-> Coat) and fuzz (-> Sheen), off at weight 0;
+                            OpenPBR coat (-> Coat) and fuzz (-> Sheen), off at weight 0,
+                            the coat darkening the base as MaterialX's graph does (below);
                             specular anisotropy along the UV tangent, off at 0
   TwoLayer                 + a second layer blended by the maskset's R (MasterSet
                             §TwoLayer blend): colour, roughness and metalness mixed, the
@@ -53,6 +54,14 @@ The formulas are MaterialX's, copied, not approximated — each one names its so
   transmission_weight); and subsurface uses Base Color, so Base Color = lerp(base,
   subsurface_color, subsurface_weight). Each is exact at weight 0 and at weight 1.
 
+  Principled's coat does not darken what lies under it; OpenPBR's does (light reflected back
+  down inside the coat), so the group multiplies Base Color by MaterialX's own factor
+  (``open_pbr_surface.mtlx``, "Coat darkening calculation"): Kcoat = 1 - (1 - F0(coat_ior)) /
+  coat_ior^2, Ebase = mix(mix(base, subsurface_color, subsurface_weight), base x
+  specular_weight, metalness), factor = mix(1, (1 - Kcoat) / (1 - Ebase Kcoat), coat_weight x
+  coat_darkening). MaterialX multiplies the whole base substrate by it, its specular too; here
+  it reaches the base's colour only, so the base's own reflection under the coat is undarkened.
+
 Sockets that are Creator ports carry the frozen port name (LCDSchema §Creator subset), so
 the Blender exporter reads them as it read the look-alike's.
 
@@ -66,7 +75,8 @@ import math
 
 import bpy
 
-VERSION = 11    # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 12    # bump when a group's contents change; ensure_*() rebuilds an older one
+#               (12: the coat darkens the base, OpenPBR's coat_darkening)
 #               (11: Phase12 12.4, the emission sockets take their ports' names)
 #               (8: Phase10, a deposit overlay covers the surface in its colour)
 #               (9: Phase12 12.1, the see-through colour's socket takes its port's name)
@@ -215,6 +225,7 @@ def _sockets(parts: set) -> list:
          ("Coat Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
          ("Coat Roughness", "NodeSocketFloat", 0.0),
          ("Coat IOR", "NodeSocketFloat", 1.6),
+         ("Coat Darkening", "NodeSocketFloat", 1.0),
          ("Fuzz Weight", "NodeSocketFloat", 0.0),
          ("Fuzz Color", "NodeSocketColor", (1.0, 1.0, 1.0, 1.0)),
          ("Fuzz Roughness", "NodeSocketFloat", 0.5),
@@ -388,7 +399,8 @@ def _build(name: str, parts: set):
         L(keep, m.inputs[1])
         return m.outputs[0]
 
-    L(hidden(metal, 0, 300), bsdf.inputs["Metallic"])
+    metal = hidden(metal, 0, 300)
+    L(metal, bsdf.inputs["Metallic"])
 
     rc = _math(ng, "ADD", 200, 200, clamp=True)                # roughness_biased_clamped
     L(rough, rc.inputs[0])
@@ -454,7 +466,10 @@ def _build(name: str, parts: set):
         src = gi.outputs[sock]
         if sock in ("Coat Weight", "Fuzz Weight"):             # a deposit hides coat and fibres
             src = hidden(src, 600, -350 if sock == "Coat Weight" else -450)
+        if sock == "Coat Weight":
+            coat_w = src
         L(src, bsdf.inputs[pin])
+    base_under = base      # OpenPBR's base_color, before Principled's one-colour mappings below
 
     if "opacity" in parts:
         # the article's ifgreatereq: opacity >= cutoff -> 1, else 0  (== 1 - (opacity < cutoff))
@@ -565,7 +580,62 @@ def _build(name: str, parts: set):
         L(clear.outputs["BSDF"], cover.inputs[1])
         L(add.outputs["Shader"], cover.inputs[2])
         L(cover.outputs["Shader"], go.inputs["BSDF"])
-    L(base, bsdf.inputs["Base Color"])
+    # OpenPBR coat darkening (MaterialX open_pbr_surface.mtlx, "Coat darkening calculation")
+    ior = gi.outputs["Coat IOR"]
+    f0a = _math(ng, "SUBTRACT", 0, 1500)                       # F0 = ((n - 1) / (n + 1))^2
+    L(ior, f0a.inputs[0])
+    f0a.inputs[1].default_value = 1.0
+    f0b = _math(ng, "ADD", 0, 1650)
+    L(ior, f0b.inputs[0])
+    f0b.inputs[1].default_value = 1.0
+    f0q = _math(ng, "DIVIDE", 150, 1550)
+    L(f0a.outputs[0], f0q.inputs[0])
+    L(f0b.outputs[0], f0q.inputs[1])
+    f0 = _math(ng, "POWER", 300, 1550)
+    L(f0q.outputs[0], f0.inputs[0])
+    f0.inputs[1].default_value = 2.0
+    omf = _math(ng, "SUBTRACT", 450, 1550)                     # 1 - F0
+    omf.inputs[0].default_value = 1.0
+    L(f0.outputs[0], omf.inputs[1])
+    n2 = _math(ng, "MULTIPLY", 450, 1700)
+    L(ior, n2.inputs[0])
+    L(ior, n2.inputs[1])
+    omk = _math(ng, "DIVIDE", 600, 1600)                       # 1 - Kcoat = (1 - F0) / n^2
+    L(omf.outputs[0], omk.inputs[0])
+    L(n2.outputs[0], omk.inputs[1])
+    kc = _math(ng, "SUBTRACT", 750, 1600)                      # Kcoat
+    kc.inputs[0].default_value = 1.0
+    L(omk.outputs[0], kc.inputs[1])
+    e_diel = base_under
+    if "subsurface" in parts:
+        e_diel = _lerp_color(ng, base_under, gi.outputs["Subsurface Color"], sw, 0, 1850)
+    e_metal = _vmath(ng, "SCALE", 300, 1950)
+    L(base_under, e_metal.inputs[0])
+    L(gi.outputs["Specular Weight"], e_metal.inputs["Scale"])
+    e_base = _lerp_color(ng, e_diel, e_metal.outputs[0], metal, 450, 1850)
+    ek = _vmath(ng, "SCALE", 900, 1850)                        # Ebase Kcoat
+    L(e_base, ek.inputs[0])
+    L(kc.outputs[0], ek.inputs["Scale"])
+    den = _vmath(ng, "SUBTRACT", 1050, 1850)                   # 1 - Ebase Kcoat
+    den.inputs[0].default_value = (1.0, 1.0, 1.0)
+    L(ek.outputs[0], den.inputs[1])
+    omk_v = _node(ng, "ShaderNodeCombineXYZ", 1050, 1650)
+    for axis in ("X", "Y", "Z"):
+        L(omk.outputs[0], omk_v.inputs[axis])
+    dark = _vmath(ng, "DIVIDE", 1200, 1750)                    # base_darkening
+    L(omk_v.outputs[0], dark.inputs[0])
+    L(den.outputs[0], dark.inputs[1])
+    amt = _math(ng, "MULTIPLY", 1050, 1500)                    # coat_weight x coat_darkening
+    L(coat_w, amt.inputs[0])
+    L(gi.outputs["Coat Darkening"], amt.inputs[1])
+    one = _node(ng, "ShaderNodeCombineXYZ", 1050, 1400)
+    for axis in ("X", "Y", "Z"):
+        one.inputs[axis].default_value = 1.0
+    factor = _lerp_color(ng, one.outputs[0], dark.outputs[0], amt.outputs[0], 1350, 1500)
+    darkened = _vmath(ng, "MULTIPLY", 1500, 1000)
+    L(base, darkened.inputs[0])
+    L(factor, darkened.inputs[1])
+    L(darkened.outputs[0], bsdf.inputs["Base Color"])
     return ng
 
 

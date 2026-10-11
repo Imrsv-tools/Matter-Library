@@ -1,0 +1,21 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/engineered/metal/CastIron_Raw
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Metal052C
+    sha256_scope: shipped_source_set
+    sha256: 2665b0012852eae6434212fd70efd8fc20b2dd1672cb441cd14b9a8ca0e2d30b
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Metal052C_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/engineered/metal/CastIron_Raw_basecolor_s01.png
+      sha256: ac846b1209376d6a2492260c8bd4fce25dffb230d00ec33fae07a609f7c6d064
+    - path: MatterLibrary/textures/base/engineered/metal/CastIron_Raw_metalness_s01.png
+      sha256: 8c0c2ffcc25193d91137e81f919f4b6fc3b927a44b05372c7a49e0143757001b
+    - path: MatterLibrary/textures/base/engineered/metal/CastIron_Raw_normal_s01.png
+      sha256: 6812e147304d7aa3faa99fba0a1dfbbc7d6aab193274c68b4f8204f83455c58e
+    - path: MatterLibrary/textures/base/engineered/metal/CastIron_Raw_roughness_s01.png
+      sha256: f181c76d86bd56d38f44d0f4b532e9b93db59c086850c750c77c77556bdd44bf

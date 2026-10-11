@@ -1,9 +1,13 @@
 # activate-usd-tools.sh — put the IMRSV USD toolchain on PATH for a shell.
-#   conda activate imrsv-usd-tools && source activate-usd-tools.sh
-# Must be sourced from inside the conda env that built it.
+#   conda activate imrsv-usd-tools && source activate-usd-tools.sh   (conda env)
+#   source activate-usd-tools.sh                                     (uv venv: activated here)
 #
 # Override the install location with USD_TOOLS_ROOT (default ~/usd-tools).
-INST="${USD_TOOLS_ROOT:-${HOME}/usd-tools}/inst/usd-26.03"
+USD_TOOLS_ROOT="${USD_TOOLS_ROOT:-${HOME}/usd-tools}"
+INST="${USD_TOOLS_ROOT}/inst/usd-26.03"
+if [ -z "${CONDA_PREFIX:-}" ] && [ -f "${USD_TOOLS_ROOT}/venv/bin/activate" ]; then
+  source "${USD_TOOLS_ROOT}/venv/bin/activate"
+fi
 export PATH="${INST}/bin:${PATH}"
 export PYTHONPATH="${INST}/lib/python:${PYTHONPATH:-}"
 # Only the install's own lib — NOT the conda env lib. (Garch links libGL via the conda

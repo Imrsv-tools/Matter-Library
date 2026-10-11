@@ -245,6 +245,7 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
               "subsurface_scatter_anisotropy": ("Subsurface Anisotropy", None),
               "coat_weight": ("Coat Weight", None), "coat_color": ("Coat Color", _rgba),
               "coat_roughness": ("Coat Roughness", None), "coat_ior": ("Coat IOR", None),
+              "coat_darkening": ("Coat Darkening", None),
               "fuzz_weight": ("Fuzz Weight", None), "fuzz_color": ("Fuzz Color", _rgba),
               "fuzz_roughness": ("Fuzz Roughness", None),
               "specular_roughness_anisotropy": ("Anisotropy", None)}

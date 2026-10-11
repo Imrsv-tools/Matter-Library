@@ -173,6 +173,21 @@ for a in ARTS:
   - **Run here, on Glass_Clear's job:** this machine's card: OptiX chosen. Forced to the CPU: it renders, and its three pictures differ from the card's by noise (0.07 to 0.41 of an 8-bit code on average). **Every graphics device made to fail its test render, a stand-in for the platform's card:** the log names OptiX and CUDA as listed and unable to render, the job completes on the CPU, and the pictures are the forced-CPU ones. The same, told it must use the card: it stops and says why. A value it does not know: refused.
   - **Not run on a card that really cannot render.** The stand-in fails the driver's own test, not Cycles. That Cycles reports such a card as a failed render, or writes no picture, is what the test relies on; the platform's machine is where that is shown.
   - **The cost of the CPU here:** about a minute for the three pictures, against about ten seconds.
+  - **The stand-in, so it can be run again** (it was scratch, and is not kept as a file). A script handed to Blender in place of the driver, which imports the driver, makes its test render report failure on any graphics device, and runs the job:
+
+    ```python
+    # blender -b --factory-startup --python-exit-code 1 --python <this> -- <job.json>
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, "tools/parity/drivers")          # from the repo root
+    import blender_render as D
+    real = D._renders
+    D._renders = lambda scn: ((False, "simulated: the device's kernels could not be built")
+                              if scn.cycles.device == "GPU" else real(scn))
+    D.run(Path(sys.argv[sys.argv.index("--") + 1]))
+    ```
+- **TG-F24 — The side view adds no verdict of its own** *(added after the commit that built it; the full sweeps were run once it had landed)*. Glass_Clear through its 17 slider settings and Diamond_Brilliant through its 6, in all three tools: every row takes the same verdict in the side view as in the two older views, and the rows already flagged are the same rows. The stored sheets of both articles carry the view. **The lead's look at it is still owed.**
+- **A thing to know before the next rig run into scratch.** One article's defaults, three views, are about 430 MB on disk, nearly all of it the Unreal driver's raw float captures. A scratch run pointed at `/tmp` filled that machine's quota and killed the run; scratch output belongs on the home disk.
 
 ---
 

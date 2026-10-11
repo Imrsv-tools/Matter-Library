@@ -14,7 +14,8 @@ depends only on this script and the engine.
 
 Built: the 8 masters (``MASTERS``), all on the Opaque core (6.3: ``place2d``, the per-article
 textures, the mask set, three overlays each at its own real-world size, the roughness bias and the
-tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function), each with its
+tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function, but for the coat's
+darkening of the base, which is MaterialX's own), each with its
 own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair; Phase09: the mesh's
 picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the Sky (the rig's
 visible dome, unlit, which the runtime's sky light captures).
@@ -502,7 +503,6 @@ def build_master(token, white, no_wear, flat, white_colour=None):
         base = g.op(M.MaterialExpressionLinearInterpolate, base,
                     g.op(M.MaterialExpressionMultiply, base, base, 5), 4)
         g.link(w, base, "Alpha")
-    feed(base, "base_color")
     if len(calls) == 2:
         for c, m in zip(calls, (0.0, 1.0)):
             g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
@@ -531,6 +531,7 @@ def build_master(token, white, no_wear, flat, white_colour=None):
 
     missing = []
     params = {}     # each pass-through parameter as the article sets it, before any scaling
+    fed = {}        # ... and as Epic's function is given it
     for name, default in {**PASS_THROUGH, **spec.get("extra", {})}.items():
         if name not in inputs:
             missing.append(name)
@@ -551,9 +552,49 @@ def build_master(token, white, no_wear, flat, white_colour=None):
             # HANGS THE GPU (learning U11: Xid 109 in SubsurfaceScattering, 9.3; the floor alone
             # cleared it, the job otherwise identical)
             p = g.op_k(M.MaterialExpressionMax, p, SUBSURFACE_FLOOR, 4)
-        feed(p, name)
+        fed[name] = p
+        if name != "subsurface_color":      # fed below, darkened by the coat as the base is
+            feed(p, name)
+    if "coat_darkening" not in inputs:
+        missing.append("coat_darkening")
     if missing:
         raise RuntimeError(f"{token}: Epic's function has no input {missing}")
+
+    # OpenPBR coat darkening, MaterialX's own (open_pbr_surface.mtlx, "Coat darkening
+    # calculation"), as in Blender's _build: Kcoat = 1 - (1 - F0(coat_ior)) / coat_ior^2, Ebase =
+    # mix(mix(base, subsurface_color, subsurface_weight), base x specular_weight, metalness), and
+    # the base colour x mix(1, (1 - Kcoat) / (1 - Ebase Kcoat), coat_weight x coat_darkening).
+    # Epic's function darkens about a third as much as MaterialX (porcelain, close up: L* -2.3
+    # where Storm's is -7.3, 2026-10-10), so its own pin is given 0, not the article's value.
+    ior = params["coat_ior"]
+    f0 = g.op(M.MaterialExpressionDivide, g.op_k(M.MaterialExpressionSubtract, ior, 1.0, 5),
+              g.op_k(M.MaterialExpressionAdd, ior, 1.0, 5), 4)
+    omk = g.op(M.MaterialExpressionDivide, g.one(M.MaterialExpressionOneMinus,
+                                                 g.op(M.MaterialExpressionMultiply, f0, f0, 3), 3),
+               g.op(M.MaterialExpressionMultiply, ior, ior, 3), 2)        # 1 - Kcoat
+    kc = g.one(M.MaterialExpressionOneMinus, omk, 2)
+    e_base = base
+    if "subsurface_weight" in fed:
+        e_base = g.node(M.MaterialExpressionLinearInterpolate, 3)
+        g.link(base, e_base, "A")
+        g.link(fed["subsurface_color"], e_base, "B")
+        g.link(fed["subsurface_weight"], e_base, "Alpha")
+    e_metal = g.op(M.MaterialExpressionMultiply, base, fed["specular_weight"], 3)
+    e_mix = g.node(M.MaterialExpressionLinearInterpolate, 2)
+    g.link(e_base, e_mix, "A")
+    g.link(e_metal, e_mix, "B")
+    g.link(metal, e_mix, "Alpha")
+    dark = g.op(M.MaterialExpressionDivide, omk,
+                g.one(M.MaterialExpressionOneMinus, g.op(M.MaterialExpressionMultiply, e_mix, kc, 2), 2), 1)
+    amount = g.op(M.MaterialExpressionMultiply, fed["coat_weight"],
+                  g.scalar("coat_darkening", 1.0, col=3), 2)
+    # MaterialX darkens the whole base substrate, so the scattered colour too: Epic's function
+    # takes it on its own pin, where Blender's Principled folds it into Base Color
+    factor = g.lerp_from_one(dark, amount, 1)
+    feed(g.op(M.MaterialExpressionMultiply, base, factor, 1), "base_color")
+    if "subsurface_color" in fed:
+        feed(g.op(M.MaterialExpressionMultiply, fed["subsurface_color"], factor, 1), "subsurface_color")
+    feed(g.node(M.MaterialExpressionConstant, 2, r=0.0), "coat_darkening")
     if "thin" in spec:
         feed(g.node(M.MaterialExpressionConstant, 2, r=1.0 if spec["thin"] else 0.0), "geometry_thin_walled")
 

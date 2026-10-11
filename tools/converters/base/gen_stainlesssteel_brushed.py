@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+"""Generate the base texture set `StainlessSteel_Brushed` (lane L2).
+
+Brushed stainless steel: an abrasive belt leaves fine parallel grooves, so the surface is a
+field of streaks, each a few hundredths of a millimetre wide, running the full length of the
+part. The grooves run along V (image columns), so the article's `specular_roughness_anisotropy`
+stretches the highlight across them, along U (the tangent), as on Satin and Hair.
+
+Only roughness and normal are written: the colour is the article's constant, Physically Based
+`Stainless Steel`. Scale `s001`: a 1 cm tile, so one pixel is ~0.01 mm. Seamless (tileable.py
+for the along-groove variation; the groove profile is per column, so it wraps by construction),
+fixed seed, no network.
+
+Writes MatterLibrary/textures/base/engineered/metal/StainlessSteel_Brushed_<channel>_s001.png.
+
+    gen_stainlesssteel_brushed.py [--out DIR]
+
+It refuses to overwrite an existing file (AI_WorkingAgreement §Build Safety).
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import tileable as tl  # noqa: E402
+
+ROOT = Path(__file__).resolve().parent.parent.parent.parent
+OUT = ROOT / "MatterLibrary" / "textures" / "base" / "engineered" / "metal"
+SET = "StainlessSteel_Brushed"
+SCALE = "s001"
+SEED = 411
+
+
+def grooves(seed: int) -> np.ndarray:
+    """One random depth per column, summed over groove widths of 1-16 px and smoothed with a
+    wrap-around box filter, so the profile tiles across the seam. Normalised to [0, 1]."""
+    rng = np.random.RandomState(seed)
+    acc = np.zeros(tl.SIZE)
+    for k, w in enumerate((1, 2, 4, 8, 16)):
+        cols = np.repeat(rng.rand(tl.SIZE // w), w)
+        cols = np.roll(cols, rng.randint(w))                  # stagger the octaves
+        acc += cols * 0.5 ** (k * 0.5)
+    acc = (acc + np.roll(acc, 1) + np.roll(acc, -1)) / 3.0     # soften the pixel edges
+    return (acc - acc.min()) / (acc.max() - acc.min())
+
+
+def maps() -> dict:
+    profile = grooves(SEED)[None, :]                           # (1, size): varies across, not along
+    along = tl.fbm((3, 6), SEED + 10)                          # each groove fades in and out along its length
+    patches = tl.fbm((4, 8), SEED + 20)                        # broad belt-pressure patches
+
+    height = profile * (0.75 + 0.25 * along)
+    rough = np.clip(0.30 + 0.08 * (height - 0.5) + 0.05 * (patches - 0.5), 0.2, 0.4)
+    return {"roughness": tl.gray(rough),
+            "normal": tl.normal_map(height, strength=2.0)}
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="Generate the StainlessSteel_Brushed base texture set.")
+    ap.add_argument("--out", default=str(OUT))
+    args = ap.parse_args(argv)
+    out = Path(args.out)
+    targets = {ch: out / f"{SET}_{ch}_{SCALE}.png" for ch in ("roughness", "normal")}
+    if any(p.exists() for p in targets.values()):
+        print(f"refusing to overwrite {SET} in {out} (Build Safety); use --out <dir>", file=sys.stderr)
+        return 1
+    out.mkdir(parents=True, exist_ok=True)
+    for ch, img in maps().items():
+        img.save(targets[ch], "PNG", optimize=True)
+        print(f"wrote {targets[ch]}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

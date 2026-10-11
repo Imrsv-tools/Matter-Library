@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/engineered/composite/Cardboard_Kraft
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Cardboard002
+    sha256_scope: shipped_source_set
+    sha256: 0e243edb61c5ce588a4c60a2474aa0397fa5fb722fa95fef60063af66ed74395
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Cardboard002_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/engineered/composite/Cardboard_Kraft_basecolor_s01.png
+      sha256: 05010e88c2262b1c802ab0a5d0aac6d82a3677c32cb628a7c6495fee0c57558a
+    - path: MatterLibrary/textures/base/engineered/composite/Cardboard_Kraft_normal_s01.png
+      sha256: c8ef850dc9a3d0ff05ea83d82bbf236f1a2e75a5423f0535382fe5f6d0825cce
+    - path: MatterLibrary/textures/base/engineered/composite/Cardboard_Kraft_roughness_s01.png
+      sha256: 1663330092a9d490c23217b57143c733ec882213f5263ebc8e3342fbe49bc312

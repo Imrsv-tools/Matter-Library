@@ -25,9 +25,12 @@ has none of the three), so a difference between the columns is the material's.
 Colour: the Standard view transform (a plain sRGB encode, no tone curve), like usdrecord's
 ``sRGB`` colour correction.
 
-The device: the first that can actually RENDER, tried in the order OptiX, CUDA, CPU, and named in
-the log (``pick_device``). A listed graphics device that cannot render is passed over, where
-before it failed the job. ``MATTER_BLENDER_DEVICE=cpu`` or ``=gpu`` forces the choice.
+The device: the first that can actually RENDER, tried in the order OptiX, CUDA, Metal, CPU, and
+named in the log (``pick_device``). On an Apple Silicon Mac, Metal draws the sweep about twice as
+fast as the CPU and leaves the CPU to the other tools, which the rig runs at the same time (its
+first run on a machine also builds the Metal kernels, about two minutes, once). A listed
+graphics device that cannot render is passed over, where before it failed the job.
+``MATTER_BLENDER_DEVICE=cpu`` or ``=gpu`` forces the choice.
 """
 
 from __future__ import annotations
@@ -55,7 +58,7 @@ DOME_K = 1.0     # measured against Storm, Phase05 5.1 (see the phase doc's exec
 SUN_K = 1.0
 
 
-GPU_KINDS = ("OPTIX", "CUDA")
+GPU_KINDS = ("OPTIX", "CUDA", "METAL")
 DEVICE_ENV = "MATTER_BLENDER_DEVICE"      # cpu | gpu; unset: the first device that can render
 
 
@@ -101,7 +104,7 @@ def _renders(scn) -> tuple[bool, str]:
 
 
 def pick_device(scn) -> str:
-    """Set Cycles to the first device that RENDERS, and say which: OptiX, then CUDA, then the CPU.
+    """Set Cycles to the first device that RENDERS, and say which: OptiX, CUDA, Metal, then the CPU.
 
     ``MATTER_BLENDER_DEVICE=cpu`` skips the graphics devices; ``=gpu`` refuses the CPU, so a
     machine that must render on its card fails instead of quietly taking minutes per picture.

@@ -55,14 +55,14 @@ The **author tier** is the master's full param schema ([MasterSet](../Ontology/M
 
 | Carrier | Producer input(s) (OpenPBR) | Masters | Blender master socket → Principled BSDF |
 |---|---|---|---|
-| **Coat** | `coat_weight` · `coat_color` · `coat_roughness` · `coat_ior` | any | `Coat Weight` · `Coat Color` → **Coat Tint** · `Coat Roughness` · `Coat IOR` |
+| **Coat** | `coat_weight` · `coat_color` · `coat_roughness` · `coat_ior` · `coat_darkening` *(added 2026-10-10)* | any | `Coat Weight` · `Coat Color` → **Coat Tint** · `Coat Roughness` · `Coat IOR` · `Coat Darkening` → no Principled pin: the group multiplies **Base Color** by MaterialX's own darkening factor, which Principled's coat lacks (the Unreal masters do the same, feeding Epic's own pin 0) |
 | **Fuzz** | `fuzz_weight` · `fuzz_color` · `fuzz_roughness` | any | `Fuzz Weight` / `Fuzz Color` / `Fuzz Roughness` → **Sheen** Weight / Tint / Roughness |
 | **Scatter anisotropy** | `subsurface_scatter_anisotropy` *(−1…1; > 0 = forward)* | Subsurface | `Subsurface Anisotropy` *(Blender honours 0…1, random-walk methods only)* |
 | **Specular anisotropy** *(carrier C3, added 2026-09-27 at Phase07 step 7.6)* | `specular_roughness_anisotropy` *(0…1)* | any | `Anisotropy` → Principled **Anisotropic** = a ÷ 0.9 and **Roughness** × (2(1−a) ÷ (1+(1−a)²))^¼, with the **UV-map** tangent. That matches OpenPBR's lobe (its axis ratio and its area) exactly up to a = 0.9, and is the identity at a = 0 |
 
 **The anisotropy tangent is the mesh's UV `U` direction.** OpenPBR's `geometry_tangent` defaults to `Tworld`, derived from texcoord 0, and the highlight stretches **along** it. A card mesh whose strands run along `V` therefore gets the fibre's band across the strands. That is a requirement on the mesh (the platform's side), not on the article.
 
-Defaults are OpenPBR's (weight 0; coat IOR 1.6; fuzz roughness 0.5). The coat sits on the **geometry** normal, not the article's normal map, as OpenPBR's `geometry_coat_normal` defaults to it. *Consumer-side:* an Unreal master gains the matching parameters when it is built (Phase06), and IMRSV's extractor must read them to show them ([PlatformDependencies](../../Planning/PlatformDependencies.md) M1).
+Defaults are OpenPBR's (weight 0; coat IOR 1.6; coat darkening 1; fuzz roughness 0.5). The coat sits on the **geometry** normal, not the article's normal map, as OpenPBR's `geometry_coat_normal` defaults to it. *Consumer-side:* an Unreal master gains the matching parameters when it is built (Phase06), and IMRSV's extractor must read them to show them ([PlatformDependencies](../../Planning/PlatformDependencies.md) M1).
 
 ⭐ **`geometry_thin_walled` is the OpenPBR thin-vs-thick discriminator** — it is what makes TranslucentThick *not* TranslucentThin **at the producer**. Without it the two masters are the same material described twice. *(2026-10-05: what a **consumer** draws for each is owned by [MasterSet](../Ontology/MasterSet.md) §Material-settings intent: a thin-walled article does not deflect the view at any angle, and a solid one bends it by its index.)*
 

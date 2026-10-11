@@ -1,0 +1,20 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/engineered/composite/Paper_Natural
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Paper001
+    sha256_scope: shipped_source_set
+    sha256: 97da702b847cd29564fa115fa58d9b2696447044266beb3f37055f74c959944c
+    note: Shipped source textures are processed derivatives (resized/de-lit/tiled) of the ambientCG asset; NOT byte-identical to the upstream download. sha256 attests the shipped release-source set, not
+      an upstream-download checksum.
+    files:
+    - path: MatterLibrary/textures/base/engineered/composite/Paper_Natural_basecolor_s001.png
+      sha256: 1167721118c42ec5fb5a31473dc9d1de0bfa0209ba975e730441741ce268612d
+    - path: MatterLibrary/textures/base/engineered/composite/Paper_Natural_normal_s001.png
+      sha256: c8a1f29945389b6b5f3323eb9a9ca910eda27544b5fff75c87dd63597d8ddd26
+    - path: MatterLibrary/textures/base/engineered/composite/Paper_Natural_roughness_s001.png
+      sha256: 0c0bba4d8124b57a6524afbad9ec8fdabea6b7d7d16afcf6e9ed36f2470406bf

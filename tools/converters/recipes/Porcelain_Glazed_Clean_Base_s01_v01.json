@@ -1,0 +1,59 @@
+{
+  "_comment": "Glazed porcelain: the white, glass-glazed body of plates, cups, bowls and tiles. Opaque: a dielectric body under a clear, glossy glaze, the glaze carried as a coat (C2). Param-only (L1), authored white so a Creator's tint reaches every glaze colour. Carries the row's wear layers at 0 (C1): scratches (overlay 1, damage) and fingerprints, gated by the Grime mask. The row's first layer, Crazing01, is not made yet; when it is, it takes slot 1 and the rest move down. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
+  "name": "Porcelain_Glazed_Clean_Base_s01_v01",
+  "status": "draft",
+  "path": "engineered/ceramic/Porcelain_Glazed_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "ceramic",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_const": "0.745, 0.745, 0.723",
+  "roughness_const": 0.4,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "coat_weight": 1.0,
+  "coat_roughness": 0.03,
+  "coat_ior": 1.52,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {
+      "texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png",
+      "density_port": "overlay2_density"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "maskset_blend",
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "physicallybased",
+      "entry": "Porcelain",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609302132,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.745, 0.745, 0.723",
+        "metalness_const": 0,
+        "roughness_const": 0,
+        "specular_ior": 1.5
+      }
+    },
+    {
+      "kind": "judgement",
+      "why": "Physically Based's roughness 0 is the glaze's surface, carried here as the coat (weight 1, roughness 0.03, IOR 1.52, a soda-lime glass glaze). The body under it is a fired bisque, roughness 0.4."
+    }
+  ]
+}

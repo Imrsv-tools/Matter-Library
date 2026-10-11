@@ -34,8 +34,10 @@ Where the runtime comes from, first found wins: ``$MATTER_UNREAL_RUNTIME`` (a pa
 launcher); editor mode on request, ``$MATTER_UNREAL_EDITOR`` (an Unreal 5.8 ``UnrealEditor``) on
 ``unreal/MatterRuntime``; else the build ``unreal/RUNTIME.json`` pins, a GitHub Release asset of
 this repo, downloaded once into the git-ignored ``unreal/package/`` and checked by sha256
-(Phase06 D2), so a machine with no Unreal renders the column. ``find_runtime()`` returns None
-when there is none, and the rig then skips the column with a notice.
+(Phase06 D2), so a machine with no Unreal renders the column. That build is Linux-only: on a Mac,
+with neither variable set, the driver runs editor mode on the Unreal 5.8 under ``$UE_ROOT``
+(default ``/Users/Shared/Epic Games/UE_5.8``). ``find_runtime()`` returns None when there is
+none, and the rig then skips the column with a notice.
 """
 
 from __future__ import annotations
@@ -120,7 +122,7 @@ FLAT_NORMAL = [0.5, 0.5, 1.0, 1.0]     # exact, for an article with no normal ma
 # lane-A values passed straight to Epic's OpenPBR function under their own names
 PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
                 "specular_color", "specular_ior", "specular_roughness_anisotropy", "coat_weight",
-                "coat_color", "coat_roughness", "coat_ior", "fuzz_weight", "fuzz_color", "fuzz_roughness",
+                "coat_color", "coat_roughness", "coat_ior", "coat_darkening", "fuzz_weight", "fuzz_color", "fuzz_roughness",
                 "emission_luminance", "emission_color", "subsurface_weight", "subsurface_color",
                 "subsurface_radius", "subsurface_radius_scale", "subsurface_scatter_anisotropy",
                 "transmission_weight", "transmission_color", "transmission_depth"}
@@ -503,12 +505,19 @@ def find_runtime() -> list[str] | None:
 
     First found wins: ``$MATTER_UNREAL_RUNTIME`` (a launcher), editor mode when asked for by
     ``$MATTER_UNREAL_EDITOR``, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
-    downloaded and checked on first use.
+    downloaded and checked on first use. The pinned build is Linux-only, so a Mac runs editor
+    mode on the Unreal 5.8 under ``$UE_ROOT`` instead, or has no runtime.
     """
     exe = os.environ.get("MATTER_UNREAL_RUNTIME")
     if exe:
         return [exe]
     editor = os.environ.get("MATTER_UNREAL_EDITOR")
+    if not editor and sys.platform == "darwin":
+        ue = Path(os.environ.get("UE_ROOT", "/Users/Shared/Epic Games/UE_5.8"))
+        mac = ue / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor"
+        if not mac.is_file():
+            return None
+        editor = str(mac)
     if editor:
         return [editor, str(PROJECT), "-game"]
     if PIN.is_file():

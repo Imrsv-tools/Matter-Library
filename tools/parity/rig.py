@@ -5,7 +5,8 @@
 
 ``<article>`` is an article stem (``GreyCard_Neutral18_Clean_Base_s01_v01``) or a path to
 its ``.mtlx``. The rig writes a render job (``job.py``), runs
-the Storm driver and the Blender driver on it, and writes, into
+the Storm, Blender and Unreal drivers on it, all at once (``--serial``: one after another), and
+writes, into
 ``library/parity/<article>/`` (git-ignored):
 
 * ``sheet.png`` — one row per slider setting: Storm | Blender | Unreal (Phase06:
@@ -197,6 +198,40 @@ def run_unreal(job_path: Path) -> str | None:
     except unreal_driver.Unsupported as e:
         return str(e)
     return None
+
+
+def keep_awake() -> None:
+    """Hold off idle sleep until this process exits (macOS ``caffeinate``; elsewhere nothing).
+
+    A Mac on battery idle-sleeps with the rig mid-job and renders only in its short maintenance
+    wakes: a sweep of about two minutes took 26 (Cardboard_Kraft, 2026-10-09, Blender's pictures
+    in bursts at each wake in the power log)."""
+    if sys.platform == "darwin" and shutil.which("caffeinate"):
+        subprocess.Popen(["caffeinate", "-i", "-w", str(os.getpid())])
+
+
+def render_all(renders: dict, serial: bool, took: dict) -> dict:
+    """Run each tool's render; all at once unless ``serial``. Returns each one's result and
+    records each one's seconds (and ``all``, the wall clock) in ``took``.
+
+    The tools do not read each other's pictures: each reads the job and writes its own folder
+    (Blender the rig's mask as well), and scoring waits for all of them. Storm and Unreal draw on the GPU while
+    Blender, here, renders on the CPU, so at once costs about the slowest tool alone."""
+    from concurrent.futures import ThreadPoolExecutor  # noqa: PLC0415
+
+    def timed(tool):
+        t = time.time()
+        try:
+            return renders[tool]()
+        finally:
+            took[tool] = time.time() - t
+
+    t0 = time.time()
+    with ThreadPoolExecutor(1 if serial else len(renders)) as pool:     # one: in this order
+        futures = {tool: pool.submit(timed, tool) for tool in renders}
+    results = {tool: f.result() for tool, f in futures.items()}   # re-raises a tool's failure
+    took["all"] = time.time() - t0
+    return results
 
 
 def _font(size: int):
@@ -484,6 +519,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default=None, help=f"default: {OUT_ROOT}/<article>")
     ap.add_argument("--score-only", action="store_true",
                     help="re-score the pictures already rendered (no Storm, no Blender)")
+    ap.add_argument("--serial", action="store_true",
+                    help="render the tools one after another (default: all at once)")
     ap.add_argument("--no-blender", action="store_true",
                     help="skip Blender (a machine whose Blender cannot render parity: Storm is then "
                          "compared with Unreal, on Unreal's own mask)")
@@ -506,21 +543,20 @@ def main(argv=None) -> int:
     job = json.loads(job_path.read_text(encoding="utf-8"))
     colours = region_colours(job)
 
-    t0 = time.time()
+    took = {}
     if not args.score_only:
-        storm.run(job_path)
-    t1 = time.time()
-    if not args.score_only and not args.no_blender:
-        run_blender(job_path)
-    blender_on = not args.no_blender and (out / "blender" / "defaults.png").is_file()
-    t2 = time.time()
-    if not args.score_only:
-        unreal_skip = run_unreal(job_path)
+        keep_awake()
+        renders = {"storm": lambda: storm.run(job_path)}
+        if not args.no_blender:
+            renders["blender"] = lambda: run_blender(job_path)
+        renders["unreal"] = lambda: run_unreal(job_path)
+        results = render_all(renders, args.serial, took)
+        unreal_skip = results["unreal"]
         if unreal_skip:
             print(f"unreal: skipped — {unreal_skip}")
     else:
         unreal_skip = None if (out / "unreal" / "defaults.png").is_file() else "not rendered"
-    t3 = time.time()
+    blender_on = not args.no_blender and (out / "blender" / "defaults.png").is_file()
     tools = ("storm",) + (("blender",) if blender_on else ()) + (("unreal",) if unreal_skip is None else ())
     if len(tools) < 2:
         raise SystemExit(f"nothing to compare Storm with (Blender skipped; Unreal: {unreal_skip})")
@@ -555,7 +591,9 @@ def main(argv=None) -> int:
         checks = {"scale": scale_checks(art, job, tools),
                   "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
         card = write_scorecard(job, scores, checks, tools)
-    print(f"storm {t1 - t0:.1f}s · blender {t2 - t1:.1f}s · unreal {t3 - t2:.1f}s")
+    if took:
+        print(" · ".join(f"{t} {took[t]:.1f}s" for t in ("storm", "blender", "unreal") if t in took)
+              + f" · all {took['all']:.1f}s ({'one after another' if args.serial else 'at once'})")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")
     return 0
