@@ -183,7 +183,7 @@ A packaged runtime carries the masters as `build_masters.py` built them at the c
 git log <the "source" in unreal/RUNTIME.json>..HEAD -- unreal/MatterRuntime/Scripts/build_masters.py
 ```
 
-- **Since `unreal-runtime-v3` (source `e1fc83e`, 1 October), two changes alter pictures** *(as of 2026-10-11)*: the coat darkens the base as OpenPBR does (10 October: every article with a coat), and a light's brightness no longer depends on its colour (11 October: every Emissive article but Neon). A build with both is made on the machine with Unreal and is **not yet published**; until it is, the pinned build draws both the old way.
+- **`unreal-runtime-v4` (source `47954ea`, published and pinned 2026-10-11) carries two changes that alter pictures and that v3 (source `e1fc83e`, 1 October) did not:** the coat darkens the base as OpenPBR does (10 October: every article with a coat), and a light's brightness no longer depends on its colour (11 October: every Emissive article but Neon). A machine holding v3 fetches v4 the next time the driver looks for the pinned build. *(Was, earlier the same day: "A build with both is made on the machine with Unreal and is not yet published".)*
 - **A builder change that alters nothing at its defaults needs no new build** (the lead, 2026-10-05). One that does alter them needs one before the rig's Unreal column, or a second caller's pictures, show it.
 
 ## Open questions Unreal's column should settle
