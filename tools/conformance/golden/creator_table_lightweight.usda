@@ -16,6 +16,9 @@
     #     customLayerData imrsv:matterlibRelease
     #   - two meshes may share ONE Matter identity as INDEPENDENT instances
     #     (separate material prims -> per-mesh refinement stays independent)
+    #   - every face is wound counter-clockwise seen from outside, at USD's default
+    #     orientation (rule 10). doubleSided is 0 here because Copper is on Opaque, a
+    #     one-sided master; the flag is not a conformance rule and makes no face show.
     #
     # FORBIDDEN (asserted absent): UsdPreviewSurface, DomeLight/any Light, Camera,
     #   absolute author-machine paths, any localized Matter .mtlx or texture file.
@@ -36,7 +39,7 @@ def Xform "Creator_Table" (
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        uniform bool doubleSided = 1
+        uniform bool doubleSided = 0
         uniform token subdivisionScheme = "none"
         int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
@@ -53,7 +56,7 @@ def Xform "Creator_Table" (
         prepend apiSchemas = ["MaterialBindingAPI"]
     )
     {
-        uniform bool doubleSided = 1
+        uniform bool doubleSided = 0
         uniform token subdivisionScheme = "none"
         int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
         int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]

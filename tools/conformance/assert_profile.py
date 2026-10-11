@@ -74,6 +74,12 @@ def main() -> int:
     check(n_subdiv == n_mesh, 'each Mesh declares subdivisionScheme = "none"',
           f"{n_subdiv} of {n_mesh} meshes")
 
+    # 3c. no mesh turns its faces round: rule 10's "counter-clockwise seen from outside" is the
+    # front only at USD's default orientation, rightHanded. (Which way each face actually looks
+    # is geometry, and is not read here; doubleSided is free, and is not read either.)
+    left = re.findall(r'\borientation\s*=\s*"leftHanded"', nocomment)
+    check(not left, 'no Mesh declares orientation = "leftHanded"', f"{len(left)} found")
+
     # 4. exact Matter identity carried on assetInfo:identifier (not the prim name).
     ids = re.findall(r'string\s+identifier\s*=\s*"([^"]+)"', text)
     id_ok = len(ids) == n_bind and all(NAME_RE.match(i) for i in ids)
