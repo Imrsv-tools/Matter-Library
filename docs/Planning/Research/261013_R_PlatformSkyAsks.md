@@ -83,8 +83,18 @@ For `PlatformDependencies.md`, *From IMRSV to the Matter Library*. The library w
 
 ---
 
+## Pass 1, addendum — three rulings since (2026-10-13)
+
+*From the platform's side, the same day. The platform's lead answered three things that bear on the asks above.*
+
+- **The word.** The library's word for the thing is **HDRI**: the library holds and serves HDRIs. The platform's app shows a Creator a *Sky* on its own screens; that word is the app's and asks nothing of the library. **So read "sky" in this doc as "HDRI" wherever it names what the library holds.** The asks are unchanged. This doc's title and its ids (`SKY`) are left as written.
+- **The size — SKY-Q3 is answered, and so is A6's half of it.** 4096 × 2048 for every HDRI. The lead: *"4k I think is fine"* — it is what every scene has shown in the headset. The file format is still the library's to state.
+- **Which HDRIs — A8.** The first is the one in use today. More follow from Poly Haven, the lead's choice, when the kind is set up in the library: *"I will be getting many more open sky HDRIs from Polyhaven when we set it up in the Matter Library"*.
+
+---
+
 ## Status
 
-- **Passes:** 1, from the platform's side. The library's review is owed.
-- **Open:** A1 – A8 · SKY-Q1 – Q5.
+- **Passes:** 1 and its addendum, from the platform's side. The library's review is owed.
+- **Open:** A1 – A8 · SKY-Q1, Q2, Q4, Q5. **Answered:** SKY-Q3 — 4096 × 2048.
 - **▶ Next:** the library reads this against its own tree and rules SKY-Q1 and SKY-Q2, which shape A1 and A2.
