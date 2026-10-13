@@ -93,8 +93,20 @@ For `PlatformDependencies.md`, *From IMRSV to the Matter Library*. The library w
 
 ---
 
+## Pass 1, second addendum — what the consumer's own code says of five of the asks (2026-10-14)
+
+*From the platform's side. Read in the consumer's code; nothing was run. Nothing new is asked — these are facts the library may want in hand before it rules.*
+
+- **A2 and SKY-Q1 — a second list beside `materials` is safe; a catalog without `materials` is not.** The consumer's reader takes `release` and the `materials` array by name, and nothing else. A new top-level list beside `materials` is not seen by a consumer built before it, and does it no harm. A catalog with no top-level `materials` array is refused whole. The consumer does not read `schema_version` at all. *(Pass 1 said an unknown array "was not tried". It is now read; it is still not run.)*
+- **A1 — where an HDRI sits bears on how it is found.** The consumer hands stock USD the library's folders as a search path, one entry for each folder that holds payloads; a stock search path does not look into sub-folders. Materials give it one entry per `materials/<domain>/<class>/`. One flat folder of HDRIs would be one entry.
+- **A6 — of the two formats, Radiance `.hdr` is the one every part of the consumer reads.** Its renderer reads `.hdr` and OpenEXR. Its texture service, which hands a picture's pixels to the app, reads `.hdr` and not OpenEXR. The consumer has not yet chosen which of the two carries an HDRI; `.hdr` keeps both open.
+- **A4 — the small picture is a PNG or a JPEG.** The consumer's picture card draws those two and no other. It shows a picture whole, so a small picture in the HDRI's own 2:1 shape fills it.
+- **SKY-Q4 — the dev install is made by the library's own serve tool.** `tools/releases/serve_to_stage.py` links `materials` and `textures` into the consumer's runtime and writes a catalog of `materials`. HDRIs in the dev install would be a third link there and the catalog's new list — the library's tool, and so the library's change.
+
+---
+
 ## Status
 
-- **Passes:** 1 and its addendum, from the platform's side. The library's review is owed.
+- **Passes:** 1 and its two addenda, from the platform's side. The library's review is owed.
 - **Open:** A1 – A8 · SKY-Q1, Q2, Q4, Q5. **Answered:** SKY-Q3 — 4096 × 2048.
 - **▶ Next:** the library reads this against its own tree and rules SKY-Q1 and SKY-Q2, which shape A1 and A2.
