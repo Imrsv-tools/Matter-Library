@@ -151,6 +151,13 @@ No authorization, secret, migration or data-loss surface is touched. **`build`.*
 
 ---
 
+## Execution ledger
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| 13.1 build | `cddda36` | `build_snapshot.py` and `SiteFile.md` (DRAFT); `matterlib-0.2.0-dev.1` built: 95 materials, 56 rigged, 46 swept, 407 assets, 468 MB. Smoke: Copper's zip renders standalone, and renders flat grey with its textures hidden. Units 17/17; `run_all.py` 15 PASS, 2 SKIP, 0 FAIL. The portable rewrite is a sibling in `tools/releases/`, so `tools/conformance/` is untouched | publish, on the lead's word |
+| 13.1 publish | `c2ccfc4` | Pushed to `cddda36` and published as a pre-release (the lead: *"push and publish"*). The first upload stopped at 46 of 407 (a slow network, then the battery); `--publish` now resumes a draft, and the second network finished it. **Verified:** pre-release, tag at `cddda36`, 407/407 uploaded, every GitHub digest equal to `SHA256SUMS`, and an anonymous download of Copper's zip byte-identical. M9 updated | **the lead's sitting: acts 1 to 5** |
+
 ## Findings (Pass 1, 2026-10-14)
 
 - **F-P13-1 — 95 articles on disk:** 60 candidate, 23 approved, 12 draft. Masters: Opaque 49, Subsurface 27, TranslucentThin 6, Masked 3, TranslucentThick 3, Emissive 3, TwoLayer 2, Hair 1, system 1 (`working_tree.articles()`, measured).
