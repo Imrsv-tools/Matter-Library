@@ -53,7 +53,8 @@ BACKDROP_RADIUS = 0.6
 BACKDROP_TOP = 3.0
 BACKDROP_WIDTH = 6.0
 VIEW_TRANSFORM = "Khronos PBR Neutral"
-EXPOSURE = 0.0
+EXPOSURE = 0.0     # planned: -0.5 with SCENE_VERSION = 2, so whites keep their detail (the lead,
+                   # 2026-10-14, Phase17 RD-P17-6); this phase ships version 1 as kept
 SAMPLES = 256
 SEED = 17
 SIZE = 1024                       # px, square: the master PNG (RD-P17-3)
