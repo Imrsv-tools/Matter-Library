@@ -192,6 +192,9 @@ The controls, each read:
   - Write RuntimeCatalog, SiteFile and Consumers; add the ledger notes.
   - Publish `dev.4` on the lead's word.
   - **First clickable:** click 3, and click 2 re-run on the new catalog.
+- **15.3 — Web and the platform are told what to change** *(added at execute, the lead, 2026-10-14, verbatim: "We will also need this pahse to message Web and/or platfrom what adjustments those need to make (if any)")*.
+  - What each must change, written into the ledger rows they read (P25, M11) and sent as a message to each live session of theirs.
+  - **The Stage ask goes out as soon as 15.1 lands**, because the move is what breaks Studio's binding of the 30 (RD-P15-8). The rest goes out after 15.2, once the fields are published.
 - **At the close:** conform the Catalog tree.
 
 **Reconciled click by click:**
@@ -293,3 +296,11 @@ The seed's *"install layout in ReleaseModel"* item already landed in the quick f
 - Blender **B2** and **B12** and GitHub **G1** apply.
 - MaterialX has none that applies.
 - Storm and Unreal are not touched.
+
+---
+
+## Execution Log
+
+| Step | Landed | Result | Next |
+|---|---|---|---|
+| **15.1** ▶ **SCAFFOLD COMPLETE — sitting owed** (clicks 1, 2) | the 15.1 commit | **The 30 are in `materials/character/humanoid/<part>/`** (eyes 5 · hair 2 · skin 6 · nails 7 · teeth 1 · mouth 9), names unchanged. Each declares `group`, `species` and `part` in its `imrsv_metadata` and recipe. Re-assembly changed exactly 90 metadata lines and the skins' 24 texture paths (`../../../` → `../../../../`). **`tools/converters/groups.py`** holds the groups and Character's taxonomy. The recipe gate refuses a folder that disagrees with the file (G3/G5; probed failing three ways). The working-tree reader takes group and taxonomy from the file. Blender's library is regenerated under `Matter/<Domain>/<Class>` and `Character/Humanoid/<Part>`: 94 articles conform. The lead's Blender reads it from the repo, as Append. The dev catalog carries `group`, plus `species` and `part`, read from the file (served, 95 articles). The wish list's 30 slots are moved. **Gates:** `run_all.py` gives 15 PASS, 2 SKIP, 0 FAIL, the baseline set, and its materials, determinism and recipe lanes walked the moved files. `check_exporter.sh` passed before the edit; the re-run is recorded in the commit message. **Click 2, looked at first:** a headless Storm render of `Character30.imrsv` (30 spheres bound by bare name, with USDLiveView's search-path rule) resolves all 30, with no magenta. Its only warnings are the eye and hair fit maps, which are supplied at binding, as before. | sitting: clicks 1, 2 |

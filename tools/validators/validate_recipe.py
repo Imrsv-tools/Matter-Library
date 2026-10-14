@@ -35,6 +35,7 @@ ROOT = HERE.parent.parent
 CONVERTERS = ROOT / "tools" / "converters"
 sys.path.insert(0, str(CONVERTERS))
 from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, MaterialSpec, SET_PORTS  # noqa: E402
+import groups as G  # noqa: E402  (Phase15: the groups and Character's taxonomy)
 
 SCHEMA_PATH = CONVERTERS / "recipe.schema.json"
 MATERIALS = ROOT / "MatterLibrary" / "materials"
@@ -154,10 +155,16 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
         errs.append(f"G3 class {dom}/{cls} is not in Taxonomy.md "
                     f"(the {dom} classes are {sorted(TAXONOMY.get(dom, []))})")
 
-    # G5 — path agreement
-    want = f"{dom}/{cls}/{name}.mtlx"
+    # G3 — Character's own taxonomy (Phase15, RD-P15-1): a group, and for Character a species and
+    # one of its parts. No group means Matter; the group is never read off the domain (F-DS-5).
+    grp, species, part = d.get("group"), d.get("species"), d.get("part")
+    errs += [f"G3 {e}" for e in G.character_errors(grp, species, part)]
+
+    # G5 — path agreement: the folder says what the file declares (Phase15: a Character article
+    # sits under character/<species>/<part>/, RD-P15-8; a Matter one under <domain>/<class>/)
+    want = f"{G.folder_of(grp, species, part, dom, cls)}/{name}.mtlx"
     if d["path"] != want:
-        errs.append(f"G5 path {d['path']!r} disagrees with domain/class/name: expected {want!r}")
+        errs.append(f"G5 path {d['path']!r} disagrees with its group/taxonomy and name: expected {want!r}")
     if file_stem is not None and file_stem != name:
         errs.append(f"G5 recipe file is {file_stem}.json but its name is {name!r}")
 

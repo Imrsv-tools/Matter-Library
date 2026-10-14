@@ -215,6 +215,11 @@ class MaterialSpec:
     # per-material authored starting values for exposed LCD ports (else the schema default)
     lcd_defaults: dict = field(default_factory=dict)
     include_metadata: bool = True
+    # Phase15 (RD-P15-3): the article's group and, for Character, its own taxonomy. Written into
+    # imrsv_metadata only when declared: no group means Matter, so no Matter file changes.
+    group: Optional[str] = None
+    species: Optional[str] = None
+    part: Optional[str] = None
 
     @staticmethod
     def from_dict(d: dict) -> "MaterialSpec":
@@ -908,6 +913,9 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(nd, "meters_per_tile", "float", value=spec.meters_per_tile)
         _add_input(nd, "domain", "string", value=spec.domain, attrs={"uniform": "true"})
         _add_input(nd, "class", "string", value=spec.klass, attrs={"uniform": "true"})
+        for key in ("group", "species", "part"):          # Phase15 (RD-P15-3)
+            if getattr(spec, key):
+                _add_input(nd, key, "string", value=getattr(spec, key), attrs={"uniform": "true"})
         # addNodeDef(..., "string", ...) already declares the implicit "out" output.
 
     return mx.writeToXmlString(doc)

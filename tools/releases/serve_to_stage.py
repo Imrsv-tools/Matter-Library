@@ -49,7 +49,7 @@ REPO = HERE.parent.parent
 SOURCE = REPO / "MatterLibrary"
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 from project_runtime_catalog import (  # noqa: E402
-    SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
+    SCALE_RE, SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
 import working_tree  # noqa: E402
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
@@ -71,6 +71,16 @@ def working_tree_catalog() -> dict:
                "creator_selectable": art["creator_selectable"]}
         entry = derive_entry(row)
         entry["master"] = art["master"]
+        # Phase15 (RD-P15-3, RD-P15-5): the group and each group's taxonomy, read from the FILE.
+        # derive_entry reads domain/class off the id's folders, which for a Character article are
+        # character/<species>/<part>/, so the file's own values replace them; its domain and
+        # class stay as what it is made of. Released catalogs are unchanged (RD-P15-6).
+        leaf = art["id"].rsplit("/", 1)[1]
+        scale = SCALE_RE.search(leaf)
+        entry.update(group=art["group"], domain=art["domain"], material_class=art["material_class"],
+                     display_name=leaf[: scale.start()] if scale else leaf)
+        if art["group"] == "character":
+            entry.update(species=art["species"], part=art["part"])
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)

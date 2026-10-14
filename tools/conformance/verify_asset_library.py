@@ -71,8 +71,10 @@ sys.path.insert(0, os.path.join(REPO, "tools/converters"))
 import working_tree  # noqa: E402
 
 tree = working_tree.articles()
-selectable = [{"payload_path": a["identity"] + ".mtlx", "domain": a["domain"],
-               "material_class": a["material_class"], "status": a["status"]}
+import groups  # noqa: E402  (Phase15: an article's catalog path is its group, then its taxonomy)
+
+selectable = [{"payload_path": a["identity"] + ".mtlx", "status": a["status"],
+               "group": a["group"], "cpath": "/".join(groups.taxonomy_path(a))}
               for a in tree if a["creator_selectable"]]
 system = [{"payload_path": a["identity"] + ".mtlx"} for a in tree if not a["creator_selectable"]]
 released = [os.path.splitext(os.path.basename(m["payload_path"]))[0]
@@ -91,7 +93,7 @@ check(set(released) <= tree_ids, "every matterlib-0.1.0 article is in the workin
 
 for m in selectable:
     identity = os.path.splitext(os.path.basename(m["payload_path"]))[0]
-    cpath = "%s/%s" % (m["domain"], m["material_class"])
+    cpath = m["cpath"]
     mat = bpy.data.materials.get(identity)
     if mat is None:
         check(False, "%s: proxy material present" % identity)
@@ -101,6 +103,8 @@ for m in selectable:
     check(mat.asset_data is not None, "%s: asset-marked (browsable)" % identity)
     tags = {t.name for t in mat.asset_data.tags} if mat.asset_data else set()
     check(m["status"] in tags, "%s: tagged with its status (%s)" % (identity, m["status"]),
+          "tags %s" % sorted(tags))
+    check(m["group"] in tags, "%s: tagged with its group (%s)" % (identity, m["group"]),
           "tags %s" % sorted(tags))
     master = master_for(identity)
     one_sided = master not in TWO_SIDED_MASTERS

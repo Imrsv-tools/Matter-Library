@@ -32,6 +32,7 @@ sys.path.insert(0, os.path.join(REPO, "tools/converters"))
 from pathlib import Path  # noqa: E402
 import load_article  # noqa: E402
 import working_tree  # noqa: E402
+import groups  # noqa: E402  (Phase15: each article's group and taxonomy path)
 
 STATUS_MEANS = {
     "draft": "not yet checked side by side",
@@ -55,10 +56,18 @@ def selectable_articles():
     a bunch of magenta", 2026-09-27)."""
     return [{
         "identity": a["identity"],
-        "catalog_path": "%s/%s" % (a["domain"], a["material_class"]),
+        "catalog_path": catalog_path(a),
+        "group": a["group"],
         "mtlx": str(a["mtlx"]),
         "status": a["status"],
     } for a in working_tree.articles() if a["creator_selectable"]]
+
+
+def catalog_path(a):
+    """Phase15 (RD-DS-1): the Asset Browser files each article under its group, then that group's
+    own taxonomy: Matter/<Domain>/<Class> and Character/<Species>/<Part>. The group is read from
+    the article's file (working_tree), never from its domain."""
+    return "/".join(groups.taxonomy_path(a))
 
 
 def write_cats(paths):
@@ -66,7 +75,8 @@ def write_cats(paths):
     Returns {path: uuid}."""
     ids = {}
     lines = ["# Anonymous file for the IMRSV Matter Asset-Browser library.",
-             "# Catalog paths mirror each article's domain/material_class.", "", "VERSION 1", ""]
+             "# Catalog paths are each article's group, then that group's taxonomy (Phase15):",
+             "# Matter/<Domain>/<Class> and Character/<Species>/<Part>.", "", "VERSION 1", ""]
     for cp in sorted(set(paths)):
         cid = str(uuid.uuid5(CATALOG_NS, cp))
         ids[cp] = cid
@@ -100,8 +110,8 @@ def main():
                           "USD. Identity travels on imrsv_matter_identity."
                           % (a["identity"], a["status"], STATUS_MEANS[a["status"]]))
         try:
-            ad.tags.new("matter")
-            ad.tags.new(a["catalog_path"].split("/")[-1])
+            ad.tags.new(a["group"])
+            ad.tags.new(a["catalog_path"].split("/")[-1].lower())
             ad.tags.new(a["status"])
         except Exception:
             pass

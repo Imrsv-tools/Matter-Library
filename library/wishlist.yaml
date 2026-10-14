@@ -163,55 +163,55 @@ rows:
   - {name: Canvas_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Concrete_Smooth_Worn_Dusty_s1_v01, slot: engineered/cementitious, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
   - {name: Copper_Verdigris_Aged_Base_s01_v01, slot: engineered/metal, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
-  - {name: Cornea_Clear_Clean_Base_s001_v01, slot: biological/tissue, master: TranslucentThin, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Cornea_Clear_Clean_Base_s001_v01, slot: character/humanoid/eyes, master: TranslucentThin, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Cotton_Jersey_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Denim_Indigo_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Denim_LightWash_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Diagnostic_UVGrid_Clean_Base_s1_v01, slot: utility/virtual, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
   - {name: Diamond_Brilliant_Clean_Base_s01_v01, slot: natural/mineral, master: TranslucentThick, kind: rejudge, state: kept, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Earthenware_Natural_Clean_Base_s01_v01, slot: engineered/ceramic, master: Opaque, kind: rejudge, state: queued, note: "on disk, status draft"}
-  - {name: Enamel_Natural_Clean_Base_s001_v01, slot: biological/bone, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Eye_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Enamel_Natural_Clean_Base_s001_v01, slot: character/humanoid/teeth, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Eye_Natural_Clean_Base_s001_v01, slot: character/humanoid/eyes, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Felt_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Glass_Clear_Clean_Base_s01_v01, slot: engineered/glass, master: TranslucentThin, kind: rejudge, state: queued, note: "on disk, status approved"}
   - {name: Glass_Green_Clean_Base_s01_v01, slot: engineered/glass, master: TranslucentThin, kind: rejudge, state: queued, note: "on disk, status candidate; Reevaluate (2026-10-05, Phase12 click 5, the lead's pass): colour-only. Glass_Clear with transmission_color set to 0.35, 0.70, 0.30 stands in for it. Kept on disk, not deleted"}
   - {name: GreyCard_Neutral18_Clean_Base_s01_v01, slot: utility/virtual, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Gum_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Hair_DarkBrown_Clean_Base_s001_v01, slot: biological/keratin, master: Masked, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Hair_Natural_Clean_Base_s001_v01, slot: biological/keratin, master: Hair, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Iris_Brown_Clean_Base_s001_v01, slot: biological/tissue, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Gum_Natural_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Hair_DarkBrown_Clean_Base_s001_v01, slot: character/humanoid/hair, master: Masked, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Hair_Natural_Clean_Base_s001_v01, slot: character/humanoid/hair, master: Hair, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Iris_Brown_Clean_Base_s001_v01, slot: character/humanoid/eyes, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Lace_Floral_Clean_Base_s01_v01, slot: synthetic/textile, master: Masked, kind: rejudge, state: kept, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Leather_Brown_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Leather_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Limestone_Veined_Clean_Base_s01_v01, slot: natural/stone, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
-  - {name: Lips_FitzpatrickIII_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_FitzpatrickII_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_FitzpatrickIV_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_FitzpatrickI_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_FitzpatrickVI_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_FitzpatrickV_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Lips_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickIII_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickII_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickIV_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickI_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickVI_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_FitzpatrickV_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Lips_Natural_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Marble_Veined_Polished_Base_s01_v01, slot: natural/stone, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status approved"}
-  - {name: Nail_FitzpatrickIII_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_FitzpatrickII_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_FitzpatrickIV_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_FitzpatrickI_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_FitzpatrickVI_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_FitzpatrickV_Clean_Base_s001_v01, slot: biological/keratin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Nail_Natural_Clean_Base_s001_v01, slot: biological/keratin, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickIII_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickII_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickIV_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickI_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickVI_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_FitzpatrickV_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Nail_Natural_Clean_Base_s001_v01, slot: character/humanoid/nails, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Neon_Signage_Clean_Base_s01_v01, slot: utility/emissive, master: Emissive, kind: rejudge, state: kept, proving: 3, batch: "261002-7", note: "on disk, status approved"}
   - {name: Oak_Natural_Clean_Base_s1_v01, slot: natural/wood, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Pupil_Dark_Clean_Base_s001_v01, slot: biological/tissue, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Pupil_Dark_Clean_Base_s001_v01, slot: character/humanoid/eyes, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Rubber_Natural_Clean_Base_s001_v01, slot: synthetic/polymer, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Rust_OnSteel_Flaking_Base_s01_v01, slot: engineered/metal, master: TwoLayer, kind: rejudge, state: redo, proving: 2, batch: "261002-2", note: "on disk, status approved", redo: "rebuild as flaking rust, not a blocky speckle; seamless textures (7 of 9 seam); add its wear layers (C1)"}
   - {name: Satin_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Sclera_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickIII_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickII_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickIV_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickI_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickVI_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Skin_FitzpatrickV_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Sclera_Natural_Clean_Base_s001_v01, slot: character/humanoid/eyes, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickIII_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickII_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickIV_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickI_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickVI_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Skin_FitzpatrickV_Clean_Base_s001_v01, slot: character/humanoid/skin, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: StretchKnit_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
-  - {name: Tongue_Natural_Clean_Base_s001_v01, slot: biological/tissue, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: Tongue_Natural_Clean_Base_s001_v01, slot: character/humanoid/mouth, master: Subsurface, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: WoolSuiting_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}

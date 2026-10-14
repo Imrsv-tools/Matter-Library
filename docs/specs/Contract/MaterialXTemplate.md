@@ -19,6 +19,8 @@ The contract for **what a Matter material `.mtlx` looks like**. Every Matter mat
 
 A material **may** carry an internal **`imrsv_metadata` nodedef** inside the `.mtlx` — an optional portability hint holding `master_material`, `scale_tag`, `meters_per_tile`, `domain`, `class` (deliberately **no `version`** — the manifest is the version source of truth). The historical name is kept.
 
+**The group, in the file *(2026-10-14, Phase15, RD-P15-3)*:** a **Character** article's nodedef also carries `group` (`character`), `species` (`humanoid`) and `part` (`eyes`, `hair`, `skin`, `nails`, `teeth` or `mouth`; [Taxonomy](../Ontology/Taxonomy.md) §Character), each a `uniform` string. **A nodedef with no `group` is Matter**, so no Matter file carries the three. The dev catalog and the site file read the group from here, never from the domain (F-DS-5). The assembler writes them from the recipe's keys of the same names.
+
 *(Updated 2026-09-23, measured: all 12 live articles under `MatterLibrary/materials/` carry `ND_imrsv_metadata` with exactly those five inputs; `master_material` values are Opaque ×5, Masked, TranslucentThin, TranslucentThick, Subsurface, TwoLayer, Emissive, `system` ×1 each.)*
 
 > ⚠ **This is NOT a no-`imrsv:` violation.** `imrsv_metadata` is an **internal MaterialX nodedef inside the `.mtlx` document** — it is *not* a USD `imrsv:` composition attribute on a prim. The no-`imrsv:`-attrs rule is about keeping the **USD composition** clean; a nodedef inside a self-contained material document is invisible to the composition. State this explicitly so a later pass doesn't "fix" it.

@@ -22,7 +22,9 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[2]
+import groups as G  # Phase15: the groups and Character's taxonomy (same folder)
+
+REPO =Path(__file__).resolve().parents[2]
 MATERIALS = REPO / "MatterLibrary" / "materials"
 RECIPES = REPO / "tools" / "converters" / "recipes"
 RELEASE_CATALOG = REPO / "library" / "releases" / "matterlib-0.1.0.catalog.json"   # read only
@@ -31,15 +33,40 @@ SYSTEM = {"IMRSV_MissingMaterial"}
 STATUSES = ("draft", "candidate", "approved", "deprecated", "retired")
 
 
-def master_of(mtlx: Path) -> str:
-    """The article's declared master token, from its imrsv_metadata."""
+def metadata_of(mtlx: Path) -> dict:
+    """Every input of the article's imrsv_metadata block, by name ({} when it has none)."""
     root = ET.parse(mtlx).getroot()
     for nd in root.iter("nodedef"):
         if nd.get("node") == "imrsv_metadata":
-            for i in nd.iter("input"):
-                if i.get("name") == "master_material":
-                    return i.get("value", "")
-    return ""
+            return {i.get("name"): i.get("value", "") for i in nd.iter("input")}
+    return {}
+
+
+def master_of(mtlx: Path) -> str:
+    """The article's declared master token, from its imrsv_metadata."""
+    return metadata_of(mtlx).get("master_material", "")
+
+
+def taxonomy_of(mtlx: Path, rel: str) -> dict:
+    """The article's group and its place in that group's taxonomy, read from the FILE (Phase15,
+    RD-P15-3), never guessed from the domain (F-DS-5). No group means Matter. Its folder must
+    agree with what it declares: a disagreement is an error, not a guess."""
+    md = metadata_of(mtlx)
+    folder = rel.rsplit("/", 1)[0]
+    if not md:                                    # a system material with no metadata block
+        domain, klass = folder.split("/")[:2]
+        md = {"domain": domain, "class": klass}
+    group = md.get("group") or G.DEFAULT_GROUP
+    errs = G.character_errors(group, md.get("species"), md.get("part"))
+    want = G.folder_of(group, md.get("species"), md.get("part"), md.get("domain", ""), md.get("class", ""))
+    if not errs and folder != want:
+        errs.append(f"it sits in {folder}/ but declares {want}/")
+    if errs:
+        raise ValueError(f"{mtlx}: " + "; ".join(errs))
+    out = {"group": group, "domain": md.get("domain", ""), "material_class": md.get("class", "")}
+    if group == G.CHARACTER:
+        out.update(species=md["species"], part=md["part"])
+    return out
 
 
 def released() -> dict:
@@ -68,11 +95,10 @@ def articles() -> list[dict]:
         rel = mtlx.relative_to(MATERIALS).with_suffix("").as_posix()
         m = VERSION_RE.match(rel)
         mid, ver = (m["leaf"], m["ver"]) if m else (rel, "v01")
-        domain, klass = rel.split("/")[:2]
         rows.append({
             "id": mid, "version": ver, "status": status_of(mtlx.stem, (mid, ver), release),
             "master": master_of(mtlx),
             "creator_selectable": mtlx.stem not in SYSTEM,
-            "domain": domain, "material_class": klass, "identity": mtlx.stem, "mtlx": mtlx,
+            **taxonomy_of(mtlx, rel), "identity": mtlx.stem, "mtlx": mtlx,
         })
     return rows

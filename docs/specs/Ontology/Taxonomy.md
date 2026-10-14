@@ -16,7 +16,7 @@ The Matter Library organizes materials into a tight, deep taxonomy: **6 Domains*
 | 🧬 **Biological** *(added 2026-09-27)* | tissue · keratin · bone | 3 |
 | | **Total** | **23** |
 
-> **Reevaluate (2026-10-14, the lead, Phase13 RD-P13-2):** *"it is not Matter, it really requires a human context (not cubes)"*. Biological materials are **a second-class category beside Matter**: kept and browsable, **apart**, and shown on a subject in a human context (skin on a side face and hands, an eye, teeth), never on the rig's cubes. What publishes it today: the site file's `section: character` ([SiteFile](../Contract/SiteFile.md)). How the domain itself is restructured is still to be set up; until then the domain, its classes and its articles stay as below.
+> **Reevaluate (2026-10-14, the lead, Phase13 RD-P13-2):** *"it is not Matter, it really requires a human context (not cubes)"*. Biological materials are **a second-class category beside Matter**: kept and browsable, **apart**, and shown on a subject in a human context (skin on a side face and hands, an eye, teeth), never on the rig's cubes. ~~What publishes it today: the site file's `section: character`. How the domain itself is restructured is still to be set up; until then the domain, its classes and its articles stay as below.~~ **Set up 2026-10-14 (Phase15): Character is a group of its own, with its own taxonomy (§Character).** All 30 of today's biological articles are Character materials and moved there. The `biological` domain stays, for **generic** biological matter (a generic skin pattern, a generic hair), which is Matter (RD-DS-1); it holds no article today.
 
 **`biological`** *(added 2026-09-27, lead ruling CM1, Phase07)* is **the matter of living bodies**, people and creatures alike:
 - **`tissue`**: skin, mucosa (lips, gums, tongue), sclera, iris, cornea.
@@ -47,12 +47,28 @@ materials/
 ├── synthetic/      {plastic, polymer, textile, coating}
 ├── environmental/  {sand, vegetation, liquid, atmospheric}
 ├── utility/        {emissive, virtual, energy}
-└── biological/     {tissue, keratin, bone}
+├── biological/     {tissue, keratin, bone}       generic biological matter only (none today)
+└── character/      not a Domain: the Character group (§Character), by species, then part
+    └── humanoid/   {eyes, hair, skin, nails, teeth, mouth}
 ```
 
 Base textures mirror the same hierarchy under `textures/base/`; cross-domain overlay and mask textures live in shared folders (`textures/shared/{overlays,masks}/`). Full tree: [Catalog](../Catalog/Catalog.md).
 
 *(Updated 2026-09-23, measured: in this repo the tree is rooted at `MatterLibrary/` — `MatterLibrary/materials/<domain>/<class>/`, `MatterLibrary/textures/base/<domain>/…` and `MatterLibrary/textures/shared/{overlays,masks}/` all exist.)* Folders are created as articles land: today 4 Domains and 9 Classes are populated (engineered/{cementitious, glass, metal} · natural/{mineral, stone} · synthetic/{plastic, textile} · utility/{emissive, virtual}); the environmental Domain has no article yet. The taxonomy above is the full intended set regardless.
+
+## Character — a group of its own *(2026-10-14, Phase15)*
+
+**The library holds three groups: Matter, Character and HDRIs**, each browsed by its own taxonomy (the lead, 2026-10-14, RD-DS-1: *"We have 3 conecpts in the Matter Library now … Matter | Character | HDRI … these have different thumbnail requriments, taxonomy"*). This page's Domains and Classes are **Matter's** taxonomy. **Character's runs species, then part**; an HDRI's runs *when*, then *sky* ([RuntimeCatalog](../Contract/RuntimeCatalog.md) §HDRIs).
+
+| Species | Parts, in browse order |
+|---|---|
+| `humanoid` | `eyes` · `hair` · `skin` · `nails` · `teeth` · `mouth` |
+
+- **The parts are the six rows the lead ruled** (Eyes, Hair, Skin, Nails, Teeth, Mouth). Today's articles fall in them by their Material token: eyes = Cornea, Eye, Iris, Pupil, Sclera · hair = Hair · skin = Skin · nails = Nail · teeth = Enamel · mouth = Lips, Gum, Tongue (RD-P15-1).
+- **Other species** (canine, equine, …) are added beside `humanoid` when the first article for one is made (additive, like a Class). Which mesh a part fits is added by *Character Materials, Their Own Library* (Phase19).
+- **The group lives in the file.** A Character article declares `group`, `species` and `part` in its `imrsv_metadata` ([MaterialXTemplate](../Contract/MaterialXTemplate.md)); **a file with no `group` is Matter**. The group is never worked out from the domain: a generic skin pattern is `biological`, and Matter (F-DS-5).
+- **A Character article keeps its `domain` and `class`** as what it is made of (`biological` / `tissue`, …). They no longer decide where it is browsed.
+- **Its folder is `materials/character/<species>/<part>/`** (RD-P15-8), and the recipe gate (G5) refuses a folder that disagrees with what the file declares. The list of species and parts is `tools/converters/groups.py`.
 
 ## Growth model
 

@@ -1,25 +1,29 @@
 # Anonymous file for the IMRSV Matter Asset-Browser library.
-# Catalog paths mirror each article's domain/material_class.
+# Catalog paths are each article's group, then that group's taxonomy (Phase15):
+# Matter/<Domain>/<Class> and Character/<Species>/<Part>.
 
 VERSION 1
 
-c63ae30d-f4de-55e2-8265-134a8760f59c:biological/bone:biological-bone
-2b158137-f219-5ff0-8a8c-a6c4f9e6a7fd:biological/keratin:biological-keratin
-238c4f47-9ef2-5426-8814-5863d223d1b6:biological/tissue:biological-tissue
-e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementitious
-04cf9d02-7bbc-54c8-adb2-e6878ff7e727:engineered/ceramic:engineered-ceramic
-d15ee386-7cfe-56e2-8a69-172ddf6c03c7:engineered/composite:engineered-composite
-3f33cced-4f95-545a-88e2-2b5f70082073:engineered/glass:engineered-glass
-1d4eba5e-8429-54a4-811a-42e7056b20ee:engineered/metal:engineered-metal
-e51f86a9-5e66-59e6-a6ae-cd46b6d37b03:environmental/sand:environmental-sand
-fd47a487-0aeb-5bd3-8bd7-be6d2644c0e9:environmental/vegetation:environmental-vegetation
-0c85cfcc-f203-5a18-902c-a152b6f2f966:natural/mineral:natural-mineral
-c9f79144-b109-5043-bd3c-1e1c5fafb145:natural/soil:natural-soil
-57771307-e81e-5a87-966e-482639f264bd:natural/stone:natural-stone
-10c839d1-df8d-563b-bde4-ea627a5a6eee:natural/wood:natural-wood
-b198e183-a29e-579f-b086-4c9990b25a65:synthetic/coating:synthetic-coating
-62f8858f-976a-5243-9508-b37fab10a81e:synthetic/plastic:synthetic-plastic
-6fd533b6-b083-5084-9dd1-f33b2266d520:synthetic/polymer:synthetic-polymer
-196a75d2-9441-501c-b2b0-f1430ea50a41:synthetic/textile:synthetic-textile
-e9233954-7e64-57c6-9050-4dca0d92079d:utility/emissive:utility-emissive
-112b849f-0edb-5edd-bff2-f2e12dccde1d:utility/virtual:utility-virtual
+f13e0174-5a6e-5317-a08d-732ac1034a5b:Character/Humanoid/Eyes:Character-Humanoid-Eyes
+9a3f3def-e8e3-5cca-afb2-5c6c46b50c79:Character/Humanoid/Hair:Character-Humanoid-Hair
+a9bd58f2-0735-51bc-a1ec-f649d9d7fc1d:Character/Humanoid/Mouth:Character-Humanoid-Mouth
+e43c3cde-2df0-56d6-a89b-7273fd8319d9:Character/Humanoid/Nails:Character-Humanoid-Nails
+4616efa0-f4db-5e20-a00f-e27626915b9d:Character/Humanoid/Skin:Character-Humanoid-Skin
+4f0e6338-e26b-5166-ae43-f6900e0dbfd9:Character/Humanoid/Teeth:Character-Humanoid-Teeth
+b5f66503-41d5-581b-b3a9-68ffe3bee269:Matter/Engineered/Cementitious:Matter-Engineered-Cementitious
+fddd2cb0-23df-5fc2-babd-7394b84459cb:Matter/Engineered/Ceramic:Matter-Engineered-Ceramic
+f3cefea6-4b1e-5b60-bb0a-1199d70250cc:Matter/Engineered/Composite:Matter-Engineered-Composite
+dfd2dd87-d076-51d6-8053-45fba46498d6:Matter/Engineered/Glass:Matter-Engineered-Glass
+adaa8177-b5f3-54ac-9fc1-c6a16b8a1893:Matter/Engineered/Metal:Matter-Engineered-Metal
+e262c743-017e-5c5f-afa5-347534480767:Matter/Environmental/Sand:Matter-Environmental-Sand
+48f5117c-d4de-5c20-adb8-4fca638dfad5:Matter/Environmental/Vegetation:Matter-Environmental-Vegetation
+a4786cd9-245a-5ec7-8ee6-ea7aa3530f9d:Matter/Natural/Mineral:Matter-Natural-Mineral
+5fe1b660-a232-5c1c-b29e-351f75670fb6:Matter/Natural/Soil:Matter-Natural-Soil
+78d21372-860a-53d9-b0ac-7324f8c7b368:Matter/Natural/Stone:Matter-Natural-Stone
+38ce5a95-f9c3-5d1c-b304-fde81cd6ab64:Matter/Natural/Wood:Matter-Natural-Wood
+c487fd01-4725-5089-8bfd-249c96e7b9e2:Matter/Synthetic/Coating:Matter-Synthetic-Coating
+67b83514-63f1-5222-b74e-2e2b0b9644e3:Matter/Synthetic/Plastic:Matter-Synthetic-Plastic
+ed1cd2a2-8de6-51d9-9388-5bed2ac12f31:Matter/Synthetic/Polymer:Matter-Synthetic-Polymer
+067b5ac1-b989-5331-8d1c-a2dda982df10:Matter/Synthetic/Textile:Matter-Synthetic-Textile
+84b98ddf-d30a-5a15-adc5-2c4f9ae2df1b:Matter/Utility/Emissive:Matter-Utility-Emissive
+bb1435a4-dceb-5213-9fd1-58186aa60042:Matter/Utility/Virtual:Matter-Utility-Virtual
