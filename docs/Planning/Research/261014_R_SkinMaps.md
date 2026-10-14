@@ -259,7 +259,97 @@ Every claim about another system is as of 2026-10-14; recheck at that system's n
 
 **And measure** how many pixels hm08's face gets on a 2048² atlas (F-SKM-12).
 
-It shows the lead, by eye, whether a colour map is worth it and whether a library-made map holds up against a photo. It was first offered at CM Pass 6 and never run. **It waits for the library's permanent machine** (`261014_R_MaterialPipeline.md` Pass 9: the lead, *"this is on my laptop right now"*). Running it on the laptop takes one sitting, if the lead would rather not wait.
+**Run 2026-10-14 on the laptop, on the lead's word: Pass 5.**
+
+It shows the lead, by eye, whether a colour map is worth it and whether a library-made map holds up against a photo. It was first offered at CM Pass 6 and never run. ~~**It waits for the library's permanent machine**~~ (`261014_R_MaterialPipeline.md` Pass 9: the lead, *"this is on my laptop right now"*). Running it on the laptop takes one sitting, if the lead would rather not wait.
+
+## Pass 5 — The probe, run on the laptop (2026-10-14, at `f627ef3`)
+
+**Run:** `261014_R_SkinMaps_probe.py`, committed beside this doc. Its four steps are in its header.
+- **Scratch only:** everything it writes lands in the git-ignored `library/parity/SkinMapsProbe/`. The sheet is `SkinMapsProbe_sheet.jpg` there.
+- **What it rendered:** Skin_FitzpatrickIV on the rig's clothed character, in three views (whole body, face, hand), in Storm, Blender (Cycles) and Unreal (`unreal-runtime-v4`).
+- **The variants:**
+  - **today:** the article as it is;
+  - **photo:** a probe copy that takes a map, carrying MakeHuman's photo atlas by luminance. A comparison only (RD-SKM-2).
+  - **made v1 and made v2:** the same copy carrying a colour map made from CC0 parts only (F-SKM-21):
+    - MPFB2's region masks and its `sss.png` thickness map (blob-pinned, CC0 by MPFB2's `LICENSE.ASSETS.md`, read);
+    - the measured tones;
+    - an AO bake and 3D value noise from the mesh;
+    - cheeks placed from the face's own 3D positions.
+- **On the map variants:**
+  - the Lips part wears the skin article and the map (F-SKM-9);
+  - the body keeps hm08's atlas UVs, through a runtime patch of the rig, as the eye's picture does;
+  - the pores are placed by `uv_scale` = 0.01 ÷ 1.534 = 0.0065.
+- **Cost:** about 2.5 minutes per variant, all three tools at once. The photo run took 6 minutes in each tool, cause not looked into.
+
+- **F-SKM-22 — A map removes the hard line at the lips, in all three tools.** With the Lips part on the skin article and the map, the lips' edge is the map's feathered edge, not the part's. Storm, Blender and Unreal move alike by eye on every view.
+- **F-SKM-23 — Blender cannot yet render a tinted skin whose scatter follows its map.** `blender/masters/load_article.py` refuses it: *"a subsurface colour following a TINTED base is not mapped in Blender yet"* (F-P09-5; `Eye_Natural` has no tint port, so it never hit this).
+  - Every skin article carries the Creator tint (`base_color_tint`), so **this is owed before any skin takes a map**. It joins F-SKM-19's re-assembly.
+  - The probe dropped the tint port from its copies; the tint's default is white, so the look is unchanged.
+- **F-SKM-24 — The photo atlas by luminance, rendered** (comparison only):
+  - **the lips lose their colour** and go grey-beige: luminance carries no hue (F-SKM-14 confirmed by eye);
+  - **the face reads lighter than today's tone:** the map is normalised to the whole body's mean, and the photo's face is brighter than its body;
+  - **the photo's baked shading shows** in the eye sockets and around the mouth;
+  - its fine detail (pores, blotches) is the richest of the variants;
+  - detail p5/p50/p95 = 0.48 / 1.07 / 1.35; peak k = 1.70, so the article's colour was raised to (0.741, 0.386, 0.223) (F-SKM-20 in practice).
+- **F-SKM-25 — The library-made map holds up once its average is held to the measured tone.**
+  - **v1** (redness from thickness 0.55, ears 0.5, cheeks 0.6) **turned the whole body red**: the redness moved the skin's average, not only its regions.
+  - **v2** halves the strengths and rescales the map so **the skin's average is the measured tone** per channel (lips excluded). The result:
+    - the lips keep their colour and blend into the face with no line;
+    - the cheeks, ears and fingertips are warmer;
+    - the article's colour moves by under 7% (0.455, 0.241, 0.139 against the tone's 0.436, 0.227, 0.131).
+  - **What it lacks next to the photo** is fine-scale detail: freckles, millimetre blotchiness, veins.
+  - **The lesson for the phase:** a map's normalisation holds the measured tone as its average. This is F-SKM-20's rule, extended from brightness to colour.
+- **F-SKM-26 — The face's share of a single hm08 atlas, measured.**
+  - The face mask covers **194,717 texels at 2048²**, about a 441-pixel square. That is 6.7% of the UV area the body covers, and 4.6% of the atlas; 70% of the atlas is covered at all.
+  - MetaHuman gives the face its own 2K–8K map (F-SKM-12), so close-ups will want a larger atlas, or a face map of its own **on the same mesh version**.
+- **F-SKM-27 — The P18 stopgap works with a map on one UV set.** The map sat on hm08's atlas UVs and the pores at `uv_scale` 0.0065, in all three tools, as F-SKM-13 predicted.
+
+## Pass 6 — The AI route, explored (web only, 2026-10-14; RD-SKM-2)
+
+**Examined:** one web sweep, given RD-SKM-2 to RD-SKM-4, RD-MP-1, RD-MP-8, F-MP-18 and F-MP-19 verbatim. It covered:
+- mesh-texturing generators;
+- human-skin generators;
+- image models guided in UV space;
+- de-lighting;
+- copyright and provenance.
+
+The sourcing marks are Pass 3's.
+
+- **F-SKM-28 — Few generators keep a mesh's own UVs, and each comes with a catch:**
+  - **Meshy's retexture** keeps them on request (`enable_original_uv`, read) and returns colour (and a PBR set) at up to 8K. It is a cloud service.
+    - On the free plan, Meshy **owns the output** and releases it CC BY 4.0 with credit to Meshy; that is not CC0.
+    - Paid plans own their output *"to the extent possible under applicable law"* (read, terms of 2026-09-19).
+    - It may train on non-Enterprise customers' inputs and outputs.
+  - **Tripo** keeps them (second-hand).
+  - **StableProjectorz** keeps them, runs locally, and its output licence follows the image model loaded (read).
+  - **SyncMVD and Paint3D** keep them. Paint3D is guided by a position map in UV space and gives *"lighting-less"* output, but it is trained on Objaverse objects, not skin (read).
+  - **Hunyuan3D-Paint 2.1 always re-unwraps** (its code calls `xatlas` unconditionally, read), which would lose hm08's layout. Its licence also **excludes the EU, the UK and South Korea** (read).
+- **F-SKM-29 — No released human-skin generator draws onto an arbitrary layout such as hm08.**
+  - **The human ones target templates the library cannot use:**
+    - SMPL, whose licence is *"for the sole purpose of performing non-commercial scientific research"* (read): UVMap-ID, TexDreamer, SMPL-GPTexture;
+    - face templates built from FFHQ's Flickr photos, with no consent statement (read).
+  - **MetaHuman's synthesis** fits its own template and licence. Whether its textures may leave that licence as CC0 is not confirmed; its training data and consent are not published.
+  - **A general method exists** (Paint3D's UV-position guidance; DirectUV, abstract only, 2026-09-28), but not for skin.
+- **F-SKM-30 — The open route that fits the licences is a permissive image model guided in UV space.**
+  - **The models:** FLUX.1 [schnell], Qwen-Image and Z-Image-Turbo are Apache-2.0 (read). They would be guided by hm08's own position and normal maps baked in UV space, which is Paint3D's mechanism and the same bake Pass 5 already makes.
+  - **The known problems** (read, Paint3D):
+    - seams where the UV islands are cut;
+    - duplicated features;
+    - lighting baked in by general models.
+  - **None of these models documents its training data**, so F-MP-19's consent question applies to every general model: in a weaker form, since no one person's photo is used, but it is not answered.
+  - **This laptop has an 8 GB RTX 2080** (measured). The mesh-texturing models need 16–24 GB, so **an AI probe belongs on the library service's GPU host** (RD-MP-12).
+- **F-SKM-31 — Labelling AI output is now the norm.**
+  - **Asset stores** (second-hand): Fab and Sketchfab require a *"CreatedWithAI"* tag.
+  - **Poly Haven** (read, 2024-03-25): *"We won't make assets with AI"*, *"not some legal or moral stance"*.
+  - **The EU AI Act's machine-readable marking** applies from 2026-08-02 (second-hand; its final timing is not confirmed).
+  - **Copyright** (second-hand): the US position stands since *Thaler* (cert denied 2026-03-02), and prompts alone are not authorship. Creative Commons recommends CC0 for such output.
+  - **For the library:** F-MP-14/18's origin field covers it, with *AI-assisted* as a value and the model named.
+- **F-SKM-32 — The two routes combine where each is weak** (a design sketch).
+  - **The library-made map holds the colour right but lacks fine detail** (F-SKM-25).
+  - **AI output is rich in fine detail but uncertain in colour, lighting and provenance.**
+  - **So:** keep the library-made map as the colour (the measured tone as its average, the regions by design), and take from a generator **only a tone-free fine-detail layer** (freckles, millimetre mottling) normalised to an average of 1, MAP-F4's way. The generator then cannot move the tone, the lips or the groin (RD-SKM-4).
+  - **A procedural detail layer is the non-AI alternative for the same slot.**
 
 ## Resolved
 
@@ -283,15 +373,17 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
 | Q-SKM-4 | **How a mesh version is named and recorded**, so each skin map says which mesh it fits (the fit set's family folder, plus a version)? | A small contract question for the phase that builds the first map: the family is `makehuman` today, and hm08 is its first version. |
 | ~~Q-SKM-5~~ → **RD-SKM-2** (b or c; explore c) | **Where the first map comes from** (F-SKM-15): (a) MakeHuman's CC0 photo atlases, whose licence is fine but which record no consent from the people photographed (against F-MP-19) and carry baked shading; (b) a map the library makes from CC0 region masks and its measured tones (F-SKM-21); (c) AI-generated, which is CC0 in form but has unknown training sources. | **(b) for what ships.** (a) only as the probe's comparison, never published. |
 | ~~Q-SKM-6~~ → **RD-SKM-3** (b) | **Redness** (F-SKM-14): (a) a luminance map only, accepting no redness; (b) one colour map per tone, carrying hue (six pictures per mesh version, no new input); (c) one map plus a separate redness picture (a second mesh-supplied input, so a contract addition). | **(b), if Q-SKM-5 is (b):** a library-made map costs nothing more to make per tone, and needs no contract change. Revisit (c) if the full map set ever opens new inputs. |
-| Q-SKM-7 | **Which ships: the library-made map or an AI-generated one** (RD-SKM-2)? The AI route is still to explore: which generator can draw onto hm08's layout, what it was trained on, and how its output's origin is recorded (F-MP-18). | After the probe and an exploration of the AI route. |
+| Q-SKM-7 | **Which ships: the library-made map or an AI-generated one** (RD-SKM-2)? *(Explored 2026-10-14, Passes 5–6.)* | **The library-made map ships first.** It holds up once calibrated (F-SKM-25), every tool renders it, and its provenance is clean. **AI then joins as a fine-detail layer on top** (F-SKM-32), from an Apache-2.0 model guided in UV space and labelled AI-assisted. It is probed on the library service's GPU, not the 8 GB laptop (F-SKM-30). |
 
 ## Status
 
-- **Passes captured:** 4 (2026-10-14):
+- **Passes captured:** 6 (2026-10-14):
   - Pass 1: what the repo holds;
   - Pass 2: the lead's clarification;
   - Pass 3: the industry survey, web only;
-  - Pass 4: what a first map needs in this repo, measured.
+  - Pass 4: what a first map needs in this repo, measured;
+  - Pass 5: the probe, run on the laptop;
+  - Pass 6: the AI route, web only.
 - **Ruled:**
   - **RD-SKM-1:** MAP-RD2 locks the mesh, not the pictures. Skin maps are made per mesh version; today's mesh is MakeHuman's hm08 on Manny. Nothing earlier is reversed except MAP-RD5's *"skin stays general"* (by RD-MP-9).
   - **RD-SKM-2 to RD-SKM-4** (2026-10-14):
@@ -307,6 +399,15 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
   - **The only open-licence source on the approved mesh is MakeHuman's CC0 photo atlases, and no consent is recorded for them** (F-SKM-15). A library-made map from CC0 region masks avoids that (F-SKM-21).
   - **No surveyed base body carries genitals; a neutral map is fine on every host** (F-SKM-16, F-SKM-17).
   - a skin map is a fit-set picture, so it changes no part of CM2 (F-SKM-10).
+  - **The probe (Pass 5):**
+    - a map removes the hard line at the lips in all three tools (F-SKM-22);
+    - the photo map loses the lips' colour (F-SKM-24);
+    - the library-made map holds up once its average is held to the measured tone (F-SKM-25);
+    - Blender cannot yet render a tinted skin whose scatter follows its map (F-SKM-23);
+    - the face gets about a 441-pixel square of a 2048² atlas (F-SKM-26).
+  - **The AI route (Pass 6):**
+    - no human-skin generator fits hm08; Apache-2.0 image models guided in UV space could, untested (F-SKM-28 to F-SKM-30);
+    - the two routes combine as library colour plus an AI fine-detail layer (F-SKM-32).
 - **Unverified (second-hand only):**
   - Daz's and Character Creator's anatomy handling, and their layouts' resolutions;
   - MetaHuman's lack of anatomy;
@@ -317,7 +418,11 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
   - Q-SKM-7: which ships, library-made or AI (after the probe and the AI exploration);
   - Q-SKM-4: naming a mesh version (for the phase).
 - **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
+- **Owed by the phase, found by the probe:**
+  - re-assemble the six skin articles to take a map (F-SKM-19);
+  - map a tinted, map-following scatter colour in Blender (F-SKM-23);
+  - write the normalisation rule: the measured tone stays the average (F-SKM-20, F-SKM-25).
 - **Next step:**
-  1. The probe, on the laptop (in progress 2026-10-14).
-  2. Explore the AI route (Q-SKM-7).
-  3. `/discovery` on *Skin Maps*, when the lead opens it.
+  1. The lead answers Q-SKM-7 (recommended: the library-made map first, AI later as a detail layer).
+  2. `/discovery` on *Skin Maps*, when the lead opens it.
+  3. The AI detail-layer probe, on the library service's GPU.

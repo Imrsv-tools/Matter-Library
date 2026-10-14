@@ -1,6 +1,11 @@
 # PhaseTBD — Skin Maps
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead ruled the same day (RD-SKM-2 to RD-SKM-4). The probe (on the laptop) and an exploration of the AI route (Q-SKM-7) come before `/discovery`. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead ruled the same day (RD-SKM-2 to RD-SKM-4). The probe ran on the laptop (Pass 5) and the AI route was explored (Pass 6). The lead's answer to Q-SKM-7 comes before `/discovery`.
+
+**Owed here, found by the probe:**
+- re-assemble the six skin articles to take a map (F-SKM-19);
+- map a tinted, map-following scatter colour in Blender (F-SKM-23);
+- hold the measured tone as the map's average (F-SKM-20, F-SKM-25). **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
