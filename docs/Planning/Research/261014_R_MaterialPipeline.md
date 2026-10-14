@@ -378,7 +378,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 
 ## Resolved (continued)
 
-- **RD-MP-12 — The library service needs a new server, rented from Hetzner.** The two personal machines (the laptop, and the Linux GPU machine the Unreal work used) are not hosts. They can stand in for **a contributor's side**. The platform's web server is the only server today, and it records no GPU. (The lead, 2026-10-14; in `PhaseTBD_LibraryService.md` *(numbered Phase17 on 2026-10-14: `docs/Planning/Phases/Phase17_LibraryService.md`)*.)
+- **RD-MP-12 — The library service needs a new server, rented from Hetzner.** *(Suspended 2026-10-14 by RD-MP-14: "stay local for now". Hetzner had no GPU server available that day.)* The two personal machines (the laptop, and the Linux GPU machine the Unreal work used) are not hosts. They can stand in for **a contributor's side**. The platform's web server is the only server today, and it records no GPU. (The lead, 2026-10-14; in `PhaseTBD_LibraryService.md` *(numbered Phase17 on 2026-10-14: `docs/Planning/Phases/Phase17_LibraryService.md`)*.)
 - **RD-MP-13 — Phase11 closes now:**
   - review by verdict, with the rows by-verdict cannot keep put to the lead's eye (F-MP-47);
   - 11.4's refine pass moves into the loop as redo rows;
@@ -386,6 +386,10 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   - the close.
 
   **Material-making continues as a standing process outside the phase line** (the lead, 2026-10-14: *"1) yes"*, to F-MP-46). The close itself is `/execute Phase11`'s, in Phase11's doc. (Q-MP-8, Q-MP-12.)
+- **RD-MP-14 — No rented server for now: the library's work stays local** (the lead, 2026-10-14, in Phase17's discovery, after Hetzner had no GPU server and the alternatives were priced: *"We have to rethink and stay local for now"*).
+  - **Read as (mine, not the lead's words):** RD-MP-12's *"a new server, rented"* is suspended, not withdrawn. No server is rented from any provider until the lead reopens it.
+  - **Not decided by it:** what *The Library Service* (Phase17) becomes, and whether Thumbnails (RD-MP-10) still waits for a permanent machine. Both are Phase17's Q-P17-7.
+  - The provider options priced at the time are in `Phase17_LibraryService.md` F-P17-7.
 
 ## Resolved
 
@@ -421,7 +425,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 ## Status
 
 - **Passes captured:** 11 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8–11 record the lead's answers.
-- **Ruled:** RD-MP-1 to RD-MP-13.
+- **Ruled:** RD-MP-1 to RD-MP-14. *(RD-MP-14, 2026-10-14: no rented server for now; the work stays local.)*
   - **Licences:** CC0 only. *(RD-MP-1's CC BY was withdrawn the same day, `261014_R_RoadmapOrder.md` RD-RO-2; a contributor's handle is carried as a courtesy.)*
   - **Thumbnails:** Cycles renders them, on a subject chosen per Class, before the review; they are called thumbnails and never stored in git.
   - **The console:** the IMRSV team's, for curating versions.

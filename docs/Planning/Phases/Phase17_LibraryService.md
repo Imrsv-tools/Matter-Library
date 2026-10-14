@@ -1,6 +1,6 @@
 # Phase17 — The Library Service
 
-**Status:** BRIEF READY (2026-10-14), lane **high-rigor**, next **`/plan Phase17`**. **One lead call is open: where the server comes from (Q-P17-1, reopened in Pass 2: Hetzner has no GPU server available).** It blocks the first click, not the plan. Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
+**Status:** ON HOLD (2026-10-14). **The lead: *"We have to rethink and stay local for now"*** (RD-MP-14, recorded in `261014_R_MaterialPipeline.md` §Resolved). The Brief below was written for a rented server, and is kept as the design for when one exists. **What Phase17 becomes meanwhile is Q-P17-7**, the lead's call. *(Was: BRIEF READY, lane high-rigor, next `/plan Phase17`, with Q-P17-1 open on where the server comes from.)* Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
 
 ## Outcome
 
@@ -15,6 +15,26 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 ---
 
 ## The Brief
+
+> **On hold (2026-10-14, RD-MP-14).** Everything below assumes a rented GPU server, which the lead has put off: *"stay local for now"*. Nothing in it is deleted. It runs as written once a server exists, after re-checking F-P17-1 and F-P17-7's prices.
+
+### Q-P17-7 — What Phase17 becomes while the work stays local (open, the lead's)
+
+**Without a server, the phase's outcome has no user:** the only person who would hand the laptop a package is the agent, on the same laptop, which already gates and rigs directly.
+
+- **(A) Hold Phase17, keep its Brief, and go on to Phase18 Thumbnails on the laptop.**
+  - Cycles thumbnails run on the laptop's 8 GB card.
+  - RD-MP-10's *"waits for the permanent machine"* yields to RD-MP-14.
+  - Phase18's *"Depends on: The Library Service"* becomes *"runs on the laptop for now"*.
+  - Phase19 and Phase20 keep their order.
+  - **What stays parked:** the AI skin-detail probe (it needs 16–24 GB, F-P17-3) and running the loop at volume off the laptop.
+- **(B) Re-scope Phase17 to a local door:** the package command and the inbox runner (17.2) on the laptop, and the batch loop through them (17.3), with no server.
+  - It builds the contributor's path now. Locally its only user is the agent.
+  - The lane drops to build, since nothing faces a network.
+- **(C) Re-scope Phase17 to the other Linux GPU machine as the local always-on box,** on the private network.
+  - It needs the lead to say that machine counts as a host. RD-MP-12 said the personal machines are not.
+
+**Recommendation: (A).** It is the next thing with a user, the pictures the site and the console are waiting for, and it needs nothing that is missing. Phase17 comes back when a server is wanted. Its recipe, door and package then run as written. *(F-RO-17's logic holds either way: build the kit where it runs today, and move it when measured hours justify a box.)*
 
 ### First human test
 
@@ -122,7 +142,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 
 ### Open: the lead's act
 
-- **Q-P17-1 — Where the GPU server comes from** (reopened 2026-10-14, Pass 2).
+- ~~**Q-P17-1 — Where the GPU server comes from**~~ → **RD-MP-14: none for now, stay local** (the lead, 2026-10-14). Kept below as the record for when it reopens. (Reopened 2026-10-14, Pass 2.)
   - **The lead, verbatim:** *"Hmmm... no gpus avaiable... shoudl we consdier other sources"*.
   - **RD-MP-12 said Hetzner** (*"we would need to get another serier from Hetzner"*). The lead now asks whether to look elsewhere, so RD-MP-12's provider half is open. Its other half stands: a server, not the personal machines. The options are in F-P17-7.
   - **Recommendation: (b), a Scaleway L4 rented by the hour,** powered on for a batch or an upload and off otherwise.
@@ -263,3 +283,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
   - **The lead, verbatim:** *"Hmmm... no gpus avaiable... shoudl we consdier other sources"*.
   - Q-P17-1 is reopened as "where from", with four options and a recommendation (F-P17-7).
   - Nothing else in the Brief moves unless (b) is taken. Its effects on 17.1 and Q-P17-6 are listed under Q-P17-1.
+- **2026-10-14 — Pass 3: stay local.**
+  - **The lead, verbatim:** *"We have to rethink and stay local for now"*.
+  - Recorded upstream as RD-MP-14, because it reaches RD-MP-10, RD-MP-12 and Phase18.
+  - The phase is ON HOLD with its Brief kept. What it becomes meanwhile is Q-P17-7: (A) hold it and go on to Thumbnails on the laptop, recommended; (B) a local door; (C) the other machine as the box.
