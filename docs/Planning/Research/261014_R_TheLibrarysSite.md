@@ -27,7 +27,7 @@
   - its wear layers: the recipe;
   - the Physically Based values used, and the ambientCG source: the recipe's `sources`;
   - texture provenance and its evidence: the lockfile;
-  - the licence: CC0-1.0 throughout;
+  - the licence: CC0-1.0 throughout *(true when written; since RD-MP-1, 2026-10-14, an article may be CC BY 4.0, so the site shows each article's own licence and the attribution it asks for)*;
   - the per-slider parity verdict across Storm, Blender and Unreal: `library/parity/<article>/scorecard.json`;
   - what changed between two releases: the lockfile diff.
 - **WS-F4 — Two things would be new data:**
@@ -52,7 +52,7 @@ The lead, 2026-10-14, on all four recommendations together: *"Great... I agree. 
   *The cost, accepted:* the site's code is not public, so the community contributes to the library and not to the site.
 - **RD-WS-2 — The library publishes each release on GitHub Releases, with its digest. IMRSV's web side mirrors it**, verified against that digest, for speed and for its apps. This answers the host question the release-bundle phase held open (`PhaseTBD_ReleaseBundleConsumerContract.md` F6). **The size check it named still applies:** GitHub's documented per-file limit (under 2 GiB) shapes how the bundle is split. That is to be confirmed when that phase resumes.
 - **RD-WS-3 — Before the first versionable library, the site runs on staging from the dev catalog, with each article's status shown. It launches publicly with the first versionable release.** This follows the pre-release ruling (`.ai/AI_WorkingAgreement.md` §Settled practices): the site adds no release step for dev work.
-- **RD-WS-4 — The library publishes a file for the site beside each release**, projected from the same records as the runtime catalog (WS-F3), plus the standard preview set (WS-F5). **The library owns its shape**, as a contract spec under `docs/specs/Contract/`, written by the phase that builds it. **Its name is not chosen.** The runtime catalog is unchanged.
+- **RD-WS-4 — The library publishes a file for the site beside each release**, projected from the same records as the runtime catalog (WS-F3), plus the standard preview set (WS-F5) *(called **thumbnails** since RD-MP-5, 2026-10-14; "preview" stays the review render, `261014_R_MaterialPipeline.md`)*. **The library owns its shape**, as a contract spec under `docs/specs/Contract/`, written by the phase that builds it. **Its name is not chosen.** The runtime catalog is unchanged.
 
 ## What the library owes, and where each item is tracked
 

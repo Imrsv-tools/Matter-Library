@@ -251,23 +251,77 @@ The lead: *"so peeps can manage versions etc."* "Peeps" can be read two ways, an
 
 **One sitting, now, as a probe:** render a showcase thumbnail in Cycles for three articles: `Oak_Natural` on the sphere and cube, `Glass_Clear` with a backdrop, and `Skin_FitzpatrickIII` on the clothed character's hand and face. Lit fully, toned, one view each. **Cost, roughly:** a few minutes of GPU per picture, in a scratch folder, building nothing in the repo. It would answer Q-MP-1 and Q-MP-2 by eye rather than by argument.
 
+## Pass 8 — The lead's first answers (2026-10-14)
+
+The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs. What do you mean by hold not body skin map? 1) After clarity on bodyskin map - I agree with your reccomdation 2) Ahh yeah.. I mean the IMRSV team managing what materials are going into what librarvy versions... I feel like this should be a front that we can use to view and evluate them, update versions, keep whatever provanence might exist etc"*.
+
+**Read as:**
+- The licence ruling (RD-MP-1) is taken as given.
+- Item 1 agrees to the recommendations of Q-MP-1, -2, -3, -5 and -7. **Q-MP-6 is held** until the lead has the clarity he asked for.
+- Item 2 answers Q-MP-4.
+- Q-MP-8 was not answered and stays open.
+
+- **F-MP-35 — What "the library holds no body skin map" means.** Put to the lead in chat, recorded here:
+  - **What the library's skin is now:** a **tileable material**. A tone plus pores at a 1 cm tile, so it works on any mesh.
+  - **What a body skin map is:** one painted picture laid over **one** body's UV layout. Face features, moles, nipples and genitals sit where that body has them, so it fits that body's mesh only.
+  - **Where one could land:** the library already holds per-mesh pictures for MakeHuman's hair and eyes (the fit set). A full-body skin picture would be the next one there.
+  - **The proposed rule:** never add one. Skin stays a material, and regional variety comes from separate substances (lips and nails as their own articles, PlatformDependencies P15) and from the Creator's tint.
+  - **Why:**
+    - Phase07's ruling (*"a painted skin atlas … stays outside the taxonomy"*, CM2);
+    - a full-body map carries intimate anatomy, which brings in the guidance's whole adult-only review track and every host's content policy, including this public GitHub repo's;
+    - it ties skin to one mesh.
+  - **What it costs:** painted realism, such as freckles placed on a face, or blush. Where a consumer wants that, the body's own map is the character pipeline's, which is the platform's.
+- **F-MP-36 — The licence change touches more than a word.** Each item is owed downstream and none is done here:
+  - each article carries its own licence; the recipe, lockfile and catalog say which;
+  - the release carries an **attribution list** for its CC BY articles;
+  - consumers show credit (the site, the Blender library, Studio);
+  - the manifest validator's CC0-only provenance gate widens;
+  - `CONTRIBUTING.md` and `LICENSE-CONTENT.md` offer the choice;
+  - `_Architecture.md` §Governance, the Glossary's *Matter Library* line (*"a community, CC0 … library"*) and `Experience_MatterLibrary.md` change their wording.
+
+  The site research's *"the licence: CC0-1.0 throughout"* (WS-F3) is no longer true; it gets an in-place note.
+- **F-MP-37 — The console is for the IMRSV team, and it is a front end the team can reach.** Its job, in the lead's words: *"view and evaluate them, update versions, keep whatever provenance might exist"*. That is F-MP-24's maintainer's console, used by more than one person. **Where it runs is now the open question (Q-MP-9).** "A local page" (the Q-MP-4 recommendation) assumed one maintainer at this machine.
+
+## Resolved
+
+- **RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0** (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
+- **RD-MP-2 — The hero thumbnail is rendered by Cycles today, and labelled with its renderer.** An Unreal hero follows once a showcase build of the runtime exists and the solid see-through master is repaired (M6). (Q-MP-1.)
+- **RD-MP-3 — F-MP-9's subject-per-Class table is the starting set**, evolved with the showcase scene's version: skin on the clothed character's hand and part of the face; hair on a head. (Q-MP-2.)
+- **RD-MP-4 — Thumbnails are made before the review**, so the maintainer approves what the public will see. (Q-MP-3.)
+- **RD-MP-5 — "Thumbnail" is the word for the published pictures; "preview" stays the review render.** RD-WS-4's *"a standard preview set"* means the thumbnails (in-place note there). The derived specs that say "preview set" (Catalog §Thumbnails's note, RuntimeCatalog's note, Consumers, PlatformDependencies M9) are conformed when a phase next touches them. (Q-MP-5.)
+- **RD-MP-6 — Thumbnails never go in git or LFS.** Before a release they sit in a folder on this machine that git ignores, served to the site's staging; at a release they are release assets. (Q-MP-7.)
+- **RD-MP-7 — The management front end is for the IMRSV team: to view and evaluate materials, decide what goes into which library version, and keep their provenance.** The Creator's side lives in each consumer. (Q-MP-4; where the console runs is Q-MP-9.)
+
 ## Open questions
 
 | Id | Question | Recommendation |
 |---|---|---|
-| Q-MP-1 | Which renderer makes the hero thumbnail? | **Cycles now**, labelled. An Unreal hero once a showcase build of the runtime exists and the solid see-through master is repaired (M6). |
-| Q-MP-2 | The subject per Class (F-MP-9's table): accept it as the starting set? | Yes, with skin on the hand and part of the face, and hair on a head, as the lead suggested. Evolve it with the scene's version. |
-| Q-MP-3 | Thumbnails before the review, or after? | **Before**, so the maintainer approves what the public sees. |
-| Q-MP-4 | "A front end so peeps can manage versions": maintainers, Creators, or both, and which first? | **The maintainer's console first**, local, writing through git. The Creator's side lives in each consumer. |
-| Q-MP-5 | One word for the published pictures? | **"Thumbnail"** (Catalog §Thumbnails already uses it). "Preview" stays the review render. RD-WS-4's "preview set" gets an in-place note. |
-| Q-MP-6 | A rule that the library holds no body skin atlas (the fit set included)? | Yes. |
-| Q-MP-7 | Where thumbnails live before a release? | A folder on this machine that git ignores, served to the site's staging; release assets at a release. Never git or LFS. |
+| ~~Q-MP-1~~ | ~~Which renderer makes the hero thumbnail?~~ | → RD-MP-2 |
+| ~~Q-MP-2~~ | ~~The subject per Class?~~ | → RD-MP-3 |
+| ~~Q-MP-3~~ | ~~Thumbnails before the review, or after?~~ | → RD-MP-4 |
+| ~~Q-MP-4~~ | ~~Who is the management front end for?~~ | → RD-MP-7 |
+| ~~Q-MP-5~~ | ~~One word for the published pictures?~~ | → RD-MP-5 |
+| Q-MP-6 *(held, F-MP-35)* | A rule that the library holds no body skin map (the fit set included)? | Yes. |
+| ~~Q-MP-7~~ | ~~Where thumbnails live before a release?~~ | → RD-MP-6 |
 | Q-MP-8 | Run Phase11's end review before building more of the flow? | **Yes** (F-MP-26). |
+| Q-MP-9 | **Where does the team's console run?** (a) A small web app **in this repo**, served from the library machine (where the rig, renders and thumbnails already are) and reachable by the team over its private network. It writes through the existing tools and commits to git. (b) **The platform's web back office**, which already has staff accounts and hosting, writing changes to this repo as pull requests. | **(a).** It keeps the library able to outlive IMRSV (RD-WS-1, condition 3), and anyone who forks the library can curate it. The heavy files it shows stay on the machine that makes them. Approvals stay the maintainer's act either way (`promote_release.py`). |
+| Q-MP-10 | **The default licence for a new article** (RD-MP-1), and who chooses? | **CC0-1.0 by default.** All 95 on disk are CC0-dedicable, and their sources (ambientCG, Physically Based, our own generators) are CC0. CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article. |
 
 ## Status
 
-- **Passes captured:** 7 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design.
-- **Current direction:** the flow's first half runs; its second half is a sketch (Pass 5). The bottleneck is the review (F-MP-2). The thumbnail is a showcase render, not a rig render, made today by Cycles on a subject chosen per Class.
-- **Open:** Q-MP-1 to Q-MP-8, each with a recommendation. Nothing is ruled.
+- **Passes captured:** 8 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Pass 8 records the lead's first answers.
+- **Ruled:** RD-MP-1 to RD-MP-7.
+  - **CC BY 4.0 is allowed beside CC0**, which amends R13.
+  - Cycles makes the hero thumbnail, on a subject chosen per Class, before the review; it is called a thumbnail; it is never stored in git.
+  - The management front end is the IMRSV team's console for curating versions.
+- **Current direction:** the flow's first half runs; its second half is a sketch (Pass 5). The bottleneck is the review (F-MP-2).
+- **Open:**
+  - Q-MP-6 (the body skin map rule; held for the lead's clarity, F-MP-35);
+  - Q-MP-8 (the end review first);
+  - Q-MP-9 (where the console runs);
+  - Q-MP-10 (the default licence).
+- **Durable docs owed, and the verb that lands them:**
+  - **RD-MP-1's consequences (F-MP-36):** the licence field, the attribution list, the validator, `CONTRIBUTING.md`, `LICENSE-CONTENT.md`, `_Architecture.md` §Governance, the Glossary and `Experience_MatterLibrary.md`. A lead-directed `/quick-fix` for the words once Q-MP-10 is answered, or the phase that first ships a CC BY article for the field and the validator.
+  - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them.
 - **Unverified:** Unreal's path tracer or Lumen in a packaged Linux runtime; the GPU time a showcase costs (F-MP-32); the bundle's size at 200 articles.
-- **Next step:** the lead's answers to Q-MP-1 to Q-MP-8, or the three-article probe first. Then Phase11's end review, and a seed for *Thumbnails* if the lead wants one.
+- **Next step:** the lead's answers to Q-MP-6, Q-MP-8, Q-MP-9 and Q-MP-10; the three-article probe (it now tests RD-MP-2 and RD-MP-3 by eye); then Phase11's end review, and seeds for *Thumbnails* and *the team's console* if the lead wants them.
