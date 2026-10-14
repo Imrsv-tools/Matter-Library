@@ -36,6 +36,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "parity"))
+sys.path.insert(0, str(HERE.parent / "parity" / "scene"))
 import job as jobmod  # noqa: E402  (the rig's article reader and setting scene)
 import showcase as S  # noqa: E402
 
@@ -93,26 +94,74 @@ def find(name: str) -> Path:
     return jobmod.find_article(name)
 
 
+def character_spec(art) -> tuple[dict, list[Path], dict]:
+    """A Character article's subject: the clothed character wearing the rig's cast, on the skin of the
+    article's own tone where there is one, with the article on its family's parts; its whitelisted
+    views; and every file the picture is drawn from besides the article."""
+    import build_character as B  # noqa: PLC0415  (heavy: parses the pinned CC0 sources)
+    import rig  # noqa: PLC0415  (the rig's cast)
+    parts_of, views = S.character_family(art.name)
+    variant = art.name.split("_")[1]
+    skin = f"Skin_{variant}_Clean_Base_s001_v01"
+    if not list(jobmod.MATERIALS.rglob(f"{skin}.mtlx")):
+        skin = rig.CHARACTER_SKIN
+    cast = {"Body": skin} | rig.cast_for(skin) | {p: art.name for p in parts_of}
+    arts = {p: jobmod.Article.read(jobmod.find_article(a)) for p, a in cast.items()}
+    meshmaps = B.mesh_maps()
+    parts = B.load_parts()
+    cams = S.character_cameras(parts, B.cameras(parts))
+    hide_always = [] if "Cornea" in parts_of else ["Cornea"]     # as the rig hides it (RD-P09-4)
+    extra = S.CHARACTER_VIEW_EXTRA.get(art.name.split("_")[0], {})
+    view_specs = {}
+    for v in views:
+        c = dict(cams[v])
+        if extra.get("raise"):
+            c["pos"] = (c["pos"][0], round(c["pos"][1] + extra["raise"], 4), c["pos"][2])
+        c["hide"] = sorted(set(c.get("hide", []) + hide_always + extra.get("hide", [])))
+        view_specs[v] = c
+    bindings = [{"subject": f"/World/Character/{p}",
+                 "article": {"name": a.name, "path": str(a.path), "master": a.master}}
+                | {port: str(path) for port, path in jobmod.maps_for(p, a, meshmaps).items()}
+                for p, a in arts.items()]
+    spec = {"keep": [f"/World/Character/{p}" for p in B.PARTS], "build": None, "views": view_specs,
+            "bindings": bindings, "on": parts_of}
+    context = [jobmod.CHARACTER_SCENE]
+    for p, a in arts.items():
+        if a.name != art.name:
+            context += [a.path, *a.textures.values()]
+        context += list(jobmod.maps_for(p, a, meshmaps).values())
+    return spec, context, arts
+
+
 def make(name: str, rend: dict | None, force: bool, draft: bool) -> tuple[Path, str]:
     """One article's pictures. Returns its folder and what was done."""
     art = jobmod.Article.read(find(name))
     subject = S.subject_for(art.master, art.path)
-    spec = S.SUBJECTS[subject]
+    if subject == "character":
+        spec, context, cast = character_spec(art)
+    else:
+        spec, context, cast = S.SUBJECTS[subject], [jobmod.SCENE], None
     folder = (S.OUT_ROOT / "_draft" if draft else S.OUT_ROOT) / art.name
-    want = None
+    views = list(spec["views"])
+    why = []
     if not draft:
-        want = S.record(art.path, art.textures.values(), rend, list(spec["views"]), subject, look())
+        want = S.record(art.path, art.textures.values(), rend, views, subject, look(), spec, context)
         why = S.stale(folder, want)
         if not why and not force:
             return folder, "fresh"
     work = folder / "_job"
     work.mkdir(parents=True, exist_ok=True)
     (folder / "record.json").unlink(missing_ok=True)   # no record while the pictures are in doubt
-    scene = jobmod.write_setting_scene(art, {"id": "defaults", "set": {}}, work / "scene.usda")
+    for old in folder.glob("*.png"):                     # a view the subject no longer has must not linger
+        old.unlink()
+    if cast:
+        scene = jobmod.write_character_scene(cast, work / "scene.usda")
+    else:
+        scene = jobmod.write_setting_scene(art, {"id": "defaults", "set": {}}, work / "scene.usda")
     tj = {"article": {"name": art.name, "path": str(art.path), "master": art.master},
           "meters_per_tile": art.meters_per_tile, "subject": subject,
           "scene": str(scene), "keep": spec["keep"], "build": spec["build"], "lift": spec.get("lift", 0.0),
-          "exposure": spec.get("exposure", 0.0),
+          "exposure": spec.get("exposure", 0.0), "bindings": spec.get("bindings"),
           "views": spec["views"], "look": look(),
           "samples": 32 if draft else S.SAMPLES, "seed": S.SEED, "size": 384 if draft else S.SIZE,
           "out_dir": str(folder)}
@@ -127,7 +176,7 @@ def make(name: str, rend: dict | None, force: bool, draft: bool) -> tuple[Path, 
     if got["device"] != rend["device"] or got["blender"] != rend["blender"]:
         raise SystemExit(f"{art.name}: rendered on {got['device']} / {got['blender']}, but the probe "
                          f"said {rend['device']} / {rend['blender']}; no record written")
-    rec = S.record(art.path, art.textures.values(), rend, list(spec["views"]), subject, look(), got["seconds"])
+    rec = S.record(art.path, art.textures.values(), rend, views, subject, look(), spec, context, got["seconds"])
     (folder / "record.json").write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8")
     per = ", ".join(f"{v} {s:.1f} s" for v, s in got["seconds"].items())
     return folder, f"made ({'forced' if force and not why else '; '.join(why)}): {per}; Blender {took:.0f} s in all"

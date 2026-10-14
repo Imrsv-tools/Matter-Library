@@ -121,17 +121,13 @@ VIEW_ORDER = ("card", "close", "dark")
 UNDERFOOT = {"Slate_Cleft", "Terrazzo_Polished"}
 
 
-class NotYet(Exception):
-    """An article whose subject a later step builds (Character: 17.3)."""
-
-
 def subject_for(master: str, path: Path) -> str:
     """The subject an article is pictured on, from its master, its class and its name."""
     rel = path.resolve().relative_to(REPO / "MatterLibrary" / "materials").parts
     domain, klass = rel[0], rel[1]
     name = "_".join(path.stem.split("_")[:2])
     if domain == "character":
-        raise NotYet(f"{path.stem}: a Character article is pictured on the character (17.3)")
+        return "character"          # on the clothed character, in a human context (17.3)
     if master == "Emissive":
         return "tube"
     if master == "TranslucentThin":
@@ -149,6 +145,88 @@ def subject_for(master: str, path: Path) -> str:
     if klass == "cementitious":
         return "wall"
     return "sphere_cube"
+
+
+# ------------------------------------------------------------------ Character (17.3)
+
+# A Character article is pictured on the clothed character only (F-MP-17, RD-P13-2, RD-DS-4), from
+# these views and NO OTHER: the whole body, the waist and the feet are never a thumbnail.
+CHARACTER_VIEWS = ("face", "hand", "mouth", "lips", "eye", "head")
+
+
+class Refused(ValueError):
+    """A view a Character article is never pictured from."""
+
+
+def character_views(names) -> list[str]:
+    """``names``, refused unless every one is on the whitelist (``CHARACTER_VIEWS``)."""
+    names = list(names)
+    bad = [n for n in names if n not in CHARACTER_VIEWS]
+    if bad:
+        raise Refused(f"view {', '.join(map(repr, bad))} is never a thumbnail: a Character article is "
+                      f"pictured only from {', '.join(CHARACTER_VIEWS)} (F-MP-17)")
+    return names
+
+
+# Each family: the parts its article goes on, and the views it is pictured from (the Brief's
+# §The subjects). The rest of the character wears the rig's cast (``rig.cast_for``), on the skin
+# of the article's own tone where it has one.
+CHARACTER_FAMILIES = {
+    "Skin": (["Body"], ["face", "hand"]),
+    "Lips": (["Lips"], ["lips"]),
+    "Nail": (["Nails"], ["hand"]),
+    "Eye": (["Pupil", "Iris", "Sclera"], ["eye"]),
+    "Iris": (["Iris"], ["eye"]),
+    "Pupil": (["Pupil"], ["eye"]),
+    "Sclera": (["Sclera"], ["eye"]),
+    "Cornea": (["Cornea"], ["eye"]),
+    "Enamel": (["Teeth"], ["mouth"]),
+    "Gum": (["Gums"], ["mouth"]),
+    "Tongue": (["Tongue"], ["mouth"]),
+    "Hair": (["Hair", "Brows", "Lashes"], ["head"]),
+}
+CHARACTER_FOCAL = 50.0
+# A family whose part the view's own framing cannot show: MakeHuman's jaw is closed, so the tongue
+# sits behind the teeth in the mouth view. For a Tongue article the view also hides the teeth and
+# looks down from ``raise`` metres higher (17.3).
+CHARACTER_VIEW_EXTRA = {"Tongue": {"hide": ["Teeth"], "raise": 0.05}}
+
+
+def character_family(stem: str) -> tuple[list[str], list[str]]:
+    fam = stem.split("_")[0]
+    if fam not in CHARACTER_FAMILIES:
+        raise SystemExit(f"{stem}: no Character family {fam!r} (have {', '.join(CHARACTER_FAMILIES)})")
+    parts, views = CHARACTER_FAMILIES[fam]
+    return parts, character_views(views)
+
+
+def _centre(pts):
+    return tuple((min(p[k] for p in pts) + max(p[k] for p in pts)) / 2 for k in range(3))
+
+
+def character_cameras(parts: dict, rig_cams: dict) -> dict:
+    """Every whitelisted view's camera, framed from the parts' bounds (rig space: metres, Y up,
+    the character facing +Z, its left hand at +X). ``hand`` and ``mouth`` are the rig's own framings
+    (``build_character.cameras``); ``face`` is half the face (the character's left eye, cheek and
+    the side of the nose); ``lips``, ``eye`` and ``head`` are new."""
+    def cam(pos, aim, **kw):
+        return {"pos": tuple(round(c, 4) for c in pos), "aim": tuple(round(c, 4) for c in aim),
+                "focal": CHARACTER_FOCAL, "relight": True} | kw
+    eye = _centre([p for p in parts["Iris"]["points"] if p[0] > 0])
+    lips = _centre(parts["Lips"]["points"])
+    hair = _centre(parts["Hair"]["points"])
+    cheek = (eye[0] * 1.5, eye[1] - 0.03, eye[2] - 0.03)
+    hand, mouth = rig_cams["CamHand"], rig_cams["CamMouth"]
+    return {
+        "face": cam((cheek[0] + 0.13, cheek[1] + 0.02, cheek[2] + 0.13), cheek),
+        "hand": cam(*hand),
+        # MakeHuman's mouth is closed, so the rig's view hides the face; a thumbnail hides every part
+        # but the mouth's, or the hair behind the head shows through it
+        "mouth": cam(*mouth, hide=sorted(p for p in parts if p not in ("Teeth", "Gums", "Tongue"))),
+        "lips": cam((lips[0], lips[1] + 0.005, lips[2] + 0.11), lips),
+        "eye": cam((eye[0] + 0.005, eye[1] + 0.004, eye[2] + 0.075), eye),
+        "head": cam((hair[0] + 0.32, hair[1] + 0.12, hair[2] + 0.42), (hair[0], hair[1] - 0.01, hair[2])),
+    }
 
 
 # ------------------------------------------------------------------ the record (F-MP-10)
@@ -172,24 +250,27 @@ def masters_hash() -> str:
     return _sha(MASTERS.glob("*.py"))
 
 
-def scene_hash(look: dict, subject: str) -> str:
-    """The scene as it is drawn: the look the job carries, this subject (its geometry and cameras)
-    and the Blender side. A number tuned without a ``SCENE_VERSION`` bump still makes the pictures
-    it changes stale, and only those (a new tube leaves the oak alone)."""
-    h = hashlib.sha256(json.dumps({"look": look, "subject": SUBJECTS.get(subject)},
-                                  sort_keys=True).encode())
+def scene_hash(look: dict, spec: dict) -> str:
+    """The scene as it is drawn: the look the job carries, this subject as sent (its geometry,
+    cameras and, for Character, its cast) and the Blender side. A number tuned without a
+    ``SCENE_VERSION`` bump still makes the pictures it changes stale, and only those (a new tube
+    leaves the oak alone)."""
+    h = hashlib.sha256(json.dumps({"look": look, "subject": spec}, sort_keys=True, default=str).encode())
     for f in ("showcase_blender.py", "subjects_blender.py"):
         h.update((HERE / f).read_bytes())
     return h.hexdigest()
 
 
 def record(mtlx: Path, textures, renderer: dict, views: list[str], subject: str, look: dict,
-           seconds: dict | None = None) -> dict:
+           spec: dict, context=(), seconds: dict | None = None) -> dict:
     """What a picture was made from. ``seconds`` (GPU time per view) is a measurement, not an
-    input, so it is written and never compared."""
+    input, so it is written and never compared. ``context`` is every other file the picture is
+    drawn from: the rig scene file and, on the character, the cast's articles, their textures and
+    the fit maps; a changed skin makes the lips picture stale."""
     r = {"article": mtlx.stem, "article_sha256": article_hash(mtlx, textures),
          "masters_sha256": masters_hash(), "renderer": renderer,
-         "scene_version": SCENE_VERSION, "scene_sha256": scene_hash(look, subject),
+         "scene_version": SCENE_VERSION, "scene_sha256": scene_hash(look, spec),
+         "context_sha256": _sha(sorted(set(map(Path, context)))),
          "samples": SAMPLES, "size": SIZE,
          "subject": subject, "views": sorted(views)}
     if seconds is not None:
@@ -197,7 +278,8 @@ def record(mtlx: Path, textures, renderer: dict, views: list[str], subject: str,
     return r
 
 
-INPUTS = ("article_sha256", "masters_sha256", "renderer", "scene_version", "scene_sha256", "samples", "size",
+INPUTS = ("article_sha256", "masters_sha256", "renderer", "scene_version", "scene_sha256", "context_sha256",
+          "samples", "size",
           "subject", "views")
 
 

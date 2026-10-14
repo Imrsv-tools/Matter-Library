@@ -32,11 +32,13 @@ try:
     (masters / "m.py").write_text("x = 1\n")
     S.MASTERS = masters
     rend = {"blender": "5.2.2 LTS", "engine": "Cycles", "device": "OPTIX"}
+    ctx = tmp / "scene.usda"
+    ctx.write_text("#usda 1.0\n")
     LOOK = {"hdri_strength": 0.22, "key_power": 110.0}
 
     def want(**over):
         r = S.record(mtlx, [tex], over.pop("renderer", rend), ["card", "close"], "sphere_cube",
-                     over.pop("look", LOOK))
+                     over.pop("look", LOOK), S.SUBJECTS["sphere_cube"], [ctx])
         return r | over
 
     def made(rec):
@@ -76,6 +78,9 @@ try:
     check(S.stale(f, want(samples=S.SAMPLES * 2)) == ["samples"], "stale at other samples")
     check(S.stale(f, want(look=LOOK | {"key_power": 120.0})) == ["scene_sha256"],
           "stale when a look number is tuned without a version bump")
+    ctx.write_text("#usda 1.0\n# changed\n")
+    check(S.stale(f, want()) == ["context_sha256"], "stale when a file the picture is drawn from changes (the cast)")
+    ctx.write_text("#usda 1.0\n")
     (f / "close.png").unlink()
     check(S.stale(f, want()) == ["no close.png"], "stale when a view's picture is missing")
 finally:
@@ -99,11 +104,26 @@ for rel, master, want_subject in [
         ("environmental/vegetation/OakLeaf_Natural_Clean_Base_s01_v01.mtlx", "Masked", "leaf")]:
     got = S.subject_for(master, M / rel)
     check(got == want_subject, f"{Path(rel).stem.split('_Clean')[0]}: {got}")
-try:
-    S.subject_for("Subsurface", M / "character/humanoid/Skin_FitzpatrickIII_Clean_Base_s001_v01.mtlx")
-    check(False, "a Character article is refused until 17.3 builds its views")
-except S.NotYet:
-    check(True, "a Character article is refused until 17.3 builds its views")
+check(S.subject_for("Subsurface", M / "character/humanoid/Skin_FitzpatrickIII_Clean_Base_s001_v01.mtlx")
+      == "character", "a Character article goes on the character")
+
+print("== Character: the views a part is pictured from (17.3, F-MP-17) ==")
+for v in ("wide", "waist", "feet", "body"):
+    try:
+        S.character_views(["face", v])
+        check(False, f"the view {v!r} is refused")
+    except S.Refused:
+        check(True, f"the view {v!r} is refused")
+check(S.character_views(S.CHARACTER_VIEWS) == list(S.CHARACTER_VIEWS), "every whitelisted view is allowed")
+check(all(set(v) <= set(S.CHARACTER_VIEWS) for _, v in S.CHARACTER_FAMILIES.values()),
+      "every family's views are on the whitelist")
+for stem, parts, views in [("Skin_FitzpatrickIII_Clean_Base_s001_v01", ["Body"], ["face", "hand"]),
+                           ("Lips_Natural_Clean_Base_s001_v01", ["Lips"], ["lips"]),
+                           ("Nail_FitzpatrickI_Clean_Base_s001_v01", ["Nails"], ["hand"]),
+                           ("Eye_Natural_Clean_Base_s001_v01", ["Pupil", "Iris", "Sclera"], ["eye"]),
+                           ("Enamel_Natural_Clean_Base_s001_v01", ["Teeth"], ["mouth"]),
+                           ("Hair_DarkBrown_Clean_Base_s001_v01", ["Hair", "Brows", "Lashes"], ["head"])]:
+    check(S.character_family(stem) == (parts, views), f"{stem.split('_Clean')[0]}: on {parts}, from {views}")
 check(all(set(v) <= set(S.VIEW_ORDER) for v in (s["views"] for s in S.SUBJECTS.values())),
       "every subject's views are named in VIEW_ORDER (the sheet's order)")
 

@@ -19,6 +19,7 @@ Blender's Z up, so this script does the same to its own objects: (x, y, z) -> (x
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import sys
@@ -159,11 +160,14 @@ def setup(job: dict) -> tuple[dict, dict]:
             raise SystemExit(f"{o.name} has no 'st' UV map")
         lo = min((o.matrix_world @ Vector(c)).z for c in o.bound_box)
         print(f"thumbnails: subject {o.name} rests at z = {lo:.4f}")
-    a = job["article"]
-    mat = load_article.build(Path(a["path"]), {}, name=f"{a['name']}__thumbnail")
-    for o in subjects:
-        o.data.materials.clear()
-        o.data.materials.append(mat)
+    if job.get("bindings"):
+        bind(job["bindings"])
+    else:
+        a = job["article"]
+        mat = load_article.build(Path(a["path"]), {}, name=f"{a['name']}__thumbnail")
+        for o in subjects:
+            o.data.materials.clear()
+            o.data.materials.append(mat)
 
     look = job["look"]
     backdrop(look)
@@ -187,7 +191,53 @@ def setup(job: dict) -> tuple[dict, dict]:
     scn.render.image_settings.color_depth = "8"
     cams = {name: camera(f"ML_Cam_{name}", spec) for name, spec in job["views"].items()}
     scn.camera = next(iter(cams.values()))
-    return cams, {"lights": lights, "bg": bg, "strength": look["hdri_strength"]}
+    return cams, {"lights": lights, "bg": bg, "strength": look["hdri_strength"], "look": look}
+
+
+def bind(bindings: list) -> None:
+    """The character: one article per part, each with the mesh's maps (as the rig's Blender driver
+    binds a character job, ``blender_render.run``)."""
+    built = {}
+    for b in bindings:
+        a = b["article"]
+        cut, pic = b.get("cutout_map"), b.get("base_color_map")
+        key = (a["name"], cut, pic)
+        if key not in built:
+            tag = f"__{Path(cut or pic).stem}" if (cut or pic) else ""
+            built[key] = load_article.build(Path(a["path"]), {}, name=f"{a['name']}__thumbnail{tag}",
+                                            cutout_map=Path(cut) if cut else None,
+                                            base_color_map=Path(pic) if pic else None)
+        o = bpy.data.objects.get(b["subject"].rsplit("/", 1)[1])
+        if o is None:
+            raise SystemExit(f"binding: no part {b['subject']!r} after import")
+        o.data.materials.clear()
+        o.data.materials.append(built[key])
+
+
+def aim_lights(rig: dict, target) -> None:
+    """Keep the key's and the rim's relation to what the view looks at: the look is built around a
+    subject at ``key_aim``; a face 1.5 m up gets the same light (``relight``, the character)."""
+    look = rig["look"]
+    for o, which in zip(rig["lights"], ("key", "rim")):
+        pos, aim = Vector(look[f"{which}_pos"]), Vector(look[f"{which}_aim"])
+        at = Vector(target) if target is not None else aim
+        p, a = v(at + (pos - aim)), v(at)
+        o.matrix_world = Matrix.Translation(p) @ (a - p).to_track_quat("-Z", "Y").to_matrix().to_4x4()
+
+
+@contextlib.contextmanager
+def hidden(names):
+    """Hide a view's parts from the render for the duration (the mouth view hides the face)."""
+    objs = [bpy.data.objects.get(n) for n in names]
+    if None in objs:
+        raise SystemExit(f"view hides a part not found: {names}")
+    for o in objs:
+        o.hide_render = True
+    try:
+        yield
+    finally:
+        for o in objs:
+            o.hide_render = False
 
 
 def lit(rig: dict, on: bool) -> None:
@@ -206,11 +256,14 @@ def run(job_path: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
     seconds = {}
     for name, cam in cams.items():
+        spec = job["views"][name]
         scn.camera = cam
-        lit(rig, not job["views"][name].get("dark"))
+        lit(rig, not spec.get("dark"))
+        aim_lights(rig, spec["aim"] if spec.get("relight") else None)
         scn.render.filepath = str(out / f"{name}.png")
         t = time.perf_counter()
-        bpy.ops.render.render(write_still=True)
+        with hidden(spec.get("hide", [])):
+            bpy.ops.render.render(write_still=True)
         seconds[name] = round(time.perf_counter() - t, 2)
         print(f"thumbnails: wrote {scn.render.filepath} in {seconds[name]} s")
     (out / "render.json").write_text(json.dumps(
