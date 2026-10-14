@@ -99,6 +99,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
 
+### Comparison Pictures in Each Tool — RESEARCH *(added 2026-10-14 by Phase17's execution, on the lead's "we have to revamp this test... lets either seed a phase to do this or setup a research", with the website's ask for a real comparison set; Pass 1 owed)*
+**Outcome:** each material's pictures in Storm, Blender and Unreal can be compared by a person: one readable scene (a standard shader ball, a neutral backdrop, a dome whose reflections read), each tool's own renderer named, differences shown and not tuned away, current or not shipped.
+- `docs/Planning/Research/261014_R_ComparisonPictures.md`
+
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
 - Automated transformers (MaterialX → Blender / Unreal), after manual parity is proven. Parity-gate automation in CI. A Realm level above Domain. Texture storage beyond Git LFS (asset management, content-addressed pointers). Further engine targets. Personal saved variants, community scoring and contributor reputation (`docs/specs/Experience/Experience_MatterLibrary.md` §Future Layers). The planned roots in `docs/ToolingConventions.md` §Planned roots.
