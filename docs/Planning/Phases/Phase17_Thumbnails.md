@@ -1,6 +1,6 @@
 # Phase17 — Thumbnails
 
-**Status:** BRIEF READY (2026-10-14, discovery Pass 1, opened by the lead: *"/discovery P17"*). Lane **build**. Next: **`/execute P17`**. Runs on the library machine (the laptop) for now: the lead, *"We have to rethink and stay local for now"* (RD-MP-14), then *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"* (RD-DS-8). **This phase's ids start at `Q-P17-8`, `F-P17-8` and `RD-P17-1`.** The Library Service minted `Q-P17-1…7` and `F-P17-1…7` while it was Phase17, and those stay its own. *(Numbered Phase18 earlier the same day, RD-DS-7. Seeded by `/research` on the lead's *"Seed all the TBD phases we discovered here"*.)*
+**Status:** IN EXECUTION (2026-10-14, *"/execute P17"*; Brief ready the same day, discovery Pass 1). Lane **build**. Runs on the library machine (the laptop) for now: the lead, *"We have to rethink and stay local for now"* (RD-MP-14), then *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"* (RD-DS-8). **This phase's ids start at `Q-P17-8`, `F-P17-8` and `RD-P17-1`.** The Library Service minted `Q-P17-1…7` and `F-P17-1…7` while it was Phase17, and those stay its own. *(Numbered Phase18 earlier the same day, RD-DS-7. Seeded by `/research` on the lead's *"Seed all the TBD phases we discovered here"*.)*
 
 ## Outcome
 
@@ -237,6 +237,18 @@ None. Every open question in the seed is closed above, unless you say otherwise.
   - The website asks for thumbnails at web size with their renderer named, and a picture subject per Character row (M9 (3), M11 (2)).
   - It builds its browsing from the site file's groups (SiteFile §Groups) and shows a labelled swatch where a picture is missing (SiteFile; M11).
   - No other consumer has asked for material thumbnails.
+
+## Execution Log
+
+**Tree at start (2026-10-14):** `main` at `a903b51`, the library machine. Six Refiner-lane files modified by a sibling session (`.ai/`, `.claude/`, `AGENTS.md`, the refinement backlog); not touched. **Gate:** `run_all.py` 15 PASS, 2 SKIP (compression, staging), 0 FAIL. The Brief's red (`approval_binds_freeze`) went green with the maintainer's re-approval (`f113b3a`).
+
+| Step | Commit | Result | Next |
+|---|---|---|---|
+| **17.1** | the 17.1 commit | `tools/thumbnails/`: the scene (`showcase.py`, `SCENE_VERSION = 1`), the Blender side (`showcase_blender.py`), the probe, the tool and the sheet (`make_thumbnails.py`), and 16 units for the record and staleness (`test_thumbnails.py`). Oak and polished steel made, card and close, at 1024² and 256 samples. A re-run makes nothing. **GPU time (F-MP-32): 12–14 s per picture** on the RTX 2080 Max-Q (OptiX), about 30 s of Blender per article. **▶ SCAFFOLD COMPLETE — sitting owed (click 1).** | the lead's eye on the look |
+
+- **F-P17-16 — A polished mirror vanishes into a plain grey studio.** At the first look (HDRI, key, grey sweep) the steel cube's top face and bevel read as a translucent ghost around the cube. They were mirrors of a back wall the same grey as the wall beside them. The cube was bisected (hidden: gone; backdrop hidden: still there; diffuse: the cube's own outline). Fixed in the scene, not the article: **a rim light** behind and above, narrow (40° spread) and hidden from the camera, gives a mirror something bright to reflect and edges every subject against the backdrop.
+- **F-P17-17 — `SCENE_VERSION` alone cannot keep a picture honest.** Tuning the look between renders left the version at 1, so the stale check called the old pictures fresh. **The record now also carries `scene_sha256`**: the look the job carries, the cameras, the subjects and the Blender-side script. `SCENE_VERSION` stays the name the lead keeps; the hash catches a number tuned without a bump (a unit).
+- **Handed in by Phase16 (`08f5968`):** `tools/releases/hdris.py` `stale()` dates an HDRI thumbnail against the module's own mtime, so any edit to `hdris.py` re-makes all 59. It is not in this Brief's steps. It is a candidate for 17.4's stale pass, or a quick fix. Recorded, not yet changed.
 
 ## Discovery Log
 
