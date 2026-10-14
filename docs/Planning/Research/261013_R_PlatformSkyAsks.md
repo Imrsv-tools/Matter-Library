@@ -176,5 +176,5 @@ Until that phase writes them, this section is the authority.
 
 - **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14).
 - **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
-- **Open:** A1 – A8, which are now the work of one library phase, *HDRIs in the Library* (SKY-F16), seeded 2026-10-14 (`d52ca83`: the stub and the Roadmap entry). The ledger row is M10 (`94133fb`). The Glossary's *HDRI* headword is that phase's to land (SKY-F13).
-- **▶ Next:** the lead starts `/discovery` on *HDRIs in the library* when he chooses. That is a deliberate gate, not a slide. The platform's HDRI phase waits on it.
+- ~~**Open:** A1 – A8 …~~ **Delivered 2026-10-14 by Phase14** (`docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`): A1 – A6 and A8 in full, and A7 for the dev install. A release that holds HDRIs is planned. The Glossary's *HDRI* headword landed. The ledger row M10 says what the library serves.
+- ~~**▶ Next:** the lead starts `/discovery` …~~ **▶ Next:** nothing from the library. The platform's HDRI phase builds its side against the dev install (M10).

@@ -11,10 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase14 — HDRIs in the Library — ACTIVE *(numbered Phase14 and opened by the lead 2026-10-14, "/discovery P14"; added 2026-10-14 by `/research` on the lead's "seed the phase", from the platform's HDRI asks, RD-SKY-1 to 4; the platform's own HDRI phase waits on it)*
-**Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
-- `docs/Planning/Phases/Phase14_HdrisInTheLibrary.md`
-
 ### Phase15 — Scale Grids — ACTIVE *(numbered Phase15 and opened by the lead 2026-10-14, "/discovery P15"; added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
 - `docs/Planning/Phases/Phase15_ScaleGrids.md`
@@ -173,3 +169,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
 - `docs/Planning/Phases/Complete/Phase13_MaterialsDescribed.md`
 *Closed 2026-10-14: every material described and published in the dev snapshots `matterlib-0.2.0-dev.1` and `-dev.2`; biological materials are browsed apart (RD-P13-2).*
+
+### Phase14 — HDRIs in the Library — COMPLETE
+**Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
+- `docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`
+*Closed 2026-10-14 on the library side: all 59 of Poly Haven's Pure Skies, credited, named by file and served; the app's side is the platform's HDRI phase (M10).*
