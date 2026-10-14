@@ -1,6 +1,6 @@
 # Phase16 — Every Entry Says What It Is
 
-**Status:** BRIEF READY (2026-10-14), **two lead calls open** (§Blockers), **executes after Phase15** (RD-DS-5). Opened by the lead's `/discovery P16` the evening it was numbered (*"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6), while Phase15's own discovery ran in parallel. Seeded by `/research` on *"yes record it and seed all three"*. It comes after *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Phase15_MatterCharacterHdri.md)), whose structure it fills, and before The Library Service ([`Phase17_LibraryService.md`](Phase17_LibraryService.md); RD-DS-7).
+**Status:** BRIEF READY (2026-10-14), **one lead call open** (§Blockers), **executes after Phase15** (RD-DS-5). Opened by the lead's `/discovery P16` the evening it was numbered (*"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6), while Phase15's own discovery ran in parallel. Seeded by `/research` on *"yes record it and seed all three"*. It comes after *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Phase15_MatterCharacterHdri.md)), whose structure it fills, and before The Library Service ([`Phase17_LibraryService.md`](Phase17_LibraryService.md); RD-DS-7).
 
 ## Outcome
 
@@ -20,7 +20,7 @@ The lead: *"I want Materials to work like Assets and Compositions.... same thing
 
 **Where:** the lead's Blender on the library machine, with the Matter Asset-Browser library the agent has regenerated **and installed** (the installed library, not the repo's copy).
 
-1. **Asset Browser → Matter Library → Copper verdigris** (engineered / metal). The asset sidebar shows **Author** = the contributor and **License** = `CC0-1.0`, and the catalog path shows its place in the taxonomy, as today. *Judge: the material says who gave it and under what licence.* Today the sidebar reads `IMRSV` for every article (hard-coded) and has no licence (F-P16-2).
+1. **Asset Browser → Matter Library → Copper verdigris** (engineered / metal). The asset sidebar shows **Author** = `MatterBot` and **License** = `CC0-1.0`, and the catalog path shows its place in the taxonomy, as today. *Judge: the material says who gave it and under what licence.* Today the sidebar reads `IMRSV` for every article (hard-coded) and has no licence (F-P16-2).
 2. **The same for a character material (a skin) and a material the library made from a script (the UV grid).** *Judge: it holds across the library, not only for the pilot's twelve.* The three are picked by their files' metadata, read after step 16.1, never by their names.
 3. **HDRIs: no click. This is a waiver, to be confirmed by the lead** (unless you say otherwise). No surface the lead uses shows an HDRI's credit yet: USDLiveView and Studio read it in their own phases (P25, P26), and the website's mirror accepts only one site-file schema (F-P16-9). What the lead gets instead is the agent's evidence, written into the step's log:
    - the stamped header, read back;
@@ -37,17 +37,18 @@ The lead: *"I want Materials to work like Assets and Compositions.... same thing
 | **The recipe gains `contributor`.** The licence is not a recipe field: it is `CC0-1.0` library-wide (RD-RO-2). | 16.1 |
 | **Blender's asset library reads both from the file** into Blender's own `author` and `license` fields. | 16.1 |
 | **The pilot `matterlib-0.1.0` is re-frozen in place**, since 12 of its `.mtlx` files change. The lead's promote command is handed over at the start of the close. | 16.1 |
-| **Every HDRI's `.hdr` header carries** its id, version, name, licence, contributor and full credit (RD-P16-2). Where the stamp is made is Blocker 2. | 16.2 |
-| **The catalog entries carry `contributor` and `licence`**, for materials and HDRIs alike, and each HDRI also carries its **`credit`** (A9). They are projected from the files, in the dev install and in the projector (RD-DS-2). `no_projection_guard` is narrowed **by key** (F-P16-3). | 16.2 |
+| **Every HDRI's `.hdr` header carries** its id, version, name, licence, contributor and full credit (RD-P16-2), and Phase15's `group`, `when` and `sky` (RD-P15-4). Where the stamp is made is Blocker 2. | 16.2 |
+| **The catalog entries carry `contributor` and `licence`**, for materials and HDRIs alike, and each HDRI also carries its **`credit`** (A9). They are projected from the files into the dev catalog (RD-DS-2, RD-P16-8). | 16.2 |
 | **The site file:** `contributor` stops being *(planned)*; `credit.edited_from` becomes a name and an address (M11 (4)); each HDRI's `description` drops the source's resolution claim (M11 (3)). A dev snapshot is built, and published at the lead's word. | 16.3 |
-| Specs: MaterialXTemplate (the block), RuntimeCatalog (the fields, the guard), SiteFile, Identity §HDRI names (the header). CREDITS.md's *"per-material credit … is planned"* line. Ledger notes on P26, M10 and M11. | at the close |
+| Specs: MaterialXTemplate (the block), RuntimeCatalog (the fields), SiteFile, Identity §HDRI names (the header). CREDITS.md's *"per-material credit … is planned"* line, and its *"the first 12 articles"* credit (RD-P16-11). Ledger notes on P26, M10 and M11. | at the close |
 
 ### Not now
 
 | Not now → where | What it will consume from this phase |
 |---|---|
-| **The group and each group's taxonomy** in the files, the catalog and the site file (Character as a group; HDRIs by *when* and *sky*) → **Phase15** | the same metadata block and `.hdr` header, and the same catalog entry |
-| **A10, each HDRI's tagging** → **Phase15**, whose HDRI taxonomy is built from those tags (RD-P16-9) | — |
+| **The group and each group's taxonomy** in the `.mtlx` files, the dev catalog and the site file (Character as a group; HDRIs by *when* and *sky*) → **Phase15**. *Writing an HDRI's `group`, `when` and `sky` into its header is this phase's: 16.2's stamp (RD-P15-4).* | the same metadata block and dev-catalog entry |
+| **A10, each HDRI's tagging**, on the dev catalog's HDRI entries → **Phase15**, whose HDRI taxonomy is built from those tags (RD-P16-9; accepted there, RD-P15-4) | — |
+| **The release projector, and narrowing `no_projection_guard`** → the first release after this phase (*Release Bundle*), as `master` was handled and as Phase15's group is (RD-P15-6, RD-P16-8) | the dev catalog's field names; F-P16-3 (the guard must check keys) |
 | **Reading and showing the facts** in Stage, Studio's picker, USDLiveView and the website → the consumers (P25, P26, M11) | the catalog's `contributor`, `licence` and `credit` fields, and the `.mtlx` and `.hdr` fields |
 | **Linking a handle to an account; counting use for Forseti** → the platform (Phase13's deferral; F-DS-12) | the `contributor` field |
 | **Stamped HDRIs in a real release** → *Release Bundle and Consumer Contract* | the stamp tool built here |
@@ -88,22 +89,25 @@ The lead: *"I want Materials to work like Assets and Compositions.... same thing
   - the HDRI's page there;
   - each author, with their role;
   - each sponsor, with their link;
-  - the HDRI it was edited from, as a name and an address.
+  - the HDRI it was edited from, as a name and an address;
+  - Phase15's `group`, `when` and `sky`, under the spellings Phase15 lands (RD-P15-4).
 
   The source's description and raw tags stay out. The description stays in the record and the site file. The tags feed Phase15's taxonomy. *(Seed question 1: a short line, or the whole description.)* The probe carried a 400-character line and UTF-8 text with no effect on the pixels (F-P16-1).
-- **RD-P16-3 — `edited_from` is published as two fields, a name and an address**, in the site file and in the catalog's `credit` (M11 (4)).
+- **RD-P16-3 — `edited_from` is published as two fields, a name and an address**, in the site file and in the catalog's `credit` (M11 (4)). They are **added beside** the existing Markdown line, which stays until the site has moved, so the change is additive (RD-P16-8).
 - **RD-P16-4 — The *"Free 16K"* sentence:** the library's `description` of an HDRI drops the source's opening resolution claim. The source's own words stay verbatim in the record. *(All 59 open with a 16K, 20K or 24K claim, in 23 phrasings, measured; the library's file is 4096 × 2048, F-P16-6.)*
 - **RD-P16-5 — What stays producer-side:** the recipes and the per-HDRI records. They are the source the files are written from, and they never ship (F-DS-11). *(Seed question 3.)*
 - **RD-P16-6 — The contributor's form is a handle**, as RD-RO-2 says. It is one field on materials and HDRIs alike: *who brought this entry into the library*. An HDRI's source people sit in its `credit`, not in `contributor`. *(Seed question 4.)* Whose handle the library's own entries carry is Blocker 1.
 - **RD-P16-7 — The byte change** *(seed question 2)* follows from Blocker 2. If the stamp is made in the served copy, the record's `sha256` still describes the file in the repo, and nothing changes. If the stamp is made in the repo, the HDRI evidence check (`validate_manifest.py`) compares the file **with the library's header lines removed** against the record's `sha256`. Under either answer, Phase14's *byte-identical default* becomes *pixel-identical*, and the M10 note says so.
-- **RD-P16-8 — The catalog carries the fields in both producers**: the dev install's `serve_to_stage.py` and the projector. `no_projection_guard` keeps refusing `provenance` and `evidence`, but checks **keys**, not substrings (F-P16-3). The `schema_version` step and the site file's schema step are **claimed at execution, not here**, because Phase15 moves the same two numbers (§Shared with Phase15).
-- **RD-P16-9 — A10 (tagging) moves to Phase15**, whose HDRI taxonomy reads those tags. *(The seed's "it also answers A10", refined 2026-10-14. If Phase15's Brief hands A10 back, it returns here.)*
+- **RD-P16-8 — Only the dev catalog and the site file carry the new fields, and neither schema number moves** *(revised 2026-10-14 to match Phase15's RD-P15-5 to RD-P15-7)*. The release projector stays as it is, so the pilot's catalog re-projects unchanged. A frozen release gains the fields with the first release after this phase, as `master` did. With nothing projected into a release, `no_projection_guard` is not touched now; its blind spot (F-P16-3) is fixed when the projector gains the fields. Both changes are additive, and the website's mirror checks the version number, so neither `schema_version` nor the site file's schema is bumped. *(Was: both producers, the guard narrowed now, the schema steps claimed at execute.)*
+- **RD-P16-9 — A10 (tagging) moves to Phase15**, whose HDRI taxonomy reads those tags. *(The seed's "it also answers A10", refined 2026-10-14. Phase15 accepted it the same evening: the whole `tagging` block on each dev-catalog HDRI entry, RD-P15-4.)*
 - **RD-P16-10 — The 95 `.mtlx` files are stamped by inserting two inputs, not by re-assembling them.** Each diff must be exactly the two new lines; any other count aborts the run. The assembler writes both inputs for every article built from now on.
+- **RD-P16-11 — The library's own entries carry the handle `MatterBot`** (the lead, 2026-10-14, on Blocker 1: *"MatterBot (I didn't make these, The system did)"*). That is all 154 today: 95 materials and 59 HDRIs. *The agent's reading:* it covers the pilot's 12 too, so CREDITS.md's *"the first 12 articles"* credit is corrected at the close. An HDRI's Poly Haven people stay in its `credit` (RD-P16-6).
+- **RD-P16-8 and RD-P16-9 revised the same evening** to match Phase15's Brief (RD-P15-4 to RD-P15-7).
 
 ### Risk lane — `build`
 
 The lane was checked against the controls themselves, read on 2026-10-14:
-- **`no_projection_guard`** (`run_all.py`). It is narrowed, as RD-DS-2 already ruled. It is not a new gate.
+- **`no_projection_guard`** (`run_all.py`). Not touched now, because only the dev catalog gains fields (RD-P16-8).
 - **The freeze** (`freeze_release.py`) hashes every referenced `.mtlx`, so stamping the pilot's 12 means a re-freeze in place. Approving it stays the maintainer's act (`LOCAL_DELTAS.md`, the publishing-producer row).
 - **The `materials` lane** (`validate_material.py`) reads only `master_material` from the block, and has no list of allowed inputs (F-P16-8).
 - **The HDRI evidence check** (`validate_manifest.py`) applies only to an HDRI listed in a lockfile, and none is listed yet.
@@ -115,7 +119,7 @@ The lane was checked against the controls themselves, read on 2026-10-14:
 | Step | Intent | First clickable result |
 |---|---|---|
 | **16.1** | **Every material says who gave it and its licence, and Blender shows it.** Recipe key, assembler, the 95 stamped (RD-P16-10), the asset-library generator reads the block, the library is regenerated and installed, the pilot is re-frozen. | Clicks 1 and 2 |
-| **16.2** | **The engines' catalog says it, and so does every HDRI file.** The HDRI stamp (where: Blocker 2); `contributor`, `licence` and HDRI `credit` on every catalog entry in the dev install and the projector; the guard narrowed by key; the stamped default sky checked pixel for pixel in Storm and Blender; the Unreal check handed to the machine with Unreal. | Click 3's evidence |
+| **16.2** | **The engines' catalog says it, and so does every HDRI file.** The HDRI stamp (where: Blocker 2); `contributor`, `licence` and HDRI `credit` on every entry of the dev catalog; the stamp also writes Phase15's `group`, `when` and `sky` (RD-P15-4); the stamped default sky checked pixel for pixel in Storm and Blender; the Unreal check handed to the machine with Unreal. | Click 3's evidence |
 | **16.3** | **The website's file says it.** In the site file: `contributor`, `edited_from` split into a name and an address, and the trimmed description. A dev snapshot is built, and published at the lead's word. | The snapshot's site file, fetched from its public address |
 
 The steps run in order: 16.2's catalog fields read what 16.1 stamped. **16.1 alone is a whole demonstrable result**, and is the first thing to hand the lead.
@@ -133,8 +137,7 @@ The steps run in order: 16.2's catalog fields read what 16.1 stamped. **16.1 alo
 - **16.2:**
   - `tools/releases/hdris.py`: the stamp, beside `thumbnail()`.
   - `tools/releases/serve_to_stage.py`: today it links `hdris/` into the checkout. Under Blocker 2's option A, it writes stamped copies, re-made only when stale, as the thumbnails are.
-  - `tools/converters/project_runtime_catalog.py` `derive_entry` / `derive_hdri_entry`.
-  - `tools/validators/run_all.py` `run_no_projection_guard`.
+  - The dev catalog's entries, built in `serve_to_stage.py` on `derive_entry` / `derive_hdri_entry` (the projector's shared helpers; the release projection itself is unchanged).
   - `tools/validators/validate_manifest.py`'s evidence check, and `test_hdri.py`, under option B only.
 - **16.3:** `tools/releases/build_snapshot.py` (`LICENCE`, the HDRI credit and description), and `test_build_snapshot.py`.
 - **Gate:** `uv run tools/validators/run_all.py`, baselined before the first edit. It last read 15 PASS / 2 SKIP at Phase14 (dated: re-measure it). No file under `blender/addons/` or `tools/conformance/` changes, so `check_exporter.sh` is not owed.
@@ -144,22 +147,20 @@ The steps run in order: 16.2's catalog fields read what 16.1 stamped. **16.1 alo
 **Phase15 and this phase write the same places:**
 - the `imrsv_metadata` block;
 - the `.hdr` header;
-- the catalog entry, through `derive_entry`, and its `schema_version`;
-- the site file and its schema;
+- the dev catalog's entries, through `derive_entry`;
+- the site file;
 - `build_snapshot.py`.
 
-**Execution follows RD-DS-5: Phase15 first.** This phase's first act at execute is to read Phase15's closed Brief and the code it landed. **Reuse its key spellings, its header prefix and its stamp, if it built one.** Claim the next `schema_version` and site-file schema numbers then, not before. This phase owns only `contributor`, `licence` and the HDRI `credit`. The group and every taxonomy field are Phase15's.
+**Execution follows RD-DS-5: Phase15 first.** This phase's first act at execute is to read Phase15's closed Brief and the code it landed. **Reuse its key spellings.** Phase15 builds no `.hdr` stamp and moves no schema number (its RD-P15-4, -5 and -7; agreed with Phase15's discovery session the same evening, `cc6905b`). **16.2's stamp is the only header write, and it carries Phase15's `group`, `when` and `sky` too**, so each file changes once. This phase owns `contributor`, `licence`, the HDRI `credit` and the stamp. The group and every taxonomy field are Phase15's.
 
 ### Blockers — the lead's calls
 
-1. **Whose handle do the library's own 154 entries carry** (95 materials, 59 HDRIs)? RD-RO-2 carries a handle *"if one is provided"*, and nobody has provided one for these. Today `CREDITS.md` names **@PeteSmalls** for *"the first 12 articles"*, and Blender's library says `IMRSV` for all of them. **Recommended: `PeteSmalls` on all 154,** because the maintainer keeps every entry. The alternatives:
-   - a house handle for the library's own work;
-   - no handle at all. Forseti then sees nobody for any of them, and Blender's Author field stays empty.
+1. ~~**Whose handle do the library's own 154 entries carry?**~~ **Answered by the lead:** `MatterBot` (RD-P16-11).
 2. **Where an HDRI is stamped:**
    - **(A) In the copy a consumer receives.** The repo keeps Poly Haven's bytes. The dev install writes stamped copies (about 1 GB on local disk, in place of links), and a release will do the same.
    - **(B) In the repo.** All 59 are re-written in place: about 1 GB more in the organisation's metered LFS (1,006 MB measured today), kept in history for good.
 
-   **Recommended: (A).** Every file a consumer receives says what it is, which is what RD-DS-3 asks: consumers never read the checkout. LFS does not grow, and the import's check against Poly Haven's checksum stays true. A material is stamped in the repo either way, since the library writes the `.mtlx` itself.
+   **Recommended: (A).** Every file a consumer receives says what it is, which is what RD-DS-3 asks: consumers never read the checkout. LFS does not grow, and the import's check against Poly Haven's checksum stays true. A material is stamped in the repo either way, since the library writes the `.mtlx` itself. **One reader of the checkout exists:** USDLiveView's `IMRSV_MATTER_LIBRARY` mode searches a checkout whole (measured at its origin). Under (A) that mode would see unstamped HDRIs. Its default path, the active release in the install, would see stamped ones.
 
 ---
 
@@ -167,11 +168,11 @@ The steps run in order: 16.2's catalog fields read what 16.1 stamped. **16.1 alo
 
 - **F-P16-1 — Storm reads a stamped `.hdr` pixel for pixel** (probe, 2026-10-14). `AristeaWreck_PureSky_v01.hdr` was given seven lines after `FORMAT=`, including UTF-8 text and a 400-character line. It was rendered as a visible dome with `usdrecord`, twice per file. All four PNGs are byte-identical (sha `671591c6…`), and they show a real sky (mean 209, standard deviation 53). The probe is under `/tmp/claude-p16/probe/` (stamp.py, two `.usda` files). Together with F-DS-10 (Blender 5.2.2), two of the three readers are proven. **Unreal's importer is not run** (the machine with Unreal). Storm's S2 lesson (a hand-written flat `.hdr` misread) does not apply: it was the pixel data, not the header.
 - **F-P16-2 — Blender's asset metadata already has the fields.** `AssetMetaData` has `author`, `description`, `copyright`, `license` and `tags` (5.2.2, measured). `gen_asset_library.py` sets `author = "IMRSV"` for every article and leaves `license` empty.
-- **F-P16-3 — The guard cannot see a `licence` field.** `run_no_projection_guard` refuses the **substring** `license` in the projected JSON. The site file's key is `licence`, which does not contain it, so a catalog `licence` field would pass the guard without the guard ever seeing it. The guard is narrowed to check keys, structurally (`.claude/CLAUDE.md` §Codebase search: a filter that must match nothing should be structural).
+- **F-P16-3 — The guard cannot see a `licence` field.** `run_no_projection_guard` refuses the **substring** `license` in the projected JSON. The site file's key is `licence`, which does not contain it, so a catalog `licence` field would pass the guard without the guard ever seeing it. When the release projector gains the fields (RD-P16-8), the guard must check keys, structurally (`.claude/CLAUDE.md` §Codebase search: a filter that must match nothing should be structural).
 - **F-P16-4 — The HDRIs are 1,006 MB in LFS** (measured). The organisation's LFS is metered (Phase14 F-P14-13; the figures were given to the lead there, not here). Blocker 2.
 - **F-P16-5 — Stamping changes 12 frozen pilot payloads.** The freeze hashes every referenced `.mtlx`. A re-freeze in place is settled practice.
 - **F-P16-6 — All 59 HDRI descriptions open with a resolution claim**: 16K, 20K or 24K, in 23 phrasings (measured). One reads *"Free 16K, unclipped - bright morning/afternoon…"* without the word *HDRI*, so the trim is checked on all 59 by hand, not just by a pattern.
-- **F-P16-7 — Phase15's discovery was running at the same time** (2026-10-14 evening; its doc was not yet changed at this commit). §Shared with Phase15 is the answer.
+- **F-P16-7 — Phase15's discovery was running at the same time** (2026-10-14 evening; its doc was not yet changed at this commit). §Shared with Phase15 is the answer. Phase15's Brief landed as `cc6905b`, and the split is agreed.
 - **F-P16-8 — The `materials` lane has no list of allowed metadata inputs**, so the two new inputs do not trip it (`validate_material.py` `_master_token` reads only `master_material`).
 - **F-P16-9 — The website's mirror accepts exactly one site-file schema** (re-measured at its origin, 2026-10-14 evening, as in `261014_R_DownstreamPicture.md`). The site cannot show this phase's fields until it moves (P25, M11).
 
@@ -186,3 +187,4 @@ The steps run in order: 16.2's catalog fields read what 16.1 stamped. **16.1 alo
 
   The `.hdr` probe was extended to Storm (F-P16-1), and Blender's asset fields were measured. **Learnings:** Storm S2–S4 (read, and not a blocker, F-P16-1). No other domain applies: no master, colour or Unreal behaviour changes. **The tree was searched for this phase's name:** no code names it. The docs that do are the Roadmap, the research, Phase15's and Phase19's docs, and the ledger (P26, M11, M12). Hits on `P16` elsewhere are the ledger's row P16, which is a different id.
 - **2026-10-14, the same pass:** RD-DS-7 landed mid-pass (`4b0b67b`): The Library Service and Thumbnails moved ahead of Character and Scale Grids. This phase keeps its number and its place after Phase15. The Brief cites the new order.
+- **2026-10-14, the same evening:** the lead answered Blocker 1, *"MatterBot (I didn't make these, The system did)"* (RD-P16-11), and asked what *the consumer* means in Blocker 2. Phase15's Brief landed (`cc6905b`). Its session confirmed by message that Phase15 builds no `.hdr` stamp, moves no schema number and leaves the release projector alone. RD-P16-8 and RD-P16-9, the 16.2 stamp and §Shared with Phase15 were brought into line with it.

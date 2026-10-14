@@ -15,7 +15,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
 - `docs/Planning/Phases/Phase15_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
 
-### Phase16 — Every Entry Says What It Is — BRIEF READY, two lead calls open, executes after Phase15 *(discovery opened 2026-10-14, "/discovery P16"; added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file; numbered Phase16 the same day, RD-DS-6)*
+### Phase16 — Every Entry Says What It Is — BRIEF READY, one lead call open, executes after Phase15 *(discovery opened 2026-10-14, "/discovery P16"; added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file; numbered Phase16 the same day, RD-DS-6)*
 **Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
 - `docs/Planning/Phases/Phase16_EveryEntrySaysWhatItIs.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
 
