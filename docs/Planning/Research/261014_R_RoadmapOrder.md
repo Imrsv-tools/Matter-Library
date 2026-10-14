@@ -10,10 +10,17 @@
 
 ## The current picture
 
-- **Active:** Phase11 (Library Coverage). **It has been ruled to close** (RD-MP-13: review by verdict, the refine pass moved into the loop, the Blender library rebuilt). The close itself has not run, and Phase11's doc does not yet record the ruling.
-- **Future:** 18 entries, all unnumbered. **8 were added today**, each placed last by the agent that added it, so the tail of the list is in the order the day found them, not an order anyone chose.
-- **The next free number is Phase13** (Phase12 is complete).
-- **The long pole is a server nobody has rented yet.** Thumbnails, the console and the skin-map probe all run on *The Library Service*, and RD-MP-12 puts that on a new Hetzner machine. Everything else can run on the laptop now.
+*(Reconciled at the end of the run, 2026-10-14. Passes 1–2 below are the audit as measured at its start.)*
+
+- **The Roadmap holds the lead's order** (RD-RO-3, landed `2739b6b`, pushed):
+  - first: Materials Described, whose first step is the dev snapshot the platform's site is waiting on, then HDRIs and Scale Grids;
+  - then the library service, which takes one package per material and tests it on upload (RD-RO-1), and what runs on it;
+  - then the first real release and its consumers.
+- **Nothing is numbered.** The next free number is Phase13; Phase11 closed the same day (`6b824f7`).
+- **Materials are CC0 only** (RD-RO-2), and *Two Licences* is withdrawn.
+- **Still open, blocking nothing:**
+  - Q-RO-2: when the Release Bundle starts;
+  - Q-RO-5's record of the service's shapes. The order's line has the service rendering on upload.
 
 ---
 
