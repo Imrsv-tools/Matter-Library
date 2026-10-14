@@ -1,6 +1,6 @@
 # PhaseTBD — Two Licences
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14) — not numbered. **Withdrawn the same day** (the lead: *"YES... CC0 for materials... we decided that... material are CC0 but we will carry a handle if one is provided as courtesy and Forseti tracking"*, `../../Research/261014_R_RoadmapOrder.md` RD-RO-2): materials stay CC0 only, so nothing here is built. Kept so its intent survives (Don't Delete Spec Functionality); the handle lands in *Materials Described*. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 

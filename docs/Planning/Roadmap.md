@@ -24,49 +24,11 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Complete/Phase11_LibraryCoverage.md` (F-LC-7, F-LC-8; numbered Phase11 on 2026-10-02).
 
-### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4)*
-**Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
-- `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
+> **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign.
 
-### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey is done (2026-10-14); three questions for the lead and a probe come before discovery**; was "Skin That Reads as Skin" for part of that day)*
-**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
-- `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
-
-### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
-**Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
-- `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`
-
-### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
-**Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
-- `docs/Planning/PlatformDependencies.md` (P1–P4, P10)
-
-### Blender from a Release — RESEARCH
-**Outcome:** a Blender user installs the Matter add-on and library from a release and uses Matter materials without cloning this repository.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 4) · `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped
-
-### See the Library — RESEARCH *(2026-10-14, lead: the library's website is built and run by IMRSV's web platform from published releases; the library publishes a file for the site and a preview set beside each release, RD-WS-1 to RD-WS-4)*
-**Outcome:** anyone can browse what is in a release, with a preview image of every material.
-- `docs/Planning/Research/261014_R_TheLibrarysSite.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails · `docs/Planning/PlatformDependencies.md` (P24, M9)
-
-### Version Management — SEEDED
-**Outcome:** a maintainer can cut the next release from the last one — keeping, adding, deprecating and retiring materials — and every earlier release stays exactly reproducible.
-- `docs/Planning/Phases/Future/PhaseTBD_VersionManagement.md`
-
-### Author a Material End to End — RESEARCH
-**Outcome:** a contributor can go from an idea to a validated material in the library in minutes, using one tool (the first cut of the Matter Manager).
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 7)
-
-### Contribution Path — RESEARCH
-**Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md` · `docs/Planning/Research/261014_R_MaterialPipeline.md` F-MP-28 (a contributed generator script runs as code on the library service: a sandbox or a maintainer's read before a run)
-
-### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here)*
-**Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Complete/Phase05_TestRig.md`
-
-### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26; **re-scoped 2026-09-28, lead: "Studio adopts the library masters"**, `PlatformDependencies.md` P20)*
-**Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
+### Materials Described — SEEDED *(added 2026-10-14, the same word, RD-WS-4; the other library half of See the Library; **first in the order, 2026-10-14: its first step publishes the dev snapshot the platform's site is waiting on**, `261014_R_RoadmapOrder.md` F-RO-27)*
+**Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
+- `docs/Planning/Phases/Future/PhaseTBD_MaterialsDescribed.md`
 
 ### HDRIs in the Library — SEEDED *(added 2026-10-14 by `/research` on the lead's "seed the phase", from the platform's HDRI asks, RD-SKY-1 to 4; the platform's own HDRI phase waits on it)*
 **Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
@@ -76,7 +38,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
 - `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md`
 
-### The Library Service — SEEDED *(added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; its place in the order is the lead's; *Thumbnails* and the team's console build on it)*
+### The Library Service — SEEDED *(added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; *Thumbnails* and the team's console build on it; **2026-10-14: a material arrives as one package, tested and pictured on upload, RD-RO-1; its spec is defined beside the phases above it**)*
 **Outcome:** the library's work (the test rig, the build loop, thumbnails, the dev catalog the site's staging reads) runs on a permanent machine instead of the lead's laptop, and the IMRSV team reaches it from wherever they are.
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md`
 
@@ -84,15 +46,55 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
 - `docs/Planning/Phases/Future/PhaseTBD_Thumbnails.md`
 
-### Materials Described — SEEDED *(added 2026-10-14, the same word, RD-WS-4; the other library half of See the Library)*
-**Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
-- `docs/Planning/Phases/Future/PhaseTBD_MaterialsDescribed.md`
+### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey is done (2026-10-14); three questions for the lead and a probe come before discovery**; was "Skin That Reads as Skin" for part of that day)*
+**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
+- `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
 ### The Library Console — SEEDED *(added 2026-10-14, the same word, RD-MP-7; runs on The Library Service)*
 **Outcome:** the IMRSV team opens one page to review new materials and keep or send back each one, choose which materials go into each library version, and see each material's provenance.
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryConsole.md`
 
-### Two Licences — SEEDED *(added 2026-10-14, the same word, RD-MP-1 and RD-MP-8: CC BY 4.0 beside CC0, CC0 the default)*
+### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
+**Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
+- `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`
+
+### Version Management — SEEDED
+**Outcome:** a maintainer can cut the next release from the last one — keeping, adding, deprecating and retiring materials — and every earlier release stays exactly reproducible.
+- `docs/Planning/Phases/Future/PhaseTBD_VersionManagement.md`
+
+### Blender from a Release — RESEARCH
+**Outcome:** a Blender user installs the Matter add-on and library from a release and uses Matter materials without cloning this repository.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 4) · `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped
+
+### Unreal Reference Masters — RESEARCH *(its masters are first built by Phase06, 2026-09-26; **re-scoped 2026-09-28, lead: "Studio adopts the library masters"**, `PlatformDependencies.md` P20)*
+**Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
+
+### Contribution Path — RESEARCH
+**Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md` · `docs/Planning/Research/261014_R_MaterialPipeline.md` F-MP-28 (a contributed generator script runs as code on the library service: a sandbox or a maintainer's read before a run) · `261014_R_RoadmapOrder.md` F-RO-23 (a contribution is one material package, tested on upload, RD-RO-1; this entry keeps what is specific to outsiders)
+
+### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
+**Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
+- `docs/Planning/PlatformDependencies.md` (P1–P4, P10)
+
+### See the Library — RESEARCH *(2026-10-14, lead: the library's website is built and run by IMRSV's web platform from published releases; the library publishes a file for the site and a preview set beside each release, RD-WS-1 to RD-WS-4; **a consumer outcome since 2026-10-14:** the library's halves are Materials Described, Thumbnails and the release publish, `261014_R_RoadmapOrder.md` F-RO-6)*
+**Outcome:** anyone can browse what is in a release, with a preview image of every material.
+- `docs/Planning/Research/261014_R_TheLibrarysSite.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails · `docs/Planning/PlatformDependencies.md` (P24, M9)
+
+### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4; **held 2026-10-14:** research, after the Skin Maps survey)*
+**Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
+- `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
+
+### Author a Material End to End — RESEARCH *(`Reevaluate (2026-10-14)`: The Library Console is its maintainer half, and the Creator's half lives in each consumer, `261014_R_RoadmapOrder.md` F-RO-6)*
+**Outcome:** a contributor can go from an idea to a validated material in the library in minutes, using one tool (the first cut of the Matter Manager).
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 7)
+
+### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here; `Reevaluate (2026-10-14)`: Materials Described carries the parity verdict per Creator port to the site, `261014_R_RoadmapOrder.md` F-RO-6)*
+**Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Complete/Phase05_TestRig.md`
+
+### Two Licences — SEEDED, withdrawn 2026-10-14 *(added 2026-10-14, the same word, RD-MP-1 and RD-MP-8: CC BY 4.0 beside CC0, CC0 the default; **withdrawn the same day, the lead: "material are CC0"**, RD-RO-2; kept so its intent survives)*
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
 

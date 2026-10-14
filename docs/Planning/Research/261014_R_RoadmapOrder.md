@@ -286,6 +286,7 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 ## Resolved
 
 - **RD-RO-1 — A material is submitted as one package, in one upload, tested on upload and taken apart on the library's side. The contributor never uploads the material, its textures and its pictures separately.** (The lead, 2026-10-14: *"they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web)… this is too messy"*.) This rules out Pass 4's split submission. Who makes the pictures is Q-RO-5.
+- **RD-RO-3 — Pass 6's order is the Roadmap's order, unnumbered** (the lead, 2026-10-14, to *"Order is good - put it on the Roadmap"*: *"yep! Good... quickix and push"*). It closes Q-RO-1's order half; numbers stay the lead's to assign.
 - **RD-RO-2 — Materials are CC0-1.0, and only CC0. A contributor's handle, when one is given, is carried as a courtesy and for the platform's Forseti tracking.** (The lead, 2026-10-14: *"YES... CC0 for materials... we decided that... material are CC0 but we will carry a handle if one is provided as courtesy and Forseti tracking"*.) Its effects:
   - **It withdraws RD-MP-1** (CC BY beside CC0), with in-place notes there and on R13. RD-MP-8's default becomes the only licence.
   - ***Two Licences* leaves the order:** it is marked `Withdrawn (2026-10-14)` and kept, by the quick fix that lands the cut.
@@ -318,8 +319,14 @@ A **Wave** (the method's word for coupled phases) was considered for the service
   - ~~Q-RO-6~~ → **RD-RO-2:** CC0 only, with a contributor's handle carried as a courtesy.
 - **Owed beside the cut:** PlatformDependencies **M9** gains the site's dev-snapshot ask (F-RO-24), as a quick fix.
   - Q-RO-2 to Q-RO-4 each carry a recommendation and block nothing.
-- **Next step:** the lead cuts the order and names the numbers. The ruling lands in `## Resolved` first. Then, as a lead-directed `/quick-fix`, the change goes onto the Roadmap:
-  - reorder `## Future`;
-  - rename each numbered stub from `PhaseTBD_<Name>` to `Phase<NN>_<Name>` and fix its pointers (F-RO-8);
-  - set its status line;
-  - carry RD-RO-1 and the package door into *The Library Service*'s stub, and the outsider-only scope into *Contribution Path*'s pointer (F-RO-23).
+- **Graduated, 2026-10-14 (RD-RO-3):** the lead cut Pass 6's order and directed a `/quick-fix` and a push. The quick fix landed:
+  - `## Future` reordered, with a dated re-sequencing note;
+  - Two Licences marked withdrawn;
+  - See the Library and the two overlapping entries annotated (Q-RO-3, taken as recommended);
+  - the package door carried into *The Library Service*'s stub;
+  - the dev snapshot carried into *Materials Described*'s stub;
+  - the outsider-only scope added to *Contribution Path*'s pointer;
+  - the site's snapshot ask added to M9.
+
+  **No numbers were assigned.** Q-RO-1's numbering half stays the lead's, and F-RO-8 prices the renames for whenever he names them. Q-RO-2 (when the Release Bundle starts) stays open, and blocks nothing.
+- **Next step:** `/discovery` on *Materials Described*, starting with the dev snapshot.

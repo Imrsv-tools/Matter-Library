@@ -58,6 +58,15 @@ The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`
 - The build loop at volume (`Phase11_LibraryCoverage.md`; Q-MP-12).
 - *See the Library*'s staging feed (RD-WS-3).
 
+## Carried in (2026-10-14)
+
+From [`261014_R_RoadmapOrder.md`](../../Research/261014_R_RoadmapOrder.md) Passes 3–5, and the order the lead cut the same day:
+- **A material arrives as one package, in one upload, tested on upload and taken apart here** (RD-RO-1; the lead: *"they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web)"*). The package holds the recipe, the `.mtlx` and its textures, provenance, and the words. One command in this repo makes it (F-RO-19).
+- **This service makes the pictures on upload,** the rig in all three tools and then the thumbnails, so a contributor needs no GPU (F-RO-20). The order's line for this phase says so; Q-RO-5 keeps the record of the shapes weighed.
+- **The web server cannot hold the GPU half** (F-RO-10). Hetzner's GPU machines are dedicated and monthly: the GEX44 is quoted at €184–234 a month plus setup by third parties (unverified, 2026-10-14). Read the real price on hetzner.com.
+- **The batch loop submits through the same door** (F-RO-22). **A package carries data, not code** (F-RO-21).
+- **Its spec is defined beside the phases above it in the order** (F-RO-12): GPU, its memory, RAM and disk, measured from today's two machines; the price; the setup recipe. Renting is the lead's act.
+
 ## Discovery Log
 
 *(empty — `/discovery` fills it)*

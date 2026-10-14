@@ -29,7 +29,17 @@ The authority until this phase writes its specs: [`261014_R_TheLibrarysSite.md`]
 
 ## Depends on
 
-Nothing to start. *Thumbnails* supplies the pictures it lists. *Two Licences* supplies each article's licence.
+Nothing to start. *Thumbnails* supplies the pictures it lists. ~~*Two Licences* supplies each article's licence.~~ Every article is CC0-1.0 (RD-RO-2, 2026-10-14).
+
+## Carried in (2026-10-14)
+
+From [`261014_R_RoadmapOrder.md`](../../Research/261014_R_RoadmapOrder.md) Pass 6 and RD-RO-2:
+- **First in the order. Its first step is the dev snapshot the platform's site is waiting on** (PlatformDependencies M9): a GitHub pre-release with a `matterlib-` tag, carrying the site file, the rig's pictures at web size, one MaterialX zip per material, and a sha256 for every file (F-RO-24 to F-RO-27).
+  - **Real fields only.** A field that does not exist yet (a thumbnail, a summary) is left out, never made up; the site labels the gap.
+  - The site drafted a file shape and asked the library to adopt or change it. **Adopt it as a draft contract spec, marked as one**, while only staging reads it.
+  - Publishing the pre-release is public and irreversible: the lead's word.
+- **The words follow** as its later step: the summaries and search words.
+- **A contributor's handle,** when one is given, is carried as a courtesy and for the platform's Forseti tracking (RD-RO-2). Nothing records one today.
 
 ## Discovery Log
 

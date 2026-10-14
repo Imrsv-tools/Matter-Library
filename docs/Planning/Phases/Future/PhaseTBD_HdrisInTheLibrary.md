@@ -21,7 +21,7 @@ The authority until this phase writes the specs: [`261013_R_PlatformSkyAsks.md`]
 - **The dev install** (RD-SKY-4): `tools/releases/serve_to_stage.py` links `hdris` and writes the list.
 - **No compression** (RD-SKY-4): one line in [CompressedDistribution](../../../specs/Tooling/CompressedDistribution.md).
 - **The small picture** (A4): a 2:1 JPEG per HDRI, named in its entry. *(2026-10-14: the published pictures are called **thumbnails** and are not stored in git, `261014_R_MaterialPipeline.md` RD-MP-5. Discovery reads A4 against that ruling.)*
-- **Provenance and licence** (A5): a record per HDRI under `library/provenance/sources/`, made from the library's own download, and an `hdris/` row in `LICENSE-CONTENT.md`. *(2026-10-14: each article carries CC0-1.0 or CC BY 4.0, `261014_R_MaterialPipeline.md` RD-MP-1. Poly Haven publishes CC0.)*
+- **Provenance and licence** (A5): a record per HDRI under `library/provenance/sources/`, made from the library's own download, and an `hdris/` row in `LICENSE-CONTENT.md`. *(2026-10-14: each article carries CC0-1.0 or CC BY 4.0, `261014_R_MaterialPipeline.md` RD-MP-1; withdrawn the same day, CC0 only, `261014_R_RoadmapOrder.md` RD-RO-2. Poly Haven publishes CC0.)*
 - **Storage** (A7): `.gitattributes` puts `MatterLibrary/hdris/**` in LFS. About 16 MB per HDRI, with many to come.
 - **The first HDRI** (A8): the one every scene uses today, Poly Haven's *industrial_sunset_02_puresky*. The rest are the lead's choice from Poly Haven.
 - **The word:** the Glossary's *HDRI* headword, before any spec uses it.
