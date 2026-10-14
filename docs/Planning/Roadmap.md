@@ -11,7 +11,11 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (2026-10-14). Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
+### Phase13 — Materials Described — ACTIVE *(numbered Phase13 and opened by the lead 2026-10-14, "/discovery materials definitions and numner the phase"; added 2026-10-14, RD-WS-4; the other library half of See the Library; **its first step publishes the dev snapshot the platform's site is waiting on**, `261014_R_RoadmapOrder.md` F-RO-27)*
+**Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
+- `docs/Planning/Phases/Future/Phase13_MaterialsDescribed.md`
+
+*Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 
 ==================================================================================
 ## Future
@@ -24,11 +28,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Complete/Phase11_LibraryCoverage.md` (F-LC-7, F-LC-8; numbered Phase11 on 2026-10-02).
 
-> **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign.
-
-### Materials Described — SEEDED *(added 2026-10-14, the same word, RD-WS-4; the other library half of See the Library; **first in the order, 2026-10-14: its first step publishes the dev snapshot the platform's site is waiting on**, `261014_R_RoadmapOrder.md` F-RO-27)*
-**Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
-- `docs/Planning/Phases/Future/PhaseTBD_MaterialsDescribed.md`
+> **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign. *(The same day the lead numbered the head entry, Materials Described, as **Phase13**; it moved to `## Active`.)*
 
 ### HDRIs in the Library — SEEDED *(added 2026-10-14 by `/research` on the lead's "seed the phase", from the platform's HDRI asks, RD-SKY-1 to 4; the platform's own HDRI phase waits on it)*
 **Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.

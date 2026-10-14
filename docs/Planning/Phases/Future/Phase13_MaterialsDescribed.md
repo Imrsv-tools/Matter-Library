@@ -1,6 +1,7 @@
-# PhaseTBD — Materials Described
+# Phase13 — Materials Described
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** DISCOVERY, Pass 1 (2026-10-14). **Numbered Phase13 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery materials definitions and numner the phase"* (RD-P13-1). Seeded the same day as a pointer-shell by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*).
+**Ids:** `Q-P13-n` · `F-P13-n` · `RD-P13-n`. Ids cited from research (`F-MP-n`, `RD-WS-n`, `F-RO-n`) keep their own stems.
 
 ## Outcome
 
