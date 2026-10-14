@@ -68,6 +68,12 @@ REPO_SLUG = "Imrsv-tools/Matter-Library"
 TAG_RE = re.compile(r"^matterlib-(\d+\.\d+\.\d+-dev\.\d+)$")
 SITE_SCHEMA_VERSION = 2              # 1 -> 2 (Phase14 14.3): adds groups[], hdris[] and default_hdri
 LICENCE = "CC0-1.0"                  # every article (RD-RO-2)
+# Phase16 (RD-P16-4): the source's opening resolution claim (all 59 open with one, in 23 phrasings,
+# F-P16-6): "free", the resolution, "unclipped" and "HDRI" in any order, then a separator or a
+# joining word. The library's description starts after it; the record keeps the source's words.
+RESOLUTION_CLAIM = re.compile(
+    r"^(?:(?:free|unclipped|\(unclipped\)|\d+k|hdri)[ ,]*)+(?:[:.\-]\s*|(?:showing|of|with|capturing)\s+)?",
+    re.I)
 TOOLS = ("storm", "blender", "unreal")
 VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
 MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
@@ -158,6 +164,17 @@ def portable(mtlx_text: str, mtlx_dir: Path) -> tuple[str, dict[str, Path]]:
     return mtlx_text, files
 
 
+def description(source: str) -> str:
+    """The library's description of an HDRI: the source's, without its opening resolution claim
+    (RD-P16-4). A description that does not open with one (no resolution in the opening) is kept
+    as it is."""
+    m = RESOLUTION_CLAIM.match(source)
+    if not m or not re.search(r"\d+k", m.group(0), re.I):
+        return source
+    rest = source[m.end():]
+    return rest[:1].upper() + rest[1:]
+
+
 def hdri_entry(hdri: dict, thumb: str, thumb_sha: str) -> dict:
     """One HDRI's site entry: its identity as the runtime catalog has it, Poly Haven's name as its
     label, and every credit and tag its record holds; one thumbnail; no download (RD-P14-4). A
@@ -165,18 +182,16 @@ def hdri_entry(hdri: dict, thumb: str, thumb_sha: str) -> dict:
     rec = hdri["record"]
     cat = derive_hdri_entry({"id": hdri["id"], "version": hdri["version"], "status": rec.get("status") or "draft"})
     c = rec.get("credit") or {}
+    f = H.facts(hdri)      # Phase16 (RD-P16-2): the same facts the served .hdr is stamped with
     out = {"id": cat["id"], "version": cat["version"], "identity": hdri["identity"],
            "label": c.get("name") or label(cat["display_name"]), "display_name": cat["display_name"],
-           "status": cat["status"], "creator_selectable": cat["creator_selectable"], "licence": LICENCE,
-           "group": G.HDRIS, **G.hdri_taxonomy(rec),            # Phase15 (RD-P15-4): when, sky
+           "status": cat["status"], "creator_selectable": cat["creator_selectable"],
+           **{k: f[k] for k in ("licence", "contributor", "group", "when", "sky") if k in f},
            "pictures": [{"role": "thumbnail", "file": thumb, "sha256": thumb_sha}]}
     if rec.get("description"):
-        out["description"] = rec["description"]
-    credit = {k: c[k] for k in ("source", "source_url", "asset_url", "authors", "sponsors") if c.get(k)}
-    if c.get("info"):
-        credit["edited_from"] = c["info"]
-    if credit:
-        out["credit"] = credit
+        out["description"] = description(rec["description"])     # RD-P16-4
+    if f.get("credit"):    # A9's shape, with edited_from as a name and an address (RD-P16-3)
+        out["credit"] = f["credit"]
     for key in ("tagging", "captured"):
         if rec.get(key):
             out[key] = rec[key]
@@ -330,8 +345,11 @@ def build(tag: str, out: Path) -> dict:
             "domain": art["domain"], "material_class": art["material_class"],
             "master": art["master"], "scale": entry["scale"],
             "status": entry["status"], "creator_selectable": entry["creator_selectable"],
-            "controls": controls(mtlx), "licence": LICENCE,
+            "controls": controls(mtlx),
         }
+        # Phase16 (RD-P16-11): who gave it and its licence, read from its own file; a field the
+        # file does not declare is left out (not known yet, RD-WS-1).
+        rec.update({k: art[k] for k in ("licence", "contributor") if art[k]})
         if art["group"] == G.CHARACTER:                      # Phase15: Character's own taxonomy
             rec.update(species=art["species"], part=art["part"])
         for key in ("summary", "search_words", "origin"):    # the words (13.2), when written

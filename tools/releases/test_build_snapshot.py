@@ -138,6 +138,38 @@ check(bare["status"] == "draft" and bare["label"] == "Bare pure sky"
       and not {"credit", "description", "tagging", "captured"} & set(bare),
       "with no record: status draft, a derived label, and nothing invented")
 
+print("== Phase16: who gave it, its credit and its description ==")
+import re  # noqa: E402
+H, working_tree = B.H, B.working_tree
+for src, want in [
+    ("Free 16K HDRI, unclipped: midday partly cloudy sky.", "Midday partly cloudy sky."),
+    ("Free 24K unclipped HDRI showing a low-contrast sunset.", "A low-contrast sunset."),
+    ("Unclipped, free 20K HDRI: low-contrast sunrise.", "Low-contrast sunrise."),
+    ("Free, unclipped 16K HDRI of a low-contrast industrial sunset: soft glow.", "A low-contrast industrial sunset: soft glow."),
+    ("Free 24K HDRI (unclipped): midday pure sky.", "Midday pure sky."),
+    ("Free 20K HDRI, unclipped, clear late-afternoon sky.", "Clear late-afternoon sky."),
+    ("Free 16K, unclipped - bright morning/afternoon pure sky.", "Bright morning/afternoon pure sky."),
+    ("Free 16K unclipped HDRI capturing a bright sunrise.", "A bright sunrise."),
+    ("A calm industrial sunset.", "A calm industrial sunset."),
+    ("Free and open sky with no resolution named.", "Free and open sky with no resolution named."),
+]:
+    check(B.description(src) == want, f"description {src[:40]!r} -> {B.description(src)!r}")
+real = [B.description(h["record"].get("description", "")) for h in H.on_disk()]
+check(len(real) == 59 and not [d for d in real if B.RESOLUTION_CLAIM.match(d) and re.search(r"\d+K", d[:30])],
+      "all 59 real descriptions lose their opening resolution claim (RD-P16-4)")
+md = {**full, "record": {**full["record"], "provenance": {"license": "CC0-1.0"},
+                         "credit": {**full["record"]["credit"],
+                                    "info": "Edited sky-only version of [Snow Field](https://polyhaven.com/a/snow_field)."}}}
+e2 = B.hdri_entry(md, "t.webp", "0" * 64)
+check(e2["contributor"] == "MatterBot" and e2["licence"] == "CC0-1.0",
+      "an HDRI entry says who gave it and its licence (RD-P16-11)")
+check(e2["credit"]["edited_from_name"] == "Snow Field" and e2["credit"]["edited_from_url"] == "https://polyhaven.com/a/snow_field"
+      and e2["credit"]["edited_from"].startswith("Edited"),
+      "edited_from is published as a name and an address, beside the Markdown line (RD-P16-3)")
+arts = working_tree.articles()
+check(arts and all(a["contributor"] == "MatterBot" and a["licence"] == "CC0-1.0" for a in arts),
+      f"every article's file says MatterBot and CC0-1.0 ({len(arts)})")
+
 print("== ranges ==")
 check(set(LCD_RANGES) == set(LCD_PORTS), "every Creator port has a range, and no range names a non-port")
 
