@@ -1,11 +1,11 @@
-# Research — Scale probes: a metre that reads as a metre on every material
+# Research — Scale grids: a metre that reads as a metre on every material
 
 **Opened:** 2026-10-14 · **Mode:** research, a **design** landscape. It commits to nothing. **Mnemonic:** `SP` (ids `SP-Fn`, `SP-Qn`).
 **Requested by:** the lead, 2026-10-14, on the scale reference the platform offered (`261013_R_PlatformTrackedItemsAsks.md` A1):
 
 > *"I esspecially like size conformace topics - I think we might also want a series of textures / materials at the various scales but should all show a meter mapped... so as we have more detailed materials they have maybe TINY grids inside what would be a 1 meter grid and a large scale material might have the smallest grid as a meter (that would be extreme but I think you get the idea) the point being if we mapped all object in the scese with materials in thier resoultion we would be able to see that a meter is a meter and they all look correct... anything with incorrect scale to the material will be OBVIOUS.... thoughts?"*
 
-**Question:** what would a series of *scale probes* look like, one for each material size, such that a scene with every object wearing the probe of its own material shows at a glance whether a metre is a metre?
+**Question:** what would a series of *scale grids* look like, one for each material size, such that a scene with every object wearing the scale grid of its own material shows at a glance whether a metre is a metre?
 
 **Measured at:** `2064ef0` (2026-10-14).
 
@@ -13,30 +13,30 @@
 
 ## The short version
 
-- **It works, and the existing check is the same idea measured in one scene.** The rig's ruler check already asks *"does the base texture render at its recorded size?"*. A probe asks the same question by eye, on any mesh, in any app.
-- **The language is colour = length.** Every probe draws lines at powers of ten metres, and the colour of a line is its length, the same in every probe. Neighbouring objects of different sizes then show the same colours at the same spacing, and one that is wrong shows a colour at the wrong spacing.
-- **A repeating tile cannot draw a length longer than itself.** A 1 cm tile cannot hold a metre line. So the metre is shown **across** the series, not inside every probe. The 1 cm lines of a fine probe must match the 1 cm lines of a 1 m probe beside it, and the 1 m cube carries the metre itself.
-- **A probe must be swapped in at the article's real tile size, not its tag.** 15 of the 94 recipes tile at a size other than their tag says (SP-F2). A swap by tag would show those 15 as wrong when they are right.
+- **It works, and the existing check is the same idea measured in one scene.** The rig's ruler check already asks *"does the base texture render at its recorded size?"*. A scale grid asks the same question by eye, on any mesh, in any app.
+- **The language is colour = length.** Every scale grid draws lines at powers of ten metres, and the colour of a line is its length, the same in every scale grid. Neighbouring objects of different sizes then show the same colours at the same spacing, and one that is wrong shows a colour at the wrong spacing.
+- **A repeating tile cannot draw a length longer than itself.** A 1 cm tile cannot hold a metre line. So the metre is shown **across** the series, not inside every scale grid. The 1 cm lines of a fine scale grid must match the 1 cm lines of a 1 m scale grid beside it, and the 1 m cube carries the metre itself.
+- **A scale grid must be swapped in at the article's real tile size, not its tag.** 15 of the 94 recipes tile at a size other than their tag says (SP-F2). A swap by tag would show those 15 as wrong when they are right.
 
 ## Pass 1 — the idea, read against the library
 
-- **SP-F1 — the rule a probe tests is already written.** *"The mesh's UV unit must be the article's tile … one UV unit = one tile = its `meters_per_tile`"*, and a binding that cannot change the mesh sets `uv_scale` to make it so ([LCDSchema](../../specs/Contract/LCDSchema.md) §Creator-adjustable subset). So a probe tests **the binding**, the mesh's UVs and its `uv_scale` together, not the material. That is exactly what goes wrong in practice: the same file records skin detail drawn about 170 times too large on a character's own atlas.
-- **SP-F2 — an article's size is its `meters_per_tile`, and the tag is coarser.** That is [MasterSet](../../specs/Ontology/MasterSet.md) §Scale: *"An article's size is its `meters_per_tile` … not its coarser tag"*. Measured over `tools/converters/recipes/*.json` on 2026-10-14: 79 match their tag, 15 differ and one has neither. Examples: Oak `s1` tiles at 0.8 m, Concrete_Polished `s1` at 3 m and MildSteel_Raw `s01` at 0.3 m. **So a probe stands in for an article at the article's `meters_per_tile`**, which the swap reaches through `uv_scale` (SP-F5). Six fixed probes, one per tag, would misreport those 15.
-- **SP-F3 — a seed exists, and it measures direction, not length.** `utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01` is generated by `tools/converters/gen_uvgrid.py`. It is an `s1` tile of **8** cells, so each cell is 12.5 cm, with a red–green gradient that shows the UV's direction. It does not read in metres. It is kept: the probes are new beside it, and nothing is removed.
-- **SP-F4 — the rig's furniture is the same idea, in one scene.** It has *"a 10 cm ruler of 1 cm black and white cells on the floor"* (`tools/parity/JOB_FORMAT.md`), and its ruler check measures a texture's rendered size against `meters_per_tile` (`tools/parity/rig.py`). A probe takes that check out of the rig and into any scene, for a person's eye.
+- **SP-F1 — the rule a scale grid tests is already written.** *"The mesh's UV unit must be the article's tile … one UV unit = one tile = its `meters_per_tile`"*, and a binding that cannot change the mesh sets `uv_scale` to make it so ([LCDSchema](../../specs/Contract/LCDSchema.md) §Creator-adjustable subset). So a scale grid tests **the binding**, the mesh's UVs and its `uv_scale` together, not the material. That is exactly what goes wrong in practice: the same file records skin detail drawn about 170 times too large on a character's own atlas.
+- **SP-F2 — an article's size is its `meters_per_tile`, and the tag is coarser.** That is [MasterSet](../../specs/Ontology/MasterSet.md) §Scale: *"An article's size is its `meters_per_tile` … not its coarser tag"*. Measured over `tools/converters/recipes/*.json` on 2026-10-14: 79 match their tag, 15 differ and one has neither. Examples: Oak `s1` tiles at 0.8 m, Concrete_Polished `s1` at 3 m and MildSteel_Raw `s01` at 0.3 m. **So a scale grid stands in for an article at the article's `meters_per_tile`**, which the swap reaches through `uv_scale` (SP-F5). Six fixed scale grids, one per tag, would misreport those 15.
+- **SP-F3 — a seed exists, and it measures direction, not length.** `utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01` is generated by `tools/converters/gen_uvgrid.py`. It is an `s1` tile of **8** cells, so each cell is 12.5 cm, with a red–green gradient that shows the UV's direction. It does not read in metres. It is kept: the scale grids are new beside it, and nothing is removed.
+- **SP-F4 — the rig's furniture is the same idea, in one scene.** It has *"a 10 cm ruler of 1 cm black and white cells on the floor"* (`tools/parity/JOB_FORMAT.md`), and its ruler check measures a texture's rendered size against `meters_per_tile` (`tools/parity/rig.py`). A scale grid takes that check out of the rig and into any scene, for a person's eye.
 
 ## The design sketch
 
-- **One length, one colour, in every probe.** Lines are drawn at each power of ten from 1 mm to 100 m, each in its own fixed colour: for example, 1 m red, 10 cm green, 1 cm blue. The palette is the phase's to choose. It has to stay distinguishable to a colour-blind eye, so line weight steps with length too.
-- **What one probe draws:** its own tile's edge, and the next two powers of ten below it while the texture's resolution can hold them. A 1 m probe draws 1 m, 10 cm and 1 cm. A 100 m probe draws 100 m, 10 m and 1 m, so its finest line is the metre, as the lead put it. A 1 mm probe draws only its edge and tenths.
-- **The metre in the scene:** the platform's 1 m cube (A1) wears the 1 m probe, so it is the scene's reference. Everything else is judged against the colours on it.
-- **A probe for `sUKN`:** no metric grid, but a hatch that reads *"size unknown"*. An article whose size nobody recorded then stands out as that, instead of passing as right.
+- **One length, one colour, in every scale grid.** Lines are drawn at each power of ten from 1 mm to 100 m, each in its own fixed colour: for example, 1 m red, 10 cm green, 1 cm blue. The palette is the phase's to choose. It has to stay distinguishable to a colour-blind eye, so line weight steps with length too.
+- **What one scale grid draws:** its own tile's edge, and the next two powers of ten below it while the texture's resolution can hold them. A 1 m scale grid draws 1 m, 10 cm and 1 cm. A 100 m scale grid draws 100 m, 10 m and 1 m, so its finest line is the metre, as the lead put it. A 1 mm scale grid draws only its edge and tenths.
+- **The metre in the scene:** the platform's 1 m cube (A1) wears the 1 m scale grid, so it is the scene's reference. Everything else is judged against the colours on it.
+- **A scale grid for `sUKN`:** no metric grid, but a hatch that reads *"size unknown"*. An article whose size nobody recorded then stands out as that, instead of passing as right.
 - **Made by a script, as the UV grid is:** procedural, deterministic and CC0 by construction. Its provenance is the generator script, which `CONTRIBUTING.md` already accepts as evidence.
 
 ### The swap — the "scale view"
 
-- **SP-F5 — the swap keeps the binding and changes only the material.** Each bound article is replaced by the probe nearest its size. The binding's `uv_scale` is multiplied by (the probe's tile ÷ the article's `meters_per_tile`), so the probe's tile lands at the article's real size (SP-F2). `uv_offset` and `uv_rotation` are kept. The article's name carries its tag and `imrsv_metadata` carries its `meters_per_tile` ([MaterialXTemplate](../../specs/Contract/MaterialXTemplate.md)), so the swap needs nothing that is not already in the file.
-- **Where it could run:** the rig, as a scene mode · the Blender add-on, as a toggle on the lead's own scene · and, if the probes ship as articles, any consumer that wants a scale view of its own (a Studio debug view is the platform's to decide).
+- **SP-F5 — the swap keeps the binding and changes only the material.** Each bound article is replaced by the scale grid nearest its size. The binding's `uv_scale` is multiplied by (the scale grid's tile ÷ the article's `meters_per_tile`), so the scale grid's tile lands at the article's real size (SP-F2). `uv_offset` and `uv_rotation` are kept. The article's name carries its tag and `imrsv_metadata` carries its `meters_per_tile` ([MaterialXTemplate](../../specs/Contract/MaterialXTemplate.md)), so the swap needs nothing that is not already in the file.
+- **Where it could run:** the rig, as a scene mode · the Blender add-on, as a toggle on the lead's own scene · and, if the scale grids ship as articles, any consumer that wants a scale view of its own (a Studio debug view is the platform's to decide).
 - **What it makes obvious:**
   - a mesh whose UVs are in the wrong unit;
   - a binding that forgot its `uv_scale`;
@@ -46,10 +46,10 @@
 
 ## Questions for the lead
 
-- **SP-Q1 — Are the probes library content or tooling?** *Lean:* content, under `utility/virtual/` beside the UV grid, which already ships as an article. A consumer can then show a scale view from a release, and nothing extra is installed.
-- **SP-Q2 — Six probes, or one procedural probe?** Six textures, one per tag, are the lowest common denominator every renderer draws, plus a swap that sets `uv_scale` (SP-F5). One procedural MaterialX grid could take `meters_per_tile` as an input and need no compensation, but procedural nodes are exactly what the library avoids for portability. *Lean:* six textures.
+- **SP-Q1 — Are the scale grids library content or tooling?** *Lean:* content, under `utility/virtual/` beside the UV grid, which already ships as an article. A consumer can then show a scale view from a release, and nothing extra is installed.
+- **SP-Q2 — Six scale grids, or one procedural scale grid?** Six textures, one per tag, are the lowest common denominator every renderer draws, plus a swap that sets `uv_scale` (SP-F5). One procedural MaterialX grid could take `meters_per_tile` as an input and need no compensation, but procedural nodes are exactly what the library avoids for portability. *Lean:* six textures.
 - **SP-Q3 — Is this a phase of its own?** *Lean:* yes, small. Its scope would be:
-  - the generator and the six probes;
+  - the generator and the six scale grids;
   - the swap in the rig and in the Blender add-on;
   - a rig run on a character, which is where SP-F1's 170× error lives.
 
@@ -57,11 +57,23 @@
 
 ## Seen the same day
 
-- **SP-F6 — the 1 m cube already shows the idea working** (`13528ea`, the conformance golden, 2026-10-14). In the gate's own Storm render, the cube's faces show 10 × 10 Copper tiles of 10 cm each. Beside it, the table top shows the same texture about 12 times larger. That is because the golden puts one tile across the 1.2 m top **on purpose**, to prove a distinct UV fit, so it is a test of the profile, not a mistake. Without the cube nobody would see that difference; beside it, it cannot be missed. **One limit for the probes:** `tools/conformance/build_portable.py` materialises one article, so the cube wears Copper. To wear a probe, that tool must learn to carry two.
+- **SP-F6 — the 1 m cube already shows the idea working** (`13528ea`, the conformance golden, 2026-10-14). In the gate's own Storm render, the cube's faces show 10 × 10 Copper tiles of 10 cm each. Beside it, the table top shows the same texture about 12 times larger. That is because the golden puts one tile across the 1.2 m top **on purpose**, to prove a distinct UV fit, so it is a test of the profile, not a mistake. Without the cube nobody would see that difference; beside it, it cannot be missed. **One limit for the scale grids:** `tools/conformance/build_portable.py` materialises one article, so the cube wears Copper. To wear a scale grid, that tool must learn to carry two.
+
+## Resolved
+
+The lead, 2026-10-14: *"the 1m thing is s new concept I would like us to capture an do... a Material for every UV scale that "aligns" with eachtoehr as I described that we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*.
+
+- **RD-SP-1 — A material for every UV scale, all aligned with one another, used to test that UVs are applied to scale. It is a phase of its own.**
+  - **SP-Q3 is answered:** it is its own phase.
+  - **SP-Q2 is answered by the same words:** one material per scale tag, `s0001` to `s100`, which is six textures as leaned, plus the `sUKN` hatch the sketch proposes.
+  - **SP-Q1 narrows:** they are materials. Whether they ship in releases, or stay for testing, is the phase's discovery to settle.
+- **The word is *scale grid*, not *probe*** (agent-chosen, 2026-10-14; the lead may change it). The Glossary already defines **Probe** as a disposable feasibility test, so a second meaning would be a collision. *Scale grid* sits beside the existing `Diagnostic_UVGrid` article. The headword is the phase's to add. This doc's file name and its `SP` ids are kept as written.
+
+**Made owed:** the phase **Scale Grids**, seeded the same day as `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md`. `/discovery` lands it. Until then, this doc's design sketch and §Resolved are the authority.
 
 ## Status
 
-- **Passes:** 1 (2026-10-14). Design sketch only; nothing is built.
-- **Done the same day, beside it:** the platform's 1 m cube in the conformance golden (`13528ea`, `261013_R_PlatformTrackedItemsAsks.md` A1). It wears Copper at real scale and is the probes' future reference (SP-F6).
-- **Open:** SP-Q1 – Q3, with the lead.
-- **▶ Next:** the lead's word on SP-Q3. If it is a phase, a Roadmap seed, as *HDRIs in the library* was.
+- **Passes:** 1 (2026-10-14). Design sketch only; nothing is built. **Ruled:** RD-SP-1, a phase of its own.
+- **Done the same day, beside it:** the platform's 1 m cube in the conformance golden (`13528ea`, `261013_R_PlatformTrackedItemsAsks.md` A1). It wears Copper at real scale and is the scale grids' future reference (SP-F6).
+- **Answered:** SP-Q2 and SP-Q3 (RD-SP-1). **For the phase's discovery:** SP-Q1's remainder (do they ship in releases?), the colour palette, and teaching `build_portable.py` to carry two articles so the cube can wear the 1 m scale grid (SP-F6). No question is with the lead.
+- **▶ Next:** the lead starts `/discovery` on *Scale Grids*, seeded 2026-10-14, when he chooses. That is a deliberate gate, not a slide.
