@@ -1,6 +1,6 @@
-# PhaseTBD — Scale Grids
+# Phase15 — Scale Grids
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word: *"a Material for every UV scale that "aligns" with eachtoehr … we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*. `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** DISCOVERY, Pass 1 (2026-10-14). Numbered Phase15 by the lead: *"/discovery P15"*. Seeded 2026-10-14 as a pointer-shell written by `/research` on the lead's word: *"a Material for every UV scale that "aligns" with eachtoehr … we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*. `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
