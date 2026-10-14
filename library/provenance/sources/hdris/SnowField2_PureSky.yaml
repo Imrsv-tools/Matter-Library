@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: SnowField2_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/SnowField2_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/snow_field_2_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/snow_field_2_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 51fb3b329af2773655bfd40b4456879062d3b3e3d2fd6dada16684ac949d21dc
+    md5: f56779db3629d28b6831921f6c901a91
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: snow_field_2_puresky
+  asset_url: https://polyhaven.com/a/snow_field_2_puresky
+  name: Snow Field 2 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors: []
+  info: Edited sky-only version of [Snow Field 2](https://polyhaven.com/a/snow_field_2).
+description: Unclipped, free 16K HDRI. Soft overcast morning light over a flat snow field with low-contrast, cool tones and a subtle sunbreak revealing a pale blue patch.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - overcast
+  - low contrast
+  - morning-afternoon
+  - skies
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: overcast
+    light_type: natural
+    contrast: low
+    season: winter
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-02-09'
+  whitebalance: 6350
+  evs_cap: 12
+  coords:
+  - 50.862231
+  - 34.740651
+poly_haven:
+  date_published: '2023-02-05'
+  files_hash: 94e85bb438adcba21be5a9f2497c4565df9eb02d
+retrieved: '2026-10-14'

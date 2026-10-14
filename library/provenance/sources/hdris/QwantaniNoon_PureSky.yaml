@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: QwantaniNoon_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/QwantaniNoon_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_noon_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_noon_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 5156af85a70bd1516116b8d0c78f346c3ed07bfabcbfddef7cd05521dbbc1742
+    md5: bc1b8591bb17f5e3896729ff92b2e74d
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_noon_puresky
+  asset_url: https://polyhaven.com/a/qwantani_noon_puresky
+  name: Qwantani Noon (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors: []
+  info: Edited sky-only version of [Qwantani Noon](https://polyhaven.com/a/qwantani_noon).
+description: Free 24K HDRI, unclipped - clear midday pure sky with a bright sun and high-contrast natural light, ideal for outdoor renders, reflections and crisp shadows.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - high contrast
+  - midday
+  - clear
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2024-08-21'
+  whitebalance: 5313
+  evs_cap: 22
+  coords:
+  - -28.48533209827116
+  - 29.012639559934758
+poly_haven:
+  date_published: '2025-08-29'
+  files_hash: 5602a3dd5e5e442ed4b30f263c80ca0adc7548e3
+retrieved: '2026-10-14'

@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: AristeaWreck_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/AristeaWreck_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/aristea_wreck_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/aristea_wreck_puresky_4k.hdr
+    sha256_scope: file
+    sha256: d9e033a951b5300affbf7830793bae23f913fe16e92f2893f826231f35a949eb
+    md5: 793c76233b0b5f54bbaf8c0e847685b8
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: aristea_wreck_puresky
+  asset_url: https://polyhaven.com/a/aristea_wreck_puresky
+  name: Aristea Wreck (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Aristea Wreck](https://polyhaven.com/a/aristea_wreck).
+description: 'Free 16K HDRI, unclipped: midday partly cloudy sky with high broken clouds and a soft sun, natural medium contrast light, cool blue horizon and reflections.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - midday
+  - partly cloudy
+  - medium contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2017-08-29'
+  whitebalance: 5400
+  evs_cap: 8
+  coords:
+  - -30.345199
+  - 17.278928
+poly_haven:
+  date_published: '2022-11-12'
+  files_hash: f786ccfc0c55e83454c2528f6dc472fbf4838f72
+retrieved: '2026-10-14'

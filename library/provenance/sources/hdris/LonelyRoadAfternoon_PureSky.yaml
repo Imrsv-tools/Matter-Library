@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: LonelyRoadAfternoon_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/LonelyRoadAfternoon_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/lonely_road_afternoon_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/lonely_road_afternoon_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 06758aba364dfd89f441cb26f3f4faae8b148b93ef46da72d4d87f9f5d21207b
+    md5: e4ab180cedef85b2eab00564bd209a03
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: lonely_road_afternoon_puresky
+  asset_url: https://polyhaven.com/a/lonely_road_afternoon_puresky
+  name: Lonely Road Afternoon (Pure Sky)
+  authors:
+  - name: Dimitrios Savva
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors:
+  - id: '76058381'
+    name: INab Studio
+    url: https://assetstore.unity.com/publishers/60810
+  info: Edited sky-only version of [Lonely Road Afternoon](https://polyhaven.com/a/lonely_road_afternoon).
+description: Free 20K HDRI, unclipped, clear late-afternoon sky with a low warm sun, high-contrast lighting, soft horizon glow and deep, calming blue tones.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - clear
+  - sunrise-sunset
+  - high contrast
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-11-10'
+  whitebalance: 5539
+  evs_cap: 22
+  coords:
+  - -28.046333
+  - 26.603583
+poly_haven:
+  date_published: '2024-04-03'
+  files_hash: a42a7bd01ea14acde667b441ffa854a97ec50f0d
+retrieved: '2026-10-14'

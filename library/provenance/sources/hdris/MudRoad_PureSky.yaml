@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: MudRoad_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/MudRoad_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/mud_road_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/mud_road_puresky_4k.hdr
+    sha256_scope: file
+    sha256: a84d211d59fa0284535c7563eaefc38944fd055f8934e4494dc5d65a85f674a3
+    md5: b0b8bb4a381e5496ea8c16b42ff978db
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: mud_road_puresky
+  asset_url: https://polyhaven.com/a/mud_road_puresky
+  name: Mud Road (Pure Sky)
+  authors:
+  - name: Sergey Rudavin
+    role: Original
+  - name: Jarod Guest
+    role: Sky Edits
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Mud Road](https://polyhaven.com/a/mud_road).
+description: Free 16K unclipped HDRI with a soft midday overcast sky, low-contrast natural light and neutral cloud cover, producing a calm, muted mood.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - midday
+  - overcast
+  - low contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: overcast
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2016-02-16'
+  evs_cap: 6
+poly_haven:
+  date_published: '2023-02-04'
+  files_hash: 77b915f0943a8b833aca5923b89bb2e241b44bc0
+retrieved: '2026-10-14'

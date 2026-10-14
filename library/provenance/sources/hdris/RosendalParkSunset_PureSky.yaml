@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: RosendalParkSunset_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/RosendalParkSunset_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/rosendal_park_sunset_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/rosendal_park_sunset_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 9c5ce57318680bcb870b118e3a71c9cafb896d0d0dd930cb7c5a3c5d48049e31
+    md5: 844d7d3d3bd25b29b4a28275aa6aa929
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: rosendal_park_sunset_puresky
+  asset_url: https://polyhaven.com/a/rosendal_park_sunset_puresky
+  name: Rosendal Park Sunset (Pure Sky)
+  authors:
+  - name: Dimitrios Savva
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors: []
+  info: Edited sky-only version of [Rosendal Park Sunset](https://polyhaven.com/a/rosendal_park_sunset).
+description: Free 20K unclipped HDRI - low-contrast sunset with a soft warm horizon glow and clear cool-blue sky, yielding gentle, natural ambient lighting.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - clear
+  - skies
+  - low contrast
+  - sunrise-sunset
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: clear
+    light_type: natural
+    contrast: low
+    season: summer
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-08-12'
+  whitebalance: 5539
+  evs_cap: 12
+  coords:
+  - -28.506456
+  - 27.9373
+poly_haven:
+  date_published: '2024-04-26'
+  files_hash: 95f060f3912f76cf282851b4b2803dde70cc4423
+retrieved: '2026-10-14'

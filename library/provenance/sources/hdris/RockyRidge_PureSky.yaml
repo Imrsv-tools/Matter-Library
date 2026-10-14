@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: RockyRidge_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/RockyRidge_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/rocky_ridge_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/rocky_ridge_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 82efe60eea01151530c16f841270bfbdb5dd5eafdc3f285fb3cc368d8c0a7501
+    md5: 82a9fe5e7184408d7da4821401b54c26
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: rocky_ridge_puresky
+  asset_url: https://polyhaven.com/a/rocky_ridge_puresky
+  name: Rocky Ridge (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Rocky Ridge](https://polyhaven.com/a/rocky_ridge).
+description: 'Free 16K unclipped HDRI: a pure, partly cloudy sunrise with a warm low sun, serene blue tones and medium-contrast natural lighting.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - partly cloudy
+  - medium contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2015-07-05'
+  evs_cap: 21
+  coords:
+  - -26.145263
+  - 27.967626
+poly_haven:
+  date_published: '2022-12-04'
+  files_hash: 5da32381cb36edfae70629894c1f243e2b444f44
+retrieved: '2026-10-14'

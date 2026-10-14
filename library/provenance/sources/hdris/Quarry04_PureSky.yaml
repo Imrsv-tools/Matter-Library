@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Quarry04_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Quarry04_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/quarry_04_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/quarry_04_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 0b131486dae8b26104d06d6a4bca751e46962a185ff3c601cf32f8375a1f03a7
+    md5: 9afcd38260e6a32093813841d2eb4ff7
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: quarry_04_puresky
+  asset_url: https://polyhaven.com/a/quarry_04_puresky
+  name: Quarry 04 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '26820710'
+    name: Light Films
+    url: http://www.lightfilms-digital.com/
+  info: Edited sky-only version of [Quarry 04](https://polyhaven.com/a/quarry_04).
+description: 'Free 16K HDRI, unclipped: soft, low-contrast sunrise with partly cloudy blue skies and a warm horizon glow, giving cool ambient light and subtle reflections.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - sunrise-sunset
+  - low contrast
+  - partly cloudy
+  - natural light
+  - nature
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-05-05'
+  evs_cap: 12
+poly_haven:
+  date_published: '2022-12-10'
+  files_hash: ca582464d34d9328b7287142cb3de3eddf4913ed
+retrieved: '2026-10-14'

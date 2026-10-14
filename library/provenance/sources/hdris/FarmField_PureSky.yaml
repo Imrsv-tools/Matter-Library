@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: FarmField_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/FarmField_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/farm_field_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/farm_field_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 7090661f06ed7f6b8a66b75879712164b42d819e2ce2088f69c5a643e4e503cc
+    md5: f07abd431e00742b9d2f4ba5fbb0613d
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: farm_field_puresky
+  asset_url: https://polyhaven.com/a/farm_field_puresky
+  name: Farm Field (Pure Sky)
+  authors:
+  - name: Dimitrios Savva
+    role: Photography
+  - name: Jarod Guest
+    role: Processing & Sky Edits
+  sponsors:
+  - id: '32966849'
+    name: PixelDoesDev
+    url: https://youtube.com/@pixeldoesdev
+  info: Edited sky-only version of [Farm Field](https://polyhaven.com/a/farm_field).
+description: Unclipped free 24K HDRI, soft midday farm sky with low-contrast, partly cloudy natural light, diffuse sun rays and subtle cloud breaks.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - partly cloudy
+  - low contrast
+  - midday
+  - skies
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-10-22'
+  whitebalance: 5313
+  evs_cap: 12
+  coords:
+  - -23.565487
+  - 30.031894
+poly_haven:
+  date_published: '2023-03-11'
+  files_hash: 3a2ab74231da12433453e8891fb1643fbd40cf0f
+retrieved: '2026-10-14'

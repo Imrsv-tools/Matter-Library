@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: KloofendalMistyMorning_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/KloofendalMistyMorning_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_misty_morning_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_misty_morning_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 604aa1d0db357a0a786b85047f0e29f73e262afc9da13b79262d9ab5e71e7307
+    md5: 7f0f40b402cd944c599b88000f53e108
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_misty_morning_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_misty_morning_puresky
+  name: Kloofendal Misty Morning (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: All
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Kloofendal Misty Morning](https://polyhaven.com/a/kloofendal_misty_morning).
+description: Free 24K unclipped HDRI of a misty morning pure sky with soft, low-contrast, cool diffused light and subtle highlights.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - natural light
+  - nature
+  - overcast
+  - low contrast
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: morning
+    weather: fog
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-06-07'
+  whitebalance: 5313
+  evs_cap: 12
+  coords:
+  - -26.123391
+  - 27.883609
+poly_haven:
+  date_published: '2023-07-14'
+  files_hash: ac12e666675b00fd703d0d6b2596e9a2dd2efe90
+retrieved: '2026-10-14'

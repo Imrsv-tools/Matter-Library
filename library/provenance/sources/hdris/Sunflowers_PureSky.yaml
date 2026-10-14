@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Sunflowers_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Sunflowers_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/sunflowers_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/sunflowers_puresky_4k.hdr
+    sha256_scope: file
+    sha256: d5bd90316896c6f9619f19752590f1ccac7b7190032aea28b808ccdbbc3b590e
+    md5: 7ca3349587930ac40b2eb7720e093839
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: sunflowers_puresky
+  asset_url: https://polyhaven.com/a/sunflowers_puresky
+  name: Sunflowers (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '78546118'
+    name: Unreal Engine Tools by Lukas Schmidt
+    url: https://www.unrealengine.com/marketplace/en-US/profile/ElKaWeh
+  info: Edited sky-only version of [Sunflowers](https://polyhaven.com/a/sunflowers).
+description: Free 16K, unclipped HDRI. Bright midday partly-cloudy sky with high-contrast sun, crisp blue tones and soft clouds for natural uplifting light.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - midday
+  - partly cloudy
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    season: summer
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-08-05'
+  whitebalance: 6550
+  evs_cap: 23
+poly_haven:
+  date_published: '2023-02-12'
+  files_hash: 4c1a24f165b1f71a7d8fb29a7ba4ff4c5c6743e6
+retrieved: '2026-10-14'

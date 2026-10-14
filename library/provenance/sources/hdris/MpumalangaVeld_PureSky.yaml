@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: MpumalangaVeld_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/MpumalangaVeld_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/mpumalanga_veld_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/mpumalanga_veld_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 115a9654d57f61aec3aa91d2126cea9193f98424f8b967b1209e9ab2bb8d9d94
+    md5: 5057669f9f158fe4217f1010abc0ac9c
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: mpumalanga_veld_puresky
+  asset_url: https://polyhaven.com/a/mpumalanga_veld_puresky
+  name: Mpumalanga Veld (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky Edits
+  sponsors: []
+  info: Edited sky-only version of [Mpumalanga Veld](https://polyhaven.com/a/mpumalanga_veld).
+description: 'Free 16K unclipped HDRI: clear, high-contrast sunrise sky over a calm blue horizon, warm sun glow and cool natural ambient lighting.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - clear
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2015-09-26'
+  evs_cap: 21
+  coords:
+  - -24.889112
+  - 30.876935
+poly_haven:
+  date_published: '2023-01-07'
+  files_hash: 1d0e31c7a8a908038f6de74414bba46bfb7fedef
+retrieved: '2026-10-14'

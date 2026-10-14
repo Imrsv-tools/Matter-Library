@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: TableMountain1_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/TableMountain1_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/table_mountain_1_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/table_mountain_1_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 1b1c70d89fdd257b242c6790d1a3e92bcaa4e72ea5f6644641df29e9efbb8617
+    md5: 295692ba4a4494103ce36cb3477f7b1b
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: table_mountain_1_puresky
+  asset_url: https://polyhaven.com/a/table_mountain_1_puresky
+  name: Table Mountain 1 (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors:
+  - id: '3237733'
+    name: Goro Fujita
+    url: http://www.gorofujita.com/
+  info: Edited sky-only version of [Table Mountain 1](https://polyhaven.com/a/table_mountain_1).
+description: Free 16K unclipped HDRI capturing a bright sunrise with high-contrast natural light, and scattered clouds.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - partly cloudy
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2016-06-03'
+  whitebalance: 5400
+  evs_cap: 21
+  coords:
+  - -33.958547
+  - 18.405612
+poly_haven:
+  date_published: '2022-12-03'
+  files_hash: 26ab59fa90b7a492c9da696a9f9ae6e8ce29f74f
+retrieved: '2026-10-14'

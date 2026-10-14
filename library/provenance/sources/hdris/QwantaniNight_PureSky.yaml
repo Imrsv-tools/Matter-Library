@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: QwantaniNight_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/QwantaniNight_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_night_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_night_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 7f064792a1b9108f4aacd004e8ee86364e98faf2e0a0ee5dfb33a9593da28db3
+    md5: acd645e92308841aa0c82eada9830f2d
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_night_puresky
+  asset_url: https://polyhaven.com/a/qwantani_night_puresky
+  name: Qwantani Night (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors:
+  - id: '10485422'
+    name: Bernd Schmidt
+    url: https://lernupgrade.de/
+  info: Edited sky-only version of [Qwantani Night](https://polyhaven.com/a/qwantani_night).
+description: Free 24K unclipped HDRI - clear, low-contrast night sky with Milky Way and cool distant glows, great for subtle night lighting.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - clear
+  - low contrast
+  - night
+  - pure skies
+  attributes:
+    time_of_day: night
+    weather: clear
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2024-08-22'
+  whitebalance: 4901
+  evs_cap: 23
+  coords:
+  - -28.48533209827116
+  - 29.012639559934758
+poly_haven:
+  date_published: '2025-08-22'
+  files_hash: 0478aaabb44e4947e5853f496f59433bf6d72af4
+retrieved: '2026-10-14'

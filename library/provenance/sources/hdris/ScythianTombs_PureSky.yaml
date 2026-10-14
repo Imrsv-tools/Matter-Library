@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: ScythianTombs_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/ScythianTombs_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/scythian_tombs_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/scythian_tombs_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 54c34fd4f4f238ace1498f2f4a602fe9f5e892280943a613a7b85b7347957d61
+    md5: 5cac2864223828da9b06121bba33a942
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: scythian_tombs_puresky
+  asset_url: https://polyhaven.com/a/scythian_tombs_puresky
+  name: Scythian Tombs (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors: []
+  info: Edited sky-only version of [Scythian Tombs](https://polyhaven.com/a/scythian_tombs).
+description: Free 16K, unclipped HDRI with soft, low-contrast sunrise light, warm sun glow and delicate streaky clouds for a calm, pastel sky mood.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - partly cloudy
+  - low contrast
+  - skies
+  - sunrise-sunset
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-10-09'
+  whitebalance: 6000
+  evs_cap: 23
+  coords:
+  - 50.799222
+  - 33.583327
+poly_haven:
+  date_published: '2023-02-26'
+  files_hash: 9fd40374e76f8e52aeb1ea6edeec170bc7ddcdd5
+retrieved: '2026-10-14'

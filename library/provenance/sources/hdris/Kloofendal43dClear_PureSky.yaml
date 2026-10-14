@@ -1,0 +1,61 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloofendal43dClear_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloofendal43dClear_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_43d_clear_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_43d_clear_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 1f92cbf17e46659ff37c9770d065280da226896b0f56091c4c1fca071da7fbeb
+    md5: 4e0af6bcab0e373639f3b48b6677a2c1
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_43d_clear_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_43d_clear_puresky
+  name: Kloofendal 43d Clear (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: All
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Kloofendal 43d Clear](https://polyhaven.com/a/kloofendal_43d_clear).
+description: Free 24K, unclipped HDRI. Bright midday pure sky with a crisp sun, high-contrast lighting, soft horizon haze and clean blue tones.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - partly cloudy
+  - clear
+  - skies
+  - high contrast
+  - midday
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-05-17'
+  whitebalance: 5313
+  evs_cap: 22
+  coords:
+  - -26.123391
+  - 27.883609
+poly_haven:
+  date_published: '2023-07-21'
+  files_hash: 09f5f7d429f9d21e6141483b59f1c35a43677099
+retrieved: '2026-10-14'

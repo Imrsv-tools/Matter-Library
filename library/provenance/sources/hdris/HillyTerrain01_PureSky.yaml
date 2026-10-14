@@ -1,0 +1,56 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: HillyTerrain01_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/HillyTerrain01_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/hilly_terrain_01_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/hilly_terrain_01_puresky_4k.hdr
+    sha256_scope: file
+    sha256: e78fce3aab2f29b4b0223e469acd45c2310f9fe57ba26a5c3bf3935d54f91d0d
+    md5: 7187d4e09c18d940747b5ad6c808dfcb
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: hilly_terrain_01_puresky
+  asset_url: https://polyhaven.com/a/hilly_terrain_01_puresky
+  name: Hilly Terrain 01 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors: []
+  info: Edited sky-only version of [Hilly Terrain 01](https://polyhaven.com/a/hilly_terrain_01).
+description: 'Free 16K unclipped HDRI: tranquil sunrise with a pure blue, partly cloudy sky, warm low sun, soft natural light and medium contrast.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - nature
+  - partly cloudy
+  - sunrise-sunset
+  - medium contrast
+  - natural light
+  - skies
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    season: summer
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-05-28'
+  evs_cap: 22
+poly_haven:
+  date_published: '2022-12-25'
+  files_hash: 320e75534f91411b1f72a6a79a6f11af918a718b
+retrieved: '2026-10-14'

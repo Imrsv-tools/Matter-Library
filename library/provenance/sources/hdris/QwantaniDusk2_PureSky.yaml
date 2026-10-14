@@ -1,0 +1,63 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: QwantaniDusk2_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/QwantaniDusk2_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_dusk_2_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_dusk_2_puresky_4k.hdr
+    sha256_scope: file
+    sha256: dbe5f750e4753f51ef8d178553318ad8550035cac0ce5cfab058e76cf8f021d2
+    md5: a37e1a2ff49dea91e8be7a83f219557e
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_dusk_2_puresky
+  asset_url: https://polyhaven.com/a/qwantani_dusk_2_puresky
+  name: Qwantani Dusk 2 (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors:
+  - id: '84390067'
+    name: Richy
+    url: https://itsrichy.myportfolio.com/work
+  info: Edited sky-only version of [Qwantani Dusk 2](https://polyhaven.com/a/qwantani_dusk_2).
+description: Free 24K unclipped HDRI - soft, low-contrast dusk with pure sky and warm sunset glow, thin clouds and calm horizon reflection for gentle outdoor lighting.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - clear
+  - low contrast
+  - sunrise-sunset
+  - partly cloudy
+  - pure skies
+  attributes:
+    time_of_day: dusk
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2024-08-22'
+  whitebalance: 5303
+  evs_cap: 12
+  coords:
+  - -28.48533209827116
+  - 29.012639559934758
+poly_haven:
+  date_published: '2025-07-11'
+  files_hash: e7a26fbf92c52195321e54f09991aa9be837cdd9
+retrieved: '2026-10-14'

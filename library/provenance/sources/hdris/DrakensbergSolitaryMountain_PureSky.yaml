@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: DrakensbergSolitaryMountain_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/DrakensbergSolitaryMountain_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/drakensberg_solitary_mountain_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/drakensberg_solitary_mountain_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 977b9538b46b1ade99788a58314485b2e9a3e67c9812cd61afea39ccfe8be3b8
+    md5: 2bcbf7dc8e8e6a93e1dd3bbaa5980618
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: drakensberg_solitary_mountain_puresky
+  asset_url: https://polyhaven.com/a/drakensberg_solitary_mountain_puresky
+  name: Drakensberg Solitary Mountain (Pure Sky)
+  authors:
+  - name: Dimitrios Savva
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors: []
+  info: Edited sky-only version of [Drakensberg Solitary Mountain](https://polyhaven.com/a/drakensberg_solitary_mountain).
+description: 'Free 24K unclipped HDRI: clear, high-contrast morning/afternoon sky with pure blue tones, crisp sun and soft horizon glow.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - skies
+  - clear
+  - morning-afternoon
+  - high contrast
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-05-15'
+  whitebalance: 5313
+  evs_cap: 22
+  coords:
+  - -28.94226
+  - 29.32537
+poly_haven:
+  date_published: '2023-01-01'
+  files_hash: bd9887e272576d761a737c899592e21c167fed42
+retrieved: '2026-10-14'

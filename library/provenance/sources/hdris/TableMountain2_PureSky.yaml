@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: TableMountain2_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/TableMountain2_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/table_mountain_2_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/table_mountain_2_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 9235687cc48cc7e466189e118d27e138e0c54427e2cf72e36a3c91af97644f35
+    md5: a8159ca0e51b34606fff4fca703f8a21
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: table_mountain_2_puresky
+  asset_url: https://polyhaven.com/a/table_mountain_2_puresky
+  name: Table Mountain 2 (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky Edits
+  sponsors: []
+  info: Edited sky-only version of [Table Mountain 2](https://polyhaven.com/a/table_mountain_2).
+description: 'Free 16K unclipped HDRI of a pure sunrise sky: low warm sun, partly cloudy high-contrast natural light with soft clouds.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - partly cloudy
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2016-06-03'
+  whitebalance: 5400
+  evs_cap: 21
+  coords:
+  - -33.958997
+  - 18.404364
+poly_haven:
+  date_published: '2023-02-25'
+  files_hash: b4084d7503c7dd2f2e899718ecf71ee6c7ae9d9e
+retrieved: '2026-10-14'

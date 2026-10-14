@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: QwantaniSunrise_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/QwantaniSunrise_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_sunrise_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_sunrise_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 832faa8891cf47d5fc55dbd07cc0b6c8f0dedc2ef136a64410cf81ad0c671c99
+    md5: 201d05f722c5a4c43e5bd476abc5cb2b
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_sunrise_puresky
+  asset_url: https://polyhaven.com/a/qwantani_sunrise_puresky
+  name: Qwantani Sunrise (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors: []
+  info: Edited sky-only version of [Qwantani Sunrise](https://polyhaven.com/a/qwantani_sunrise).
+description: 'Free 24K unclipped HDRI: pure, low-contrast sunrise sky - soft warm rim light and cool ambient fill, perfect for outdoor renders, product shots and archviz.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - clear
+  - low contrast
+  - sunrise-sunset
+  - pure skies
+  attributes:
+    time_of_day: sunrise
+    weather: clear
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2024-08-19'
+  whitebalance: 5303
+  evs_cap: 22
+  coords:
+  - -28.48533209827116
+  - 29.012639559934758
+poly_haven:
+  date_published: '2025-09-05'
+  files_hash: 7fe5b6232b0636a24e12222f9ae3fbe0953bddd4
+retrieved: '2026-10-14'

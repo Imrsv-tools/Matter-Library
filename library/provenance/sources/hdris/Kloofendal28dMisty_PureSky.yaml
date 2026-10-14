@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloofendal28dMisty_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloofendal28dMisty_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_28d_misty_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_28d_misty_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 18dd8b719b900b4397d36da13518276e24ce355b8d4c89fa8f27bf4d31c4f221
+    md5: c8daf26e6596f253c0bd308e21fa6486
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_28d_misty_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_28d_misty_puresky
+  name: Kloofendal 28d Misty (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Processing
+  - name: Jenelle van Heerden
+    role: Photography
+  sponsors:
+  - id: '82322099'
+    name: Iaian7 / John Einselen
+    url: https://jeinselen.com
+  info: Edited sky-only version of [Kloofendal 28d Misty](https://polyhaven.com/a/kloofendal_28d_misty).
+description: Free 24K HDRI, unclipped - misty pure sky with soft, diffused sun, medium contrast and gentle haze for natural morning/afternoon lighting and reflections.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - natural light
+  - nature
+  - partly cloudy
+  - medium contrast
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: morning
+    weather: fog
+    light_type: natural
+    contrast: medium
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-06-07'
+  whitebalance: 5313
+  evs_cap: 22
+  coords:
+  - -26.123391
+  - 27.883609
+poly_haven:
+  date_published: '2023-08-11'
+  files_hash: ea9f1a3b89bbc5bc317ac24ec2f91814e964d5ee
+retrieved: '2026-10-14'

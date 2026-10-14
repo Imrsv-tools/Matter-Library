@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloppenheim07_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloppenheim07_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloppenheim_07_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloppenheim_07_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 98a94dc8c290a89de0147642750beb9dae4c791ee33c1689bebbf58126e97f22
+    md5: f88d16589849778174261f25a676f2b4
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloppenheim_07_puresky
+  asset_url: https://polyhaven.com/a/kloppenheim_07_puresky
+  name: Kloppenheim 07 (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Kloppenheim 07](https://polyhaven.com/a/kloppenheim_07).
+description: 'Free 24K unclipped HDRI: low-contrast overcast night sky with soft moonlight breaks, cool ambient tones and a faint warm horizon glow.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - night
+  - overcast
+  - low contrast
+  - natural light
+  - artificial light
+  - pure skies
+  attributes:
+    time_of_day: night
+    weather: overcast
+    light_type: mixed
+    contrast: low
+    environment: outdoor
+    sky_view: obstructed
+captured:
+  date_taken: '2019-11-03'
+  whitebalance: 3776
+  evs_cap: 22
+  coords:
+  - -25.654156
+  - 30.161901
+poly_haven:
+  date_published: '2022-12-18'
+  files_hash: fbad8f7d2923c80781beabd62d27e5b0c1b45760
+retrieved: '2026-10-14'

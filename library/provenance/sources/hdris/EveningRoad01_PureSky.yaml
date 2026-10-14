@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: EveningRoad01_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/EveningRoad01_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/evening_road_01_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/evening_road_01_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 13619d89635fc0bcce3ad41cc5b62350e328551a5370da34f570a36dd9e6e4a0
+    md5: 3461499a68e8fe03ec42592f4bc2d5ef
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: evening_road_01_puresky
+  asset_url: https://polyhaven.com/a/evening_road_01_puresky
+  name: Evening Road 01 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Evening Road 01](https://polyhaven.com/a/evening_road_01).
+description: 'Free 16K unclipped HDRI: evening sky with low golden sun, cool blue tones, scattered clouds and medium-contrast lighting.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - partly cloudy
+  - medium contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-08-11'
+  whitebalance: 5400
+  evs_cap: 12
+poly_haven:
+  date_published: '2023-03-04'
+  files_hash: eded15ce74d3bc548d23d72636fbaeac48c3d692
+retrieved: '2026-10-14'

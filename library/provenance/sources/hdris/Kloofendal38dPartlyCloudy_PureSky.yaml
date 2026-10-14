@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloofendal38dPartlyCloudy_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloofendal38dPartlyCloudy_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_38d_partly_cloudy_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_38d_partly_cloudy_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 257fa01e23f33197156c4d69234a89111b143f747c8f1a356846256b747d150e
+    md5: f0e9e19f824767c92f36d2af7ae605b8
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_38d_partly_cloudy_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_38d_partly_cloudy_puresky
+  name: Kloofendal 38d Partly Cloudy (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Kloofendal 38d Partly Cloudy](https://polyhaven.com/a/kloofendal_38d_partly_cloudy).
+description: Free 24K unclipped HDRI. Midday partly cloudy sky with cool blue tones, strong directional sun, high-contrast lighting and soft cloud shafts.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - nature
+  - partly cloudy
+  - natural light
+  - midday
+  - high contrast
+  - skies
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2020-12-04'
+  whitebalance: 5319
+  evs_cap: 22
+  coords:
+  - -26.14066228
+  - 27.89984354
+poly_haven:
+  date_published: '2022-11-07'
+  files_hash: 6de64489e7b408f8b3ab416b06ceaf5f45d8bc6f
+retrieved: '2026-10-14'

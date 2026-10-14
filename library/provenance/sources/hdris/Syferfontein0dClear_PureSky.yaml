@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Syferfontein0dClear_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Syferfontein0dClear_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/syferfontein_0d_clear_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/syferfontein_0d_clear_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 482a7df85bc9db8375681d17265f00f6cc14d564903a9872b9be74c70e1017f8
+    md5: 8c829355bb5582fe20784e0b642e4888
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: syferfontein_0d_clear_puresky
+  asset_url: https://polyhaven.com/a/syferfontein_0d_clear_puresky
+  name: Syferfontein 0d Clear (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors:
+  - id: '20953239'
+    name: HDR Light Studio
+    url: https://www.lightmap.co.uk
+  info: Edited sky-only version of [Syferfontein 0d Clear](https://polyhaven.com/a/syferfontein_0d_clear).
+description: 'Free 16K unclipped HDRI - clear pure sky at sunrise with soft, low-contrast natural light: cool blue tones and a subtle warm horizon glow.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - clear
+  - low contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: clear
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2018-08-11'
+  whitebalance: 5400
+  evs_cap: 10
+  coords:
+  - -26.3588
+  - 27.7549
+poly_haven:
+  date_published: '2022-11-27'
+  files_hash: 06ee352f1cb4cb981a9fe44f949c080ff0d6352e
+retrieved: '2026-10-14'

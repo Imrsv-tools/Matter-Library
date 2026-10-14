@@ -1,0 +1,66 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: BelfastSunset_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/BelfastSunset_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/belfast_sunset_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/belfast_sunset_puresky_4k.hdr
+    sha256_scope: file
+    sha256: cafc52b99ce15d84bd039826a0333f5ab0259d8c1f4feb2f7faf5fafa039108a
+    md5: 52d2339c16069a2aaa7fd37a320d8495
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: belfast_sunset_puresky
+  asset_url: https://polyhaven.com/a/belfast_sunset_puresky
+  name: Belfast Sunset (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Processing
+  - name: Dimitrios Savva
+    role: Photography
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors:
+  - id: '3267566'
+    name: Calinou
+    url: https://hugo.pro/
+  - id: '3237733'
+    name: Goro Fujita
+    url: http://www.gorofujita.com/
+  info: Edited sky-only version of [Belfast Sunset](https://polyhaven.com/a/belfast_sunset).
+description: Free 24K unclipped HDRI showing a low-contrast, partly cloudy sunset over calm water, with a warm golden horizon and soft violet-blue light.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - low contrast
+  - partly cloudy
+  - sunrise-sunset
+  - skies
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2021-06-02'
+  evs_cap: 12
+  coords:
+  - -25.687944
+  - 30.113194
+poly_haven:
+  date_published: '2022-10-19'
+  files_hash: 52069dda20d0309f5009c492aa97b968effd3f32
+retrieved: '2026-10-14'

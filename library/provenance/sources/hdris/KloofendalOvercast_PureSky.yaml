@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: KloofendalOvercast_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/KloofendalOvercast_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_overcast_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_overcast_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 77ade807bd208195073a51b970dea574fa70cd80cf666aeedf5cd416ab5c8abd
+    md5: 6678d8e9a87f9b8cdfc4fc4038591d59
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_overcast_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_overcast_puresky
+  name: Kloofendal Overcast (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: All
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Kloofendal Overcast](https://polyhaven.com/a/kloofendal_overcast).
+description: Unclipped, free 24K HDRI with soft, low-contrast overcast light, cool diffuse morning/afternoon sky with a subtle sun glow and gentle reflections.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - natural light
+  - overcast
+  - low contrast
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: overcast
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-05-17'
+  whitebalance: 5303
+  evs_cap: 6
+  coords:
+  - -26.123391
+  - 27.883609
+poly_haven:
+  date_published: '2023-07-28'
+  files_hash: f3d1fee9ab7e14cc43e9da35244c7460c795dd31
+retrieved: '2026-10-14'

@@ -1,0 +1,61 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Syferfontein18dClear_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Syferfontein18dClear_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/syferfontein_18d_clear_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/syferfontein_18d_clear_puresky_4k.hdr
+    sha256_scope: file
+    sha256: f30416cc649eaae319cc9d489764e2d71e01936a44c989c6a1806d1e11d7b5c8
+    md5: 098673729bed2329d63eb9ad36ca5783
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: syferfontein_18d_clear_puresky
+  asset_url: https://polyhaven.com/a/syferfontein_18d_clear_puresky
+  name: Syferfontein 18d Clear (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky Edits
+  sponsors:
+  - id: '4047949'
+    name: WaffleDealer
+  info: Edited sky-only version of [Syferfontein 18d Clear](https://polyhaven.com/a/syferfontein_18d_clear).
+description: 'Unclipped, free 16K HDRI: clear pure sky with bright sun, warm horizon and crisp, high-contrast natural light.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - morning-afternoon
+  - clear
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2018-07-22'
+  whitebalance: 5400
+  evs_cap: 22
+  coords:
+  - -26.3588
+  - 27.7549
+poly_haven:
+  date_published: '2023-02-19'
+  files_hash: cf21ce7095b3c7df54fcc3d94f484a52a821a245
+retrieved: '2026-10-14'

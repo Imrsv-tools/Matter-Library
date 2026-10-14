@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloppenheim01_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloppenheim01_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloppenheim_01_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloppenheim_01_puresky_4k.hdr
+    sha256_scope: file
+    sha256: e667700214b1141dd0890c6e45decf9c84964b3c6596b717a48c56e3d893bde3
+    md5: 6f090dd65ba66ab4fa1120151653cd8f
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloppenheim_01_puresky
+  asset_url: https://polyhaven.com/a/kloppenheim_01_puresky
+  name: Kloppenheim 01 (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Kloppenheim 01](https://polyhaven.com/a/kloppenheim_01).
+description: 'Unclipped, free 24K HDRI: soft, low-contrast overcast sunrise with cool blue-gray skies and a warm sun break, producing calm natural light and subtle reflections.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - overcast
+  - low contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: overcast
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-11-01'
+  evs_cap: 8
+  coords:
+  - -25.654156
+  - 30.161901
+poly_haven:
+  date_published: '2022-11-20'
+  files_hash: 7195ba27570ddc3fed3bafaba2570cd22adb0abd
+retrieved: '2026-10-14'

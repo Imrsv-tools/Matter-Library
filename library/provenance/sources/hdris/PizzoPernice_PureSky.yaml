@@ -1,0 +1,62 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: PizzoPernice_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/PizzoPernice_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/pizzo_pernice_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/pizzo_pernice_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 60d8c49953be961e2dc6e6144b2a93f232324154f0582fdda36d0ffe2d6eef19
+    md5: 70d5b689a0ffd55c665c86205e7df893
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: pizzo_pernice_puresky
+  asset_url: https://polyhaven.com/a/pizzo_pernice_puresky
+  name: Pizzo Pernice (Pure Sky)
+  authors:
+  - name: Andreas Mischok
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors:
+  - id: '7934315'
+    name: I/O Studio
+    url: https://www.iostudio.ca
+  info: Edited sky-only version of [Pizzo Pernice](https://polyhaven.com/a/pizzo_pernice).
+description: 'Free 20K, unclipped HDRI: bright clear midday sky with a hard sun, high-contrast natural light and subtle horizon haze - ideal for crisp outdoor renders.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - natural light
+  - outdoor
+  - nature
+  - high contrast
+  - skies
+  - clear
+  - midday
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: clear
+    light_type: natural
+    contrast: high
+    season: summer
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-04-16'
+  evs_cap: 22
+  coords:
+  - 45.995926
+  - 8.51848
+poly_haven:
+  date_published: '2022-12-17'
+  files_hash: b83281f83c3c98b859da0afe4f119abec3eddf08
+retrieved: '2026-10-14'

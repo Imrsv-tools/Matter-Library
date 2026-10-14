@@ -1,0 +1,55 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Quarry01_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Quarry01_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/quarry_01_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/quarry_01_puresky_4k.hdr
+    sha256_scope: file
+    sha256: a969cee038ef4c2fbf8563da1efefac3e9b219902c46f85f952faa4be2edeb42
+    md5: 120d01454fbbea370af90b62cce62516
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: quarry_01_puresky
+  asset_url: https://polyhaven.com/a/quarry_01_puresky
+  name: Quarry 01 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors: []
+  info: Edited sky-only version of [Quarry 01](https://polyhaven.com/a/quarry_01).
+description: Free 16K unclipped HDRI capturing a pure, clear sunrise sky with warm sun glow and high-contrast natural light over a calm horizon.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - clear
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-06-17'
+  evs_cap: 24
+poly_haven:
+  date_published: '2022-12-11'
+  files_hash: 21369ed880c53937648ab14c3868fca959de47f8
+retrieved: '2026-10-14'

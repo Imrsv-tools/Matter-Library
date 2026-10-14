@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Qwantani_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Qwantani_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 5776f890607ff98e21cc1f04bdc3dacbdf33795386dbebb418f42b0fc92814d1
+    md5: 94c077ffc29d6f36a94eb84ba0c862b0
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_puresky
+  asset_url: https://polyhaven.com/a/qwantani_puresky
+  name: Qwantani (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Qwantani](https://polyhaven.com/a/qwantani).
+description: Free 16K unclipped HDRI. Clear pure sky with bright sun, strong natural high-contrast light, deep blue gradient and soft horizon.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - morning-afternoon
+  - clear
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-05-02'
+  whitebalance: 5400
+  evs_cap: 20
+  coords:
+  - -28.48536987
+  - 29.01268416
+poly_haven:
+  date_published: '2022-10-29'
+  files_hash: da86fd9b2f8c1a8699777ae7c1184b3abc5a98f4
+retrieved: '2026-10-14'

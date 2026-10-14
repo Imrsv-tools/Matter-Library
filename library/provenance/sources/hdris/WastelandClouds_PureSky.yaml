@@ -1,0 +1,55 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: WastelandClouds_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/WastelandClouds_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/wasteland_clouds_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/wasteland_clouds_puresky_4k.hdr
+    sha256_scope: file
+    sha256: f5076d12387720b253bb1cc9a826d10fcd1f5295041f39bfaa206475a4f8042a
+    md5: cabbc907e709f4d7ec85934876acc37f
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: wasteland_clouds_puresky
+  asset_url: https://polyhaven.com/a/wasteland_clouds_puresky
+  name: Wasteland Clouds (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors: []
+  info: Edited sky-only version of [Wasteland Clouds](https://polyhaven.com/a/wasteland_clouds).
+description: Free 16K unclipped HDRI - serene sunrise/sunset glow at the horizon, broad partly cloudy sky, medium contrast with soft warm light.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - sunrise-sunset
+  - partly cloudy
+  - medium contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-04-10'
+  evs_cap: 16
+poly_haven:
+  date_published: '2023-01-08'
+  files_hash: de3c2289b1de06b8716a7b53b14acccabbf2ca95
+retrieved: '2026-10-14'

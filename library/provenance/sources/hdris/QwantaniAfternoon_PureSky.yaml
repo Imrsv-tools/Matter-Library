@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: QwantaniAfternoon_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/QwantaniAfternoon_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/qwantani_afternoon_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/qwantani_afternoon_puresky_4k.hdr
+    sha256_scope: file
+    sha256: eb46647d93c8c76150f06802de7198a77739e9b9f72c13afc5db269de62f342a
+    md5: a43d4ae827832848c5bbe6234741c6d6
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: qwantani_afternoon_puresky
+  asset_url: https://polyhaven.com/a/qwantani_afternoon_puresky
+  name: Qwantani Afternoon (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Photography
+  - name: Jarod Guest
+    role: Processing
+  sponsors: []
+  info: Edited sky-only version of [Qwantani Afternoon](https://polyhaven.com/a/qwantani_afternoon).
+description: 'Free 24K unclipped HDRI: pure clear afternoon sky with high-contrast sun, crisp late-afternoon light, soft horizon haze and blue ambient for outdoor renders.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - clear
+  - high contrast
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2024-08-21'
+  whitebalance: 5313
+  evs_cap: 22
+  coords:
+  - -28.48533209827116
+  - 29.012639559934758
+poly_haven:
+  date_published: '2025-06-20'
+  files_hash: 9096d3cb6c1f1d33ef3711f72242c5ba9a06ab22
+retrieved: '2026-10-14'

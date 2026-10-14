@@ -1,0 +1,63 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: AutumnField_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/AutumnField_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/autumn_field_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/autumn_field_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 52e13951317a14f74d9c04d687368d702f1c0648b48265f17831310a95eba2e9
+    md5: 7891f2f4b9448b2aa4959f78cd4d6cfc
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: autumn_field_puresky
+  asset_url: https://polyhaven.com/a/autumn_field_puresky
+  name: Autumn Field (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '78546118'
+    name: Unreal Engine Tools by Lukas Schmidt
+    url: https://www.unrealengine.com/marketplace/en-US/profile/ElKaWeh
+  - id: '76058381'
+    name: INab Studio
+    url: https://assetstore.unity.com/publishers/60810
+  info: Edited sky-only version of [Autumn Field](https://polyhaven.com/a/autumn_field).
+description: 'Free 16K HDRI, unclipped: clear pure-blue sky with strong morning sun, high-contrast cool tones, crisp shadows and soft reflections over a calm horizon.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - natural light
+  - nature
+  - skies
+  - high contrast
+  - clear
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: clear
+    light_type: natural
+    contrast: high
+    season: autumn
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-10-11'
+  whitebalance: 5450
+  evs_cap: 27
+poly_haven:
+  date_published: '2024-04-19'
+  files_hash: b0c7cf817c8120909c16f72ac2f3104cdb14ce02
+retrieved: '2026-10-14'

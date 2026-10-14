@@ -1,0 +1,60 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: DrackensteinQuarry_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/DrackensteinQuarry_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/drackenstein_quarry_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/drackenstein_quarry_puresky_4k.hdr
+    sha256_scope: file
+    sha256: c789da5b358ee10e06b5cc72df1267766374608b1366e4dd3e7493603937f478
+    md5: 9a726fb916aa83d38dc56237302bd37e
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: drackenstein_quarry_puresky
+  asset_url: https://polyhaven.com/a/drackenstein_quarry_puresky
+  name: Drackenstein Quarry (Pure Sky)
+  authors:
+  - name: Andreas Mischok
+    role: Original
+  - name: Jarod Guest
+    role: Sky Edits
+  sponsors:
+  - id: '118714804'
+    name: Chris Hughes ( Spitfire_502 )
+  info: Edited sky-only version of [Drackenstein Quarry](https://polyhaven.com/a/drackenstein_quarry).
+description: 'Free, unclipped 20K HDRI with a pure-sky sunrise: low-contrast natural light, soft warm rim sun, scattered clouds and calm reflections for subtle lighting.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - partly cloudy
+  - nature
+  - natural light
+  - low contrast
+  - sunrise-sunset
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2022-01-02'
+  evs_cap: 22
+  coords:
+  - 48.548582
+  - 9.657288
+poly_haven:
+  date_published: '2022-12-31'
+  files_hash: aecdca77a9dad8efc4f5822ccd262b956646eb69
+retrieved: '2026-10-14'

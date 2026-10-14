@@ -1,0 +1,68 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: Kloofendal48dPartlyCloudy_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/Kloofendal48dPartlyCloudy_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/kloofendal_48d_partly_cloudy_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 3061c00a16ecae748e84fd6c44c04804f539c118bb66325db858bad87b11bf88
+    md5: 816340c969d2e60d659051d13ac3c4dc
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: kloofendal_48d_partly_cloudy_puresky
+  asset_url: https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
+  name: Kloofendal 48d Partly Cloudy (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors:
+  - id: '45968783'
+    name: Ro-Racing Studios
+    url: https://www.patreon.com/RoRacingStudios
+  - id: '77433244'
+    name: Antoine Bagattini - BagaPie
+    url: https://abaga.gumroad.com/
+  - id: '76058381'
+    name: INab Studio
+    url: https://assetstore.unity.com/publishers/60810
+  info: Edited sky-only version of [Kloofendal 48d Partly Cloudy](https://polyhaven.com/a/kloofendal_48d_partly_cloudy).
+description: Free 16K unclipped HDRI - midday partly-cloudy pure sky with bright sun, high-contrast natural light and crisp clouds for realistic outdoor lighting.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - midday
+  - partly cloudy
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: midday
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-03-22'
+  whitebalance: 5400
+  evs_cap: 21
+  coords:
+  - -26.14066228
+  - 27.89984354
+poly_haven:
+  date_published: '2022-11-19'
+  files_hash: 4cce3bc9b9588036541551fe5ae8077af6b37e45
+retrieved: '2026-10-14'

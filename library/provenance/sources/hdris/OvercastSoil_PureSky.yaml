@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: OvercastSoil_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/OvercastSoil_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/overcast_soil_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/overcast_soil_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 717958e9dfd092fcead82ff4691f3d615088803dd1888bb638ba948669021140
+    md5: 8c05e24908d99a6c4c5c1a63d753df3f
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: overcast_soil_puresky
+  asset_url: https://polyhaven.com/a/overcast_soil_puresky
+  name: Overcast Soil (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '146772882'
+    name: Igor Sirotov Architects
+    url: https://www.igorsirotov.com/
+  info: Edited sky-only version of [Overcast Soil](https://polyhaven.com/a/overcast_soil).
+description: 'Free 16K unclipped HDRI: soft, low-contrast overcast sky with diffused natural morning/afternoon light and a subtle warm horizon glow, calm moody lighting.'
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - natural light
+  - nature
+  - low contrast
+  - overcast
+  - morning-afternoon
+  - pure skies
+  attributes:
+    time_of_day: afternoon
+    weather: overcast
+    light_type: natural
+    contrast: low
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2023-10-19'
+  whitebalance: 6900
+  evs_cap: 12
+poly_haven:
+  date_published: '2024-04-17'
+  files_hash: 9033f81c52e20f80a4d4c7bad282af4fc4a8570f
+retrieved: '2026-10-14'

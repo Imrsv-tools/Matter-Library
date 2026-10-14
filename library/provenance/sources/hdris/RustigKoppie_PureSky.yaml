@@ -1,0 +1,58 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: RustigKoppie_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/RustigKoppie_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/rustig_koppie_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/rustig_koppie_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 0a7431d4831e71d8690ab1be0a9baaec181962918166395cf14cbe1add6a84a9
+    md5: 499abd33d77b000b80a7ce024fc72ec2
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: rustig_koppie_puresky
+  asset_url: https://polyhaven.com/a/rustig_koppie_puresky
+  name: Rustig Koppie (Pure Sky)
+  authors:
+  - name: Greg Zaal
+    role: Original
+  - name: Jarod Guest
+    role: Sky edits
+  sponsors: []
+  info: Edited sky-only version of [Rustig Koppie](https://polyhaven.com/a/rustig_koppie).
+description: Free 16K, unclipped - bright morning/afternoon pure sky with a high-contrast sun, sparse soft clouds and calm blue horizon; natural, serene lighting.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - partly cloudy
+  - morning-afternoon
+  - high contrast
+  - natural light
+  - pure skies
+  attributes:
+    time_of_day: morning
+    weather: partly_cloudy
+    light_type: natural
+    contrast: high
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2017-06-24'
+  evs_cap: 22
+  coords:
+  - -25.795704
+  - 27.6427
+poly_haven:
+  date_published: '2022-11-05'
+  files_hash: d949224d62ee2aa15200527697f7bf90ab46b3a1
+retrieved: '2026-10-14'
