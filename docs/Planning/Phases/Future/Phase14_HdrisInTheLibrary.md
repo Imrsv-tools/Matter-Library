@@ -1,6 +1,7 @@
-# PhaseTBD — HDRIs in the Library
+# Phase14 — HDRIs in the Library
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"seed the phase"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** DISCOVERY, Pass 1 (2026-10-14). **Numbered Phase14 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery P14"*. No phase carried 14, so the number goes to the entry heading `## Future` (RD-RO-3's order), and no ruling newer than that order undercuts it. Seeded the same day as a pointer-shell by `/research` on the lead's word (*"seed the phase"*).
+**Ids:** `Q-P14-n` · `F-P14-n` · `RD-P14-n`. Ids cited from research (`SKY-Fn`, `RD-SKY-n`, `F-RO-n`, `RD-MP-n`) keep their own stems.
 
 ## Outcome
 
