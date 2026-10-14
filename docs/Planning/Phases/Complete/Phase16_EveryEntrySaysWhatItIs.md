@@ -221,11 +221,12 @@ None. Both of the lead's calls are answered: RD-P16-11 and RD-P16-12.
   | A released catalog carrying the fields; `no_projection_guard` checking keys (F-P16-3) | **ruled out** (Brief §Not now, RD-P16-8): the first release after this phase |
   | `/matter-generate` and `/matter-batch` writing `contributor` | **ruled out** (Brief §Not now): a quick fix when material-making resumes; until then the recipe lane refuses a recipe without it |
   | Stage, Studio, USDLiveView and the website reading the facts | **ruled out** (Brief §Not now): P25, P26, M11; USDLiveView's L3 is met at the source |
-  | The website's own research doc still says a material may be CC BY 4.0 (written before RD-RO-2) | **surfaced at the close**: the website's doc to correct; named in the handback |
+  | The website's own research doc still says a material may be CC BY 4.0 (written before RD-RO-2) | **surfaced at the close**: the website's doc to correct; **its session told 2026-10-14** at the lead's word (*"tell the website about the licence"*), pointing at F-MLS-1 and F-MLS-21 and RD-RO-2 |
 
 - **Folded in at the lead's word:** the platform's GPA-Q2 (the bare name is the stable key: [Identity](../../../specs/Ontology/Identity.md) §Filename grammar, [Consumers](../../../specs/Consumers.md)), and the ledger rows P6 (DONE), P25 and P27 from the platform's Pass 2 (`261014_R_GroupsPlatformAsks.md`, parked).
 - **Specs conformed:** RuntimeCatalog (§Who gave it and its licence; the stale *"licence and credit stay out"* annotated), SiteFile (`contributor` shipped; `edited_from_name`/`_url`; the trimmed `description`), MaterialXTemplate (the two inputs), Identity §HDRI names (the header format), Consumers, ToolingConventions; CREDITS.md (MatterBot; per-entry credit is in each file); `260923_R_StandaloneSetup.md` Q12 answered; Roadmap entry moved to Complete.
 - **Gate (`run_all.py`, the close's evidence; no CI runs here):** recorded in the `🎉` commit.
+- **Found while building, not this phase's to change:** `tools/releases/hdris.py` `stale()` dates a thumbnail against the module file's own mtime, so **any** edit to `hdris.py` (16.2 added the stamp there) re-makes all 59 thumbnails at the next serve. Harmless (time only) and measured once: the first serve after 16.2 made 59, the second 0. A home for it is *Thumbnails* (Phase17), which owns the thumbnail recipe.
 
 ---
 
