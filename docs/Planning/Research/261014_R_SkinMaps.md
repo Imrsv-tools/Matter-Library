@@ -362,6 +362,8 @@ The sourcing marks are Pass 3's.
 - **RD-SKM-3 — One colour map per skin tone, carrying hue** (the lead, 2026-10-14: *"2b"*): six pictures per mesh version, one per Fitzpatrick article, through the existing `base_color_map`, with no new input. It answers Q-SKM-6.
 - **RD-SKM-4 — The library's map is neutral at the genitals and groin** (the lead, 2026-10-14: *"3 yes"*): plain skin there. The areolae keep their natural colour variation, with a one-line context note where the fit set says what it holds. Anatomy, if ever, is a separate opt-in package outside this repo, and none is planned. It answers Q-SKM-2.
 - **The probe runs on the laptop now** (the lead, 2026-10-14: *"run the probe on the laptop"*). It answers Q-SKM-3.
+- **RD-SKM-5 — The library-made map ships first; AI joins later, only as a fine-detail layer on top of it** (the lead, 2026-10-14: *"a"*, to F-SKM-32's option). The AI layer is tone-free and normalised to an average of 1, so it cannot move the tone, the lips or the groin. It is probed on the library service's GPU. A fully AI-made map and a paid cloud service are not taken. It answers Q-SKM-7.
+- **RD-SKM-6 — Skin maps get a spec that contributors can work from** (the lead, 2026-10-14: *"we need to start documenting a spec for this so other contributors can maybe also try thier hand at crafting these"*). Written as a **draft** spec in `docs/specs/Authoring/SkinMaps.md` by a lead-directed `/quick-fix`. It records the rulings as ruled, the probe's lessons as proposed, and the open questions as open; the phase's discovery hardens it.
 
 ## Open questions
 
@@ -373,7 +375,7 @@ The sourcing marks are Pass 3's.
 | Q-SKM-4 | **How a mesh version is named and recorded**, so each skin map says which mesh it fits (the fit set's family folder, plus a version)? | A small contract question for the phase that builds the first map: the family is `makehuman` today, and hm08 is its first version. |
 | ~~Q-SKM-5~~ → **RD-SKM-2** (b or c; explore c) | **Where the first map comes from** (F-SKM-15): (a) MakeHuman's CC0 photo atlases, whose licence is fine but which record no consent from the people photographed (against F-MP-19) and carry baked shading; (b) a map the library makes from CC0 region masks and its measured tones (F-SKM-21); (c) AI-generated, which is CC0 in form but has unknown training sources. | **(b) for what ships.** (a) only as the probe's comparison, never published. |
 | ~~Q-SKM-6~~ → **RD-SKM-3** (b) | **Redness** (F-SKM-14): (a) a luminance map only, accepting no redness; (b) one colour map per tone, carrying hue (six pictures per mesh version, no new input); (c) one map plus a separate redness picture (a second mesh-supplied input, so a contract addition). | **(b), if Q-SKM-5 is (b):** a library-made map costs nothing more to make per tone, and needs no contract change. Revisit (c) if the full map set ever opens new inputs. |
-| Q-SKM-7 | **Which ships: the library-made map or an AI-generated one** (RD-SKM-2)? *(Explored 2026-10-14, Passes 5–6.)* | **The library-made map ships first.** It holds up once calibrated (F-SKM-25), every tool renders it, and its provenance is clean. **AI then joins as a fine-detail layer on top** (F-SKM-32), from an Apache-2.0 model guided in UV space and labelled AI-assisted. It is probed on the library service's GPU, not the 8 GB laptop (F-SKM-30). |
+| ~~Q-SKM-7~~ → **RD-SKM-5** (a) | **Which ships: the library-made map or an AI-generated one** (RD-SKM-2)? *(Explored 2026-10-14, Passes 5–6.)* | **The library-made map ships first.** It holds up once calibrated (F-SKM-25), every tool renders it, and its provenance is clean. **AI then joins as a fine-detail layer on top** (F-SKM-32), from an Apache-2.0 model guided in UV space and labelled AI-assisted. It is probed on the library service's GPU, not the 8 GB laptop (F-SKM-30). |
 
 ## Status
 
@@ -386,11 +388,13 @@ The sourcing marks are Pass 3's.
   - Pass 6: the AI route, web only.
 - **Ruled:**
   - **RD-SKM-1:** MAP-RD2 locks the mesh, not the pictures. Skin maps are made per mesh version; today's mesh is MakeHuman's hm08 on Manny. Nothing earlier is reversed except MAP-RD5's *"skin stays general"* (by RD-MP-9).
-  - **RD-SKM-2 to RD-SKM-4** (2026-10-14):
-    - the first map is library-made or AI-generated, never MakeHuman's photos, and the AI route is to be explored;
+  - **RD-SKM-2 to RD-SKM-6** (2026-10-14):
+    - the first map is library-made or AI-generated, never MakeHuman's photos;
     - one colour map per tone;
-    - neutral at the genitals and groin.
-  - The probe runs on the laptop now.
+    - neutral at the genitals and groin;
+    - **the library-made map ships first, with AI later only as a fine-detail layer;**
+    - **a draft spec for contributors.**
+  - The probe ran on the laptop.
 - **Direction:** plan to move character skin to skin maps. Today's tone per part gives a hard line at the lips and no variation (F-SKM-2); with a map, the lips can wear the skin and the map's own lip colour (F-SKM-9).
 - **Found:**
   - **The industry's first map is colour**; the library already has the tiling micro layer (`Skin_Pores`), on the same UVs as the industry uses (F-SKM-11, F-SKM-13).
@@ -414,15 +418,14 @@ The sourcing marks are Pass 3's.
   - EEVEE's scatter inputs;
   - the content of the US Copyright Office report;
   - any measured loss when moving maps between layouts.
-- **Open:**
-  - Q-SKM-7: which ships, library-made or AI (after the probe and the AI exploration);
-  - Q-SKM-4: naming a mesh version (for the phase).
+- **Open:** Q-SKM-4, naming a mesh version (for the phase).
+- **Durable doc owed (RD-SKM-6):** `docs/specs/Authoring/SkinMaps.md`, a draft contributor spec, landed by a lead-directed `/quick-fix` (in progress 2026-10-14).
 - **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
 - **Owed by the phase, found by the probe:**
   - re-assemble the six skin articles to take a map (F-SKM-19);
   - map a tinted, map-following scatter colour in Blender (F-SKM-23);
   - write the normalisation rule: the measured tone stays the average (F-SKM-20, F-SKM-25).
 - **Next step:**
-  1. The lead answers Q-SKM-7 (recommended: the library-made map first, AI later as a detail layer).
+  1. The draft spec (RD-SKM-6), by the lead-directed `/quick-fix`.
   2. `/discovery` on *Skin Maps*, when the lead opens it.
   3. The AI detail-layer probe, on the library service's GPU.
