@@ -27,8 +27,8 @@ print("== label ==")
 for raw, want in [("Copper_Verdigris_Aged_Base", "Copper verdigris aged"),
                   ("Oak_Natural_Clean_Base", "Oak"),
                   ("ABS_Matte_Clean_Base", "ABS matte"),
-                  ("Skin_FitzpatrickI_Clean_Base", "Skin fitzpatrick I"),
-                  ("Skin_FitzpatrickIV_Clean_Base", "Skin fitzpatrick IV"),
+                  ("Paint_GradeI_Clean_Base", "Paint grade I"),          # a roman numeral keeps its capital
+                  ("Paint_GradeIV_Clean_Base", "Paint grade IV"),
                   ("Diagnostic_UVGrid_Clean_Base", "Diagnostic UV grid"),
                   ("Rust_OnSteel_Flaking_Base", "Rust on steel flaking"),
                   ("GreyCard_Neutral18_Clean_Base", "Grey card neutral 18")]:
@@ -83,6 +83,10 @@ with tempfile.TemporaryDirectory() as tmp:
         check(False, "two different textures with one name are refused")
     except SystemExit:
         check(True, "two different textures with one name are refused")
+
+print("== section ==")
+check(B.section("engineered") == "matter" and B.section("environmental") == "matter", "a Matter domain is Matter")
+check(B.section("biological") == "character", "biological is a character material, browsed apart (RD-P13-2)")
 
 print("== ranges ==")
 check(set(LCD_RANGES) == set(LCD_PORTS), "every Creator port has a range, and no range names a non-port")

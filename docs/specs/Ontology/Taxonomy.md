@@ -16,6 +16,8 @@ The Matter Library organizes materials into a tight, deep taxonomy: **6 Domains*
 | 🧬 **Biological** *(added 2026-09-27)* | tissue · keratin · bone | 3 |
 | | **Total** | **23** |
 
+> **Reevaluate (2026-10-14, the lead, Phase13 RD-P13-2):** *"it is not Matter, it really requires a human context (not cubes)"*. Biological materials are **a second-class category beside Matter**: kept and browsable, **apart**, and shown on a subject in a human context (skin on a side face and hands, an eye, teeth), never on the rig's cubes. What publishes it today: the site file's `section: character` ([SiteFile](../Contract/SiteFile.md)). How the domain itself is restructured is still to be set up; until then the domain, its classes and its articles stay as below.
+
 **`biological`** *(added 2026-09-27, lead ruling CM1, Phase07)* is **the matter of living bodies**, people and creatures alike:
 - **`tissue`**: skin, mucosa (lips, gums, tongue), sclera, iris, cornea.
 - **`keratin`**: hair fibre, nail, horn, feather.

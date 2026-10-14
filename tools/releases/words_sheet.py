@@ -77,17 +77,20 @@ def main(argv=None) -> int:
     out.mkdir(exist_ok=True)
     for old in out.glob("*.png"):
         old.unlink()
-    by_domain: dict[str, list] = {}
+    # Matter first, by domain; character materials last, browsed apart (RD-P13-2)
+    groups: dict[tuple, list] = {}
     for m in site["materials"]:
-        by_domain.setdefault(m["domain"], []).append(m)
+        sec = m.get("section", "matter")
+        groups.setdefault((sec != "matter", sec if sec != "matter" else m["domain"]), []).append(m)
     n = 0
-    for domain in sorted(by_domain):
-        mats = sorted(by_domain[domain], key=lambda m: (m["material_class"], m["label"]))
+    for (apart, name) in sorted(groups):
+        mats = sorted(groups[(apart, name)], key=lambda m: (m["material_class"], m["label"]))
         parts = [mats[i:i + ROWS] for i in range(0, len(mats), ROWS)]
+        what = f"{name} materials, browsed apart" if apart else f"Matter: {name}"
         for k, part in enumerate(parts, 1):
             n += 1
-            title = f"Words for {args.tag} — {domain} ({k} of {len(parts)}): name · summary · search words · origin"
-            page(snap, title, part).save(out / f"{n:02d}_{domain}_{k}.png")
+            title = f"Words for {args.tag} — {what} ({k} of {len(parts)}): name · summary · search words · origin"
+            page(snap, title, part).save(out / f"{n:02d}_{name}_{k}.png")
     print(f"{n} pages: {out}")
     return 0
 

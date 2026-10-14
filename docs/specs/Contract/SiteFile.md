@@ -42,6 +42,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `identity` | The qualified name with its version (`Copper_Verdigris_Aged_Base_s01_v01`), the stem every file name below begins with. |
 | `label` | The name a person reads. **Derived** from the tokens (PascalCase split, the default tokens `Natural`, `Clean` and `Base` dropped, sentence case, acronyms and roman numerals kept): `Copper verdigris aged`. Where that reads badly, the recipe's `label` replaces it (Phase13 13.2). |
 | `master` | The article's master token ([MasterSet](../Ontology/MasterSet.md)). |
+| `section` | Where it is browsed: `matter`, or `character` beside it. **Biological materials (skin, eyes, teeth, hair, nails) are not Matter**: they stay browsable, apart, and are shown in a human context (skin on a side face and hands, an eye on an eye), **never on the rig's cubes**, so a `character` material publishes no rig picture until such a picture exists (the lead, 2026-10-14, Phase13 RD-P13-2; its subjects are *Thumbnails*' RD-MP-3). Its verdicts, still evidence, stay under `parity`. *(Other kinds, such as HDRIs, are not sections: each is a list of its own beside `materials`, as in the [runtime catalog](RuntimeCatalog.md), added by its own phase.)* |
 | `meters_per_tile` | The real-world size of one texture tile, from the article's metadata. |
 
 **Per material — what a Creator may change:**

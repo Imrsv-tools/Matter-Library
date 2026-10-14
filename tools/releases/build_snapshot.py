@@ -64,6 +64,14 @@ VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
 MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
 WEBP_QUALITY = 90
 DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
+# RD-P13-2 (the lead, 2026-10-14): biological materials are not Matter. They stay browsable, on
+# the side, and are shown in a human context, never on the rig's cubes.
+CHARACTER_DOMAINS = {"biological"}
+
+
+def section(domain: str) -> str:
+    """Where a material is browsed: "matter", or "character" beside it (RD-P13-2)."""
+    return "character" if domain in CHARACTER_DOMAINS else "matter"
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)     # fixed, so a zip of the same files is byte-identical
 
 
@@ -277,6 +285,7 @@ def build(tag: str, out: Path) -> dict:
             "id": entry["id"], "version": entry["version"], "identity": identity,
             "label": recipe.get("label") or label(entry["display_name"]),
             "display_name": entry["display_name"],
+            "section": section(entry["domain"]),
             "domain": entry["domain"], "material_class": entry["material_class"],
             "master": art["master"], "scale": entry["scale"],
             "status": entry["status"], "creator_selectable": entry["creator_selectable"],
@@ -294,10 +303,13 @@ def build(tag: str, out: Path) -> dict:
             rec["sources"] = src
 
         art_dir = PARITY / identity
-        pics = rig_pictures(art_dir)
-        if pics:
+        # a character material is never shown on the rig's cubes (RD-P13-2): its verdicts are
+        # still evidence, but its pictures wait for a human context (Thumbnails, RD-MP-3)
+        rendered = rig_pictures(art_dir)
+        pics = rendered if rec["section"] == "matter" else []
+        if rendered:
             card = art_dir / "scorecard.json"
-            parity = {"tools": sorted({t for t, _, _ in pics}, key=TOOLS.index),
+            parity = {"tools": sorted({t for t, _, _ in rendered}, key=TOOLS.index),
                       "scene": "the rig's test scene"}
             if card.is_file():
                 parity["measured"] = dt.date.fromtimestamp(card.stat().st_mtime).isoformat()
@@ -307,6 +319,7 @@ def build(tag: str, out: Path) -> dict:
                 if verdicts:
                     parity["controls"] = verdicts
             rec["parity"] = parity
+        if pics:
             rec["pictures"] = []
             for tool, view, src in pics:
                 name = f"{identity}__{tool}{'__close' if view == 'close' else ''}.webp"
@@ -339,13 +352,17 @@ def build(tag: str, out: Path) -> dict:
     swept = sum(1 for r in materials if "controls" in r.get("parity", {}))
     size = sum((out / a).stat().st_size for a in assets)
     described = sum(1 for r in materials if "summary" in r)
+    pictured = sum(1 for r in materials if r.get("pictures"))
+    characters = sum(1 for r in materials if r["section"] == "character")
     notes = (
         f"A **dev snapshot** of the Matter Library, for its website's staging. Not a release: "
         f"nothing here is versioned or approved, and every material shows its own status.\n\n"
         f"- `{site_name}`: every material on disk ({len(materials)}), with what the library knows "
         f"about each. A field it does not know yet is left out, never made up.\n"
-        f"- Pictures: the parity rig's test scene in the tools that ran, for {rigged} materials "
-        f"({swept} with a verdict per control). Each carries the date it was measured.\n"
+        f"- Each material's `section`: `matter`, or `character` ({characters}: skin, eyes, teeth, hair "
+        f"and nails), browsed apart and never shown on the rig's cubes.\n"
+        f"- Pictures: the parity rig's test scene in the tools that ran, for {pictured} Matter materials. "
+        f"A verdict per control for {swept} materials, each with the date it was measured.\n"
         f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
         f"- `SHA256SUMS`: a digest for every file.\n"
         + (f"- Words: a plain name, a one-line summary and search words for {described} materials, "
@@ -353,8 +370,9 @@ def build(tag: str, out: Path) -> dict:
         + f"Not yet in it: thumbnails{'' if described else ', summaries and search words'}. "
         f"Every material is CC0-1.0.\n")
     (out / "NOTES.md").write_text(notes, encoding="utf-8")   # the release body; not an asset
-    return {"out": str(out), "materials": len(materials), "rigged": rigged, "swept": swept,
-            "assets": len(assets), "bytes": size}
+    return {"out": str(out), "materials": len(materials), "character": characters, "rigged": rigged,
+            "pictured": pictured, "swept": swept, "described": described, "assets": len(assets),
+            "bytes": size}
 
 
 # ------------------------------------------------------------------ publishing (lead's word)

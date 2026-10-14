@@ -23,6 +23,8 @@ The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`
 - **A few pictures each** (F-MP-11): a card, a close-up, a context view, a dark view for lights; optionally looks at a Creator setting.
 - **Each records what made it** (F-MP-10): the article's hash, the masters version, the renderer, the scene version. A change to any of them makes it stale.
 
+- **Carried in from Phase13 (RD-P13-2, the lead, 2026-10-14):** biological materials are not Matter, and need a human-context picture per kind: *"the skins need the sideface/hands image, eyes need an Eye image, Teeth need a teeth image, etc so that is a different experinence and we need to set taht up"*. Until this phase makes those, the site file publishes **no picture** for a `section: character` material (never the rig's cubes).
+
 ## Open questions (settle during this phase)
 
 - GPU time per article at the chosen sample counts (F-MP-32), measured on the service.
