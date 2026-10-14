@@ -1,13 +1,13 @@
 # Phase14 — HDRIs in the Library
 
-**Status:** DISCOVERY, Pass 1 — **Brief written (2026-10-14), lane `build`.** One question for the lead (Q-P14-1) gates act 1 of 14.1's TRY, not its build. **Numbered Phase14 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery P14"* (RD-P14-1). No phase carried 14, so the number goes to the entry heading `## Future` (RD-RO-3's order, after Materials Described took Phase13), and no ruling newer than that order undercuts it. Seeded the same day as a pointer-shell by `/research` on the lead's word (*"seed the phase"*).
+**Status:** DISCOVERY, Pass 2 — **Brief written (2026-10-14), lane `build`; Pass 2 widened 14.2 to all 59 Pure Skies, over-credited (RD-P14-2).** One question for the lead (Q-P14-1) gates act 1 of 14.1's TRY, not its build. **Numbered Phase14 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery P14"* (RD-P14-1). No phase carried 14, so the number goes to the entry heading `## Future` (RD-RO-3's order, after Materials Described took Phase13), and no ruling newer than that order undercuts it. Seeded the same day as a pointer-shell by `/research` on the lead's word (*"seed the phase"*).
 **Ids:** `Q-P14-n` · `F-P14-n` · `RD-P14-n`. Ids cited from research (`SKY-Fn`, `RD-SKY-n`, `F-RO-n`, `RD-MP-n`) keep their own stems.
 
 ## Outcome
 
 **A scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.** The dev install serves HDRIs before any release holds one.
 
-*How it becomes true:* this phase is the library's half. It covers the kind, the name, the catalog list, the first HDRI and the lead's picks, the dev install serving them by name, and a USD viewer showing a scene lit by one. **The IMRSV app's half is the platform's own HDRI phase**, which waits on this one ([PlatformDependencies](../../PlatformDependencies.md) M10) and is judged there.
+*How it becomes true:* this phase is the library's half. It covers the kind, the name, the catalog list, **all 59 of Poly Haven's Pure Skies, each credited to Poly Haven and its contributors with Poly Haven's own tagging** (RD-P14-2), the dev install serving them by name, and a USD viewer showing a scene lit by one. **The IMRSV app's half is the platform's own HDRI phase**, which waits on this one ([PlatformDependencies](../../PlatformDependencies.md) M10) and is judged there.
 
 ## Why this is a phase
 
@@ -24,14 +24,14 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 **The agent does first** (machine-checkable, not the lead's):
 - serve the working tree (`uv run tools/releases/serve_to_stage.py`);
 - confirm the dev catalog lists the HDRI, names it as `default_hdri`, and gives it a thumbnail that exists;
-- build the scene: a copy of Asset-Library's `CubeAndCone_04` composition in a scratch folder, its `DomeLight` renamed to the bare `@IndustrialSunset_PureSky_v01.hdr@`, with **no `Assets/HDRIs/` folder beside it**;
+- build the scene: a copy of Asset-Library's `CubeAndCone_04` composition in a scratch folder, its `DomeLight` renamed to the bare `@IndustrialSunset02_PureSky_v01.hdr@`, with **no `Assets/HDRIs/` folder beside it**;
 - open that copy in USDLiveView, with the unchanged original in a second window.
 
 | Act | The lead uses and judges | Step |
 |---|---|---|
 | 1 | The two windows show **the same sunset sky** behind the cubes and cones, lighting them the same way. The copy carries no sky file: its sky comes from the library, by name. | 14.1 |
 | 2 | The HDRI's **thumbnail** reads as that sky: whole, 2:1, recognisable. | 14.1 |
-| 3 | The lead names one or more Poly Haven HDRIs. The agent adds them and changes **only the dome's name** in the same scene, and the lead sees the other sky. | 14.2 |
+| 3 | The lead picks any of the 59 Pure Skies by its name. The agent changes **only the dome's name** in the same scene, and the lead sees that sky. The lead opens its record and finds Poly Haven, its contributors and their roles, and Poly Haven's tagging. | 14.2 |
 
 **Can each surface show the thing judged?**
 - **Act 1:**
@@ -40,7 +40,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - **USDLiveView draws a dome as the background by default** (F-P14-5; read in code, not run).
   - **The act needs USDLiveView's launcher to put the HDRI folder on its search path (Q-P14-1).** Without that, it fails exactly as the unresolved probe did.
 - **Act 2:** `magick` reads the Radiance file and writes a 2:1 JPEG that reads as the sky (F-P14-6).
-- **Act 3:** Poly Haven serves the 4k `.hdr` to this machine (F-P14-8); the doer is the agent, on the lead's picks.
+- **Act 3:** Poly Haven's API lists all 59 with a 4k `.hdr` each, and serves them to this machine (F-P14-8, F-P14-10). The doer is the agent; the lead only picks and judges.
 - **Nothing in Not-now is needed** by any act.
 
 ### In now / not now
@@ -55,12 +55,13 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 | **Provenance and licence** (A5):<br>• a record per HDRI under `library/provenance/sources/hdris/<id>.yaml`, made from **the library's own Poly Haven download** (URL, `sha256`, `CC0-1.0`; RD-RO-2);<br>• a `MatterLibrary/hdris/` row in `LICENSE-CONTENT.md`, and a Poly Haven line under its third-party sources. | 14.1 |
 | **Storage** (A7): `.gitattributes` puts `MatterLibrary/hdris/**` in LFS. | 14.1 |
 | **The importer:** `tools/converters/import_polyhaven_hdri.py <polyhaven-id> <Name> <Variant>`. It downloads the 4k `.hdr`, runs the HDRI check, and writes the file and its record (the `import_ambientcg.py` pattern). | 14.1 |
-| **The first HDRI** (A8): Poly Haven's `industrial_sunset_02_puresky` as `IndustrialSunset_PureSky_v01.hdr`. **Its hash is compared with the copy scenes use today** (SKY-F1's open point, F-P14-8), and a difference is reported before the lead's sitting. | 14.1 |
-| **The default**, named once in `library/hdris.yaml` (`default: IndustrialSunset_PureSky`; Q-P14-5). | 14.1 |
+| **The first HDRI** (A8): Poly Haven's `industrial_sunset_02_puresky` as `IndustrialSunset02_PureSky_v01.hdr`. *(Was `IndustrialSunset_PureSky` until 2026-10-14: that name belongs to Poly Haven's other sky, `industrial_sunset_puresky`, F-P14-11.)* **Its hash is compared with the copy scenes use today** (SKY-F1's open point, F-P14-8), and a difference is reported before the lead's sitting. | 14.1 |
+| **The default**, named once in `library/hdris.yaml` (`default: IndustrialSunset02_PureSky`; Q-P14-5). | 14.1 |
 | **The dev install** (RD-SKY-4), in `serve_to_stage.py`:<br>• `releases/matterlib-dev/hdris` linked into the checkout, beside `materials` and `textures`;<br>• the `hdris` list and `default_hdri` written into the dev catalog;<br>• each HDRI's thumbnail generated into the runtime's `releases/matterlib-dev/thumbnails/`, never into the checkout (Q-P14-3);<br>• an HDRI that fails the check is refused, as a missing payload is. | 14.1 |
 | **No compression** (RD-SKY-4): one line in [CompressedDistribution](../../../specs/Tooling/CompressedDistribution.md). | 14.1 |
 | **A guard:** `freeze_release.py` refuses a lockfile that lists HDRIs, so no release is frozen without hashing them, until staging carries them (Not now). | 14.1 |
-| **The lead's picks** from Poly Haven, added by the importer (Q-P14-4). | 14.2 |
+| ~~**The lead's picks** from Poly Haven, added by the importer (Q-P14-4).~~ **Superseded 2026-10-14 by RD-P14-2:** **every one of Poly Haven's 59 Pure Skies**, imported by category through Poly Haven's API, about 1.06 GB at 4k (F-P14-10). | 14.2 |
+| **Credit, over rather than under** (RD-P14-2), in each HDRI's record, verbatim from Poly Haven's API (F-P14-12):<br>• **the source:** Poly Haven, its asset id, its asset page (`https://polyhaven.com/a/<id>`) and the file URL;<br>• **the contributors and their roles** (its `authors`, e.g. *Original*, *Sky edits*), its `info` line, which names the original HDRI a sky was edited from, and its `sponsors`, the people who funded it;<br>• **its tagging:** `tags`, `categories` and `attributes` (time of day, weather, contrast, light type, …), plus its name, description, date taken and white balance.<br>Then:<br>• **`CREDITS.md`** gains a Poly Haven section listing every contributor;<br>• **`LICENSE-CONTENT.md`** names Poly Haven among its third-party sources;<br>• **the importer** sends a unique User-Agent, as Poly Haven's API requires. | 14.1 (the shape, on the first HDRI) · 14.2 (all 59) |
 | **Docs at the close:**<br>• [Consumers](../../../specs/Consumers.md) §USD viewers: the HDRI folder on the search path;<br>• `ToolingConventions.md`: the importer and the `hdris/` root;<br>• `_Architecture.md`: one line in the component map;<br>• PlatformDependencies M10: what the dev install serves, and what the platform's phase now has. | at the close |
 
 | Not now | Why, and who owns it |
@@ -68,8 +69,8 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 | **Staging, freezing and activating a release that holds HDRIs.** A7's *"inside the release folder"* is written into the specs. | **(planned)**, built with the first release that holds one: *Release Bundle and Consumer Contract*. Pre-release, no release ceremony (`AI_WorkingAgreement.md` §Settled practices). The freeze guard above keeps the gap loud. |
 | **The app's half:** Stage's search path, the picker and the switch away from per-scene copies. | The platform's HDRI phase (M10). |
 | **USDLiveView's launcher change.** | USDLiveView's lane: its own ask doc already waits on this phase's folder (F-P14-1). Q-P14-1 says who does it and when. |
-| **HDRIs on the library's website.** | Not asked. Phase13's site file lists materials. |
-| **Storage beyond LFS** (the seed's open question on A7). | ~16 MB each, so LFS holds them until the count makes it a question. It joins the Parking lot's *Texture storage beyond Git LFS* and the LFS quota the site research flagged (`261014_R_TheLibrarysSite.md` WS-F1). |
+| **HDRIs on the library's website.** *(Was "not asked"; 2026-10-14, the lead wants the credits and tagging recorded because they *"will all be helpful when looking for HDRIs in the library on the site"*, RD-P14-2.)* | **This phase records everything the site will show; publishing it is a site-file change.** Phase13's site file lists materials only. **What it will consume from this phase:** each HDRI's record (name, description, contributors and roles, Poly Haven's tagging, its source links) and its thumbnail. The owner is the next change to the site file after Phase13's 13.1. |
+| **Storage beyond LFS** (the seed's open question on A7). | **All 59 come to about 1.06 GB at 4k, against 161 MB of textures in LFS today** (F-P14-10). The organisation is on metered LFS, so the lead weighs the cost (F-P14-13); LFS holds them unless the lead says otherwise. It joins the Parking lot's *Texture storage beyond Git LFS* and the LFS quota the site research flagged (`261014_R_TheLibrarysSite.md` WS-F1). |
 | **The rig or the preview tool lit by a library HDRI** (the seed's third open question). | A later question, as the seed said. The rig's flat dome is deliberate (Storm learnings S2, S4). |
 
 ### The reuse check
@@ -103,6 +104,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 
 **This phase:**
 - **RD-P14-1 — Numbered Phase14 and opened by the lead**: *"/discovery P14"* (2026-10-14).
+- **RD-P14-2 — All of Poly Haven's Pure Skies, over-credited** (the lead, 2026-10-14, verbatim): *"what I would like to do this phase is ensure we are over crediting. I would like use to get all the HDRIs from https://polyhaven.com/hdris/pure-skies The PureSkys section in the format we want to use. Let's account for the tagging they have the and the contributors they list as well as indicateing these came from PolyHaven. this will all be helpful when looking for HDRIs in the library on the site..."* It supersedes 14.2's *"the lead's picks"* and refines Q-P14-4. *"The format we want to use"* is RD-SKY-3's: Radiance `.hdr`, 4096 × 2048.
 - **Q-P14-2 — `schema_version` 3 only for a catalog that lists HDRIs.** *Decided, unless the lead says otherwise.*
   - **Why:** the freeze hash-locks each release's catalog (F-P14-4), and the catalog-freshness lane re-projects **every** lockfile with the one projector constant.
   - **What a global bump would do:** turn the committed 0.0.1 and 0.1.0 catalogs red. Re-projecting them would rewrite the approved pilot's frozen payload and owe a re-freeze and the maintainer's re-approval, for a release that holds no HDRI.
@@ -111,7 +113,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - It is a 1024 × 512 JPEG made from the HDRI by `magick`, written into the dev install at serve time. At a release it becomes a release asset, with the release.
   - The entry field is `thumbnail_path` (RD-MP-5's word), not A2's `preview path`.
   - It is a deterministic derivative, so nothing is lost by not storing it (RD-MP-6).
-- **Q-P14-4 — No HDRI wish list.** *Decided, unless otherwise.* `library/wishlist.yaml` stays materials: its rows carry slot, master, lane and layers, and `/matter-batch` builds them. The lead names Poly Haven HDRIs (*"I will be getting many more open sky HDRIs from Polyhaven"*), and the importer adds each one. This closes the seed's A8 question.
+- **Q-P14-4 — No HDRI wish list.** *Decided, unless otherwise.* `library/wishlist.yaml` stays materials: its rows carry slot, master, lane and layers, and `/matter-batch` builds them. The lead names Poly Haven HDRIs (*"I will be getting many more open sky HDRIs from Polyhaven"*), and the importer adds each one. This closes the seed's A8 question. **Refined 2026-10-14 by RD-P14-2:** the set is now Poly Haven's whole Pure Skies category, so the importer takes a category as well as an id. Still no wish list.
 - **Q-P14-5 — Identity and the default.** *Decided, unless otherwise.*
   - **The id** is `<Name>_<Variant>` and `version` is `vNN`, so `id` + `version` resolve to the file as a material's do. The display name is the id.
   - **The default** is authored once, in `library/hdris.yaml`, which the serve tool reads; a lockfile carries it as `default_hdri`.
@@ -142,7 +144,11 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - The importer, the HDRI check, and the first HDRI with its record and LFS rule.
   - The lockfile and projector support, the freeze guard, and the serve tool.
   - *First clickable result:* **acts 1 and 2.** Act 1 also needs Q-P14-1's launcher change.
-- **14.2 — The lead's picks.** The lead names HDRIs from Poly Haven, the importer adds each, and the agent re-serves and swaps only the dome's name in the act-1 scene. *First clickable result:* **act 3.**
+- **14.2 — All 59 Pure Skies, credited.** *(Was "the lead's picks" until RD-P14-2.)*
+  - The importer takes Poly Haven's Pure Skies category and adds all 59, each named by rule (F-P14-11) and recorded with its full credit.
+  - `CREDITS.md` and `LICENSE-CONTENT.md` gain Poly Haven.
+  - The agent re-serves and swaps only the dome's name in the act-1 scene.
+  - *First clickable result:* **act 3.**
 
 **Reconciled, act by act:**
 - Act 1 needs 14.1 and the launcher change.
@@ -166,7 +172,10 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 **Tools:**
 - **`tools/converters/import_polyhaven_hdri.py` (new):**
   - Poly Haven's file URL shape is `https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/<polyhaven-id>_4k.hdr` (measured for the first HDRI);
-  - it writes `MatterLibrary/hdris/<id>_v01.hdr` and `library/provenance/sources/hdris/<id>.yaml`.
+  - it writes `MatterLibrary/hdris/<id>_v01.hdr` and `library/provenance/sources/hdris/<id>.yaml`;
+  - it takes one Poly Haven id, or a category (`--category "pure skies"`, through `https://api.polyhaven.com/assets?type=hdris&categories=…`);
+  - it reads `/info/<id>` for the credit and the tagging (F-P14-12) and `/files/<id>` for the 4k URL and MD5, which it verifies before it records the `sha256`;
+  - it sends a unique User-Agent naming the Matter Library.
 - **`tools/validators/validate_manifest.py`:**
   - `check_hdri(path)`: name, Radiance header, `-Y 2048 +X 4096`;
   - the `hdris[]` loop and the `default_hdri` check.
@@ -192,7 +201,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 - **F-P14-2 — This repo cannot add the folder from outside.**
   - `serve_to_stage.py --view` hands the launcher `IMRSV_MATTER_LIBRARY=MatterLibrary/`.
   - The launcher then **sets** `PXR_AR_DEFAULT_SEARCH_PATH` itself, overwriting anything it was given.
-- **F-P14-3 — Storm draws a bare-named HDRI once its folder is on the search path** (probe, 2026-10-14, OpenUSD 26.03, `usdrecord --enableDomeLightVisibility`). The probe used `CubeAndCone_04`, its dome renamed to `@IndustrialSunset_PureSky_v01.hdr@`, with the file in a separate `hdris/` folder:
+- **F-P14-3 — Storm draws a bare-named HDRI once its folder is on the search path** (probe, 2026-10-14, OpenUSD 26.03, `usdrecord --enableDomeLightVisibility`). The probe used `CubeAndCone_04`, its dome renamed to `@IndustrialSunset_PureSky_v01.hdr@` (the probe's name, as it ran; the HDRI's name is `IndustrialSunset02_PureSky`, F-P14-11), with the file in a separate `hdris/` folder:
   - **folder on the path:** the same picture as the copied-in original (RMSE 0.015);
   - **folder off the path:** no sky (RMSE 0.84 against "on"), and Storm warns *"Texture asset path 'IndustrialSunset_PureSky_v01.hdr' for dome light could not be resolved"*.
 
@@ -215,6 +224,18 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - Its snapshot builder writes into `library/snapshots/`, and it changes neither the serve tool nor the projector.
   - Both phases touch the Glossary, `RuntimeCatalog.md`'s notes, `Consumers.md`, `ToolingConventions.md` and PlatformDependencies, in different sections.
   - **Phase13's site file lists materials only.**
+- **F-P14-10 — Poly Haven's Pure Skies are 59 HDRIs, every one with a 4k `.hdr`: about 1.06 GB in all, 12.7–22.0 MB each** (Poly Haven's API, 2026-10-14: `/assets?type=hdris&categories=pure skies`, then `/files/<id>` for each). LFS holds 161 MB of textures today (191 files). **The agent can fetch all 59 itself; the lead downloads nothing.**
+  - **The API's terms** (`polyhaven.com/our-api`): free for any purpose, commercial included. Two conditions: **attribution** (*"make it clear to your users that the assets came from Poly Haven"*, a condition of using the live API, *"not of the assets themselves: the assets are CC0"*) and **a unique User-Agent** on every request.
+  - **A checksum to verify against:** each file listing carries the file's size and MD5.
+- **F-P14-11 — Library names follow by rule, with one correction.** Strip `_puresky`, PascalCase the rest, and add `_PureSky_v01`: all 59 are unique, the longest is 39 characters, and all are inside the charset. **Poly Haven has both `industrial_sunset_puresky` and `industrial_sunset_02_puresky`**, so today's sky is `IndustrialSunset02_PureSky`, not the `IndustrialSunset_PureSky` this Brief first gave it.
+- **F-P14-12 — What Poly Haven's API carries per HDRI:**
+  - `name`, `description`, `info` (e.g. *"Edited sky-only version of [Aristea Wreck](…)"*);
+  - `authors` as contributor → role, e.g. *Original*, *Sky edits*: **seven contributors** across the 59;
+  - `tags`, **which is only `pure skies` on all 59**, so the useful tagging is `categories` (e.g. *outdoor, midday, partly cloudy, medium contrast*) and `attributes` (`time_of_day`, `weather`, `light_type`, `contrast`, `environment`, `sky_view`);
+  - `sponsors` (who funded the asset), `date_taken`, `whitebalance` and `coords`.
+
+  All of it is recorded verbatim, so nothing is re-derived when the site shows it.
+- **F-P14-13 — The organisation's LFS is metered** (read from the account's billing API, 2026-10-14). The figures were given to the lead in session and are not recorded here: the repo is public.
 
 ## Questions for the lead
 
@@ -235,3 +256,8 @@ The platform's side (its runtime, plugin and app; its web publish check; USDLive
   - **Probed:** a bare-named dome in Storm, a thumbnail, and Poly Haven's file.
   - **The seed agrees with the product docs.** Pass 1 added two refinements (Q-P14-2: the schema rule, which the freeze forces; Q-P14-3: the thumbnail, which RD-MP-6 forces) and one finding that moves work into another repo (F-P14-1).
   - **The Brief was written in this pass.** Only Q-P14-1 needs the lead, and it gates act 1's sitting, not `/execute`.
+- **Pass 2 (2026-10-14):**
+  - **The lead widened 14.2 to all of Poly Haven's Pure Skies, over-credited** (RD-P14-2).
+  - **Measured through Poly Haven's API:** the 59, their sizes, their credit and tagging fields, and the API's terms (F-P14-10, F-P14-12); the organisation's LFS billing (F-P14-13).
+  - **The sweep found one name clash** (F-P14-11): the first HDRI is now `IndustrialSunset02_PureSky`.
+  - The Brief still holds. 14.2 is bigger, and act 3 now also checks the credit.
