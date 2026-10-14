@@ -45,6 +45,10 @@ import validate_manifest as vman  # noqa: E402
 import yaml  # noqa: E402
 
 SCHEMA_VERSION = 2  # 1->2 (Phase 60sq1 Step 4): adds the durable `creator_selectable` field (RD-5).
+# 2->3 (Phase14): adds the top-level `hdris` list and `default_hdri`. A catalog takes 3 ONLY when it
+# lists HDRIs (Q-P14-2): every release catalog is frozen with its payload and re-projected by the
+# catalog-freshness lane, so a catalog without HDRIs must keep projecting byte-identically at 2.
+SCHEMA_VERSION_HDRIS = 3
 SCALE_RE = re.compile(r"_(s\d+)$")
 
 
@@ -93,6 +97,22 @@ def derive_entry(material: dict) -> dict:
     }
 
 
+def derive_hdri_entry(hdri: dict) -> dict:
+    """Project one lockfile HDRI entry (Identity.md §HDRI names). Paths are catalog-relative: the
+    payload under hdris/, its thumbnail under thumbnails/hdris/ (made from the HDRI, never stored in
+    git: Q-P14-3)."""
+    hid, version = hdri["id"], hdri["version"]
+    return {
+        "id": hid,
+        "display_name": hid,
+        "version": version,
+        "status": hdri["status"],
+        "creator_selectable": bool(hdri.get("creator_selectable", True)),
+        "payload_path": f"hdris/{hid}_{version}.hdr",
+        "thumbnail_path": f"thumbnails/hdris/{hid}_{version}.jpg",
+    }
+
+
 def build_catalog(lockfile: Path, materials_root: Path) -> dict:
     """Validate the lockfile and build the runtime-catalog dict. Raises ValueError on invalid input."""
     results = vman.validate_manifest(lockfile, materials_root)
@@ -106,7 +126,13 @@ def build_catalog(lockfile: Path, materials_root: Path) -> dict:
 
     entries = [derive_entry(m) for m in materials]
     entries.sort(key=lambda e: e["id"])
-    return {"schema_version": SCHEMA_VERSION, "release": release, "materials": entries}
+    catalog = {"schema_version": SCHEMA_VERSION, "release": release, "materials": entries}
+    hdris = data.get("hdris") or []
+    if hdris:  # Q-P14-2: only a catalog that lists HDRIs moves to schema 3
+        catalog["schema_version"] = SCHEMA_VERSION_HDRIS
+        catalog["hdris"] = sorted((derive_hdri_entry(h) for h in hdris), key=lambda e: e["id"])
+        catalog["default_hdri"] = data["default_hdri"]
+    return catalog
 
 
 def project_to_string(lockfile: Path, materials_root: Path) -> str:

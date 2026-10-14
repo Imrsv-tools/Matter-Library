@@ -61,6 +61,13 @@ def _payload_files(repo_root: Path, version: str, staging: Path | None) -> dict:
         raise FileNotFoundError(f"no catalog for release {version}: {catalog}")
     if not manifest.exists():
         raise FileNotFoundError(f"no manifest for release {version}: {manifest}")
+    # Phase14 guard: a release that lists HDRIs cannot be frozen until staging and this freeze hash
+    # them (planned, with the first release that holds one). Refuse loudly rather than freeze a
+    # payload whose HDRIs no hash covers.
+    import yaml  # noqa: PLC0415  (only this guard needs it)
+    if (yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}).get("hdris"):
+        raise ValueError(f"release {version} lists HDRIs; freezing them is not built yet "
+                         "(Phase14 Not now: staging, freezing and activating HDRIs)")
 
     # .mtlx: exactly the payloads the catalog names (catalog-relative == MatterLibrary-relative).
     entries = json.loads(catalog.read_text(encoding="utf-8")).get("materials", [])

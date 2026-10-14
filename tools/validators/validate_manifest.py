@@ -23,6 +23,12 @@ Phase 60 — auditable-provenance no-ship gate (shipped-pixel rule, RD-Provenanc
     texture of *lower* status, nor an uncovered/clouded texture — a material's bound textures
     must all be at least as promoted as the material. Binding is read from the material .mtlx.
 
+Phase14 — HDRIs, a second kind beside materials (Identity.md §HDRI names):
+  * each `hdris[]` entry has id (<Name>_<Variant>) + version + status, and resolves to
+    MatterLibrary/hdris/<id>_<version>.hdr, which passes `check_hdri` (name, Radiance RGBE,
+    4096 x 2048); a promoted HDRI carries provenance, and its evidence sha256 matches the file;
+  * `default_hdri` names exactly one listed HDRI.
+
 Exit 0 iff well-formed and every id resolves.
 """
 
@@ -47,6 +53,64 @@ STATUS_RANK = {"draft": 0, "candidate": 1, "approved": 2, "deprecated": 3, "reti
 PROMOTED = {"candidate", "approved"}
 # Texture-file references inside a material .mtlx: the part after 'textures/'.
 _TEX_REF_RE = re.compile(r"textures/([^\"']+?\.(?:png|exr|jpg|jpeg|tga|hdr|bmp))")
+
+
+# ---- HDRIs (Phase14): a second kind of entry, beside materials (Identity.md §HDRI names) ----
+# <Name>_<Variant>_vNN.hdr, PascalCase tokens; the id is <Name>_<Variant>. Radiance, 4096 x 2048.
+HDRI_STEM_RE = re.compile(r"^(?P<id>[A-Z][A-Za-z0-9]*_[A-Z][A-Za-z0-9]*)_(?P<version>v\d+)$")
+HDRI_EXT = ".hdr"
+HDRI_SIZE = (4096, 2048)          # width, height: RD-SKY-3
+HDRI_NAME_BUDGET = 63             # Identity.md §Name budget, the same as a material's
+
+
+def hdri_id_version(path: Path) -> tuple[str, str] | None:
+    """(id, version) from an HDRI's file name, or None when the name is off-grammar."""
+    m = HDRI_STEM_RE.match(path.stem) if path.suffix == HDRI_EXT else None
+    return (m["id"], m["version"]) if m else None
+
+
+def read_hdr_header(path: Path) -> tuple[str, int, int]:
+    """(FORMAT, width, height) from a Radiance file's header, reading only the header.
+    Raises ValueError for anything that is not a Radiance file (an un-fetched LFS pointer too)."""
+    with open(path, "rb") as f:
+        head = f.read(65536)
+    lines = head.split(b"\n")
+    if not lines or lines[0].strip() not in (b"#?RADIANCE", b"#?RGBE"):
+        raise ValueError("not a Radiance .hdr (no #?RADIANCE line; an un-fetched LFS pointer?)")
+    fmt = ""
+    for i, line in enumerate(lines[1:], start=1):
+        text = line.strip()
+        if text.startswith(b"FORMAT="):
+            fmt = text[len(b"FORMAT="):].decode("ascii", "replace")
+        if text == b"":                                   # the header ends at its blank line
+            res = lines[i + 1].split() if i + 1 < len(lines) else []
+            if len(res) == 4 and res[0] in (b"-Y", b"+Y") and res[2] in (b"+X", b"-X"):
+                return fmt, int(res[3]), int(res[1])
+            raise ValueError(f"no resolution line after the header: {lines[i + 1][:40]!r}")
+    raise ValueError("header has no end (no blank line in the first 64 KB)")
+
+
+def check_hdri(path: Path) -> list:
+    """Errors ([] == conformant) for one HDRI file: its name, its format and its size.
+    Used by the lockfile check below and by tools/releases/serve_to_stage.py."""
+    errs = []
+    if path.suffix != HDRI_EXT:
+        errs.append(f"extension {path.suffix!r}, expected {HDRI_EXT}")
+    if len(path.stem) > HDRI_NAME_BUDGET:
+        errs.append(f"name length {len(path.stem)} > {HDRI_NAME_BUDGET}")
+    if not HDRI_STEM_RE.match(path.stem):
+        errs.append(f"name {path.stem!r} is not <Name>_<Variant>_vNN (PascalCase tokens)")
+    if not path.is_file():
+        return errs + [f"no such file: {path}"]
+    try:
+        fmt, width, height = read_hdr_header(path)
+    except ValueError as exc:
+        return errs + [str(exc)]
+    if fmt != "32-bit_rle_rgbe":
+        errs.append(f"FORMAT={fmt!r}, expected 32-bit_rle_rgbe")
+    if (width, height) != HDRI_SIZE:
+        errs.append(f"size {width} x {height}, expected {HDRI_SIZE[0]} x {HDRI_SIZE[1]}")
+    return errs
 
 
 def _repo_root(manifest: Path) -> Path:
@@ -224,6 +288,42 @@ def validate_manifest(path: Path, materials_root: Path) -> list:
                     cerrs.append(f"binds under-promoted texture {bound!r} (status {bstatus!r} < material {mstatus!r})")
             results.append((f"coverage {mid}", not cerrs,
                             "all bound textures >= material status" if not cerrs else "; ".join(cerrs)))
+
+    # ---- HDRIs (Phase14): id + version + status + the file itself + provenance; one default ----
+    hdris = (data or {}).get("hdris") or []
+    hdris_root = materials_root.parent / "hdris"
+    hdri_ids = []
+    for i, h in enumerate(hdris):
+        tag = f"hdri[{i}]"
+        if not isinstance(h, dict):
+            results.append((tag, False, f"not a mapping: {h!r}"))
+            continue
+        hid, ver, status = h.get("id"), h.get("version"), h.get("status")
+        errs = []
+        if not (isinstance(hid, str) and HDRI_STEM_RE.match(f"{hid}_v01")):
+            errs.append(f"id {hid!r} is not <Name>_<Variant>")
+        else:
+            hdri_ids.append(hid)
+        if not (isinstance(ver, str) and VERSION_RE.match(ver)):
+            errs.append(f"version {ver!r} not 'vNN'")
+        if status not in LIFECYCLE:
+            errs.append(f"status {status!r} not in {sorted(LIFECYCLE)}")
+        if isinstance(hid, str) and isinstance(ver, str):
+            hdr = hdris_root / f"{hid}_{ver}{HDRI_EXT}"
+            errs.extend(check_hdri(hdr))
+            ev = (h.get("provenance") or {}).get("evidence") if isinstance(h.get("provenance"), dict) else None
+            if isinstance(ev, dict) and ev.get("sha256") and hdr.is_file() and not sp.is_lfs_pointer(hdr):
+                if sp.file_sha256(hdr) != ev["sha256"]:
+                    errs.append("file does not match its evidence sha256")
+        if status in PROMOTED:  # the shipped-pixel rule holds for an HDRI as for a texture
+            errs.extend(_validate_provenance(h.get("provenance"), repo_root, status))
+        results.append((f"{tag} {hid}", not errs, "ok" if not errs else "; ".join(errs)))
+
+    default = (data or {}).get("default_hdri")
+    if hdris or default is not None:
+        ok = isinstance(default, str) and default in hdri_ids
+        results.append(("default_hdri", ok, f"{default!r}" if ok else
+                        f"default_hdri {default!r} names no listed HDRI ({len(hdri_ids)} listed)"))
 
     return results
 
