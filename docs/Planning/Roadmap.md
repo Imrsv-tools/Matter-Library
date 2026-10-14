@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase17 — Thumbnails — SEEDED *(**renumbered Phase17 2026-10-14**, when The Library Service went back to TBD: *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"*, RD-DS-8; numbered Phase18 the same day, RD-DS-7; added 2026-10-14 by `/research` on the lead's "Seed all the TBD phases we discovered here", RD-MP-2 to RD-MP-6; **runs on the laptop for now** (RD-MP-14: *"stay local for now"*); the library's half of See the Library)*
+### Phase17 — Thumbnails — BRIEF READY (Pass 1), lane build, next `/execute P17` *(discovery opened 2026-10-14, "/discovery P17"; Cycles on the laptop, Matter by Class and Character in a human context, published in the next dev snapshot; **renumbered Phase17 2026-10-14**, when The Library Service went back to TBD: *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"*, RD-DS-8; numbered Phase18 the same day, RD-DS-7; added 2026-10-14 by `/research` on the lead's "Seed all the TBD phases we discovered here", RD-MP-2 to RD-MP-6; **runs on the laptop for now** (RD-MP-14: *"stay local for now"*); the library's half of See the Library)*
 **Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
 - `docs/Planning/Phases/Phase17_Thumbnails.md`
 
