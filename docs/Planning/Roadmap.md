@@ -11,10 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase17 — Thumbnails — BRIEF READY (Pass 1), lane build, next `/execute P17` *(discovery opened 2026-10-14, "/discovery P17"; Cycles on the laptop, Matter by Class and Character in a human context, published in the next dev snapshot; **renumbered Phase17 2026-10-14**, when The Library Service went back to TBD: *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"*, RD-DS-8; numbered Phase18 the same day, RD-DS-7; added 2026-10-14 by `/research` on the lead's "Seed all the TBD phases we discovered here", RD-MP-2 to RD-MP-6; **runs on the laptop for now** (RD-MP-14: *"stay local for now"*); the library's half of See the Library)*
-**Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
-- `docs/Planning/Phases/Phase17_Thumbnails.md`
-
 ### Phase18 — Character Materials, Their Own Library — SEEDED *(**renumbered Phase18 2026-10-14**, RD-DS-8; renumbered Phase19 the same evening, after Thumbnails, whose per-part picture rig it builds on**, RD-DS-7; added 2026-10-14, the same word, third of the three, RD-DS-4; Skin Maps and Skin Maps Beyond Colour are its first instances; numbered Phase17 the same day, RD-DS-6)*
 **Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
 - `docs/Planning/Phases/Phase18_CharacterLibrary.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
@@ -193,3 +189,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
 - `docs/Planning/Phases/Complete/Phase16_EveryEntrySaysWhatItIs.md`
 *Closed 2026-10-14 on the library side: `contributor` and `licence` in every `.mtlx`, every served HDRI stamped with its facts, the dev catalog and `matterlib-0.2.0-dev.5`; reading them is each consumer's (P25, P26, M11).*
+
+### Phase17 — Thumbnails — COMPLETE
+**Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
+- `docs/Planning/Phases/Complete/Phase17_Thumbnails.md`
+*Closed 2026-10-15: 82 kept materials pictured in Cycles, published as baseline JPEG (`matterlib-0.2.0-dev.7`) and served in the dev install; the comparison pictures are seeded as research.*

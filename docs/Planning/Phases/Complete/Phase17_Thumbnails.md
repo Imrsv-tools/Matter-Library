@@ -1,6 +1,6 @@
 # Phase17 — Thumbnails
 
-**Status:** IN EXECUTION (2026-10-14, *"/execute P17"*; Brief ready the same day, discovery Pass 1). Lane **build**. Runs on the library machine (the laptop) for now: the lead, *"We have to rethink and stay local for now"* (RD-MP-14), then *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"* (RD-DS-8). **This phase's ids start at `Q-P17-8`, `F-P17-8` and `RD-P17-1`.** The Library Service minted `Q-P17-1…7` and `F-P17-1…7` while it was Phase17, and those stay its own. *(Numbered Phase18 earlier the same day, RD-DS-7. Seeded by `/research` on the lead's *"Seed all the TBD phases we discovered here"*.)*
+**Status:** 🎉 COMPLETE (closed 2026-10-15, the lead: *"close"*). Executed 2026-10-14 (*"/execute P17"*); Brief ready the same day, discovery Pass 1. Lane **build**. Runs on the library machine (the laptop) for now: the lead, *"We have to rethink and stay local for now"* (RD-MP-14), then *"Make this phase TBD, move the others forward, Thumbnails become Phase 17"* (RD-DS-8). **This phase's ids start at `Q-P17-8`, `F-P17-8` and `RD-P17-1`.** The Library Service minted `Q-P17-1…7` and `F-P17-1…7` while it was Phase17, and those stay its own. *(Numbered Phase18 earlier the same day, RD-DS-7. Seeded by `/research` on the lead's *"Seed all the TBD phases we discovered here"*.)*
 
 ## Outcome
 
@@ -102,7 +102,7 @@ The rig's pictures are diagnostics: lit the same in every tool so the tools can 
 
 ### Decisions that bind
 
-**From research (the authority):** [`261014_R_MaterialPipeline.md`](../Research/261014_R_MaterialPipeline.md) §Resolved.
+**From research (the authority):** [`261014_R_MaterialPipeline.md`](../../Research/261014_R_MaterialPipeline.md) §Resolved.
 - **RD-MP-2:** Cycles renders the hero thumbnail today, and it is labelled with its renderer.
 - **RD-MP-3:** F-MP-9's subject-per-Class table is the starting set: skin on the clothed character's hand and part of the face; hair on a head.
 - **RD-MP-4:** thumbnails are made before the review.
@@ -267,8 +267,41 @@ None. Every open question in the seed is closed above, unless you say otherwise.
   - **Whites flatten.** An article near albedo 0.8 lands in the tone curve's shoulder: Marble, ABS, PowderCoat, Silicone and polished concrete read RGB 237–245 over their close-ups. Nothing clips, but the marble's veins vanish (the rig's own flat close-up spans only 211–217). An A/B on marble, ABS, polished concrete and oak at −0.5 and −1 stop: at −0.5 the veins and the concrete's mottle show, and oak darkens a little.
   - **Clean clear sheets are invisible.** `Acrylic_Clear` and `Glass_Reeded` on the pane: one thin-walled sheet seen nearly face-on reflects ~4 %, has no edge, and (thin wall) bends nothing. Turning it 25° more did not help. A thin dark frame round the pane is the candidate fix.
 - **F-P17-24 — The groups are shared, so RD-P17-4 lands in the site file alone.** `tools/converters/groups.py` feeds the site file *and* the dev catalog. Flipping Matter to `thumbnail` there would tell the dev install's readers it serves thumbnails, and it does not (Not now, *planned*). The builder overrides it for the site file. A test pins both words.
-- **F-P17-25 — The rig's pictures on a material page read as "what it looks like in each tool", and fail at it** (the lead and the website, at click 5). The UV-grid wall swamps the material, the light is flat, and the pictures are 512 px and older than the masters. Not this phase's to fix (the lead: *"we don't need to do that this phase"*). Research [`261014_R_ComparisonPictures.md`](../Research/261014_R_ComparisonPictures.md) is seeded with the lead's words (a standard shader ball, a dome whose reflections read, a neutral background) and the website's ask (a real comparison set), and the Roadmap has *Comparison Pictures in Each Tool* (RESEARCH).
+- **F-P17-25 — The rig's pictures on a material page read as "what it looks like in each tool", and fail at it** (the lead and the website, at click 5). The UV-grid wall swamps the material, the light is flat, and the pictures are 512 px and older than the masters. Not this phase's to fix (the lead: *"we don't need to do that this phase"*). Research [`261014_R_ComparisonPictures.md`](../../Research/261014_R_ComparisonPictures.md) is seeded with the lead's words (a standard shader ball, a dome whose reflections read, a neutral background) and the website's ask (a real comparison set), and the Roadmap has *Comparison Pictures in Each Tool* (RESEARCH).
 - **Handed in by Phase16 (`08f5968`):** `tools/releases/hdris.py` `stale()` dates an HDRI thumbnail against the module's own mtime, so any edit to `hdris.py` re-makes all 59. It is not in this Brief's steps. It is a candidate for 17.4's stale pass, or a quick fix. Recorded, not yet changed.
+
+### CLOSE — DONE (2026-10-15)
+
+**The Outcome, re-read:** *"Every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console."* **Holds:**
+- 82 of 82 kept articles are made, and a re-run makes none.
+- Every subject was judged suitable by the lead at clicks 2 and 3, and the full set at click 4 (*"this is fine for now"*).
+- The website shows them: dev.7 is mirrored, and the lead at click 5 said *"really good"*.
+- The console's inputs exist: the folder and the record, which together are the stale list.
+
+**Gate:** `run_all.py` 15 PASS, 2 SKIP (compression, staging), 0 FAIL (the evidence; CI is parked). Units: `test_thumbnails.py` 43, `test_build_snapshot.py` 61.
+
+**Deferral ledger:**
+
+| Item | Disposition |
+|---|---|
+| Whites flatten (exposure −0.5, scene v2) | **already routed**: offered at click 4, and the lead: *"this is fine for now... a future run should [use] the .5 setting"* (RD-P17-6, *planned*) |
+| A frame round a clean clear pane; a closer camera for nails | **already routed**: offered at click 4, not taken (RD-P17-6) |
+| `Hair_DarkBrown`'s helmet, `Glass_Clear`'s dust, `Canvas_Natural`'s weave, `Diamond_Brilliant`'s blue | the articles' own, not this phase's surface: for their review (RD-MP-4) |
+| The batch skill runs `make_thumbnails.py` before its review page (RD-MP-4) | **deferred**: the skill file holds another session's uncommitted edit. The review page already shows a row's thumbnail or the command that makes it. The skill line belongs to the next `/matter-batch` or to the Refiner |
+| `hdris.stale()` keys on the module's mtime (handed in by Phase16) | **deferred as an addition** (a pre-existing defect): a quick fix |
+| An Unreal hero thumbnail, Creator looks, release assets, a completeness gate | **ruled out**: the Brief's *Not now* |
+| Studio shows the pictures | the platform's (M13: a re-serve on its machine, its picker reading `thumbnail_path`) |
+| Comparison pictures in each tool | the lead: not this phase. Research seeded (`261014_R_ComparisonPictures.md`) |
+
+**Docs conformed at the close:**
+- Catalog §Thumbnails and `_Architecture` §LCD row 9: the `usdrecord` claims are annotated as superseded (F-P17-12).
+- RD-MP-5's four "preview" wordings: Catalog, RuntimeCatalog, Consumers and M9.
+- The Glossary's *Thumbnail*: no longer planned.
+- ToolingConventions: `tools/thumbnails/`, `library/thumbnails/` and an entry point.
+- Learnings Blender B13 – B15.
+- SiteFile and RuntimeCatalog were conformed at 17.5 and 17.6.
+
+**Pushed:** through `349abf2` at the lead's words at 17.5 and 17.6. Unpushed: `f643e02`, `697c942` and the close.
 
 ## Discovery Log
 

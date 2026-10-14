@@ -6,7 +6,7 @@
 
 **Question:** can the dev install serve each material's thumbnail, named in the dev catalog, the way it already serves each HDRI's?
 
-**Extends, does not replace:** [Phase17 — Thumbnails](../Phases/Phase17_Thumbnails.md) (its *Not now* row *"Thumbnails served in the dev install"*, and F-P17-24), [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §HDRIs (`hdris[].thumbnail_path`), [PlatformDependencies](../PlatformDependencies.md) M10, P19, P3.
+**Extends, does not replace:** [Phase17 — Thumbnails](../Phases/Complete/Phase17_Thumbnails.md) (its *Not now* row *"Thumbnails served in the dev install"*, and F-P17-24), [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §HDRIs (`hdris[].thumbnail_path`), [PlatformDependencies](../PlatformDependencies.md) M10, P19, P3.
 
 **Public-repo note.** The platform's planning is private. It is summarised here by what it does with the library and what it needs — no platform paths, code or ruling ids.
 

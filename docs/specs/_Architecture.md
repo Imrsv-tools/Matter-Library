@@ -152,7 +152,7 @@ The settled technical decisions this architecture rests on. They were first reac
 | 6 | ~~Unreal masters target the legacy material model for v1; Substrate deferred.~~ **Superseded 2026-09-23 by R15: Unreal 5.8+ with Substrate.** | The original deferral was for Substrate's maturity and VR issues in 5.6/5.7. The surviving part: **the master contract (names, parameters, LCD mapping) is the stable artifact; the renderer implementation swaps.** |
 | 7 | **One self-contained `.mtlx` file per article.** | Multi-file include chains fail to find node definitions in some USD viewers (OpenUSD issues #1636 / #1586). A consumer must also set the MaterialX standard-library search path for its USD build. |
 | 8 | **Resolution uses the stock USD search path.** A bare `@Name.mtlx@` resolves through `ArDefaultResolver` and `PXR_AR_DEFAULT_SEARCH_PATH`, with no custom resolver. | Works everywhere USD does. Gotcha: the current directory is searched first and can shadow an install. |
-| 9 | **Viewers approximate transmission and subsurface.** TranslucentThick and Subsurface get a "recognisable, not ΔE < 2" bar in real-time USD viewers; `usdrecord` suits the thumbnail pipeline. | Real-time rasterisation cannot path-trace these lobes. |
+| 9 | **Viewers approximate transmission and subsurface.** TranslucentThick and Subsurface get a "recognisable, not ΔE < 2" bar in real-time USD viewers; `usdrecord` serves the preview (review) render. *Thumbnails are Cycles showcase renders* (Phase17, RD-MP-2). *Was, until 2026-10-14: "`usdrecord` suits the thumbnail pipeline".* | Real-time rasterisation cannot path-trace these lobes. |
 
 ---
 

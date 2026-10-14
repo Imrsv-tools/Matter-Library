@@ -44,7 +44,7 @@ It asks two questions. **Which renderer counts as each tool's own** (Cycles or E
 
 ## Pointers
 
-- Phase17 — Thumbnails (`docs/Planning/Phases/Phase17_Thumbnails.md`): F-P17-9, RD-P17-7, the record and stale logic.
+- Phase17 — Thumbnails (`docs/Planning/Phases/Complete/Phase17_Thumbnails.md`): F-P17-9, RD-P17-7, the record and stale logic.
 - `tools/parity/JOB_FORMAT.md` (the job, the matched lighting, the Unreal driver), `tools/parity/scene/build_scene.py`.
 - [SiteFile](../../specs/Contract/SiteFile.md) `pictures[]`. [PlatformDependencies](../PlatformDependencies.md) M9.
 - [`261014_R_MaterialPipeline.md`](261014_R_MaterialPipeline.md) F-MP-6 (the rig's pictures are not thumbnails), RD-MP-2 (Unreal hero picture, waiting on a showcase runtime).
