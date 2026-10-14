@@ -13,7 +13,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 ### Phase14 — HDRIs in the Library — ACTIVE *(numbered Phase14 and opened by the lead 2026-10-14, "/discovery P14"; added 2026-10-14 by `/research` on the lead's "seed the phase", from the platform's HDRI asks, RD-SKY-1 to 4; the platform's own HDRI phase waits on it)*
 **Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
-- `docs/Planning/Phases/Future/Phase14_HdrisInTheLibrary.md`
+- `docs/Planning/Phases/Phase14_HdrisInTheLibrary.md`
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 
