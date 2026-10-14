@@ -1,7 +1,7 @@
 {
   "_comment": "Cleft (riven) slate: a fine-grained, dark blue-grey metamorphic stone split along its cleavage, so its face is a set of shallow, ragged terraces with a faint ripple and the odd rusty iron stain: a roofing or flooring slate as split, not honed. Opaque: a solid, dull dielectric. Base textures are generated (L2, tools/converters/base/gen_slate_cleft.py), not scanned: ambientCG has no asset that names slate as a stone surface (only slate roofing tiles, an assembly, and a gravel), and the library names only what a source states. Carries every relevant wear layer at 0 (C1): edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Slate_Cleft_Clean_Base_s1_v01",
-  "status": "draft",
+  "status": "approved",
   "path": "natural/stone/Slate_Cleft_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",

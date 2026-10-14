@@ -1,7 +1,7 @@
 {
   "_comment": "Unglazed fireclay: a refractory clay fired hot (firebricks, kiln furniture, the bare body of fireclay sinks), denser and paler than earthenware: a buff-cream body with coarse grog and dark iron specks, matte and porous. Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_fireclay_natural.py) with their MEAN albedo anchored to a judgement, since Physically Based has no fireclay (its Clay is modelling clay, its Brick is red). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant. Built by the Phase11 batch.",
   "name": "Fireclay_Natural_Clean_Base_s01_v01",
-  "status": "draft",
+  "status": "approved",
   "path": "engineered/ceramic/Fireclay_Natural_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",
