@@ -85,7 +85,11 @@ The options, independent of each other:
 - **Checks to carry forward:** F4 (encoder on this box) before any `.dds`-bearing step; the host's per-asset limit (F6); the `LCDSchema.md` vs Coverage `## Resolved` check (Q7).
 - **Ruled since Pass 1 (2026-10-14, the lead; `261014_R_TheLibrarysSite.md`):**
   - **RD-WS-2, the host:** each release is published **on GitHub Releases with its digest**, and IMRSV's web side mirrors it, verified against that digest. F6's size check still applies: GitHub documents a per-file limit under 2 GiB, which shapes how the bundle is split; confirm it when discovery resumes.
-  - **RD-WS-4:** a file for the library's website and a standard preview set are published beside each release. Whether this phase or *See the Library* builds them is for discovery, when it resumes.
+  - **RD-WS-4:** a file for the library's website and a standard preview set are published beside each release. Whether this phase or *See the Library* builds them is for discovery, when it resumes. *(Since seeded as their own phases: Materials Described and Thumbnails.)*
+- **Carried from `261014_R_MaterialPipeline.md` (2026-10-14), for L2 and the checks:**
+  - **F-MP-27:** the pilot's 12 approved articles never went through the build loop's review; the first release for users re-judges them or carries them as they are.
+  - **F-MP-29:** the compressed-texture encoder is missing (F4, above).
+  - **F-MP-30:** at about 200 articles the bundle may need splitting under GitHub's per-file limit (F6, above).
 
 ## Execution Log
 

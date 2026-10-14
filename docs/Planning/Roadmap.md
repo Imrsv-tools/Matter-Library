@@ -60,7 +60,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 ### Contribution Path — RESEARCH
 **Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md`
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md` · `docs/Planning/Research/261014_R_MaterialPipeline.md` F-MP-28 (a contributed generator script runs as code on the library service: a sandbox or a maintainer's read before a run)
 
 ### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here)*
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.

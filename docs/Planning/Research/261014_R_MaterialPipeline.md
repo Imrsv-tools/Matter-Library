@@ -431,6 +431,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **Seeded (F-MP-48):** *The Library Service*, *Thumbnails*, *Materials Described*, *The Library Console*, *Two Licences*, *Skin Maps*.
 - **Current direction:** the flow's first half runs, on a laptop. Its second half is now six seeded phases, the service first, because everything after it runs there.
 - **Open:** nothing in this doc. Each seed carries its own open questions.
+- **Routed (2026-10-14):** F-MP-27, -29 and -30 → the release-bundle phase doc; F-MP-31 → *Version Management*; F-MP-28 → *Contribution Path* (its Roadmap pointer); the new terms → the Glossary (*Thumbnail*, *Site file*, *Library service*, *Approved human mesh*, *Skin map*).
 - **Durable docs owed, and the verb that lands them:**
   - **RD-MP-1 and RD-MP-8's consequences:** owned by *Two Licences*.
   - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them (*Thumbnails* at the latest).

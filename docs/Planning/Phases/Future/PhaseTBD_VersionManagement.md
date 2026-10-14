@@ -43,6 +43,11 @@ The release machinery exists and has cut one pilot (`matterlib-0.1.0`). What has
 ### First curated release
 - ~~Author the first real manifest, tag `matterlib-1.0`, validate end-to-end consumption by the platform.~~ — **Partly delivered, re-shaped:** the first real manifest and approval exist as the **pilot** `matterlib-0.1.0`, and consumption by IMRSV ran on it. **The first release for users**, and its version number, is a lead decision owned by the release-bundle phase (lead, 2026-09-23: "Create whatever version we need; we are unreleased").
 
+## Carried in (2026-10-14)
+
+- **Retiring an article must not break the compositions that use it** (`261014_R_MaterialPipeline.md` F-MP-31). The old release stays installable, and the composition's pin finds it. What a consumer tells the Creator is open (`Experience_MatterLibrary.md` §Open Experience Questions).
+- **The team's console** (*The Library Console*, seeded 2026-10-14) is where a maintainer cuts the next release. This phase owns the rules it follows.
+
 ## Dependencies / related
 
 - The release lifecycle as built: [`docs/specs/Distribution/ReleaseModel.md`](../../../specs/Distribution/ReleaseModel.md).
