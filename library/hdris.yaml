@@ -1,0 +1,8 @@
+# The HDRIs' library-wide settings (Phase14, Q-P14-5). The HDRIs themselves are the files in
+# MatterLibrary/hdris/, each with its record in library/provenance/sources/hdris/.
+#
+# default: the HDRI a new scene starts with (A3). Named once, here: the dev install
+# (tools/releases/serve_to_stage.py) writes it as the catalog's `default_hdri`, and a release
+# lockfile carries it as `default_hdri`. It is the sky every scene used before the library held
+# HDRIs, byte-identical to it (Phase14 14.1), so no scene's look changes.
+default: IndustrialSunset02_PureSky

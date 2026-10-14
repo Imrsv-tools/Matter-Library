@@ -1,0 +1,59 @@
+# One HDRI's record (Phase14): its provenance block, which a release lock carries, and
+# everything Poly Haven credits and tags. Written by tools/converters/import_polyhaven_hdri.py.
+id: IndustrialSunset02_PureSky
+version: v01
+status: candidate
+file: MatterLibrary/hdris/IndustrialSunset02_PureSky_v01.hdr
+provenance:
+  source: Poly Haven
+  license: CC0-1.0
+  evidence:
+    url: https://polyhaven.com/a/industrial_sunset_02_puresky
+    file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/industrial_sunset_02_puresky_4k.hdr
+    sha256_scope: file
+    sha256: 79c8cbb67b306a04ae8e5aa17536f8f5fb71b2219c09b39793890bc53b1ef9f7
+    md5: 4622800e22ecc1b2930e03df65fb3a00
+credit:
+  source: Poly Haven
+  source_url: https://polyhaven.com
+  asset_id: industrial_sunset_02_puresky
+  asset_url: https://polyhaven.com/a/industrial_sunset_02_puresky
+  name: Industrial Sunset 02 (Pure Sky)
+  authors:
+  - name: Jarod Guest
+    role: Sky Edits
+  - name: Sergej Majboroda
+    role: Original
+  sponsors:
+  - id: '37678923'
+    name: Giraffart
+    url: http://www.giraffart.co.uk/
+  info: Edited sky-only version of [Industrial Sunset 02](https://polyhaven.com/a/industrial_sunset_02).
+description: Free 16K, unclipped HDRI showing a calm industrial sunset, cool blue skies with partly cloudy, medium-contrast lighting and a low warm sun casting soft glow.
+tagging:
+  tags:
+  - pure skies
+  categories:
+  - outdoor
+  - skies
+  - nature
+  - natural light
+  - partly cloudy
+  - medium contrast
+  - sunrise-sunset
+  - pure skies
+  attributes:
+    time_of_day: sunset
+    weather: partly_cloudy
+    light_type: natural
+    contrast: medium
+    season: spring
+    environment: outdoor
+    sky_view: open
+captured:
+  date_taken: '2019-05-29'
+  evs_cap: 12
+poly_haven:
+  date_published: '2023-01-21'
+  files_hash: 2642377bdc8dc045bd156228b972d5f3aa6eb775
+retrieved: '2026-10-14'
