@@ -17,7 +17,7 @@ Today skin is a flat tone per part, which the lead judged *"pretty terrible in f
 
 ## Scope — as ruled at research (2026-10-14)
 
-The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../Research/261014_R_SkinMaps.md) §Resolved and Passes 1–4.
+The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../Research/261014_R_SkinMaps.md) §Resolved and Passes 1–6. **A draft contributor spec exists** (RD-SKM-6, 2026-10-14): [`docs/specs/Authoring/SkinMaps.md`](../../../specs/Authoring/SkinMaps.md). This phase hardens it, turning its *Proposed* and *Open* marks into rulings.
 
 - **A skin map is a fit-set picture for the approved mesh** (F-SKM-10). The skin article stays the substance (tone, scatter, coat, fuzz, pores), so CM2 holds.
 - **The colour half needs no contract change:** `base_color_map` on Subsurface exists in every library target (F-SKM-3).

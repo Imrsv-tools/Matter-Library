@@ -20,6 +20,7 @@ Navigation for `docs/specs/`. **Start at [`_Architecture.md`](_Architecture.md)*
 | what a Blender-exported Matter asset must look like | [`Contract/CreatorAssetProfile.md`](Contract/CreatorAssetProfile.md) |
 | what is in the current release | [`Catalog/Catalog.md`](Catalog/Catalog.md) |
 | how materials get made, and the provenance rule | [`Authoring/AuthoringGoldenPath.md`](Authoring/AuthoringGoldenPath.md) |
+| what a contributed skin map is, and how to make one *(draft, planned)* | [`Authoring/SkinMaps.md`](Authoring/SkinMaps.md) |
 | how a release is staged, frozen, approved, activated and rolled back | [`Distribution/ReleaseModel.md`](Distribution/ReleaseModel.md) |
 | what the tools in `tools/` do and which gates run | [`Tooling/AuthoringHarness.md`](Tooling/AuthoringHarness.md) |
 | the pinned USD + MaterialX build used for validation | [`Tooling/USDValidationToolchain.md`](Tooling/USDValidationToolchain.md) |

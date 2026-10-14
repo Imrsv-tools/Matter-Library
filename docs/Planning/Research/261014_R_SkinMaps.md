@@ -419,13 +419,14 @@ The sourcing marks are Pass 3's.
   - the content of the US Copyright Office report;
   - any measured loss when moving maps between layouts.
 - **Open:** Q-SKM-4, naming a mesh version (for the phase).
-- **Durable doc owed (RD-SKM-6):** `docs/specs/Authoring/SkinMaps.md`, a draft contributor spec, landed by a lead-directed `/quick-fix` (in progress 2026-10-14).
+- **Durable doc (RD-SKM-6): landed** 2026-10-14 as the draft `docs/specs/Authoring/SkinMaps.md`, by a lead-directed `/quick-fix` (the `✅ Quick Fix — skin-map contributor spec` commit).
+  - It marks each statement *Ruled*, *Proposed* or *Open*. The phase's discovery hardens the *Proposed* and *Open* ones.
+  - Pointers: `_Docs_Index`, `_Architecture`, the Glossary's *Skin map* and the phase stub.
 - **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
 - **Owed by the phase, found by the probe:**
   - re-assemble the six skin articles to take a map (F-SKM-19);
   - map a tinted, map-following scatter colour in Blender (F-SKM-23);
   - write the normalisation rule: the measured tone stays the average (F-SKM-20, F-SKM-25).
 - **Next step:**
-  1. The draft spec (RD-SKM-6), by the lead-directed `/quick-fix`.
-  2. `/discovery` on *Skin Maps*, when the lead opens it.
-  3. The AI detail-layer probe, on the library service's GPU.
+  1. `/discovery` on *Skin Maps*, when the lead opens it: it hardens the draft spec.
+  2. The AI detail-layer probe, on the library service's GPU.
