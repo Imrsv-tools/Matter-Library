@@ -206,11 +206,34 @@ Until that phase writes them, this section is the authority.
 - **Safe for today's consumer either way:** it reads `groups[]` and each entry's fields by name and ignores a key it does not know.
 - **The words underneath stay Poly Haven's** — `when` and `sky` unchanged; A11 adds the grouping beside them, nothing in their place.
 
+## Pass 5 — one more ask: a name a person reads, for each HDRI (2026-10-14)
+
+*From the platform's side. Read against `5f50522`: the served dev catalog, and the 59 records under `library/provenance/sources/hdris/`, counted by a throwaway script that wrote nothing. One ask, A12. The ruling is the library's; the platform's lead has said how the app would like it, below.*
+
+**The need.** The app's HDRI window shows each HDRI as a card: its 2:1 thumbnail, a title on one line, and *"Poly Haven · CC0"* under it. The title is the one thing the dev catalog has no field for. An HDRI's `display_name` is its id by contract (RuntimeCatalog §HDRIs, *"The id; UI metadata"*), so a card would read *AristeaWreck_PureSky*, *Kloofendal48dPartlyCloudy_PureSky*. The platform's lead ruled (2026-10-14) that the app shows the name **as the library serves it** — so the cards read as ids until the library serves a readable one — rather than the app deriving a name of its own and keeping a second copy of the library's naming rule.
+
+**What the library already holds.** Every one of the 59 records has Poly Haven's own title, `credit.name` — *Aristea Wreck (Pure Sky)*, *Drakensberg Solitary Mountain (Pure Sky)* — and the catalog does not carry it. All 59 end in *(Pure Sky)*. With it, 15 of the 59 are longer than 30 characters (the longest is 40); without it, the longest is 29, and no two of the 59 are the same.
+
+| # | Ask | Why | What exists |
+|---|---|---|---|
+| A12 | **A name a person reads, on each HDRI, in what the dev install serves** — one string per entry, beside `display_name`. | The app's card title, and the name shown under the chosen HDRI in the app; the site could show the same. | Poly Haven's `credit.name` in each record, not projected; `display_name` = the id. For materials, the site file's `label` is the same idea (SiteFile §Schema, `label`: *"The name a person reads"*). |
+
+**How the platform would like it** *(its lead's wish, the library's ruling):*
+
+- **A key `hdris[].label`**, as the site file already names a material's readable name, in the dev catalog and the site file alike.
+- **Its value: Poly Haven's own title, without *(Pure Sky)*** — *Aristea Wreck*, *Drakensberg Solitary Mountain*, *Industrial Sunset 02*. Every HDRI in the library is a pure sky today, so the suffix tells none apart, and the card has room for one line only. If the library later holds two variants of one source, the label is where they differ, by the library's rule.
+- **The source's spelling, not a re-cased one** — Poly Haven writes names as titles (*Kloofendal 48d Partly Cloudy*), and the credit under it already quotes Poly Haven.
+- **Additive, `schema_version` unchanged**, as `contributor` and `credit` were. Left out when the record holds no name, never filled with the id: the app falls back to `display_name` on its own.
+
+- **Safe for today's consumer:** the app reads each entry's fields by name and ignores a key it does not know; until `label` is served, it shows `display_name`.
+- **Nothing else changes:** `id`, `display_name` and the file names stay as they are; a scene still names `<id>_<version>.hdr`.
+
 ## Status
 
-- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10) · 4 (the platform's side: A9, A10 seen served; A11).
+- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10) · 4 (the platform's side: A9, A10 seen served; A11) · 5 (the platform's side: A12).
 - **Open (Pass 4, 2026-10-14):** A11 — the HDRI rows' grouping in what the dev install serves, or a ruling that it stays each consumer's. The library's to rule.
+- **Open (Pass 5, 2026-10-14):** A12 — a name a person reads on each HDRI (`hdris[].label`, Poly Haven's title without *(Pure Sky)*, as the platform would like it). The library's to rule.
 - **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
 - ~~**Open:** A1 – A8 …~~ **Delivered 2026-10-14 by Phase14** (`docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`): A1 – A6 and A8 in full, and A7 for the dev install. A release that holds HDRIs is planned. The Glossary's *HDRI* headword landed. The ledger row M10 says what the library serves.
 - ~~**Open (Pass 3, 2026-10-14):** A9 (each HDRI's credit) and A10 (each HDRI's tagging), in what the dev install serves. The library's to rule: where, and in what shape, beside the `no_projection_guard` rule. The library's pass on them is owed.~~ *(Answered and served — Phase16 and Phase15; seen in Pass 4.)*
-- ~~**▶ Next:** the lead starts `/discovery` …~~ **▶ Next:** the library's pass on A11. The platform's HDRI phase builds the rest of its side against the dev install (M10). *(The Pass-2-era Open and Next lines that came in with Pass 3 were written against `94ad878`, before Phase14 closed; they are folded into the lines above at the merge.)*
+- ~~**▶ Next:** the lead starts `/discovery` …~~ **▶ Next:** the library's pass on A11 and A12. The platform's HDRI phase builds the rest of its side against the dev install (M10). *(The Pass-2-era Open and Next lines that came in with Pass 3 were written against `94ad878`, before Phase14 closed; they are folded into the lines above at the merge.)*
