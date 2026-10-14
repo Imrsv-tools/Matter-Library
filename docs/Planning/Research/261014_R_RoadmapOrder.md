@@ -111,6 +111,41 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 
 ---
 
+## Pass 3 — Where the library service runs: the web server, or a new machine (2026-10-14)
+
+**The lead, verbatim:** *"Do I need a new Hetzner machine or should we/ could we run it on the Web system? I think the laptop work but concurently we can define and setup the server specs.... what do you think?"*
+
+**It re-asks a ruling, quoted:** RD-MP-12, *"The library service needs a new server, rented from Hetzner … The platform's web server is the only server today, and it records no GPU."* This pass tests whether that still holds. It does not reverse it.
+
+**Examined:** the platform's web repo, read-only. Its server facts are not copied here (this repo is public). Also, Hetzner's GPU offer as third parties report it.
+
+- **F-RO-9 — The web server is a small, shared cloud server with no GPU.** Its own docs throttle the platform's builds on it because it is shared (read 2026-10-14). Hetzner's cloud servers do not offer a GPU; its GPU machines are dedicated servers rented by the month. **Unverified as of 2026-10-14** (third-party listings; Hetzner's own price page was not read): the entry model is the GEX44 (one RTX 4000 SFF Ada, 20 GB), quoted at €184 to €234 a month plus a setup fee. The service's discovery reads the price on hetzner.com.
+- **F-RO-10 — The service is two halves, and only one of them could live on the web server:**
+  - **The GPU half** cannot run there:
+    - the rig in three tools (the Unreal runtime needs Vulkan on a GPU, and Storm and Cycles render on one);
+    - thumbnails;
+    - the 30–50 minute toolchain build.
+
+    With no GPU, rendering on a few shared cores would take hours per batch and slow the site down.
+  - **The light half** could run there: the console, the dev catalog, serving the thumbnail folder, git.
+  - **Two jobs never run on the web server, whichever shape is chosen:**
+    - the agent's sessions, which hold push rights to this public repo;
+    - a contributor's generator script, which is outside code (F-MP-28).
+
+    A public website's machine should hold neither.
+- **F-RO-11 — Three shapes. Each keeps the code in this repo, so each keeps RD-MP-11 and RD-WS-1's *"the library survives without IMRSV"*:**
+  - **(a) One new GPU machine runs everything** (RD-MP-12 as ruled). One box, one setup, always on. It costs one monthly rental.
+  - **(b) The light half on the web server, the GPU half on a new GPU machine.** Two boxes, and the renders are copied from one to the other for the console to show. The saving is small, because the GPU box is rented by the month anyway.
+  - **(c) The light half on the web server, with a GPU hired by the hour** from a cloud that rents GPUs that way (Hetzner does not). It is cheapest if batches are occasional. It has the most moving parts: the toolchain and the Unreal runtime are set up again on every start.
+- **F-RO-12 — "The laptop work, and concurrently define and set up the server specs" is Pass 2's draft, with the service's discovery run beside the laptop phases.** That parallel track is the service's discovery, which delivers:
+  - the spec (GPU, its memory, RAM, disk), measured from what the rig, the toolchain and the Unreal runtime use on today's two machines;
+  - the price from Hetzner's own page;
+  - the setup recipe, in this repo.
+
+  **Renting the machine is the lead's act.** No laptop phase waits on it.
+
+---
+
 ## Open questions
 
 | Id | Question | Recommendation |
@@ -119,6 +154,7 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 | Q-RO-2 | **When does the Release Bundle start?** Its L1 ruling (2026-09-25) is the lead's *"b"*, choosing the option that reads *"Re-sequence. Library Coverage becomes P4 (the ~200 materials) … The bundle waits for a library worth versioning."* The same day: *"we have 200 materials to build and test before we have our first versionable library"*. RD-MP-13 has since made material work a standing process with no end. So what marks *"worth versioning"* now: a count of kept materials, or the console existing to cut one? | **After the console, at a count the lead names when it reaches the head of the list.** Not blocking today. |
 | Q-RO-3 | **The four overlapping older entries** (F-RO-6): keep them as they are, or annotate them? | **Annotate, never delete:** *See the Library* and *IMRSV Consumes Releases* marked as consumer outcomes; *Author a Material End to End* and *Parity Baselines* marked `Reevaluate (2026-10-14)`, with a pointer to what overlaps them. |
 | Q-RO-4 | **One Roadmap line for the standing material-making process**, so the Roadmap does not read as if material work stopped when Phase11 closes (F-RO-7)? | **Yes:** one line under `## Active`, *"Material-making: a standing process, not a phase"*, pointing at `library/wishlist.yaml` and the batch summaries. |
+| Q-RO-5 | **Where the library service runs** (F-RO-11): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, or (c) the light half on the web server and a GPU hired by the hour? | **(a)**, which keeps RD-MP-12. A GPU machine is rented by the month anyway, so moving the light half off it saves little and adds a copy step and a second machine to keep running. The web server stays the website's. The service's discovery confirms it with a measured spec and Hetzner's own price. |
 
 ## Resolved
 
@@ -126,13 +162,18 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 
 ## Status
 
-- **Passes captured:** 2 (2026-10-14). Pass 1 is the audit, Pass 2 the draft order.
+- **Passes captured:** 3 (2026-10-14). Pass 1 is the audit, Pass 2 the draft order, Pass 3 where the library service runs.
 - **Current direction:**
   - close Phase11;
-  - then the five laptop phases, HDRIs first because the platform is waiting, with the service's discovery started early because the server must be rented;
+  - then the five laptop phases, HDRIs first because the platform is waiting;
+  - **beside them, the service's discovery:** the server's spec, its price and its setup recipe. The lead proposed this (F-RO-12);
   - then the server-bound three;
   - then the first real release and its consumers.
-- **Open:** Q-RO-1 (the cut and the numbers) is the one that changes what happens next. Q-RO-2 to Q-RO-4 each carry a recommendation and block nothing.
+- **The web server cannot host the service's GPU half** (F-RO-10). The recommendation stays RD-MP-12: one new GPU machine (Q-RO-5).
+- **Open:**
+  - Q-RO-1 (the cut and the numbers) is the one that changes what happens next.
+  - Q-RO-5 (where the service runs) changes the service's scope, not the order.
+  - Q-RO-2 to Q-RO-4 each carry a recommendation and block nothing.
 - **Next step:** the lead cuts the order and names the numbers. The ruling lands in `## Resolved` first. Then, as a lead-directed `/quick-fix`, the change goes onto the Roadmap:
   - reorder `## Future`;
   - rename each numbered stub from `PhaseTBD_<Name>` to `Phase<NN>_<Name>` and fix its pointers (F-RO-8);
