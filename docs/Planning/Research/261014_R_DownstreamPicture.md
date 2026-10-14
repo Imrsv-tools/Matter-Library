@@ -303,4 +303,6 @@ Every consumer reads what the library publishes, so the library's items come fir
 - **Graduated 2026-10-14 (the lead: *"push it, then do the doc quick fix"*):** the doc-only quick fix landed (the commit marked `✅ Quick Fix`): ReleaseModel's layout (F-DS-1, F-DS-2), the Consumers drift note, and the ledger notes on P3, P7, P19, P21 and M10, with new rows P25, P26, M11 and M12.
 - **Numbered 2026-10-14 (RD-DS-6):** Phase15 – 17, ahead of Scale Grids (Phase18).
 - **Re-sequenced 2026-10-14 (RD-DS-7):** Phase15 – 20 as above, so the whole chain (structure, facts, service, pictures, Character) is in place before materials are added at volume again.
-- **▶ Next:** `/discovery Phase15` when the lead opens it (a deliberate gate). That quick fix now also adds ledger rows for F-DS-12's ask: a bound material and a scene's sky carry their id, contributor and licence.
+- **Taken up 2026-10-14 evening, in other sessions:** Phase15 and Phase16 each have discovery Pass 1 and a Brief, and Phase15 is executing (the lead chose Character's folder, `materials/character/humanoid/<part>/`). Their phase docs are now the authority; this doc's §Resolved stays the record of the rulings they rest on.
+- **Still open here, none blocking:** Q-DS-3 (may a build for others carry the dev install), Q-DS-4 (the dev install's identity), Q-DS-5 (where the fit pictures live in a real release).
+- **▶ Next:** nothing from this research. It parks. That quick fix now also adds ledger rows for F-DS-12's ask: a bound material and a scene's sky carry their id, contributor and licence.
