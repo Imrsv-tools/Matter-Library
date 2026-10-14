@@ -65,6 +65,21 @@
 
 ---
 
+## Pass 2 — the platform's pass (2026-10-14)
+
+*Written from the platform's side, at the lead's word: "is there anything you need to / want to relay back to the Matter library... just update and push the doc". Read against the platform's own code; what is stated here about it is not verifiable from this repo (private code).*
+
+- **Ask 1 (P27) — confirmed, and taken now.** Stage takes as search roots exactly the folders two levels below `materials/`, so the 30 Character materials are not found by bare name. Nothing else on the platform's side depends on the depth: a material's textures are reached by its own relative path, and a pick from Studio's picker finds its file through `payload_path`. The lead ruled the change be made at once: Stage will search every folder under `materials/` that holds a `.mtlx`, at any depth, as [Consumers](../../specs/Consumers.md) says. **Done when** is the library's own: the character wears the dev install's skin, eyes, hair, nails, teeth and mouth with nothing magenta.
+- **GPA-Q1 — yes, the platform kept the `id`, in every saved scene.** When a library material is bound, the platform names the material instance in the scene after the material's catalog `id`, and later recognises the instance by that `id`. So every scene saved before this regroup that holds a Character material names it `biological/tissue/…` (flattened) and **no longer recognises it**, even once Ask 1 is built. The bare `.mtlx` name inside it is unchanged and would resolve.
+  - **The platform takes the loss.** It is pre-release; the lead: *"we do not need to be reverse compatible with previous compositions... we are still building and this is a part of growth... more will be coming soon"*.
+  - **The platform will recognise a bound material by its bare name, not by its `id`** (the lead's ruling), so the next regroup costs scenes nothing. Not built yet.
+  - **Asked of the library (GPA-Q2): say in the contract that the bare name is the stable key and the `id` is not.** Today [Identity](../../specs/Ontology/Identity.md) and [Consumers](../../specs/Consumers.md) say a material resolves by its bare name, but nowhere that the name survives a regroup while the `id` (where it is browsed) may move. The platform is about to lean on exactly that, and so does every saved scene in any consumer. A sentence in Identity, and a line in Consumers' *what a consumer may rely on*, would do. If the library can't promise it (a name that must change, say, for a rename), say what happens then, and the platform plans for it.
+- **P6 — already true on the platform's side.** Studio's picker builds its class list from the catalog's classes; no class is hard-coded. Only its scale list is fixed. The row can close on this report.
+- **Ask 2 (P25) — taken in the platform's work on HDRIs, now in discovery.** Stage reads nine keys per material today and drops the rest, and reads no `hdris` at all yet. The platform's HDRI work adds the HDRI list and is where Studio's library windows learn to narrow by rows, as the website does. The groups, their taxonomies and Character's rows come in with it, read from `groups[]`, and the group is never inferred from the domain.
+  - **A10 is received:** `hdris[].tagging`, `when` and `sky` in the dev catalog are what the platform's Sky window narrows by. **A9 (the credit) waits on the library's Phase16** (P26), as this doc says.
+- **One word note, no change asked.** In the platform, *group* already names an area of a Set or Prop, and *part* a shape added under an object. The platform's app will label the library's groups and Character's parts in words of its own; the catalog's field names are fine as they are.
+
 ## Status
 
-- **2026-10-14:** written by the library at the lead's word. Both asks are in the ledger: P27 (urgent) and P25. **The platform's pass is owed**, taken up in a platform session.
+- **2026-10-14:** written by the library at the lead's word. Both asks are in the ledger: P27 (urgent) and P25. ~~**The platform's pass is owed**, taken up in a platform session.~~
+- **2026-10-14:** the platform's pass is Pass 2. P27 is being built now; P25 rides the platform's HDRI work; GPA-Q1 is answered (yes, and the platform moves to the name). **Owed by the library:** GPA-Q2 (the bare name as the stable key, in the contract), and the ledger rows P6 (closes on the platform's report) and P27/P25 (the platform's status).
