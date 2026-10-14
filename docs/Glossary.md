@@ -83,6 +83,8 @@
 | **Thumbnail** *(planned)* | A published showcase picture of an article: rendered at its best on a subject that suits it, labelled with its renderer, never stored in git. Not a **preview** (the review render, `tools/preview_generators/`) and not a rig picture (a diagnostic). → `docs/Planning/Phases/Future/PhaseTBD_Thumbnails.md` |
 | **Site file** *(planned; name not chosen)* | The file the library publishes beside each release for its website: what a person sees about each article. The runtime catalog stays the engines' file. → `docs/Planning/Research/261014_R_TheLibrarysSite.md` RD-WS-4 |
 | **Library service** *(planned)* | The permanent server the library's work runs on (the rig, the build loop, thumbnails, the console), with its code in this repo, run by IMRSV. → `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md` |
+| **Scale grid** *(planned)* | A diagnostic article per scale tag, the same name except that tag, one colour per length in every grid, shipped in releases: swap a scene's objects to them and a wrong UV scale is obvious (RD-SP-1 – 4). → `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md` |
+| **HDRI** *(planned, as a library entry)* | A scene's lighting picture, chosen from the library by name like an article; the library is the only place it comes from. → Phase14 in `docs/Planning/Roadmap.md` |
 | **Staging** (staging tree) | The built release payload, with PNG + compressed textures, under `library/staging/`. It is rebuildable and never committed. → `docs/specs/Distribution/ReleaseModel.md` |
 | **Freeze** (freeze record, hash-lock) | `*.freeze.json`: the hashes of the manifest, catalog, `.mtlx` files and textures, combined into one `payload_digest`. → `docs/specs/Distribution/ReleaseModel.md` |
 | **Release approval** | `*.approval.json`: the external record that promotes a frozen release to activation-eligible. It never edits the manifest. → `docs/specs/Distribution/ReleaseModel.md` |
@@ -104,7 +106,7 @@
 | **Provenance** | The recorded origin and licence of every shipped texture, with `evidence: {url, sha256}` for third-party sources. → `docs/specs/Contract/Manifest.md` |
 | **Shipped-pixel rule** | No pixel ships in a release unless its provenance is recorded and it is CC0-dedicable (lead ruling R13). → `docs/specs/Authoring/AuthoringGoldenPath.md` |
 | **CC0-dedicable** | An input that can be released under CC0-1.0 with no rights retained, e.g. ambientCG or in-house procedural textures. → `LICENSE-CONTENT.md` |
-| **Wish list** | Every material the library wants, one row each, with where it stands (`queued` · `built` · `stuck` · `kept` · `redo`): `library/wishlist.yaml`. It says `kept`, never "approved"; a keep writes the article's *Status lifecycle* word. → `docs/ToolingConventions.md` |
+| **Wish list** | Every material the library wants, one row each, with where it stands (`queued` · `built` · `stuck` · `kept` · `redo`): `library/wishlist.yaml`. A row is `build` (make it) or `rejudge` (an article already on disk: rig and review only). It says `kept`, never "approved"; a keep writes the article's *Status lifecycle* word. → `docs/ToolingConventions.md` |
 | **Batch** | One run of the material-making loop (`/matter-batch`) over the next few wish-list rows: each built, rigged in all three tools, refined up to 3 rig runs, and committed as `draft`, with one summary in `library/batches/` that the maintainer reviews to keep or redo each row. **A standing process, never a phase** (Phase11, RD-MP-13). → `docs/ToolingConventions.md` |
 
 ## Creator assets and Blender
@@ -128,6 +130,8 @@
 | **BCn** / compressed role | GPU block-compressed textures (BC7 / BC5 / BC4) chosen by a texture's role (colour, normal, single-channel). → `docs/specs/Tooling/CompressedDistribution.md` |
 | **Codec A/B** | The ΔE2000 comparison of each PNG against its compressed twin, gating that compression stays visually faithful. → `docs/specs/Tooling/CompressedDistribution.md` |
 | **OCIO parity config** | The colour-management config used so every parity render is judged under the same view transform. *Reevaluate (2026-10-14): nothing calls its builder, and the parity rig compares with no tone curve (`tools/parity/JOB_FORMAT.md`); whether to retire it is open (`docs/Planning/Research/261013_R_PlatformTrackedItemsAsks.md` TI-F5).* → `docs/specs/Tooling/CompressedDistribution.md` |
+| **Parity rig** (the rig) | `tools/parity/rig.py`: renders one article side by side in USDLiveView's renderer (Storm), Blender (Cycles) and Unreal at its real tile size, with a 10 cm ruler, into one sheet; `--sweep` moves each Creator slider and scores whether every tool moved alike. Not a **preview** (Storm only, not to scale). → `docs/ToolingConventions.md` |
+| **Moved verdict** (keep by verdict) | The rig's per-slider judgement, read from its scorecard by `wishlist.py verdict`: did every tool move alike. A row whose sliders all did can be **kept by verdict**, without a sitting; the rest go to the lead's eye (Phase11 close, RD-MP-13). → `docs/ToolingConventions.md` |
 | **USD validation toolchain** | The pinned OpenUSD + MaterialX build (`tools/usd-toolchain/`) used to preview and check articles the way a USD consumer sees them. → `docs/specs/Tooling/USDValidationToolchain.md` |
 
 ## Consumer-side terms (IMRSV)
@@ -166,7 +170,7 @@
 |---|---|
 | **RESEARCH** | Roadmap status: the thinking lives in a research doc — no phase doc yet; the entry's pointers are the raw material. |
 | **SEEDED** | Roadmap status: a phase doc exists. That doc is what discovery → plan → execute run against. |
-| **ACTIVE** | Roadmap status: being worked. The phase doc moves from `Phases/Future/` up to `Phases/`. |
+| **ACTIVE** | Roadmap status: being worked. Its doc's folder follows numbering, not status: it leaves `Phases/Future/` for `Phases/` when the lead numbers it. |
 | **COMPLETE** | Roadmap status: closed; the phase doc moves to `Phases/Complete/`. |
 | **TBD** | Roadmap status: a phase the lead has not numbered. It may hold a perfectly settled position — order is position in the list, never an ordinal. |
 | **Probe** *(a.k.a. spike)* | A local, disposable feasibility test answering what documentation cannot settle. → `.ai/commands/research.md` §Disposable probes. |

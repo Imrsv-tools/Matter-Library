@@ -72,7 +72,7 @@ An entry's status names **which artifact exists**, which is why it is unambiguou
 |---|---|
 | `RESEARCH` | The thinking lives in a research doc. **No phase doc** — the entry's pointers are the raw material. |
 | `SEEDED` | **A phase doc exists.** It is what discovery → plan → execute run against; seeding it is the handoff off RESEARCH. |
-| `ACTIVE` | Being worked. (The doc has already moved up to `Phases/` — see §Where a phase doc lives.) |
+| `ACTIVE` | Being worked. (Its doc's folder follows numbering, not status — see §Where a phase doc lives.) |
 | `COMPLETE` | Closed; the phase doc moves to `Phases/Complete/`. |
 | `TBD` | Not yet started. **Unnumbered** — see §Phase Numbering. A `TBD` entry may hold a perfectly settled position in the sequence; position in the list *is* the order, and it carries no number until work starts on it. |
 

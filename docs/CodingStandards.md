@@ -1,8 +1,8 @@
 # Matter Library — Coding Standards
 
-**Status: NOT YET.** This document arrives **when research commits to a stack** — see
-`docs/architecture/` and `Methodology/AgenticEngineering_Workflow.md` §Where stack knowledge
-lives.
+**Status: NOT YET.** The stack is settled (`.claude/CLAUDE.md` §Standalone reminders); this
+document arrives **when a phase first rules on how code is written** (`.ai/commands/LOCAL_DELTAS.md`).
+Until then, where tools live and how they run is `ToolingConventions.md`'s.
 
 ⛔ **Do not populate this ahead of that decision.** A standards doc written before a stack is
 chosen is a guess wearing the costume of a decision, and every later reader treats it as settled.
@@ -19,7 +19,7 @@ explicit gap is honest and greppable; a silent omission reads as "no rule exists
 
 ## What does NOT land here
 
-- **What the system is** → `docs/architecture/`.
+- **What the system is** → `docs/specs/`.
 - **Where scripts, fixtures and CI entry points live, and what they are called** →
   `ToolingConventions.md`.
 - **Casing matrices, identifier vocabularies, id registries** → `NamingConventions.md`.
