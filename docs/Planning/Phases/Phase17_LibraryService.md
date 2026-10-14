@@ -1,6 +1,6 @@
 # Phase17 — The Library Service
 
-**Status:** BRIEF READY (2026-10-14), lane **high-rigor**, next **`/plan Phase17`**. **One lead act is open: renting the server (Q-P17-1).** It blocks the first click, not the plan. Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
+**Status:** BRIEF READY (2026-10-14), lane **high-rigor**, next **`/plan Phase17`**. **One lead call is open: where the server comes from (Q-P17-1, reopened in Pass 2: Hetzner has no GPU server available).** It blocks the first click, not the plan. Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
 
 ## Outcome
 
@@ -97,7 +97,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 
 **Lead rulings carried in** (quoted where they are recorded):
 - **RD-MP-11:** independent, with its code in this repo, run by IMRSV; the platform consumes what it publishes and never reaches into it.
-- **RD-MP-12:** a new server rented from Hetzner. The two personal machines are not hosts, and stand in only for a contributor's side. The platform's web server is not a host for the GPU work.
+- **RD-MP-12:** a new server rented from Hetzner *(the provider half reopened by the lead 2026-10-14, Q-P17-1: Hetzner has no GPU server available)*. The two personal machines are not hosts, and stand in only for a contributor's side. The platform's web server is not a host for the GPU work.
 - **RD-RO-1:** one package, one upload, tested on upload and taken apart on the library's side.
 - **RD-RO-2:** CC0 only; a contributor's handle is carried as a courtesy.
 - **RD-MP-6:** thumbnails never go in git.
@@ -116,18 +116,27 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
   - The agent fetches that branch over the private network, and pushes from the laptop on the lead's word, as today.
   - The box then holds no key that can publish to this public repo.
 - **Q-P17-5 → what runs unattended:** the door's check and rig. **What waits for a person:** the review, the push, any publish and any approval (F-MP-22).
-- **Q-P17-6 → cost.** The server is a flat monthly rental, so GPU hours are not billed (F-P17-1).
+- **Q-P17-6 → cost.** The server is a flat monthly rental, so GPU hours are not billed (F-P17-1). *(Holds for options (a) and (c) of Q-P17-1. Under (b) it is billed by the hour, about €9–25 per full sweep, F-P17-7.)*
   - A full rig sweep of ~200 articles at the laptop's measured 3.4–9.6 minutes each is roughly 11 to 32 hours, against about 720 hours in a month.
   - One box is enough. Its real limits are disk and VRAM, both covered in F-P17-3.
 
 ### Open: the lead's act
 
-- **Q-P17-1 — Rent the server: a Hetzner GEX45, €214 a month plus €209 setup, excluding VAT** (F-P17-1)?
-  - **Recommendation: yes, the GEX45, now,** so it is ready when `/plan` ends.
-  - It has three times the laptop's VRAM and four times its RAM.
-  - A 96 GB model is for a later need the library does not have yet.
+- **Q-P17-1 — Where the GPU server comes from** (reopened 2026-10-14, Pass 2).
+  - **The lead, verbatim:** *"Hmmm... no gpus avaiable... shoudl we consdier other sources"*.
+  - **RD-MP-12 said Hetzner** (*"we would need to get another serier from Hetzner"*). The lead now asks whether to look elsewhere, so RD-MP-12's provider half is open. Its other half stands: a server, not the personal machines. The options are in F-P17-7.
+  - **Recommendation: (b), a Scaleway L4 rented by the hour,** powered on for a batch or an upload and off otherwise.
+    - It is the same 24 GB of VRAM as the GEX45, with 48 GB of RAM, in the EU, at a price read from Scaleway's own page.
+    - At the library's real use it costs less than the GEX45 would have (F-P17-7).
+    - The hours it records decide later whether a box that is always on is worth it.
+  - **What it changes in the Brief, if taken:**
+    - 17.1 adds the agent starting and stopping the server through the provider's command-line tool. The provider's key stays on the laptop, never on the server.
+    - Uploads are taken only while the server is on.
+    - Q-P17-6's "flat rental" becomes "billed by the hour".
+    - The lane, the steps and the test clicks are otherwise unchanged.
+  - **The superseded first form, kept for the record:** *"Rent a Hetzner GEX45, €214 a month plus €209 setup, excluding VAT?"* (Pass 1). Hetzner then had none available.
   - **What it blocks:** every click of the first human test (all of 17.1 onwards). `/plan` does not wait on it.
-  - **What the agent needs once it is rented:** SSH access to the box from the laptop, and the box joined to the lead's private network. Joining needs an invite or key that only the lead can issue.
+  - **What the agent needs once a server exists:** SSH access to it from the laptop, and the server joined to the lead's private network. Joining needs an invite or key that only the lead can issue. For (b), the agent also needs a provider key on the laptop to start and stop it.
 
 ### Findings (Pass 1, measured 2026-10-14)
 
@@ -141,6 +150,26 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
     - Helsinki.
   - **Price:** €214.00 a month, plus a one-time setup fee of €209.00, both excluding VAT (Hetzner's press release of 2026-09-01).
   - The next models up (GEX63, GEX131) carry 96 GB of VRAM. Their prices were not shown on the page.
+- **F-P17-7 — Other sources, read 2026-10-14 (Pass 2).**
+  - **What any source must have:**
+    - an NVIDIA card that draws graphics (Vulkan for the Unreal runtime, an X server for Storm);
+    - root on Ubuntu;
+    - about 500 GB of disk.
+  - **That rules out compute-only cards (A100, H100) and container-only marketplaces,** where we could not run our own X server. L4, L40S, A10 and the RTX workstation cards draw graphics. That they do so on each provider's image is **unverified until 17.1 runs**.
+
+  | Option | What it is | Cost, excluding VAT | Source of the price |
+  |---|---|---|---|
+  | **(a) Another monthly server, always on** | Scaleway L4-1-24G left on (1 × L4, 24 GB; 8 vCPU; 48 GB RAM; Paris) | ~€575 a month (€0.79 an hour × the month) | Scaleway's GPU price page, read 2026-10-14 |
+  | | OVHcloud L4 public-cloud instance left on | about €500–730 a month | third-party trackers only, which disagree |
+  | | small German hosts (an RTX A4000 or RTX 4000 Ada) | from about €93–100 a month | the hosts' own landing pages; model prices not shown; unverified |
+  | **(b) The same Scaleway L4, by the hour** | on for a batch or an upload, powered off between | €0.79 an hour while on, plus the disk and IP while off. A full ~200-article sweep (11–32 hours, F-P17-3) is about €9–25 | Scaleway's price page; its docs: *a powered-off Instance stops compute billing; attached volumes and flexible IPs keep billing* |
+  | **(c) Wait for Hetzner** | the GEX45 when stock returns | €214 a month + €209 setup | F-P17-1; availability is the lead's observation, 2026-10-14 |
+  | **(d) Buy a GPU box** and run it as the server on the private network | a machine bought for the job, not a personal one | a one-off purchase (not priced here) plus power | — |
+
+  - **Notes on the options:**
+    - **(b) needs one thing (a) does not:** the agent starts the server before work and stops it after. That is the provider's command-line tool, run from the laptop.
+    - **(d) would sit beside RD-MP-12's "the personal machines are not hosts"** only as a bought, dedicated machine. The lead would have to say a home or office box counts as a server.
+    - **AWS's L4 (g6.xlarge, Frankfurt) is about $1.01 an hour with 16 GiB of RAM** (third-party trackers). It is dearer than Scaleway, with a third of the RAM.
 - **F-P17-2 — Storm needs a display; the other two do not.**
   - The USD toolchain's Garch is GLX-only (`make_preview.py`'s `usd_env`), so `usdrecord` needs an X server.
   - On the box that is an X server on the NVIDIA GPU, not a software one: software GL would make Storm slow and its pictures differ.
@@ -153,7 +182,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
     - the toolchain: 2.2 GB;
     - the Unreal runtime: 1.5 GB;
     - LFS: 1.2 GB.
-  - **At ~200 articles:** about 200 GB of rig output plus thumbnails. That fits the GEX45's disks mirrored (512 GB), and needs a pruning rule before the library grows much further.
+  - **At ~200 articles:** about 200 GB of rig output plus thumbnails. That fits the GEX45's disks mirrored (512 GB), or a ~500 GB volume on any other source, and needs a pruning rule before the library grows much further.
   - **VRAM:** 24 GB covers the AI skin probe's 16–24 GB, at the top of its range (`261014_R_SkinMaps.md`).
 - **F-P17-4 — Nothing is built.** A tree grep for the phase's name finds only the Glossary's *Library service* entry, marked `(planned)`. No prior phase built, deferred or half-built any part of it.
 - **F-P17-5 — The site's staging reads a published GitHub pre-release, not a running server** (`build_snapshot.py`, Phase13). So "the dev catalog the site reads" needs no service endpoint. It needs the rig pictures to be where the snapshot is built (§Not now).
@@ -230,3 +259,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
     - packaging: Q-P17-2;
     - cost: Q-P17-6.
   - **A sibling session was live in the tree throughout** (Phase15 moving the character articles). This pass touched none of its files.
+- **2026-10-14 — Pass 2: Hetzner has no GPU server available.**
+  - **The lead, verbatim:** *"Hmmm... no gpus avaiable... shoudl we consdier other sources"*.
+  - Q-P17-1 is reopened as "where from", with four options and a recommendation (F-P17-7).
+  - Nothing else in the Brief moves unless (b) is taken. Its effects on 17.1 and Q-P17-6 are listed under Q-P17-1.
