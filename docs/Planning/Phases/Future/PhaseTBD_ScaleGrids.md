@@ -20,12 +20,13 @@ The authority until this phase writes its specs: [`261014_R_ScaleProbes.md`](../
 - **The swap ("scale view"):** each bound article is replaced by the grid nearest its size. The binding's UV scale is corrected for the article's real `meters_per_tile`, because 15 of 94 recipes tile at a size other than their tag. The UV offset and rotation are kept. It runs in the rig and in the Blender add-on.
 - **The 1 m reference cube** in the conformance golden (`13528ea`) wears the 1 m grid. That needs `tools/conformance/build_portable.py` to carry more than one article.
 - **The word:** the Glossary's *Scale grid* headword. *Probe* is taken.
+- **They ship in releases** (RD-SP-2): library content, so every consumer can offer a scale view when troubleshooting.
+- **One name, except the scale tag** (RD-SP-3): for example `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`. The exact tokens are checked against [Identity](../../../specs/Ontology/Identity.md).
 
 ## Open questions (settle during this phase)
 
-- Do the grids ship in releases, so a consumer can offer a scale view, or stay as tooling? *Lean:* ship, under `utility/virtual/` beside the UV grid.
+- Where they sit: `utility/virtual/`, beside the UV grid, is the lean.
 - The colour palette: readable to a colour-blind eye, with line weight stepping with length too.
-- Their names under [Identity](../../../specs/Ontology/Identity.md): six articles that differ only in their scale tag.
 - Where the first proof runs: a character, where the 170× error lived, and the conformance table.
 
 ## Discovery Log

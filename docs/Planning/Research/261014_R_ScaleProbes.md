@@ -69,11 +69,14 @@ The lead, 2026-10-14: *"the 1m thing is s new concept I would like us to capture
   - **SP-Q1 narrows:** they are materials. Whether they ship in releases, or stay for testing, is the phase's discovery to settle.
 - **The word is *scale grid*, not *probe*** (agent-chosen, 2026-10-14; the lead may change it). The Glossary already defines **Probe** as a disposable feasibility test, so a second meaning would be a collision. *Scale grid* sits beside the existing `Diagnostic_UVGrid` article. The headword is the phase's to add. This doc's file name and its `SP` ids are kept as written.
 
+- **RD-SP-2 — The scale grids ship in releases** (the lead, 2026-10-14: *"Yes ship in releases... very useful in all locations when trouble shooting"*). They are library content, so every consumer can offer a scale view. **This answers SP-Q1.**
+- **RD-SP-3 — Every scale grid has the same name except its scale tag** (the lead, the same message: *"exact name execpt scale"*). With the existing UV grid's tokens that reads `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`, for `s0001` to `s100` and `sUKN`. The exact tokens are the phase's, checked against [Identity](../../specs/Ontology/Identity.md).
+
 **Made owed:** the phase **Scale Grids**, seeded the same day as `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md`. `/discovery` lands it. Until then, this doc's design sketch and §Resolved are the authority.
 
 ## Status
 
 - **Passes:** 1 (2026-10-14). Design sketch only; nothing is built. **Ruled:** RD-SP-1, a phase of its own.
 - **Done the same day, beside it:** the platform's 1 m cube in the conformance golden (`13528ea`, `261013_R_PlatformTrackedItemsAsks.md` A1). It wears Copper at real scale and is the scale grids' future reference (SP-F6).
-- **Answered:** SP-Q2 and SP-Q3 (RD-SP-1). **For the phase's discovery:** SP-Q1's remainder (do they ship in releases?), the colour palette, and teaching `build_portable.py` to carry two articles so the cube can wear the 1 m scale grid (SP-F6). No question is with the lead.
+- **Answered:** SP-Q1 – Q3 (RD-SP-1 – 3): a phase of its own; one grid per scale; they ship in releases; one name except the scale tag. **For the phase's discovery:** the colour palette, and teaching `build_portable.py` to carry two articles so the cube can wear the 1 m scale grid (SP-F6). No question is with the lead.
 - **▶ Next:** the lead starts `/discovery` on *Scale Grids*, seeded 2026-10-14, when he chooses. That is a deliberate gate, not a slide.
