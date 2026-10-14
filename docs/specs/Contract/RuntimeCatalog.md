@@ -132,6 +132,18 @@ The library holds three **groups**, each browsed by its own taxonomy ([Taxonomy]
 - **A released catalog carries none of these yet** *(planned, with the first release after Phase16, RD-P16-8)*: the release projector is unchanged, so every frozen catalog re-projects byte-identically. When it gains them, `no_projection_guard` must check **keys**, not substrings: `licence` does not contain `license` (F-P16-3).
 - **The dev install serves stamped copies of the HDRIs** (`releases/matterlib-dev/hdris/`, a folder, no longer a link into the checkout; RD-P16-12): each carries these facts in its header, and its pixels are the checkout's bytes. A reader that resolves the checkout directly (USDLiveView's `IMRSV_MATTER_LIBRARY`) sees the unstamped files.
 
+### A material's thumbnail *(2026-10-14, Phase17; the dev catalog)*
+
+**Each material's thumbnail is served in the dev install and named on its entry, the way an HDRI's is** (the platform's ask A1 – A3, [`261014_R_PlatformMaterialPicturesAsks.md`](../../Planning/Research/261014_R_PlatformMaterialPicturesAsks.md); [Catalog](../Catalog/Catalog.md) §Thumbnails). Additive: `schema_version` is unchanged.
+
+| Field | Type | Meaning | Source |
+|-------|------|---------|--------|
+| `materials[].thumbnail_path` | string | `thumbnails/materials/<identity>.jpg`, relative to the catalog file: **one picture, the material's first view** (Matter's `card`; a Character material's first human-context view: `face`, `hand`, `mouth`, `lips`, `eye`, `head`, in that order). A **baseline JPEG, 512 × 512**, sRGB: the reader draws it at about 200 px, many at once. **Absent when the material has no thumbnail yet** (a draft gets one when it comes to review; the system material never does). | made at serve time by `tools/releases/material_thumbnails.py` |
+
+- **Where the serve takes it from, on any machine:** this machine's master (`library/thumbnails/<identity>/`, git-ignored) when its record was made from the article and the Blender masters now on disk; else the newest published dev snapshot's picture, downloaded once and checked against the site file's `sha256`. Offline with neither, the entry has no field and the serve goes on.
+- **`groups[]`: Matter is `shown: thumbnail`** in the dev catalog as in the site file (PIC-Q2; until then `rig`).
+- **A released catalog carries none yet** *(planned: a release asset, with the first release that ships pictures, the platform's A4)*: the release projector is unchanged, so every frozen catalog re-projects byte-identically.
+
 ### Off-grammar system material
 
 `IMRSV_MissingMaterial` (`utility/virtual/IMRSV_MissingMaterial`) has no `sNN` scale tag and resolves by bare `<id>.mtlx` (no `_vNN` axis in the filename), carrying a nominal `version: v01`. Its `scale` is empty and its `payload_path` omits the `_<version>` suffix. It is also the sole material carrying `creator_selectable: false` — so it is never offered in the Creator browse/assign set while still resolving by exact identity for the broken-material fallback. See [Manifest.md](Manifest.md) §Off-grammar exception. *(Updated 2026-09-23, measured: in `matterlib-0.1.0.catalog.json` its `scale` is `""`, `payload_path` is `materials/utility/virtual/IMRSV_MissingMaterial.mtlx`, and it is the only `creator_selectable: false` entry.)*

@@ -108,8 +108,7 @@ print("== groups (RD-P14-4) ==")
 check([g["id"] for g in B.GROUPS] == ["matter", "character", "hdris"], "Matter, Character and HDRIs, in browse order")
 check({g["id"]: g["shown"] for g in B.GROUPS} == {"matter": "thumbnail", "character": "human", "hdris": "thumbnail"},
       "each group says how it is shown: Matter by its thumbnails (RD-P17-4), Character never on the rig's cubes (RD-P13-2)")
-check(next(g for g in G.GROUPS if g["id"] == "matter")["shown"] == "rig",
-      "the dev catalog's groups keep `rig`: the dev install serves no thumbnails (Phase17 Not now)")
+check(B.GROUPS is G.GROUPS, "the site file and the dev catalog read one list (Phase17: the dev install serves thumbnails too)")
 
 print("== thumbnails (Phase17 17.5) ==")
 with tempfile.TemporaryDirectory() as t:
@@ -151,6 +150,28 @@ check([(r["species"], [p["label"] for p in r["parts"]]) for r in rows]
       == [("humanoid", ["Eyes", "Hair", "Skin", "Nails", "Teeth", "Mouth"])],
       "Character's rows, in the lead's order (M11 (1))")
 
+print("== a material's thumbnail in the dev install (Phase17, the platform's A1 - A3) ==")
+import material_thumbnails as MT  # noqa: E402
+check(MT.first_view(["close", "card"]) == "card" and MT.first_view(["hand", "face"]) == "face"
+      and MT.first_view(["dark", "card"]) == "card" and MT.first_view([]) is None,
+      "one picture per material: Matter's card, a Character material's first human-context view")
+with tempfile.TemporaryDirectory() as t:
+    t = Path(t)
+    MT.THUMBS = t
+    mtlx, tex = t / "A_Test_Clean_Base_s01_v01.mtlx", t / "a.png"
+    mtlx.write_text('<materialx><image name="b"><input name="file" type="filename" value="a.png"/></image></materialx>')
+    tex.write_bytes(b"px")
+    f = t / mtlx.stem
+    f.mkdir()
+    check(MT.local_source(mtlx.stem, mtlx) is None, "no record: no local picture (the published one is tried)")
+    rec = {"article_sha256": MT.T.article_hash(mtlx, [tex.resolve()]), "masters_sha256": MT.T.masters_hash(),
+           "views": ["card", "close"]}
+    (f / "record.json").write_text(json.dumps(rec))
+    (f / "card.png").write_bytes(b"png")
+    check(MT.local_source(mtlx.stem, mtlx) == f / "card.png", "a fresh record's first view is the local picture")
+    tex.write_bytes(b"changed")
+    check(MT.local_source(mtlx.stem, mtlx) is None, "a record of another version of the article is not used")
+
 print("== hdri entry (14.3) ==")
 full = {"id": "IndustrialSunset02_PureSky", "version": "v01", "identity": "IndustrialSunset02_PureSky_v01",
         "record": {"status": "candidate", "description": "A calm industrial sunset.",
@@ -159,15 +180,15 @@ full = {"id": "IndustrialSunset02_PureSky", "version": "v01", "identity": "Indus
                               "authors": [{"name": "A", "role": "Original"}], "sponsors": [],
                               "info": "Edited sky-only version of X."},
                    "tagging": {"tags": ["pure skies"], "categories": ["outdoor"]}}}
-e = B.hdri_entry(full, "IndustrialSunset02_PureSky_v01__thumbnail.webp", "ab" * 32)
+e = B.hdri_entry(full, "IndustrialSunset02_PureSky_v01__thumbnail.jpg", "ab" * 32)
 check(e["label"] == "Industrial Sunset 02 (Pure Sky)", "the label is Poly Haven's own name")
 check(e["credit"]["authors"] == [{"name": "A", "role": "Original"}] and e["credit"]["edited_from"].startswith("Edited"),
       "the credit carries the contributors with their roles and what it was edited from")
 check("sponsors" not in e["credit"], "an empty sponsor list is left out, not published empty")
-check(e["pictures"] == [{"role": "thumbnail", "file": "IndustrialSunset02_PureSky_v01__thumbnail.webp", "sha256": "ab" * 32}],
+check(e["pictures"] == [{"role": "thumbnail", "file": "IndustrialSunset02_PureSky_v01__thumbnail.jpg", "sha256": "ab" * 32}],
       "one thumbnail picture")
 check("download" not in e, "no download: thumbnails and credit only (RD-P14-4)")
-bare = B.hdri_entry({"id": "Bare_PureSky", "version": "v01", "identity": "Bare_PureSky_v01", "record": {}}, "t.webp", "0" * 64)
+bare = B.hdri_entry({"id": "Bare_PureSky", "version": "v01", "identity": "Bare_PureSky_v01", "record": {}}, "t.jpg", "0" * 64)
 check(bare["status"] == "draft" and bare["label"] == "Bare pure sky"
       and not {"credit", "description", "tagging", "captured"} & set(bare),
       "with no record: status draft, a derived label, and nothing invented")
@@ -194,7 +215,7 @@ check(len(real) == 59 and not [d for d in real if B.RESOLUTION_CLAIM.match(d) an
 md = {**full, "record": {**full["record"], "provenance": {"license": "CC0-1.0"},
                          "credit": {**full["record"]["credit"],
                                     "info": "Edited sky-only version of [Snow Field](https://polyhaven.com/a/snow_field)."}}}
-e2 = B.hdri_entry(md, "t.webp", "0" * 64)
+e2 = B.hdri_entry(md, "t.jpg", "0" * 64)
 check(e2["contributor"] == "MatterBot" and e2["licence"] == "CC0-1.0",
       "an HDRI entry says who gave it and its licence (RD-P16-11)")
 check(e2["credit"]["edited_from_name"] == "Snow Field" and e2["credit"]["edited_from_url"] == "https://polyhaven.com/a/snow_field"

@@ -37,7 +37,9 @@ SPECIES_LABELS = {"humanoid": "Humanoid"}
 # catalog carries too (RD-P15-5). `taxonomy` names the fields a group is browsed by, in order;
 # Character's `rows` are its parts' labels and order, per species.
 GROUPS = [
-    {"id": MATTER, "label": "Matter", "list": "materials", "section": MATTER, "shown": "rig",
+    # Phase17 (RD-P17-4, PIC-Q2): Matter is shown by its own thumbnails, in the site file and the
+    # dev catalog alike (until then `rig`, the parity rig's cubes, whose pictures stay as evidence)
+    {"id": MATTER, "label": "Matter", "list": "materials", "section": MATTER, "shown": "thumbnail",
      "taxonomy": ["domain", "material_class"]},
     {"id": CHARACTER, "label": "Character", "list": "materials", "section": CHARACTER, "shown": "human",
      "taxonomy": ["species", "part"],

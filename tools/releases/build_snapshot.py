@@ -10,14 +10,14 @@ release gates glob that folder). It lists every article on disk, as the dev cata
 (working_tree.articles()), and writes, into a git-ignored folder:
 
   * ``matterlib-<release>.site.json``: the site file (docs/specs/Contract/SiteFile.md, DRAFT);
-  * ``<identity>__<tool>[__close].webp``: the parity rig's default pictures of the test scene, per
+  * ``<identity>__<tool>[__close].jpg``: the parity rig's default pictures of the test scene, per
     tool that ran (never a character render, a sweep picture, a log or a job file: those carry
     local paths, Phase13 F-P13-3);
   * ``<identity>.zip``: the article's .mtlx with every texture it uses, references rewritten to
     ``textures/<name>``, so it opens with no search path (the exporter's complete-portable form);
-  * ``<identity>__thumbnail.webp``: each HDRI's 1024 x 512 thumbnail, tone-mapped (Phase14 14.3;
+  * ``<identity>__thumbnail.jpg``: each HDRI's 1024 x 512 thumbnail, tone-mapped (Phase14 14.3;
     the HDRI itself is not published: thumbnails and credit only, RD-P14-4);
-  * ``<identity>__thumbnail__<view>.webp``: each material's thumbnails, 1024 x 1024, the showcase
+  * ``<identity>__thumbnail__<view>.jpg``: each material's thumbnails, 1024 x 1024, the showcase
     pictures ``tools/thumbnails/make_thumbnails.py`` makes in Cycles, labelled with their renderer
     (Phase17 17.5). A Character material publishes these, its human-context pictures, and still
     never a rig picture. A thumbnail older than its article or the masters is refused, not shipped;
@@ -85,7 +85,10 @@ RESOLUTION_CLAIM = re.compile(
 TOOLS = ("storm", "blender", "unreal")
 VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
 MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
-WEBP_QUALITY = 90
+# Every picture the library publishes is a baseline JPEG (the lead, 2026-10-14, Phase17): the
+# website, Blender and Unreal all read it; Unreal reads no WebP at all (PIC-F3). Until Phase17's
+# fix every picture here was WebP. Baseline, not progressive: the plainest JPEG every reader takes.
+JPEG_QUALITY = 90
 DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
 # RD-P14-4 (the lead, 2026-10-14): the library relays what sits side by side on the site, and how
 # each is shown, so the site builds its navigation from the library. In browse order:
@@ -95,10 +98,7 @@ DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
 #   thumbnail - the HDRI's own 2:1 picture.
 # Phase15 (RD-P15-5): the list lives in tools/converters/groups.py, which the dev catalog reads
 # too, and each group names its taxonomy; Character's gains its rows (species, then parts).
-# Phase17 (RD-P17-4): in the SITE FILE, Matter is shown by its own thumbnails, as an HDRI is; the
-# rig's pictures stay, as evidence. Only here: the dev catalog keeps groups.py's word (`rig`),
-# because the dev install does not serve thumbnails (Phase17 Not now, planned).
-GROUPS = [g | {"shown": "thumbnail"} if g["id"] == G.MATTER else g for g in G.GROUPS]
+GROUPS = G.GROUPS      # Phase17 (RD-P17-4): Matter is shown by its thumbnails, in both files
 
 
 class Stale(Exception):
@@ -354,9 +354,13 @@ def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path])
     os.replace(tmp, dest)
 
 
-def write_webp(src: Path, dest: Path) -> None:
+def write_jpeg(src: Path, dest: Path, size: int | None = None) -> None:
+    """A baseline sRGB JPEG of ``src``, resized to ``size`` px square when given."""
+    im = Image.open(src).convert("RGB")
+    if size and im.size != (size, size):
+        im = im.resize((size, size), Image.LANCZOS)
     buf = io.BytesIO()
-    Image.open(src).convert("RGB").save(buf, "WEBP", quality=WEBP_QUALITY, method=6)
+    im.save(buf, "JPEG", quality=JPEG_QUALITY, optimize=True, progressive=False)
     dest.write_bytes(buf.getvalue())
 
 
@@ -431,16 +435,16 @@ def build(tag: str, out: Path) -> dict:
         if thumbs:                     # Phase17 17.5: the showcase pictures, first
             rec["pictures"] = []
             for view, src, trec in thumbs:
-                name = f"{identity}__thumbnail__{view}.webp"
-                write_webp(src, out / name)
+                name = f"{identity}__thumbnail__{view}.jpg"
+                write_jpeg(src, out / name)
                 rec["pictures"].append({"role": "thumbnail", "view": view, "renderer": renderer_label(trec),
                                         "file": name, "sha256": sha256(out / name)})
                 assets.append(name)
         if pics:
             rec.setdefault("pictures", [])
             for tool, view, src in pics:
-                name = f"{identity}__{tool}{'__close' if view == 'close' else ''}.webp"
-                write_webp(src, out / name)
+                name = f"{identity}__{tool}{'__close' if view == 'close' else ''}.jpg"
+                write_jpeg(src, out / name)
                 rec["pictures"].append({"role": "rig", "tool": tool, "view": view, "file": name,
                                         "sha256": sha256(out / name)})
                 assets.append(name)
@@ -458,7 +462,7 @@ def build(tag: str, out: Path) -> dict:
     hdris = []
     listed = H.on_disk()
     for h in listed:     # 14.3: thumbnails and credit only, never the .hdr (RD-P14-4)
-        thumb = f"{h['identity']}__thumbnail.webp"
+        thumb = f"{h['identity']}__thumbnail.jpg"
         H.thumbnail(h["path"], out / thumb)
         hdris.append(hdri_entry(h, thumb, sha256(out / thumb)))
         assets.append(thumb)

@@ -15,6 +15,10 @@ What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
     RD-P16-12; a symlink into the checkout until then), remade only when stale; and
     ``releases/matterlib-dev/thumbnails/hdris/`` -> a 1024 x 512 JPEG made from
     each HDRI, here in the runtime and never in the checkout (Q-P14-3);
+  * ``releases/matterlib-dev/thumbnails/materials/`` -> each material's thumbnail, a 512 px JPEG
+    of its first view, named by its entry's ``thumbnail_path`` (Phase17; the platform's ask A1 - A3):
+    from this machine's master when it has a fresh one, else from the newest published dev
+    snapshot, checked against its sha256 (``material_thumbnails.py``);
   * ``releases/matterlib-dev/matterlib-dev.catalog.json`` -> projected from the working tree
     (every ``.mtlx``; ``status`` from its recipe, else ``draft``; plus each article's own
     ``master`` token, so a consumer can route by it rather than by class: Phase07 7.2, L4), and,
@@ -56,6 +60,7 @@ import working_tree  # noqa: E402
 import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy)
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
+import material_thumbnails as MT  # noqa: E402  (Phase17: each material's thumbnail, served)
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
@@ -262,6 +267,10 @@ def main(argv=None) -> int:
         link(dev / "materials", SOURCE / "materials")
         link(dev / "textures", SOURCE / "textures")
         catalog = working_tree_catalog()
+        mt = MT.serve(dev, catalog["materials"], SOURCE)
+        print(f"thumbnails  {mt['local'] + mt['published']} materials pictured ({mt['local']} from this "
+              f"machine's masters, {mt['published']} from {mt['tag'] or 'no published snapshot'}), "
+              f"{mt['none']} without; {mt['made']} made in {dev / MT.FOLDER}")
         if catalog.get("hdris"):
             stamped = stamp_hdris(dev)
             made = make_thumbnails(dev, catalog["hdris"])

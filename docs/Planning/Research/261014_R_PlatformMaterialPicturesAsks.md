@@ -60,3 +60,20 @@
 For `PlatformDependencies.md`, *From IMRSV to the Matter Library*. The library writes its own row; this is a draft.
 
 > **M13** · **A material's thumbnail in the dev install** (2026-10-14): each material's first thumbnail served in the dev install and named on its dev-catalog entry, as an HDRI's is, in JPEG or PNG, on any machine that serves the dev install; in a release later. · *The platform's app finds a material by its picture; it reads only the dev install, and draws PNG and JPEG.* · Matter Library (the serve tool, the catalog field) · the platform's runtime and app (the consumer side) · `261014_R_PlatformMaterialPicturesAsks.md` A1 – A4 · OPEN
+
+---
+
+## Pass 2 — The library's pass
+
+*Written from the library's side, 2026-10-14, during Phase17's execution, at the lead's word: "Platform … has sent you a request to pick a proper image format.. like we have for HDRI.. pull and check".*
+
+- **PIC-F6 — The lead rules the format: every picture the library publishes is a baseline JPEG.** That covers thumbnails, the rig's evidence and the HDRI thumbnails, in the dev snapshot as in the dev install. Blender, Unreal and the web all read it. WebP was Phase17's own Brief recommendation (RD-P17-3) and is withdrawn. The PNG masters stay the source, git-ignored. Baseline, not progressive: the plainest JPEG every reader takes.
+- **A1 — answered.** `materials[].thumbnail_path` in the dev catalog names `thumbnails/materials/<identity>.jpg`: one picture, the material's first view. A material without a thumbnail has no field ([RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §A material's thumbnail).
+- **A2 — answered: JPEG, 512 × 512.** The size is the library's to state. 512 is twice the ~200 px the app draws, and a quarter of the 1024 masters' memory.
+- **A3 — answered.** The serve takes this machine's master when its record matches the article and masters on disk. Otherwise it downloads the newest published dev snapshot's picture once, refuses it unless it matches the site file's `sha256`, and caches it git-ignored. Measured on the library machine against a scratch install: 83 pictured from the masters, and the same 83 with the masters hidden, from `dev.6`. Both were 512 × 512 baseline JPEGs, and a re-serve made none.
+- **A4 — planned**, with the first release that ships pictures (the release-bundle phase), as for HDRIs.
+- **PIC-Q1:** the published snapshot, as above; the masters do not travel (RD-MP-6). **PIC-Q2: yes.** Matter is `shown: thumbnail` in the dev catalog and the site file alike (`groups.py`), and F-P17-24's split is withdrawn. **PIC-Q3: one** per material. The site file keeps every view.
+
+## Status
+
+**Pass 1 (the platform's): done. Pass 2 (the library's): done, 2026-10-14.** A1 – A3 are built in Phase17. The format is ruled by the lead. A4 is planned. Ledger row: [PlatformDependencies](../PlatformDependencies.md) **M13**. The consumer side (the picker's card and panel) is the platform's.
