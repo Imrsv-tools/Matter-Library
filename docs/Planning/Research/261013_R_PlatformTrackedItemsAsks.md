@@ -75,6 +75,15 @@ Not written into `PlatformDependencies.md` from here; that file is the library's
 | **Mark the parity config `Reevaluate (2026-10-14)`** in the four docs of TI-F5 | `/quick-fix` (docs) | The docs stop calling an unused tool current, and nothing is deleted |
 | **A one-metre cube in the conformance golden** (A1) | `/quick-fix`, with both conformance checks baselined first | A consumer that imports the article at the wrong size shows it at a glance. Or drop it: the platform called it an idea |
 
+## Resolved
+
+The lead, 2026-10-14, on Pass 2's three offers: *"agree with your recommendations, I esspecially like size conformace topics … do the quick fixes"*.
+
+- **RD-TI-1 — M2 closes** in the ledger, with the platform's report.
+- **RD-TI-2 — the AgX parity config is marked `Reevaluate (2026-10-14)`**, not deleted. Retiring it stays a later call.
+- **RD-TI-3 — A1 is taken:** a one-metre cube goes into the conformance golden.
+- **Beyond A1, the lead's own idea:** a series of scale probes, so that *"anything with incorrect scale to the material will be OBVIOUS"*. It is its own design question: `261014_R_ScaleProbes.md`.
+
 ## Status
 
 - **Passes:** 1 (the platform's), 2 (the library's, 2026-10-14).

@@ -152,9 +152,29 @@ For `PlatformDependencies.md`, *From IMRSV to the Matter Library*. The library w
 
 ---
 
+## Resolved
+
+The lead, 2026-10-14, on Pass 2's recommendations: *"agree with your recommendations … seed the phase"*.
+
+- **RD-SKY-1 — An HDRI is a second kind of library entry, beside materials.** It lives in one flat folder, `MatterLibrary/hdris/`, with a top-level `hdris` list in the catalog and the lockfile. The Realm stays planned, for composite matter, and [Taxonomy](../../specs/Ontology/Taxonomy.md) gains a line that an HDRI is a kind beside the taxonomy (SKY-Q1).
+- **RD-SKY-2 — An HDRI's name is `<Name>_<Variant>_vNN.hdr`.** It uses PascalCase tokens and the material's character budget and version rule. It has no scale tag and no size in the name. Names are unique within `hdris/` (SKY-Q2).
+- **RD-SKY-3 — Every HDRI is a Radiance `.hdr` file, 4096 × 2048** (A6. The size was ruled 2026-10-13, SKY-Q3).
+- **RD-SKY-4 — The dev install serves HDRIs through the library's own serve tool**, built to the shape of RD-SKY-1 and RD-SKY-2 (SKY-Q4). **HDRIs skip the compression step** (SKY-Q5).
+- **The asks' table above (A1 – A8) is the phase's starting point**, agreed in the same word. Its details are confirmed or changed by that phase's discovery: the default as one top-level key, a 2:1 JPEG preview, provenance as a texture's, and `schema_version` moving from 2 to 3.
+
+**Made owed:** one library phase, **HDRIs in the library**, seeded the same day as `docs/Planning/Phases/Future/PhaseTBD_HdrisInTheLibrary.md`. It is landed by `/discovery`. The durable docs it lands:
+- [Taxonomy](../../specs/Ontology/Taxonomy.md): the kind beside the taxonomy.
+- [Identity](../../specs/Ontology/Identity.md): the HDRI name.
+- [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) and [Manifest](../../specs/Contract/Manifest.md): the `hdris` list.
+- [CompressedDistribution](../../specs/Tooling/CompressedDistribution.md): no compression for HDRIs.
+- The Glossary's *HDRI* headword.
+- `LICENSE-CONTENT.md` and `.gitattributes`: the new folder.
+
+Until that phase writes them, this section is the authority.
+
 ## Status
 
 - **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14).
-- **Answered:** SKY-Q3, 4096 × 2048. **Recommended, for the lead to rule:** SKY-Q1 (a second kind, `hdris/`, beside materials; the Realm stays planned) · SKY-Q2 (`<Name>_<Variant>_vNN.hdr`) · SKY-Q4 (yes, through the library's serve tool, after the rulings) · SKY-Q5 (no compression) · A6's format (Radiance `.hdr`).
-- **Open:** A1 – A8, all for one library phase (SKY-F16). The Glossary's *HDRI* headword is owed (SKY-F13). The ledger row M10 is offered (SKY-F15).
-- **▶ Next:** the lead rules Q1, Q2 and the format. On his word, a **Roadmap seed** for *HDRIs in the library* (a `PhaseTBD_` stub) and the ledger row M10, then `/discovery` on that phase. The platform's HDRI phase waits on it.
+- **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
+- **Open:** A1 – A8, which are now the work of one library phase, *HDRIs in the library* (SKY-F16), seeded 2026-10-14. The Glossary's *HDRI* headword is that phase's to land (SKY-F13).
+- **▶ Next:** the lead starts `/discovery` on *HDRIs in the library* when he chooses. That is a deliberate gate, not a slide. The platform's HDRI phase waits on it.
