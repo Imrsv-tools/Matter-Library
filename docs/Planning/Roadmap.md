@@ -30,7 +30,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey comes before discovery**; was "Skin That Reads as Skin" for part of that day)*
+### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey is done (2026-10-14); three questions for the lead and a probe come before discovery**; was "Skin That Reads as Skin" for part of that day)*
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
 - `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 

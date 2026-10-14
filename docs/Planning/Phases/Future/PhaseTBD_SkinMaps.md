@@ -1,6 +1,6 @@
 # PhaseTBD — Skin Maps
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **Its research is not finished:** the industry survey (`261014_R_SkinMaps.md` Pass 3) comes before `/discovery`. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead's answers to Q-SKM-2, -5 and -6 come before `/discovery`, and the probe should too (Q-SKM-3). **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
@@ -12,18 +12,22 @@ Today skin is a flat tone per part, which the lead judged *"pretty terrible in f
 
 ## Scope — as ruled at research (2026-10-14)
 
-The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../Research/261014_R_SkinMaps.md) §Resolved and Passes 1–2.
+The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../Research/261014_R_SkinMaps.md) §Resolved and Passes 1–4.
 
 - **A skin map is a fit-set picture for the approved mesh** (F-SKM-10). The skin article stays the substance (tone, scatter, coat, fuzz, pores), so CM2 holds.
-- **The colour half needs no contract change:** `base_color_map` on Subsurface exists in every library target (F-SKM-3). Maps beyond colour (roughness, normal, scatter thickness) are Pass 3's question.
+- **The colour half needs no contract change:** `base_color_map` on Subsurface exists in every library target (F-SKM-3).
+  - **But the six skin articles must be re-assembled to take it:** declare the map, and let the scatter colour follow it (F-SKM-19).
+  - The map's normalisation must keep the measured tone as the average (F-SKM-20).
+- **Colour is the industry's first map**, and the tiling micro layer is already here (F-SKM-11, F-SKM-13). The maps beyond colour (normal, roughness, cavity, scatter) each need a new input; that is a later question for the phase.
 - **The lips can wear the skin article plus the map's lip colour**, which removes the hard line (F-SKM-9).
 - **A mesh version is named and recorded,** so each map says which mesh it fits (Q-SKM-4).
 
 ## Open questions (settle in research, then here)
 
-- Q-SKM-2: intimate anatomy in the map, or neutral regions; the hosts' content policies, starting with this public repo (F-SKM-6).
-- Q-SKM-3: the probe (today's skin against one atlas multiplied in) before or after the survey; it runs on *The Library Service*.
-- The survey's questions: `261014_R_SkinMaps.md` Pass 3.
+- Q-SKM-2: intimate anatomy in the map, or neutral regions; the hosts' content policies, starting with this public repo (F-SKM-6). The survey recommends neutral (F-SKM-16, F-SKM-17).
+- Q-SKM-3: the probe compares today's skin, a MakeHuman atlas and a library-made map, and runs before discovery. It runs on *The Library Service*, or on the laptop on the lead's word.
+- Q-SKM-5: where the first map comes from (MakeHuman's photo atlases record no consent; a library-made map, F-SKM-21).
+- Q-SKM-6: redness (a luminance map has none, F-SKM-14).
 
 ## Discovery Log
 
