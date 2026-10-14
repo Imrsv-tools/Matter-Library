@@ -235,6 +235,11 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - `sponsors` (who funded the asset), `date_taken`, `whitebalance` and `coords`.
 
   All of it is recorded verbatim, so nothing is re-derived when the site shows it.
+- **F-P14-14 — An HDRI stays a `.hdr`, not a MaterialX document** (the lead asked, 2026-10-14: *"Do we consider converting these HDRIs to MaterialX so they fit a bit more in our realm... or is there not really a concept of HDRI in mtlx?"*).
+  - **MaterialX 1.39 has no environment or dome light:** its standard library defines only `point_light`, `directional_light` and `spot_light` (read in the build's `libraries/`). Its one lat-long node, `latlongimage`, is a texture lookup by view direction, not a light. MaterialX tools take an environment as a viewer setting.
+  - **In USD, the environment is UsdLux's `DomeLight`,** which takes the image file itself (`inputs:texture:file`). Every consumer reads the image (SKY-F2), so a MaterialX wrapper would be read by nobody and would break RD-SKY-1/2's bare file name.
+  - **The fit with the library comes from the shared grammar, catalog list, provenance and release folder.**
+  - **A closer USD-native fit**, a small `.usda` per HDRI holding a ready-made `DomeLight`, would change what a scene names. It is a contract question for the platform, not this phase.
 - **F-P14-13 — The organisation's LFS is metered** (read from the account's billing API, 2026-10-14). The figures were given to the lead in session and are not recorded here: the repo is public.
 
 ## Questions for the lead
