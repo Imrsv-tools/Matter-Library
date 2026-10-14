@@ -270,6 +270,45 @@ Filling a library is a loop, not a sequence of phases: build, check in every too
 
 *Compiled from each row's scorecard by `wishlist.py`'s verdict (2026-10-02). "Moved nothing" counts the declared sliders that changed no tool's picture; a high count means controls a Creator would find dead (the LED's wear: F-P11-9). The three re-judges carry no wear layers (against C1): a redo would add them.*
 
+## The close sitting (RD-MP-13, 2026-10-14)
+
+**RD-MP-13 replaces 11.4 and the one-sitting end review** (`../../Research/261014_R_MaterialPipeline.md` F-MP-46, F-MP-47; the lead, 2026-10-14: *"1) yes"*): keep by verdict, put the rest to the lead's eye, move 11.4's refine pass into the loop as redo rows, rebuild the Blender library, close.
+
+**Kept by verdict, at the close (`cd403e8`), 11 rows, each `approved`:** Granite_Polished · Slate_Cleft · BlackWalnut_Natural · Aluminium_Raw · Concrete_Polished · Terrazzo_Polished · Terracotta_Unglazed · Fireclay_Natural · Paint_OnMetal_Chipped · LED_CoolWhite · Neon_Signage. Re-measured over the 35 built rows (35, not 30: batch `261004-1` added five re-judges): 11 clean · 6 a seam or ruler flag only · 17 a tool disagrees · 1 with no complete rig run, as F-MP-47.
+
+**The 24 for the lead's eye.** Pages: `library/parity/_review/<batch>.png`, opened by the agent; each row's whole sweep is `library/parity/<row>/sheet.png`. **The page shows each row at its defaults and its dust row, not the slider that disagrees**, so it answers the one question: *does it read as its matter?* A keep over a tool disagreeing sets `candidate`; a keep over a seam or ruler flag sets `approved` (Decision 4). **A redo goes back on the list with its note, for the loop** (11.4's refine pass, now ordinary redo rows).
+
+| Page | Row | Why it is here | Agent's recommendation |
+|---|---|---|---|
+| 261002-1 | Polypropylene_Natural | Scratches01 trips Blender alone (F-P11-7) | keep · `candidate` |
+| 261002-2 | Glass_Frosted | three renderers, three looks (F-P11-10) | keep · `candidate` |
+| 261002-2 | LED_WarmWhite | no complete rig run (Phase12 re-rigged it without Unreal, 2026-10-05); colour-only of LED_CoolWhite (its list note) | redo: *"re-rig; or retire as LED_CoolWhite with a warm emission colour"*, the lead's call |
+| 261002-2 | Rust_OnSteel_Flaking | seams (7 of 9 textures) · ruler off; reads as a blocky speckle (F-P11-11, F-P11-19) | **redo:** *"rebuild as flaking rust; seamless textures; add its wear layers (C1)"* |
+| 261002-3 | Onyx_Polished | WaterSpots01 UNEVEN | keep · `candidate` |
+| 261002-3 | NephriteJade_Polished | WaterSpots01 UNEVEN at 0.5; reads sage, not jade (F-P11-19) | **redo:** *"reads sage: deeper, more saturated jade green, more translucency"* |
+| 261002-3 | WhiteOak_Weathered | Cracks01 UNEVEN; seam flag; Cracks01 is crazing, wrong for wood (F-P11-12) | **redo:** *"make a grain-aligned Checks01 and use it in place of Cracks01"* |
+| 261002-4 | Loam_Natural | seam flag only | keep · `approved` (the rename to `Soil_Natural` is flagged in batch 4) |
+| 261002-4 | Sapphire_Natural | three looks (F-P11-10); the 36 cm sphere draws navy-black (F-P11-15) | keep · `candidate` |
+| 261002-4 | Gold_Polished | HairlineScratches01 UNEVEN (its 1 cm grid, F-P11-14); flat in the grey rig (F-P11-15) | keep · `candidate` |
+| 261002-4 | Aluminium_Brushed | roughness and HairlineScratches01 UNEVEN | keep · `candidate` |
+| 261002-4 | StainlessSteel_Polished | HairlineScratches01 UNEVEN | keep · `candidate` |
+| 261002-5 | MildSteel_Raw | Scratches01 UNEVEN | keep · `candidate` |
+| 261002-5 | Glass_Reeded | the reeds cannot show: a library limit (F-P11-16) | keep · `candidate` (a redo cannot fix it) |
+| 261002-5 | LeadCrystal_Clear | only Cycles refracts (F-P11-10) | keep · `candidate` |
+| 261002-5 | Concrete_BoardFormed | seam flag only | keep · `approved` |
+| 261002-6 | Acrylic_Clear | roughness and wear disagree (see-through) | keep · `candidate` |
+| 261002-6 | Silicone_Translucent | wear disagrees; its tint is dead (F-P11-17, a limit) | keep · `candidate` |
+| 261002-6 | Paint_Gloss | the coat is out of reach of roughness (F-P11-17, a limit) | keep · `candidate` |
+| 261002-6 | BeachSand_Dry | Pitting01 UNEVEN at the close-up | keep · `candidate` |
+| 261002-7 | OakLeaf_Natural | ruler off (the cut-out blind spot); a dull olive, one leaf visibly repeating (F-P11-19) | **redo:** *"a livelier leaf green; break the visible repeat"* |
+| 261002-7 | Diamond_Brilliant | roughness +0.5 and the see-through tint UNEVEN; a re-judge without wear layers | keep · `candidate` |
+| 261002-7 | Lace_Floral | seam flag · ruler off (the cut-out blind spot, F-P11-18); without wear layers | keep · `approved` |
+| 261004-1 | PowderCoat_Textured | ruler off, unconfirmed (a near-flat white) | keep · `approved` |
+
+**Also for the lead's word:**
+- **Terracotta_Unglazed is kept by verdict, and F-P11-19 says it "could pass for painted clay".** Say redo to send it back as well.
+- **The flawed layers (rule per layer, F-P11-12, F-P11-14):** HairlineScratches01 and Pitting01 show a 1 cm grid on highlights; Edges01 reads as a lace of cells (a tiling mask cannot know a mesh's edges: contract work). Cracks01 is right for glaze, plaster and dried earth, and wrong for wood. **Recommended:** regenerate HairlineScratches01 and Pitting01 as uniform fields (F-P11-14's fix); leave Edges01 until the library has a curvature input. The wish list holds no layer rows, so a layer redo rides on the redo note of the next row that carries it.
+
 ## Execution Log
 
 **Resume (paused by the lead, 2026-10-02, after 11.3):** next is **11.4, the refine pass** over the 30 proving rows under `/matter-batch` §4 (RD-P11-4), in batches by a fresh agent each, one rig at a time, starting with the faults F-P11-19 names. Rebuild the review pages after (`uv run tools/parity/review_pages.py 261002-1 … 261002-7`), refresh the review table from the scorecards (`wishlist.py verdict` per row), then the end review. **State at pause:** 26 rows built and 4 re-judged, all `draft` (nothing kept), 7 new layers, gate 15 PASS / 2 SKIP / 0 FAIL at `aa23deb`; **nothing pushed** (the push is the lead's). Still for the end review: the four flawed layers (F-P11-14, F-P11-12) and the library limits (F-P11-9, -16, -17), which are later phases' work.
