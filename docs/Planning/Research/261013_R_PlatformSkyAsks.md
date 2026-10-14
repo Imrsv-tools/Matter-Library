@@ -191,10 +191,26 @@ Until that phase writes them, this section is the authority.
 - **The edited-from line is Markdown** (*"Edited sky-only version of [Industrial Sunset 02](https://…)"*). The consumer draws every text as text, as the site does (the site's own note on the same field). The edited-from HDRI's name and its link given apart would serve both consumers; one fixed link form, written down, would also do. The library's choice.
 - **One fact, not an ask.** M10 says *"USDLiveView's launcher finds the folder: done in its repo, 2026-10-14"*. At USDLiveView's `origin/main` (`8fb88e1`), on every branch, the launcher names no HDRI folder yet. It may be unpushed where it was made. That repo's to push.
 
+## Pass 4 — A9 and A10 seen served; one more ask, the HDRI rows' grouping (2026-10-14)
+
+*From the platform's side. Read against `f113b3a`; the served dev catalog read on the platform's machine, nothing written. One ask, A11. The ruling is the library's.*
+
+**A9 and A10 are answered, and served.** The dev catalog (`schema_version` 3) carries every one of the 59 HDRIs' `contributor`, `licence` and whole `credit` — sponsors on the 28 that have them, the edited-from name and link apart — and `when`, `sky` and the whole `tagging`; `groups[hdris]` gives `taxonomy` `when` › `sky`. The consumer has what it needs to draw the credit and to read the rows. Nothing more is owed on either.
+
+**The need behind A11.** Two consumers now browse HDRIs by the same rows: the library's site and the app's HDRI window, which narrows by the same Dig. Both show fewer toggles than Poly Haven's words — **Day** (`morning-afternoon` + `midday`) · **Sunrise & sunset** · **Night**, then **Clear** · **Cloudy** (`partly_cloudy` + `overcast`), with `fog`'s 2 still unplaced. That grouping is written today in one consumer's code only. This doc's contract calls it *"a consumer's presentation"* (RuntimeCatalog §Groups, `hdris[].when`, `hdris[].sky`), and for one consumer it is. With two, a second copy can drift from the first — a sky counted under Cloudy on the site and on its own in the app — and fog's placement has to be decided twice.
+
+| # | Ask | Why | What exists |
+|---|---|---|---|
+| A11 | **The HDRI rows' grouping, in what the dev install serves** — for each of `when` and `sky`, the toggles in order, each with its `label` and the Poly Haven words it covers (`fog` placed). Shaped as the library's choice; `groups[character].rows` is a precedent the consumer already reads by field name. **Or** a ruling that the grouping stays each consumer's — then the app copies the site's, cites it, and pins its counts. | One grouping, read by both consumers, so the site and the app offer the same toggles and the same counts. | `groups[hdris]` with `taxonomy` `when` › `sky`; `groups[character].rows` with labels in order; the grouping itself only in the site's code. |
+
+- **Safe for today's consumer either way:** it reads `groups[]` and each entry's fields by name and ignores a key it does not know.
+- **The words underneath stay Poly Haven's** — `when` and `sky` unchanged; A11 adds the grouping beside them, nothing in their place.
+
 ## Status
 
-- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10).
+- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10) · 4 (the platform's side: A9, A10 seen served; A11).
+- **Open (Pass 4, 2026-10-14):** A11 — the HDRI rows' grouping in what the dev install serves, or a ruling that it stays each consumer's. The library's to rule.
 - **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
 - ~~**Open:** A1 – A8 …~~ **Delivered 2026-10-14 by Phase14** (`docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`): A1 – A6 and A8 in full, and A7 for the dev install. A release that holds HDRIs is planned. The Glossary's *HDRI* headword landed. The ledger row M10 says what the library serves.
-- **Open (Pass 3, 2026-10-14):** A9 (each HDRI's credit) and A10 (each HDRI's tagging), in what the dev install serves. The library's to rule: where, and in what shape, beside the `no_projection_guard` rule. The library's pass on them is owed.
-- ~~**▶ Next:** the lead starts `/discovery` …~~ **▶ Next:** the library's pass on A9 and A10. The platform's HDRI phase builds the rest of its side against the dev install (M10). *(The Pass-2-era Open and Next lines that came in with Pass 3 were written against `94ad878`, before Phase14 closed; they are folded into the lines above at the merge.)*
+- ~~**Open (Pass 3, 2026-10-14):** A9 (each HDRI's credit) and A10 (each HDRI's tagging), in what the dev install serves. The library's to rule: where, and in what shape, beside the `no_projection_guard` rule. The library's pass on them is owed.~~ *(Answered and served — Phase16 and Phase15; seen in Pass 4.)*
+- ~~**▶ Next:** the lead starts `/discovery` …~~ **▶ Next:** the library's pass on A11. The platform's HDRI phase builds the rest of its side against the dev install (M10). *(The Pass-2-era Open and Next lines that came in with Pass 3 were written against `94ad878`, before Phase14 closed; they are folded into the lines above at the merge.)*
