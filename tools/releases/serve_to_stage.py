@@ -10,9 +10,15 @@ is no lockfile, no freeze, no approval and no version bump. Re-run it after addi
 What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
   * ``releases/matterlib-dev/materials`` and ``textures`` -> symlinks into this checkout, so a
     re-assembled article or a regenerated texture is live with no re-serve;
+  * ``releases/matterlib-dev/hdris`` -> a symlink into this checkout's ``MatterLibrary/hdris/``
+    (Phase14), and ``releases/matterlib-dev/thumbnails/hdris/`` -> a 1024 x 512 JPEG made from
+    each HDRI, here in the runtime and never in the checkout (Q-P14-3);
   * ``releases/matterlib-dev/matterlib-dev.catalog.json`` -> projected from the working tree
     (every ``.mtlx``; ``status`` from its recipe, else ``draft``; plus each article's own
-    ``master`` token, so a consumer can route by it rather than by class: Phase07 7.2, L4);
+    ``master`` token, so a consumer can route by it rather than by class: Phase07 7.2, L4), and,
+    when the checkout holds HDRIs, their ``hdris`` list and ``default_hdri`` at schema 3 (Phase14:
+    each file passes the HDRI check or the serve is refused; status from its record, else draft;
+    the default from ``library/hdris.yaml``);
   * ``active-release.json`` -> ``matterlib-dev`` (the previous value is kept in
     ``active-release.before-dev.json``; ``--off`` puts it back);
   * then (re)starts the Stage daemon from that runtime, unless ``--no-restart``.
@@ -31,6 +37,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import signal
 import socket
 import subprocess
@@ -42,14 +49,25 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 SOURCE = REPO / "MatterLibrary"
 sys.path.insert(0, str(REPO / "tools" / "converters"))
-from project_runtime_catalog import SCHEMA_VERSION, derive_entry  # noqa: E402
+from project_runtime_catalog import (  # noqa: E402
+    SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
+import validate_manifest as vm  # noqa: E402  (on sys.path via project_runtime_catalog)
 import working_tree  # noqa: E402
+import yaml  # noqa: E402
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
 SELECTOR = "active-release.json"
 BACKUP = "active-release.before-dev.json"
 PORT = 8081
+HDRIS = SOURCE / "hdris"                                                # Phase14
+HDRI_RECORDS = REPO / "library" / "provenance" / "sources" / "hdris"
+HDRI_SETTINGS = REPO / "library" / "hdris.yaml"
+THUMBNAIL = "1024x512"                                                   # 2:1, the HDRI's own shape
+# The tone curve, in linear light, before sRGB: exposure 0.6 into Reinhard (u / (1 + u)), then
+# saturation +35 % and a gentle contrast. A plain conversion clips everything above 1.0 (this sky's
+# sun is 6200) into a white disc; this matches Poly Haven's own preview of the sky (14.1).
+TONE = ["-fx", "(0.6*u)/(1+0.6*u)", "-colorspace", "sRGB", "-modulate", "100,135", "-sigmoidal-contrast", "2,50%"]
 
 
 def working_tree_catalog() -> dict:
@@ -65,7 +83,51 @@ def working_tree_catalog() -> dict:
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)
-    return {"schema_version": SCHEMA_VERSION, "release": SERVED_RELEASE, "materials": entries}
+    catalog = {"schema_version": SCHEMA_VERSION, "release": SERVED_RELEASE, "materials": entries}
+    hdris, default = working_tree_hdris()
+    if hdris:  # Q-P14-2: schema 3 only when HDRIs are listed
+        catalog.update(schema_version=SCHEMA_VERSION_HDRIS, hdris=hdris, default_hdri=default)
+    return catalog
+
+
+def working_tree_hdris() -> tuple[list[dict], str | None]:
+    """Every HDRI on disk as a catalog entry, and the default (Phase14). A file that fails the
+    HDRI check refuses the serve, as a missing payload does."""
+    files = sorted(p for p in HDRIS.iterdir() if p.is_file()) if HDRIS.is_dir() else []
+    entries = []
+    for hdr in files:
+        errs = vm.check_hdri(hdr)
+        if errs:
+            raise SystemExit(f"cannot serve {hdr.relative_to(REPO)}: {'; '.join(errs)}")
+        hid, version = vm.hdri_id_version(hdr)
+        record = HDRI_RECORDS / f"{hid}.yaml"
+        status = (yaml.safe_load(record.read_text(encoding="utf-8")) or {}).get("status") \
+            if record.is_file() else None
+        entries.append(derive_hdri_entry({"id": hid, "version": version, "status": status or "draft"}))
+    default = (yaml.safe_load(HDRI_SETTINGS.read_text(encoding="utf-8")) or {}).get("default") \
+        if HDRI_SETTINGS.is_file() else None
+    if entries and default not in {e["id"] for e in entries}:
+        raise SystemExit(f"{HDRI_SETTINGS.relative_to(REPO)}: default {default!r} names no HDRI on disk")
+    return entries, default
+
+
+def make_thumbnails(dev: Path, entries: list[dict]) -> int:
+    """A 2:1 JPEG per HDRI in the runtime (never in git: RD-MP-6), remade when the HDRI or this
+    tool (its recipe) is newer than the thumbnail."""
+    magick = shutil.which("magick")
+    if entries and not magick:
+        raise SystemExit("ImageMagick's `magick` is needed to make the HDRI thumbnails")
+    made = 0
+    for e in entries:
+        src, dst = SOURCE / e["payload_path"], dev / e["thumbnail_path"]
+        if dst.is_file() and dst.stat().st_mtime >= max(src.stat().st_mtime, Path(__file__).stat().st_mtime):
+            continue
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        tmp = dst.with_name(dst.stem + ".tmp.jpg")
+        subprocess.run([magick, str(src), "-resize", THUMBNAIL + "!", *TONE, "-quality", "88", str(tmp)], check=True)
+        os.replace(tmp, dst)
+        made += 1
+    return made
 
 
 def write_atomic(path: Path, text: str) -> None:
@@ -175,6 +237,11 @@ def main(argv=None) -> int:
         link(dev / "materials", SOURCE / "materials")
         link(dev / "textures", SOURCE / "textures")
         catalog = working_tree_catalog()
+        if catalog.get("hdris"):
+            link(dev / "hdris", HDRIS)
+            made = make_thumbnails(dev, catalog["hdris"])
+            print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
+                  f"{made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
         write_atomic(dev / f"{DEV}.catalog.json",
                      json.dumps(catalog, indent=2, sort_keys=True) + "\n")
         current = json.loads(selector.read_text()).get("active_release") if selector.exists() else None
