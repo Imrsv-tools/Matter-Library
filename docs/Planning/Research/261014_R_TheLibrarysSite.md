@@ -27,7 +27,7 @@
   - its wear layers: the recipe;
   - the Physically Based values used, and the ambientCG source: the recipe's `sources`;
   - texture provenance and its evidence: the lockfile;
-  - the licence: CC0-1.0 throughout *(true when written; since RD-MP-1, 2026-10-14, an article may be CC BY 4.0, so the site shows each article's own licence and the attribution it asks for)*;
+  - the licence: CC0-1.0 throughout *(true when written; since RD-MP-1, 2026-10-14, an article may be CC BY 4.0, so the site shows each article's own licence and the attribution it asks for; **withdrawn the same day**, `261014_R_RoadmapOrder.md` RD-RO-2: CC0 throughout holds, with a contributor's handle shown as a courtesy)*;
   - the per-slider parity verdict across Storm, Blender and Unreal: `library/parity/<article>/scorecard.json`;
   - what changed between two releases: the lockfile diff.
 - **WS-F4 — Two things would be new data:**

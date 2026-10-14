@@ -389,14 +389,14 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 
 ## Resolved
 
-- **RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0** (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
+- ~~**RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0**~~ *(**Withdrawn 2026-10-14** by `261014_R_RoadmapOrder.md` RD-RO-2: materials are CC0 only; a contributor's handle is carried as a courtesy and for Forseti tracking.)* (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
 - **RD-MP-2 — The hero thumbnail is rendered by Cycles today, and labelled with its renderer.** An Unreal hero follows once a showcase build of the runtime exists and the solid see-through master is repaired (M6). (Q-MP-1.)
 - **RD-MP-3 — F-MP-9's subject-per-Class table is the starting set**, evolved with the showcase scene's version: skin on the clothed character's hand and part of the face; hair on a head. (Q-MP-2.)
 - **RD-MP-4 — Thumbnails are made before the review**, so the maintainer approves what the public will see. (Q-MP-3.)
 - **RD-MP-5 — "Thumbnail" is the word for the published pictures; "preview" stays the review render.** RD-WS-4's *"a standard preview set"* means the thumbnails (in-place note there). The derived specs that say "preview set" (Catalog §Thumbnails's note, RuntimeCatalog's note, Consumers, PlatformDependencies M9) are conformed when a phase next touches them. (Q-MP-5.)
 - **RD-MP-6 — Thumbnails never go in git or LFS.** Before a release they sit in a folder on this machine that git ignores, served to the site's staging; at a release they are release assets. (Q-MP-7.)
 - **RD-MP-7 — The management front end is for the IMRSV team: to view and evaluate materials, decide what goes into which library version, and keep their provenance.** The Creator's side lives in each consumer. (Q-MP-4; where the console runs is Q-MP-9.)
-- **RD-MP-8 — A new article is CC0-1.0 by default** (the lead, 2026-10-14: *"CC0 is fine"*). CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article (RD-MP-1). (Q-MP-10.)
+- **RD-MP-8 — A new article is CC0-1.0 by default** *(since RD-RO-2, 2026-10-14: CC0-1.0 is the only licence)* (the lead, 2026-10-14: *"CC0 is fine"*). CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article (RD-MP-1). (Q-MP-10.)
 - **RD-MP-9 — The "no body skin map" rule is not taken. The direction is to plan a move to skin maps** (the lead, 2026-10-14: *"I think we need to plan to move to SkinMaps"*), researched in `261014_R_SkinMaps.md`. ~~The rulings it reopens are quoted there (MAP-RD2, MAP-RD5).~~ *(Corrected the same day: it reopens neither MAP-RD2 nor CM2. MAP-RD2 locks the mesh, not the pictures, so a skin map for the approved mesh is allowed, `261014_R_SkinMaps.md` RD-SKM-1. Only MAP-RD5's "skin stays general" is superseded.)* (Q-MP-6.)
 - **RD-MP-11 — The library gets a permanent home of its own: an independent library service, with its code in this repo, run by IMRSV on a GPU host; the platform consumes what it publishes** (the lead, 2026-10-14: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). F-MP-42 is its shape; the host is still open. Seeded as `PhaseTBD_LibraryService.md`. (Q-MP-11.)
 - **RD-MP-10 — The thumbnail probe waits for the library's permanent machine, and is one of its first tests** (the lead, 2026-10-14: *"lets pause on that … we might want to consdier if this moved to something more perminante with the this as one of the firsts tests"*).
@@ -422,7 +422,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 
 - **Passes captured:** 11 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8–11 record the lead's answers.
 - **Ruled:** RD-MP-1 to RD-MP-13.
-  - **Licences:** CC BY 4.0 is allowed beside CC0 (which amends R13), and CC0 is the default.
+  - **Licences:** CC0 only. *(RD-MP-1's CC BY was withdrawn the same day, `261014_R_RoadmapOrder.md` RD-RO-2; a contributor's handle is carried as a courtesy.)*
   - **Thumbnails:** Cycles renders them, on a subject chosen per Class, before the review; they are called thumbnails and never stored in git.
   - **The console:** the IMRSV team's, for curating versions.
   - **Skin:** it moves toward skin maps, made per approved mesh version (`261014_R_SkinMaps.md` RD-SKM-1); no earlier ruling is reversed.
@@ -433,7 +433,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **Open:** nothing in this doc. Each seed carries its own open questions.
 - **Routed (2026-10-14):** F-MP-27, -29 and -30 → the release-bundle phase doc; F-MP-31 → *Version Management*; F-MP-28 → *Contribution Path* (its Roadmap pointer); the new terms → the Glossary (*Thumbnail*, *Site file*, *Library service*, *Approved human mesh*, *Skin map*).
 - **Durable docs owed, and the verb that lands them:**
-  - **RD-MP-1 and RD-MP-8's consequences:** owned by *Two Licences*.
+  - ~~**RD-MP-1 and RD-MP-8's consequences:** owned by *Two Licences*.~~ Withdrawn with RD-MP-1 (RD-RO-2).
   - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them (*Thumbnails* at the latest).
   - ~~**RD-MP-13:** Phase11's close, by `/execute Phase11`, in its own doc.~~ **Done 2026-10-14:** 29 of 35 kept, 6 redo (`Phases/Complete/Phase11_LibraryCoverage.md` §The close sitting).
 - **Unverified:**

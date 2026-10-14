@@ -224,6 +224,52 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 - *Hair That Reads as Hair*: research, after the Skin Maps survey.
 - *Author a Material End to End* and *Parity Baselines*: `Reevaluate (2026-10-14)` (F-RO-6).
 
+## Pass 6 — What the platform's site phase needs now, and whether a placeholder is smart (2026-10-14)
+
+**The lead, verbatim:** *"Can we do the things WEB needs for its phase 36 even if we just have palcehoder we fill out later... or is taht not really smart?"*
+
+**Examined:** the platform's site phase, read-only at the web repo's origin, 2026-10-14. It is in execution. It wrote a section addressed to this library's session (*"Needs the library"*). Its ids are not copied here (`LOCAL_DELTAS.md` §Separation). Also measured: what the library already holds on disk.
+
+- **F-RO-24 — What the site asks for: one dev snapshot, published as a GitHub pre-release**, which is the library half of PlatformDependencies **M9**:
+  1. a tag starting `matterlib-` (for example `matterlib-0.2.0-dev.1`), marked as a pre-release;
+  2. **the site file**: per article, its id and version, domain, class and master, scale tag and metres per tile, status and whether a Creator can pick it, the Creator controls with start values and ranges, sources and licence, the parity verdict per control, and the file names of its pictures and its zip. A summary and a plain name are optional;
+  3. **pictures**, as release assets at web size: thumbnails, and the rig's pictures in the three tools. **"Whatever subset exists is fine."**
+  4. **one MaterialX zip per material:** the `.mtlx` and every texture it uses, the shared wear layers included;
+  5. **a sha256 digest for every file.**
+
+  The site's browsing is already built on a fixture it drafted from this repo's public files. Only the step that shows pictures, downloads and releases is parked on this snapshot. The site stays on staging until the library's first versionable release.
+- **F-RO-25 — Almost all of it is real data today, not placeholder** (measured 2026-10-14):
+  - every field in item 2 already exists in the recipes, the lockfile, the masters' control table and the dev catalog, except the parity verdict. **Rig output exists for 82 articles, 72 of them with a scorecard**, under the git-ignored `library/parity/` on the laptop (81 GB at full size);
+  - the zip follows the exporter's complete-portable form (`tools/conformance/build_portable.py`), which already gathers an article and its wear layers;
+  - digests are trivial;
+  - **only the thumbnails (RD-MP-2) and the summaries do not exist.**
+- **F-RO-26 — So the smart form of "placeholder" is *absent and labelled*, never *made up*.**
+  - The site already handles the absence. A missing picture shows a swatch of the material's colour, labelled *"texture, not a render"*. A missing plain name is derived from the article's name. A missing summary is simply not shown.
+  - The snapshot therefore carries only true fields. It leaves the thumbnails and summaries out, and fills them in later in the same file shape. This keeps the Working Agreement's *No Mock Data Masquerading as Real*: a field present with a made-up value would be published on a public release.
+  - **The real risk is the file's shape,** because the library owns it as a contract (RD-WS-4) and both repos pay for a change. The site drafted a shape and asked the library to adopt or change it. Adopting it as a **draft contract spec, marked as one, before the first versionable release** costs little to change while only staging reads it.
+- **F-RO-27 — This is *Materials Described*'s first step, and it moves to the front.** That phase's Outcome already says *"the library publishes everything the website shows about each material in one file beside each release"*:
+  - **its first step** is the dev snapshot above;
+  - **its later step** writes and confirms the summaries and search words.
+
+  The pictures it carries are the rig's for now. *Thumbnails* adds the showcase pictures to the same file later. The pre-release is a small slice of *Release Bundle*'s publishing (the GitHub Release and its digest), and decides none of that phase's contract.
+- **F-RO-28 — A pre-release on this public repo is a publication: irreversible, and the lead's word** (`.claude/CLAUDE.md`). Its content is already public in the repo, all CC0. A pre-release also takes the downloads off Git LFS bandwidth, which the site's research warned about.
+- **F-RO-29 — The site's licence ruling collides with this repo's.** On the web side, the lead answered *"Yes CC0 only"*, recorded there as *"Every Matter article is CC0-1.0; CC BY is not allowed"*. The web side notes *"the library records its own"*. This repo's **RD-MP-1** says: *"CC BY 4.0 is allowed beside CC0-1.0"* (the lead: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **RD-MP-8** says: *"A new article is CC0-1.0 by default"* (*"CC0 is fine"*). Both rulings are recorded; neither is resolved here (Q-RO-6). *(Resolved the same day: CC0 only, RD-RO-2.)* Either way, the snapshot is unaffected: every article on disk is CC0. **If CC0-only holds for the library, *Two Licences* leaves the order**, marked `Withdrawn (2026-10-14)` and kept.
+
+### The order, with this pass (unnumbered; one after the other)
+
+- **Materials Described:** the website shows every material, with its rig pictures and a download, from a dev snapshot the library publishes; then a readable name, a one-line description and search words for each.
+- **HDRIs in the Library:** a scene's HDRI is chosen from the library by name.
+- **Scale Grids:** swap every object to its scale grid and see at once whether a metre is a metre.
+- **The Library Service:** a contributor uploads one material package, and it comes back tested in all three tools, waiting for review.
+- **Thumbnails:** every material is shown at its best, on a subject that suits it.
+- **Skin Maps:** a character's skin varies across the body, as real skin does.
+- **The Library Console:** the team reviews, keeps or sends back, and picks what goes into each version, on one page.
+- **Release Bundle:** anyone downloads one verified release and uses it without this repo.
+- **Version Management:** the next release is cut from the last, and every old one stays reproducible.
+- **Blender from a Release:** a Blender user installs the add-on and the library from a release.
+- **Unreal Reference Masters:** Studio, or any Unreal user, renders library materials with the masters from a release.
+- **Contribution Path:** an outsider submits a package and gets a verdict; only maintainers release.
+
 ---
 
 ## Open questions
@@ -234,11 +280,16 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 | Q-RO-2 | **When does the Release Bundle start?** Its L1 ruling (2026-09-25) is the lead's *"b"*, choosing the option that reads *"Re-sequence. Library Coverage becomes P4 (the ~200 materials) … The bundle waits for a library worth versioning."* The same day: *"we have 200 materials to build and test before we have our first versionable library"*. RD-MP-13 has since made material work a standing process with no end. So what marks *"worth versioning"* now: a count of kept materials, or the console existing to cut one? | **After the console, at a count the lead names when it reaches the head of the list.** Not blocking today. |
 | Q-RO-3 | **The four overlapping older entries** (F-RO-6): keep them as they are, or annotate them? | **Annotate, never delete:** *See the Library* and *IMRSV Consumes Releases* marked as consumer outcomes; *Author a Material End to End* and *Parity Baselines* marked `Reevaluate (2026-10-14)`, with a pointer to what overlaps them. |
 | Q-RO-4 | **One Roadmap line for the standing material-making process**, so the Roadmap does not read as if material work stopped when Phase11 closes (F-RO-7)? | **Yes:** one line under `## Active`, *"Material-making: a standing process, not a phase"*, pointing at `library/wishlist.yaml` and the batch summaries. |
+| ~~Q-RO-6~~ → RD-RO-2 | **CC0 only, or CC0 with CC BY allowed?** On the web side the lead said *"Yes CC0 only"*. This repo's RD-MP-1 allows CC BY beside CC0 (F-RO-29). | **CC0 only, library-wide**, as the lead's latest word. RD-MP-1 is then marked withdrawn in place, and *Two Licences* is marked `Withdrawn (2026-10-14)` and kept, not deleted. The lead decides. |
 | Q-RO-5 | **Where the library service runs** (F-RO-11, F-RO-16): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, (c) the light half on the web server and a GPU hired by the hour, or **(d) the GPU work on each contributor's machine, sent as a ready package, with a small server that has no GPU and checks the evidence** (Pass 4, the lead's idea)? | **(a), with the one-package door (RD-RO-1, F-RO-20):** the service renders the rig and the thumbnails on upload. *(Pass 4 recommended (d); the lead rejected its split submission in Pass 5. A package carrying the contributor's own pictures is still possible, but it brings back Pass 4's costs.)* |
 
 ## Resolved
 
 - **RD-RO-1 — A material is submitted as one package, in one upload, tested on upload and taken apart on the library's side. The contributor never uploads the material, its textures and its pictures separately.** (The lead, 2026-10-14: *"they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web)… this is too messy"*.) This rules out Pass 4's split submission. Who makes the pictures is Q-RO-5.
+- **RD-RO-2 — Materials are CC0-1.0, and only CC0. A contributor's handle, when one is given, is carried as a courtesy and for the platform's Forseti tracking.** (The lead, 2026-10-14: *"YES... CC0 for materials... we decided that... material are CC0 but we will carry a handle if one is provided as courtesy and Forseti tracking"*.) Its effects:
+  - **It withdraws RD-MP-1** (CC BY beside CC0), with in-place notes there and on R13. RD-MP-8's default becomes the only licence.
+  - ***Two Licences* leaves the order:** it is marked `Withdrawn (2026-10-14)` and kept, by the quick fix that lands the cut.
+  - **The handle is new data** that nothing records today. The material package carries it when a contributor gives one (RD-RO-1). The site file publishes it (*Materials Described*). It is credit, never a licence condition. Closes Q-RO-6.
 
 ## Status
 
@@ -247,11 +298,15 @@ A **Wave** (the method's word for coupled phases) was considered for the service
   - Pass 2, the draft order;
   - Pass 3, where the library service runs;
   - Pass 4, the contributor-side shape (d);
-  - Pass 5, one package per material, with the order redrawn.
-- **Ruled:** RD-RO-1. A material is submitted as one package in one upload, tested on upload and taken apart on our side. Pass 4's split submission is out.
+  - Pass 5, one package per material, with the order redrawn;
+  - Pass 6, the site's dev snapshot. It is real data with gaps labelled, not placeholders, so *Materials Described* moves to the front and the order is redrawn again.
+- **Ruled:**
+  - **RD-RO-1:** a material is submitted as one package in one upload, tested on upload and taken apart on our side. Pass 4's split submission is out.
+  - **RD-RO-2:** materials are CC0 only, and a contributor's handle is carried as a courtesy and for Forseti tracking. RD-MP-1 is withdrawn, and *Two Licences* leaves the order.
 - **Phase11's close is underway** in another session (the lead, 2026-10-14).
-- **Current direction:** Pass 5's redrawn order:
-  - the four laptop phases (HDRIs, Scale Grids, Two Licences, Materials Described);
+- **Current direction:** Pass 6's order:
+  - *Materials Described* first. Its first step is the dev snapshot the platform's site is parked on (F-RO-27);
+  - then the laptop phases (HDRIs, Scale Grids). *Two Licences* is withdrawn (RD-RO-2);
   - beside them, the library service's spec (F-RO-12);
   - then the service, whose first outcome is the package door (F-RO-23);
   - then Thumbnails, Skin Maps and the console;
@@ -260,6 +315,8 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 - **Open:**
   - Q-RO-1: the lead checks Pass 5's order (*"Not numbered just one after the other with SHORT outcome so I can verify this makes sense"*), then cuts it and names any numbers.
   - Q-RO-5: who makes the pictures. The recommendation is (a), the service.
+  - ~~Q-RO-6~~ → **RD-RO-2:** CC0 only, with a contributor's handle carried as a courtesy.
+- **Owed beside the cut:** PlatformDependencies **M9** gains the site's dev-snapshot ask (F-RO-24), as a quick fix.
   - Q-RO-2 to Q-RO-4 each carry a recommendation and block nothing.
 - **Next step:** the lead cuts the order and names the numbers. The ruling lands in `## Resolved` first. Then, as a lead-directed `/quick-fix`, the change goes onto the Roadmap:
   - reorder `## Future`;
