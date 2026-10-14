@@ -5,6 +5,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "Satin paint: the low-sheen finish of painted cabinets, trim, walls and furniture, authored white so a Creator tints it to any colour. Opaque, a dielectric film; the substance is the paint, not what it covers (D1). Param-only (L1). The satin sibling of Paint_Gloss: the same white, without the gloss coat. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, placed by the Edges mask (G damage along borders, B deposit in corners, A handling on open faces). Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "Paint_Satin_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "draft",
   "path": "synthetic/coating/Paint_Satin_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",

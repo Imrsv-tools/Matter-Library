@@ -4,6 +4,7 @@
   "origin": ["agent-drafted"],
   "_comment": "Vulcanised rubber, as a shoe sole (Phase08 8.3, RD-P08-6: rubber is synthetic/polymer). OPAQUE, matte, near-black: carbon-black-filled rubber, the common sole. The one dark wardrobe article (RD-P08-5's exception: a Creator rarely lightens a sole). No texture: a sole's tread is the mesh's, not the substance's (D1).",
   "name": "Rubber_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/polymer/Rubber_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

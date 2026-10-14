@@ -5,6 +5,7 @@
   "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Dry beach sand: the loose, pale khaki sand above the tide line, its surface combed by the wind into low ripples a few centimetres apart (ambientCG Ground055S, CC0; tagged beach, ground, sand; 150 x 150 cm). Opaque: sand is a matte, rough granular solid at any viewing distance. The source does not say dry; the scan shows no wet sheen or darkening, and it is tagged neither wet nor damp (ambientCG's wet beach scans are). Carries every relevant wear layer at 0 (C1): pitting (overlay 1, damage: footprint-scale pocking and rain pits), dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit the row's order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. Built by the Phase11 batch.",
   "name": "BeachSand_Dry_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "environmental/sand/BeachSand_Dry_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",

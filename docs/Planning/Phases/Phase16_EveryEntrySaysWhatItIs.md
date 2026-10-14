@@ -1,6 +1,6 @@
 # Phase16 — Every Entry Says What It Is
 
-**Status:** BRIEF READY (2026-10-14, Pass 2), lane **build**, **no lead call open**. Next: **`/execute P16`**. Phase15 closed the same evening, so nothing now stands ahead of this phase. Pass 2 re-cut the Brief on what Phase15 actually landed. Opened by the lead's `/discovery P16`, then *"Things shifted a bit and P15 just finished... do another discovery pass"*. Numbered Phase16 on *"Lets make these the next phases (Before the scaled grid)"* (RD-DS-6). Seeded by `/research` on *"yes record it and seed all three"*. It follows *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Complete/Phase15_MatterCharacterHdri.md)), whose structure it fills, and comes before The Library Service ([`PhaseTBD_LibraryService.md`](Future/PhaseTBD_LibraryService.md); RD-DS-7).
+**Status:** IN EXECUTION (2026-10-14, `/execute P16`; baseline `run_all.py` 15 PASS / 2 SKIP / 0 FAIL at `830538d`), lane **build**. Brief ready at Pass 2. Phase15 closed the same evening, so nothing now stands ahead of this phase. Pass 2 re-cut the Brief on what Phase15 actually landed. Opened by the lead's `/discovery P16`, then *"Things shifted a bit and P15 just finished... do another discovery pass"*. Numbered Phase16 on *"Lets make these the next phases (Before the scaled grid)"* (RD-DS-6). Seeded by `/research` on *"yes record it and seed all three"*. It follows *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Complete/Phase15_MatterCharacterHdri.md)), whose structure it fills, and comes before The Library Service ([`PhaseTBD_LibraryService.md`](Future/PhaseTBD_LibraryService.md); RD-DS-7).
 
 ## Outcome
 
@@ -197,6 +197,14 @@ The steps run in order, because 16.2's material fields read what 16.1 wrote. **1
 ### Blockers
 
 None. Both of the lead's calls are answered: RD-P16-11 and RD-P16-12.
+
+---
+
+## Execution ledger
+
+| Step | Landed | Result | Next |
+|---|---|---|---|
+| **16.1** | the 16.1 commit | ▶ **SCAFFOLD COMPLETE — sitting owed** (clicks 1 and 2). All 95 recipes say `contributor: "MatterBot"`; all 95 re-assembled, each diff exactly the two lines (`contributor`, `licence`). Library regenerated (94 assets); read back from the saved `.blend`, all 94 `author`/`license` equal their own file's, one value pair (`MatterBot`, `CC0-1.0`). `verify_asset_library`: CONFORMS. Pilot re-frozen (12 `.mtlx` hashes). The recipe lane's RED fixtures were keyed (a false red, recorded on the gate) and `missing_contributor.json` added. `run_all.py`: 14 PASS / 2 SKIP / 1 FAIL — `approval_binds_freeze`, red until the maintainer's promote, as at Phase12 | the lead's clicks 1 and 2; then 16.2 |
 
 ---
 

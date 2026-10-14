@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Indigo denim (Phase07 7.5): a 3/1 warp-faced twill, rope-dyed indigo warp over an undyed weft. OPAQUE with a little FUZZ. The colour IS the weave: the base-colour map carries the indigo warp and the white weft flecks, which a tint cannot make, so this article has a base-colour texture where the jersey has a constant.",
   "name": "Denim_Indigo_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/textile/Denim_Indigo_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

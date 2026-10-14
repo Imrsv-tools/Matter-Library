@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "A fingernail or toenail for skin type II (Phase08 8.2, RD-P08-3; N1): paired with Skin_FitzpatrickII_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, smooth, with a light coat: the bed's colour through a translucent keratin plate. Derived from the skin by one rule (sources). The lunula and free-edge whitening would be mesh-bound maps, later (research Pass 4).",
   "name": "Nail_FitzpatrickII_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/nails/Nail_FitzpatrickII_Clean_Base_s001_v01.mtlx",
   "master": "Subsurface",

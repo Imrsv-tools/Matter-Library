@@ -5,7 +5,7 @@
   "description": "One JSON recipe per article (tools/converters/recipes/<Stem>.json). The assembler (assemble_mtlx.py) turns it into the .mtlx; nobody hand-writes MaterialX. Checked by the `recipe` lane of run_all.py (validate_recipe.py), which also checks what a schema cannot: the taxonomy (G3), path agreement (G5), physical plausibility (G6) and the layer assignment (G7). Every property here must be a MaterialSpec field or one of the metadata keys (_comment, path, class, sources); the lane checks that too, so this file cannot drift from the assembler.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "path", "master", "domain", "class", "scale_tag", "meters_per_tile", "lcd_ports"],
+  "required": ["name", "path", "master", "domain", "class", "scale_tag", "meters_per_tile", "lcd_ports", "contributor"],
   "properties": {
     "_comment": {"type": "string", "description": "Why this master, what the article is for."},
     "status": {"type": "string", "enum": ["draft", "candidate", "approved", "deprecated", "retired"], "description": "The article's lifecycle state before a release (Phase07, D-S): missing = draft. candidate = passed USDLiveView and Blender in the parity rig; approved = Unreal agrees too. Never written into the .mtlx; a release's own status lives in its lockfile."},
@@ -18,6 +18,7 @@
     "group": {"type": "string", "enum": ["matter", "character"], "description": "Phase15 (RD-P15-3): the group the article is browsed in, written into its imrsv_metadata. Absent = matter, so a Matter recipe never needs it. Never derived from the domain (F-DS-5)."},
     "species": {"type": "string", "enum": ["humanoid"], "description": "Phase15: a Character article's species (tools/converters/groups.py). Character only."},
     "part": {"type": "string", "enum": ["eyes", "hair", "skin", "nails", "teeth", "mouth"], "description": "Phase15 (RD-P15-1): a Character article's part, one of its species' rows (tools/converters/groups.py). Character only."},
+    "contributor": {"type": "string", "minLength": 1, "maxLength": 64, "description": "Phase16 (RD-P16-6, RD-P16-11): who brought the article into the library, as a handle, written into its imrsv_metadata. Required. The library's own articles say \"MatterBot\". A courtesy and for tracking, never a licence condition (RD-RO-2): the licence is CC0-1.0 library-wide, a constant in the assembler and never a recipe field."},
     "master": {"type": "string", "enum": ["Opaque", "Masked", "TranslucentThin", "TranslucentThick", "Subsurface", "TwoLayer", "Emissive", "Hair", "system"]},
     "domain": {"type": "string", "enum": ["natural", "engineered", "synthetic", "environmental", "utility", "biological"]},
     "class": {"type": "string", "description": "A class of the domain in Taxonomy.md (checked by G3)."},

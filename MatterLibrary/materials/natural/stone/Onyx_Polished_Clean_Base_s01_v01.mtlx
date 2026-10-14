@@ -338,5 +338,7 @@
     <input name="meters_per_tile" type="float" value="0.3" />
     <input name="domain" type="string" value="natural" uniform="true" />
     <input name="class" type="string" value="stone" uniform="true" />
+    <input name="contributor" type="string" value="MatterBot" uniform="true" />
+    <input name="licence" type="string" value="CC0-1.0" uniform="true" />
   </nodedef>
 </materialx>

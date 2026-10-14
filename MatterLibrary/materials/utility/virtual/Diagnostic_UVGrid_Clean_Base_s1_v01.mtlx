@@ -45,5 +45,7 @@
     <input name="meters_per_tile" type="float" value="1.0" />
     <input name="domain" type="string" value="utility" uniform="true" />
     <input name="class" type="string" value="virtual" uniform="true" />
+    <input name="contributor" type="string" value="MatterBot" uniform="true" />
+    <input name="licence" type="string" value="CC0-1.0" uniform="true" />
   </nodedef>
 </materialx>

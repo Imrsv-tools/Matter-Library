@@ -5,6 +5,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "Glazed porcelain: the white, glass-glazed body of plates, cups, bowls and tiles. Opaque: a dielectric body under a clear, glossy glaze, the glaze carried as a coat (C2). Param-only (L1), authored white so a Creator's tint reaches every glaze colour. Carries the row's wear layers at 0 (C1): scratches (overlay 1, damage) and fingerprints, gated by the Grime mask. The row's first layer, Crazing01, is not made yet; when it is, it takes slot 1 and the rest move down. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "Porcelain_Glazed_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "draft",
   "path": "engineered/ceramic/Porcelain_Glazed_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",

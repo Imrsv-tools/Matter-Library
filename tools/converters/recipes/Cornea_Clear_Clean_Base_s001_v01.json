@@ -5,6 +5,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "The cornea and tear film (Phase07 7.5): the clear shell over the eye. TRANSLUCENTTHIN (thin-walled: a shell), Physically Based Eye (Cornea). MakeHuman's high-poly eye has this shell (its texture hides it); without a clear article on it the eye renders covered.",
   "name": "Cornea_Clear_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/eyes/Cornea_Clear_Clean_Base_s001_v01.mtlx",
   "master": "TranslucentThin",

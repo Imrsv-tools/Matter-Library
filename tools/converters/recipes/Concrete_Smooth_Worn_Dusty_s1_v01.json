@@ -5,6 +5,7 @@
   "origin": ["scan", "agent-drafted"],
   "_comment": "Proof article 3 — layered/overlay. Opaque master + 2 overlays (shared dust + scratches). ambientCG CC0 (Concrete034) base. Exercises overlay1/2_density + tint/UV/roughness_bias. New (engineered/cementitious per Taxonomy.md). Phase 71 (71.11): repointed at the regenerated PACKED-DATA overlays (R/G = normal XY, B = roughness bias, A = mask density) — they were albedo bitmaps, and the `_basecolor_` in their old filenames was the tell.",
   "name": "Concrete_Smooth_Worn_Dusty_s1_v01",
+  "contributor": "MatterBot",
   "path": "engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

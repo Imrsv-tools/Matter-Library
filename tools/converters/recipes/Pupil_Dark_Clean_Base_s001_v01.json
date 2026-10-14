@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "The pupil (Phase07 7.5): the opening in the iris, which shows the dark inside of the eye. OPAQUE and near-black; nothing is truly black.",
   "name": "Pupil_Dark_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/eyes/Pupil_Dark_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

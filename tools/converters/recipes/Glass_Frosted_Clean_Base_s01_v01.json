@@ -5,6 +5,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "Frosted glass: clear soda-lime glass whose surface is acid-etched or sandblasted, so light passes but blurs (shower screens, office partitions, lamp shades). TranslucentThin: a pane is a thin shell seen through, the same master as Glass_Clear and Glass_Green. The frost is the surface roughness, nothing else: the same glass as Glass_Clear with a rough face. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article. Built by the Phase11 batch.",
   "name": "Glass_Frosted_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "engineered/glass/Glass_Frosted_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThin",

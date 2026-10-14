@@ -5,6 +5,7 @@
   "origin": ["scan", "agent-drafted"],
   "_comment": "Proof article 2 — one textured. Opaque master, ambientCG CC0 (Travertine009, a veined limestone-family stone). Exercises tint + UV + roughness_bias. Overwrites the stale standard_surface seed (D6 REFINE).",
   "name": "Limestone_Veined_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "natural/stone/Limestone_Veined_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",

@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Phase 71 example article — TWOLAYER, and the article that finally makes the master REACHABLE (the `rust -> TwoLayer` name exception; class metal -> Opaque otherwise, so nothing could ever bind it). The defining observable is TWO LAYERS THAT ARE VISIBLY TWO: bright polished metallic steel under dark orange non-metallic flaking rust, with the maskset saying where the rust sits. Each layer carries its OWN base colour / roughness / metalness / normal. ⚠ `maskset_blend` MUST be nonzero — the blend is t = k * maskset_blend, so at the schema default of 0 layer 2 is invisible however well it is authored (71.7 enforces this).",
   "name": "Rust_OnSteel_Flaking_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
   "master": "TwoLayer",
   "domain": "engineered",

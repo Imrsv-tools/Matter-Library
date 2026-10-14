@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Natural (undyed) full-grain leather (Phase08 8.3, RD-P08-5): a vegetable-tanned hide's own pale tan, authored light so a Creator's tint (a 0-1 multiply) reaches the browns, black and other dyed colours below it; Leather_Brown is kept. OPAQUE, semi-matte, with a light COAT for the finish, on Leather_Brown's pebbled grain.",
   "name": "Leather_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/textile/Leather_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

@@ -1,6 +1,7 @@
 {
   "_comment": "RED fixture (Phase03 3.2): a calibration reference carrying a wear layer. Must be REJECTED by the recipe lane.",
   "name": "Diagnostic_UVGrid_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
   "path": "utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "utility",

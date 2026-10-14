@@ -4,6 +4,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "One fresh green oak leaf's upper surface on a card, cut out by its own opacity map: MASKED, the master for a leaf card (MasterSet; grass ground cover is Opaque). The two-sided, thin-transmission foliage variant is (planned) in MasterSet, so light through the leaf is not carried; Masked is today's master. Generated (L2), not scanned: no ambientCG source names oak (its single-leaf sets Leaf001-003 say only green, leaf, single, tree), so the oak outline is drawn by judgement and the colour anchored to Physically Based Grass. One leaf per tile, about 12 cm. Carries every relevant wear layer at 0 (C1): pitting (overlay 1, damage: small holes and spotting), dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit the row's order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. Built by the Phase11 batch.",
   "name": "OakLeaf_Natural_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "draft",
   "path": "environmental/vegetation/OakLeaf_Natural_Clean_Base_s01_v01.mtlx",
   "master": "Masked",

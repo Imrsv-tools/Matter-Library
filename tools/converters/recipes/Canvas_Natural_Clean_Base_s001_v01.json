@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Undyed cotton canvas (duck) (Phase08 8.4, RD-P08-5): a heavy plain weave, the stuff of sneakers, tote bags and work jackets. Authored at the unbleached cotton's own pale ecru so a Creator's tint (a 0-1 multiply) reaches the khakis, olives, navies and black below it. OPAQUE with a little FUZZ: matte, with fewer loose fibres than a knit. The weave (16 ends x 14 picks per cm) is the article's own normal and roughness.",
   "name": "Canvas_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/textile/Canvas_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

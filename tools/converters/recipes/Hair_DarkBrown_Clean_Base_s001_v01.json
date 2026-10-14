@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "Hair fibre (Phase07 7.6, ruling L2): keratin coloured by eumelanin, on MASKED. The strands are the MESH's cut-out, supplied when the article is bound (cutout_map), never part of the article (D1), so one article dresses hair, brows and lashes alike. With no map supplied it renders solid, never magenta. The highlight is stretched along the UV tangent (anisotropy): card strands run along V.",
   "name": "Hair_DarkBrown_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/hair/Hair_DarkBrown_Clean_Base_s001_v01.mtlx",
   "master": "Masked",

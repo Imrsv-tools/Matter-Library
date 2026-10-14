@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "Proof article 1 — simple plastic. Opaque master, param-only (the minimal/param path). Exercises base_color_tint + roughness_bias. Overwrites the stale standard_surface seed (D6 REFINE).",
   "name": "ABS_Matte_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

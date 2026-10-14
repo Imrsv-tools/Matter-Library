@@ -90,7 +90,9 @@ def status_of(stem: str, key: tuple, release: dict) -> str:
 
 
 def articles() -> list[dict]:
-    """Every .mtlx on disk: id, version, status, master, creator_selectable, domain, class, mtlx."""
+    """Every .mtlx on disk: id, version, status, master, creator_selectable, domain, class, mtlx,
+    and (Phase16) its contributor and licence as its own file declares them ("" when it does not:
+    an absent field means not known yet, never a guess, RD-WS-1)."""
     rows, release = [], released()
     for mtlx in sorted(MATERIALS.rglob("*.mtlx")):
         rel = mtlx.relative_to(MATERIALS).with_suffix("").as_posix()
@@ -102,6 +104,8 @@ def articles() -> list[dict]:
             "display_name": leaf[: scale.start()] if scale else leaf,   # the name, sNN dropped
             "id": mid, "version": ver, "status": status_of(mtlx.stem, (mid, ver), release),
             "master": master_of(mtlx),
+            "contributor": metadata_of(mtlx).get("contributor", ""),     # Phase16 (RD-P16-11)
+            "licence": metadata_of(mtlx).get("licence", ""),             # Phase16 (RD-P16-1)
             "creator_selectable": mtlx.stem not in SYSTEM,
             **taxonomy_of(mtlx, rel), "identity": mtlx.stem, "mtlx": mtlx,
         })

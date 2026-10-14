@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Proof article 7 — glass. TranslucentThin master + the textureless/param-only base path. Overwrites the stale standard_surface seed (D6 REFINE). ⭐ Phase 71 (71.11) — WIDENED 1 -> 8 ports. Two things had to change. (a) The AUTHOR TIER: it gains `transmission_color` (the tint you see THROUGH it) and `thin_walled: true` — THE OpenPBR thin-vs-thick discriminator, without which Thin and Thick are the same material described twice (71.7's master-conformance now makes that a build failure). (b) The CREATOR ports: an interface input that nothing drives is a DEAD port, and the corrected channel contract means a maskset only has a job if there is something for it to gate. So the 8 ports are only honest if the article really carries the layers — hence a dusty, scratched, grimy pane. That is a natural window, it is the layered-materials marquee, and it is the ONLY article that exercises overlays on a TRANSLUCENT master.",
   "name": "Glass_Clear_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThin",
   "domain": "engineered",

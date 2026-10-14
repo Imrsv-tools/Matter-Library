@@ -131,6 +131,10 @@ def layer_size_m(path: str) -> float:
 RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources", "status",
                         "label", "summary", "search_words", "origin"}
 
+# Phase16 (RD-RO-2): every article is CC0-1.0, library-wide, so the licence is a constant written
+# into each file's imrsv_metadata and never a recipe field. The site file's LICENCE agrees.
+LICENCE = "CC0-1.0"
+
 
 @dataclass
 class Overlay:
@@ -220,6 +224,9 @@ class MaterialSpec:
     group: Optional[str] = None
     species: Optional[str] = None
     part: Optional[str] = None
+    # Phase16 (RD-P16-6, RD-P16-11): who brought the article into the library, as a handle. The
+    # recipe gate requires it; the library's own articles say "MatterBot".
+    contributor: Optional[str] = None
 
     @staticmethod
     def from_dict(d: dict) -> "MaterialSpec":
@@ -916,6 +923,9 @@ def assemble(spec: MaterialSpec) -> str:
         for key in ("group", "species", "part"):          # Phase15 (RD-P15-3)
             if getattr(spec, key):
                 _add_input(nd, key, "string", value=getattr(spec, key), attrs={"uniform": "true"})
+        if spec.contributor:                              # Phase16 (RD-P16-11)
+            _add_input(nd, "contributor", "string", value=spec.contributor, attrs={"uniform": "true"})
+        _add_input(nd, "licence", "string", value=LICENCE, attrs={"uniform": "true"})  # RD-P16-1
         # addNodeDef(..., "string", ...) already declares the implicit "out" output.
 
     return mx.writeToXmlString(doc)

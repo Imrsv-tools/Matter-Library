@@ -5,6 +5,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Brown full-grain leather (Phase07 7.5): a finished hide with a pebbled grain. OPAQUE, semi-matte, with a light COAT for the finish.",
   "name": "Leather_Brown_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/textile/Leather_Brown_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

@@ -127,6 +127,9 @@ def run_determinism(root: Path) -> bool:
 
 
 # Each RED recipe fixture and the guard that must reject it (fixtures/recipes/).
+# FALSE RED: 2026-10-14 — Phase16 16.1 made `contributor` required and the fixtures lacked it, so
+# ten failed on G2 before their own guard; wrong_type "passed" G2 on that same missing key. Each
+# fixture now has the key, so it fails only on its own defect (Phase16 16.1).
 RECIPE_FIXTURES = {
     "unknown_key.json": "G1",
     "wrong_type.json": "G2",
@@ -140,6 +143,7 @@ RECIPE_FIXTURES = {
     "virtual_with_layers.json": "G7",
     "deposit_wrong_slot.json": "G7",     # Phase10: a deposit's colour is its own slot's port
     "set_port_wrong_master.json": "G7",  # Phase12: the see-through colour port off its masters
+    "missing_contributor.json": "G2",    # Phase16: every article says who gave it (RD-P16-11)
 }
 
 

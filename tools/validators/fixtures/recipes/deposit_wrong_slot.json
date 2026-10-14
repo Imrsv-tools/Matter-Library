@@ -1,6 +1,7 @@
 {
   "_comment": "RED fixture (Phase10): the dust deposit on overlay 3 takes overlay 1's colour port. A deposit's colour is its own slot's Creator port (MasterSet §Overlay semantic). Must be REJECTED by the recipe lane (G7).",
   "name": "Oak_Natural_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
   "path": "natural/wood/Oak_Natural_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",

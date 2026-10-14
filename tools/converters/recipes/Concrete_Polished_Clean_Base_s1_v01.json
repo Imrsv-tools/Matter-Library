@@ -5,6 +5,7 @@
   "origin": ["procedural", "measured", "agent-drafted"],
   "_comment": "Polished concrete: a cast slab ground flat, densified and polished, the clean floor of a gallery or a showroom. Opaque: a solid dielectric with a flat, glossy face. The maps are generated (L2, gen_concrete_polished.py), not scanned as the wish list planned: ambientCG has no concrete tagged polished (its clean, smooth ones measure a mean roughness of 0.49 to 0.78), and none states a floor's physical size. The mean colour is anchored to Physically Based 'Concrete'. BUILT FOR LARGE FLOORS: the tile is 3 m, and it carries no landmark (no stain, crack or single scratch) for the eye to count repeats by; a 5 m floor tile holds 1.67 repeats, so the pattern does not lock to the floor's own module. It is one substance, not an assembly (D1): joints and floor tiles are geometry. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), scuffs, dust as a deposit (Phase10), gated by the Grime mask. Not carried: the wet look. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A3).",
   "name": "Concrete_Polished_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
   "status": "approved",
   "path": "engineered/cementitious/Concrete_Polished_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",

@@ -58,6 +58,8 @@ def selectable_articles():
         "identity": a["identity"],
         "catalog_path": catalog_path(a),
         "group": a["group"],
+        "contributor": a["contributor"],
+        "licence": a["licence"],
         "mtlx": str(a["mtlx"]),
         "status": a["status"],
     } for a in working_tree.articles() if a["creator_selectable"]]
@@ -105,7 +107,10 @@ def main():
             mat.asset_mark()
         ad = mat.asset_data
         ad.catalog_id = cat_ids[a["catalog_path"]]
-        ad.author = "IMRSV"
+        # Phase16 (RD-P16-11): who gave it and under what licence, read from the article's own
+        # file, never hard-coded (it read "IMRSV" for every article until then, F-P16-2).
+        ad.author = a["contributor"]
+        ad.license = a["licence"]
         ad.description = ("Matter material %s (%s: %s). Assign to a mesh; export via IMRSV LCD "
                           "USD. Identity travels on imrsv_matter_identity."
                           % (a["identity"], a["status"], STATUS_MEANS[a["status"]]))

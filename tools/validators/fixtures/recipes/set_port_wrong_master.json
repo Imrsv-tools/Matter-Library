@@ -1,6 +1,7 @@
 {
   "_comment": "RED fixture (Phase12): an Opaque article declares the see-through colour port. `transmission_color` is a Creator port of the see-through masters only (LCDSchema §Creator-adjustable subset); on Opaque nothing transmits, so the control would be dead. Must be REJECTED by the recipe lane (G7).",
   "name": "ABS_Matte_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

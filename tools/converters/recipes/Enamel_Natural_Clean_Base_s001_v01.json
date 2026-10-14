@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "Tooth enamel (Phase07 7.5). OPAQUE (MasterSet: enamel is Opaque). Smooth and slightly warm white.",
   "name": "Enamel_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/teeth/Enamel_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

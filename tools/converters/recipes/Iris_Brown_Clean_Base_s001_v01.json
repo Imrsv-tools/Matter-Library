@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "A brown iris (Phase07 7.5): a pigment, OPAQUE (D-E). Seen through the cornea shell, which carries the wet highlight. A pigment with no pattern for now (the radial pattern is mesh-bound detail, research CM2).",
   "name": "Iris_Brown_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/eyes/Iris_Brown_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

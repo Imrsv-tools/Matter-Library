@@ -4,6 +4,7 @@
   "origin": ["procedural", "agent-drafted"],
   "_comment": "Undyed satin (Phase08 8.4, RD-P08-5): a five-end warp satin in fine polyester filament, the face of a lining, a slip dress or a blouse. Authored white so a Creator's tint (a 0-1 multiply) reaches every dyed colour. OPAQUE, glossy, with SPECULAR ANISOTROPY: the face is almost all warp float, so the highlight is stretched across the warp (the warp runs along V; the highlight along U, as the hair's, Learnings B9). No fuzz: filament does not shed. The weave is the article's own normal and roughness.",
   "name": "Satin_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "synthetic/textile/Satin_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

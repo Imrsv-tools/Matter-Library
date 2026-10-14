@@ -4,6 +4,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "The white of the eye (Phase07 7.5). SUBSURFACE (D-E: the eye is composed from existing masters). Physically Based Eye (Sclera). Its wet shine comes from the cornea shell over it, so the sclera itself is not glossy.",
   "name": "Sclera_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/eyes/Sclera_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Subsurface",

@@ -5,6 +5,7 @@
   "origin": ["scan", "agent-drafted"],
   "_comment": "Polished onyx: honey-banded calcite onyx (the stone sold as onyx marble), cut and polished, its wavy amber, orange and cream bands glowing where light gets in (ambientCG Onyx007, CC0, tagged onyx and honey; roughness map mean 0.04, so polished). SUBSURFACE: onyx's look is light scattering through it, more than marble's (backlit onyx panels glow through 2 cm). subsurface_color is ONE constant, the texture's mean linear albedo: the library cannot drive a textured article's scatter colour from its texture, so at subsurface_weight 0.5 the bands keep about half their contrast (a judgement between the glow and the banding). subsurface_radius 0.015 m (red), a judgement for a far clearer calcite than marble's 0.0085. The source states no physical size: meters_per_tile 0.3 is a judgement (bands a few mm wide, waves of 5-10 cm). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Onyx_Polished_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "natural/stone/Onyx_Polished_Clean_Base_s01_v01.mtlx",
   "master": "Subsurface",

@@ -1,6 +1,7 @@
 {
   "_comment": "RED fixture (Phase03 3.2): four overlays, over the assembler's cap. Must be REJECTED by the recipe lane.",
   "name": "Glass_Clear_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
   "master": "TranslucentThin",
   "domain": "engineered",

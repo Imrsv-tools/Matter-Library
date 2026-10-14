@@ -1,6 +1,7 @@
 {
   "_comment": "RED fixture (Phase03 3.2): base colour reflects more light than arrives. Must be REJECTED by the recipe lane.",
   "name": "ABS_Matte_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "path": "synthetic/plastic/ABS_Matte_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

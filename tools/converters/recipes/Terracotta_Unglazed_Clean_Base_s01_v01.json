@@ -5,6 +5,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "Unglazed terracotta: a red-orange earthenware clay fired low and left bare (flower pots, roof and floor tiles, architectural cladding), matte and porous. Opaque: a solid, rough dielectric. Param-only (L1): Physically Based 'Terracotta' gives the colour, the roughness and the IOR; a plain fired body reads at this scale without a texture. Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant. Not carried: the efflorescence (a pale salt bloom) the wish list also wants, which needs a colour deposit layer. Built by the Phase11 batch.",
   "name": "Terracotta_Unglazed_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
   "status": "draft",
   "path": "engineered/ceramic/Terracotta_Unglazed_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",

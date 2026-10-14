@@ -64,5 +64,7 @@
     <input name="group" type="string" value="character" uniform="true" />
     <input name="species" type="string" value="humanoid" uniform="true" />
     <input name="part" type="string" value="hair" uniform="true" />
+    <input name="contributor" type="string" value="MatterBot" uniform="true" />
+    <input name="licence" type="string" value="CC0-1.0" uniform="true" />
   </nodedef>
 </materialx>

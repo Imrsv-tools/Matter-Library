@@ -4,6 +4,7 @@
   "origin": ["agent-drafted"],
   "_comment": "A fingernail or toenail (Phase07 7.5): keratin over the pink nail bed. OPAQUE (MasterSet: nail is Opaque), smooth, with a natural sheen as a light coat.",
   "name": "Nail_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/nails/Nail_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",

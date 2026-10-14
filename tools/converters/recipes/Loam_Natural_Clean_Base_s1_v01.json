@@ -4,6 +4,7 @@
   "origin": ["scan", "agent-drafted"],
   "_comment": "Loam: a dark brown, crumbly topsoil, the ground of a garden bed or a forest path (ambientCG Ground048, CC0; tagged soil, dirt, ground; 140 x 140 cm). Opaque: soil is a matte, rough solid at any viewing distance. The source says soil, not loam (loam is a soil texture class); the name keeps the wish list's word for an ordinary garden topsoil. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage; Cracks01 draws a dried-mud network, the right shape for soil), pitting (overlay 2, rain-pocked or crumbled ground), gated by the Patches mask. Built by the Phase11 batch.",
   "name": "Loam_Natural_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
   "status": "approved",
   "path": "natural/soil/Loam_Natural_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",

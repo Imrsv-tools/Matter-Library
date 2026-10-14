@@ -5,6 +5,7 @@
   "origin": ["agent-drafted"],
   "_comment": "Gum mucosa (Phase07 7.5). SUBSURFACE, moist.",
   "name": "Gum_Natural_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
   "status": "candidate",
   "path": "character/humanoid/mouth/Gum_Natural_Clean_Base_s001_v01.mtlx",
   "master": "Subsurface",
