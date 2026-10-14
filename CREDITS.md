@@ -8,9 +8,10 @@ The Matter Library's content is CC0: no one is *required* to credit anyone. We c
 
 | Who | What |
 |---|---|
-| **@PeteSmalls** | founding maintainer: the library model, the taxonomy and naming, the first 12 articles, the authoring and release tooling, the Blender bridge |
+| **@PeteSmalls** | founding maintainer: the library model, the taxonomy and naming, the authoring and release tooling, the Blender bridge |
+| **MatterBot** | the library's own contributor: every material and HDRI entry the library's tooling made, the first 12 articles among them (the maintainer, 2026-10-14: *"I didn't make these, The system did"*) |
 
-*Contributors are added here when their first contribution merges. Per-material credit, a contributor field recorded with each article, is planned (`docs/Planning/Research/260923_R_StandaloneSetup.md`, Q12).*
+*Contributors are added here when their first contribution merges. **Per-entry credit is recorded in each file** (since 2026-10-14, Phase16): every material's `.mtlx` declares its `contributor` (a handle) and `licence` in its `imrsv_metadata`, and every served HDRI carries its contributor and its source's full credit in its header. The handle is credit as a courtesy, never a licence condition. This answers `docs/Planning/Research/260923_R_StandaloneSetup.md` Q12.*
 
 ## Texture sources
 

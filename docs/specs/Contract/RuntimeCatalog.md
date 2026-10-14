@@ -91,7 +91,7 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
 | `hdris[].thumbnail_path` | string | `thumbnails/hdris/<id>_<version>.jpg`: a 1024 × 512 JPEG made from the HDRI (tone-mapped), relative to the catalog file. Made, never stored in git ([`261014_R_MaterialPipeline.md`](../../Planning/Research/261014_R_MaterialPipeline.md) RD-MP-5, RD-MP-6). In the dev install it is made at serve time; in a release it is a release asset *(planned, with the first release that holds HDRIs)*. | derived from `id` + `version` |
 | `default_hdri` | string | The id of the HDRI a new scene starts with: **one top-level key, so two defaults cannot be written** (A3). It names a listed HDRI, or the lockfile check refuses the release. | lockfile `default_hdri` |
 
-Provenance, licence and credit stay out of the catalog for HDRIs as for textures (`no_projection_guard`); they live in each HDRI's record, `library/provenance/sources/hdris/<id>.yaml`.
+Provenance stays out of the catalog for HDRIs as for textures (`no_projection_guard`); it lives in each HDRI's record, `library/provenance/sources/hdris/<id>.yaml`. **Licence, contributor and credit are not provenance:** since Phase16 (2026-10-14) the **dev catalog** carries them on every entry (§Who gave it and its licence, below; the lead's RD-DS-2). A released catalog does not yet *(planned, with the first release after Phase16)*.
 
 > **Planned (2026-10-14):** a release that holds HDRIs. Staging, freezing and activating one are not built yet, and `tools/releases/freeze_release.py` refuses a lockfile that lists HDRIs until they are (Phase14 §Not now). The dev install serves HDRIs today.
 
@@ -112,12 +112,25 @@ The library holds three **groups**, each browsed by its own taxonomy ([Taxonomy]
 | `materials[].species`, `materials[].part` | string | **Character only:** its species (`humanoid`) and part (`eyes`, `hair`, `skin`, `nails`, `teeth`, `mouth`). | the `.mtlx`'s `imrsv_metadata` |
 | `materials[].domain`, `materials[].material_class` | string | On a Character entry, **what it is made of** (`biological` / `tissue`, …): read from the file, since its `id`'s folders are `character/<species>/<part>/`. They no longer say where it is browsed; `group` does. | the `.mtlx`'s `imrsv_metadata` |
 | `hdris[].group` | string | `hdris`. | — |
-| `hdris[].when`, `hdris[].sky` | string | Its time of day (Poly Haven's category: `sunrise-sunset`, `morning-afternoon`, `midday`, `night`) and its sky (Poly Haven's `weather`: `clear`, `partly_cloudy`, `overcast`, `fog`). **Poly Haven's own words**; grouping them into fewer rows is a consumer's presentation. Left out when the record holds none. | the HDRI's record (into its `.hdr` header at Phase16) |
+| `hdris[].when`, `hdris[].sky` | string | Its time of day (Poly Haven's category: `sunrise-sunset`, `morning-afternoon`, `midday`, `night`) and its sky (Poly Haven's `weather`: `clear`, `partly_cloudy`, `overcast`, `fog`). **Poly Haven's own words**; grouping them into fewer rows is a consumer's presentation. Left out when the record holds none. | the HDRI's record; also in the served `.hdr`'s header since Phase16 ([Identity](../Ontology/Identity.md) §HDRI names) |
 | `hdris[].tagging` | object | The record's whole `tagging` block (`tags`, `categories`, `attributes`): the platform's ask A10. | the HDRI's record |
 
 - **The 30 Character entries' `id`s changed with their folder** (`character/humanoid/skin/Skin_FitzpatrickIV_Clean_Base_s001`, was `biological/tissue/…`); their names, and so every scene that names one bare, did not ([Identity](../Ontology/Identity.md)).
 - **A released catalog carries none of this yet** *(planned, with the first release after Phase15, RD-P15-6)*: the projector is unchanged, so every frozen catalog re-projects byte-identically.
-- These are taxonomy fields, not promotion metadata: `no_projection_guard` is untouched. Licence and contributor are Phase16's.
+- These are taxonomy fields, not promotion metadata: `no_projection_guard` is untouched. Licence and contributor are Phase16's (next section).
+
+### Who gave it and its licence *(2026-10-14, Phase16; the dev catalog)*
+
+**Every entry says who brought it into the library and under what licence, and every HDRI its full credit** (the lead, RD-DS-2, RD-DS-3: *"people contribute they are tracked,, the is a license it is added"*). The facts are written **inside the entry's own file** and the catalog projects them: a material's from its `.mtlx`'s `imrsv_metadata` ([MaterialXTemplate](../Authoring/MaterialXTemplate.md)), an HDRI's from the same facts its served `.hdr` is stamped with (`tools/releases/hdris.py` `facts()`; [Identity](../Ontology/Identity.md) §HDRI names), so the catalog and the file cannot disagree. **Additive: `schema_version` is unchanged** (3 with HDRIs).
+
+| Field | Type | Meaning | Source |
+|-------|------|---------|--------|
+| `materials[].contributor`, `hdris[].contributor` | string | **A handle: who brought the entry into the library** (RD-P16-6). Credit as a courtesy and for the platform's tracking, **never a licence condition** (RD-RO-2). The library's own entries say `MatterBot` (RD-P16-11); an HDRI's source people are in its `credit`. Left out when the file declares none. | the `.mtlx`'s `imrsv_metadata` (`contributor`, from the recipe) · the HDRI's record, else `MatterBot` |
+| `materials[].licence`, `hdris[].licence` | string | `CC0-1.0`: materials are CC0 only (RD-RO-2). Spelled `licence`, as the site file publishes it (RD-P16-1). | the `.mtlx`'s `imrsv_metadata` (`licence`, a constant in the assembler) · the HDRI's record (`provenance.license`) |
+| `hdris[].credit` | object | **The site file's shape** ([SiteFile](SiteFile.md) §Per HDRI; the platform's ask A9): `source`, `source_url`, `asset_url`, `authors[]` (`name`, `role`), `sponsors[]` (`id`, `name`, `url`), `edited_from` (the source's Markdown line) and, since Phase16, `edited_from_name` and `edited_from_url` (the same as a name and an address, RD-P16-3). A field the record does not hold is left out. | the HDRI's record |
+
+- **A released catalog carries none of these yet** *(planned, with the first release after Phase16, RD-P16-8)*: the release projector is unchanged, so every frozen catalog re-projects byte-identically. When it gains them, `no_projection_guard` must check **keys**, not substrings: `licence` does not contain `license` (F-P16-3).
+- **The dev install serves stamped copies of the HDRIs** (`releases/matterlib-dev/hdris/`, a folder, no longer a link into the checkout; RD-P16-12): each carries these facts in its header, and its pixels are the checkout's bytes. A reader that resolves the checkout directly (USDLiveView's `IMRSV_MATTER_LIBRARY`) sees the unstamped files.
 
 ### Off-grammar system material
 

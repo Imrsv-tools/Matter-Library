@@ -63,9 +63,9 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 
 | Field | Meaning |
 |---|---|
-| `licence` | `CC0-1.0`, every article (RD-RO-2). |
+| `licence` | `CC0-1.0`, every article (RD-RO-2). Read from the article's own `.mtlx` since Phase16 (2026-10-14). |
 | `sources[]` | The recipe's sources: `kind` (`ambientcg`, `physicallybased`, `procedural`, `judgement`) with what that kind records (an `asset` and `url`, the values used, a `why`). For a pilot article whose recipe has none, its textures' lockfile provenance (`kind`, `license`, `url`), wear layers excepted: like a recipe's, these sources are the article's own, and its wear layers are under `wear_layers`. Absent when nothing is recorded. |
-| `contributor` *(planned)* | A contributor's handle, when one was given: credit as a courtesy and for the platform's Forseti tracking, never a licence condition (RD-RO-2). Nothing records one yet. |
+| `contributor` | A contributor's handle, when one was given: credit as a courtesy and for the platform's Forseti tracking, never a licence condition (RD-RO-2). **Since Phase16 (2026-10-14, `matterlib-0.2.0-dev.5`)** read from the article's own `.mtlx` (its `imrsv_metadata`); the library's own articles say `MatterBot` (RD-P16-11). Left out when the file declares none. |
 | `origin` | Where the article came from, any of: `scan` (a scanned source, e.g. ambientCG), `procedural` (a generator), `measured` (measured values, e.g. Physically Based), `agent-drafted` (an agent wrote the recipe). Derived from its sources at 13.2, kept in the recipe, confirmed by the maintainer (F-MP-18). Absent until written. |
 
 **Per material — evidence and pictures:**
@@ -100,9 +100,9 @@ A group reads the list it names, filtered by `section` where it gives one. **A g
 | `id`, `version`, `display_name`, `status`, `creator_selectable` | As the [runtime catalog](RuntimeCatalog.md) §HDRIs defines them. |
 | `identity` | `<id>_<version>`: the file's stem, which every asset name below begins with. |
 | `label` | The name a person reads: **the source's own name** (`Industrial Sunset 02 (Pure Sky)`); derived from the tokens, as a material's, only when the record has none. |
-| `description` | The source's one-line description. |
-| `licence` | `CC0-1.0`. |
-| `credit` | `source` (`Poly Haven`), `source_url`, `asset_url` (its page there), `authors[]` (each `name` and `role`, e.g. *Original*, *Sky Edits*), `sponsors[]` (each `id`, `name` and `url` where given) and `edited_from` (the source's line naming the HDRI a sky was edited from). |
+| `description` | The source's one-line description, **without its opening resolution claim** (*"Free 16K HDRI, unclipped: …"*, which read as a claim about the library's 4096 × 2048 file; Phase16, RD-P16-4, the website's ask M11 (3)). The source's own words stay in the record. |
+| `licence`, `contributor` | `CC0-1.0`, from the record; and who brought it into the library, `MatterBot` for the library's own (Phase16, RD-P16-11). Poly Haven's people are in `credit`. The same facts are in the served `.hdr`'s header ([Identity](../Ontology/Identity.md) §HDRI names). |
+| `credit` | `source` (`Poly Haven`), `source_url`, `asset_url` (its page there), `authors[]` (each `name` and `role`, e.g. *Original*, *Sky Edits*), `sponsors[]` (each `id`, `name` and `url` where given) and `edited_from` (the source's line naming the HDRI a sky was edited from, as Markdown), with **`edited_from_name` and `edited_from_url`** beside it, the same as a name and an address *(Phase16, RD-P16-3, the website's ask M11 (4); the Markdown line stays until the site has moved)*. |
 | `group`, `when`, `sky` *(2026-10-14, Phase15)* | `hdris`, and the HDRI's two browse axes, in Poly Haven's own words: `when` its time category (`sunrise-sunset`, `morning-afternoon`, `midday`, `night`), `sky` its `weather` (`clear`, `partly_cloudy`, `overcast`, `fog`). Read from `tagging`; left out when it holds none. |
 | `tagging` | The source's own `tags`, `categories` and `attributes` (`time_of_day`, `weather`, `light_type`, `contrast`, `environment`, `sky_view`, …): **what a search and a filter on the site read.** |
 | `captured` | `date_taken`, `whitebalance`, `evs_cap`, `coords`, where the source gives them. |

@@ -15,6 +15,9 @@ Whatever the consumer, the contract it reads from this repo is the same:
 | the **release**: runtime catalog, install-root layout, active-release selector | [RuntimeCatalog](Contract/RuntimeCatalog.md) · [ReleaseModel](Distribution/ReleaseModel.md) |
 | **compressed textures**: role → BC format and colour space | [CompressedDistribution](Tooling/CompressedDistribution.md) |
 | **Creator assets** exported from Blender | [CreatorAssetProfile](Contract/CreatorAssetProfile.md) |
+| **who gave it and its licence**: `contributor`, `licence`, and an HDRI's `credit`, in each file and the dev catalog *(2026-10-14, Phase16)* | [MaterialXTemplate](Contract/MaterialXTemplate.md) · [Identity](Ontology/Identity.md) §HDRI names · [RuntimeCatalog](Contract/RuntimeCatalog.md) |
+
+**What a consumer may rely on — the bare name is the stable key** *(2026-10-14, the platform's ask GPA-Q2)*. Store and recognise a library material by its **bare file name**, never by its catalog `id`: the `id` embeds the folder it is browsed in, which the library may move, and the name survives the move. A new `vNN` is a new name, and a replaced material is a new article with the old one kept `deprecated` ([Identity](Ontology/Identity.md) §Filename grammar).
 
 > **Drift (2026-09-23):** consumers should receive all of the above as **one published release bundle** plus **the master contract as data** (R14). Both are *(planned)*, owned by the release-bundle / consumer-contract phase. Until then the IMRSV consumer assembles its install from this repo's checkout.
 
@@ -51,8 +54,9 @@ IMRSV is the first and largest consumer. The following topics were **moved out o
 
 A USD viewer consumes the raw `.mtlx` articles:
 - It resolves `@Name.mtlx@` through the stock USD search path ([_Architecture](_Architecture.md) §Decisions of record 8).
-- **That search path holds every folder under the release's `materials/` that holds a `.mtlx`, at any depth** *(2026-10-14, Phase15)*. A Matter article sits two levels down (`<domain>/<class>/`), but a Character article sits three (`character/<species>/<part>/`, [Taxonomy](Ontology/Taxonomy.md) §Character). A consumer that assumes a depth misses a group. USDLiveView's launcher walks every depth. Stage takes only the two-level folders today: ledger row P27.
+- **That search path holds every folder under the release's `materials/` that holds a `.mtlx`, at any depth** *(2026-10-14, Phase15)*. A Matter article sits two levels down (`<domain>/<class>/`), but a Character article sits three (`character/<species>/<part>/`, [Taxonomy](Ontology/Taxonomy.md) §Character). A consumer that assumes a depth misses a group. USDLiveView's launcher walks every depth. Stage takes only the two-level folders today: ledger row P27, which the platform is building now (2026-10-14).
 - An [HDRI](../Glossary.md) is named the same way, bare, on a `DomeLight` (`@<Name>_<Variant>_vNN.hdr@`, [Identity](Ontology/Identity.md) §HDRI names), so the viewer's search path must hold the library's `hdris/` folder. USDLiveView's launcher does since 2026-10-14 (Phase14). A stock viewer draws the sky only when its dome is set visible.
+- **A served HDRI is a stamped copy** *(2026-10-14, Phase16)*: its header carries its facts ([Identity](Ontology/Identity.md) §HDRI names) and its pixels are the checkout's bytes, so it renders identically. A viewer that resolves the checkout directly (USDLiveView's `IMRSV_MATTER_LIBRARY`) reads the unstamped file: the same picture, without the header facts.
 - It must set the MaterialX standard-library search path for its build (decision 7).
 - It should honour the active-release selector rather than scanning every installed release (*Drift, 2026-09-23: USDLiveView scans all releases today; listed in `docs/Planning/PlatformDependencies.md`*). *(Done 2026-10-14: its launcher searches only the release the selector names, P7.)*
 - This repo's own validation baseline for USD rendering is [USDValidationToolchain](Tooling/USDValidationToolchain.md).
