@@ -1,6 +1,6 @@
-# PhaseTBD — Thumbnails
+# Phase18 — Thumbnails
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14). **Numbered Phase18 by the lead the same day**, after The Library Service and ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
@@ -12,7 +12,7 @@ The rig's pictures are diagnostics, lit the same in every tool to compare them, 
 
 ## Scope — as ruled at research (2026-10-14)
 
-The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`](../../Research/261014_R_MaterialPipeline.md) Pass 2 and §Resolved.
+The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`](../Research/261014_R_MaterialPipeline.md) Pass 2 and §Resolved.
 
 - **The renderer** (RD-MP-2): Cycles today, labelled on every picture. An Unreal hero follows a showcase build of the runtime and the solid see-through master's repair (M6).
 - **The subject per Class** (RD-MP-3): F-MP-9's table, starting set. Skin on the clothed character's hand and part of the face; hair on a head; ground matter on a slab at real size; glass and gems with a backdrop.

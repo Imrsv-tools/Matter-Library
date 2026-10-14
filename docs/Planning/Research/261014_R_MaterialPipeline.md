@@ -378,7 +378,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 
 ## Resolved (continued)
 
-- **RD-MP-12 — The library service needs a new server, rented from Hetzner.** The two personal machines (the laptop, and the Linux GPU machine the Unreal work used) are not hosts. They can stand in for **a contributor's side**. The platform's web server is the only server today, and it records no GPU. (The lead, 2026-10-14; in `PhaseTBD_LibraryService.md`.)
+- **RD-MP-12 — The library service needs a new server, rented from Hetzner.** The two personal machines (the laptop, and the Linux GPU machine the Unreal work used) are not hosts. They can stand in for **a contributor's side**. The platform's web server is the only server today, and it records no GPU. (The lead, 2026-10-14; in `PhaseTBD_LibraryService.md` *(numbered Phase17 on 2026-10-14: `docs/Planning/Phases/Phase17_LibraryService.md`)*.)
 - **RD-MP-13 — Phase11 closes now:**
   - review by verdict, with the rows by-verdict cannot keep put to the lead's eye (F-MP-47);
   - 11.4's refine pass moves into the loop as redo rows;
@@ -398,7 +398,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **RD-MP-7 — The management front end is for the IMRSV team: to view and evaluate materials, decide what goes into which library version, and keep their provenance.** The Creator's side lives in each consumer. (Q-MP-4; where the console runs is Q-MP-9.)
 - **RD-MP-8 — A new article is CC0-1.0 by default** *(since RD-RO-2, 2026-10-14: CC0-1.0 is the only licence)* (the lead, 2026-10-14: *"CC0 is fine"*). CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article (RD-MP-1). (Q-MP-10.)
 - **RD-MP-9 — The "no body skin map" rule is not taken. The direction is to plan a move to skin maps** (the lead, 2026-10-14: *"I think we need to plan to move to SkinMaps"*), researched in `261014_R_SkinMaps.md`. ~~The rulings it reopens are quoted there (MAP-RD2, MAP-RD5).~~ *(Corrected the same day: it reopens neither MAP-RD2 nor CM2. MAP-RD2 locks the mesh, not the pictures, so a skin map for the approved mesh is allowed, `261014_R_SkinMaps.md` RD-SKM-1. Only MAP-RD5's "skin stays general" is superseded.)* (Q-MP-6.)
-- **RD-MP-11 — The library gets a permanent home of its own: an independent library service, with its code in this repo, run by IMRSV on a GPU host; the platform consumes what it publishes** (the lead, 2026-10-14: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). F-MP-42 is its shape; the host is still open. Seeded as `PhaseTBD_LibraryService.md`. (Q-MP-11.)
+- **RD-MP-11 — The library gets a permanent home of its own: an independent library service, with its code in this repo, run by IMRSV on a GPU host; the platform consumes what it publishes** (the lead, 2026-10-14: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). F-MP-42 is its shape; the host is still open. Seeded as `PhaseTBD_LibraryService.md` *(numbered Phase17 on 2026-10-14: `docs/Planning/Phases/Phase17_LibraryService.md`)*. (Q-MP-11.)
 - **RD-MP-10 — The thumbnail probe waits for the library's permanent machine, and is one of its first tests** (the lead, 2026-10-14: *"lets pause on that … we might want to consdier if this moved to something more perminante with the this as one of the firsts tests"*).
 
 ## Open questions

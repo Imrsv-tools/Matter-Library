@@ -78,7 +78,7 @@ The lead, 2026-10-14: *"the 1m thing is s new concept I would like us to capture
   - **Four levels of line, thickest to thinnest:** the tile's edge, then each tenth below it, three times. This raises the sketch's three levels to four.
   - **For discovery:** four levels put 1,000 of the finest cells across a tile, about 4 px each at 4096 px. Whether the finest level stays legible, or fades with distance, is measured there. The palette needs one colour for each length any grid draws, from the `s0001` grid's finest line to 100 m, and must stay distinct to a colour-blind eye (line weight helps).
 
-**Made owed:** the phase **Scale Grids**, seeded the same day and numbered **Phase15** the same day too, then **renumbered Phase18** that evening behind three new phases: `docs/Planning/Phases/Phase18_ScaleGrids.md`. `/discovery` lands it. Until then, this doc's design sketch and §Resolved are the authority.
+**Made owed:** the phase **Scale Grids**, seeded the same day and numbered **Phase15** the same day too, then **renumbered Phase18** that evening behind three new phases, and **Phase20** later that evening behind The Library Service and Thumbnails too: `docs/Planning/Phases/Phase20_ScaleGrids.md`. `/discovery` lands it. Until then, this doc's design sketch and §Resolved are the authority.
 
 ## Status
 

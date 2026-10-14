@@ -1,6 +1,6 @@
-# PhaseTBD — The Library Service
+# Phase17 — The Library Service
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14). **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). A pointer-shell written by `/research` on the lead's word (*"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
@@ -24,7 +24,7 @@ It is one thing a person can see: a batch, a rig run and a thumbnail produced by
 
 ## Scope — as ruled at research (2026-10-14)
 
-The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`](../../Research/261014_R_MaterialPipeline.md) §Resolved (RD-MP-11) and F-MP-40 to F-MP-42.
+The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`](../Research/261014_R_MaterialPipeline.md) §Resolved (RD-MP-11) and F-MP-40 to F-MP-42.
 
 - **Independent, with its code in this repo, run by IMRSV** (RD-MP-11). Anyone who forks the library can stand one up, which keeps RD-WS-1's condition 3: *the library survives without IMRSV*. The platform's site and mirror consume what it publishes, and never reach into it.
 - **What it runs** (F-MP-40):
@@ -60,7 +60,7 @@ The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`
 
 ## Carried in (2026-10-14)
 
-From [`261014_R_RoadmapOrder.md`](../../Research/261014_R_RoadmapOrder.md) Passes 3–5, and the order the lead cut the same day:
+From [`261014_R_RoadmapOrder.md`](../Research/261014_R_RoadmapOrder.md) Passes 3–5, and the order the lead cut the same day:
 - **A material arrives as one package, in one upload, tested on upload and taken apart here** (RD-RO-1; the lead: *"they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web)"*). The package holds the recipe, the `.mtlx` and its textures, provenance, and the words. One command in this repo makes it (F-RO-19).
 - **This service makes the pictures on upload,** the rig in all three tools and then the thumbnails, so a contributor needs no GPU (F-RO-20). The order's line for this phase says so; Q-RO-5 keeps the record of the shapes weighed.
 - **The web server cannot hold the GPU half** (F-RO-10). Hetzner's GPU machines are dedicated and monthly: the GEX44 is quoted at €184–234 a month plus setup by third parties (unverified, 2026-10-14). Read the real price on hetzner.com.

@@ -1,6 +1,6 @@
 # Phase15 — Matter, Character and HDRI
 
-**Status:** SEEDED (2026-10-14). **Numbered Phase15 by the lead the same day:** *"Lets make these the next phases (Before the scaled grid)"*; Scale Grids, which held the number, is Phase18 and follows these three. A pointer-shell written by `/research` on the lead's word: *"yes record it and seed all three"*. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It is the first of three phases in that order (RD-DS-5): this one, then *Every Entry Says What It Is* ([`Phase16_EveryEntrySaysWhatItIs.md`](Phase16_EveryEntrySaysWhatItIs.md)), then *Character Materials, Their Own Library* ([`Phase17_CharacterLibrary.md`](Phase17_CharacterLibrary.md)).
+**Status:** SEEDED (2026-10-14). **Numbered Phase15 by the lead the same day:** *"Lets make these the next phases (Before the scaled grid)"*; Scale Grids, which held the number, is Phase18 and follows these three. A pointer-shell written by `/research` on the lead's word: *"yes record it and seed all three"*. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It is the first of three phases in that order (RD-DS-5): this one, then *Every Entry Says What It Is* ([`Phase16_EveryEntrySaysWhatItIs.md`](Phase16_EveryEntrySaysWhatItIs.md)), then, after The Library Service and Thumbnails (RD-DS-7), *Character Materials, Their Own Library* ([`Phase19_CharacterLibrary.md`](Phase19_CharacterLibrary.md)).
 
 ## Outcome
 
