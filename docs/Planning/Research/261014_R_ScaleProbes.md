@@ -72,6 +72,12 @@ The lead, 2026-10-14: *"the 1m thing is s new concept I would like us to capture
 - **RD-SP-2 — The scale grids ship in releases** (the lead, 2026-10-14: *"Yes ship in releases... very useful in all locations when trouble shooting"*). They are library content, so every consumer can offer a scale view. **This answers SP-Q1.**
 - **RD-SP-3 — Every scale grid has the same name except its scale tag** (the lead, the same message: *"exact name execpt scale"*). With the existing UV grid's tokens that reads `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`, for `s0001` to `s100` and `sUKN`. The exact tokens are the phase's, checked against [Identity](../../specs/Ontology/Identity.md).
 
+- **RD-SP-4 — One colour per length, the same in every grid; each grid's base is its own scale's colour; four line thicknesses** (the lead, 2026-10-14: *"consistant scale colors in the grid … if each scale had that is its base then someting like 4 thicknessed of grid for grid testing, then the size of each grid has a st color no matter the doc... like Blue is 1 meter in all of them (for example)"*). Read as:
+  - **A line's colour is its length, in every grid** (blue = 1 m was his example). This was already the design sketch's rule.
+  - **A grid's background is its own scale's colour**, as a dark shade. The 1 m grid is dark blue, with its tile edge in bright blue. The grid's identity and its thickest line agree.
+  - **Four levels of line, thickest to thinnest:** the tile's edge, then each tenth below it, three times. This raises the sketch's three levels to four.
+  - **For discovery:** four levels put 1,000 of the finest cells across a tile, about 4 px each at 4096 px. Whether the finest level stays legible, or fades with distance, is measured there. The palette needs one colour for each length any grid draws, from the `s0001` grid's finest line to 100 m, and must stay distinct to a colour-blind eye (line weight helps).
+
 **Made owed:** the phase **Scale Grids**, seeded the same day as `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md`. `/discovery` lands it. Until then, this doc's design sketch and §Resolved are the authority.
 
 ## Status
