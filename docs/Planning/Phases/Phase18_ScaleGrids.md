@@ -2,6 +2,8 @@
 
 **Status:** BRIEF READY (2026-10-14) — discovery Pass 1 done; lane **build**; next **`/execute Phase18`**, after Phase15 – 17. Numbered Phase15 by the lead: *"/discovery P15"*; **renumbered Phase18 the same day**, when the lead put three phases ahead of it: *"Lets make these the next phases (Before the scaled grid)"*. Its ids (`F-P15-n`) and step numbers (`15.n`) were minted as Phase15 and are kept as minted. Seeded the same day by `/research` on the lead's word: *"a Material for every UV scale that "aligns" with eachtoehr … we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*.
 
+> **⚠ Re-verify before `/execute` (added 2026-10-14 by this discovery's retro, after the renumbering).** The Brief below was measured before Phase15 – 17 were put ahead of it, and **Phase17 (*Character Materials, Their Own Library*, RD-DS-4) may take skin, eyes and teeth out of Matter**: fitted to a part mesh's own UVs, perhaps with no tile size. That reaches two of the five clicks (click 2's planted raw-atlas skin, the 170× case; click 4, the character in the rig), D-4's rule for atlas-sampled articles, and F-P15-1's counts (46 articles at `s001`, mostly character). **What survives whatever Phase17 rules:** the seven grids, the Blender scale view on Matter objects, and the golden cube (steps 15.1, 15.2 and 15.4). The executor re-measures F-P15-1 and the baselines, and re-reads Phase17's outcome before keeping clicks 2 and 4 as written. The Brief's "Phase14 is executing at the same time" is history: Phase14 closed the same evening (`a16dfbb`).
+
 ## Outcome
 
 **Anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.**
