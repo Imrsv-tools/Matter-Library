@@ -1,6 +1,6 @@
 # PhaseTBD — Skin Maps
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead's answers to Q-SKM-2, -5 and -6 come before `/discovery`, and the probe should too (Q-SKM-3). **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead ruled the same day (RD-SKM-2 to RD-SKM-4). The probe (on the laptop) and an exploration of the AI route (Q-SKM-7) come before `/discovery`. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
@@ -24,10 +24,12 @@ The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../
 
 ## Open questions (settle in research, then here)
 
-- Q-SKM-2: intimate anatomy in the map, or neutral regions; the hosts' content policies, starting with this public repo (F-SKM-6). The survey recommends neutral (F-SKM-16, F-SKM-17).
-- Q-SKM-3: the probe compares today's skin, a MakeHuman atlas and a library-made map, and runs before discovery. It runs on *The Library Service*, or on the laptop on the lead's word.
-- Q-SKM-5: where the first map comes from (MakeHuman's photo atlases record no consent; a library-made map, F-SKM-21).
-- Q-SKM-6: redness (a luminance map has none, F-SKM-14).
+- ~~Q-SKM-2~~ → RD-SKM-4: neutral at the genitals and groin.
+- ~~Q-SKM-3~~ → the probe runs on the laptop now: today's skin, a MakeHuman atlas (comparison only) and a library-made map.
+- ~~Q-SKM-5~~ → RD-SKM-2: library-made or AI-generated, never the photo atlases; the AI route is to be explored.
+- ~~Q-SKM-6~~ → RD-SKM-3: one colour map per tone.
+- Q-SKM-7: which ships, library-made or AI.
+- Q-SKM-4: naming a mesh version.
 
 ## Discovery Log
 

@@ -268,17 +268,22 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
   - Any skin map made for it serves every character built from it, whatever its shape, skeleton or weights.
   - A future mesh gets its own skin-map spec, and the meshes that keep its topology use that version's maps.
   - In-place note on MAP-RD2 in `260929_R_CharacterMaps.md`. It answers Q-SKM-1, and it reopens neither MAP-RD2 nor CM2.
+- **RD-SKM-2 — The first skin map is made by the library (F-SKM-21) or AI-generated, never taken from MakeHuman's photo atlases; the AI route is to be explored** (the lead, 2026-10-14: *"1b or c I want to explore that option"*). The photo atlases stay a probe comparison only, never published. Which of the two ships is open until the AI route is explored (Q-SKM-7). It answers Q-SKM-5.
+- **RD-SKM-3 — One colour map per skin tone, carrying hue** (the lead, 2026-10-14: *"2b"*): six pictures per mesh version, one per Fitzpatrick article, through the existing `base_color_map`, with no new input. It answers Q-SKM-6.
+- **RD-SKM-4 — The library's map is neutral at the genitals and groin** (the lead, 2026-10-14: *"3 yes"*): plain skin there. The areolae keep their natural colour variation, with a one-line context note where the fit set says what it holds. Anatomy, if ever, is a separate opt-in package outside this repo, and none is planned. It answers Q-SKM-2.
+- **The probe runs on the laptop now** (the lead, 2026-10-14: *"run the probe on the laptop"*). It answers Q-SKM-3.
 
 ## Open questions
 
 | Id | Question | Recommendation |
 |---|---|---|
 | ~~Q-SKM-1~~ | ~~Does one skin map for the hm08 layout count as allowed under MAP-RD2?~~ | → **RD-SKM-1:** yes; MAP-RD2 is about locking the mesh. |
-| Q-SKM-2 | Is intimate anatomy in the map in scope for the library at all, or does the library's map leave those regions neutral? | **Neutral at the genitals and groin** (plain skin there), as every surveyed system's base body is (F-SKM-16). That is fine on every host (F-SKM-17). Anatomy, if ever, is a separate opt-in package outside this repo, and none is planned. The areolae keep their natural colour variation, with a one-line context note where the fit set says what it holds (GitHub's own advice, F-SKM-17). *(Recommendation updated 2026-10-14, Pass 3.)* |
-| Q-SKM-3 | Run the probe before discovery, or after? *(Was "before the survey, or after"; the survey ran 2026-10-14.)* | **Before discovery.** It settles "is a colour map worth it" and "does a library-made map hold up" by eye. It waits for the permanent machine unless the lead runs it on the laptop. |
+| ~~Q-SKM-2~~ → **RD-SKM-4** (neutral) | Is intimate anatomy in the map in scope for the library at all, or does the library's map leave those regions neutral? | **Neutral at the genitals and groin** (plain skin there), as every surveyed system's base body is (F-SKM-16). That is fine on every host (F-SKM-17). Anatomy, if ever, is a separate opt-in package outside this repo, and none is planned. The areolae keep their natural colour variation, with a one-line context note where the fit set says what it holds (GitHub's own advice, F-SKM-17). *(Recommendation updated 2026-10-14, Pass 3.)* |
+| ~~Q-SKM-3~~ → run now, on the laptop (the lead, 2026-10-14) | Run the probe before discovery, or after? *(Was "before the survey, or after"; the survey ran 2026-10-14.)* | **Before discovery.** It settles "is a colour map worth it" and "does a library-made map hold up" by eye. It waits for the permanent machine unless the lead runs it on the laptop. |
 | Q-SKM-4 | **How a mesh version is named and recorded**, so each skin map says which mesh it fits (the fit set's family folder, plus a version)? | A small contract question for the phase that builds the first map: the family is `makehuman` today, and hm08 is its first version. |
-| Q-SKM-5 | **Where the first map comes from** (F-SKM-15): (a) MakeHuman's CC0 photo atlases, whose licence is fine but which record no consent from the people photographed (against F-MP-19) and carry baked shading; (b) a map the library makes from CC0 region masks and its measured tones (F-SKM-21); (c) AI-generated, which is CC0 in form but has unknown training sources. | **(b) for what ships.** (a) only as the probe's comparison, never published. |
-| Q-SKM-6 | **Redness** (F-SKM-14): (a) a luminance map only, accepting no redness; (b) one colour map per tone, carrying hue (six pictures per mesh version, no new input); (c) one map plus a separate redness picture (a second mesh-supplied input, so a contract addition). | **(b), if Q-SKM-5 is (b):** a library-made map costs nothing more to make per tone, and needs no contract change. Revisit (c) if the full map set ever opens new inputs. |
+| ~~Q-SKM-5~~ → **RD-SKM-2** (b or c; explore c) | **Where the first map comes from** (F-SKM-15): (a) MakeHuman's CC0 photo atlases, whose licence is fine but which record no consent from the people photographed (against F-MP-19) and carry baked shading; (b) a map the library makes from CC0 region masks and its measured tones (F-SKM-21); (c) AI-generated, which is CC0 in form but has unknown training sources. | **(b) for what ships.** (a) only as the probe's comparison, never published. |
+| ~~Q-SKM-6~~ → **RD-SKM-3** (b) | **Redness** (F-SKM-14): (a) a luminance map only, accepting no redness; (b) one colour map per tone, carrying hue (six pictures per mesh version, no new input); (c) one map plus a separate redness picture (a second mesh-supplied input, so a contract addition). | **(b), if Q-SKM-5 is (b):** a library-made map costs nothing more to make per tone, and needs no contract change. Revisit (c) if the full map set ever opens new inputs. |
+| Q-SKM-7 | **Which ships: the library-made map or an AI-generated one** (RD-SKM-2)? The AI route is still to explore: which generator can draw onto hm08's layout, what it was trained on, and how its output's origin is recorded (F-MP-18). | After the probe and an exploration of the AI route. |
 
 ## Status
 
@@ -287,7 +292,13 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
   - Pass 2: the lead's clarification;
   - Pass 3: the industry survey, web only;
   - Pass 4: what a first map needs in this repo, measured.
-- **Ruled:** RD-SKM-1. MAP-RD2 locks the mesh, not the pictures. Skin maps are made per mesh version; today's mesh is MakeHuman's hm08 on Manny. Nothing earlier is reversed except MAP-RD5's *"skin stays general"* (by RD-MP-9).
+- **Ruled:**
+  - **RD-SKM-1:** MAP-RD2 locks the mesh, not the pictures. Skin maps are made per mesh version; today's mesh is MakeHuman's hm08 on Manny. Nothing earlier is reversed except MAP-RD5's *"skin stays general"* (by RD-MP-9).
+  - **RD-SKM-2 to RD-SKM-4** (2026-10-14):
+    - the first map is library-made or AI-generated, never MakeHuman's photos, and the AI route is to be explored;
+    - one colour map per tone;
+    - neutral at the genitals and groin.
+  - The probe runs on the laptop now.
 - **Direction:** plan to move character skin to skin maps. Today's tone per part gives a hard line at the lips and no variation (F-SKM-2); with a map, the lips can wear the skin and the map's own lip colour (F-SKM-9).
 - **Found:**
   - **The industry's first map is colour**; the library already has the tiling micro layer (`Skin_Pores`), on the same UVs as the industry uses (F-SKM-11, F-SKM-13).
@@ -303,10 +314,10 @@ It shows the lead, by eye, whether a colour map is worth it and whether a librar
   - the content of the US Copyright Office report;
   - any measured loss when moving maps between layouts.
 - **Open:**
-  - **for the lead:** Q-SKM-2 (anatomy), Q-SKM-5 (the source), Q-SKM-6 (redness);
-  - **for the phase:** Q-SKM-3 (the probe's timing), Q-SKM-4 (naming a mesh version).
+  - Q-SKM-7: which ships, library-made or AI (after the probe and the AI exploration);
+  - Q-SKM-4: naming a mesh version (for the phase).
 - **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
 - **Next step:**
-  1. The lead answers Q-SKM-2, -5 and -6.
-  2. The probe, on the permanent machine (or the laptop, on the lead's word).
+  1. The probe, on the laptop (in progress 2026-10-14).
+  2. Explore the AI route (Q-SKM-7).
   3. `/discovery` on *Skin Maps*, when the lead opens it.
