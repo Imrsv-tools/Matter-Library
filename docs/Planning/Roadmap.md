@@ -94,6 +94,18 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
 
+### Matter, Character and HDRI — SEEDED *(added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; the library's half, with the site's and the platform's asked through the ledger)*
+**Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
+- `docs/Planning/Phases/Future/PhaseTBD_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
+### Every Entry Says What It Is — SEEDED *(added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file)*
+**Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
+- `docs/Planning/Phases/Future/PhaseTBD_EveryEntrySaysWhatItIs.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
+### Character Materials, Their Own Library — SEEDED *(added 2026-10-14, the same word, third of the three, RD-DS-4; Skin Maps and Skin Maps Beyond Colour are its first instances)*
+**Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
+- `docs/Planning/Phases/Future/PhaseTBD_CharacterLibrary.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
 - Automated transformers (MaterialX → Blender / Unreal), after manual parity is proven. Parity-gate automation in CI. A Realm level above Domain. Texture storage beyond Git LFS (asset management, content-addressed pointers). Further engine targets. Personal saved variants, community scoring and contributor reputation (`docs/specs/Experience/Experience_MatterLibrary.md` §Future Layers). The planned roots in `docs/ToolingConventions.md` §Planned roots.
