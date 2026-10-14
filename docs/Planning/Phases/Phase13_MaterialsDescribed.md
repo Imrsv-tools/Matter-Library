@@ -1,6 +1,6 @@
 # Phase13 — Materials Described
 
-**Status:** BRIEF READY (2026-10-14; discovery Pass 1). Lane **`build`**, with the publication gated on the lead's word (§Risk lane). Next: `/execute Phase13`. **Numbered Phase13 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery materials definitions and numner the phase"* (RD-P13-1). Seeded the same day as a pointer-shell by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*).
+**Status:** IN EXECUTION (2026-10-14, the lead: *"no need for plan? if not go ahead with /execute"*). Brief written at discovery Pass 1 the same day. Lane **`build`**, with the publication gated on the lead's word (§Risk lane). **Numbered Phase13 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery materials definitions and numner the phase"* (RD-P13-1). Seeded the same day as a pointer-shell by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*).
 **Ids:** `Q-P13-n` · `F-P13-n` · `RD-P13-n`. Ids cited from research (`F-MP-n`, `RD-WS-n`, `F-RO-n`) keep their own stems. The platform's site work is cited by date and content, never by its ids (`LOCAL_DELTAS.md` §Separation).
 
 ## Outcome
