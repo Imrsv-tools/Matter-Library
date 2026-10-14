@@ -1,4 +1,8 @@
 {
+  "label": "Lips, Fitzpatrick type III",
+  "summary": "Lips to match skin type III: redder, smoother and moister than the skin.",
+  "search_words": ["lips", "mouth", "skin", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "Lip mucosa for skin type III (Phase08 8.2, RD-P08-3): paired with Skin_FitzpatrickIII_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, as skin, but redder, smoother and moist. Derived from the skin by one rule (sources).",
   "name": "Lips_FitzpatrickIII_Clean_Base_s001_v01",
   "status": "candidate",

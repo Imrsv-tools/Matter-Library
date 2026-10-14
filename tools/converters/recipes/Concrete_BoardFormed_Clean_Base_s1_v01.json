@@ -1,4 +1,8 @@
 {
+  "label": "Board-formed concrete",
+  "summary": "Concrete cast against rough timber boards, so each board's grain and joint is printed in its face.",
+  "search_words": ["concrete", "board formed", "board marked", "cement", "brutalist", "wall"],
+  "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Board-formed concrete: cast-in-place concrete poured against rough-sawn timber boards, so the face keeps each board's imprint: vertical strips about 10 cm wide, their joints, the wood grain and knots, and the form-tie holes (ambientCG Concrete045, CC0; tagged concrete, industrial, modern, pattern; 200 x 200 cm, so meters_per_tile 2 and tag s1, from the source). The source does not say board-formed; the maps show it plainly. It is one substance carrying an imprint, not an assembly (D1). Opaque: a matte, porous solid. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage; Cracks01 draws a crazing network, the right shape for concrete), scratches, dust as a deposit (Phase10), gated by the Grime mask. Not carried: the wet look and efflorescence the wish list also wants. Built by the Phase11 batch.",
   "name": "Concrete_BoardFormed_Clean_Base_s1_v01",
   "status": "approved",

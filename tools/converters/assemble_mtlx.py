@@ -125,7 +125,11 @@ def layer_size_m(path: str) -> float:
 # Recipe keys that are not spec fields: harness metadata, not material data (Phase03 G1).
 # `status` (Phase07, D-S) is the article's lifecycle state BEFORE a release; it never reaches
 # the .mtlx, which is frozen once released, so promoting an article never changes its file.
-RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources", "status"}
+# The words (Phase13 13.2: `label`, `summary`, `search_words`, `origin`) are what a person reads
+# about the article on the library's website (SiteFile.md); like `status`, they never reach the
+# .mtlx, so rewording an article never changes its file.
+RECIPE_METADATA_KEYS = {"_comment", "path", "class", "sources", "status",
+                        "label", "summary", "search_words", "origin"}
 
 
 @dataclass

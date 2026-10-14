@@ -1,4 +1,8 @@
 {
+  "label": "Kraft cardboard",
+  "summary": "Brown unbleached cardboard, the board of boxes, cartons and paper bags.",
+  "search_words": ["cardboard", "kraft", "box", "carton", "paper", "packaging"],
+  "origin": ["scan", "agent-drafted"],
   "_comment": "Brown kraft cardboard: the unbleached board of boxes, cartons and paper bags. Opaque, a matte dielectric fibre sheet, from an ambientCG scan (L3). Placed in engineered/composite as the wish list does: the class's boundary is not written yet (O11), so the home is provisional. Carries the row's wear layers at 0 (C1): scuffs (overlay 1, damage) and dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit that order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. The row's damage layer, Creases01, is not made yet; Scuffs01 stands in for it in slot 1. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "Cardboard_Kraft_Clean_Base_s01_v01",
   "status": "draft",

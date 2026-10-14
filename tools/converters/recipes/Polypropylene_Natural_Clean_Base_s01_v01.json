@@ -1,4 +1,7 @@
 {
+  "summary": "Milky, waxy moulded plastic, as in food tubs, bottle caps and storage boxes.",
+  "search_words": ["polypropylene", "pp", "plastic", "tub", "container", "milky plastic"],
+  "origin": ["measured", "agent-drafted"],
   "_comment": "Natural (uncoloured) polypropylene: the milky, waxy-feeling moulded plastic of food tubs, bottle caps and storage boxes. Opaque: a solid dielectric; real natural PP is faintly translucent in thin walls, which this master does not carry (a surface reads opaque at tile scale). Satin rather than glossy, the moulded finish PP usually leaves. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints, and dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
   "name": "Polypropylene_Natural_Clean_Base_s01_v01",
   "status": "candidate",

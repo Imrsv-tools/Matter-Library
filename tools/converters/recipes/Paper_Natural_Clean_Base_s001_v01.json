@@ -1,4 +1,7 @@
 {
+  "summary": "Plain white paper, as in printer paper, book pages and notes.",
+  "search_words": ["paper", "white paper", "page", "sheet", "printer paper"],
+  "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Plain white paper: printer and writing paper, book pages, notes, paper towel. Opaque, a matte dielectric fibre sheet, from an ambientCG scan (L3). Placed in engineered/composite as the wish list does: the class's boundary is not written yet (O11), so the home is provisional. The scan's albedo is brighter than Physically Based `Office Paper`; the authored tint brings its mean onto that entry. Carries the row's wear layers at 0 (C1): scuffs (overlay 1, damage) and dust as a deposit (overlay 2), gated by the Patches mask, whose channels fit that order (G damage patches, B deposit drifts); overlay 3 is empty, as the row has it. The row's damage layer, Creases01, is not made yet; Scuffs01 stands in for it in slot 1. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "Paper_Natural_Clean_Base_s001_v01",
   "status": "draft",

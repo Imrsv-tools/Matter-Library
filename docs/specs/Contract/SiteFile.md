@@ -40,7 +40,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 |---|---|
 | `id`, `version`, `display_name`, `domain`, `material_class`, `scale`, `status`, `creator_selectable` | As the runtime catalog defines them. `creator_selectable: false` only on `IMRSV_MissingMaterial`; a site lists it or not as its browse rule says. |
 | `identity` | The qualified name with its version (`Copper_Verdigris_Aged_Base_s01_v01`), the stem every file name below begins with. |
-| `label` | The name a person reads. **Derived** from the tokens (PascalCase split, the default tokens `Natural`, `Clean` and `Base` dropped, sentence case, acronyms and roman numerals kept): `Copper verdigris aged`. An override written per article replaces it *(planned, 13.2)*. |
+| `label` | The name a person reads. **Derived** from the tokens (PascalCase split, the default tokens `Natural`, `Clean` and `Base` dropped, sentence case, acronyms and roman numerals kept): `Copper verdigris aged`. Where that reads badly, the recipe's `label` replaces it (Phase13 13.2). |
 | `master` | The article's master token ([MasterSet](../Ontology/MasterSet.md)). |
 | `meters_per_tile` | The real-world size of one texture tile, from the article's metadata. |
 
@@ -56,9 +56,9 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | Field | Meaning |
 |---|---|
 | `licence` | `CC0-1.0`, every article (RD-RO-2). |
-| `sources[]` | The recipe's sources: `kind` (`ambientcg`, `physicallybased`, `procedural`, `judgement`) with what that kind records (an `asset` and `url`, the values used, a `why`). For a pilot article whose recipe has none, its textures' lockfile provenance (`kind`, `license`, `url`). Absent when nothing is recorded. |
+| `sources[]` | The recipe's sources: `kind` (`ambientcg`, `physicallybased`, `procedural`, `judgement`) with what that kind records (an `asset` and `url`, the values used, a `why`). For a pilot article whose recipe has none, its textures' lockfile provenance (`kind`, `license`, `url`), wear layers excepted: like a recipe's, these sources are the article's own, and its wear layers are under `wear_layers`. Absent when nothing is recorded. |
 | `contributor` *(planned)* | A contributor's handle, when one was given: credit as a courtesy and for the platform's Forseti tracking, never a licence condition (RD-RO-2). Nothing records one yet. |
-| `origin` *(planned, 13.2)* | `procedural` · `scan` · `measured` · `agent-drafted` (F-MP-18). |
+| `origin` | Where the article came from, any of: `scan` (a scanned source, e.g. ambientCG), `procedural` (a generator), `measured` (measured values, e.g. Physically Based), `agent-drafted` (an agent wrote the recipe). Derived from its sources at 13.2, kept in the recipe, confirmed by the maintainer (F-MP-18). Absent until written. |
 
 **Per material — evidence and pictures:**
 
@@ -67,7 +67,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `parity` | Present when the parity rig has rendered the article. `tools` (which of `storm`, `blender`, `unreal` ran), `scene` (the rig's test scene), `measured` (the date of the rig's scorecard, absent if it has none) and `controls` (per port: `verdict`, the worst of its rows, and `rows[]` each with its `setting` and `verdict`). The words are the rig's own Moved verdicts: `moved alike` · `UNEVEN` · `ONE-SIDED` · `no change in any tool` ([_Architecture](../_Architecture.md) §LCD). **A control with no entry was not swept**, which is not a pass. **Evidence is published as measured:** a picture or verdict older than the current masters or Unreal runtime says so only through its date (Phase13 Q-P13-4). |
 | `pictures[]` | `role` (`rig` today; `thumbnail` once [Catalog](../Catalog/Catalog.md) §Thumbnails exist), `tool`, `view` (`wide` or `close`), `file` and `sha256`. **Only the test scene's default pictures** are published: never a character render, a sweep picture, or a rig log or job file. WebP, at the rig's 512 px. |
 | `download` | `file` (`<identity>.zip`), `bytes`, `sha256` and `textures` (how many). The zip holds `<identity>.mtlx` with every texture reference rewritten to `textures/<name>`, and those textures, shared wear layers included, so it opens anywhere with no search path. **Fit-set pictures** (hair cards, eyes) are supplied when an article is bound to a mesh, never referenced by it, so they are not in the zip. |
-| `summary`, `search_words` *(planned, 13.2)* | A one-line public description and the words a search should find it by, written by the agent and confirmed by the maintainer with the picture (F-MP-14). |
+| `summary`, `search_words` | A one-line public description and the words a search should find it by, written by the agent and confirmed by the maintainer with the picture (F-MP-14). |
 
 ## Limits
 

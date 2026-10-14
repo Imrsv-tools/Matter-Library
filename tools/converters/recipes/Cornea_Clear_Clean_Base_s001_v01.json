@@ -1,4 +1,8 @@
 {
+  "label": "Cornea",
+  "summary": "The clear, wet shell over the front of an eye, which carries its highlight.",
+  "search_words": ["cornea", "eye", "tear film", "character", "human"],
+  "origin": ["measured", "agent-drafted"],
   "_comment": "The cornea and tear film (Phase07 7.5): the clear shell over the eye. TRANSLUCENTTHIN (thin-walled: a shell), Physically Based Eye (Cornea). MakeHuman's high-poly eye has this shell (its texture hides it); without a clear article on it the eye renders covered.",
   "name": "Cornea_Clear_Clean_Base_s001_v01",
   "status": "candidate",

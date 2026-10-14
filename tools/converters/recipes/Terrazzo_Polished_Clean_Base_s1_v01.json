@@ -1,4 +1,8 @@
 {
+  "label": "Polished terrazzo",
+  "summary": "Stone chips set in cement, ground flat and polished, as on floors.",
+  "search_words": ["terrazzo", "floor", "chips", "stone", "cement", "polished"],
+  "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Polished terrazzo: chips of stone set in a cement binder, then ground flat and polished, so the floor shows each chip cut through (ambientCG Terrazzo019L, CC0; tagged beige, floor, stone, terrazzo; 80 x 80 cm, so meters_per_tile 0.8 from the source and tag s1, not the wish list's s01; the L variant is the largest of the asset's three sizes). A warm beige: tan and cream chips from under 1 cm to about 6 cm in a beige matrix, polished (roughness map mean 0.28). It is one substance, a composite stone, not an assembly (D1): the chips are part of the matter; divider strips and floor tiles are geometry. Opaque: a solid dielectric. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), scuffs, dust as a deposit (Phase10), gated by the Grime mask. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A5).",
   "name": "Terrazzo_Polished_Clean_Base_s1_v01",
   "status": "approved",

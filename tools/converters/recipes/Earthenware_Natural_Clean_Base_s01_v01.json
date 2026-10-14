@@ -1,4 +1,8 @@
 {
+  "label": "Unglazed earthenware",
+  "summary": "Low-fired, porous, matte clay, the body of flowerpots and plain pottery.",
+  "search_words": ["earthenware", "clay", "pottery", "ceramic", "terracotta", "unglazed"],
+  "origin": ["procedural", "measured", "agent-drafted"],
   "_comment": "Unglazed earthenware: low-fired, porous, matte clay (flowerpots, terracotta ware). Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_earthenware_natural.py) with their MEAN albedo anchored to Physically Based `Terracotta` (terracotta is unglazed earthenware). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust (overlay 2), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant.",
   "name": "Earthenware_Natural_Clean_Base_s01_v01",
   "path": "engineered/ceramic/Earthenware_Natural_Clean_Base_s01_v01.mtlx",

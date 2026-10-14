@@ -1,4 +1,8 @@
 {
+  "label": "Gums",
+  "summary": "Moist pink gum tissue, for a character's mouth.",
+  "search_words": ["gums", "gum", "mouth", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "Gum mucosa (Phase07 7.5). SUBSURFACE, moist.",
   "name": "Gum_Natural_Clean_Base_s001_v01",
   "status": "candidate",

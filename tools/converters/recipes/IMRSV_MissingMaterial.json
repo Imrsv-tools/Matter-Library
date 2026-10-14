@@ -1,4 +1,8 @@
 {
+  "label": "Missing material",
+  "summary": "The bright magenta stand-in shown when a material cannot be found; not for use.",
+  "search_words": ["missing", "fallback", "error", "magenta"],
+  "origin": ["agent-drafted"],
   "_comment": "Proof article 6 — system fallback (off-grammar, sanctioned in MasterSet.md). Constant magenta + emission = the named-and-deliberate broken-material look; textureless. master 'system'. New.",
   "name": "IMRSV_MissingMaterial",
   "path": "utility/virtual/IMRSV_MissingMaterial.mtlx",

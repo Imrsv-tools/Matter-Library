@@ -198,6 +198,8 @@ def sources(recipe: dict, texture_files: dict[str, Path], pilot: dict) -> list[d
         return [{k: v for k, v in s.items() if k != "provenance"} for s in recipe["sources"]]
     seen, out = set(), []
     for src in texture_files.values():
+        if "shared/overlays" in src.as_posix():
+            continue   # a wear layer is listed under wear_layers, as a recipe's sources never list it
         prov = _provenance_of(src, pilot)
         if not prov:
             continue
@@ -273,12 +275,16 @@ def build(tag: str, out: Path) -> dict:
                               "creator_selectable": art["creator_selectable"]})
         rec = {
             "id": entry["id"], "version": entry["version"], "identity": identity,
-            "label": label(entry["display_name"]), "display_name": entry["display_name"],
+            "label": recipe.get("label") or label(entry["display_name"]),
+            "display_name": entry["display_name"],
             "domain": entry["domain"], "material_class": entry["material_class"],
             "master": art["master"], "scale": entry["scale"],
             "status": entry["status"], "creator_selectable": entry["creator_selectable"],
             "controls": controls(mtlx), "licence": LICENCE,
         }
+        for key in ("summary", "search_words", "origin"):    # the words (13.2), when written
+            if recipe.get(key):
+                rec[key] = recipe[key]
         if meta.get("meters_per_tile"):
             rec["meters_per_tile"] = float(meta["meters_per_tile"])
         if wear := wear_layers(recipe):
@@ -332,6 +338,7 @@ def build(tag: str, out: Path) -> dict:
     rigged = sum(1 for r in materials if "parity" in r)
     swept = sum(1 for r in materials if "controls" in r.get("parity", {}))
     size = sum((out / a).stat().st_size for a in assets)
+    described = sum(1 for r in materials if "summary" in r)
     notes = (
         f"A **dev snapshot** of the Matter Library, for its website's staging. Not a release: "
         f"nothing here is versioned or approved, and every material shows its own status.\n\n"
@@ -340,8 +347,11 @@ def build(tag: str, out: Path) -> dict:
         f"- Pictures: the parity rig's test scene in the tools that ran, for {rigged} materials "
         f"({swept} with a verdict per control). Each carries the date it was measured.\n"
         f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
-        f"- `SHA256SUMS`: a digest for every file.\n\n"
-        f"Not yet in it: thumbnails, summaries and search words. Every material is CC0-1.0.\n")
+        f"- `SHA256SUMS`: a digest for every file.\n"
+        + (f"- Words: a plain name, a one-line summary and search words for {described} materials, "
+           f"confirmed by the maintainer.\n\n" if described else "\n")
+        + f"Not yet in it: thumbnails{'' if described else ', summaries and search words'}. "
+        f"Every material is CC0-1.0.\n")
     (out / "NOTES.md").write_text(notes, encoding="utf-8")   # the release body; not an asset
     return {"out": str(out), "materials": len(materials), "rigged": rigged, "swept": swept,
             "assets": len(assets), "bytes": size}

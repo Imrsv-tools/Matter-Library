@@ -1,4 +1,7 @@
 {
+  "summary": "A fingernail or toenail: keratin over the pink nail bed, with a natural sheen.",
+  "search_words": ["nail", "fingernail", "toenail", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "A fingernail or toenail (Phase07 7.5): keratin over the pink nail bed. OPAQUE (MasterSet: nail is Opaque), smooth, with a natural sheen as a light coat.",
   "name": "Nail_Natural_Clean_Base_s001_v01",
   "status": "candidate",

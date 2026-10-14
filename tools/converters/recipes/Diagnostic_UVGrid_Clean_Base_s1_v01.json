@@ -1,4 +1,8 @@
 {
+  "label": "UV grid (diagnostic)",
+  "summary": "A numbered checker grid for checking a model's UVs: stretching, seams and scale show at a glance.",
+  "search_words": ["uv grid", "checker", "uv test", "diagnostic", "debug"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Proof article 5 — UV/grid diagnostic. Base color = the procedural UV grid (gen_uvgrid.py); exercises uv_scale/offset/rotation + base_color_tint. Master 'Opaque' (matrix allows Opaque/Emissive; Opaque keeps it lit + validates cleanly). New.",
   "name": "Diagnostic_UVGrid_Clean_Base_s1_v01",
   "path": "utility/virtual/Diagnostic_UVGrid_Clean_Base_s1_v01.mtlx",

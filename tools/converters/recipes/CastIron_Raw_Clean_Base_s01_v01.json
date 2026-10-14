@@ -1,4 +1,8 @@
 {
+  "label": "Raw cast iron",
+  "summary": "Near-black satin cast iron with a fine cast grain, as on a seasoned pan or a stove grate.",
+  "search_words": ["cast iron", "iron", "metal", "cookware", "dark metal"],
+  "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Cast iron as cookware and stove hardware: the near-black, satin surface of a seasoned pan, a stove grate, hooks and hinges, with a fine cast grain and small pits. Opaque, a conductor, from an ambientCG scan (L3, Metal052C) grounded on Physically Based `Cast Iron`: the scan's bright bare-iron albedo is tinted onto that entry's colour by the authored base_color_tint, and its metalness and roughness maps are kept. A bare, machined iron is a later sibling. APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), pitting (overlay 2, corrosion pits), dust as a deposit (Phase10), gated by the Grime mask, as on MildSteel_Raw. Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "CastIron_Raw_Clean_Base_s01_v01",
   "status": "draft",

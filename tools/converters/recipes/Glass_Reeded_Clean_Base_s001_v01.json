@@ -1,4 +1,8 @@
 {
+  "label": "Reeded glass",
+  "summary": "Clear glass pressed into rounded parallel ridges, so what is behind it breaks into stripes.",
+  "search_words": ["glass", "reeded", "fluted", "ribbed glass", "textured glass", "shower screen"],
+  "origin": ["procedural", "measured", "agent-drafted"],
   "_comment": "Reeded (fluted) glass: clear rolled soda-lime glass whose face is pressed into parallel, rounded ridges about 10 mm wide (shower screens, cabinet doors, partitions), so what is seen through it breaks into vertical strips. TranslucentThin: a pane is a thin shell seen through, the same master as Glass_Clear and Glass_Frosted. The reeds are the normal map (tools/converters/base/gen_glass_reeded.py; one reed per 1 cm tile, running along V); the glass itself is Physically Based 'Glass (Soda-lime)'. APPROXIMATE: a thin-walled shell does not refract, so the reeds can tilt only the reflection, not bend what is seen through the pane, which is what makes reeded glass read as reeded. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article. Built by the Phase11 batch.",
   "name": "Glass_Reeded_Clean_Base_s001_v01",
   "status": "candidate",

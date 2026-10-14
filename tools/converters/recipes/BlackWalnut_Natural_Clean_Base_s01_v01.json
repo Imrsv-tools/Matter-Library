@@ -1,4 +1,7 @@
 {
+  "summary": "Unfinished black walnut: chocolate-brown wood with darker grain bands and fine open pores.",
+  "search_words": ["walnut", "wood", "hardwood", "dark wood", "timber"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Natural black walnut: unfinished (sanded, no oil or lacquer), flat-sawn chocolate-brown heartwood with darker latewood bands and fine open pores. Opaque: a solid, diffuse-dominant dielectric. Base textures are generated (L2, tools/converters/base/gen_blackwalnut_natural.py), not scanned: ambientCG has no asset that says walnut, and the library names only what a source states. Carries every relevant wear layer at 0 (C1): scuffs (overlay 1, damage), scratches, and dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
   "name": "BlackWalnut_Natural_Clean_Base_s01_v01",
   "status": "approved",

@@ -1,4 +1,7 @@
 {
+  "summary": "A whole eyeball in one material, white, iris and pupil, for a character's eye mesh.",
+  "search_words": ["eye", "eyeball", "iris", "sclera", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "The whole eyeball (Phase09 9.2, RD-P09-3): ONE article bound on the sclera, iris and pupil, which share MakeHuman's one eye layout (MAP-F11). The eye's picture is the MESH's (base_color_map, supplied at binding from the library's fit set, textures/fit/makehuman/eyes/<Colour>_basecolor_sUKN.png): it draws the white with its veins, the iris with its fibres and dark limbal ring, and the pupil, so the face-stepped cuts between the parts stop showing. The eye's COLOUR is which picture the binding supplies (F-P09-3; the lead's lean to separate pictures, MAP-Q5), so the article carries no tint port. Its own colour is a near-white: the picture multiplies it, and with no picture supplied it reads as a plain white of the eye, never magenta. On SUBSURFACE until the Eye token exists (9.3); its subsurface colour follows the picture (F-P09-5), at full weight with a short 2 mm scatter so the iris fibres survive it (raised 2026-10-05 from half weight and 1 mm, see sources). The wet look is a coat (MAP-RD5: the tear film on the cornea, not a cornea shell). Iris_Brown, Sclera_Natural, Pupil_Dark and Cornea_Clear are kept.",
   "name": "Eye_Natural_Clean_Base_s001_v01",
   "status": "candidate",

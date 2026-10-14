@@ -1,4 +1,8 @@
 {
+  "label": "Brushed stainless steel",
+  "summary": "Satin, belt-grained stainless steel, as on appliance fronts, range hoods and sinks.",
+  "search_words": ["stainless steel", "steel", "brushed metal", "metal", "appliance", "inox"],
+  "origin": ["procedural", "measured", "agent-drafted"],
   "_comment": "Brushed stainless steel: the satin, belt-grained finish of appliance fronts, range hoods and sinks. Opaque, a conductor, with specular anisotropy: the grooves (the article's own normal and roughness, L2, gen_stainlesssteel_brushed.py) run along V, so the highlight stretches along U, as on Aluminium_Brushed. Colour is the Physically Based constant, as on StainlessSteel_Polished. APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (B the corner band for a deposit, A the open faces for handling marks, so dust takes slot 2 and fingerprints slot 3). Drafted by /matter-generate for the Kitchen_set look; Storm only, not rigged.",
   "name": "StainlessSteel_Brushed_Clean_Base_s001_v01",
   "status": "draft",

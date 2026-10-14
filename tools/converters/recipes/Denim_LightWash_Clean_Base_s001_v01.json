@@ -1,4 +1,8 @@
 {
+  "label": "Light-wash denim",
+  "summary": "Bleached, light-wash denim twill, pale enough to tint to any wash.",
+  "search_words": ["denim", "jeans", "light wash", "twill", "fabric", "textile"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Light-wash denim (Phase08 8.3, RD-P08-5): Denim_Indigo's 3/1 twill with the indigo warp bleached, authored light so a Creator's tint (a 0-1 multiply) reaches the mid and dark washes and other colours, which it cannot do from dark indigo. OPAQUE with a little FUZZ. The colour IS the weave (warp and white weft flecks), so a base-colour texture; its normal and roughness are Denim_Twill's (the same weave).",
   "name": "Denim_LightWash_Clean_Base_s001_v01",
   "status": "candidate",

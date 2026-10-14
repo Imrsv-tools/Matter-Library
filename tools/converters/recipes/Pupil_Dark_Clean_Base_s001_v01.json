@@ -1,4 +1,8 @@
 {
+  "label": "Pupil",
+  "summary": "The near-black opening at the centre of an eye.",
+  "search_words": ["pupil", "eye", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "The pupil (Phase07 7.5): the opening in the iris, which shows the dark inside of the eye. OPAQUE and near-black; nothing is truly black.",
   "name": "Pupil_Dark_Clean_Base_s001_v01",
   "status": "candidate",

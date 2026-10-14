@@ -102,6 +102,11 @@ def schema_errors(value, schema: dict, root: dict, where: str) -> list:
         errs.append(f"{where}: {value!r} does not match {schema['pattern']}")
     if "minimum" in schema and _is_type(value, "number") and value < schema["minimum"]:
         errs.append(f"{where}: {value} < minimum {schema['minimum']}")
+    # lengths and counts (Phase13 13.2: the words' bounds)
+    for key, kind, test in (("minLength", str, lambda n, b: n < b), ("maxLength", str, lambda n, b: n > b),
+                            ("minItems", list, lambda n, b: n < b), ("maxItems", list, lambda n, b: n > b)):
+        if key in schema and isinstance(value, kind) and test(len(value), schema[key]):
+            errs.append(f"{where}: length {len(value)} breaks {key} {schema[key]}")
     if isinstance(value, dict):
         props = schema.get("properties", {})
         for k in schema.get("required", []):

@@ -1,4 +1,8 @@
 {
+  "label": "Brown leather",
+  "summary": "Brown full-grain leather with a pebbled grain and a light finish.",
+  "search_words": ["leather", "brown leather", "hide", "upholstery", "bag", "shoes"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Brown full-grain leather (Phase07 7.5): a finished hide with a pebbled grain. OPAQUE, semi-matte, with a light COAT for the finish.",
   "name": "Leather_Brown_Clean_Base_s001_v01",
   "status": "candidate",

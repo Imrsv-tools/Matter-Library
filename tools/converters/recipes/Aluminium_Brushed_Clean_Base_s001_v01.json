@@ -1,4 +1,8 @@
 {
+  "label": "Brushed aluminium",
+  "summary": "Aluminium sheet with fine parallel brush lines, as on laptop lids, appliance fronts and trim.",
+  "search_words": ["aluminium", "aluminum", "brushed metal", "metal", "satin metal"],
+  "origin": ["procedural", "measured", "agent-drafted"],
   "_comment": "Brushed aluminium: rolled aluminium sheet finished with an abrasive belt or pad, a dense field of fine parallel grooves (appliance fronts, laptop lids, trim, nameplates). Opaque, a solid metal, with SPECULAR ANISOTROPY (OpenPBR's own input, Phase07 7.6): the grooves run along V in the generated maps, and the anisotropy stretches the highlight along U, across the grooves, as a brushed face does. The maps are generated (L2, gen_aluminium_brushed.py), the mean colour anchored to Physically Based 'Aluminum'. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the corner band meant for a deposit, its A the open faces meant for handling marks). Built by the Phase11 batch.",
   "name": "Aluminium_Brushed_Clean_Base_s001_v01",
   "status": "candidate",

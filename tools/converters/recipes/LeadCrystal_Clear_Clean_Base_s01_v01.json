@@ -1,4 +1,8 @@
 {
+  "label": "Lead crystal",
+  "summary": "Heavy, sparkling lead-oxide glass, as in decanters, tumblers and chandelier drops.",
+  "search_words": ["crystal", "lead crystal", "glass", "decanter", "chandelier", "clear"],
+  "origin": ["agent-drafted"],
   "_comment": "Clear lead crystal: lead-oxide glass (24-30 % PbO), cast or cut and polished, the glass of decanters, tumblers, bowls and chandelier drops. TRANSLUCENTTHICK, unlike a pane (Glass_Clear is Thin): crystal is a solid, heavy body seen through, and what makes it crystal and not ordinary glass is its higher IOR (about 1.56 against soda-lime's 1.52), so it bends what is seen through it more and its facets throw brighter reflections. Param-only: a clear glass has no albedo texture. Physically Based has no lead-crystal entry, so the values are judgement. APPROXIMATE: dispersion, the rainbow fire of cut crystal, is not carried. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints (handled glassware), gated by the Grime mask. Water spots would be a fourth; per C3 that is a sibling article. Built by the Phase11 batch.",
   "name": "LeadCrystal_Clear_Clean_Base_s01_v01",
   "status": "candidate",

@@ -1,4 +1,8 @@
 {
+  "label": "Chipped paint on metal",
+  "summary": "White paint on steel, flaked off in sharp chips that show the bare metal underneath.",
+  "search_words": ["paint", "chipped", "peeling", "painted metal", "worn", "steel"],
+  "origin": ["scan", "measured", "agent-drafted"],
   "_comment": "Paint on metal, chipped: a white semi-gloss enamel on steel (railings, machinery, lockers, tool cabinets) that has flaked off in small sharp-edged chips to show bare steel. TWOLAYER (MasterSet: two real opaque layers, the mask choosing where layer 2 sits): layer 1 is the paint (param-only: ambientCG's painted-steel scans Metal027-029 declare metalness 1 everywhere, which is not paint), layer 2 the bare steel substrate (the library's existing Metal002 scan, the MildSteel_Raw set, reused rather than imported twice), placed by the PaintChip01 mask (R = where the coat has chipped off). meters_per_tile 0.3 is the steel scan's judged size; the chips are sampled at the mask's own 10 cm size (1-12 mm flakes). maskset_blend MUST be non-zero (it defaults to 1 here) or the steel never shows. The Creator tint is a whole-material control (the blend happens before it), so it tints the bare steel as well as the paint. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage, gated by PaintChip01's G, the cracked halo round each chip) and dust as a deposit (overlay 2, gated by its B, settled in the chips); overlay 3 is empty, as the row has it. Built by the Phase11 batch.",
   "name": "Paint_OnMetal_Chipped_Base_s01_v01",
   "status": "approved",

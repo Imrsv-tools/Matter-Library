@@ -1,4 +1,8 @@
 {
+  "label": "Wool felt",
+  "summary": "Undyed pressed wool felt, matted with no weave, as in hats, slippers and craft sheets; tint it any colour.",
+  "search_words": ["felt", "wool", "fabric", "textile", "hat"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Undyed wool felt (Phase08 8.4, RD-P08-5): pressed, matted wool with no weave, the stuff of a hat, a slipper or a craft sheet. Authored at undyed wool's pale oatmeal so a Creator's tint (a 0-1 multiply) reaches the dyed colours below it. OPAQUE, very matte, with heavy FUZZ: felt's look is its loose surface fibres. The matted fibres are the article's own normal and roughness.",
   "name": "Felt_Natural_Clean_Base_s001_v01",
   "status": "candidate",

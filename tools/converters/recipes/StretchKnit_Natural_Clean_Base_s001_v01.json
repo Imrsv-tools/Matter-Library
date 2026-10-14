@@ -1,4 +1,7 @@
 {
+  "summary": "Undyed stretchy synthetic knit, as in leggings and sportswear; tint it any colour.",
+  "search_words": ["stretch", "knit", "lycra", "spandex", "sportswear", "fabric", "textile"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Undyed synthetic stretch knit (Phase08 8.4, RD-P08-5): a polyester-elastane single jersey, the stuff of leggings, sportswear and a fitted top. Authored white so a Creator's tint (a 0-1 multiply) reaches every dyed colour. OPAQUE with a soft sheen and very little FUZZ: continuous filament, unlike Cotton_Jersey's staple cotton. The knit (Cotton_Jersey's loop, 20 wales x 28 courses per cm) is the article's own normal and roughness.",
   "name": "StretchKnit_Natural_Clean_Base_s001_v01",
   "status": "candidate",

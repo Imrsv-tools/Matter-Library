@@ -1,4 +1,7 @@
 {
+  "summary": "Undyed cotton single jersey, the soft knit of a T-shirt; tint it any colour.",
+  "search_words": ["jersey", "cotton", "knit", "t-shirt", "fabric", "textile"],
+  "origin": ["procedural", "agent-drafted"],
   "_comment": "Cotton single jersey, undyed (Phase07 7.5): a T-shirt's knit. OPAQUE with FUZZ: a cotton knit's look is its loose surface fibres, which catch light at grazing angles. The knit (12 wales x 16 courses per cm) is the article's own normal and roughness. Off-white yarn: a Creator dyes it with `base_color_tint`.",
   "name": "Cotton_Jersey_Clean_Base_s001_v01",
   "status": "candidate",

@@ -1,4 +1,7 @@
 {
+  "summary": "Lips: redder, smoother and moister than skin.",
+  "search_words": ["lips", "mouth", "character", "human"],
+  "origin": ["agent-drafted"],
   "_comment": "Lip mucosa (Phase07 7.5). SUBSURFACE, as skin, but redder, smoother and moist: MPFB2's enhanced skin gives the lips roughness 0.35 and smaller pores; here no pores (the lip surface is a smooth mucosa at this scale). A mid tone: a Creator tints it (`base_color_tint`) to sit with a darker or lighter skin.",
   "name": "Lips_Natural_Clean_Base_s001_v01",
   "status": "candidate",
