@@ -53,3 +53,31 @@
 Not written into `PlatformDependencies.md` from here; that file is the library's.
 
 - **M2** — *reported by the platform, 2026-10-13:* none of the three is tracked there as a Matter item. Emissive colour: answered here (P23); the platform's remaining item is its own. The cross-renderer match: closed there, answered by the parity rig. The portable export's scale: closed there, the article is correctly sized; a scale reference in the article is offered as an idea (`261013_R_PlatformTrackedItemsAsks.md` A1). **The row could close**, with A1 taken or dropped.
+
+---
+
+## Pass 2 — the library's review (2026-10-14)
+
+*From the library's side. Read against this tree at `42e26fa`; nothing was run. The lead tied the platform's asks to the platform's issue-sweep phase, 2026-10-14. That phase's sort of the platform's tracker is where this doc came from. Its plan lists the library as a repo it does not touch, and it asks nothing of the library beyond this doc. Its sky work was split out to the platform's next phase, whose asks are `261013_R_PlatformSkyAsks.md`.*
+
+- **TI-F4 — TI-F2 holds.** The rig's colour rule is *"no tone curve. A plain sRGB encode: Storm's `sRGB` colour correction, Blender's `Standard` view transform. In Unreal, turn off the filmic tonemapper and auto-exposure"* (`tools/parity/JOB_FORMAT.md`, the lighting rules). TI-F3 was not driven again here. The golden that is tracked is `tools/conformance/golden/creator_table_lightweight.usda`. `creator_table_portable.usda` is built from it by `tools/conformance/build_portable.py` and is not committed.
+- **TI-F5 — TI-Q1 answered: nothing calls the AgX parity config.** `tools/conformance/build_ocio_parity_config.py` is named by no other script in `tools/`. The rig compares pictures with no tone curve (TI-F4), and the codec A/B comparator runs one pinned Storm pipeline of its own (`docs/specs/Tooling/CompressedDistribution.md` §Codec A/B comparator). **Four docs still describe it as a current tool:** `CompressedDistribution.md` §OCIO 2.4-native parity config · `docs/specs/Tooling/AuthoringHarness.md`'s tool table · `docs/ToolingConventions.md`'s `tools/conformance/` row · the Glossary's *OCIO parity config*. Under the library's rule against deleting specified work (`.ai/AI_WorkingAgreement.md` §Project practices), the fix is to **mark it, not remove it**: `Reevaluate (2026-10-14)`: nothing calls it, and the rig compares with no tone curve. Whether to retire it is the lead's call.
+- **TI-F6 — A1, the scale reference, is small and is the library's.** The table is the conformance golden above. Today a size is judged by the rig's ruler check, on a material. Nothing is placed in the article itself. A one-metre cube beside the table changes what the golden holds. The conformance checks that read it are baselined before the edit and run again after it (`check_conformance.sh`, `check_exporter.sh`), so the change is a `/quick-fix`. The platform offered it as an idea, not a need.
+- **TI-F7 — M2 can close.** All three items are answered or closed on the platform's side (TI-F1 to F3). The library's half of the first one is row P23. The ledger is the library's file. The row's new text is the platform's suggested note, kept almost word for word.
+- **TI-F8 — a fourth thread, from the same sort: one platform issue is parked waiting on the library's AP-Q5**, *who owns a garment's substance split* (`260928_R_PlatformAppearanceAsks.md`, still **Open** there). Since then, on the platform's side (2026-10-13), the platform's lead ruled two things. Everything of a character's is one platform phase of its own. Hair and wardrobe items are assets, stored and documented like sets and props, with a version and a licence. That says **where a garment lives** (the platform's asset store, not this library). It does not say **who splits a garment into its substances**. AP-Q5 is not answered here. It is noted so the next pass on that doc starts from the ruling.
+- **TI-F9 — one Matter-facing fact in the issue-sweep phase, and nothing asked of the library.** Stage keeps a test fixture that mirrors the library's materials, with a guard that compares the two. On 2026-10-13 that phase measured the fixture **19 files behind the library's checkout**. Stage's own mirror tool updates it. That phase records the fixture as another lane's content and files it at its close. It is Stage's to mend, not the library's.
+
+### What this pass offers (nothing is changed by it)
+
+| Offer | Lane | What it does |
+|---|---|---|
+| **Close M2** in `PlatformDependencies.md`, with the note above | `/quick-fix` (the ledger) | The row says what the platform reported, and closes. A1 is carried in this doc, not the ledger |
+| **Mark the parity config `Reevaluate (2026-10-14)`** in the four docs of TI-F5 | `/quick-fix` (docs) | The docs stop calling an unused tool current, and nothing is deleted |
+| **A one-metre cube in the conformance golden** (A1) | `/quick-fix`, with both conformance checks baselined first | A consumer that imports the article at the wrong size shows it at a glance. Or drop it: the platform called it an idea |
+
+## Status
+
+- **Passes:** 1 (the platform's), 2 (the library's, 2026-10-14).
+- **Answered:** TI-Q1. Nothing in the tree calls the AgX parity config. The offer is to mark it for reevaluation, not remove it (TI-F5).
+- **Open:** A1 (take it or drop it) · M2's close (a ledger quick fix) · AP-Q5, in its own doc (TI-F8).
+- **▶ Next:** the lead's word on the three offers above. Each is a quick fix of its own, and none waits on the platform.

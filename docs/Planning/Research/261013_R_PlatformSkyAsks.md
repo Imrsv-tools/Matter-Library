@@ -105,8 +105,56 @@ For `PlatformDependencies.md`, *From IMRSV to the Matter Library*. The library w
 
 ---
 
+## Pass 2 — the library's review (2026-10-14)
+
+*From the library's side. Read against this tree at `42e26fa`; nothing was built or run. The lead tied the platform's asks to the platform's issue-sweep phase, 2026-10-14. That phase built the dome's tint and left the move of its sky to the library for the platform's next phase. That next phase is now in discovery. It names this review as the first thing it waits on: its own work can be seen running only once the dev install holds HDRIs (A1 – A3). This pass says what the library's tree confirms and what each ask costs. It recommends an answer to each question. **The rulings are the lead's.***
+
+### The platform's reads of the library, checked
+
+- **SKY-F12 — F6 to F11 hold against the tree**, with one narrowing:
+  - **F6.** The lockfile check resolves each id to `<id>_<version>.mtlx`, falling back to a bare `<id>.mtlx` (`tools/validators/validate_manifest.py:120-121`). The dev catalog is `{schema_version, release, materials}` and nothing else (`tools/releases/serve_to_stage.py:68`).
+  - **F7.** The Realm is planned, in [Taxonomy](../../specs/Ontology/Taxonomy.md) §Realm, and it is also in the Roadmap's parking lot.
+  - **F9.** `.gitattributes` puts `MatterLibrary/textures/**` alone in LFS. `LICENSE-CONTENT.md` lists each content path by name.
+  - **F10.** `CONTRIBUTING.md` accepts a CC0 library *"recorded with the source URL and a hash of what you shipped"*.
+  - **F11, narrowed.** The preview tool lights with a dome picture of its own (`tools/preview_generators/make_preview.py`, `dome_env.png`). That it is a flat grey was not opened here.
+- **SKY-F13 — the library's own Glossary has no *HDRI* headword.** The platform's lead ruled the word on 2026-10-13: the library holds and serves **HDRIs**, and the platform's app calls one a *Sky*. The library's working agreement says to fix the Glossary before using a new term. So the headword is owed before any spec says *HDRI*. It lands with the first durable doc that names one. This research doc does not count, and it says *HDRI* below.
+- **SKY-F14 — the catalog has bumped its version once before, for a smaller change.** `schema_version` went from 1 to 2 for the additive `creator_selectable` field ([RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §Schema). The consumer reads no `schema_version` (second addendum). The library's contract still owns that number, and it moves only in a contract phase. So an `hdris` list is a contract change: it is built by a phase, not a quick fix.
+
+### The questions, as the library reads them — recommended answers, for the lead to rule
+
+- **SKY-Q1 — a second kind beside materials, not the first Realm.** *Recommended.* The Realm is written for *composite matter*, for example Buildings. It brings that matter's own taxonomy below it, and the five-level query vector. An HDRI has no Domain, no Class, no master, no Creator ports and no tile. Putting it under a Realm would give it levels it never fills.
+  - **The plainer shape:** one flat folder beside `materials/`, `MatterLibrary/hdris/`, and one top-level `hdris` list in the catalog and the lockfile.
+  - **Why it suits the consumer:** a flat folder is one search-path entry (second addendum, A1). A second list is invisible to a consumer built before it.
+  - **What the Realm keeps:** it stays planned, for composite matter. [Taxonomy](../../specs/Ontology/Taxonomy.md) gains a line that an HDRI is a kind **beside** the taxonomy, not in it. Nothing specified is removed.
+- **SKY-Q2 — the name: the material grammar's shape, without its scale tag.** *Recommended:* `<Name>_<Variant>_vNN.hdr`, in PascalCase tokens. For example, `IndustrialSunset_PureSky_v01.hdr`. The tokens are the library's choice; the source's own id goes in the provenance record, not the name.
+  - **Dropped:** `sNN`, because an HDRI has no tile. The size, because one size is ruled.
+  - **Kept:** the character budget, because it costs nothing. The version follows the material's rule ([Identity](../../specs/Ontology/Identity.md) §Two version axes), so `_vNN` advances on a changed picture.
+  - **The file format is part of the name** (Q2's first point), so it is fixed once, by A6.
+  - **No clash with a material:** the extensions differ, and the two folders are separate search-path entries. **Unique within `hdris/`** is checked as material names are.
+- **SKY-Q4 — yes, and it is the cheapest unblocker.** The dev install is the library's own tool (second addendum). `serve_to_stage.py` links `materials` and `textures` (`:175-176`). It would link `hdris` beside them and write the `hdris` list. That is a small change to the tool, but its list is the catalog shape of SKY-F14, so it follows Q1's and Q2's rulings. It is not built ahead of them.
+- **SKY-Q5 — no.** The compression table is low-dynamic-range BCn by texture role ([CompressedDistribution](../../specs/Tooling/CompressedDistribution.md)). An HDRI ships as its file, and that spec gains a line that HDRIs skip the step.
+
+### The asks, priced
+
+| # | The library's answer | Size |
+|---|---|---|
+| A1 | `MatterLibrary/hdris/<Name>_<Variant>_vNN.hdr`, flat, unique there (Q1, Q2) | in the phase |
+| A2 | A top-level `hdris` list beside `materials`, the same in a release's catalog and the dev catalog. Each entry carries id, display name, version, status, `creator_selectable`, payload path and preview path. `schema_version` moves from 2 to 3 (SKY-F14) | the phase's contract step |
+| A3 | **One top-level key naming the default HDRI's id**, not a flag on each entry, so two defaults cannot be written. The lockfile check fails a default that names no listed HDRI | in the phase |
+| A4 | A 2:1 JPEG made from each HDRI and shipped beside it, named in its entry (the consumer draws PNG or JPEG, second addendum). The library has no tool for it today: its preview tool renders a material on a sphere. The tool is new, and small | in the phase |
+| A5 | As a texture's: a record under `library/provenance/sources/` with Poly Haven's URL, CC0 and a hash. `LICENSE-CONTENT.md` gains an `hdris/` row. **This also closes F1's open point:** the library records the file it downloads from Poly Haven itself, not the platform's copy | in the phase |
+| A6 | **Radiance `.hdr`.** Every part of the consumer reads it; OpenEXR reaches its renderer only (second addendum). 4096 × 2048 is ruled. The lockfile check refuses any other size or shape | in the phase |
+| A7 | Inside the release folder, as `materials/` and `textures/` are. `.gitattributes` gains `MatterLibrary/hdris/**` for LFS. **A cost to name:** one HDRI is about 16 MB (F1), and *"many more"* are coming (the lead, first addendum). That goes on the LFS quota the website research already flagged (`261014_R_TheLibrarysSite.md` WS-F1), and onto *Texture storage beyond Git LFS* in the Roadmap's parking lot | in the phase; the storage is a later question |
+| A8 | The first HDRI is the one in use, downloaded again from Poly Haven by the library (A5). The rest are the lead's choice from Poly Haven. Whether they go on `library/wishlist.yaml` (materials today) or a list of their own is the phase's call | in the phase |
+
+- **SKY-F15 — the ledger id the platform suggested is taken.** On 2026-10-14 M9 became *What the website needs from each release*. The HDRI row would be **M10**, with the platform's draft text otherwise unchanged.
+- **SKY-F16 — what this comes to: one library phase, and nothing to build before the rulings.** A1 – A8 belong together. They share a folder, a name, a catalog list and a contract number. Each depends on Q1 and Q2. Nothing here is a one-sitting quick fix ahead of those rulings: even the serve tool's change writes the contract's shape. **Proposed, unnumbered:** *HDRIs in the library*. It covers the kind, its name, the catalog's `hdris` list, the lockfile check, provenance, LFS and the licence row, the serve tool, the preview, the Glossary's headword and the first HDRI. Its Outcome: *a consumer names a scene's HDRI from the library, and the dev install serves it.* It runs ahead of the platform's HDRI phase, which waits on it.
+
+---
+
 ## Status
 
-- **Passes:** 1 and its two addenda, from the platform's side. The library's review is owed.
-- **Open:** A1 – A8 · SKY-Q1, Q2, Q4, Q5. **Answered:** SKY-Q3 — 4096 × 2048.
-- **▶ Next:** the library reads this against its own tree and rules SKY-Q1 and SKY-Q2, which shape A1 and A2.
+- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14).
+- **Answered:** SKY-Q3, 4096 × 2048. **Recommended, for the lead to rule:** SKY-Q1 (a second kind, `hdris/`, beside materials; the Realm stays planned) · SKY-Q2 (`<Name>_<Variant>_vNN.hdr`) · SKY-Q4 (yes, through the library's serve tool, after the rulings) · SKY-Q5 (no compression) · A6's format (Radiance `.hdr`).
+- **Open:** A1 – A8, all for one library phase (SKY-F16). The Glossary's *HDRI* headword is owed (SKY-F13). The ledger row M10 is offered (SKY-F15).
+- **▶ Next:** the lead rules Q1, Q2 and the format. On his word, a **Roadmap seed** for *HDRIs in the library* (a `PhaseTBD_` stub) and the ledger row M10, then `/discovery` on that phase. The platform's HDRI phase waits on it.
