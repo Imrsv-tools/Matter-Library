@@ -111,7 +111,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `verify_asset_library.py` | headless structure verifier for the generated Blender Asset-Browser library |
 | `render_leg_probe.py` | probe: does an article sample each carried LCD appearance scalar in Storm |
 | `codec_ab.py` | [Codec A/B](CompressedDistribution.md) — ΔE2000 / SSIM of source PNG vs release BCn through one pinned Storm pipeline |
-| `build_ocio_parity_config.py` | builds and validates the OCIO 2.4-native [parity config](CompressedDistribution.md) |
+| `build_ocio_parity_config.py` | builds and validates the OCIO 2.4-native [parity config](CompressedDistribution.md). *Reevaluate (2026-10-14): no tool calls it; see the config's own note.* |
 | `check_conformance.sh` | Creator Asset Profile conformance gate |
 | `check_exporter.sh` | real-exporter conformance gate |
 | `check_asset_library.sh` | Asset-Browser library generate + structure gate |

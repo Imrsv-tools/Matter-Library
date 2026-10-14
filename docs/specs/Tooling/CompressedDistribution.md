@@ -76,6 +76,8 @@ pixel-identical images** (the acceptance invariant).
 *Shipped (Phase05, 2026-09-27): the **cross-renderer** leg.* `tools/parity/rig.py` renders one article side by side in USDLiveView's renderer (Storm) and Blender (Cycles), in one test scene with matched lighting, over every Creator slider. It scores ΔE2000 per setting against the per-master bar (< 2 for Opaque, Masked, Emissive and TwoLayer; "recognisable" by eye for the see-through and subsurface masters), plus a ruler (real-world size) check and a seam check. The render-job contract for a third renderer is `tools/parity/JOB_FORMAT.md` (Unreal: Phase06). The two gates below are the **codec** leg, one renderer against itself. Two gates:
 
 ### OCIO 2.4-native parity config
+> **Reevaluate (2026-10-14).** Nothing in the tree calls this builder. The cross-renderer parity rig compares pictures with **no tone curve** (`tools/parity/JOB_FORMAT.md`, the lighting rules), and the codec A/B comparator below runs its own pinned Storm pipeline, so no gate or rig run uses this config today. It is kept, not removed. Whether to retire it is open (`docs/Planning/Research/261013_R_PlatformTrackedItemsAsks.md` TI-F5, RD-TI-2).
+
 Built by `tools/conformance/build_ocio_parity_config.py` (a machine-local, reproducible artifact written to the builder's default output directory, overridable with `--out`; never committed). It
 **supersedes** an earlier header-hacked qualitative-smoke config (which is NEVER
 parity-grade). Finding: Blender's shipped config is mathematically faithful under

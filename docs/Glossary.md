@@ -120,7 +120,7 @@
 | **Determinism gate** | The check that the same inputs always produce byte-identical outputs (articles, catalogs, compressed textures). → `docs/specs/Tooling/AuthoringHarness.md` |
 | **BCn** / compressed role | GPU block-compressed textures (BC7 / BC5 / BC4) chosen by a texture's role (colour, normal, single-channel). → `docs/specs/Tooling/CompressedDistribution.md` |
 | **Codec A/B** | The ΔE2000 comparison of each PNG against its compressed twin, gating that compression stays visually faithful. → `docs/specs/Tooling/CompressedDistribution.md` |
-| **OCIO parity config** | The colour-management config used so every parity render is judged under the same view transform. → `docs/specs/Tooling/CompressedDistribution.md` |
+| **OCIO parity config** | The colour-management config used so every parity render is judged under the same view transform. *Reevaluate (2026-10-14): nothing calls its builder, and the parity rig compares with no tone curve (`tools/parity/JOB_FORMAT.md`); whether to retire it is open (`docs/Planning/Research/261013_R_PlatformTrackedItemsAsks.md` TI-F5).* → `docs/specs/Tooling/CompressedDistribution.md` |
 | **USD validation toolchain** | The pinned OpenUSD + MaterialX build (`tools/usd-toolchain/`) used to preview and check articles the way a USD consumer sees them. → `docs/specs/Tooling/USDValidationToolchain.md` |
 
 ## Consumer-side terms (IMRSV)
