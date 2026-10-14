@@ -144,6 +144,26 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 
   **Renting the machine is the lead's act.** No laptop phase waits on it.
 
+## Pass 4 — A fourth shape: the GPU work happens on the contributor's machine (2026-10-14)
+
+**The lead, verbatim:** *"I lean toward server option "a"... I wonder - is there an option that all the creation and other work is done locally on the contributors system (the test, the thumbnails, etc) then all that is packed and sent to the git repo basically "ready to go" and we validate what we can of the content... so don't need a GPU?"*
+
+- **F-RO-13 — This is how the work already runs.** The laptop builds each article, runs the rig in all three tools and writes the batch summary. The Unreal column comes from the packaged runtime, which the rig downloads, and which runs on *"any Linux machine with a GPU"* (Phase06's Outcome; Phase06 Click 2 proved it on a machine with no Unreal installed). The service was meant to move that work off the laptop. This shape instead makes the contributor's machine the place it belongs.
+- **F-RO-14 — What a server with no GPU can still check.** A contributor's pictures are **evidence that the server cannot re-make**, so it checks that the evidence belongs to the content:
+  - **The gate**, `run_all.py`, as today: the name, the schema, MaterialX validity, the lockfile, provenance and the licence.
+  - **The binding.** Each rig result and thumbnail records what made it: the article's hash, the masters version, the renderer and its version, and the scene version (F-MP-10). The server checks every one of them against the repo. A picture of a different article, or one made with old masters or an unpinned tool, is refused.
+  - **The picture as a file:** its size, its format, its colour space, and that it is not blank.
+  - **Possibly, a small CPU render** (Cycles runs without a GPU) compared with the contributor's thumbnail, to catch a picture that does not match its article. It is unproven, and slow even at a small size. A probe would decide it.
+
+  **What it cannot check:** the Unreal and Storm columns, without re-rendering them on a GPU. **The maintainer's review stays the real gate** (F-MP-22). The review judges the sheet and the thumbnails, so the server only has to show that they are the article's own.
+- **F-RO-15 — What it costs:**
+  - **A contributor needs a Linux machine with a GPU** for the Unreal column, plus Blender 5.1+ and the USD toolchain (a 30–50 minute build). That narrows who can contribute a full article. A contributor without one could send the build alone and leave the rig and thumbnails to the maintainer's machine.
+  - **One look across the library needs a pinned kit:** the same showcase scene, tool versions and colour settings on every machine. Shape (a) needs the same recipe for its own server, so the work is the same either way. Here it is packaged for contributors.
+  - **Re-running the whole library has no home.** When a master, the runtime or the showcase scene changes, every affected picture is stale (F-MP-4, F-MP-23). The masters' builder has changed in **15 commits since 2026-09-28** (`git log`, 2026-10-14). At 7–22 minutes of rig time per article (F-MP-44), a sweep of ~200 articles is roughly **23–73 GPU hours**, plus thumbnails. Nobody's contribution pays for that. It falls on the maintainer's machine, or on a GPU hired by the hour for the sweep.
+  - **Thumbnails do not go in git** (RD-MP-6). So the package splits in two: the article goes to the repo as a pull request, and the pictures are uploaded to the server's folder. *"Sent to the git repo ready to go"* holds for the article, not the pictures.
+- **F-RO-16 — The server shrinks to a small always-on machine with no GPU:** the checks above, the console, the dev catalog and the thumbnail folder. **It runs no agent session and no contributor code** (F-RO-10's two exclusions), which makes it a plain web app. That reopens the web server as a candidate host, or a small cloud server of its own beside it.
+- **F-RO-17 — It grows into (a) without throwing anything away.** Shape (d) builds the pinned kit, the evidence records, the checks and the console. If library-wide sweeps outgrow personal machines and hourly hire, a GPU machine can join later and run the same kit. That decision then rests on measured hours, not on a guess.
+
 ---
 
 ## Open questions
@@ -154,7 +174,7 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 | Q-RO-2 | **When does the Release Bundle start?** Its L1 ruling (2026-09-25) is the lead's *"b"*, choosing the option that reads *"Re-sequence. Library Coverage becomes P4 (the ~200 materials) … The bundle waits for a library worth versioning."* The same day: *"we have 200 materials to build and test before we have our first versionable library"*. RD-MP-13 has since made material work a standing process with no end. So what marks *"worth versioning"* now: a count of kept materials, or the console existing to cut one? | **After the console, at a count the lead names when it reaches the head of the list.** Not blocking today. |
 | Q-RO-3 | **The four overlapping older entries** (F-RO-6): keep them as they are, or annotate them? | **Annotate, never delete:** *See the Library* and *IMRSV Consumes Releases* marked as consumer outcomes; *Author a Material End to End* and *Parity Baselines* marked `Reevaluate (2026-10-14)`, with a pointer to what overlaps them. |
 | Q-RO-4 | **One Roadmap line for the standing material-making process**, so the Roadmap does not read as if material work stopped when Phase11 closes (F-RO-7)? | **Yes:** one line under `## Active`, *"Material-making: a standing process, not a phase"*, pointing at `library/wishlist.yaml` and the batch summaries. |
-| Q-RO-5 | **Where the library service runs** (F-RO-11): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, or (c) the light half on the web server and a GPU hired by the hour? | **(a)**, which keeps RD-MP-12. A GPU machine is rented by the month anyway, so moving the light half off it saves little and adds a copy step and a second machine to keep running. The web server stays the website's. The service's discovery confirms it with a measured spec and Hetzner's own price. |
+| Q-RO-5 | **Where the library service runs** (F-RO-11, F-RO-16): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, (c) the light half on the web server and a GPU hired by the hour, or **(d) the GPU work on each contributor's machine, sent as a ready package, with a small server that has no GPU and checks the evidence** (Pass 4, the lead's idea)? | **(d) to start, with (a) as its later step** (F-RO-17). It costs no GPU rental while the lead is the only contributor, and it is how the laptop already works. Its weak point is library-wide re-runs after a master changes (F-RO-15). Measuring those hours is what decides whether (a) is ever needed. *(Was (a), before Pass 4.)* The lead leans (a); the choice is his. |
 
 ## Resolved
 
@@ -162,14 +182,14 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 
 ## Status
 
-- **Passes captured:** 3 (2026-10-14). Pass 1 is the audit, Pass 2 the draft order, Pass 3 where the library service runs.
+- **Passes captured:** 4 (2026-10-14). Pass 1 is the audit, Pass 2 the draft order, Pass 3 where the library service runs, Pass 4 the contributor-side shape (d).
 - **Current direction:**
   - close Phase11;
   - then the five laptop phases, HDRIs first because the platform is waiting;
   - **beside them, the service's discovery:** the server's spec, its price and its setup recipe. The lead proposed this (F-RO-12);
   - then the server-bound three;
   - then the first real release and its consumers.
-- **The web server cannot host the service's GPU half** (F-RO-10). The recommendation stays RD-MP-12: one new GPU machine (Q-RO-5).
+- **The web server cannot host the service's GPU half** (F-RO-10). **But the service may not need a GPU:** in shape (d), contributors' machines do the GPU work, as the laptop does today, and a small server with no GPU checks the evidence (Pass 4). (d) to start and (a) later is the recommendation; the lead leans (a) (Q-RO-5). **Under (d), Pass 2's "on the server" group loosens:** Thumbnails and the skin-map probe run on a contributor's machine, so they no longer wait for a server, and only the console needs one (a small one). RD-MP-10 paused the thumbnail probe *"until the permanent machine exists"*. Under (d) that pause would be the lead's to lift.
 - **Open:**
   - Q-RO-1 (the cut and the numbers) is the one that changes what happens next.
   - Q-RO-5 (where the service runs) changes the service's scope, not the order.
