@@ -39,6 +39,12 @@ Run `/matter-generate` §1–5 with **the row as the brief**: its name, slot, ma
 - **ambientCG can answer 404 for a few minutes;** retry before treating a scan as missing.
 - **A layer near-invisible in the render** (on matter it cannot change much: roughening on a rough surface) is judged on a glossier row where one exists, or from the rig's own "where they differ" column; say which.
 - **The recipe carries `"status": "draft"`** (after `name`).
+- **The recipe carries the words** (Phase13 13.3; `docs/specs/Contract/SiteFile.md`): what a person reads about it on the library's website, written now and confirmed at the review with the picture.
+  - `"summary"`: one plain public line, 160 characters at most: what the matter is and where it is found (*"Bare mill-finish aluminium, a bright pale silver straight from the rolls, with no polish or anodising."*). No authoring talk (masters, lanes, phases); that stays in `_comment`.
+  - `"search_words"`: lowercase words a person would type, synonyms included (`"aluminium", "aluminum", "bare metal", "metal"`).
+  - `"origin"`: from its sources: `scan` (an ambientCG scan) · `procedural` (a generator) · `measured` (Physically Based values) · and always `agent-drafted`.
+  - `"label"` **only** where the name derived from the tokens reads badly (`Glass_Clear` derives "Glass clear": write `"Clear glass"`).
+  - **Biological is not Matter** (RD-P13-2): its words name the body part it is for; never use it as an example.
 - **A scan with no physical size** (`import_ambientcg.py` prints `meters_per_tile 0`; common for stone): set `meters_per_tile` by judgement from the feature size (grain, bands), record it as a `judgement` source, and say so on the summary.
 - **A planned name that differs from the row's** (the skill's §1 re-plans it): `wishlist.py mark <old> queued --name <new>` before you continue. **A different way of making it** (no scan names the matter, so L3 becomes L2): `--lane L2`, and say why on the summary.
 - **The gate:** `uv run tools/validators/validate_recipe.py <recipe>` per row; the full `run_all.py` once before the batch's last commit (§6).
@@ -97,6 +103,7 @@ Run `uv run tools/validators/run_all.py` (0 FAIL; the SKIPs are reported; its ac
 
 ## <stem> — built | stuck | re-judged · <slot> · <master> · <lane>
 - **Made from:** <Physically Based entry / ambientCG asset id / generator script / judgement>; layers <1 · 2 · 3 · mask>, <any made here>.
+- **Words:** <the name a person reads> — <summary> · search: <words> · origin: <…>.
 - **Critique:** <4–8 lines, /matter-generate §6, written from the sheet>.
 - **Verdict:** <all moved alike in Storm, Blender and Unreal | the rows that did not, and why>. Seams <ok/…>, scale <ok/…>. A keep sets <approved|candidate>.
 - **Tries:** <n>; <what each fix changed>.
@@ -113,7 +120,7 @@ uv run tools/converters/wishlist.py keep <stem>                  # recipe status
 uv run tools/converters/wishlist.py redo <stem> --note "<their words>"
 ```
 
-Write their words, verbatim, on the row's **Review** line in the summary, and commit the recipes, the list and the summary together. A redo row is first in the next batch.
+**The page shows each row's words under its pictures** (a row with none is flagged red): a keep confirms the words with the picture. A word they correct goes into the recipe before the `keep`. Write their words, verbatim, on the row's **Review** line in the summary, and commit the recipes, the list and the summary together. A redo row is first in the next batch.
 
 ## Hand back
 
