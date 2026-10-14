@@ -38,3 +38,26 @@ LCD_PORTS = {
     "emission_color": ("color3", "1.0, 1.0, 1.0", "Emission Color", {}),
     "emission_luminance": ("float", "0.0", "Emission Luminance", {}),
 }
+
+# Each port's range, per channel for a colour or a vector: (min, max), None where the range is open.
+# A copy of LCDSchema.md §Creator-adjustable subset's frozen "Range / default" column, as data, for a
+# reader that must state it (the site file, Phase13 13.1). `uv_scale` is "greater than 0": its min
+# is exclusive (LCD_MIN_EXCLUSIVE). The spec is the authority; this table follows it.
+LCD_RANGES = {
+    "base_color_tint": (0.0, 1.0),
+    "uv_scale": (0.0, None),
+    "uv_offset": (None, None),
+    "uv_rotation": (0.0, 360.0),
+    "overlay1_density": (0.0, 1.0),
+    "overlay2_density": (0.0, 1.0),
+    "overlay3_density": (0.0, 1.0),
+    "maskset_blend": (0.0, 1.0),
+    "roughness_bias": (-0.5, 0.5),
+    "overlay1_color": (0.0, 1.0),
+    "overlay2_color": (0.0, 1.0),
+    "overlay3_color": (0.0, 1.0),
+    "transmission_color": (0.0, 1.0),
+    "emission_color": (0.0, 1.0),
+    "emission_luminance": (0.0, None),
+}
+LCD_MIN_EXCLUSIVE = {"uv_scale"}

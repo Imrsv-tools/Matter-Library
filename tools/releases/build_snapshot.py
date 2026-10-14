@@ -1,0 +1,388 @@
+#!/usr/bin/env python3
+"""Build (and, on the lead's word, publish) a dev snapshot of the library for its website.
+
+    build_snapshot.py --tag matterlib-0.2.0-dev.1            # build into library/snapshots/<tag>/
+    build_snapshot.py --tag matterlib-0.2.0-dev.1 --publish  # then a GitHub pre-release of it
+
+Phase13 13.1 (docs/Planning/Phases/Phase13_MaterialsDescribed.md). Pre-release, so this is NOT a
+lockfile release: no stage, freeze or approval, and nothing is written to library/releases/ (the
+release gates glob that folder). It lists every article on disk, as the dev catalog does
+(working_tree.articles()), and writes, into a git-ignored folder:
+
+  * ``matterlib-<release>.site.json``: the site file (docs/specs/Contract/SiteFile.md, DRAFT);
+  * ``<identity>__<tool>[__close].webp``: the parity rig's default pictures of the test scene, per
+    tool that ran (never a character render, a sweep picture, a log or a job file: those carry
+    local paths, Phase13 F-P13-3);
+  * ``<identity>.zip``: the article's .mtlx with every texture it uses, references rewritten to
+    ``textures/<name>``, so it opens with no search path (the exporter's complete-portable form);
+  * ``SHA256SUMS``: every file above, in ``sha256sum -c`` form.
+
+Real fields only: a field the library does not hold yet (a thumbnail, a summary) is left out,
+never filled in (SiteFile.md §Absent means not known yet).
+
+``--publish`` runs ``gh release create --prerelease --target <sha>``, the shape unreal/publish.sh
+uses, and refuses unless the target commit is on origin/main. Publishing is public and
+irreversible: the agent runs it only on the lead's word.
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import hashlib
+import io
+import json
+import os
+import re
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+import zipfile
+from pathlib import Path
+
+import yaml
+from PIL import Image
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parent.parent
+sys.path.insert(0, str(REPO / "tools" / "converters"))
+sys.path.insert(0, str(REPO / "tools" / "parity"))
+import working_tree  # noqa: E402
+from lcd_ports import LCD_MIN_EXCLUSIVE, LCD_PORTS, LCD_RANGES  # noqa: E402
+from project_runtime_catalog import derive_entry  # noqa: E402
+
+PARITY = REPO / "library" / "parity"
+SNAPSHOTS = REPO / "library" / "snapshots"
+RECIPES = REPO / "tools" / "converters" / "recipes"
+PILOT_LOCK = REPO / "library" / "releases" / "matterlib-0.1.0.lock.yaml"
+REPO_SLUG = "Imrsv-tools/Matter-Library"
+TAG_RE = re.compile(r"^matterlib-(\d+\.\d+\.\d+-dev\.\d+)$")
+SITE_SCHEMA_VERSION = 1
+LICENCE = "CC0-1.0"                  # every article (RD-RO-2)
+TOOLS = ("storm", "blender", "unreal")
+VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
+MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
+WEBP_QUALITY = 90
+DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
+ZIP_TIME = (2026, 1, 1, 0, 0, 0)     # fixed, so a zip of the same files is byte-identical
+
+
+# ------------------------------------------------------------------ pure parts (unit-tested)
+
+def label(display_name: str) -> str:
+    """A name a person reads, derived from the article's tokens: split the PascalCase, drop the
+    default tokens, sentence case. ``Copper_Verdigris_Aged_Base`` -> ``Copper verdigris aged``;
+    an acronym or a roman numeral keeps its capitals (``ABS``, ``Fitzpatrick III``)."""
+    words = []
+    for token in display_name.split("_"):
+        if token in DEFAULT_TOKENS:
+            continue
+        words += re.findall(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+", token)
+    out = [w if (w.isupper() and (len(w) > 1 or w in "IVX")) else w.lower() for w in words]
+    if out and not out[0].isupper():
+        out[0] = out[0][0].upper() + out[0][1:]
+    return " ".join(out)
+
+
+SEVERITY = {"ONE-SIDED": 3, "UNEVEN": 2, "moved alike": 1, "no change in any tool": 0}
+
+
+def control_verdicts(scorecard: dict, job: dict, moved_verdict) -> dict:
+    """Per Creator control: the worst of its sweep rows' Moved verdicts, and each row's. A control
+    the sweep did not move has no entry (absent, not passed)."""
+    port_of = {s["id"]: (s.get("port"), s.get("label", s["id"])) for s in job.get("settings", [])}
+    out: dict[str, dict] = {}
+    for sid, row in scorecard.get("settings", {}).items():
+        port, lab = port_of.get(sid, (None, sid))
+        if sid == "defaults" or not port:
+            continue
+        word, _ = moved_verdict(row.get("moved"), md=False)
+        if word == "—":
+            continue
+        entry = out.setdefault(port, {"verdict": word, "rows": []})
+        entry["rows"].append({"setting": lab, "verdict": word})
+        if SEVERITY.get(word, 0) > SEVERITY.get(entry["verdict"], 0):
+            entry["verdict"] = word
+    return out
+
+
+def rig_pictures(art_dir: Path) -> list[tuple[str, str, Path]]:
+    """(tool, view, source) for each default picture of the test scene a tool rendered. Nothing
+    else in the folder is ever taken: not the sweep's pictures, logs, job files or scenes."""
+    found = []
+    for tool in TOOLS:
+        for view, name in VIEWS:
+            src = art_dir / tool / name
+            if src.is_file():
+                found.append((tool, view, src))
+    return found
+
+
+def portable(mtlx_text: str, mtlx_dir: Path) -> tuple[str, dict[str, Path]]:
+    """The .mtlx with every texture reference rewritten to ``textures/<name>``, and the files to
+    pack. Two different files with one name would collide in ``textures/``: refused, not dropped."""
+    files: dict[str, Path] = {}
+    for ref in sorted(set(re.findall(r'type="filename" value="([^"]+)"', mtlx_text))):
+        src = (mtlx_dir / ref).resolve()
+        if not src.is_file():
+            raise SystemExit(f"missing texture {ref} (from {mtlx_dir})")
+        base = src.name
+        if base in files and files[base] != src:
+            raise SystemExit(f"two textures named {base}: {files[base]} and {src}")
+        files[base] = src
+        mtlx_text = mtlx_text.replace(f'value="{ref}"', f'value="textures/{base}"')
+    return mtlx_text, files
+
+
+# ------------------------------------------------------------------ reading the records
+
+def _value(text: str, typ: str):
+    nums = [float(v) for v in text.split(",")]
+    return nums[0] if typ == "float" else nums
+
+
+def controls(mtlx: Path) -> list[dict]:
+    """The Creator controls the article declares: its nodegraph's interface inputs that are LCD
+    ports, with the article's own start value and the port's frozen range."""
+    root = ET.parse(mtlx).getroot()
+    graph = root.find("nodegraph")
+    out = []
+    for i in (graph.findall("input") if graph is not None else []):
+        name = i.get("name")
+        if name not in LCD_PORTS:
+            continue
+        lo, hi = LCD_RANGES[name]
+        rng = {"min": lo, "max": hi}
+        if name in LCD_MIN_EXCLUSIVE:
+            rng["min_exclusive"] = True
+        out.append({"port": name, "name": LCD_PORTS[name][2], "type": i.get("type"),
+                    "start": _value(i.get("value"), i.get("type")), "range": rng})
+    return out
+
+
+def metadata(mtlx: Path) -> dict:
+    root = ET.parse(mtlx).getroot()
+    for nd in root.iter("nodedef"):
+        if nd.get("node") == "imrsv_metadata":
+            return {i.get("name"): i.get("value") for i in nd.iter("input")}
+    return {}
+
+
+TEXTURES = REPO / "MatterLibrary" / "textures"
+
+
+def pilot_provenance() -> dict[str, dict]:
+    """Each pilot texture's lockfile id (``base/natural/stone/Marble_Veined``) -> its provenance.
+    A texture file belongs to the id that prefixes its path under MatterLibrary/textures/."""
+    if not PILOT_LOCK.is_file():
+        return {}
+    lock = yaml.safe_load(PILOT_LOCK.read_text(encoding="utf-8"))
+    return {t["id"]: t["provenance"] for t in lock.get("textures", []) if t.get("provenance")}
+
+
+def _provenance_of(src: Path, pilot: dict) -> dict | None:
+    try:
+        rel = src.relative_to(TEXTURES).as_posix()
+    except ValueError:
+        return None
+    for tid, prov in pilot.items():
+        if rel.startswith(tid + "_"):
+            return prov
+    return None
+
+
+def sources(recipe: dict, texture_files: dict[str, Path], pilot: dict) -> list[dict]:
+    """The recipe's sources (minus its repo-internal provenance path); for a pilot article with
+    none, its textures' lockfile provenance, once per source."""
+    if recipe.get("sources"):
+        return [{k: v for k, v in s.items() if k != "provenance"} for s in recipe["sources"]]
+    seen, out = set(), []
+    for src in texture_files.values():
+        prov = _provenance_of(src, pilot)
+        if not prov:
+            continue
+        ev = prov.get("evidence")
+        url = ev.get("url") if isinstance(ev, dict) else None
+        key = (prov.get("source"), url)
+        if key in seen:
+            continue
+        seen.add(key)
+        entry = {"kind": str(prov.get("source", "")).lower(), "license": prov.get("license")}
+        if url:
+            entry["url"] = url
+        out.append(entry)
+    return out
+
+
+def wear_layers(recipe: dict) -> list[dict]:
+    out = []
+    for o in recipe.get("overlays", []):
+        layer = {"layer": Path(o["texture"]).stem.split("_")[0], "density_port": o.get("density_port")}
+        if o.get("color_port"):
+            layer["color_port"] = o["color_port"]
+        out.append(layer)
+    return out
+
+
+# ------------------------------------------------------------------ writing
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path]) -> None:
+    tmp = dest.with_name(dest.name + ".tmp")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr(zipfile.ZipInfo(f"{identity}.mtlx", ZIP_TIME), mtlx_text)
+        for base in sorted(files):
+            info = zipfile.ZipInfo(f"textures/{base}", ZIP_TIME)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, files[base].read_bytes())
+    os.replace(tmp, dest)
+
+
+def write_webp(src: Path, dest: Path) -> None:
+    buf = io.BytesIO()
+    Image.open(src).convert("RGB").save(buf, "WEBP", quality=WEBP_QUALITY, method=6)
+    dest.write_bytes(buf.getvalue())
+
+
+def build(tag: str, out: Path) -> dict:
+    from rig import moved_verdict  # the rig's own verdict word; never re-derived here
+
+    m = TAG_RE.match(tag)
+    if not m:
+        raise SystemExit(f"tag {tag!r} is not matterlib-X.Y.Z-dev.N (NamingConventions.md)")
+    release = m[1]
+    out.mkdir(parents=True, exist_ok=True)
+    for old in out.iterdir():          # a rebuild starts clean; the folder is the snapshot's own
+        if old.is_file():
+            old.unlink()
+    pilot = pilot_provenance()
+    materials, assets = [], []
+    for art in working_tree.articles():
+        identity, mtlx = art["identity"], art["mtlx"]
+        recipe_path = RECIPES / f"{identity}.json"
+        recipe = json.loads(recipe_path.read_text(encoding="utf-8")) if recipe_path.is_file() else {}
+        meta = metadata(mtlx)
+        entry = derive_entry({"id": art["id"], "version": art["version"], "status": art["status"],
+                              "creator_selectable": art["creator_selectable"]})
+        rec = {
+            "id": entry["id"], "version": entry["version"], "identity": identity,
+            "label": label(entry["display_name"]), "display_name": entry["display_name"],
+            "domain": entry["domain"], "material_class": entry["material_class"],
+            "master": art["master"], "scale": entry["scale"],
+            "status": entry["status"], "creator_selectable": entry["creator_selectable"],
+            "controls": controls(mtlx), "licence": LICENCE,
+        }
+        if meta.get("meters_per_tile"):
+            rec["meters_per_tile"] = float(meta["meters_per_tile"])
+        if wear := wear_layers(recipe):
+            rec["wear_layers"] = wear
+        text, files = portable(mtlx.read_text(encoding="utf-8"), mtlx.parent)
+        if src := sources(recipe, files, pilot):
+            rec["sources"] = src
+
+        art_dir = PARITY / identity
+        pics = rig_pictures(art_dir)
+        if pics:
+            card = art_dir / "scorecard.json"
+            parity = {"tools": sorted({t for t, _, _ in pics}, key=TOOLS.index),
+                      "scene": "the rig's test scene"}
+            if card.is_file():
+                parity["measured"] = dt.date.fromtimestamp(card.stat().st_mtime).isoformat()
+                verdicts = control_verdicts(json.loads(card.read_text(encoding="utf-8")),
+                                            json.loads((art_dir / "job.json").read_text(encoding="utf-8")),
+                                            moved_verdict)
+                if verdicts:
+                    parity["controls"] = verdicts
+            rec["parity"] = parity
+            rec["pictures"] = []
+            for tool, view, src in pics:
+                name = f"{identity}__{tool}{'__close' if view == 'close' else ''}.webp"
+                write_webp(src, out / name)
+                rec["pictures"].append({"role": "rig", "tool": tool, "view": view, "file": name,
+                                        "sha256": sha256(out / name)})
+                assets.append(name)
+
+        zname = f"{identity}.zip"
+        write_zip(out / zname, identity, text, files)
+        rec["download"] = {"file": zname, "bytes": (out / zname).stat().st_size,
+                           "sha256": sha256(out / zname), "textures": len(files)}
+        assets.append(zname)
+        materials.append(rec)
+
+    site_name = f"matterlib-{release}.site.json"
+    site = {"schema_version": SITE_SCHEMA_VERSION, "release": release,
+            "made": dt.date.today().isoformat(), "draft": True,
+            "materials": sorted(materials, key=lambda r: r["id"])}
+    (out / site_name).write_text(json.dumps(site, indent=1, sort_keys=True, ensure_ascii=False) + "\n",
+                                 encoding="utf-8")
+    assets.append(site_name)
+    sums = "".join(f"{sha256(out / a)}  {a}\n" for a in sorted(assets))
+    (out / "SHA256SUMS").write_text(sums, encoding="utf-8")
+    assets.append("SHA256SUMS")
+    if len(assets) > MAX_ASSETS:
+        raise SystemExit(f"{len(assets)} assets: over GitHub's {MAX_ASSETS} a release (Release Bundle splits)")
+
+    rigged = sum(1 for r in materials if "parity" in r)
+    swept = sum(1 for r in materials if "controls" in r.get("parity", {}))
+    size = sum((out / a).stat().st_size for a in assets)
+    notes = (
+        f"A **dev snapshot** of the Matter Library, for its website's staging. Not a release: "
+        f"nothing here is versioned or approved, and every material shows its own status.\n\n"
+        f"- `{site_name}`: every material on disk ({len(materials)}), with what the library knows "
+        f"about each. A field it does not know yet is left out, never made up.\n"
+        f"- Pictures: the parity rig's test scene in the tools that ran, for {rigged} materials "
+        f"({swept} with a verdict per control). Each carries the date it was measured.\n"
+        f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
+        f"- `SHA256SUMS`: a digest for every file.\n\n"
+        f"Not yet in it: thumbnails, summaries and search words. Every material is CC0-1.0.\n")
+    (out / "NOTES.md").write_text(notes, encoding="utf-8")   # the release body; not an asset
+    return {"out": str(out), "materials": len(materials), "rigged": rigged, "swept": swept,
+            "assets": len(assets), "bytes": size}
+
+
+# ------------------------------------------------------------------ publishing (lead's word)
+
+def git(*args: str) -> str:
+    return subprocess.run(["git", "-C", str(REPO), *args], check=True, capture_output=True,
+                          text=True).stdout.strip()
+
+
+def publish(tag: str, out: Path, target: str) -> None:
+    sha = git("rev-parse", "--verify", f"{target}^{{commit}}")
+    git("fetch", "-q", "origin")
+    if subprocess.run(["git", "-C", str(REPO), "merge-base", "--is-ancestor", sha, "origin/main"]).returncode:
+        raise SystemExit(f"{sha[:10]} is not on origin/main: push first (the lead's word), then publish")
+    files = sorted(p for p in out.iterdir() if p.is_file() and p.name != "NOTES.md")
+    if len(files) > MAX_ASSETS:
+        raise SystemExit(f"{len(files)} assets: over {MAX_ASSETS}")
+    subprocess.run(["gh", "release", "create", tag, *map(str, files), "--repo", REPO_SLUG,
+                    "--prerelease", "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
+                    "--notes-file", str(out / "NOTES.md")], check=True)
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--tag", required=True, help="matterlib-X.Y.Z-dev.N")
+    ap.add_argument("--out", type=Path, help="default: library/snapshots/<tag>/")
+    ap.add_argument("--publish", action="store_true", help="publish the built folder (the lead's word)")
+    ap.add_argument("--target", default="HEAD", help="the commit the tag points at (must be on origin/main)")
+    args = ap.parse_args(argv)
+    out = args.out or SNAPSHOTS / args.tag
+    if args.publish:
+        if not (out / "SHA256SUMS").is_file():
+            raise SystemExit(f"nothing built at {out}: build first")
+        publish(args.tag, out, args.target)
+        return 0
+    print(json.dumps(build(args.tag, out), indent=1))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
