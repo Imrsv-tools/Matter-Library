@@ -1,6 +1,6 @@
-# Phase18 — Thumbnails
+# Phase17 — Thumbnails
 
-**Status:** SEEDED (2026-10-14). **Numbered Phase18 by the lead the same day**, after The Library Service and ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-14). **Renumbered Phase17 later the same evening**, when The Library Service went back to TBD: *"Make this phase TBD, move the others forward, Thumbnails become Phase 17, skin detail stay parked TBD"* (RD-DS-8). **This phase's own ids start at `Q-P17-8`, `F-P17-8` and `RD-P17-1`:** The Library Service minted `Q-P17-1…7` and `F-P17-1…7` while it was Phase17, and those stay its own. **Before that, numbered Phase18 by the lead the same day**, after The Library Service and ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 
@@ -33,7 +33,7 @@ The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`
 
 ## Depends on
 
-*The Library Service* (where the renders run; RD-MP-10: the thumbnail probe is one of its first tests).
+~~*The Library Service* (where the renders run; RD-MP-10: the thumbnail probe is one of its first tests).~~ **Runs on the laptop for now** (the lead, 2026-10-14: *"We have to rethink and stay local for now"*, RD-MP-14). The Library Service is TBD again (RD-DS-8). Its Brief, [`PhaseTBD_LibraryService.md`](Future/PhaseTBD_LibraryService.md), lists what Thumbnails would take from it when it returns.
 
 ## Discovery Log
 

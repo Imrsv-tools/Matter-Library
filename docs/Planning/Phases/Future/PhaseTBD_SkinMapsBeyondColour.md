@@ -1,6 +1,6 @@
 # PhaseTBD — Skin Maps Beyond Colour
 
-**Status:** SEEDED (2026-10-14), not numbered. A pointer-shell written by `/research` on the lead's word: *"Seed a phase TBD..."*, then *"Full skin map set"* when asked which. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It builds on *Skin Maps* ([`PhaseTBD_SkinMaps.md`](PhaseTBD_SkinMaps.md)), which ships the colour map first.
+**Status:** SEEDED (2026-10-14), not numbered, **parked** (the lead, 2026-10-14: *"skin detail stay parked TBD"*, RD-DS-8). A pointer-shell written by `/research` on the lead's word: *"Seed a phase TBD..."*, then *"Full skin map set"* when asked which. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It builds on *Skin Maps* ([`PhaseTBD_SkinMaps.md`](PhaseTBD_SkinMaps.md)), which ships the colour map first.
 
 ## Outcome
 

@@ -65,7 +65,7 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 | `humanoid` | `eyes` · `hair` · `skin` · `nails` · `teeth` · `mouth` |
 
 - **The parts are the six rows the lead ruled** (Eyes, Hair, Skin, Nails, Teeth, Mouth). Today's articles fall in them by their Material token: eyes = Cornea, Eye, Iris, Pupil, Sclera · hair = Hair · skin = Skin · nails = Nail · teeth = Enamel · mouth = Lips, Gum, Tongue (RD-P15-1).
-- **Other species** (canine, equine, …) are added beside `humanoid` when the first article for one is made (additive, like a Class). Which mesh a part fits is added by *Character Materials, Their Own Library* (Phase19).
+- **Other species** (canine, equine, …) are added beside `humanoid` when the first article for one is made (additive, like a Class). Which mesh a part fits is added by *Character Materials, Their Own Library* (Phase18).
 - **The group lives in the file.** A Character article declares `group`, `species` and `part` in its `imrsv_metadata` ([MaterialXTemplate](../Contract/MaterialXTemplate.md)); **a file with no `group` is Matter**. The group is never worked out from the domain: a generic skin pattern is `biological`, and Matter (F-DS-5).
 - **A Character article keeps its `domain` and `class`** as what it is made of (`biological` / `tissue`, …). They no longer decide where it is browsed.
 - **Its folder is `materials/character/<species>/<part>/`** (RD-P15-8), and the recipe gate (G5) refuses a folder that disagrees with what the file declares. The list of species and parts is `tools/converters/groups.py`.

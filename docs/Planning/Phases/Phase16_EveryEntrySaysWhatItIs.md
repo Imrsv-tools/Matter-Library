@@ -1,6 +1,6 @@
 # Phase16 — Every Entry Says What It Is
 
-**Status:** BRIEF READY (2026-10-14, Pass 2), lane **build**, **no lead call open**. Next: **`/execute P16`**. Phase15 closed the same evening, so nothing now stands ahead of this phase. Pass 2 re-cut the Brief on what Phase15 actually landed. Opened by the lead's `/discovery P16`, then *"Things shifted a bit and P15 just finished... do another discovery pass"*. Numbered Phase16 on *"Lets make these the next phases (Before the scaled grid)"* (RD-DS-6). Seeded by `/research` on *"yes record it and seed all three"*. It follows *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Complete/Phase15_MatterCharacterHdri.md)), whose structure it fills, and comes before The Library Service ([`Phase17_LibraryService.md`](Phase17_LibraryService.md); RD-DS-7).
+**Status:** BRIEF READY (2026-10-14, Pass 2), lane **build**, **no lead call open**. Next: **`/execute P16`**. Phase15 closed the same evening, so nothing now stands ahead of this phase. Pass 2 re-cut the Brief on what Phase15 actually landed. Opened by the lead's `/discovery P16`, then *"Things shifted a bit and P15 just finished... do another discovery pass"*. Numbered Phase16 on *"Lets make these the next phases (Before the scaled grid)"* (RD-DS-6). Seeded by `/research` on *"yes record it and seed all three"*. It follows *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Complete/Phase15_MatterCharacterHdri.md)), whose structure it fills, and comes before The Library Service ([`PhaseTBD_LibraryService.md`](Future/PhaseTBD_LibraryService.md); RD-DS-7).
 
 ## Outcome
 
@@ -67,8 +67,8 @@ The lead: *"I want Materials to work like Assets and Compositions.... same thing
 | Not now → where | What it will consume from this phase |
 |---|---|
 | **Reading and showing the facts** in Stage, Studio's picker, USDLiveView and the website → the consumers (P25, P26, M11) | the dev catalog's `contributor`, `licence` and `credit`; the `.mtlx` and `.hdr` fields |
-| **The material package carries the handle** → *The Library Service* (Phase17 17.2: *"the contributor's handle, when one is given"*) | the recipe's `contributor`, and the `.mtlx` field the package's complete-portable article already carries |
-| **`/matter-generate` and `/matter-batch` write `contributor`** into the recipes they make → a quick fix when material-making resumes, held until Phase19 (RD-DS-7). The skills are being edited in another session today. | the recipe key. Until then the recipe gate refuses a recipe without one, so the gap cannot pass silently. |
+| **The material package carries the handle** → *The Library Service* (TBD since RD-DS-8; its drafted step 17.2: *"the contributor's handle, when one is given"*) | the recipe's `contributor`, and the `.mtlx` field the package's complete-portable article already carries |
+| **`/matter-generate` and `/matter-batch` write `contributor`** into the recipes they make → a quick fix when material-making resumes, held until Phase19 (RD-DS-7; Phase18 since RD-DS-8). The skills are being edited in another session today. | the recipe key. Until then the recipe gate refuses a recipe without one, so the gap cannot pass silently. |
 | **The release projector, and narrowing `no_projection_guard`** → the first release after this phase (*Release Bundle*), as `master` was handled and as Phase15's group is (RD-P15-6, RD-P16-8) | the dev catalog's field names; F-P16-3 (the guard must check keys) |
 | **Stamped HDRIs in a real release** → *Release Bundle and Consumer Contract* | the stamp, and the facts function |
 | **Linking a handle to an account; counting use for Forseti** → the platform (Phase13's deferral; F-DS-12) | the `contributor` field |
@@ -106,7 +106,7 @@ The lead: *"I want Materials to work like Assets and Compositions.... same thing
 *Carried from research and earlier phases:*
 - **RD-DS-2:** licence and name reach the engines as fields on each catalog entry, as the name and class already do. This overrides `no_projection_guard` for these fields.
 - **RD-DS-3:** the facts come from the file itself (`.mtlx`, `.hdr`), and the catalog projects them. No sidecars.
-- **RD-DS-5, refined by RD-DS-7:** Phase15, then this phase, then The Library Service (Phase17), Thumbnails (Phase18), Character Materials (Phase19) and Scale Grids (Phase20). The lead: *"so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"*. Material-making is held until Phase19.
+- **RD-DS-5, refined by RD-DS-7:** Phase15, then this phase, then The Library Service (Phase17), Thumbnails (Phase18), Character Materials (Phase19) and Scale Grids (Phase20). *(Since RD-DS-8, the same evening: The Library Service is TBD, Thumbnails is Phase17, Character Materials Phase18 and Scale Grids Phase19.)* The lead: *"so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"*. Material-making is held until Phase19.
 - **RD-RO-2:** materials are `CC0-1.0`, and only CC0. A contributor's handle is carried as a courtesy and for Forseti tracking; it is never a licence condition.
 - **RD-WS-1 / F-RO-26:** the library publishes no invented fact, and an absent field means *not known yet*.
 - **Phase15's shapes, as landed:**
@@ -222,7 +222,7 @@ None. Both of the lead's calls are answered: RD-P16-11 and RD-P16-12.
   - **The site file** is `dev.4`, still at schema 2.
   - **Blender's library** files by group, and the lead's Blender reads it from the repo.
   - **Its 15.3 messages** already told the website that the *16K* sentence and `edited_from` are this phase's, and told USDLiveView that its ask *L3* is this phase's. *L3* is that viewer's own id and is not defined in this repo, so 16.3 asks the viewer's session what it covers before answering it.
-- **F-P16-12 — Phase17 consumes the handle** (its Brief, `7ab55ce`). Its material package carries *"the contributor's handle, when one is given"*, so this phase's recipe key and `.mtlx` field are what it packs.
+- **F-P16-12 — The Library Service (then Phase17; TBD since RD-DS-8) consumes the handle** (its Brief, `7ab55ce`). Its material package carries *"the contributor's handle, when one is given"*, so this phase's recipe key and `.mtlx` field are what it packs.
 
 ## Discovery Log
 

@@ -104,5 +104,5 @@ None.
 
 ## Open questions
 
-1. **A path in another retro deposit is stale.** `261014_P15_Discovery_ColdStart.md` cites `Phase18_ScaleGrids.md`, which is `Phase20_ScaleGrids.md` since `4b0b67b`. It is the retro lane's file, so I left it; for the Refiner at drain.
+1. **A path in another retro deposit is stale.** `261014_P15_Discovery_ColdStart.md` cites `Phase18_ScaleGrids.md`, which is `Phase19_ScaleGrids.md` since `4b0b67b`. It is the retro lane's file, so I left it; for the Refiner at drain.
 2. **Product, not method (the lead's):** Q-DS-3 to Q-DS-5 in the research doc. They cover whether a build for others may carry the dev install, the dev install's identity, and where the fit pictures live in a real release. None blocks Phase15 – 20.

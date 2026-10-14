@@ -1,6 +1,6 @@
-# Phase17 — The Library Service
+# PhaseTBD — The Library Service
 
-**Status:** ON HOLD (2026-10-14). **The lead: *"We have to rethink and stay local for now"*** (RD-MP-14, recorded in `261014_R_MaterialPipeline.md` §Resolved). The Brief below was written for a rented server, and is kept as the design for when one exists. **What Phase17 becomes meanwhile is Q-P17-7**, the lead's call. *(Was: BRIEF READY, lane high-rigor, next `/plan Phase17`, with Q-P17-1 open on where the server comes from.)* Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
+**Status:** ON HOLD (2026-10-14), **unnumbered again.** The lead: *"Make this phase TBD, move the others forward, Thumbnails become Phase 17, skin detail stay parked TBD"* (RD-DS-8). It was Phase17 for part of 2026-10-14. **Its ids stay as minted** (`Q-P17-1…7`, `F-P17-1…7`, the `17.n` steps): they are in commit messages and frozen. Thumbnails, now Phase17, starts its own at 8. Earlier the same evening: **The lead: *"We have to rethink and stay local for now"*** (RD-MP-14, recorded in `261014_R_MaterialPipeline.md` §Resolved). The Brief below was written for a rented server, and is kept as the design for when one exists. **What Phase17 becomes meanwhile is Q-P17-7**, the lead's call. *(Was: BRIEF READY, lane high-rigor, next `/plan Phase17`, with Q-P17-1 open on where the server comes from.)* Discovery opened by the lead: *"/discovery P17"*. **Numbered Phase17 by the lead the same day**, ahead of Scale Grids: *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"* (RD-DS-7). Seeded by `/research` on the lead's word: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"* (RD-MP-11). It runs after Phase15 and Phase16, and before Thumbnails (Phase18), which renders on it.
 
 ## Outcome
 
@@ -18,7 +18,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 
 > **On hold (2026-10-14, RD-MP-14).** Everything below assumes a rented GPU server, which the lead has put off: *"stay local for now"*. Nothing in it is deleted. It runs as written once a server exists, after re-checking F-P17-1 and F-P17-7's prices.
 
-### Q-P17-7 — What Phase17 becomes while the work stays local (open, the lead's)
+### ~~Q-P17-7 — What Phase17 becomes while the work stays local~~ → RD-DS-8: (A). The phase goes back to TBD, and Thumbnails goes next, as Phase17
 
 **Without a server, the phase's outcome has no user:** the only person who would hand the laptop a package is the agent, on the same laptop, which already gates and rigs directly.
 
@@ -87,7 +87,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 
 | Deferred | Where it goes | What it takes from this phase |
 |---|---|---|
-| **Thumbnails, made on upload before the review** (RD-MP-2 to RD-MP-6) | Phase18 | the box and its GPU; one more stage in the door's run, after the rig; a git-ignored thumbnail folder on the box, shown at the same address |
+| **Thumbnails, made on upload before the review** (RD-MP-2 to RD-MP-6) | Phase17, Thumbnails (Phase18 before RD-DS-8) | the box and its GPU; one more stage in the door's run, after the rig; a git-ignored thumbnail folder on the box, shown at the same address |
 | **The team's console** (RD-MP-7) | *The Library Console* | the service's address; the per-upload branch; the review page; the inbox's results |
 | **The dev snapshot built on the box** (`build_snapshot.py` reads the rig pictures, which will live there) | the first phase that needs the site fed from the service *(planned)*. Publishing stays the lead's word | the box's `library/parity/` layout, which 17.1 keeps identical to the laptop's |
 | **Agent sessions running on the box** (F-MP-40's "agent work") | **Reevaluate (2026-10-14):** F-RO-22 moved the batch loop to the door, so the agent need not run on the box; an agent with credentials on an internet-facing box is its own question | nothing until then |
@@ -255,7 +255,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
 ## Carried in (2026-10-14)
 
 - **From `261014_R_MaterialPipeline.md`:**
-  - RD-MP-10: the thumbnail probe is one of the service's first tests. It is now Phase18's first act on this box.
+  - RD-MP-10: the thumbnail probe is one of the service's first tests. It was to be Thumbnails' first act on this box. Since RD-MP-14, Thumbnails runs on the laptop.
   - F-MP-40: what the service runs.
   - F-MP-41: the web server cannot be the GPU host.
   - F-MP-42: the shape.
@@ -287,3 +287,7 @@ Everything the library does today runs on one laptop (the lead, 2026-10-14: *"th
   - **The lead, verbatim:** *"We have to rethink and stay local for now"*.
   - Recorded upstream as RD-MP-14, because it reaches RD-MP-10, RD-MP-12 and Phase18.
   - The phase is ON HOLD with its Brief kept. What it becomes meanwhile is Q-P17-7: (A) hold it and go on to Thumbnails on the laptop, recommended; (B) a local door; (C) the other machine as the box.
+- **2026-10-14 — Pass 4: back to TBD.**
+  - **The lead, verbatim:** *"Make this phase TBD, move the others forward, Thumbnails become Phase 17, skin detail stay parked TBD"*.
+  - Recorded as RD-DS-8 in `261014_R_DownstreamPicture.md`, beside RD-DS-7, the order it amends.
+  - Q-P17-7 is closed as (A). The doc moved to `Phases/Future/`, and its Brief stays the design for when a server is wanted.
