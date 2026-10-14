@@ -1,7 +1,7 @@
 {
   "_comment": "Fine-texture powder coat: a polyester powder sprayed onto metal and baked into one continuous pigmented film, the finish of architectural panels, ribs, railings and window frames. Authored white, so a Creator tints it to any colour (author light). Opaque, with no coat: unlike gloss paint the film has no clear top, it is one matte-to-satin layer whose surface cures into a dense field of small rounded bumps a few tenths of a millimetre across. That is what keeps it from reading as plastic: a soft, even satin with no sharp highlight. The maps are generated (L2, gen_powdercoat_textured.py). BUILT TO STAY EVEN ON LARGE PANELS: the 1 cm tile carries nothing slower than the bumps, so there is no mottle to repeat, and the satin is in the roughness itself, so it holds when the bumps fall below a pixel. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, placed by the Edges mask, whose channels fit the row's order (G damage along borders, B deposit in corners, A handling on open faces). Not carried: the chalking an old powder coat shows outdoors. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A4).",
   "name": "PowderCoat_Textured_Clean_Base_s001_v01",
-  "status": "draft",
+  "status": "approved",
   "path": "synthetic/coating/PowderCoat_Textured_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

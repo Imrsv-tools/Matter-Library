@@ -1,7 +1,7 @@
 {
   "_comment": "Gloss paint: a white high-gloss enamel or alkyd, as on doors, trim, railings and appliances, authored white so a Creator tints it to any colour (author light). OPAQUE with the OpenPBR coat (Phase07; MasterSet row 1 lists clearcoat as an Opaque param): the pigmented paint film is a satin body under a smooth, clear binder-rich surface, so the paint shows a broad soft sheen with a sharp mirror highlight on top, the wet look that makes gloss paint read as gloss. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, placed by the Edges mask, whose channels fit the row's order (G damage along borders, B deposit in corners, A handling on open faces). Built by the Phase11 batch.",
   "name": "Paint_Gloss_Clean_Base_s01_v01",
-  "status": "draft",
+  "status": "candidate",
   "path": "synthetic/coating/Paint_Gloss_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

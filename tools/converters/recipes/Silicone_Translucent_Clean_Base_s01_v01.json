@@ -1,7 +1,7 @@
 {
   "_comment": "Translucent silicone rubber (cured PDMS, uncoloured): the milky, soft, slightly tacky moulded rubber of kitchen utensils and bakeware, baby-bottle teats, seals and phone cases. SUBSURFACE: its look is light passing into it and spreading, so thin parts glow and edges soften; it is not see-through like a clear plastic. Satin moulded finish. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), fingerprints (silicone picks up grease), and dust as a deposit (Phase10; silicone is notorious for holding lint), gated by the Grime mask in the row's order. Built by the Phase11 batch.",
   "name": "Silicone_Translucent_Clean_Base_s01_v01",
-  "status": "draft",
+  "status": "candidate",
   "path": "synthetic/polymer/Silicone_Translucent_Clean_Base_s01_v01.mtlx",
   "master": "Subsurface",
   "domain": "synthetic",
