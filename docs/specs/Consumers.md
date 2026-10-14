@@ -53,7 +53,7 @@ A USD viewer consumes the raw `.mtlx` articles:
 - It resolves `@Name.mtlx@` through the stock USD search path ([_Architecture](_Architecture.md) §Decisions of record 8).
 - An [HDRI](../Glossary.md) is named the same way, bare, on a `DomeLight` (`@<Name>_<Variant>_vNN.hdr@`, [Identity](Ontology/Identity.md) §HDRI names), so the viewer's search path must hold the library's `hdris/` folder. USDLiveView's launcher does since 2026-10-14 (Phase14). A stock viewer draws the sky only when its dome is set visible.
 - It must set the MaterialX standard-library search path for its build (decision 7).
-- It should honour the active-release selector rather than scanning every installed release (*Drift, 2026-09-23: USDLiveView scans all releases today; listed in `docs/Planning/PlatformDependencies.md`*).
+- It should honour the active-release selector rather than scanning every installed release (*Drift, 2026-09-23: USDLiveView scans all releases today; listed in `docs/Planning/PlatformDependencies.md`*). *(Done 2026-10-14: its launcher searches only the release the selector names, P7.)*
 - This repo's own validation baseline for USD rendering is [USDValidationToolchain](Tooling/USDValidationToolchain.md).
 - **Creator overrides need nothing extra.** They are Material inputs that the article's nodegraph connects to ([LCDSchema §Carrier rule](Contract/LCDSchema.md#carrier-rule-no-imrsv-attrs)), so a stock viewer renders them through normal UsdShade resolution. A viewer must **not** add a resolution rule of its own: if an override does not render, the writer is at fault (`tools/conformance/check_lcd_carrier.py` says which).
 

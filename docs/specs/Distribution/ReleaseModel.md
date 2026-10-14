@@ -105,10 +105,16 @@ status-unread.)
 The contract for an install root (any consumer that installs Matter releases side by side):
 
 ```
-<root>/active-release.json                                  {"active_release":"matterlib-<ver>"}
-<root>/releases/matterlib-<ver>/matterlib-<ver>.catalog.json   (+ materials/ + textures/ incl. .dds)
-<root>/recovery-audit.jsonl                                 (written only by pilot recovery)
+<root>/active-release.json                                     {"active_release":"matterlib-<ver>"}
+<root>/releases/matterlib-<ver>/matterlib-<ver>.catalog.json   the one entry point; every path below is relative to it
+<root>/releases/matterlib-<ver>/materials/<domain>/<class>/…   the articles
+<root>/releases/matterlib-<ver>/textures/{base,shared,fit}/…   incl. .dds; fit/ holds the pictures a consumer supplies at binding
+<root>/releases/matterlib-<ver>/hdris/…                        the HDRIs (since 2026-10-14)
+<root>/releases/matterlib-<ver>/thumbnails/hdris/…             a picture per HDRI (since 2026-10-14)
+<root>/recovery-audit.jsonl                                    (written only by pilot recovery)
 ```
+
+> **Updated 2026-10-14** ([`261014_R_DownstreamPicture.md`](../../Planning/Research/261014_R_DownstreamPicture.md) F-DS-1, F-DS-2). **The dev install** (`matterlib-dev`, written by `tools/releases/serve_to_stage.py`) holds every folder above; its `materials/`, `textures/` and `hdris/` are links into the checkout. **A frozen release holds less, *(planned)* for the release-bundle phase:** the freeze refuses a lockfile that lists HDRIs, and staging copies only the textures the lock's articles name, so `textures/fit/` is absent too. **A release folder is self-contained:** every path its catalog and its articles name resolves inside `releases/<name>/`, and nothing points beside it (measured on the dev install, 2026-10-14). A consumer that carries one release folder, such as a packaged build, relies on this. **A consumer reads only the install, never `MatterLibrary/` in a checkout.**
 
 - Each `releases/matterlib-<ver>/` is **immutable** once installed; multiple versions coexist.
 - The selector is a single JSON object with one key, `active_release`, naming a directory under `releases/`. It is written only by activation / pilot recovery, atomically (temp-file + `rename()`).
