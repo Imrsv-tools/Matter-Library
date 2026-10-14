@@ -104,6 +104,8 @@
 | **Provenance** | The recorded origin and licence of every shipped texture, with `evidence: {url, sha256}` for third-party sources. → `docs/specs/Contract/Manifest.md` |
 | **Shipped-pixel rule** | No pixel ships in a release unless its provenance is recorded and it is CC0-dedicable (lead ruling R13). → `docs/specs/Authoring/AuthoringGoldenPath.md` |
 | **CC0-dedicable** | An input that can be released under CC0-1.0 with no rights retained, e.g. ambientCG or in-house procedural textures. → `LICENSE-CONTENT.md` |
+| **Wish list** | Every material the library wants, one row each, with where it stands (`queued` · `built` · `stuck` · `kept` · `redo`): `library/wishlist.yaml`. It says `kept`, never "approved"; a keep writes the article's *Status lifecycle* word. → `docs/ToolingConventions.md` |
+| **Batch** | One run of the material-making loop (`/matter-batch`) over the next few wish-list rows: each built, rigged in all three tools, refined up to 3 rig runs, and committed as `draft`, with one summary in `library/batches/` that the maintainer reviews to keep or redo each row. **A standing process, never a phase** (Phase11, RD-MP-13). → `docs/ToolingConventions.md` |
 
 ## Creator assets and Blender
 

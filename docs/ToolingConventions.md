@@ -30,6 +30,10 @@
 | `blender/MatterMaterials.blend` | the scaffold scene the conformance slices export from | Apache-2.0 |
 | `docs/` · `Methodology/` · `.ai/` · `.claude/` | specs, planning, method, agent surface | Apache-2.0 |
 | `.claude/skills/matter-generate/` | the `/matter-generate` skill: a draft material from a brief (Phase03). A product surface, not methodology | Apache-2.0 |
+| `.claude/skills/matter-batch/` *(Phase11, 2026-10-02)* | the `/matter-batch` skill: the loop over the wish list (build the `/matter-generate` way, rig, read the sheet, refine up to 3 rig runs, mark, commit as `draft`, write the batch summary). A product surface, not methodology | Apache-2.0 |
+| `library/wishlist.yaml` *(Phase11)* | **the wish list**: every material the library wants, one line per row (`build` or `rejudge`; state `queued` · `built` · `stuck` · `kept` · `redo`). Edited by hand to add a row; state changes go through `tools/converters/wishlist.py` (`next` · `show` · `mark` · `verdict` · `keep` · `redo` · `counts`; units `test_wishlist.py`), whose `keep` writes the recipe's `status` | CC0 |
+| `library/batches/` *(Phase11)* | one summary per batch, `<yymmdd>-<n>.md`: per row, how it was made and from what, the critique, the Moved verdict, the sheet's path and the maintainer's keep or redo | CC0 |
+| `library/parity/` | the rig's output per article (`sheet.png`, `scorecard.md`, `scorecard.json`) and `_review/<batch>.png`, one review page per batch (`tools/parity/review_pages.py`; `crop_sheet.py` cuts a sheet's rows). **Git-ignored** | — |
 
 ## Naming
 
@@ -44,6 +48,7 @@
 |---|---|
 | validate everything structural — **the one command** | `uv run tools/validators/run_all.py` (17 lanes, listed in [AuthoringHarness](specs/Tooling/AuthoringHarness.md)). From a fresh clone, uv builds `.venv/` from `pyproject.toml` + `uv.lock` (Python 3.12, MaterialX 1.39.5) first. Add `--strict` to fail on any skipped lane. Without uv: `python3.12 -m venv .venv && .venv/bin/pip install .`, then run the script with `.venv/bin/python`. |
 | (re)generate articles from recipes | `python tools/converters/build_proof_subset.py [<recipe.json> …]` |
+| **build the next materials on the wish list** (the standing material-making process, never a phase: RD-MP-13) | `/matter-batch` in a Claude Code session; `uv run tools/converters/wishlist.py next [N]` shows what it would take (redo rows first) |
 | re-project a catalog from its lockfile | `python tools/converters/project_runtime_catalog.py` |
 | stage / freeze / promote / activate a release | the scripts in `tools/releases/` ([ReleaseModel](specs/Distribution/ReleaseModel.md)) |
 | **serve the working tree to Stage and test it in USDLiveView** (pre-release; no versioning) | `uv run tools/releases/serve_to_stage.py [--view <composition>]` (`--off` to undo). Needs `IMRSV_STAGE_RUNTIME`. |

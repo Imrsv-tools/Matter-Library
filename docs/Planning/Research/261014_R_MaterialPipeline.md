@@ -435,7 +435,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **Durable docs owed, and the verb that lands them:**
   - **RD-MP-1 and RD-MP-8's consequences:** owned by *Two Licences*.
   - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them (*Thumbnails* at the latest).
-  - **RD-MP-13:** Phase11's close, by `/execute Phase11`, in its own doc.
+  - ~~**RD-MP-13:** Phase11's close, by `/execute Phase11`, in its own doc.~~ **Done 2026-10-14:** 29 of 35 kept, 6 redo (`Phases/Complete/Phase11_LibraryCoverage.md` §The close sitting).
 - **Unverified:**
   - Unreal's path tracer or Lumen in a packaged Linux runtime;
   - the GPU time a showcase costs (F-MP-32);
@@ -443,6 +443,6 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   - the platform's web server having no GPU (its docs record none);
   - which Hetzner GPU server fits, and its cost.
 - **Next step:**
-  - `/execute Phase11` for the close (the lead judges the 24 flagged rows);
+  - ~~`/execute Phase11` for the close (the lead judges the 24 flagged rows);~~ done 2026-10-14;
   - `/research` on skin maps, Pass 3 (the lead, in a new session);
   - `/discovery` on *The Library Service* when the lead opens it.

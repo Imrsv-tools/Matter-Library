@@ -592,6 +592,8 @@ Structure (O11 rulings this list needs; no recommendation forced):
 
 **Passes captured:** 7 (2026-09-25).
 
+- **Superseded as the working queue (2026-10-14, Phase11's close):** `library/wishlist.yaml` holds every row of Pass 2 plus one re-judge row per article on disk, each with its state; the tables here stay as written, and their status words are of 2026-09-25. The list fills through `/matter-batch`, a standing process (Phase11, RD-MP-13).
+
 - **`Topsoil_Forest` is plain soil** (lead, 2026-09-25); the `Composed?` flag is removed.
 - **E5 resolved (lead): `Natural`** is the default Variant (untinted, library look). `Identity.md` still says `Base` and needs updating when the C4/C5 naming rules land there. The shipped `Base`-variant articles are unaffected (none use a `Base` Variant).
 - **E2 resolved (lead): accept.** A see-through colour (`Glass_Green`, `Glass_Amber`) is its own authored article; `base_color_tint` stays surface-only, and there is no LCD change. *(**Superseded 2026-10-05 by the lead**, with the emissive half of E8: a see-through colour, an emitted colour and its brightness become Creator ports. `Phase12_GlassAndLightColour.md`, RD-GLC-2. It was in force until that phase shipped, 2026-10-05.)*

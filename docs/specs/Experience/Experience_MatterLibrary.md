@@ -119,6 +119,7 @@ The Blender half of the Creator Golden Path is real (2026-07-17):
 
   Both conform to [CreatorAssetProfile](../Contract/CreatorAssetProfile.md).
 - **The exact Matter identity travels on `assetInfo:identifier`**, independent of Blender's display name, which removes the old `_001` suffix heuristic.
+- **The library fills by a standing loop, not by phases** *(Phase11, closed 2026-10-14)*. The maintainer runs `/matter-batch` over the wish list (`library/wishlist.yaml`): each row is built, checked side by side in USDLiveView's renderer, Blender and Unreal by the parity rig, refined up to 3 rig runs, and committed as `draft` with a batch summary. The maintainer keeps or sends back each row; a keep sets the article's status (`approved` when all three tools moved alike, `candidate` otherwise), which the Asset-Browser library shows. At the close, 29 of the 35 built rows were kept (14 `approved`, 15 `candidate`) and 6 went back as redo rows.
 
 > **Resolved (Phase02, 2026-09-23):** targets are **Blender 5.1+** (R6). The add-on declared 5.1.1; it enables and registers its exporter on the lead's Blender 5.1.0 (measured headless), so it now declares `(5, 1, 0)`.
 
@@ -132,7 +133,7 @@ Part of the larger direction, but they should not drive the first usable chain:
 - material submission tools
 - curator/admin conversion tools
 - promotion of community materials into releases
-- **agentic material generation**: an agent-run generate → decompose → assemble → QC loop that proposes *candidate* articles for human judgement (lead, 2026-09-23; `docs/Planning/Research/260923_R_StandaloneSetup.md` Pass 8)
+- **agentic material generation**: an agent-run generate → decompose → assemble → QC loop that proposes *candidate* articles for human judgement (lead, 2026-09-23; `docs/Planning/Research/260923_R_StandaloneSetup.md` Pass 8) *(Shipped, maintainer side, Phase11, 2026-10-14: the wish list and `/matter-batch`, judged in all three tools by the parity rig, kept or redone by the maintainer; see §Shipped. The contributor-facing half is still planned.)*
 - optional Blender add-ons or assisted export tools
 
 ## Open Experience Questions
@@ -156,3 +157,4 @@ Part of the larger direction, but they should not drive the first usable chain:
 - 2026-09-23 — brought home and re-framed as a community resource consumed by IMRSV and others (R1/R9).
 - 2026-09-27 — creators' Blender library moved from the "recognizable, not faithful" proxy to the faithful Blender masters (Phase05 step 5.5, on the lead's 2026-09-26 ruling); the wear sliders now move the picture, and the parity rig measures the Blender look against USDLiveView's renderer.
 - 2026-10-01 — dust shows in its own colour, which the Creator can change (Phase10), alike in Blender, USDLiveView's renderer and the library's Unreal masters (`unreal-runtime-v3`).
+- 2026-10-14 — the library fills by a standing loop over a wish list, judged in all three tools (Phase11); the first 29 articles are kept.

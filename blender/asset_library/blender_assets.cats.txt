@@ -8,6 +8,7 @@ c63ae30d-f4de-55e2-8265-134a8760f59c:biological/bone:biological-bone
 238c4f47-9ef2-5426-8814-5863d223d1b6:biological/tissue:biological-tissue
 e56d34ec-4f30-5391-b97f-e13ebcf63d1a:engineered/cementitious:engineered-cementitious
 04cf9d02-7bbc-54c8-adb2-e6878ff7e727:engineered/ceramic:engineered-ceramic
+d15ee386-7cfe-56e2-8a69-172ddf6c03c7:engineered/composite:engineered-composite
 3f33cced-4f95-545a-88e2-2b5f70082073:engineered/glass:engineered-glass
 1d4eba5e-8429-54a4-811a-42e7056b20ee:engineered/metal:engineered-metal
 e51f86a9-5e66-59e6-a6ae-cd46b6d37b03:environmental/sand:environmental-sand
