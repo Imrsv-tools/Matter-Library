@@ -11,10 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase15 — Matter, Character and HDRI — IN EXECUTION, lane build; Character's folder is `materials/character/humanoid/<part>/` (RD-P15-8) *(discovery 2026-10-14; added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; **numbered Phase15 the same day, ahead of Scale Grids:** *"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6; the library's half, with the site's and the platform's asked through the ledger)*
-**Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
-- `docs/Planning/Phases/Phase15_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
-
 ### Phase16 — Every Entry Says What It Is — BRIEF READY, executes after Phase15 *(discovery opened 2026-10-14, "/discovery P16"; added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file; numbered Phase16 the same day, RD-DS-6)*
 **Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
 - `docs/Planning/Phases/Phase16_EveryEntrySaysWhatItIs.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
@@ -187,3 +183,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
 - `docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`
 *Closed 2026-10-14 on the library side: all 59 of Poly Haven's Pure Skies, credited, named by file and served; the app's side is the platform's HDRI phase (M10).*
+
+### Phase15 — Matter, Character and HDRI — COMPLETE
+**Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
+- `docs/Planning/Phases/Complete/Phase15_MatterCharacterHdri.md`
+*Closed 2026-10-14 on the library side: the groups in each file, the dev catalog and `matterlib-0.2.0-dev.4`; each consumer's browse is its own phase (P25, P27).*

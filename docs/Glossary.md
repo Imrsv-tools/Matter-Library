@@ -28,7 +28,7 @@
 
 | Term | Definition |
 |---|---|
-| **Domain** | The top taxonomy level (natural · engineered · synthetic · environmental · utility). Carried in the folder path only, never in a filename. → `docs/specs/Ontology/Taxonomy.md` |
+| **Domain** | The top level of Matter's taxonomy (natural · engineered · synthetic · environmental · utility · biological; `biological` added 2026-09-27). Character and HDRIs are groups with taxonomies of their own (**Group**). Carried in the folder path only, never in a filename. → `docs/specs/Ontology/Taxonomy.md` |
 | **Class** | The second taxonomy level inside a Domain (stone, metal, glass, …; 20 defined, `ceramic` added 2026-09-23; added as the matter needs them). Folder-only. → `docs/specs/Ontology/Taxonomy.md` |
 | **Group** | One of the three kinds of entry the library holds, each browsed by its own taxonomy: **Matter** (by Domain, then Class), **Character** (by species, then part) and **HDRIs** (by *when*, then *sky*). The lead's word is *concept*; the library's is *group*. A material's group is in its own file (`imrsv_metadata`; none means Matter), never worked out from its domain. Not the website's Dig *group* (one result and one count). *(2026-10-14, Phase15.)* → `docs/specs/Ontology/Taxonomy.md` §Character, `docs/specs/Contract/SiteFile.md` §Groups |
 | **Character material** | A material made for a character's body (skin, eyes, hair, nails, teeth, mouth): the **Character** group, browsed by species, then part, under `materials/character/<species>/<part>/`, and shown in a human context, never on the rig's cubes. A generic biological material (a generic skin pattern) is Matter. *(2026-10-14, Phase15; the lead, RD-DS-1, RD-DS-4.)* → `docs/specs/Ontology/Taxonomy.md` §Character |

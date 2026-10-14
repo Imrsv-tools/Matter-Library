@@ -1,6 +1,6 @@
 # Phase16 — Every Entry Says What It Is
 
-**Status:** BRIEF READY (2026-10-14), **no lead call open** (both answered 2026-10-14), **executes after Phase15** (RD-DS-5). Opened by the lead's `/discovery P16` the evening it was numbered (*"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6), while Phase15's own discovery ran in parallel. Seeded by `/research` on *"yes record it and seed all three"*. It comes after *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Phase15_MatterCharacterHdri.md)), whose structure it fills, and before The Library Service ([`Phase17_LibraryService.md`](Phase17_LibraryService.md); RD-DS-7).
+**Status:** BRIEF READY (2026-10-14), **no lead call open** (both answered 2026-10-14), **executes after Phase15** (RD-DS-5). Opened by the lead's `/discovery P16` the evening it was numbered (*"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6), while Phase15's own discovery ran in parallel. Seeded by `/research` on *"yes record it and seed all three"*. It comes after *Matter, Character and HDRI* ([`Phase15_MatterCharacterHdri.md`](Complete/Phase15_MatterCharacterHdri.md)), whose structure it fills, and before The Library Service ([`Phase17_LibraryService.md`](Phase17_LibraryService.md); RD-DS-7).
 
 ## Outcome
 
