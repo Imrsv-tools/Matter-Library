@@ -10,8 +10,10 @@ is no lockfile, no freeze, no approval and no version bump. Re-run it after addi
 What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
   * ``releases/matterlib-dev/materials`` and ``textures`` -> symlinks into this checkout, so a
     re-assembled article or a regenerated texture is live with no re-serve;
-  * ``releases/matterlib-dev/hdris`` -> a symlink into this checkout's ``MatterLibrary/hdris/``
-    (Phase14), and ``releases/matterlib-dev/thumbnails/hdris/`` -> a 1024 x 512 JPEG made from
+  * ``releases/matterlib-dev/hdris/`` -> a stamped copy of each HDRI in this checkout's
+    ``MatterLibrary/hdris/``: its facts in its header, its pixels the checkout's bytes (Phase16,
+    RD-P16-12; a symlink into the checkout until then), remade only when stale; and
+    ``releases/matterlib-dev/thumbnails/hdris/`` -> a 1024 x 512 JPEG made from
     each HDRI, here in the runtime and never in the checkout (Q-P14-3);
   * ``releases/matterlib-dev/matterlib-dev.catalog.json`` -> projected from the working tree
     (every ``.mtlx``; ``status`` from its recipe, else ``draft``; plus each article's own
@@ -80,6 +82,9 @@ def working_tree_catalog() -> dict:
                      display_name=art["display_name"])
         if art["group"] == "character":
             entry.update(species=art["species"], part=art["part"])
+        # Phase16 (RD-P16-11, RD-DS-2): who gave it and its licence, read from the FILE; a field
+        # the file does not declare is left out (not known yet, RD-WS-1).
+        entry.update({k: art[k] for k in ("contributor", "licence") if art[k]})
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)
@@ -101,13 +106,42 @@ def working_tree_hdris() -> tuple[list[dict], str | None]:
     for h in listed:
         entry = derive_hdri_entry({"id": h["id"], "version": h["version"],
                                    "status": h["record"].get("status") or "draft"})
-        # Phase15 (RD-P15-4): the group, its two axes, and the record's whole tagging (the
-        # platform's ask A10), read from the HDRI's record; into the .hdr header at Phase16.
-        entry.update(group=G.HDRIS, **G.hdri_taxonomy(h["record"]))
+        # Phase15 (RD-P15-4): the group and its two axes; Phase16 (RD-P16-2, RD-P16-8): its
+        # licence, contributor and full credit. All from H.facts, the same facts the served
+        # copy's header is stamped with, so the two cannot disagree. Plus the record's whole
+        # tagging (the platform's ask A10).
+        f = H.facts(h)
+        entry.update({k: f[k] for k in ("group", "when", "sky", "licence", "contributor", "credit")
+                      if k in f})
         if h["record"].get("tagging"):
             entry["tagging"] = h["record"]["tagging"]
         entries.append(entry)
     return entries, H.default(listed)
+
+
+def stamp_hdris(dev: Path) -> int:
+    """Phase16 (RD-P16-12): the dev install serves a stamped copy of each HDRI, in place of
+    Phase14's link into the checkout, so the repo keeps Poly Haven's bytes. Each copy is remade
+    only when stale (H.stamp_stale); one the checkout no longer holds is removed. The first time,
+    the copies are built beside the link and swapped in, so a reader never finds the folder empty.
+    Returns how many were (re)stamped."""
+    out = dev / "hdris"
+    build = dev / "hdris.stamping" if out.is_symlink() else out
+    build.mkdir(exist_ok=True)
+    want, made = set(), 0
+    for h in H.on_disk():
+        f, dst = H.facts(h), build / h["path"].name
+        want.add(dst.name)
+        if H.stamp_stale(h["path"], dst, f):
+            H.stamp(h["path"], dst, f)
+            made += 1
+    for p in build.iterdir():
+        if p.is_file() and p.name not in want:
+            p.unlink()
+    if build != out:
+        out.unlink()                  # the link only: never what it points at
+        build.rename(out)
+    return made
 
 
 def make_thumbnails(dev: Path, entries: list[dict]) -> int:
@@ -229,9 +263,10 @@ def main(argv=None) -> int:
         link(dev / "textures", SOURCE / "textures")
         catalog = working_tree_catalog()
         if catalog.get("hdris"):
-            link(dev / "hdris", H.HDRIS)
+            stamped = stamp_hdris(dev)
             made = make_thumbnails(dev, catalog["hdris"])
             print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
+                  f"{stamped} stamped in {dev / 'hdris'}; "
                   f"{made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
         write_atomic(dev / f"{DEV}.catalog.json",
                      json.dumps(catalog, indent=2, sort_keys=True) + "\n")

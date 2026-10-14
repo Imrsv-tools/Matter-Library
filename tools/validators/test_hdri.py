@@ -112,5 +112,78 @@ with tempfile.TemporaryDirectory() as tmp:
     except ValueError as exc:
         check("lists HDRIs" in str(exc), "freezing a release that lists HDRIs is refused, for that reason")
 
+# ---------------------------------------------------------------- Phase16 16.2: the stamp
+import hdris as H  # noqa: E402
+import serve_to_stage as sts  # noqa: E402
+
+print("== the facts (Phase16, RD-P16-2) ==")
+record = {
+    "status": "candidate",
+    "provenance": {"license": "CC0-1.0"},
+    "credit": {"source": "Poly Haven", "source_url": "https://polyhaven.com", "asset_id": "x",
+               "asset_url": "https://polyhaven.com/a/x", "name": "Ünïcode Sky (Pure Sky)",
+               "authors": [{"name": "A Person", "role": "Original"}, {"name": "B", "role": "Sky edits"}],
+               "sponsors": [{"id": "1", "name": "S", "url": "https://s.example"}],
+               "info": "Edited sky-only version of [Snow Field 2](https://polyhaven.com/a/snow_field_2)."},
+    "tagging": {"categories": ["midday"], "attributes": {"weather": "clear"}},
+}
+row = {"id": "Test_PureSky", "version": "v01", "record": record}
+f = H.facts(row)
+check(f["contributor"] == "MatterBot" and f["licence"] == "CC0-1.0" and f["name"] == "Ünïcode Sky (Pure Sky)",
+      "an HDRI's contributor is MatterBot, its licence and name come from its record")
+check(f["credit"]["edited_from_name"] == "Snow Field 2"
+      and f["credit"]["edited_from_url"] == "https://polyhaven.com/a/snow_field_2"
+      and f["credit"]["edited_from"].startswith("Edited sky-only"),
+      "edited_from is published as a name and an address beside the Markdown line (RD-P16-3)")
+check("asset_id" not in f["credit"], "the credit keeps the site file's shape (A9): no asset_id")
+check(f["group"] == "hdris" and f["when"] == "midday" and f["sky"] == "clear",
+      "the facts carry Phase15's group, when and sky")
+check(H.facts({**row, "record": {**record, "contributor": "someone"}})["contributor"] == "someone",
+      "a record naming its own contributor wins over MatterBot")
+check("licence" not in H.facts({**row, "record": {k: v for k, v in record.items() if k != "provenance"}}),
+      "a record with no licence publishes none (an absent field means not known yet)")
+
+print("== the stamp (Phase16, RD-P16-12) ==")
+with tempfile.TemporaryDirectory() as tmp:
+    src, dst = Path(tmp) / "Test_PureSky_v01.hdr", Path(tmp) / "served" / "Test_PureSky_v01.hdr"
+    pixels = bytes(range(256)) * 64
+    src.write_bytes(header() + pixels)
+    before = src.read_bytes()
+    H.stamp(src, dst, f)
+    want = {**f, "credit": {k: v for k, v in f["credit"].items() if k != "edited_from"}}
+    check(H.read_stamp(dst) == want, "a stamped header reads back as the facts")
+    check(src.read_bytes() == before, "the source is untouched (the repo keeps its bytes)")
+    out = dst.read_bytes()
+    check(out.split(b"\n\n", 1)[1] == before.split(b"\n\n", 1)[1],
+          "everything after the header is the source's own bytes")
+    check(out.startswith(b"#?RADIANCE\nFORMAT=32-bit_rle_rgbe\nEXPOSURE=1.0\nMATTER_ID=Test_PureSky\n"),
+          "the source's header lines come first, the MATTER_ lines after them")
+    check(out.count(b"MATTER_CREDIT_AUTHOR=") == 2 and b"MATTER_CREDIT_SPONSOR=" in out,
+          "a fact with several values repeats its key")
+    check(vm.check_hdri(dst) == vm.check_hdri(src),
+          "the stamped copy passes the HDRI check exactly as its source does")
+    check(not H.stamp_stale(src, dst, f), "a fresh stamp is not stale")
+    again = Path(tmp) / "again.hdr"
+    H.stamp(dst, again, f)
+    check(again.read_bytes() == out, "stamping a stamped file replaces its MATTER_ lines (idempotent)")
+    renamed = {**f, "name": "Another Name"}
+    check(H.stamp_stale(src, dst, renamed), "a changed record makes the stamp stale, with no clock")
+    try:
+        H.stamp(src, dst, {**f, "name": "two\nlines"})
+        check(False, "a value with a line break is refused")
+    except ValueError as exc:
+        check("line break" in str(exc), "a value with a line break is refused, for that reason")
+
+print("== the catalog and the header agree, on the tree ==")
+entries, _ = sts.working_tree_hdris()
+facts = {h["id"]: H.facts(h) for h in H.on_disk()}
+agree = [e["id"] for e in entries
+         if all(e.get(k) == facts[e["id"]].get(k)
+                for k in ("group", "when", "sky", "licence", "contributor", "credit"))]
+check(entries and len(agree) == len(entries) == len(facts),
+      f"every served HDRI entry carries its facts ({len(agree)} of {len(entries)})")
+check(all(e.get("contributor") and e.get("licence") and e.get("credit") for e in entries),
+      "every served HDRI entry has a contributor, a licence and a credit")
+
 print("RESULT:", "ALL PASS" if not fails else f"{len(fails)} FAIL")
 sys.exit(1 if fails else 0)
