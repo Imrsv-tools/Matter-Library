@@ -164,6 +164,66 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 - **F-RO-16 — The server shrinks to a small always-on machine with no GPU:** the checks above, the console, the dev catalog and the thumbnail folder. **It runs no agent session and no contributor code** (F-RO-10's two exclusions), which makes it a plain web app. That reopens the web server as a candidate host, or a small cloud server of its own beside it.
 - **F-RO-17 — It grows into (a) without throwing anything away.** Shape (d) builds the pinned kit, the evidence records, the checks and the console. If library-wide sweeps outgrow personal machines and hourly hire, a GPU machine can join later and run the same kit. That decision then rests on measured hours, not on a guess.
 
+## Pass 5 — One package per material, tested on upload (2026-10-14)
+
+**The lead, verbatim:** *"No...I see.. that is jenky... I was hoping our repo could explain how to have everything packaged up, they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web) but if they need to upload the material, and then texctures, and then another for the thumbnail... this is too messy... Phase 11 close is underway."*
+
+**The precedent he names:** the platform's web side takes a published composition as **one upload**. It checks the upload in a fresh sandbox per upload, and a refusal names the rule it broke. An accepted upload becomes an unchangeable version with a fingerprint. The web side's own docs were read, read-only, on 2026-10-14; no detail of theirs is copied here.
+
+- **F-RO-18 — Pass 4's shape (d) split the submission across three places:**
+  - the article into git;
+  - the pictures to a folder;
+  - the evidence checked against both.
+
+  The lead rejects it for that (RD-RO-1). What remains of Pass 4 is the check on upload (F-RO-14), which carries over.
+- **F-RO-19 — The shape the lead describes:**
+  - **One file per material: the material package.** It holds everything:
+    - the recipe, the `.mtlx` and its textures;
+    - provenance and the licence;
+    - the words (label, summary, search words).
+
+    One command in this repo makes it, and `CONTRIBUTING.md` explains how.
+  - **One upload,** to the library service.
+  - **The check on upload,** in a fresh sandbox per upload, as the web side does:
+    - the one-command gate;
+    - the package's completeness;
+    - a refusal names its rule.
+  - **Parsed on our side.** The service puts the article into git (a branch the review reads), the pictures into the thumbnail folder, and the words into the site file's source. **The contributor never sees the split.**
+- **F-RO-20 — Who makes the pictures is now the only open part, and "test on upload" points to the service:**
+  - **Contributor's evidence in the package** (Pass 4). It needs no GPU on our side. It brings back every cost F-RO-15 named: the contributor needs a Linux GPU machine and the full kit; the library-wide re-runs have no home; and nothing re-checks a picture.
+  - **The service renders on upload** (shape (a)): the rig in all three tools, then the thumbnails. The package carries the material only. **Anyone can contribute without a GPU or the toolchain.** One machine makes every picture, so the library looks consistent, and that same machine re-runs the library when a master changes.
+
+  **Recommendation: the service renders** (shape (a) with the package door). It is what *"we test on upload"* means once the test includes the pictures, and the lead already leaned (a).
+- **F-RO-21 — The package carries data, not code.** A contributor's generator *script* is code (F-MP-28). The package carries its output, the textures, and names the script as provenance. Running contributed code stays *Contribution Path*'s question.
+- **F-RO-22 — The batch loop submits through the same door.** `/matter-batch` on the laptop becomes one more contributor: it makes a package and uploads it. **One path in, for the library's own work and for outsiders.** The laptop stops being where the pictures are made.
+- **F-RO-23 — Where this sits on the Roadmap:**
+  - **The door is the library service's first outcome:** a material package uploaded, tested and pictured, waiting for review.
+  - ***Contribution Path* keeps what is specific to outsiders:** accounts, contributed scripts, and maintainers-only releases.
+  - The stub *The Library Service* is updated by the quick fix that lands the lead's cut. Research does not edit a stub.
+
+### The order, redrawn (unnumbered; one after the other, for the lead to check)
+
+*Phase11's close is underway in another session, so it is not listed.*
+
+- **HDRIs in the Library:** a scene's HDRI is chosen from the library by name.
+- **Scale Grids:** swap every object to its scale grid and see at once whether a metre is a metre.
+- **Two Licences:** a material is CC0 or CC BY, and is credited wherever it is used.
+- **Materials Described:** every material has a readable name, a one-line description and search words.
+- **The Library Service:** a contributor uploads one material package, and it comes back tested in all three tools, waiting for review. *Its spec is defined beside the four above; the build starts when the server is rented.*
+- **Thumbnails:** every material is shown at its best, on a subject that suits it.
+- **Skin Maps:** a character's skin varies across the body, as real skin does.
+- **The Library Console:** the team reviews, keeps or sends back, and picks what goes into each version, on one page.
+- **Release Bundle:** anyone downloads one verified release and uses it without this repo.
+- **Version Management:** the next release is cut from the last, and every old one stays reproducible.
+- **Blender from a Release:** a Blender user installs the add-on and the library from a release.
+- **Unreal Reference Masters:** Studio, or any Unreal user, renders library materials with the masters from a release.
+- **Contribution Path:** an outsider submits a package and gets a verdict; only maintainers release.
+
+**The platform's, kept as consumer outcomes:** *IMRSV Consumes Releases* · *See the Library*.
+**Held:**
+- *Hair That Reads as Hair*: research, after the Skin Maps survey.
+- *Author a Material End to End* and *Parity Baselines*: `Reevaluate (2026-10-14)` (F-RO-6).
+
 ---
 
 ## Open questions
@@ -174,27 +234,35 @@ A **Wave** (the method's word for coupled phases) was considered for the service
 | Q-RO-2 | **When does the Release Bundle start?** Its L1 ruling (2026-09-25) is the lead's *"b"*, choosing the option that reads *"Re-sequence. Library Coverage becomes P4 (the ~200 materials) … The bundle waits for a library worth versioning."* The same day: *"we have 200 materials to build and test before we have our first versionable library"*. RD-MP-13 has since made material work a standing process with no end. So what marks *"worth versioning"* now: a count of kept materials, or the console existing to cut one? | **After the console, at a count the lead names when it reaches the head of the list.** Not blocking today. |
 | Q-RO-3 | **The four overlapping older entries** (F-RO-6): keep them as they are, or annotate them? | **Annotate, never delete:** *See the Library* and *IMRSV Consumes Releases* marked as consumer outcomes; *Author a Material End to End* and *Parity Baselines* marked `Reevaluate (2026-10-14)`, with a pointer to what overlaps them. |
 | Q-RO-4 | **One Roadmap line for the standing material-making process**, so the Roadmap does not read as if material work stopped when Phase11 closes (F-RO-7)? | **Yes:** one line under `## Active`, *"Material-making: a standing process, not a phase"*, pointing at `library/wishlist.yaml` and the batch summaries. |
-| Q-RO-5 | **Where the library service runs** (F-RO-11, F-RO-16): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, (c) the light half on the web server and a GPU hired by the hour, or **(d) the GPU work on each contributor's machine, sent as a ready package, with a small server that has no GPU and checks the evidence** (Pass 4, the lead's idea)? | **(d) to start, with (a) as its later step** (F-RO-17). It costs no GPU rental while the lead is the only contributor, and it is how the laptop already works. Its weak point is library-wide re-runs after a master changes (F-RO-15). Measuring those hours is what decides whether (a) is ever needed. *(Was (a), before Pass 4.)* The lead leans (a); the choice is his. |
+| Q-RO-5 | **Where the library service runs** (F-RO-11, F-RO-16): (a) one new GPU machine for everything, (b) the light half on the web server and a GPU machine for the rest, (c) the light half on the web server and a GPU hired by the hour, or **(d) the GPU work on each contributor's machine, sent as a ready package, with a small server that has no GPU and checks the evidence** (Pass 4, the lead's idea)? | **(a), with the one-package door (RD-RO-1, F-RO-20):** the service renders the rig and the thumbnails on upload. *(Pass 4 recommended (d); the lead rejected its split submission in Pass 5. A package carrying the contributor's own pictures is still possible, but it brings back Pass 4's costs.)* |
 
 ## Resolved
 
-*(none yet: the cut is the lead's)*
+- **RD-RO-1 — A material is submitted as one package, in one upload, tested on upload and taken apart on the library's side. The contributor never uploads the material, its textures and its pictures separately.** (The lead, 2026-10-14: *"they submit one entry per material, then we test on upload and parse as needed (like we do with compositions on web)… this is too messy"*.) This rules out Pass 4's split submission. Who makes the pictures is Q-RO-5.
 
 ## Status
 
-- **Passes captured:** 4 (2026-10-14). Pass 1 is the audit, Pass 2 the draft order, Pass 3 where the library service runs, Pass 4 the contributor-side shape (d).
-- **Current direction:**
-  - close Phase11;
-  - then the five laptop phases, HDRIs first because the platform is waiting;
-  - **beside them, the service's discovery:** the server's spec, its price and its setup recipe. The lead proposed this (F-RO-12);
-  - then the server-bound three;
+- **Passes captured:** 5 (2026-10-14):
+  - Pass 1, the audit;
+  - Pass 2, the draft order;
+  - Pass 3, where the library service runs;
+  - Pass 4, the contributor-side shape (d);
+  - Pass 5, one package per material, with the order redrawn.
+- **Ruled:** RD-RO-1. A material is submitted as one package in one upload, tested on upload and taken apart on our side. Pass 4's split submission is out.
+- **Phase11's close is underway** in another session (the lead, 2026-10-14).
+- **Current direction:** Pass 5's redrawn order:
+  - the four laptop phases (HDRIs, Scale Grids, Two Licences, Materials Described);
+  - beside them, the library service's spec (F-RO-12);
+  - then the service, whose first outcome is the package door (F-RO-23);
+  - then Thumbnails, Skin Maps and the console;
   - then the first real release and its consumers.
-- **The web server cannot host the service's GPU half** (F-RO-10). **But the service may not need a GPU:** in shape (d), contributors' machines do the GPU work, as the laptop does today, and a small server with no GPU checks the evidence (Pass 4). (d) to start and (a) later is the recommendation; the lead leans (a) (Q-RO-5). **Under (d), Pass 2's "on the server" group loosens:** Thumbnails and the skin-map probe run on a contributor's machine, so they no longer wait for a server, and only the console needs one (a small one). RD-MP-10 paused the thumbnail probe *"until the permanent machine exists"*. Under (d) that pause would be the lead's to lift.
+- **The recommendation is (a): the service renders on upload** (F-RO-20). The web server cannot host the GPU half (F-RO-10), and the lead leans (a). Pass 4's (d) and its loosened order are superseded by RD-RO-1, kept as the record.
 - **Open:**
-  - Q-RO-1 (the cut and the numbers) is the one that changes what happens next.
-  - Q-RO-5 (where the service runs) changes the service's scope, not the order.
+  - Q-RO-1: the lead checks Pass 5's order (*"Not numbered just one after the other with SHORT outcome so I can verify this makes sense"*), then cuts it and names any numbers.
+  - Q-RO-5: who makes the pictures. The recommendation is (a), the service.
   - Q-RO-2 to Q-RO-4 each carry a recommendation and block nothing.
 - **Next step:** the lead cuts the order and names the numbers. The ruling lands in `## Resolved` first. Then, as a lead-directed `/quick-fix`, the change goes onto the Roadmap:
   - reorder `## Future`;
   - rename each numbered stub from `PhaseTBD_<Name>` to `Phase<NN>_<Name>` and fix its pointers (F-RO-8);
-  - set its status line.
+  - set its status line;
+  - carry RD-RO-1 and the package door into *The Library Service*'s stub, and the outsider-only scope into *Contribution Path*'s pointer (F-RO-23).
