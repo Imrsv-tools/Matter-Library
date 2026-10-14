@@ -326,6 +326,30 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   - **Its first tests,** as the lead said: the thumbnail probe and the review (F-MP-39 (c)).
 - **F-MP-43 — The thumbnail probe is paused** until the permanent machine exists, and becomes one of its first tests (RD-MP-10).
 
+## Pass 10 — Phase11's remainder, and making material-making a process rather than a phase (2026-10-14)
+
+**The lead, verbatim:** *"OHHHH... indeed phase 11 was taking a LONG time, how much more is left for it? we may want to break this up into phases differently or even have a material geneartion process different that the pahses for building the infra and tooling for the matter library... I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*.
+
+- **F-MP-44 — What is left of Phase11** (its Step list, measured against the wish list, 2026-10-14):
+
+  | Step | State |
+  |---|---|
+  | 11.1, 11.2, 11.3 | **Done:** the list, the helper, the batch skill, 26 built rows and 4 re-judges, 7 new wear layers. |
+  | **11.4, the refine pass** | Owed. All 30 proving rows re-read and fixed, up to 3 rig runs each. At the measured 7–22 minutes of rig time per row, that is **about 4 to 11 hours of the laptop's GPU**. |
+  | **The end review** | Owed: about 35 rows, one picture per batch. |
+  | **Close** | The Blender library rebuilt once, docs conformed. |
+
+  **The 174 queued rows were never Phase11's steps.** Its Brief puts them under *"After the proof (the loop's work, not a step of this phase)"*. Phase11's Outcome already says the library fills *"without a phase per batch"*. So the remainder is small in steps but heavy in rig time, and the long tail was always meant to be a process.
+- **F-MP-45 — The lead's split already matches the design; it only needs saying out loud:**
+  - **Tooling phases:** the library service, thumbnails, the console, the release bundle, version management, skin maps. Each is built once.
+  - **Material-making:** a **standing process**, the loop (`/matter-batch` over `library/wishlist.yaml`). It runs batches whenever there is a machine and time, and records itself in its batch summaries. **It is never a phase.**
+- **F-MP-46 — The quickest honest close for Phase11:**
+  1. Review by verdict (Q-MP-8 (b)): rows whose three tools moved alike are kept at once; the lead looks at the flagged ones.
+  2. **Move 11.4's refine pass into the loop** as ordinary redo rows, each carrying its fault, so it runs as batches on the permanent machine rather than as a phase step on the laptop.
+  3. Close: rebuild the Blender library, conform the docs.
+
+  That closes the proof without spending a day of the laptop's GPU. It is the lead's call, and it is made in Phase11's doc, not here.
+
 ## Resolved
 
 - **RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0** (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
@@ -336,7 +360,8 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **RD-MP-6 — Thumbnails never go in git or LFS.** Before a release they sit in a folder on this machine that git ignores, served to the site's staging; at a release they are release assets. (Q-MP-7.)
 - **RD-MP-7 — The management front end is for the IMRSV team: to view and evaluate materials, decide what goes into which library version, and keep their provenance.** The Creator's side lives in each consumer. (Q-MP-4; where the console runs is Q-MP-9.)
 - **RD-MP-8 — A new article is CC0-1.0 by default** (the lead, 2026-10-14: *"CC0 is fine"*). CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article (RD-MP-1). (Q-MP-10.)
-- **RD-MP-9 — The "no body skin map" rule is not taken. The direction is to plan a move to skin maps** (the lead, 2026-10-14: *"I think we need to plan to move to SkinMaps"*), researched in `261014_R_SkinMaps.md`. The rulings it reopens are quoted there (MAP-RD2, MAP-RD5). (Q-MP-6.)
+- **RD-MP-9 — The "no body skin map" rule is not taken. The direction is to plan a move to skin maps** (the lead, 2026-10-14: *"I think we need to plan to move to SkinMaps"*), researched in `261014_R_SkinMaps.md`. ~~The rulings it reopens are quoted there (MAP-RD2, MAP-RD5).~~ *(Corrected the same day: it reopens neither MAP-RD2 nor CM2. MAP-RD2 locks the mesh, not the pictures, so a skin map for the approved mesh is allowed, `261014_R_SkinMaps.md` RD-SKM-1. Only MAP-RD5's "skin stays general" is superseded.)* (Q-MP-6.)
+- **RD-MP-11 — The library gets a permanent home of its own: an independent library service, with its code in this repo, run by IMRSV on a GPU host; the platform consumes what it publishes** (the lead, 2026-10-14: *"I like your reccomendation for the library home... I guess that is ALSO a new pahse to seed"*). F-MP-42 is its shape; the host is still open. Seeded as `PhaseTBD_LibraryService.md`. (Q-MP-11.)
 - **RD-MP-10 — The thumbnail probe waits for the library's permanent machine, and is one of its first tests** (the lead, 2026-10-14: *"lets pause on that … we might want to consdier if this moved to something more perminante with the this as one of the firsts tests"*).
 
 ## Open questions
@@ -351,14 +376,17 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 | ~~Q-MP-6~~ | ~~A rule that the library holds no body skin map?~~ | → RD-MP-9 (not taken; skin maps instead) |
 | ~~Q-MP-7~~ | ~~Where thumbnails live before a release?~~ | → RD-MP-6 |
 | Q-MP-8 *(reframed 2026-10-14, F-MP-39)* | **How is the owed review done:** (a) the end review in one sitting, (b) keep by verdict and look only at the flagged rows, or (c) as the first job of the team's console on the permanent machine? | **(b) now:** it clears the backlog in minutes, and the console inherits a library with kept articles to curate. (c) if the lead would rather the console's first test be a real review. |
-| Q-MP-11 *(new, F-MP-40 to F-MP-42)* | **Where the library service runs:** a cloud GPU instance on demand, a dedicated machine, or a GPU worker on the platform's infrastructure? And is it **independent** (code here, run by IMRSV) or **part of the platform's web side**? | **Independent, code in this repo, run by IMRSV**, on a GPU host; the platform consumes what it publishes. The host is a cost and ops call, starting from whether the Linux GPU machine used for the Unreal work is free. |
+| Q-MP-12 *(new, F-MP-44 to F-MP-46)* | **Close Phase11 now** (review by verdict, 11.4's refine pass moved into the loop as redo rows, then the close), and run material-making as a standing process outside the phase line? | **Yes.** The proof is done in steps; what is left is rig time that belongs on the permanent machine. |
+| ~~Q-MP-11~~ → RD-MP-11 *(the host is still open: in the Library Service's discovery)* | **Where the library service runs:** a cloud GPU instance on demand, a dedicated machine, or a GPU worker on the platform's infrastructure? And is it **independent** (code here, run by IMRSV) or **part of the platform's web side**? | **Independent, code in this repo, run by IMRSV**, on a GPU host; the platform consumes what it publishes. The host is a cost and ops call, starting from whether the Linux GPU machine used for the Unreal work is free. |
 | ~~Q-MP-9~~ *(superseded by Q-MP-11, 2026-10-14: the "library machine" is a laptop, so where the console runs is part of where the service runs)* | **Where does the team's console run?** (a) A small web app **in this repo**, served from the library machine (where the rig, renders and thumbnails already are) and reachable by the team over its private network. It writes through the existing tools and commits to git. (b) **The platform's web back office**, which already has staff accounts and hosting, writing changes to this repo as pull requests. | **(a).** It keeps the library able to outlive IMRSV (RD-WS-1, condition 3), and anyone who forks the library can curate it. The heavy files it shows stay on the machine that makes them. Approvals stay the maintainer's act either way (`promote_release.py`). |
 | ~~Q-MP-10~~ → RD-MP-8 | **The default licence for a new article** (RD-MP-1), and who chooses? | **CC0-1.0 by default.** All 95 on disk are CC0-dedicable, and their sources (ambientCG, Physically Based, our own generators) are CC0. CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article. |
 
 ## Status
 
-- **Passes captured:** 9 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8 and 9 record the lead's answers.
-- **Ruled:** RD-MP-1 to RD-MP-10.
+- **Passes captured:** 10 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8–10 record the lead's answers.
+- **Ruled:** RD-MP-1 to RD-MP-11.
+  - **The library gets its own permanent service** (RD-MP-11), seeded as `PhaseTBD_LibraryService.md`.
+  - **Skin maps reopen no earlier ruling** (RD-MP-9 as corrected; `261014_R_SkinMaps.md` RD-SKM-1).
   - **CC BY 4.0 is allowed beside CC0** (which amends R13), and **CC0 is the default**.
   - Cycles makes the hero thumbnail, on a subject chosen per Class, before the review; it is called a thumbnail; it is never stored in git.
   - The management front end is the IMRSV team's console for curating versions.
@@ -369,7 +397,9 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   - The review is still owed (F-MP-39).
 - **Open:**
   - Q-MP-8 (how the owed review is done);
-  - Q-MP-11 (where the library service runs, and whether it is independent).
+  - Q-MP-12 (close Phase11 now, and make material-making a standing process).
+
+  The service's host is open in its own seed.
 - **Durable docs owed, and the verb that lands them:**
   - **RD-MP-1 and RD-MP-8's consequences (F-MP-36):** the licence field, the attribution list, the validator, `CONTRIBUTING.md`, `LICENSE-CONTENT.md`, `_Architecture.md` §Governance, the Glossary and `Experience_MatterLibrary.md`. A lead-directed `/quick-fix` for the words, or the phase that first ships a CC BY article for the field and the validator.
   - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them.
@@ -379,6 +409,6 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   - the bundle's size at 200 articles;
   - the platform's web server having no GPU (its docs record none).
 - **Next step:**
-  - the lead's answers to Q-MP-8 and Q-MP-11;
-  - if the service is the direction, a seed for it as a phase (*the Library Service*), whose first tests are the thumbnail probe and the review;
-  - seeds for *Thumbnails* and *the team's console* after it.
+  - the lead's answers to Q-MP-8 and Q-MP-12;
+  - `/discovery` on *the Library Service* when the lead opens it;
+  - seeds for *Thumbnails* and *the team's console* after it, both of which run on the service.

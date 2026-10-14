@@ -30,7 +30,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Skin That Reads as Skin — RESEARCH *(seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; reopens MAP-RD2 and MAP-RD5, quoted in the research)*
+### Skin That Reads as Skin — RESEARCH *(seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1)*
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal.
 - `docs/Planning/Research/261014_R_SkinMaps.md` · `docs/Planning/Research/260929_R_CharacterMaps.md` (Passes 2–4)
 
@@ -77,6 +77,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Scale Grids — SEEDED *(added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
 - `docs/Planning/Phases/Future/PhaseTBD_ScaleGrids.md`
+
+### The Library Service — SEEDED *(added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; its place in the order is the lead's; *Thumbnails* and the team's console build on it)*
+**Outcome:** the library's work (the test rig, the build loop, thumbnails, the dev catalog the site's staging reads) runs on a permanent machine instead of the lead's laptop, and the IMRSV team reaches it from wherever they are.
+- `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
