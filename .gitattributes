@@ -1,3 +1,5 @@
 # Git LFS — texture binaries (Phase 53; first real textures land here).
 # All files under the texture tree are stored via LFS, referenced by many materials.
 MatterLibrary/textures/** filter=lfs diff=lfs merge=lfs -text
+# HDRIs (Phase14, 2026-10-14): Radiance .hdr files, about 16 MB each.
+MatterLibrary/hdris/** filter=lfs diff=lfs merge=lfs -text

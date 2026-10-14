@@ -10,6 +10,7 @@ The Matter Library is a **community resource**. Its **content** is dedicated to 
 |---|---|---|
 | `MatterLibrary/materials/` | the MaterialX articles (`.mtlx`) | **CC0-1.0** |
 | `MatterLibrary/textures/` | the base, overlay and mask textures | **CC0-1.0** |
+| `MatterLibrary/hdris/` | the HDRIs (`.hdr`), each a scene's lighting picture | **CC0-1.0** |
 | `tools/converters/recipes/` | the per-article recipes the articles are generated from | **CC0-1.0** |
 | `library/releases/` · `library/provenance/` | release manifests, catalogs, freeze/approval records, provenance records — the data a release bundle carries | **CC0-1.0** |
 | `docs/specs/Contract/examples/` | a verbatim copy of a live article, kept as a reference | **CC0-1.0** |
@@ -31,6 +32,8 @@ By contributing content you dedicate it under CC0-1.0 and confirm you have the r
 ## Third-party sources in the content
 
 Some textures are derived from **[ambientCG](https://ambientcg.com)** assets, themselves released under CC0-1.0. Every shipped texture's source and licence is recorded in `library/provenance/`.
+
+The HDRIs come from **[Poly Haven](https://polyhaven.com)**, which publishes them under CC0-1.0. Each one's Poly Haven page, its contributors and their roles are recorded in `library/provenance/sources/hdris/` and credited in [`CREDITS.md`](CREDITS.md).
 
 ---
 

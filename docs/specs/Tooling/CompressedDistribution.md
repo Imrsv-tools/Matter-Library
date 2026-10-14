@@ -33,6 +33,8 @@ colour-space/normal/alpha policy per role; a corrupt/mismatched `.dds` is reject
 lane, RED fixtures in `tools/compressors/fixtures/`). The staging tree is a **gitignored reproducible build artifact** — never committed,
 never written into the authored `MatterLibrary/textures` source tree.
 
+**HDRIs skip the compression step** (2026-10-14, Phase14; `docs/Planning/Research/261013_R_PlatformSkyAsks.md` RD-SKY-4). The table below is low-dynamic-range BCn by texture role, and every consumer reads an HDRI's float file as it is, so an [HDRI](../../Glossary.md) ships as its Radiance `.hdr`.
+
 ## Frozen role → BC-format contract (14 texture roles)
 
 Keyed by role **name**. All roles use full mip chains. `specular` is a scalar (no texture field), so it is explicitly RULED OUT.

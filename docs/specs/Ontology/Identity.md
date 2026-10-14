@@ -86,6 +86,16 @@ Changing what a scale tag *means* is a library semver-**major** change (see [_Ar
 
 The `vNN` in the filename pins the material; the **library release** (a [manifest](../Contract/Manifest.md) semver) pins the whole set for reproducibility. These are **separate axes** — a release manifest pins which `vNN` of each material it includes. See [Manifest](../Contract/Manifest.md) and [Catalog](../Catalog/Catalog.md).
 
+## HDRI names
+
+*(2026-10-14, Phase14; ruled in `docs/Planning/Research/261013_R_PlatformSkyAsks.md` RD-SKY-1 to RD-SKY-3.)* An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Taxonomy](Taxonomy.md)), so the material grammar does not fit it: it has no tile and so no scale tag.
+
+- **Filename:** `<Name>_<Variant>_vNN.hdr`, in `MatterLibrary/hdris/` (one flat folder). PascalCase tokens, e.g. `IndustrialSunset02_PureSky_v01.hdr`.
+- **Id and version:** the id is `<Name>_<Variant>`; `vNN` is the HDRI's own version, following §Two version axes (a changed picture is a new `vNN`). `id` + `version` resolve to the file, as a material's do.
+- **Budget:** the same ≤63 characters of `[A-Za-z0-9_]`, unique within `hdris/`. A material's file cannot clash: the extension and the folder differ.
+- **The file:** Radiance `.hdr` (RGBE), 4096 × 2048, 2:1 latitude-longitude. Any other format or size is refused (`tools/validators/validate_manifest.py` `check_hdri`). The format is part of the name a scene stores, so it is fixed.
+- **A source's own id is not in the name.** It is in the HDRI's provenance record (`library/provenance/sources/hdris/<id>.yaml`).
+
 ## Status
 
 **Solid grammar, corrected for the name budget.** The grammar, defaults, and scale tags are carried unchanged from the library's original design; the ≤63-char / identifier-charset budget is the one hard correction (the original's own 70-char example is over).
