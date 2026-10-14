@@ -37,7 +37,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shutil
 import signal
 import socket
 import subprocess
@@ -51,23 +50,15 @@ SOURCE = REPO / "MatterLibrary"
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 from project_runtime_catalog import (  # noqa: E402
     SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
-import validate_manifest as vm  # noqa: E402  (on sys.path via project_runtime_catalog)
 import working_tree  # noqa: E402
-import yaml  # noqa: E402
+sys.path.insert(0, str(HERE))
+import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
 SELECTOR = "active-release.json"
 BACKUP = "active-release.before-dev.json"
 PORT = 8081
-HDRIS = SOURCE / "hdris"                                                # Phase14
-HDRI_RECORDS = REPO / "library" / "provenance" / "sources" / "hdris"
-HDRI_SETTINGS = REPO / "library" / "hdris.yaml"
-THUMBNAIL = "1024x512"                                                   # 2:1, the HDRI's own shape
-# The tone curve, in linear light, before sRGB: exposure 0.6 into Reinhard (u / (1 + u)), then
-# saturation +35 % and a gentle contrast. A plain conversion clips everything above 1.0 (this sky's
-# sun is 6200) into a white disc; this matches Poly Haven's own preview of the sky (14.1).
-TONE = ["-fx", "(0.6*u)/(1+0.6*u)", "-colorspace", "sRGB", "-modulate", "100,135", "-sigmoidal-contrast", "2,50%"]
 
 
 def working_tree_catalog() -> dict:
@@ -91,42 +82,22 @@ def working_tree_catalog() -> dict:
 
 
 def working_tree_hdris() -> tuple[list[dict], str | None]:
-    """Every HDRI on disk as a catalog entry, and the default (Phase14). A file that fails the
-    HDRI check refuses the serve, as a missing payload does."""
-    files = sorted(p for p in HDRIS.iterdir() if p.is_file()) if HDRIS.is_dir() else []
-    entries = []
-    for hdr in files:
-        errs = vm.check_hdri(hdr)
-        if errs:
-            raise SystemExit(f"cannot serve {hdr.relative_to(REPO)}: {'; '.join(errs)}")
-        hid, version = vm.hdri_id_version(hdr)
-        record = HDRI_RECORDS / f"{hid}.yaml"
-        status = (yaml.safe_load(record.read_text(encoding="utf-8")) or {}).get("status") \
-            if record.is_file() else None
-        entries.append(derive_hdri_entry({"id": hid, "version": version, "status": status or "draft"}))
-    default = (yaml.safe_load(HDRI_SETTINGS.read_text(encoding="utf-8")) or {}).get("default") \
-        if HDRI_SETTINGS.is_file() else None
-    if entries and default not in {e["id"] for e in entries}:
-        raise SystemExit(f"{HDRI_SETTINGS.relative_to(REPO)}: default {default!r} names no HDRI on disk")
-    return entries, default
+    """Every HDRI on disk as a catalog entry, and the default (Phase14; tools/releases/hdris.py).
+    A file that fails the HDRI check refuses the serve, as a missing payload does."""
+    listed = H.on_disk()
+    entries = [derive_hdri_entry({"id": h["id"], "version": h["version"],
+                                  "status": h["record"].get("status") or "draft"}) for h in listed]
+    return entries, H.default(listed)
 
 
 def make_thumbnails(dev: Path, entries: list[dict]) -> int:
-    """A 2:1 JPEG per HDRI in the runtime (never in git: RD-MP-6), remade when the HDRI or this
-    tool (its recipe) is newer than the thumbnail."""
-    magick = shutil.which("magick")
-    if entries and not magick:
-        raise SystemExit("ImageMagick's `magick` is needed to make the HDRI thumbnails")
+    """A 2:1 JPEG per HDRI in the runtime (never in git: RD-MP-6), remade when stale."""
     made = 0
     for e in entries:
         src, dst = SOURCE / e["payload_path"], dev / e["thumbnail_path"]
-        if dst.is_file() and dst.stat().st_mtime >= max(src.stat().st_mtime, Path(__file__).stat().st_mtime):
-            continue
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        tmp = dst.with_name(dst.stem + ".tmp.jpg")
-        subprocess.run([magick, str(src), "-resize", THUMBNAIL + "!", *TONE, "-quality", "88", str(tmp)], check=True)
-        os.replace(tmp, dst)
-        made += 1
+        if H.stale(src, dst):
+            H.thumbnail(src, dst)
+            made += 1
     return made
 
 
@@ -238,7 +209,7 @@ def main(argv=None) -> int:
         link(dev / "textures", SOURCE / "textures")
         catalog = working_tree_catalog()
         if catalog.get("hdris"):
-            link(dev / "hdris", HDRIS)
+            link(dev / "hdris", H.HDRIS)
             made = make_thumbnails(dev, catalog["hdris"])
             print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
                   f"{made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")

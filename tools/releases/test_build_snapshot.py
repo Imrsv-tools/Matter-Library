@@ -88,6 +88,35 @@ print("== section ==")
 check(B.section("engineered") == "matter" and B.section("environmental") == "matter", "a Matter domain is Matter")
 check(B.section("biological") == "character", "biological is a character material, browsed apart (RD-P13-2)")
 
+print("== groups (RD-P14-4) ==")
+check([g["id"] for g in B.GROUPS] == ["matter", "character", "hdris"], "Matter, Character and HDRIs, in browse order")
+check({g["id"]: g["shown"] for g in B.GROUPS} == {"matter": "rig", "character": "human", "hdris": "thumbnail"},
+      "each group says how it is shown: Character never on the rig's cubes (RD-P13-2)")
+check({(g["list"], g.get("section")) for g in B.GROUPS} ==
+      {("materials", "matter"), ("materials", "character"), ("hdris", None)},
+      "Matter and Character are sections of materials; HDRIs are a list of their own")
+
+print("== hdri entry (14.3) ==")
+full = {"id": "IndustrialSunset02_PureSky", "version": "v01", "identity": "IndustrialSunset02_PureSky_v01",
+        "record": {"status": "candidate", "description": "A calm industrial sunset.",
+                   "credit": {"source": "Poly Haven", "asset_url": "https://polyhaven.com/a/x",
+                              "name": "Industrial Sunset 02 (Pure Sky)",
+                              "authors": [{"name": "A", "role": "Original"}], "sponsors": [],
+                              "info": "Edited sky-only version of X."},
+                   "tagging": {"tags": ["pure skies"], "categories": ["outdoor"]}}}
+e = B.hdri_entry(full, "IndustrialSunset02_PureSky_v01__thumbnail.webp", "ab" * 32)
+check(e["label"] == "Industrial Sunset 02 (Pure Sky)", "the label is Poly Haven's own name")
+check(e["credit"]["authors"] == [{"name": "A", "role": "Original"}] and e["credit"]["edited_from"].startswith("Edited"),
+      "the credit carries the contributors with their roles and what it was edited from")
+check("sponsors" not in e["credit"], "an empty sponsor list is left out, not published empty")
+check(e["pictures"] == [{"role": "thumbnail", "file": "IndustrialSunset02_PureSky_v01__thumbnail.webp", "sha256": "ab" * 32}],
+      "one thumbnail picture")
+check("download" not in e, "no download: thumbnails and credit only (RD-P14-4)")
+bare = B.hdri_entry({"id": "Bare_PureSky", "version": "v01", "identity": "Bare_PureSky_v01", "record": {}}, "t.webp", "0" * 64)
+check(bare["status"] == "draft" and bare["label"] == "Bare pure sky"
+      and not {"credit", "description", "tagging", "captured"} & set(bare),
+      "with no record: status draft, a derived label, and nothing invented")
+
 print("== ranges ==")
 check(set(LCD_RANGES) == set(LCD_PORTS), "every Creator port has a range, and no range names a non-port")
 

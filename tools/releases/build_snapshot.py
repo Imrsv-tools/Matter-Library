@@ -15,7 +15,13 @@ release gates glob that folder). It lists every article on disk, as the dev cata
     local paths, Phase13 F-P13-3);
   * ``<identity>.zip``: the article's .mtlx with every texture it uses, references rewritten to
     ``textures/<name>``, so it opens with no search path (the exporter's complete-portable form);
+  * ``<identity>__thumbnail.webp``: each HDRI's 1024 x 512 thumbnail, tone-mapped (Phase14 14.3;
+    the HDRI itself is not published: thumbnails and credit only, RD-P14-4);
   * ``SHA256SUMS``: every file above, in ``sha256sum -c`` form.
+
+The site file also relays what the site shows side by side (``groups``: Matter, Character and
+HDRIs, the list each reads and how each is shown, RD-P14-4) and lists the HDRIs with their full
+credit and tagging (``hdris``, ``default_hdri``).
 
 Real fields only: a field the library does not hold yet (a thumbnail, a summary) is left out,
 never filled in (SiteFile.md §Absent means not known yet).
@@ -49,7 +55,9 @@ sys.path.insert(0, str(REPO / "tools" / "converters"))
 sys.path.insert(0, str(REPO / "tools" / "parity"))
 import working_tree  # noqa: E402
 from lcd_ports import LCD_MIN_EXCLUSIVE, LCD_PORTS, LCD_RANGES  # noqa: E402
-from project_runtime_catalog import derive_entry  # noqa: E402
+from project_runtime_catalog import derive_entry, derive_hdri_entry  # noqa: E402
+sys.path.insert(0, str(HERE))
+import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 
 PARITY = REPO / "library" / "parity"
 SNAPSHOTS = REPO / "library" / "snapshots"
@@ -57,7 +65,7 @@ RECIPES = REPO / "tools" / "converters" / "recipes"
 PILOT_LOCK = REPO / "library" / "releases" / "matterlib-0.1.0.lock.yaml"
 REPO_SLUG = "Imrsv-tools/Matter-Library"
 TAG_RE = re.compile(r"^matterlib-(\d+\.\d+\.\d+-dev\.\d+)$")
-SITE_SCHEMA_VERSION = 1
+SITE_SCHEMA_VERSION = 2              # 1 -> 2 (Phase14 14.3): adds groups[], hdris[] and default_hdri
 LICENCE = "CC0-1.0"                  # every article (RD-RO-2)
 TOOLS = ("storm", "blender", "unreal")
 VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
@@ -67,6 +75,17 @@ DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
 # RD-P13-2 (the lead, 2026-10-14): biological materials are not Matter. They stay browsable, on
 # the side, and are shown in a human context, never on the rig's cubes.
 CHARACTER_DOMAINS = {"biological"}
+# RD-P14-4 (the lead, 2026-10-14): the library relays what sits side by side on the site, and how
+# each is shown, so the site builds its navigation from the library. In browse order:
+#   rig       - on the parity rig's test scene (the cubes);
+#   human     - in a human context (skin on a side face and hands, an eye on an eye), never on
+#               the cubes (RD-P13-2); no picture is published until one exists (Thumbnails);
+#   thumbnail - the HDRI's own 2:1 picture.
+GROUPS = [
+    {"id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "rig"},
+    {"id": "character", "label": "Character", "list": "materials", "section": "character", "shown": "human"},
+    {"id": "hdris", "label": "HDRIs", "list": "hdris", "shown": "thumbnail"},
+]
 
 
 def section(domain: str) -> str:
@@ -140,6 +159,30 @@ def portable(mtlx_text: str, mtlx_dir: Path) -> tuple[str, dict[str, Path]]:
         files[base] = src
         mtlx_text = mtlx_text.replace(f'value="{ref}"', f'value="textures/{base}"')
     return mtlx_text, files
+
+
+def hdri_entry(hdri: dict, thumb: str, thumb_sha: str) -> dict:
+    """One HDRI's site entry: its identity as the runtime catalog has it, Poly Haven's name as its
+    label, and every credit and tag its record holds; one thumbnail; no download (RD-P14-4). A
+    field the record does not hold is left out."""
+    rec = hdri["record"]
+    cat = derive_hdri_entry({"id": hdri["id"], "version": hdri["version"], "status": rec.get("status") or "draft"})
+    c = rec.get("credit") or {}
+    out = {"id": cat["id"], "version": cat["version"], "identity": hdri["identity"],
+           "label": c.get("name") or label(cat["display_name"]), "display_name": cat["display_name"],
+           "status": cat["status"], "creator_selectable": cat["creator_selectable"], "licence": LICENCE,
+           "pictures": [{"role": "thumbnail", "file": thumb, "sha256": thumb_sha}]}
+    if rec.get("description"):
+        out["description"] = rec["description"]
+    credit = {k: c[k] for k in ("source", "source_url", "asset_url", "authors", "sponsors") if c.get(k)}
+    if c.get("info"):
+        credit["edited_from"] = c["info"]
+    if credit:
+        out["credit"] = credit
+    for key in ("tagging", "captured"):
+        if rec.get(key):
+            out[key] = rec[key]
+    return out
 
 
 # ------------------------------------------------------------------ reading the records
@@ -335,10 +378,22 @@ def build(tag: str, out: Path) -> dict:
         assets.append(zname)
         materials.append(rec)
 
+    hdris = []
+    listed = H.on_disk()
+    for h in listed:     # 14.3: thumbnails and credit only, never the .hdr (RD-P14-4)
+        thumb = f"{h['identity']}__thumbnail.webp"
+        H.thumbnail(h["path"], out / thumb)
+        hdris.append(hdri_entry(h, thumb, sha256(out / thumb)))
+        assets.append(thumb)
+
     site_name = f"matterlib-{release}.site.json"
     site = {"schema_version": SITE_SCHEMA_VERSION, "release": release,
             "made": dt.date.today().isoformat(), "draft": True,
+            "groups": GROUPS,
             "materials": sorted(materials, key=lambda r: r["id"])}
+    if hdris:
+        site["hdris"] = sorted(hdris, key=lambda r: r["id"])
+        site["default_hdri"] = H.default(listed)
     (out / site_name).write_text(json.dumps(site, indent=1, sort_keys=True, ensure_ascii=False) + "\n",
                                  encoding="utf-8")
     assets.append(site_name)
@@ -365,12 +420,17 @@ def build(tag: str, out: Path) -> dict:
         f"A verdict per control for {swept} materials, each with the date it was measured.\n"
         f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
         f"- `SHA256SUMS`: a digest for every file.\n"
+        + (f"- HDRIs: {len(hdris)} lighting pictures from [Poly Haven](https://polyhaven.com), each with "
+           f"its thumbnail and its full credit (contributors and their roles, sponsors, Poly Haven's "
+           f"tags). The HDRI files themselves are not in this snapshot.\n" if hdris else "")
+        + "- `groups`: what the site shows side by side (Matter, Character, HDRIs) and how each is shown.\n"
         + (f"- Words: a plain name, a one-line summary and search words for {described} materials, "
            f"confirmed by the maintainer.\n\n" if described else "\n")
-        + f"Not yet in it: thumbnails{'' if described else ', summaries and search words'}. "
+        + f"Not yet in it: material thumbnails{'' if described else ', summaries and search words'}. "
         f"Every material is CC0-1.0.\n")
     (out / "NOTES.md").write_text(notes, encoding="utf-8")   # the release body; not an asset
-    return {"out": str(out), "materials": len(materials), "character": characters, "rigged": rigged,
+    return {"out": str(out), "materials": len(materials), "character": characters, "hdris": len(hdris),
+            "rigged": rigged,
             "pictured": pictured, "swept": swept, "described": described, "assets": len(assets),
             "bytes": size}
 

@@ -18,21 +18,27 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "release": "0.2.0-dev.1",
   "made": "2026-10-14",
   "draft": true,
-  "materials": [ { "id": "engineered/metal/Copper_Verdigris_Aged_Base_s01", "…": "…" } ]
+  "groups": [ { "id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "rig" }, "…" ],
+  "materials": [ { "id": "engineered/metal/Copper_Verdigris_Aged_Base_s01", "…": "…" } ],
+  "hdris": [ { "id": "IndustrialSunset02_PureSky", "…": "…" } ],
+  "default_hdri": "IndustrialSunset02_PureSky"
 }
 ```
 
 | Field | Type | Meaning | Source |
 |---|---|---|---|
-| `schema_version` | int | This file's contract version, independent of the release and of the runtime catalog's. | this doc |
+| `schema_version` | int | This file's contract version, independent of the release and of the runtime catalog's. `1 → 2` (2026-10-14, Phase14 14.3): adds `groups[]`, `hdris[]` and `default_hdri`; nothing in `materials[]` changed. | this doc |
 | `release` | string | The release or snapshot this file describes (`matterlib-` is not repeated). | the tag |
 | `made` | date | The day it was built. | the builder |
 | `draft` | bool | `true` while this spec is a draft. | this doc |
+| `groups[]` | array | **What the site shows side by side, in browse order, and how each is shown** (§Groups). | this doc |
 | `materials[]` | array | Every article the release lists, sorted by `id`. A dev snapshot lists every article on disk, each with its `status`, the same set as the dev catalog. | — |
+| `hdris[]` | array | Every HDRI the library holds, sorted by `id` (§Per HDRI). Absent when it holds none. | — |
+| `default_hdri` | string | The id of the HDRI a new scene starts with, as the [runtime catalog](RuntimeCatalog.md) names it. Present with `hdris[]`. | `library/hdris.yaml` |
 
 **Per material — identity** (as the [runtime catalog](RuntimeCatalog.md)):
 
@@ -42,7 +48,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `identity` | The qualified name with its version (`Copper_Verdigris_Aged_Base_s01_v01`), the stem every file name below begins with. |
 | `label` | The name a person reads. **Derived** from the tokens (PascalCase split, the default tokens `Natural`, `Clean` and `Base` dropped, sentence case, acronyms and roman numerals kept): `Copper verdigris aged`. Where that reads badly, the recipe's `label` replaces it (Phase13 13.2). |
 | `master` | The article's master token ([MasterSet](../Ontology/MasterSet.md)). |
-| `section` | Where it is browsed: `matter`, or `character` beside it. **Biological materials (skin, eyes, teeth, hair, nails) are not Matter**: they stay browsable, apart, and are shown in a human context (skin on a side face and hands, an eye on an eye), **never on the rig's cubes**, so a `character` material publishes no rig picture until such a picture exists (the lead, 2026-10-14, Phase13 RD-P13-2; its subjects are *Thumbnails*' RD-MP-3). Its verdicts, still evidence, stay under `parity`. *(Other kinds, such as HDRIs, are not sections: each is a list of its own beside `materials`, as in the [runtime catalog](RuntimeCatalog.md), added by its own phase.)* |
+| `section` | Where it is browsed: `matter`, or `character` beside it. **Biological materials (skin, eyes, teeth, hair, nails) are not Matter**: they stay browsable, apart, and are shown in a human context (skin on a side face and hands, an eye on an eye), **never on the rig's cubes**, so a `character` material publishes no rig picture until such a picture exists (the lead, 2026-10-14, Phase13 RD-P13-2; its subjects are *Thumbnails*' RD-MP-3). Its verdicts, still evidence, stay under `parity`. *(Other kinds, such as HDRIs, are not sections: each is a list of its own beside `materials`, as in the [runtime catalog](RuntimeCatalog.md), added by its own phase: HDRIs by Phase14, §Per HDRI.)* |
 | `meters_per_tile` | The real-world size of one texture tile, from the article's metadata. |
 
 **Per material — what a Creator may change:**
@@ -70,10 +76,39 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `download` | `file` (`<identity>.zip`), `bytes`, `sha256` and `textures` (how many). The zip holds `<identity>.mtlx` with every texture reference rewritten to `textures/<name>`, and those textures, shared wear layers included, so it opens anywhere with no search path. **Fit-set pictures** (hair cards, eyes) are supplied when an article is bound to a mesh, never referenced by it, so they are not in the zip. |
 | `summary`, `search_words` | A one-line public description and the words a search should find it by, written by the agent and confirmed by the maintainer with the picture (F-MP-14). |
 
+## Groups — what sits beside what *(2026-10-14, Phase14 14.3)*
+
+**The library relays, as data, which groups the site shows side by side, so the site builds its browsing from the library and not from its own assumptions** (the lead, 2026-10-14, RD-P14-4: *"make sure the other things sitting next to it are relayed as well (We ruled the character materials need to not be at taht level as they need a different view apprach instead of cubes"*). In browse order:
+
+| `id` | `label` | `list` | `section` | `shown` |
+|---|---|---|---|---|
+| `matter` | Matter | `materials` | `matter` | `rig`: on the parity rig's test scene (the cubes) |
+| `character` | Character | `materials` | `character` | `human`: in a human context (skin on a side face and hands, an eye on an eye), **never on the cubes** (RD-P13-2). No picture is published until one exists (*Thumbnails*). |
+| `hdris` | HDRIs | `hdris` | — | `thumbnail`: the HDRI's own 2:1 picture |
+
+A group reads the list it names, filtered by `section` where it gives one. **A group is a place to browse, not a [Domain](../Ontology/Taxonomy.md):** Matter and Character are sections of `materials`; an HDRI is a kind beside the taxonomy ([Identity](../Ontology/Identity.md) §HDRI names).
+
+## Per HDRI *(2026-10-14, Phase14 14.3)*
+
+**Thumbnails and credit only** (RD-P14-4): an HDRI's `.hdr` file is not published in a snapshot, so an entry has **no `download`**. Every credit field is Poly Haven's own, as the HDRI's record holds it (`library/provenance/sources/hdris/<id>.yaml`); a field the record does not hold is left out.
+
+| Field | Meaning |
+|---|---|
+| `id`, `version`, `display_name`, `status`, `creator_selectable` | As the [runtime catalog](RuntimeCatalog.md) §HDRIs defines them. |
+| `identity` | `<id>_<version>`: the file's stem, which every asset name below begins with. |
+| `label` | The name a person reads: **the source's own name** (`Industrial Sunset 02 (Pure Sky)`); derived from the tokens, as a material's, only when the record has none. |
+| `description` | The source's one-line description. |
+| `licence` | `CC0-1.0`. |
+| `credit` | `source` (`Poly Haven`), `source_url`, `asset_url` (its page there), `authors[]` (each `name` and `role`, e.g. *Original*, *Sky Edits*), `sponsors[]` (each `id`, `name` and `url` where given) and `edited_from` (the source's line naming the HDRI a sky was edited from). |
+| `tagging` | The source's own `tags`, `categories` and `attributes` (`time_of_day`, `weather`, `light_type`, `contrast`, `environment`, `sky_view`, …): **what a search and a filter on the site read.** |
+| `captured` | `date_taken`, `whitebalance`, `evs_cap`, `coords`, where the source gives them. |
+| `pictures[]` | One entry: `role: thumbnail`, `file` (`<identity>__thumbnail.webp`, 1024 × 512, tone-mapped from the HDRI by `tools/releases/hdris.py`) and `sha256`. |
+
 ## Limits
 
-GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most seven per article (six pictures and a zip), which fits about 140 articles; the builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
+GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most seven per article (six pictures and a zip) and one per HDRI (its thumbnail): with 59 HDRIs that fits about 130 articles; the builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
 
 ## History
 
 - 2026-10-14 — written as a DRAFT by Phase13 13.1, from the field list the website's builders sent (their research, and the ask recorded at [PlatformDependencies](../../Planning/PlatformDependencies.md) M9). First published in the dev snapshot `matterlib-0.2.0-dev.1`.
+- 2026-10-14 — schema 2, by Phase14 14.3: `groups[]` (what the site shows side by side, and how), `hdris[]` with Poly Haven's credit and tagging and a thumbnail each (no download), and `default_hdri`. First in the dev snapshot `matterlib-0.2.0-dev.3`.
