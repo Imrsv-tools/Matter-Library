@@ -137,4 +137,5 @@ It shows the lead the difference by eye. It was offered at CM Pass 6 and never r
   - a skin map is a fit-set picture, so it changes no part of CM2 (F-SKM-10);
   - it brings in the publishing guidance and host policies (F-SKM-6, Q-SKM-2).
 - **Open:** Q-SKM-2 to Q-SKM-4.
-- **Next step:** Pass 3, the survey; the probe when the library's machine exists.
+- **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). Its discovery waits for Pass 3.
+- **Next step:** Pass 3, the survey, which the lead opens in a new session (*"I will start a new session for that"*). Then the probe, once the library's machine exists.

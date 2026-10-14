@@ -36,14 +36,16 @@ The authority until this phase writes its specs: [`261014_R_MaterialPipeline.md`
   - **Storage** for renders, thumbnails and staged releases; the compressed-texture encoder (`PhaseTBD_ReleaseBundleConsumerContract.md` F4).
 - **Its first tests** (RD-MP-10, the lead): the thumbnail probe (three articles in Cycles: Oak, Glass_Clear, and skin on the clothed character's hand and face), and the skin-map probe (`261014_R_SkinMaps.md`).
 
+## What the lead has said about hosts (2026-10-14)
+
+*"the Other machine is also just a personal machine not a server,,, the only server we currently have is the IMRSV Web server... so we would need to get another serier from Hetzner for this. Now - if it is just to simulate contributors side then this or that can be used"* (`261014_R_MaterialPipeline.md` RD-MP-12).
+- **The service needs a new server,** rented from Hetzner, the provider the platform's web server already uses. Hetzner rents dedicated GPU servers. Which model, and its price, is this phase's to check (unverified here).
+- **The two personal machines** (the lead's laptop, and the Linux GPU machine the Unreal work used) are **not** hosts. They can stand in for a contributor's machine: running the loop or the rig as an outside contributor would, against the service.
+- **The platform's web server is not a host** for the GPU work: it records no GPU (F-MP-41).
+
 ## Open questions (settle during this phase)
 
-- **The host** (Q-MP-11's remainder). The candidates:
-  - a cloud GPU instance, started only while work runs;
-  - a dedicated machine, starting from the Linux GPU machine the Unreal work used, if it is free (`260926_R_BigPicture_NimbleSetup.md` BP6);
-  - a GPU worker on the platform's infrastructure.
-
-  The platform's web server records no GPU (F-MP-41).
+- **Which Hetzner server:** a GPU model that runs the Unreal runtime (Vulkan) and Cycles; memory and disk for the toolchain, renders and staged releases; and the monthly cost against GPU hours at about 200 articles (F-MP-32).
 - **How the team reaches it:** a private network, as the lead tests today, and sign-in.
 - **What runs it unattended**, and what still waits for a person: a batch, a review, a push.
 - **Packaging:** containers, or a provisioning script on one machine.

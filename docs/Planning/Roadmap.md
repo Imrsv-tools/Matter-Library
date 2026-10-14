@@ -30,9 +30,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Skin That Reads as Skin — RESEARCH *(seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1)*
-**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal.
-- `docs/Planning/Research/261014_R_SkinMaps.md` · `docs/Planning/Research/260929_R_CharacterMaps.md` (Passes 2–4)
+### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey comes before discovery**; was "Skin That Reads as Skin" for part of that day)*
+**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
+- `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
@@ -81,6 +81,22 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### The Library Service — SEEDED *(added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; its place in the order is the lead's; *Thumbnails* and the team's console build on it)*
 **Outcome:** the library's work (the test rig, the build loop, thumbnails, the dev catalog the site's staging reads) runs on a permanent machine instead of the lead's laptop, and the IMRSV team reaches it from wherever they are.
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md`
+
+### Thumbnails — SEEDED *(added 2026-10-14 by `/research` on the lead's "Seed all the TBD phases we discovered here", RD-MP-2 to RD-MP-6; runs on The Library Service; the library's half of See the Library)*
+**Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
+- `docs/Planning/Phases/Future/PhaseTBD_Thumbnails.md`
+
+### Materials Described — SEEDED *(added 2026-10-14, the same word, RD-WS-4; the other library half of See the Library)*
+**Outcome:** every kept material has a name a person reads, a one-line description and search words, and the library publishes everything the website shows about each material in one file beside each release.
+- `docs/Planning/Phases/Future/PhaseTBD_MaterialsDescribed.md`
+
+### The Library Console — SEEDED *(added 2026-10-14, the same word, RD-MP-7; runs on The Library Service)*
+**Outcome:** the IMRSV team opens one page to review new materials and keep or send back each one, choose which materials go into each library version, and see each material's provenance.
+- `docs/Planning/Phases/Future/PhaseTBD_LibraryConsole.md`
+
+### Two Licences — SEEDED *(added 2026-10-14, the same word, RD-MP-1 and RD-MP-8: CC BY 4.0 beside CC0, CC0 the default)*
+**Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
+- `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).

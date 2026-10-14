@@ -350,6 +350,43 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 
   That closes the proof without spending a day of the laptop's GPU. It is the lead's call, and it is made in Phase11's doc, not here.
 
+## Pass 11 — Phase11 closes; every phase found here is seeded; the service needs a new server (2026-10-14)
+
+**The lead, verbatim:** *"1) yes 2) Seed all the TBD phases we discovered here, No, the Other machine is also just a personal machine not a server,,, the only server we currently have is the IMRSV Web server... so we would need to get another serier from Hetzner for this. Now - if it is just to simulate contributors side then this or that can be used 3) Where is taht. I will start a new session for that 4) not yet"*. Item 4 holds the push.
+
+- **F-MP-47 — What "keep by verdict" actually keeps (measured 2026-10-14, read-only, `wishlist.verdict` over the 35 built rows):**
+
+  | Group | Rows | What it means |
+  |---|---|---|
+  | **Clean** (every slider moved alike in all three tools, or moved nothing anywhere; no seam or ruler flag). A keep sets `approved`. | **11:** Granite_Polished, Slate_Cleft, BlackWalnut_Natural, Aluminium_Raw, Concrete_Polished, Terrazzo_Polished, Terracotta_Unglazed, Fireclay_Natural, Paint_OnMetal_Chipped, LED_CoolWhite, Neon_Signage | kept by verdict |
+  | **A seam or ruler flag only** | **6:** Loam_Natural, Concrete_BoardFormed, PowderCoat_Textured, OakLeaf_Natural, Lace_Floral, Rust_OnSteel_Flaking | the leaf and the lace are the known blind spot (the ruler cannot measure a cut-out base, `/matter-batch` §3) |
+  | **A tool disagrees** (ONE-SIDED or UNEVEN). A keep sets `candidate`. | **17:** Onyx, NephriteJade, WhiteOak_Weathered, Sapphire, Gold, Aluminium_Brushed, StainlessSteel_Polished, MildSteel_Raw, Glass_Frosted, Glass_Reeded, LeadCrystal_Clear, Polypropylene, Acrylic_Clear, Silicone_Translucent, Paint_Gloss, BeachSand_Dry, Diamond_Brilliant | mostly see-through matter and polished metals, where the renderers' known limits sit (M6, Storm's transparency, the brushed metal's anisotropy, P16) |
+  | **No complete rig run** | **1:** LED_WarmWhite | it needs a rig run before anyone can judge it |
+
+  **A slider that "moves nothing" is not a flag** when it is expected: UV settings on a material with no texture, a roughness bias at the clamp, a damage layer on matte matter (`/matter-batch` §3). It counts against a row only where it should have moved, and that is a judgement for the maintainer.
+
+  **So by-verdict keeps 11 of 35, and leaves 24 for the lead's eye.** That is less than Q-MP-8 (b) implied, and it is the close's first fact.
+- **F-MP-48 — Every phase this research found is seeded** (the lead's item 2). Each is a pointer-shell with an Outcome; `/discovery` fills each. On the Roadmap:
+  - *The Library Service*;
+  - *Thumbnails*;
+  - *Materials Described*: the site file and the words, the library's other half of *See the Library*;
+  - *The Library Console*;
+  - *Two Licences*;
+  - *Skin Maps*: the research's industry survey comes first.
+
+  "Material-making as a standing process" is **not** a phase, by its own definition (F-MP-45).
+
+## Resolved (continued)
+
+- **RD-MP-12 — The library service needs a new server, rented from Hetzner.** The two personal machines (the laptop, and the Linux GPU machine the Unreal work used) are not hosts. They can stand in for **a contributor's side**. The platform's web server is the only server today, and it records no GPU. (The lead, 2026-10-14; in `PhaseTBD_LibraryService.md`.)
+- **RD-MP-13 — Phase11 closes now:**
+  - review by verdict, with the rows by-verdict cannot keep put to the lead's eye (F-MP-47);
+  - 11.4's refine pass moves into the loop as redo rows;
+  - the Blender library is rebuilt;
+  - the close.
+
+  **Material-making continues as a standing process outside the phase line** (the lead, 2026-10-14: *"1) yes"*, to F-MP-46). The close itself is `/execute Phase11`'s, in Phase11's doc. (Q-MP-8, Q-MP-12.)
+
 ## Resolved
 
 - **RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0** (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
@@ -375,40 +412,36 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 | ~~Q-MP-5~~ | ~~One word for the published pictures?~~ | → RD-MP-5 |
 | ~~Q-MP-6~~ | ~~A rule that the library holds no body skin map?~~ | → RD-MP-9 (not taken; skin maps instead) |
 | ~~Q-MP-7~~ | ~~Where thumbnails live before a release?~~ | → RD-MP-6 |
-| Q-MP-8 *(reframed 2026-10-14, F-MP-39)* | **How is the owed review done:** (a) the end review in one sitting, (b) keep by verdict and look only at the flagged rows, or (c) as the first job of the team's console on the permanent machine? | **(b) now:** it clears the backlog in minutes, and the console inherits a library with kept articles to curate. (c) if the lead would rather the console's first test be a real review. |
-| Q-MP-12 *(new, F-MP-44 to F-MP-46)* | **Close Phase11 now** (review by verdict, 11.4's refine pass moved into the loop as redo rows, then the close), and run material-making as a standing process outside the phase line? | **Yes.** The proof is done in steps; what is left is rig time that belongs on the permanent machine. |
+| ~~Q-MP-8~~ → RD-MP-13 *(reframed 2026-10-14, F-MP-39; ruled the same day: by verdict, with 24 of 35 rows to the lead's eye, F-MP-47)* | **How is the owed review done:** (a) the end review in one sitting, (b) keep by verdict and look only at the flagged rows, or (c) as the first job of the team's console on the permanent machine? | **(b) now:** it clears the backlog in minutes, and the console inherits a library with kept articles to curate. (c) if the lead would rather the console's first test be a real review. |
+| ~~Q-MP-12~~ → RD-MP-13 *(and Q-MP-8 with it)* | **Close Phase11 now** (review by verdict, 11.4's refine pass moved into the loop as redo rows, then the close), and run material-making as a standing process outside the phase line? | **Yes.** The proof is done in steps; what is left is rig time that belongs on the permanent machine. |
 | ~~Q-MP-11~~ → RD-MP-11 *(the host is still open: in the Library Service's discovery)* | **Where the library service runs:** a cloud GPU instance on demand, a dedicated machine, or a GPU worker on the platform's infrastructure? And is it **independent** (code here, run by IMRSV) or **part of the platform's web side**? | **Independent, code in this repo, run by IMRSV**, on a GPU host; the platform consumes what it publishes. The host is a cost and ops call, starting from whether the Linux GPU machine used for the Unreal work is free. |
 | ~~Q-MP-9~~ *(superseded by Q-MP-11, 2026-10-14: the "library machine" is a laptop, so where the console runs is part of where the service runs)* | **Where does the team's console run?** (a) A small web app **in this repo**, served from the library machine (where the rig, renders and thumbnails already are) and reachable by the team over its private network. It writes through the existing tools and commits to git. (b) **The platform's web back office**, which already has staff accounts and hosting, writing changes to this repo as pull requests. | **(a).** It keeps the library able to outlive IMRSV (RD-WS-1, condition 3), and anyone who forks the library can curate it. The heavy files it shows stay on the machine that makes them. Approvals stay the maintainer's act either way (`promote_release.py`). |
 | ~~Q-MP-10~~ → RD-MP-8 | **The default licence for a new article** (RD-MP-1), and who chooses? | **CC0-1.0 by default.** All 95 on disk are CC0-dedicable, and their sources (ambientCG, Physically Based, our own generators) are CC0. CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article. |
 
 ## Status
 
-- **Passes captured:** 10 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8–10 record the lead's answers.
-- **Ruled:** RD-MP-1 to RD-MP-11.
-  - **The library gets its own permanent service** (RD-MP-11), seeded as `PhaseTBD_LibraryService.md`.
-  - **Skin maps reopen no earlier ruling** (RD-MP-9 as corrected; `261014_R_SkinMaps.md` RD-SKM-1).
-  - **CC BY 4.0 is allowed beside CC0** (which amends R13), and **CC0 is the default**.
-  - Cycles makes the hero thumbnail, on a subject chosen per Class, before the review; it is called a thumbnail; it is never stored in git.
-  - The management front end is the IMRSV team's console for curating versions.
-  - **Skin moves toward skin maps**, in its own research (`261014_R_SkinMaps.md`).
-  - **The thumbnail probe waits for the library's permanent machine.**
-- **Current direction:** the flow's first half runs, on a laptop. Its second half is a sketch (Pass 5).
-  - The flow needs **a permanent library service** (F-MP-40). The recommended shape is independent, with its code in this repo, run by IMRSV on a GPU host, and the platform consuming what it publishes (F-MP-42).
-  - The review is still owed (F-MP-39).
-- **Open:**
-  - Q-MP-8 (how the owed review is done);
-  - Q-MP-12 (close Phase11 now, and make material-making a standing process).
-
-  The service's host is open in its own seed.
+- **Passes captured:** 11 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8–11 record the lead's answers.
+- **Ruled:** RD-MP-1 to RD-MP-13.
+  - **Licences:** CC BY 4.0 is allowed beside CC0 (which amends R13), and CC0 is the default.
+  - **Thumbnails:** Cycles renders them, on a subject chosen per Class, before the review; they are called thumbnails and never stored in git.
+  - **The console:** the IMRSV team's, for curating versions.
+  - **Skin:** it moves toward skin maps, made per approved mesh version (`261014_R_SkinMaps.md` RD-SKM-1); no earlier ruling is reversed.
+  - **The library service:** independent, on a new Hetzner server; the personal machines only stand in for a contributor's side.
+  - **Phase11 closes now** by verdict (11 of 35 rows kept, 24 to the lead's eye, F-MP-47). Material-making is a standing process outside the phase line.
+- **Seeded (F-MP-48):** *The Library Service*, *Thumbnails*, *Materials Described*, *The Library Console*, *Two Licences*, *Skin Maps*.
+- **Current direction:** the flow's first half runs, on a laptop. Its second half is now six seeded phases, the service first, because everything after it runs there.
+- **Open:** nothing in this doc. Each seed carries its own open questions.
 - **Durable docs owed, and the verb that lands them:**
-  - **RD-MP-1 and RD-MP-8's consequences (F-MP-36):** the licence field, the attribution list, the validator, `CONTRIBUTING.md`, `LICENSE-CONTENT.md`, `_Architecture.md` §Governance, the Glossary and `Experience_MatterLibrary.md`. A lead-directed `/quick-fix` for the words, or the phase that first ships a CC BY article for the field and the validator.
-  - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them.
+  - **RD-MP-1 and RD-MP-8's consequences:** owned by *Two Licences*.
+  - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them (*Thumbnails* at the latest).
+  - **RD-MP-13:** Phase11's close, by `/execute Phase11`, in its own doc.
 - **Unverified:**
   - Unreal's path tracer or Lumen in a packaged Linux runtime;
   - the GPU time a showcase costs (F-MP-32);
   - the bundle's size at 200 articles;
-  - the platform's web server having no GPU (its docs record none).
+  - the platform's web server having no GPU (its docs record none);
+  - which Hetzner GPU server fits, and its cost.
 - **Next step:**
-  - the lead's answers to Q-MP-8 and Q-MP-12;
-  - `/discovery` on *the Library Service* when the lead opens it;
-  - seeds for *Thumbnails* and *the team's console* after it, both of which run on the service.
+  - `/execute Phase11` for the close (the lead judges the 24 flagged rows);
+  - `/research` on skin maps, Pass 3 (the lead, in a new session);
+  - `/discovery` on *The Library Service* when the lead opens it.
