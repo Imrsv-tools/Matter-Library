@@ -13,7 +13,7 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 
 - **It is a picture of the MESH, not part of the material.** The skin **article** (`Skin_FitzpatrickI` … `VI`) keeps the substance: its measured tone, scatter, coat, fuzz and the tiling pores (`Skin_Pores`). The map is a **fit-set** picture, supplied when the article is bound, as the eye's and the hairstyle's pictures are (CM2; [LCDSchema §Base colour map](../Contract/LCDSchema.md#base-colour-map-the-meshs-picture-supplied-at-binding)). **Ruled** (F-SKM-10).
 - **It reaches every renderer through the existing input**, `base_color_map`: `base = base_color_const × base_color_map × base_color_tint`. There is no new input for colour. **Ruled** (RD-SKM-3).
-- **It is colour only, for now.** Maps for normal, roughness, cavity or scatter would each need a new input. *(planned; later in the phase)*
+- **It is colour only, for now.** Maps for normal, roughness, cavity or scatter would each need a new input. *(planned: the phase* Skin Maps Beyond Colour*, [`PhaseTBD_SkinMapsBeyondColour.md`](../../Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md), seeded 2026-10-14)*
 
 ## Which mesh it fits — **Ruled** (RD-SKM-1)
 

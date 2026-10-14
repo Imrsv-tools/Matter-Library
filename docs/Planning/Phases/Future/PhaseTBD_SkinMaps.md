@@ -23,7 +23,7 @@ The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../
 - **The colour half needs no contract change:** `base_color_map` on Subsurface exists in every library target (F-SKM-3).
   - **But the six skin articles must be re-assembled to take it:** declare the map, and let the scatter colour follow it (F-SKM-19).
   - The map's normalisation must keep the measured tone as the average (F-SKM-20).
-- **Colour is the industry's first map**, and the tiling micro layer is already here (F-SKM-11, F-SKM-13). The maps beyond colour (normal, roughness, cavity, scatter) each need a new input; that is a later question for the phase.
+- **Colour is the industry's first map**, and the tiling micro layer is already here (F-SKM-11, F-SKM-13). The maps beyond colour (normal, roughness, cavity, scatter) each need a new input. **They are their own phase**, *Skin Maps Beyond Colour* ([`PhaseTBD_SkinMapsBeyondColour.md`](PhaseTBD_SkinMapsBeyondColour.md), seeded 2026-10-14), which follows this one.
 - **The lips can wear the skin article plus the map's lip colour**, which removes the hard line (F-SKM-9).
 - **A mesh version is named and recorded,** so each map says which mesh it fits (Q-SKM-4).
 

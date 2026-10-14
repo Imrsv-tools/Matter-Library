@@ -46,6 +46,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
 - `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
+### Skin Maps Beyond Colour — SEEDED *(added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first)*
+**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
+
 ### The Library Console — SEEDED *(added 2026-10-14, the same word, RD-MP-7; runs on The Library Service)*
 **Outcome:** the IMRSV team opens one page to review new materials and keep or send back each one, choose which materials go into each library version, and see each material's provenance.
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryConsole.md`

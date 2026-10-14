@@ -422,7 +422,9 @@ The sourcing marks are Pass 3's.
 - **Durable doc (RD-SKM-6): landed** 2026-10-14 as the draft `docs/specs/Authoring/SkinMaps.md`, by a lead-directed `/quick-fix` (the `✅ Quick Fix — skin-map contributor spec` commit).
   - It marks each statement *Ruled*, *Proposed* or *Open*. The phase's discovery hardens the *Proposed* and *Open* ones.
   - Pointers: `_Docs_Index`, `_Architecture`, the Glossary's *Skin map* and the phase stub.
-- **Seeded as a phase:** `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
+- **Seeded as phases:**
+  - `PhaseTBD_SkinMaps.md` (2026-10-14, the lead: *"Seed all the TBD phases we discovered here"*). The survey it waited for is done.
+  - `PhaseTBD_SkinMapsBeyondColour.md` (2026-10-14, the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*): normal, roughness, cavity and scatter maps, each a new input. It follows *Skin Maps*.
 - **Owed by the phase, found by the probe:**
   - re-assemble the six skin articles to take a map (F-SKM-19);
   - map a tinted, map-following scatter colour in Blender (F-SKM-23);
