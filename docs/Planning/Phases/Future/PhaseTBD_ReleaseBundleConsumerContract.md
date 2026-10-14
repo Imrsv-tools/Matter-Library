@@ -83,6 +83,9 @@ The options, independent of each other:
 - **Current working direction:** parked by L1 (b). When discovery resumes, Pass 2 re-verifies Pass 1's findings against the tree (they are dated 2026-09-25), then settles the trust anchor (F3) and the first human test, then writes the Brief.
 - **Open decisions:** L2 (the first release for users).
 - **Checks to carry forward:** F4 (encoder on this box) before any `.dds`-bearing step; the host's per-asset limit (F6); the `LCDSchema.md` vs Coverage `## Resolved` check (Q7).
+- **Ruled since Pass 1 (2026-10-14, the lead; `261014_R_TheLibrarysSite.md`):**
+  - **RD-WS-2, the host:** each release is published **on GitHub Releases with its digest**, and IMRSV's web side mirrors it, verified against that digest. F6's size check still applies: GitHub documents a per-file limit under 2 GiB, which shapes how the bundle is split; confirm it when discovery resumes.
+  - **RD-WS-4:** a file for the library's website and a standard preview set are published beside each release. Whether this phase or *See the Library* builds them is for discovery, when it resumes.
 
 ## Execution Log
 

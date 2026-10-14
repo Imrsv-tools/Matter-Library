@@ -56,6 +56,20 @@ A USD viewer consumes the raw `.mtlx` articles:
 - This repo's own validation baseline for USD rendering is [USDValidationToolchain](Tooling/USDValidationToolchain.md).
 - **Creator overrides need nothing extra.** They are Material inputs that the article's nodegraph connects to ([LCDSchema §Carrier rule](Contract/LCDSchema.md#carrier-rule-no-imrsv-attrs)), so a stock viewer renders them through normal UsdShade resolution. A viewer must **not** add a resolution rule of its own: if an override does not render, the writer is at fault (`tools/conformance/check_lcd_carrier.py` says which).
 
+## The library's website — built and run by IMRSV's web platform
+
+*(Ruled 2026-10-14, [`261014_R_TheLibrarysSite.md`](../Planning/Research/261014_R_TheLibrarysSite.md) RD-WS-1 to RD-WS-4. Planned: nothing is built yet.)*
+
+The library's public website is **a consumer like any other**. It is built and run by IMRSV's web platform from **published releases**, and never from this repo. The site owns its presentation. This repo owns every fact on it.
+- **It reads** a published release and **a file for the site beside it**: identity, status, master, scale, Creator ports, wear layers, grounding, provenance, licence, the parity verdict and previews. That file is projected from the same records as the [runtime catalog](Contract/RuntimeCatalog.md), which stays the engines' lean file. Both the file and its contract spec are *(planned)*.
+- **Its downloads** come from the release as the library publishes it on GitHub Releases, or from IMRSV's mirror of it, verified against the release's digest. **Never from this repo** (Git LFS).
+- **Its conditions:**
+  - the library keeps its own identity and domain;
+  - browsing and downloading need no account;
+  - the site invents no fact about a material;
+  - the site is static.
+- **Before the first versionable library** it runs on staging from the dev catalog, with each article's status shown. It launches publicly with that first release.
+
 ## Adding a consumer
 
 A new consumer (another engine, another DCC) needs nothing from this page except the table in §What every consumer binds to, plus the release it installs. If it needs a change to the contract, that is a contract change here, versioned by the library's semver (MAJOR for anything breaking).

@@ -67,6 +67,8 @@ The **runtime catalog** is the machine-side projection of the authored [manifest
 
 Per-material **parameter definitions** (`default_parameters`, the LCD parameter set) stay out of the runtime catalog — a consumer parses the resolved `.mtlx` on demand (the runtime catalog maps identity → payload path; the parameter detail comes from parsing that file). This keeps the catalog lean and avoids duplicating `.mtlx` content. *(Revisit only if a parse-free parameter lookup is ever needed — then the catalog grows parameter data; not v1.)* Provenance, licence and evidence never reach the catalog either ([Manifest.md](Manifest.md) §provenance).
 
+> **The website reads a file of its own, not this one** *(ruled 2026-10-14, [`261014_R_TheLibrarysSite.md`](../../Planning/Research/261014_R_TheLibrarysSite.md) RD-WS-4)*. What the library's site needs (the Creator ports, the grounding, provenance, licence, the parity verdict and previews) goes in **a separate file published beside each release**, projected from the same records *(planned; its name and spec are not written yet)*. This catalog stays the engines' lean file, and `no_projection_guard` still holds for it.
+
 ## Status
 
 **The runtime contract.** Consumers read this catalog; there is no directory-scan read path. Versioned by its own `schema_version` (currently `2`); the catalog seam is additive JSON.

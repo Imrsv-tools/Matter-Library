@@ -42,9 +42,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a Blender user installs the Matter add-on and library from a release and uses Matter materials without cloning this repository.
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 4) · `docs/specs/Experience/Experience_MatterLibrary.md` §Shipped
 
-### See the Library — RESEARCH
+### See the Library — RESEARCH *(2026-10-14, lead: the library's website is built and run by IMRSV's web platform from published releases; the library publishes a file for the site and a preview set beside each release, RD-WS-1 to RD-WS-4)*
 **Outcome:** anyone can browse what is in a release, with a preview image of every material.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails
+- `docs/Planning/Research/261014_R_TheLibrarysSite.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails · `docs/Planning/PlatformDependencies.md` (P24, M9)
 
 ### Version Management — SEEDED
 **Outcome:** a maintainer can cut the next release from the last one — keeping, adding, deprecating and retiring materials — and every earlier release stays exactly reproducible.
