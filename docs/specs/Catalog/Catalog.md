@@ -34,7 +34,7 @@ The **human-readable view** of what a Matter Library release contains: which art
 
 At release preparation, `usdrecord` renders each article against a standardised sphere/dome scene. The same renders double as the per-class [parity](../Tooling/CompressedDistribution.md) baselines. The preview tooling exists in `tools/preview_generators/`; a committed thumbnail set does not yet (2026-09-23).
 
-*(2026-10-14, [`261014_R_TheLibrarysSite.md`](../../Planning/Research/261014_R_TheLibrarysSite.md) RD-WS-4: the library's website is this set's first consumer. A standard preview set (one scene, fixed sizes, web formats) is published beside each release. The parity rig already renders every article in Storm, Blender and Unreal, at its defaults and with each Creator port moved; those renders are working files, not this set.)*
+*(2026-10-14, [`261014_R_TheLibrarysSite.md`](../../Planning/Research/261014_R_TheLibrarysSite.md) RD-WS-4: the library's website is this set's first consumer. A standard preview set (one scene, fixed sizes, web formats) is published beside each release. The parity rig already renders every article in Storm, Blender and Unreal, at its defaults and with each Creator port moved; those renders are working files, not this set. Phase13's dev snapshots publish the Matter materials' default rig renders as release assets, labelled `role: rig` in the [site file](../Contract/SiteFile.md); they are still not this set.)*
 
 ## History
 

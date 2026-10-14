@@ -1,6 +1,6 @@
 # Phase13 — Materials Described
 
-**Status:** IN EXECUTION (2026-10-14, the lead: *"no need for plan? if not go ahead with /execute"*). Brief written at discovery Pass 1 the same day. Lane **`build`**, with the publication gated on the lead's word (§Risk lane). **Numbered Phase13 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery materials definitions and numner the phase"* (RD-P13-1). Seeded the same day as a pointer-shell by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*).
+**Status:** 🎉 COMPLETE (closed 2026-10-14; lane `build`). The lead: *"looks right, close the phase"*. Brief at discovery Pass 1, executed the same day (the lead: *"no need for plan? if not go ahead with /execute"*). Published: the dev snapshots `matterlib-0.2.0-dev.1` and `matterlib-0.2.0-dev.2`. §Close holds the deferral ledger. **Numbered Phase13 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery materials definitions and numner the phase"* (RD-P13-1). Seeded the same day as a pointer-shell by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*).
 **Ids:** `Q-P13-n` · `F-P13-n` · `RD-P13-n`. Ids cited from research (`F-MP-n`, `RD-WS-n`, `F-RO-n`) keep their own stems. The platform's site work is cited by date and content, never by its ids (`LOCAL_DELTAS.md` §Separation).
 
 ## Outcome
@@ -167,6 +167,28 @@ No authorization, secret, migration or data-loss surface is touched. **`build`.*
 | 13.2 sitting | `0582c16` | **✅ Words confirmed** (RD-P13-3), and **RD-P13-2**: biological is not Matter. `section` in the site file; no cube pictures for the 30 character materials; Taxonomy's dated note; Thumbnails carries it in | publish dev.2 |
 | 13.2 publish | — | Pushed to `0582c16`, four of the lead's other sessions' commits named and approved (*"push and publish dev.2"*); a later Phase14 commit left behind. `matterlib-0.2.0-dev.2` published: **373/373, every digest equal; its site file, fetched anonymously, byte-identical** (65 matter, 30 character, 95 described). M9 updated | 13.3 |
 | 13.3 build | `9ff0357` | `/matter-batch` writes the words (§2), the summary carries them (§6), the review page shows them under each row, red when missing, and the keep confirms them (§7). Committed from a filtered stage: the Refiner's two held SKILL.md hunks untouched | **the lead's look at a review page** |
+| 13.3 sitting | — | **✅ The lead, 2026-10-14, at batch 261004-1's review page with its words:** *"looks right, close the phase"* | close |
+| **CLOSE — DONE** | the `🎉` commit | Durable docs conformed (RuntimeCatalog, Consumers, Catalog §Thumbnails, ToolingConventions; SiteFile, NamingConventions, the Glossary and Taxonomy during the steps). Learning `GitHub/G1` (a draft resumed; the list hides half-uploaded assets). Gate: `run_all.py` 17 lanes, 15 PASS, 2 SKIP, 0 FAIL (the library machine's release lanes); units 19/19. No CI runs here (`LOCAL_DELTAS.md`) | — |
+
+## Close
+
+**The Outcome, verbatim:** *"Every kept material has a name a person reads, a one-line description and search words. The library publishes everything the website shows about each material in one file beside each release."*
+
+**What shipped against it:** all 95 materials on disk, every kept one among them, carry a name, a one-line summary, search words and an origin, confirmed by the lead (RD-P13-3). The site file carries everything the library holds about each, in one file, **published beside each dev snapshot** (`matterlib-0.2.0-dev.1`, `-dev.2`). **There is no real release yet,** so "beside each release" is true of every snapshot published so far; the first versionable release is *Release Bundle*'s.
+
+**Deferral ledger** (every item was in the Brief's Not-now, which the lead took to `/execute`, or comes from his own ruling here):
+
+| Open thread | Disposition |
+|---|---|
+| Thumbnails, the showcase pictures the site shows | ruled out (plan keep-list) → *Thumbnails* |
+| Human-context pictures for the 30 character materials (skin on a side face and hands, an eye, teeth) | ruled out (the lead's RD-P13-2: *"we need to set taht up"*) → *Thumbnails*, which carries it in; the site file shows none until then |
+| How the `biological` domain is restructured | ruled out (RD-P13-2) → Taxonomy's dated Reevaluate note; no phase owns it yet |
+| The site file beside a real release, with its digest | ruled out (plan keep-list) → *Release Bundle* |
+| The approver per article · a completeness check before a release | ruled out (plan keep-list) → *Release Bundle* (a gate lane is a lead ruling) |
+| A picture of each moved control · changed since the last release | ruled out (plan keep-list) → *Thumbnails* · *Version Management* |
+| Re-rigging the 39 un-rigged and the evidence older than `unreal-runtime-v4` | ruled out (Q-P13-4) → the standing loop; each later snapshot carries fresher evidence |
+| Fit-set pictures in a zip | ruled out (plan keep-list) → *Blender from a Release* / *Release Bundle* |
+| `matterlib-0.2.0-dev.1` still holds the character materials' cube pictures | **left as published** (a superseded pre-release; the site takes the newest). Deleting it is the lead's call; nothing depends on it |
 
 ## Findings (Pass 1, 2026-10-14)
 
