@@ -172,9 +172,28 @@ The lead, 2026-10-14, on Pass 2's recommendations: *"agree with your recommendat
 
 Until that phase writes them, this section is the authority.
 
+---
+
+## Pass 3 — two more asks from the platform's side: the credit and the tags, where a consumer can read them (2026-10-14)
+
+*From the platform's side, after *HDRIs in the Library* landed. Read against `94ad878`; nothing was run. Two asks, A9 and A10, and one fact. The rulings are the library's.*
+
+**What the platform's lead ruled today, and why it reaches here.** The app shows **each HDRI's credit**: on its card in the HDRI window a short line, *"Poly Haven · CC0"*, and **in full under the chosen HDRI's picture** for as long as it lights the scene — Poly Haven named as the source, each person with their role, **the sponsors** (the lead: *"sponsors yes"*), and the line naming the HDRI a sky was edited from. And the app's HDRI window **narrows by the same Dig as the library's site**, with the site's first rows (the site's own ruling, RD-MSG-1, and its mapping, F-MSG-15): **When** from `tagging.categories` (*morning-afternoon* and *midday* as *Day*, *sunrise-sunset*, *night*) and **Sky** from `tagging.attributes.weather` (*clear*; *partly cloudy* and *overcast* as *Cloudy*; *fog* still to place). Merging Poly Haven's words into fewer toggles is the consumer's presentation; the words underneath stay Poly Haven's.
+
+**What a consumer can read today, for an HDRI:** the runtime catalog's `hdris[]` entry — id, display name, version, status, `creator_selectable`, payload path, thumbnail path — and `default_hdri`. The credit and the tagging are in each HDRI's record, YAML under `library/provenance/sources/hdris/`, and in the site file beside a dev snapshot. Neither is in the install the serve tool writes, and the consumer reads JSON only. *"Provenance, licence and credit stay out of the catalog for HDRIs as for textures (`no_projection_guard`)"* ([RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §HDRIs). So the consumer has nothing to draw the credit or the rows from.
+
+| # | Ask | Why | What exists |
+|---|---|---|---|
+| A9 | **Each HDRI's credit, in what the dev install serves** (and a release, when one holds HDRIs): the source and its link, the HDRI's page there, the licence, each author with their role, each sponsor with their link where given, and the edited-from line. **Where and in what shape is the library's:** in the catalog's `hdris[]` entry, or a runtime file of its own beside the catalog. | The app shows the whole credit to a Creator (above). | All of it, in each record's `credit` block; the site file already projects it as `hdris[].credit` ([SiteFile](../../specs/Contract/SiteFile.md) §Per HDRI), and that shape would serve the consumer as it stands. |
+| A10 | **Each HDRI's tagging, in the same place**: at least `categories` and `attributes.weather`. The whole `tagging` block costs little more, and keeps `contrast` and `season` for the rows the site says *"can come later"*. | The app's HDRI window digs by When and Sky, the site's rows, from the same tags (above). | Each record's `tagging`; the site file's `hdris[].tagging`. |
+
+- **On the guard.** `no_projection_guard` is the library's own rule, and A9 asks it to say, for HDRIs, whether a credit may reach a runtime file or a second runtime file carries it. Both are safe for today's consumer: it reads the catalog's lists and each entry's fields by name, and drops a key it does not know (measured for `materials[].master`, [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §Planned).
+- **The edited-from line is Markdown** (*"Edited sky-only version of [Industrial Sunset 02](https://…)"*). The consumer draws every text as text, as the site does (the site's own note on the same field). The edited-from HDRI's name and its link given apart would serve both consumers; one fixed link form, written down, would also do. The library's choice.
+- **One fact, not an ask.** M10 says *"USDLiveView's launcher finds the folder: done in its repo, 2026-10-14"*. At USDLiveView's `origin/main` (`8fb88e1`), on every branch, the launcher names no HDRI folder yet. It may be unpushed where it was made. That repo's to push.
+
 ## Status
 
-- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14).
+- **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10).
 - **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
-- **Open:** A1 – A8, which are now the work of one library phase, *HDRIs in the Library* (SKY-F16), seeded 2026-10-14 (`d52ca83`: the stub and the Roadmap entry). The ledger row is M10 (`94133fb`). The Glossary's *HDRI* headword is that phase's to land (SKY-F13).
+- **Open:** A9 and A10 (Pass 3) — the library's to rule. A1 – A8, which are now the work of one library phase, *HDRIs in the Library* (SKY-F16), seeded 2026-10-14 (`d52ca83`: the stub and the Roadmap entry). The ledger row is M10 (`94133fb`). The Glossary's *HDRI* headword is that phase's to land (SKY-F13).
 - **▶ Next:** the lead starts `/discovery` on *HDRIs in the library* when he chooses. That is a deliberate gate, not a slide. The platform's HDRI phase waits on it.
