@@ -55,9 +55,13 @@
 
   It is more than one sitting: a new tool, six articles and a Blender toggle.
 
+## Seen the same day
+
+- **SP-F6 — the 1 m cube already shows the idea working** (`13528ea`, the conformance golden, 2026-10-14). In the gate's own Storm render, the cube's faces show 10 × 10 Copper tiles of 10 cm each. Beside it, the table top shows the same texture about 12 times larger. That is because the golden puts one tile across the 1.2 m top **on purpose**, to prove a distinct UV fit, so it is a test of the profile, not a mistake. Without the cube nobody would see that difference; beside it, it cannot be missed. **One limit for the probes:** `tools/conformance/build_portable.py` materialises one article, so the cube wears Copper. To wear a probe, that tool must learn to carry two.
+
 ## Status
 
 - **Passes:** 1 (2026-10-14). Design sketch only; nothing is built.
-- **Done the same day, beside it:** the platform's 1 m cube in the conformance golden (`261013_R_PlatformTrackedItemsAsks.md` A1), plain, the probes' future reference.
+- **Done the same day, beside it:** the platform's 1 m cube in the conformance golden (`13528ea`, `261013_R_PlatformTrackedItemsAsks.md` A1). It wears Copper at real scale and is the probes' future reference (SP-F6).
 - **Open:** SP-Q1 – Q3, with the lead.
 - **▶ Next:** the lead's word on SP-Q3. If it is a phase, a Roadmap seed, as *HDRIs in the library* was.

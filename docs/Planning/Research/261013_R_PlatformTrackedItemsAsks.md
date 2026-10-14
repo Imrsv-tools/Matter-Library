@@ -87,6 +87,9 @@ The lead, 2026-10-14, on Pass 2's three offers: *"agree with your recommendation
 ## Status
 
 - **Passes:** 1 (the platform's), 2 (the library's, 2026-10-14).
-- **Answered:** TI-Q1. Nothing in the tree calls the AgX parity config. The offer is to mark it for reevaluation, not remove it (TI-F5).
-- **Open:** A1 (take it or drop it) · M2's close (a ledger quick fix) · AP-Q5, in its own doc (TI-F8).
-- **▶ Next:** the lead's word on the three offers above. Each is a quick fix of its own, and none waits on the platform.
+- **Answered and done (2026-10-14, RD-TI-1 to 3, as lead-directed quick fixes):**
+  - `94133fb`: M2 is DONE in the ledger.
+  - `0474de4`: the AgX parity config is marked `Reevaluate (2026-10-14)` in its four docs, and nothing is deleted (TI-Q1, TI-F5).
+  - `13528ea`: the 1 m reference cube is in the conformance golden (A1). Both conformance checks and `run_all.py` were green before and after, and the gate's render was looked at.
+- **Open:** AP-Q5, in its own doc (TI-F8). The cube wears Copper, not a scale probe, because `build_portable.py` materialises one article. Dressing it is `261014_R_ScaleProbes.md`'s.
+- **▶ Next:** nothing here. This doc's asks are closed.
