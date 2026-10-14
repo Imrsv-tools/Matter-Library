@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase15 — Matter, Character and HDRI — SEEDED *(added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; **numbered Phase15 the same day, ahead of Scale Grids:** *"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6; the library's half, with the site's and the platform's asked through the ledger)*
+### Phase15 — Matter, Character and HDRI — BRIEF READY, lane build; one lead question (Q-P15-1, where Character's folder sits) before `/execute` *(discovery 2026-10-14; added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; **numbered Phase15 the same day, ahead of Scale Grids:** *"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6; the library's half, with the site's and the platform's asked through the ledger)*
 **Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
 - `docs/Planning/Phases/Phase15_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
 
