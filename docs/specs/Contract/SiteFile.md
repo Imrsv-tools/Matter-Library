@@ -48,7 +48,8 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `identity` | The qualified name with its version (`Copper_Verdigris_Aged_Base_s01_v01`), the stem every file name below begins with. |
 | `label` | The name a person reads. **Derived** from the tokens (PascalCase split, the default tokens `Natural`, `Clean` and `Base` dropped, sentence case, acronyms and roman numerals kept): `Copper verdigris aged`. Where that reads badly, the recipe's `label` replaces it (Phase13 13.2). |
 | `master` | The article's master token ([MasterSet](../Ontology/MasterSet.md)). |
-| `section` | Where it is browsed: `matter`, or `character` beside it. **Biological materials (skin, eyes, teeth, hair, nails) are not Matter**: they stay browsable, apart, and are shown in a human context (skin on a side face and hands, an eye on an eye), **never on the rig's cubes**, so a `character` material publishes no rig picture until such a picture exists (the lead, 2026-10-14, Phase13 RD-P13-2; its subjects are *Thumbnails*' RD-MP-3). Its verdicts, still evidence, stay under `parity`. *(Other kinds, such as HDRIs, are not sections: each is a list of its own beside `materials`, as in the [runtime catalog](RuntimeCatalog.md), added by its own phase: HDRIs by Phase14, §Per HDRI.)* |
+| `group`, `species`, `part` *(2026-10-14, Phase15)* | The article's group (`matter` or `character`) and, for Character, its species and part, **read from the article's own file** ([RuntimeCatalog](RuntimeCatalog.md) §Groups). `domain` and `material_class` are read from the file too: on a Character article they say what it is made of, not where it is browsed. |
+| `section` | Where it is browsed: `matter`, or `character` beside it. **Since Phase15, the file's `group`** (until then worked out from the domain, `biological` → `character`, which RD-DS-1 ruled wrong for a generic biological material). **Biological materials (skin, eyes, teeth, hair, nails) are not Matter**: they stay browsable, apart, and are shown in a human context (skin on a side face and hands, an eye on an eye), **never on the rig's cubes**, so a `character` material publishes no rig picture until such a picture exists (the lead, 2026-10-14, Phase13 RD-P13-2; its subjects are *Thumbnails*' RD-MP-3). Its verdicts, still evidence, stay under `parity`. *(Other kinds, such as HDRIs, are not sections: each is a list of its own beside `materials`, as in the [runtime catalog](RuntimeCatalog.md), added by its own phase: HDRIs by Phase14, §Per HDRI.)* |
 | `meters_per_tile` | The real-world size of one texture tile, from the article's metadata. |
 
 **Per material — what a Creator may change:**
@@ -86,6 +87,8 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `character` | Character | `materials` | `character` | `human`: in a human context (skin on a side face and hands, an eye on an eye), **never on the cubes** (RD-P13-2). No picture is published until one exists (*Thumbnails*). |
 | `hdris` | HDRIs | `hdris` | — | `thumbnail`: the HDRI's own 2:1 picture |
 
+**Since Phase15 (2026-10-14), each group also names its `taxonomy`**, the fields it is browsed by, in order (Matter `domain`, `material_class` · Character `species`, `part` · HDRIs `when`, `sky`), **and Character carries its `rows`**: per species, its parts' `id`s and `label`s in order (`humanoid`: Eyes, Hair, Skin, Nails, Teeth, Mouth; the website's ask M11 (1)). Additive: `schema_version` stays 2. The dev catalog carries the same list.
+
 A group reads the list it names, filtered by `section` where it gives one. **A group is a place to browse, not a [Domain](../Ontology/Taxonomy.md):** Matter and Character are sections of `materials`; an HDRI is a kind beside the taxonomy ([Identity](../Ontology/Identity.md) §HDRI names).
 
 ## Per HDRI *(2026-10-14, Phase14 14.3)*
@@ -100,6 +103,7 @@ A group reads the list it names, filtered by `section` where it gives one. **A g
 | `description` | The source's one-line description. |
 | `licence` | `CC0-1.0`. |
 | `credit` | `source` (`Poly Haven`), `source_url`, `asset_url` (its page there), `authors[]` (each `name` and `role`, e.g. *Original*, *Sky Edits*), `sponsors[]` (each `id`, `name` and `url` where given) and `edited_from` (the source's line naming the HDRI a sky was edited from). |
+| `group`, `when`, `sky` *(2026-10-14, Phase15)* | `hdris`, and the HDRI's two browse axes, in Poly Haven's own words: `when` its time category (`sunrise-sunset`, `morning-afternoon`, `midday`, `night`), `sky` its `weather` (`clear`, `partly_cloudy`, `overcast`, `fog`). Read from `tagging`; left out when it holds none. |
 | `tagging` | The source's own `tags`, `categories` and `attributes` (`time_of_day`, `weather`, `light_type`, `contrast`, `environment`, `sky_view`, …): **what a search and a filter on the site read.** |
 | `captured` | `date_taken`, `whitebalance`, `evs_cap`, `coords`, where the source gives them. |
 | `pictures[]` | One entry: `role: thumbnail`, `file` (`<identity>__thumbnail.webp`, 1024 × 512, tone-mapped from the HDRI by `tools/releases/hdris.py`) and `sha256`. |
@@ -112,3 +116,4 @@ GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publ
 
 - 2026-10-14 — written as a DRAFT by Phase13 13.1, from the field list the website's builders sent (their research, and the ask recorded at [PlatformDependencies](../../Planning/PlatformDependencies.md) M9). First published in the dev snapshot `matterlib-0.2.0-dev.1`.
 - 2026-10-14 — schema 2, by Phase14 14.3: `groups[]` (what the site shows side by side, and how), `hdris[]` with Poly Haven's credit and tagging and a thumbnail each (no download), and `default_hdri`. First in the dev snapshot `matterlib-0.2.0-dev.3`.
+- 2026-10-14 — still schema 2 (additive), by Phase15 15.2: each material's `group` (and `section`) read from its own file, Character's `species` and `part`, each group's `taxonomy`, Character's `rows`, and each HDRI's `group`, `when` and `sky`. The 30 Character materials' `id`s follow their folder, `character/humanoid/<part>/`. First in the dev snapshot `matterlib-0.2.0-dev.4`.

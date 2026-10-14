@@ -84,9 +84,24 @@ with tempfile.TemporaryDirectory() as tmp:
     except SystemExit:
         check(True, "two different textures with one name are refused")
 
-print("== section ==")
-check(B.section("engineered") == "matter" and B.section("environmental") == "matter", "a Matter domain is Matter")
-check(B.section("biological") == "character", "biological is a character material, browsed apart (RD-P13-2)")
+print("== section (Phase15: from the file's group, never the domain) ==")
+check(B.section({"group": "matter", "domain": "engineered"}) == "matter", "a Matter article is Matter")
+check(B.section({"group": "character", "domain": "biological"}) == "character", "a Character article is Character")
+check(B.section({"group": "matter", "domain": "biological"}) == "matter",
+      "a generic biological material is Matter: the domain does not decide (RD-DS-1, F-DS-5)")
+G = B.G
+check(G.hdri_taxonomy({"tagging": {"categories": ["outdoor", "night"], "attributes": {"weather": "clear"}}})
+      == {"when": "night", "sky": "clear"}, "an HDRI's when and sky are Poly Haven's own words")
+check(G.hdri_taxonomy({"tagging": {"categories": ["outdoor"]}}) == {},
+      "an HDRI with no time category or weather leaves both out, never guessed")
+check(G.character_errors("character", "humanoid", "skin") == [] and G.character_errors(None, None, None) == [],
+      "a declared Character part, and a Matter article with no group, are both right")
+check(G.character_errors("character", "humanoid", "elbow") and G.character_errors("matter", "humanoid", None)
+      and G.character_errors("hdris", None, None),
+      "an unknown part, a Matter article with Character keys, and an HDRI group on a material are refused")
+check(G.taxonomy_path({"group": "character", "species": "humanoid", "part": "mouth"}) == ["Character", "Humanoid", "Mouth"]
+      and G.taxonomy_path({"group": "matter", "domain": "engineered", "material_class": "metal"})
+      == ["Matter", "Engineered", "Metal"], "each group's place to browse, as a person reads it")
 
 print("== groups (RD-P14-4) ==")
 check([g["id"] for g in B.GROUPS] == ["matter", "character", "hdris"], "Matter, Character and HDRIs, in browse order")
@@ -95,6 +110,12 @@ check({g["id"]: g["shown"] for g in B.GROUPS} == {"matter": "rig", "character": 
 check({(g["list"], g.get("section")) for g in B.GROUPS} ==
       {("materials", "matter"), ("materials", "character"), ("hdris", None)},
       "Matter and Character are sections of materials; HDRIs are a list of their own")
+check({g["id"]: g["taxonomy"] for g in B.GROUPS} == {"matter": ["domain", "material_class"],
+      "character": ["species", "part"], "hdris": ["when", "sky"]}, "each group names the fields it is browsed by")
+rows = next(g for g in B.GROUPS if g["id"] == "character")["rows"]
+check([(r["species"], [p["label"] for p in r["parts"]]) for r in rows]
+      == [("humanoid", ["Eyes", "Hair", "Skin", "Nails", "Teeth", "Mouth"])],
+      "Character's rows, in the lead's order (M11 (1))")
 
 print("== hdri entry (14.3) ==")
 full = {"id": "IndustrialSunset02_PureSky", "version": "v01", "identity": "IndustrialSunset02_PureSky_v01",

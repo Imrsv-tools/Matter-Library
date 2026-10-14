@@ -101,6 +101,24 @@ Provenance, licence and credit stay out of the catalog for HDRIs as for textures
 
 > **Update (2026-09-27, Phase07 7.2, ruling L4):** the **dev catalog** that `tools/releases/serve_to_stage.py` projects from the working tree (`matterlib-dev`, the pre-release install that USDLiveView and, through the platform's deploy, Studio read) now carries `materials[].master`, the article's own token read from its `imrsv_metadata.master_material`. Its `status` comes from the recipe (else the release's, else `draft`) rather than always `draft`. The field is additive and `schema_version` is unchanged: measured, Stage lists the catalog and drops the key it does not know. Released catalogs still carry no `master` until R14.
 
+### Groups — Matter, Character and HDRIs *(2026-10-14, Phase15; the dev catalog)*
+
+The library holds three **groups**, each browsed by its own taxonomy ([Taxonomy](../Ontology/Taxonomy.md) §Character; the lead, RD-DS-1). **The dev catalog** (`matterlib-dev`, written by `tools/releases/serve_to_stage.py`) carries them, read from each entry's own file and never worked out from a domain (F-DS-5). **Additive: `schema_version` is unchanged** (2, or 3 with HDRIs). A consumer built before reads `materials` by field name and ignores the rest.
+
+| Field | Type | Meaning | Source |
+|-------|------|---------|--------|
+| `groups[]` | array | The three groups, in browse order: `id` (`matter`, `character`, `hdris`), `label`, `list` (the list it reads: `materials` or `hdris`), `section` (the value of `group` a `materials` entry carries), `shown` (`rig`, `human` or `thumbnail`: how each is pictured), `taxonomy` (the fields it is browsed by, in order), and for Character `rows` (per species, its parts' `id`s and `label`s, in order: Eyes, Hair, Skin, Nails, Teeth, Mouth). **The same list as the site file's** ([SiteFile](SiteFile.md) §Groups). | `tools/converters/groups.py` |
+| `materials[].group` | string | `matter` or `character`. | the `.mtlx`'s `imrsv_metadata` (`group`; absent = `matter`) |
+| `materials[].species`, `materials[].part` | string | **Character only:** its species (`humanoid`) and part (`eyes`, `hair`, `skin`, `nails`, `teeth`, `mouth`). | the `.mtlx`'s `imrsv_metadata` |
+| `materials[].domain`, `materials[].material_class` | string | On a Character entry, **what it is made of** (`biological` / `tissue`, …): read from the file, since its `id`'s folders are `character/<species>/<part>/`. They no longer say where it is browsed; `group` does. | the `.mtlx`'s `imrsv_metadata` |
+| `hdris[].group` | string | `hdris`. | — |
+| `hdris[].when`, `hdris[].sky` | string | Its time of day (Poly Haven's category: `sunrise-sunset`, `morning-afternoon`, `midday`, `night`) and its sky (Poly Haven's `weather`: `clear`, `partly_cloudy`, `overcast`, `fog`). **Poly Haven's own words**; grouping them into fewer rows is a consumer's presentation. Left out when the record holds none. | the HDRI's record (into its `.hdr` header at Phase16) |
+| `hdris[].tagging` | object | The record's whole `tagging` block (`tags`, `categories`, `attributes`): the platform's ask A10. | the HDRI's record |
+
+- **The 30 Character entries' `id`s changed with their folder** (`character/humanoid/skin/Skin_FitzpatrickIV_Clean_Base_s001`, was `biological/tissue/…`); their names, and so every scene that names one bare, did not ([Identity](../Ontology/Identity.md)).
+- **A released catalog carries none of this yet** *(planned, with the first release after Phase15, RD-P15-6)*: the projector is unchanged, so every frozen catalog re-projects byte-identically.
+- These are taxonomy fields, not promotion metadata: `no_projection_guard` is untouched. Licence and contributor are Phase16's.
+
 ### Off-grammar system material
 
 `IMRSV_MissingMaterial` (`utility/virtual/IMRSV_MissingMaterial`) has no `sNN` scale tag and resolves by bare `<id>.mtlx` (no `_vNN` axis in the filename), carrying a nominal `version: v01`. Its `scale` is empty and its `payload_path` omits the `_<version>` suffix. It is also the sole material carrying `creator_selectable: false` — so it is never offered in the Creator browse/assign set while still resolving by exact identity for the broken-material fallback. See [Manifest.md](Manifest.md) §Off-grammar exception. *(Updated 2026-09-23, measured: in `matterlib-0.1.0.catalog.json` its `scale` is `""`, `payload_path` is `materials/utility/virtual/IMRSV_MissingMaterial.mtlx`, and it is the only `creator_selectable: false` entry.)*

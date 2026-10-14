@@ -49,6 +49,26 @@ GROUPS = [
 ]
 
 
+# HDRIs: *when* is Poly Haven's time category (exactly one per HDRI, measured on all 59,
+# 2026-10-14); *sky* is its `weather` attribute. The words stay Poly Haven's; merging them into
+# fewer rows (Day, Cloudy) is a consumer's presentation (RD-P15-4).
+HDRI_WHEN = ("sunrise-sunset", "morning-afternoon", "midday", "night")
+
+
+def hdri_taxonomy(record: dict) -> dict:
+    """An HDRI's `when` and `sky`, read from its record's tagging. A value the record does not
+    hold is left out, never guessed (SiteFile.md §The rule)."""
+    tagging = record.get("tagging") or {}
+    when = [c for c in HDRI_WHEN if c in (tagging.get("categories") or [])]
+    sky = (tagging.get("attributes") or {}).get("weather")
+    out = {}
+    if len(when) == 1:
+        out["when"] = when[0]
+    if sky:
+        out["sky"] = sky
+    return out
+
+
 def parts_of(species: str) -> list[str]:
     """The part ids of a species, in browse order ([] for an unknown species)."""
     return [p for p, _ in CHARACTER_TAXONOMY.get(species, [])]

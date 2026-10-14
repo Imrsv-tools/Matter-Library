@@ -29,6 +29,7 @@ MATERIALS = REPO / "MatterLibrary" / "materials"
 RECIPES = REPO / "tools" / "converters" / "recipes"
 RELEASE_CATALOG = REPO / "library" / "releases" / "matterlib-0.1.0.catalog.json"   # read only
 VERSION_RE = re.compile(r"^(?P<leaf>.+)_(?P<ver>v\d+)$")
+SCALE_RE = re.compile(r"_(s\d+)$")      # the same rule as project_runtime_catalog.SCALE_RE
 SYSTEM = {"IMRSV_MissingMaterial"}
 STATUSES = ("draft", "candidate", "approved", "deprecated", "retired")
 
@@ -95,7 +96,10 @@ def articles() -> list[dict]:
         rel = mtlx.relative_to(MATERIALS).with_suffix("").as_posix()
         m = VERSION_RE.match(rel)
         mid, ver = (m["leaf"], m["ver"]) if m else (rel, "v01")
+        leaf = mid.rsplit("/", 1)[1]
+        scale = SCALE_RE.search(leaf)
         rows.append({
+            "display_name": leaf[: scale.start()] if scale else leaf,   # the name, sNN dropped
             "id": mid, "version": ver, "status": status_of(mtlx.stem, (mid, ver), release),
             "master": master_of(mtlx),
             "creator_selectable": mtlx.stem not in SYSTEM,

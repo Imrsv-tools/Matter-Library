@@ -54,6 +54,7 @@ REPO = HERE.parent.parent
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 sys.path.insert(0, str(REPO / "tools" / "parity"))
 import working_tree  # noqa: E402
+import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy)
 from lcd_ports import LCD_MIN_EXCLUSIVE, LCD_PORTS, LCD_RANGES  # noqa: E402
 from project_runtime_catalog import derive_entry, derive_hdri_entry  # noqa: E402
 sys.path.insert(0, str(HERE))
@@ -72,25 +73,21 @@ VIEWS = (("wide", "defaults.png"), ("close", "defaults__close.png"))
 MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
 WEBP_QUALITY = 90
 DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
-# RD-P13-2 (the lead, 2026-10-14): biological materials are not Matter. They stay browsable, on
-# the side, and are shown in a human context, never on the rig's cubes.
-CHARACTER_DOMAINS = {"biological"}
 # RD-P14-4 (the lead, 2026-10-14): the library relays what sits side by side on the site, and how
 # each is shown, so the site builds its navigation from the library. In browse order:
 #   rig       - on the parity rig's test scene (the cubes);
 #   human     - in a human context (skin on a side face and hands, an eye on an eye), never on
 #               the cubes (RD-P13-2); no picture is published until one exists (Thumbnails);
 #   thumbnail - the HDRI's own 2:1 picture.
-GROUPS = [
-    {"id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "rig"},
-    {"id": "character", "label": "Character", "list": "materials", "section": "character", "shown": "human"},
-    {"id": "hdris", "label": "HDRIs", "list": "hdris", "shown": "thumbnail"},
-]
+# Phase15 (RD-P15-5): the list lives in tools/converters/groups.py, which the dev catalog reads
+# too, and each group names its taxonomy; Character's gains its rows (species, then parts).
+GROUPS = G.GROUPS
 
 
-def section(domain: str) -> str:
-    """Where a material is browsed: "matter", or "character" beside it (RD-P13-2)."""
-    return "character" if domain in CHARACTER_DOMAINS else "matter"
+def section(art: dict) -> str:
+    """Where a material is browsed: its group, as its own file declares it (Phase15, RD-P15-3).
+    Never worked out from the domain (F-DS-5); until Phase15 it was, `biological` -> character."""
+    return art["group"]
 ZIP_TIME = (2026, 1, 1, 0, 0, 0)     # fixed, so a zip of the same files is byte-identical
 
 
@@ -171,6 +168,7 @@ def hdri_entry(hdri: dict, thumb: str, thumb_sha: str) -> dict:
     out = {"id": cat["id"], "version": cat["version"], "identity": hdri["identity"],
            "label": c.get("name") or label(cat["display_name"]), "display_name": cat["display_name"],
            "status": cat["status"], "creator_selectable": cat["creator_selectable"], "licence": LICENCE,
+           "group": G.HDRIS, **G.hdri_taxonomy(rec),            # Phase15 (RD-P15-4): when, sky
            "pictures": [{"role": "thumbnail", "file": thumb, "sha256": thumb_sha}]}
     if rec.get("description"):
         out["description"] = rec["description"]
@@ -326,14 +324,16 @@ def build(tag: str, out: Path) -> dict:
                               "creator_selectable": art["creator_selectable"]})
         rec = {
             "id": entry["id"], "version": entry["version"], "identity": identity,
-            "label": recipe.get("label") or label(entry["display_name"]),
-            "display_name": entry["display_name"],
-            "section": section(entry["domain"]),
-            "domain": entry["domain"], "material_class": entry["material_class"],
+            "label": recipe.get("label") or label(art["display_name"]),
+            "display_name": art["display_name"],
+            "section": section(art), "group": art["group"],
+            "domain": art["domain"], "material_class": art["material_class"],
             "master": art["master"], "scale": entry["scale"],
             "status": entry["status"], "creator_selectable": entry["creator_selectable"],
             "controls": controls(mtlx), "licence": LICENCE,
         }
+        if art["group"] == G.CHARACTER:                      # Phase15: Character's own taxonomy
+            rec.update(species=art["species"], part=art["part"])
         for key in ("summary", "search_words", "origin"):    # the words (13.2), when written
             if recipe.get(key):
                 rec[key] = recipe[key]
@@ -414,8 +414,9 @@ def build(tag: str, out: Path) -> dict:
         f"nothing here is versioned or approved, and every material shows its own status.\n\n"
         f"- `{site_name}`: every material on disk ({len(materials)}), with what the library knows "
         f"about each. A field it does not know yet is left out, never made up.\n"
-        f"- Each material's `section`: `matter`, or `character` ({characters}: skin, eyes, teeth, hair "
-        f"and nails), browsed apart and never shown on the rig's cubes.\n"
+        f"- Each material's `group` (and `section`): `matter`, or `character` ({characters}: eyes, hair, "
+        f"skin, nails, teeth and mouth, each with its `species` and `part`), read from the material's "
+        f"own file; Character is browsed apart and never shown on the rig's cubes.\n"
         f"- Pictures: the parity rig's test scene in the tools that ran, for {pictured} Matter materials. "
         f"A verdict per control for {swept} materials, each with the date it was measured.\n"
         f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
@@ -423,7 +424,9 @@ def build(tag: str, out: Path) -> dict:
         + (f"- HDRIs: {len(hdris)} lighting pictures from [Poly Haven](https://polyhaven.com), each with "
            f"its thumbnail and its full credit (contributors and their roles, sponsors, Poly Haven's "
            f"tags). The HDRI files themselves are not in this snapshot.\n" if hdris else "")
-        + "- `groups`: what the site shows side by side (Matter, Character, HDRIs) and how each is shown.\n"
+        + "- `groups`: what the site shows side by side (Matter, Character, HDRIs), how each is shown, "
+          "the fields each is browsed by, and Character's rows (Eyes, Hair, Skin, Nails, Teeth, Mouth). "
+          "Each HDRI carries its `when` and `sky`, Poly Haven's own words.\n"
         + (f"- Words: a plain name, a one-line summary and search words for {described} materials, "
            f"confirmed by the maintainer.\n\n" if described else "\n")
         + f"Not yet in it: material thumbnails{'' if described else ', summaries and search words'}. "

@@ -49,8 +49,9 @@ REPO = HERE.parent.parent
 SOURCE = REPO / "MatterLibrary"
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 from project_runtime_catalog import (  # noqa: E402
-    SCALE_RE, SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
+    SCHEMA_VERSION, SCHEMA_VERSION_HDRIS, derive_entry, derive_hdri_entry)
 import working_tree  # noqa: E402
+import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy)
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 
@@ -75,16 +76,17 @@ def working_tree_catalog() -> dict:
         # derive_entry reads domain/class off the id's folders, which for a Character article are
         # character/<species>/<part>/, so the file's own values replace them; its domain and
         # class stay as what it is made of. Released catalogs are unchanged (RD-P15-6).
-        leaf = art["id"].rsplit("/", 1)[1]
-        scale = SCALE_RE.search(leaf)
         entry.update(group=art["group"], domain=art["domain"], material_class=art["material_class"],
-                     display_name=leaf[: scale.start()] if scale else leaf)
+                     display_name=art["display_name"])
         if art["group"] == "character":
             entry.update(species=art["species"], part=art["part"])
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)
-    catalog = {"schema_version": SCHEMA_VERSION, "release": SERVED_RELEASE, "materials": entries}
+    # Phase15 (RD-P15-5): the groups, in browse order, with each one's taxonomy and Character's
+    # rows: the site file's list, so the engines and the website read one shape. Additive.
+    catalog = {"schema_version": SCHEMA_VERSION, "release": SERVED_RELEASE, "materials": entries,
+               "groups": G.GROUPS}
     hdris, default = working_tree_hdris()
     if hdris:  # Q-P14-2: schema 3 only when HDRIs are listed
         catalog.update(schema_version=SCHEMA_VERSION_HDRIS, hdris=hdris, default_hdri=default)
@@ -95,8 +97,16 @@ def working_tree_hdris() -> tuple[list[dict], str | None]:
     """Every HDRI on disk as a catalog entry, and the default (Phase14; tools/releases/hdris.py).
     A file that fails the HDRI check refuses the serve, as a missing payload does."""
     listed = H.on_disk()
-    entries = [derive_hdri_entry({"id": h["id"], "version": h["version"],
-                                  "status": h["record"].get("status") or "draft"}) for h in listed]
+    entries = []
+    for h in listed:
+        entry = derive_hdri_entry({"id": h["id"], "version": h["version"],
+                                   "status": h["record"].get("status") or "draft"})
+        # Phase15 (RD-P15-4): the group, its two axes, and the record's whole tagging (the
+        # platform's ask A10), read from the HDRI's record; into the .hdr header at Phase16.
+        entry.update(group=G.HDRIS, **G.hdri_taxonomy(h["record"]))
+        if h["record"].get("tagging"):
+            entry["tagging"] = h["record"]["tagging"]
+        entries.append(entry)
     return entries, H.default(listed)
 
 
