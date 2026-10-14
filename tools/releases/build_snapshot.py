@@ -362,9 +362,42 @@ def publish(tag: str, out: Path, target: str) -> None:
     files = sorted(p for p in out.iterdir() if p.is_file() and p.name != "NOTES.md")
     if len(files) > MAX_ASSETS:
         raise SystemExit(f"{len(files)} assets: over {MAX_ASSETS}")
-    subprocess.run(["gh", "release", "create", tag, *map(str, files), "--repo", REPO_SLUG,
-                    "--prerelease", "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
-                    "--notes-file", str(out / "NOTES.md")], check=True)
+    draft = existing_draft(tag)
+    if draft is None:
+        # gh keeps the release a draft until every asset is up, then publishes it
+        subprocess.run(["gh", "release", "create", tag, *map(str, files), "--repo", REPO_SLUG,
+                        "--prerelease", "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
+                        "--notes-file", str(out / "NOTES.md")], check=True)
+        return
+    # An interrupted upload (Phase13 13.1: a slow network, a battery) left a draft: upload only
+    # what it lacks, then publish it. A file whose upload never finished is not "uploaded" and
+    # is sent again.
+    have = {a["name"] for a in draft["assets"] if a["state"] == "uploaded"}
+    for a in draft["assets"]:
+        if a["state"] != "uploaded":
+            subprocess.run(["gh", "api", "-X", "DELETE", f"repos/{REPO_SLUG}/releases/assets/{a['id']}"], check=True)
+    missing = [str(p) for p in files if p.name not in have]
+    print(f"resuming draft {draft['id']}: {len(have)} uploaded, {len(missing)} to send")
+    for i in range(0, len(missing), 20):
+        subprocess.run(["gh", "release", "upload", tag, *missing[i:i + 20], "--repo", REPO_SLUG], check=True)
+    subprocess.run(["gh", "release", "edit", tag, "--repo", REPO_SLUG, "--draft=false", "--prerelease",
+                    "--target", sha], check=True)
+
+
+def existing_draft(tag: str) -> dict | None:
+    """The draft release for this tag, if an earlier publish was interrupted."""
+    rels = json.loads(subprocess.run(["gh", "api", "--paginate", f"repos/{REPO_SLUG}/releases?per_page=100"],
+                                     check=True, capture_output=True, text=True).stdout or "[]")
+    for r in rels:
+        if r.get("tag_name") == tag:
+            if not r.get("draft"):
+                raise SystemExit(f"{tag} is already published")
+            lines = subprocess.run(
+                ["gh", "api", "--paginate", f"repos/{REPO_SLUG}/releases/{r['id']}/assets?per_page=100",
+                 "--jq", ".[] | {id, name, state}"], check=True, capture_output=True, text=True).stdout
+            r["assets"] = [json.loads(line) for line in lines.splitlines() if line.strip()]
+            return r
+    return None
 
 
 def main(argv=None) -> int:
