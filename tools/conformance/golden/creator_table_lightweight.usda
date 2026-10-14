@@ -16,6 +16,10 @@
     #     customLayerData imrsv:matterlibRelease
     #   - two meshes may share ONE Matter identity as INDEPENDENT instances
     #     (separate material prims -> per-mesh refinement stays independent)
+    #   - a 1 m reference cube stands beside the table (2026-10-14), so anyone can see at a
+    #     glance whether a consumer brought the asset in at the right size. Its UVs are at
+    #     real scale for its article's 0.1 m tile: each face spans [0,10] (LCDSchema's rule
+    #     that one UV unit is one tile)                                        [Scale_Reference_1m]
     #   - every face is wound counter-clockwise seen from outside, at USD's default
     #     orientation (rule 10). doubleSided is 0 here because Copper is on Opaque, a
     #     one-sided master; the flag is not a conformance rule and makes no face show.
@@ -67,6 +71,23 @@ def Xform "Creator_Table" (
         rel material:binding = </Creator_Table/Materials/Copper_Instance_Leg>
     }
 
+    # Region 3 — the 1 m reference cube, standing on the floor 0.2 m to the table's right.
+    # Its size is the reference; its UVs are real-scale for Copper's 0.1 m tile (UV fit C, 10x).
+    def Mesh "Scale_Reference_1m" (
+        prepend apiSchemas = ["MaterialBindingAPI"]
+    )
+    {
+        uniform bool doubleSided = 0
+        uniform token subdivisionScheme = "none"
+        int[] faceVertexCounts = [4, 4, 4, 4, 4, 4]
+        int[] faceVertexIndices = [4, 5, 6, 7, 5, 1, 2, 6, 1, 0, 3, 2, 0, 4, 7, 3, 7, 6, 2, 3, 0, 1, 5, 4]
+        point3f[] points = [(0.8, 0, -0.5), (1.8, 0, -0.5), (1.8, 1, -0.5), (0.8, 1, -0.5), (0.8, 0, 0.5), (1.8, 0, 0.5), (1.8, 1, 0.5), (0.8, 1, 0.5)]
+        texCoord2f[] primvars:st = [(0, 0), (10, 0), (10, 10), (0, 10), (0, 0), (10, 0), (10, 10), (0, 10), (0, 0), (10, 0), (10, 10), (0, 10), (0, 0), (10, 0), (10, 10), (0, 10), (0, 0), (10, 0), (10, 10), (0, 10), (0, 0), (10, 0), (10, 10), (0, 10)] (
+            interpolation = "faceVarying"
+        )
+        rel material:binding = </Creator_Table/Materials/Copper_Instance_ScaleRef>
+    }
+
     def Scope "Materials"
     {
         # Independent instance A — bound by Table_Top.
@@ -81,6 +102,16 @@ def Xform "Creator_Table" (
 
         # Independent instance B — bound by Table_Leg. Same identity, separate prim.
         def "Copper_Instance_Leg" (
+            prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>
+            assetInfo = {
+                string identifier = "Copper_Verdigris_Aged_Base_s01_v01"
+            }
+        )
+        {
+        }
+
+        # Independent instance C — bound by Scale_Reference_1m. Same identity, separate prim.
+        def "Copper_Instance_ScaleRef" (
             prepend references = @Copper_Verdigris_Aged_Base_s01_v01.mtlx@</MaterialX/Materials/Copper_Verdigris_Aged_Base_s01_v01>
             assetInfo = {
                 string identifier = "Copper_Verdigris_Aged_Base_s01_v01"

@@ -53,7 +53,7 @@ The pinned golden and the executable gate live in this repo:
 
 ```
 tools/conformance/
-  golden/creator_table_lightweight.usda      # hand-authored lightweight golden (2 Copper meshes, distinct UV fits)
+  golden/creator_table_lightweight.usda      # hand-authored lightweight golden (2 Copper table meshes, distinct UV fits, + a 1 m reference cube)
   golden/creator_table_portable/             # complete-portable package (built by build_portable.py; not committed)
   build_portable.py                          # materializes the portable form from the lightweight golden + the Library
   assert_profile.py                          # pxr-free profile asserter (shape + spec-derived NEGATIVE guards)
@@ -65,7 +65,7 @@ tools/conformance/
 *(Updated 2026-09-23, measured: `golden/creator_table_lightweight.usda`, `build_portable.py`, `assert_profile.py` and `check_conformance.sh` exist; `golden/creator_table_portable/` is a build output listed in `tools/conformance/.gitignore`, so it appears only after `build_portable.py` runs. The lightweight golden sets `metersPerUnit = 1`, `imrsv:matterlibRelease = "matterlib-0.1.0"`, `subdivisionScheme = "none"` on both meshes, and bare `@Copper_Verdigris_Aged_Base_s01_v01.mtlx@` references.)*
 
 **The gate proves — for BOTH forms:**
-- `usdchecker` → `Success!` and `usdcat --flatten` composes the material network (96 shaders = 2 Copper instances × 48). The **lightweight** form resolves the bare `@Name.mtlx@` via a leaf-dir `PXR_AR_DEFAULT_SEARCH_PATH` (Matter Library on the search path); the **portable** form composes with **no search path at all** — proving independent open.
+- `usdchecker` → `Success!` and `usdcat --flatten` composes the material network (96 shaders = 2 Copper instances × 48). *(Updated 2026-10-14, measured: **165 = 3 Copper instances × 55**. The count was already 110, 2 × 55, before the reference cube added the third instance. The gate prints the count; it does not assert it.)* The **lightweight** form resolves the bare `@Name.mtlx@` via a leaf-dir `PXR_AR_DEFAULT_SEARCH_PATH` (Matter Library on the search path); the **portable** form composes with **no search path at all** — proving independent open.
 - `assert_profile.py` → every rule above holds, including the negative "no material payload beside a lightweight asset" guard (spec-derived, not a Matter-basename allowlist — so it cannot be fooled by a differently-named generated texture).
 - `usdrecord` (Storm/GL) → an eyes-on render of both forms; the Copper material samples the mesh's authored `primvars:st` and renders as verdigris-copper metal.
 
@@ -81,3 +81,4 @@ tools/conformance/
 - 2026-07-17: the complete-portable form shipped in the real Blender exporter, alongside the release pin.
 - 2026-10-11: rule 10 added. IMRSV's asset tooling built a prop by script, saved it through the export add-on and passed all nine rules with 204 of its 3,764 triangles wound backwards; Studio drew it with parts missing from the front. The profile had said nothing about which way a face looks, and the golden itself carried `doubleSided = 1` on Copper, an Opaque article; it now carries `0`. The asserter refuses `leftHanded`. What `doubleSided` means was taken as *free* on the lead's go-ahead for the whole set of asks, with no other option named (research `261011_R_AssetToolingAsks.md`, §Resolved).
 - 2026-10-11: `check_facing.py` handed over by IMRSV's asset tooling and added to the gate (step 3b), with its self-test. It is a dated copy of a check defined and tested there (rule 10; research `261011_R_AssetToolingAsks.md`, Pass 4).
+- 2026-10-14: a **1 m reference cube** (`Scale_Reference_1m`) joins the golden beside the table. It is a third independent Copper instance, with real-scale UVs for Copper's 0.1 m tile (each face spans [0,10]). It is not a new rule: anyone can see at a glance whether a consumer brought the asset in at the right size. Offered by the platform after an import that arrived 100× too small turned out to be the consumer's units, not the article's. Taken by the lead (`261013_R_PlatformTrackedItemsAsks.md` A1, RD-TI-3). The scale probes that may later dress it are `261014_R_ScaleProbes.md`.
