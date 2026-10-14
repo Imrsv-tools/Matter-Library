@@ -238,23 +238,86 @@ def sheet(folders: list[Path], name: str) -> Path:
     return dst
 
 
+def kept() -> list[str]:
+    """Every kept article: approved or candidate, and selectable (not the system fallback,
+    ``IMRSV_MissingMaterial``). Drafts get theirs when they come to review (RD-MP-4)."""
+    sys.path.insert(0, str(S.REPO / "tools" / "converters"))
+    import working_tree  # noqa: PLC0415
+    return [a["identity"] for a in working_tree.articles()
+            if a["status"] in ("approved", "candidate") and a["creator_selectable"]]
+
+
+PAGE_CELL = 480
+
+
+def pages(folders: list[Path], name: str) -> Path:
+    """The whole library on pages, one per subject (``_sheets/NAME/NN_<subject>.png``): two articles
+    to a row, each with its views at PAGE_CELL px. For judging which you would not publish."""
+    groups: dict[str, list] = {}
+    for f in folders:
+        rec = json.loads((f / "record.json").read_text()) if (f / "record.json").is_file() else {}
+        order = [v for v in S.VIEW_ORDER + S.CHARACTER_VIEWS if v in rec.get("views", [])]
+        groups.setdefault(rec.get("subject", "?"), []).append((f, order))
+    dst = S.OUT_ROOT / "_sheets" / name
+    dst.mkdir(parents=True, exist_ok=True)
+    for old in dst.glob("*.png"):
+        old.unlink()
+    f_big, f_small = _font(34), _font(20)
+    c, head, per_row = PAGE_CELL, 46, 2
+    width = per_row * (2 * c + 30) + 10
+    for k, (subject, items) in enumerate(sorted(groups.items())):
+        rows = (len(items) + per_row - 1) // per_row
+        out = Image.new("RGB", (width, 70 + rows * (c + head + 10)), (30, 30, 30))
+        d = ImageDraw.Draw(out)
+        d.text((10, 14), f"{subject} — {len(items)} article{'s' if len(items) != 1 else ''}",
+               fill=(235, 235, 235), font=f_big)
+        for i, (f, order) in enumerate(items):
+            x0, y0 = 10 + (i % per_row) * (2 * c + 30), 70 + (i // per_row) * (c + head + 10)
+            d.text((x0, y0 + 10), f.name.replace("_Clean_Base", ""), fill=(235, 235, 235), font=f_small)
+            for j, v in enumerate(order[:2]):
+                pic = f / f"{v}.png"
+                if pic.is_file():
+                    out.paste(Image.open(pic).convert("RGB").resize((c, c), Image.LANCZOS), (x0 + j * c, y0 + head))
+                d.text((x0 + j * c + 6, y0 + head + 4), v, fill=(255, 255, 0), font=f_small)
+        out.save(dst / f"{k + 1:02d}_{subject}.png")
+    return dst
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Make thumbnails: showcase pictures in Cycles, and their record.")
-    ap.add_argument("articles", nargs="+", help="article stems (or paths to .mtlx)")
-    ap.add_argument("--sheet", metavar="NAME", help="write library/thumbnails/_sheets/NAME.png")
+    ap.add_argument("articles", nargs="*", help="article stems (or paths to .mtlx)")
+    ap.add_argument("--all-kept", action="store_true", help="every kept article (approved and candidate)")
+    ap.add_argument("--sheet", metavar="NAME", help="write library/thumbnails/_sheets/NAME.png "
+                                                    "(with --all-kept: NAME/, one page per subject)")
     ap.add_argument("--force", action="store_true", help="make them even when fresh")
     ap.add_argument("--draft", action="store_true", help="384 px, 32 samples, no record: for tuning the look")
     args = ap.parse_args(argv)
+    names = list(args.articles) + (kept() if args.all_kept else [])
+    if not names:
+        ap.error("name articles, or --all-kept")
     rend = None if args.draft else renderer()
     if rend:
         print(f"renderer: Blender {rend['blender']}, {rend['engine']}, {rend['device']}")
-    folders = []
-    for a in args.articles:
-        folder, what = make(a, rend, args.force, args.draft)
-        print(f"{folder.name}: {what}")
+    folders, failed, made, t0 = [], [], 0, time.perf_counter()
+    for a in names:
+        try:
+            folder, what = make(a, rend, args.force, args.draft)
+        except SystemExit as e:          # one article's failure does not stop the library
+            print(f"{a}: FAILED: {e}")
+            failed.append(a)
+            continue
+        made += what != "fresh"
+        print(f"{folder.name}: {what}", flush=True)
         folders.append(folder)
+    gpu = sum(sum(json.loads((f / "record.json").read_text()).get("seconds", {}).values())
+              for f in folders if (f / "record.json").is_file())
+    print(f"{len(names)} articles: {made} made, {len(folders) - made} fresh, {len(failed)} failed; "
+          f"{time.perf_counter() - t0:.0f} s this run; GPU time of the pictures as recorded {gpu:.0f} s")
     if args.sheet:
-        print(f"sheet: {sheet(folders, args.sheet)}")
+        print(f"sheet: {pages(folders, args.sheet) if args.all_kept else sheet(folders, args.sheet)}")
+    if failed:
+        print("FAILED: " + ", ".join(failed))
+        return 1
     return 0
 
 
