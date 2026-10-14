@@ -388,7 +388,7 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   **Material-making continues as a standing process outside the phase line** (the lead, 2026-10-14: *"1) yes"*, to F-MP-46). The close itself is `/execute Phase11`'s, in Phase11's doc. (Q-MP-8, Q-MP-12.)
 - **RD-MP-14 — No rented server for now: the library's work stays local** (the lead, 2026-10-14, in Phase17's discovery, after Hetzner had no GPU server and the alternatives were priced: *"We have to rethink and stay local for now"*).
   - **Read as (mine, not the lead's words):** RD-MP-12's *"a new server, rented"* is suspended, not withdrawn. No server is rented from any provider until the lead reopens it.
-  - **Not decided by it:** what *The Library Service* (Phase17) becomes, and whether Thumbnails (RD-MP-10) still waits for a permanent machine. Both are Phase17's Q-P17-7.
+  - **Not decided by it:** what *The Library Service* (Phase17) becomes, and whether Thumbnails (RD-MP-10) still waits for a permanent machine. Both are Phase17's Q-P17-7. **→ Closed the same evening by RD-DS-8** (`261014_R_DownstreamPicture.md`, option (A)): The Library Service went back to TBD (`Phases/Future/PhaseTBD_LibraryService.md`), and Thumbnails runs on the laptop as Phase17.
   - The provider options priced at the time are in `PhaseTBD_LibraryService.md` F-P17-7.
 
 ## Resolved
