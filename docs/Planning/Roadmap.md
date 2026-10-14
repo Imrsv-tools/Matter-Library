@@ -66,6 +66,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
 
+### HDRIs in the Library — SEEDED *(added 2026-10-14 by `/research` on the lead's "seed the phase", from the platform's HDRI asks, RD-SKY-1 to 4; the platform's own HDRI phase waits on it)*
+**Outcome:** a scene's lighting picture (an HDRI) is chosen from the library by name, in the IMRSV app and a USD viewer, and the library is the only place it comes from.
+- `docs/Planning/Phases/Future/PhaseTBD_HdrisInTheLibrary.md`
+
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
 - Automated transformers (MaterialX → Blender / Unreal), after manual parity is proven. Parity-gate automation in CI. A Realm level above Domain. Texture storage beyond Git LFS (asset management, content-addressed pointers). Further engine targets. Personal saved variants, community scoring and contributor reputation (`docs/specs/Experience/Experience_MatterLibrary.md` §Future Layers). The planned roots in `docs/ToolingConventions.md` §Planned roots.
