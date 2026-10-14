@@ -30,6 +30,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
+### Skin That Reads as Skin — RESEARCH *(seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; reopens MAP-RD2 and MAP-RD5, quoted in the research)*
+**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Research/261014_R_SkinMaps.md` · `docs/Planning/Research/260929_R_CharacterMaps.md` (Passes 2–4)
+
 ### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
 - `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`

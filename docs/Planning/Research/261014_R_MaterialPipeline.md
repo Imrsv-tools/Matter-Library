@@ -282,6 +282,50 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
   The site research's *"the licence: CC0-1.0 throughout"* (WS-F3) is no longer true; it gets an in-place note.
 - **F-MP-37 — The console is for the IMRSV team, and it is a front end the team can reach.** Its job, in the lead's words: *"view and evaluate them, update versions, keep whatever provenance might exist"*. That is F-MP-24's maintainer's console, used by more than one person. **Where it runs is now the open question (Q-MP-9).** "A local page" (the Q-MP-4 recommendation) assumed one maintainer at this machine.
 
+## Pass 9 — The lead's second answers: skin maps, a permanent home, CC0 by default (2026-10-14)
+
+**The lead, verbatim:**
+1. *"BodySKinMaps - Sadly - I don't think this skintype per area of a mesh apprach is gong to yeild good results... Right now... it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps … feel free to seed a reseerach on this topic"*;
+2. *"So... that "library machine" is currently this little laptop... this is not setup on a system... now - I am totalyl open to operationalizing MatterLibrary and getting it on a serviced instance that do everything... but we would need to build that and set that up.... Could be indpendent, or we could add that to imrsv web... thoughts?"*;
+3. *"CC0 is fine"*;
+4. *"What is needed from the review? I feel like it must have passed if we have moved on"*;
+5. *"lets pause on that since again --- this is on my laptop right now so we might want to consdier if this moved to something more perminante with the this as one of the firsts tests"*.
+
+- **F-MP-38 — Q-MP-6 is answered the other way.** The "no body skin map" rule is **not** taken. The lead's direction is to plan a move to skin maps, researched in **`261014_R_SkinMaps.md`** (seeded today). That doc quotes the rulings it reopens (MAP-RD2, MAP-RD5). It also finds that the colour half needs no contract change: `base_color_map` on Subsurface already exists (F-SKM-3).
+- **F-MP-39 — The review has not happened. "Moved on" was a re-sequencing, not a pass.**
+  - The lead paused Phase11 after 11.3 on 2026-10-02, and the work moved to other phases (Phase12, the platform's asks, the HDRIs).
+  - Measured: every batch summary's **Review** line reads `—` (`library/batches/*.md`); the wish list holds 35 rows `built` and **0 `kept`**; the 30 proving rows are `draft`.
+  - **What the review needs** (Phase11 §The end review): the lead opens each batch's review page (eight batches, one image each) and says keep or redo per row, about 35 rows. The agent records each verdict, and a keep writes the article's status (`approved` when all three tools moved alike, `candidate` otherwise). Phase11 also planned **11.4, a refine pass**, before it.
+  - **Three ways to do it:**
+    - **(a)** The end review as planned, in one sitting.
+    - **(b)** Keep by verdict: every row whose three tools moved alike is kept at once, and the lead looks only at the flagged rows.
+    - **(c)** Make the review the **first real job of the team's console** on the library's permanent machine (Q-MP-11).
+
+    Q-MP-8, reframed.
+- **F-MP-40 — The library's machine is a laptop, and the flow needs a permanent one.** What the service must run:
+
+  | Job | What it needs |
+  |---|---|
+  | **GPU work:** the rig in Storm, Blender and Unreal; Cycles thumbnails | a GPU with Vulkan for the Unreal runtime; Blender 5.1+; the OpenUSD and MaterialX toolchain (a 30–50 minute from-source build); the pinned Unreal runtime |
+  | **Agent work** | Claude Code sessions running `/matter-batch` and `/matter-generate` against a clone |
+  | **The team's console** (RD-MP-7) | a light web app |
+  | **The dev catalog** (`serve_to_stage.py`) and the thumbnail folder (RD-MP-6) | serving to staging (RD-WS-3) |
+  | **Git** | commits to this public repo, and pushes on the maintainer's word; approvals stay the maintainer's (`promote_release.py`) |
+  | **Storage** | renders, thumbnails and staged releases, none of them in git; the compressed-texture encoder (F-MP-29) |
+
+- **F-MP-41 — The platform's web server cannot be that machine as it stands.** Its own docs describe a small, shared server with no GPU. "Adding it to the platform's web side" can mean only two things:
+  - the **console** in the platform's back office;
+  - a **GPU worker** elsewhere, which the platform's stack calls.
+
+  The heavy half needs its own GPU host either way.
+- **F-MP-42 — The shape that keeps both repos' rulings: an independent library service, run by IMRSV.**
+  - **Its code lives in this repo:** containers for Blender, the USD toolchain, the Unreal runtime, the console and the agent's workspace. Anyone who forks the library can stand one up. That is RD-WS-1's condition 3, *"the library survives without IMRSV"*.
+  - **IMRSV runs it:** its machine, its accounts. The team may later sign in with their IMRSV accounts, since one account crosses domains on the platform's side.
+  - **The platform's site and mirror consume what it publishes:** the dev catalog and the thumbnails before a release, the bundle at a release. They never reach into it.
+  - **Where it runs is a cost and ops question:** a cloud GPU instance started only while batches and thumbnails run; a dedicated machine (the Linux GPU machine the Unreal work used, BigPicture BP6, if it is free); or a GPU worker on the platform's infrastructure. Q-MP-11.
+  - **Its first tests,** as the lead said: the thumbnail probe and the review (F-MP-39 (c)).
+- **F-MP-43 — The thumbnail probe is paused** until the permanent machine exists, and becomes one of its first tests (RD-MP-10).
+
 ## Resolved
 
 - **RD-MP-1 — CC BY 4.0 is allowed beside CC0-1.0** (the lead, 2026-10-14: *"CC by is indeed OK .. this is inline with our asset library and composition sharing approach in imrsv labs"*). **It amends R13** (`260923_R_StandaloneSetup.md`, in-place note there), which said *"Content licence: CC0-1.0 … every third-party input must itself be CC0 … CC-BY … sources do not"*. **Read as** the Asset Library's shape: **each article carries one licence, CC0-1.0 or CC BY 4.0**. A CC BY input makes its article CC BY. The default is Q-MP-10. Consequences: F-MP-36.
@@ -291,6 +335,9 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 - **RD-MP-5 — "Thumbnail" is the word for the published pictures; "preview" stays the review render.** RD-WS-4's *"a standard preview set"* means the thumbnails (in-place note there). The derived specs that say "preview set" (Catalog §Thumbnails's note, RuntimeCatalog's note, Consumers, PlatformDependencies M9) are conformed when a phase next touches them. (Q-MP-5.)
 - **RD-MP-6 — Thumbnails never go in git or LFS.** Before a release they sit in a folder on this machine that git ignores, served to the site's staging; at a release they are release assets. (Q-MP-7.)
 - **RD-MP-7 — The management front end is for the IMRSV team: to view and evaluate materials, decide what goes into which library version, and keep their provenance.** The Creator's side lives in each consumer. (Q-MP-4; where the console runs is Q-MP-9.)
+- **RD-MP-8 — A new article is CC0-1.0 by default** (the lead, 2026-10-14: *"CC0 is fine"*). CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article (RD-MP-1). (Q-MP-10.)
+- **RD-MP-9 — The "no body skin map" rule is not taken. The direction is to plan a move to skin maps** (the lead, 2026-10-14: *"I think we need to plan to move to SkinMaps"*), researched in `261014_R_SkinMaps.md`. The rulings it reopens are quoted there (MAP-RD2, MAP-RD5). (Q-MP-6.)
+- **RD-MP-10 — The thumbnail probe waits for the library's permanent machine, and is one of its first tests** (the lead, 2026-10-14: *"lets pause on that … we might want to consdier if this moved to something more perminante with the this as one of the firsts tests"*).
 
 ## Open questions
 
@@ -301,27 +348,37 @@ The lead, verbatim: *"CC by is indeed OK .. this is inline with our asset librar
 | ~~Q-MP-3~~ | ~~Thumbnails before the review, or after?~~ | → RD-MP-4 |
 | ~~Q-MP-4~~ | ~~Who is the management front end for?~~ | → RD-MP-7 |
 | ~~Q-MP-5~~ | ~~One word for the published pictures?~~ | → RD-MP-5 |
-| Q-MP-6 *(held, F-MP-35)* | A rule that the library holds no body skin map (the fit set included)? | Yes. |
+| ~~Q-MP-6~~ | ~~A rule that the library holds no body skin map?~~ | → RD-MP-9 (not taken; skin maps instead) |
 | ~~Q-MP-7~~ | ~~Where thumbnails live before a release?~~ | → RD-MP-6 |
-| Q-MP-8 | Run Phase11's end review before building more of the flow? | **Yes** (F-MP-26). |
-| Q-MP-9 | **Where does the team's console run?** (a) A small web app **in this repo**, served from the library machine (where the rig, renders and thumbnails already are) and reachable by the team over its private network. It writes through the existing tools and commits to git. (b) **The platform's web back office**, which already has staff accounts and hosting, writing changes to this repo as pull requests. | **(a).** It keeps the library able to outlive IMRSV (RD-WS-1, condition 3), and anyone who forks the library can curate it. The heavy files it shows stay on the machine that makes them. Approvals stay the maintainer's act either way (`promote_release.py`). |
-| Q-MP-10 | **The default licence for a new article** (RD-MP-1), and who chooses? | **CC0-1.0 by default.** All 95 on disk are CC0-dedicable, and their sources (ambientCG, Physically Based, our own generators) are CC0. CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article. |
+| Q-MP-8 *(reframed 2026-10-14, F-MP-39)* | **How is the owed review done:** (a) the end review in one sitting, (b) keep by verdict and look only at the flagged rows, or (c) as the first job of the team's console on the permanent machine? | **(b) now:** it clears the backlog in minutes, and the console inherits a library with kept articles to curate. (c) if the lead would rather the console's first test be a real review. |
+| Q-MP-11 *(new, F-MP-40 to F-MP-42)* | **Where the library service runs:** a cloud GPU instance on demand, a dedicated machine, or a GPU worker on the platform's infrastructure? And is it **independent** (code here, run by IMRSV) or **part of the platform's web side**? | **Independent, code in this repo, run by IMRSV**, on a GPU host; the platform consumes what it publishes. The host is a cost and ops call, starting from whether the Linux GPU machine used for the Unreal work is free. |
+| ~~Q-MP-9~~ *(superseded by Q-MP-11, 2026-10-14: the "library machine" is a laptop, so where the console runs is part of where the service runs)* | **Where does the team's console run?** (a) A small web app **in this repo**, served from the library machine (where the rig, renders and thumbnails already are) and reachable by the team over its private network. It writes through the existing tools and commits to git. (b) **The platform's web back office**, which already has staff accounts and hosting, writing changes to this repo as pull requests. | **(a).** It keeps the library able to outlive IMRSV (RD-WS-1, condition 3), and anyone who forks the library can curate it. The heavy files it shows stay on the machine that makes them. Approvals stay the maintainer's act either way (`promote_release.py`). |
+| ~~Q-MP-10~~ → RD-MP-8 | **The default licence for a new article** (RD-MP-1), and who chooses? | **CC0-1.0 by default.** All 95 on disk are CC0-dedicable, and their sources (ambientCG, Physically Based, our own generators) are CC0. CC BY 4.0 is chosen by a contributor, or forced by a CC BY input, and recorded per article. |
 
 ## Status
 
-- **Passes captured:** 8 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Pass 8 records the lead's first answers.
-- **Ruled:** RD-MP-1 to RD-MP-7.
-  - **CC BY 4.0 is allowed beside CC0**, which amends R13.
+- **Passes captured:** 9 (2026-10-14). Pass 1 is the audit; Passes 2–7 are design; Passes 8 and 9 record the lead's answers.
+- **Ruled:** RD-MP-1 to RD-MP-10.
+  - **CC BY 4.0 is allowed beside CC0** (which amends R13), and **CC0 is the default**.
   - Cycles makes the hero thumbnail, on a subject chosen per Class, before the review; it is called a thumbnail; it is never stored in git.
   - The management front end is the IMRSV team's console for curating versions.
-- **Current direction:** the flow's first half runs; its second half is a sketch (Pass 5). The bottleneck is the review (F-MP-2).
+  - **Skin moves toward skin maps**, in its own research (`261014_R_SkinMaps.md`).
+  - **The thumbnail probe waits for the library's permanent machine.**
+- **Current direction:** the flow's first half runs, on a laptop. Its second half is a sketch (Pass 5).
+  - The flow needs **a permanent library service** (F-MP-40). The recommended shape is independent, with its code in this repo, run by IMRSV on a GPU host, and the platform consuming what it publishes (F-MP-42).
+  - The review is still owed (F-MP-39).
 - **Open:**
-  - Q-MP-6 (the body skin map rule; held for the lead's clarity, F-MP-35);
-  - Q-MP-8 (the end review first);
-  - Q-MP-9 (where the console runs);
-  - Q-MP-10 (the default licence).
+  - Q-MP-8 (how the owed review is done);
+  - Q-MP-11 (where the library service runs, and whether it is independent).
 - **Durable docs owed, and the verb that lands them:**
-  - **RD-MP-1's consequences (F-MP-36):** the licence field, the attribution list, the validator, `CONTRIBUTING.md`, `LICENSE-CONTENT.md`, `_Architecture.md` §Governance, the Glossary and `Experience_MatterLibrary.md`. A lead-directed `/quick-fix` for the words once Q-MP-10 is answered, or the phase that first ships a CC BY article for the field and the validator.
+  - **RD-MP-1 and RD-MP-8's consequences (F-MP-36):** the licence field, the attribution list, the validator, `CONTRIBUTING.md`, `LICENSE-CONTENT.md`, `_Architecture.md` §Governance, the Glossary and `Experience_MatterLibrary.md`. A lead-directed `/quick-fix` for the words, or the phase that first ships a CC BY article for the field and the validator.
   - **RD-MP-5's wording in four specs:** conformed by the next phase that touches them.
-- **Unverified:** Unreal's path tracer or Lumen in a packaged Linux runtime; the GPU time a showcase costs (F-MP-32); the bundle's size at 200 articles.
-- **Next step:** the lead's answers to Q-MP-6, Q-MP-8, Q-MP-9 and Q-MP-10; the three-article probe (it now tests RD-MP-2 and RD-MP-3 by eye); then Phase11's end review, and seeds for *Thumbnails* and *the team's console* if the lead wants them.
+- **Unverified:**
+  - Unreal's path tracer or Lumen in a packaged Linux runtime;
+  - the GPU time a showcase costs (F-MP-32);
+  - the bundle's size at 200 articles;
+  - the platform's web server having no GPU (its docs record none).
+- **Next step:**
+  - the lead's answers to Q-MP-8 and Q-MP-11;
+  - if the service is the direction, a seed for it as a phase (*the Library Service*), whose first tests are the thumbnail probe and the review;
+  - seeds for *Thumbnails* and *the team's console* after it.
