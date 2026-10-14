@@ -38,7 +38,7 @@ The **runtime catalog** is the machine-side projection of the authored [manifest
 
 | Field | Type | Meaning | Source |
 |-------|------|---------|--------|
-| `schema_version` | int | Runtime-catalog data-contract version (this doc). Bumped on a breaking JSON-shape change — **independent** of the library `release` semver. Bumped `1 → 2` for the additive `creator_selectable` field. | this doc |
+| `schema_version` | int | Runtime-catalog data-contract version (this doc). Bumped on a breaking JSON-shape change — **independent** of the library `release` semver. Bumped `1 → 2` for the additive `creator_selectable` field. Moves `2 → 3` for the `hdris` list and `default_hdri`, **only in a catalog that lists HDRIs**; a catalog without them stays at 2, so every frozen release catalog re-projects byte-identically (§HDRIs, Phase14 Q-P14-2). | this doc |
 | `release` | string (semver) | The library release this catalog projects. | lockfile `release` |
 | `materials[]` | array | One entry per material, ordered deterministically (by `id`). | lockfile `materials[]` |
 | `materials[].id` | string | The qualified Matter identity — Domain/Class folder path + the [qualified name](../Ontology/Identity.md) **including** the `sNN` scale tag. The resolution key (no alias layer). | lockfile `id` |
@@ -52,6 +52,48 @@ The **runtime catalog** is the machine-side projection of the authored [manifest
 | `materials[].payload_path` | string | Path to the `.mtlx` payload, **relative to the catalog file** (`materials/<id>_<version>.mtlx`; bare `materials/<id>.mtlx` for the off-grammar system material). | derived from `id` + `version` |
 
 *Consumer-side (IMRSV): how the catalog's `material_class` replaced the old shader-family `category` in IMRSV's read surface and picker — see [Consumers](../Consumers.md).*
+
+### HDRIs — a second list beside `materials` *(2026-10-14, Phase14)*
+
+An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontology/Identity.md) §HDRI names). A catalog that holds any lists them apart from materials, so a consumer never offers one as the other:
+
+```json
+{
+  "default_hdri": "IndustrialSunset02_PureSky",
+  "hdris": [
+    {
+      "creator_selectable": true,
+      "display_name": "IndustrialSunset02_PureSky",
+      "id": "IndustrialSunset02_PureSky",
+      "payload_path": "hdris/IndustrialSunset02_PureSky_v01.hdr",
+      "status": "candidate",
+      "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_PureSky_v01.jpg",
+      "version": "v01"
+    }
+  ],
+  "materials": [ … ],
+  "release": "0.1.0",
+  "schema_version": 3
+}
+```
+
+*(Measured 2026-10-14: the entry above is the dev catalog's, as `tools/releases/serve_to_stage.py` writes it.)*
+
+| Field | Type | Meaning | Source |
+|-------|------|---------|--------|
+| `hdris[]` | array | One entry per HDRI, ordered by `id`. **Present only when the release holds HDRIs.** A consumer built before it does not read it (it reads `materials` and `release` by name). | lockfile `hdris[]` |
+| `hdris[].id` | string | `<Name>_<Variant>`: the identity, and the resolution key with `version`. | lockfile `id` |
+| `hdris[].display_name` | string | The id; UI metadata, never a resolution key. | derived from `id` |
+| `hdris[].version` | string (`vNN`) | The HDRI's own version axis. | lockfile `version` |
+| `hdris[].status` | string | The lifecycle status, as a material's. | lockfile `status` |
+| `hdris[].creator_selectable` | bool | Whether a Creator may pick it. Default `true`. | lockfile / default |
+| `hdris[].payload_path` | string | `hdris/<id>_<version>.hdr`, relative to the catalog file. **A scene names the file's bare name** (`@<id>_<version>.hdr@` on a `DomeLight`'s `inputs:texture:file`), found through the stock USD search path on the `hdris/` folder, as a material's `@<Name>.mtlx@` is. | derived from `id` + `version` |
+| `hdris[].thumbnail_path` | string | `thumbnails/hdris/<id>_<version>.jpg`: a 1024 × 512 JPEG made from the HDRI (tone-mapped), relative to the catalog file. Made, never stored in git ([`261014_R_MaterialPipeline.md`](../../Planning/Research/261014_R_MaterialPipeline.md) RD-MP-5, RD-MP-6). In the dev install it is made at serve time; in a release it is a release asset *(planned, with the first release that holds HDRIs)*. | derived from `id` + `version` |
+| `default_hdri` | string | The id of the HDRI a new scene starts with: **one top-level key, so two defaults cannot be written** (A3). It names a listed HDRI, or the lockfile check refuses the release. | lockfile `default_hdri` |
+
+Provenance, licence and credit stay out of the catalog for HDRIs as for textures (`no_projection_guard`); they live in each HDRI's record, `library/provenance/sources/hdris/<id>.yaml`.
+
+> **Planned (2026-10-14):** a release that holds HDRIs. Staging, freezing and activating one are not built yet, and `tools/releases/freeze_release.py` refuses a lockfile that lists HDRIs until they are (Phase14 §Not now). The dev install serves HDRIs today.
 
 ### Planned: the per-article master token *(planned)*
 
@@ -71,7 +113,7 @@ Per-material **parameter definitions** (`default_parameters`, the LCD parameter 
 
 ## Status
 
-**The runtime contract.** Consumers read this catalog; there is no directory-scan read path. Versioned by its own `schema_version` (currently `2`); the catalog seam is additive JSON.
+**The runtime contract.** Consumers read this catalog; there is no directory-scan read path. Versioned by its own `schema_version` (currently `2`; `3` in a catalog that lists HDRIs, since 2026-10-14); the catalog seam is additive JSON.
 
 ## History
 

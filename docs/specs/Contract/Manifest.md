@@ -54,6 +54,30 @@ textures:
 
 The `id` is the Domain/Class folder path + the [qualified Matter name](../Ontology/Identity.md) **including the `sNN` scale tag** (Domain/Class are folder-only, so they appear in the path, not the name). Carrying `sNN` in `id` is what makes `id` + `version` resolve to a file — `<id>_<version>.mtlx`. `version` pins the material's own `vNN` axis; `release` is the library semver axis — the **[two version axes](../../Glossary.md)** never conflate ([Identity](../Ontology/Identity.md)).
 
+### HDRIs — `hdris[]` and `default_hdri` *(2026-10-14, Phase14)*
+
+A lockfile may list [HDRIs](../../Glossary.md) beside its materials, and then names one default:
+
+```yaml
+hdris:
+  - id: IndustrialSunset02_PureSky          # <Name>_<Variant>, Identity §HDRI names
+    version: v01                            # resolves MatterLibrary/hdris/<id>_<version>.hdr
+    status: approved
+    provenance:                             # copied from library/provenance/sources/hdris/<id>.yaml
+      source: Poly Haven
+      license: CC0-1.0
+      evidence:
+        url: https://polyhaven.com/a/industrial_sunset_02_puresky
+        file_url: https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/4k/industrial_sunset_02_puresky_4k.hdr
+        sha256_scope: file
+        sha256: <64-hex digest of the .hdr>
+default_hdri: IndustrialSunset02_PureSky    # the HDRI a new scene starts with: names a listed one
+```
+
+`tools/validators/validate_manifest.py` checks each entry: the id and version, the status, the file itself (`check_hdri`: the name, a Radiance RGBE header, 4096 × 2048), provenance when promoted (the shipped-pixel rule, as for a texture), and the evidence `sha256` against the file. It refuses a `default_hdri` that names no listed HDRI. The projector writes them into the [runtime catalog](RuntimeCatalog.md) §HDRIs, at `schema_version` 3. An HDRI's record also carries its full credit and tagging, which never reach the catalog.
+
+> **Planned (2026-10-14):** freezing a release that lists HDRIs. `tools/releases/freeze_release.py` refuses one until staging and the freeze hash them (Phase14 §Not now).
+
 ### Off-grammar exception — `IMRSV_MissingMaterial`
 
 The system material `utility/virtual/IMRSV_MissingMaterial` is **off-grammar**: it has no `sNN` scale tag and its filename has no `_vNN` axis, so it resolves by **bare `<id>.mtlx`** (not `<id>_<version>.mtlx`). It still carries a nominal `version: v01` in the lockfile for schema uniformity. The projector emits an empty `scale` and a `payload_path` without the `_<version>` suffix for it ([RuntimeCatalog.md](RuntimeCatalog.md)). It is also the one material carrying `creator_selectable: false`. The historical name is kept.
