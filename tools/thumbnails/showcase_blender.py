@@ -30,11 +30,13 @@ from mathutils import Matrix, Vector
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
+sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(REPO / "tools" / "parity" / "drivers"))
 sys.path.insert(0, str(REPO / "tools" / "parity" / "scene"))
 sys.path.insert(0, str(REPO / "blender" / "masters"))
 import blender_render  # noqa: E402  (pick_device: the rig's device choice)
 import load_article  # noqa: E402
+import subjects_blender  # noqa: E402  (the subjects the rig does not have)
 
 Y_UP = Matrix.Rotation(math.radians(90.0), 4, "X")      # the rig's space -> Blender's
 
@@ -49,12 +51,16 @@ def camera(name: str, spec: dict):
     cam.lens = spec["focal"]
     cam.sensor_fit = "HORIZONTAL"
     cam.sensor_width = 36.0
-    cam.clip_start, cam.clip_end = 0.02, 100.0
+    cam.clip_start, cam.clip_end = 0.005, 100.0     # the gem is shot from 8 cm
     obj = bpy.data.objects.new(name, cam)
-    pitch, yaw = (math.radians(a) for a in spec["rot"])
-    # USD rotateXYZ: X first, then Y; then the stage's Y-up turn
-    obj.matrix_world = (Y_UP @ Matrix.Translation(Vector(spec["pos"]))
-                        @ Matrix.Rotation(yaw, 4, "Y") @ Matrix.Rotation(pitch, 4, "X"))
+    if "aim" in spec:
+        pos, aim = v(spec["pos"]), v(spec["aim"])
+        obj.matrix_world = Matrix.Translation(pos) @ (aim - pos).to_track_quat("-Z", "Y").to_matrix().to_4x4()
+    else:
+        pitch, yaw = (math.radians(a) for a in spec["rot"])
+        # USD rotateXYZ: X first, then Y; then the stage's Y-up turn
+        obj.matrix_world = (Y_UP @ Matrix.Translation(Vector(spec["pos"]))
+                            @ Matrix.Rotation(yaw, 4, "Y") @ Matrix.Rotation(pitch, 4, "X"))
     bpy.context.scene.collection.objects.link(obj)
     return obj
 
@@ -125,9 +131,10 @@ def world(look: dict):
     nt.links.new(env.outputs["Color"], bg.inputs["Color"])
     nt.links.new(bg.outputs["Background"], out.inputs["Surface"])
     bpy.context.scene.world = w
+    return bg
 
 
-def setup(job: dict) -> list:
+def setup(job: dict) -> tuple[dict, dict]:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.usd_import(filepath=job["scene"])
     scn = bpy.context.scene
@@ -139,6 +146,14 @@ def setup(job: dict) -> list:
     if None in subjects:
         raise SystemExit(f"subjects not found after import: {sorted(keep)} "
                          f"(have {[o.name for o in bpy.data.objects]})")
+    for o in subjects:          # the rig's slab has its top at y = 0, the backdrop's floor
+        o.matrix_world = Matrix.Translation((0.0, 0.0, float(job.get("lift", 0.0)))) @ o.matrix_world
+    if job.get("build"):
+        built, _props = subjects_blender.BUILDERS[job["build"]](float(job["meters_per_tile"]), {})
+        subjects += built
+    if not subjects:
+        raise SystemExit(f"subject {job.get('subject')!r} has nothing to put the article on")
+    bpy.context.view_layer.update()
     for o in subjects:
         if "st" not in o.data.uv_layers:
             raise SystemExit(f"{o.name} has no 'st' UV map")
@@ -152,9 +167,8 @@ def setup(job: dict) -> list:
 
     look = job["look"]
     backdrop(look)
-    area_light(look, "key")
-    area_light(look, "rim")
-    world(look)
+    lights = [area_light(look, "key"), area_light(look, "rim")]
+    bg = world(look)
     scn.render.engine = "CYCLES"
     scn.cycles.samples = int(job["samples"])
     scn.cycles.seed = int(job["seed"])
@@ -165,7 +179,7 @@ def setup(job: dict) -> list:
     scn.render.film_transparent = False
     scn.view_settings.view_transform = look["view_transform"]
     scn.view_settings.look = "None"
-    scn.view_settings.exposure = float(look["exposure"])
+    scn.view_settings.exposure = float(look["exposure"]) + float(job.get("exposure", 0.0))
     scn.view_settings.gamma = 1.0
     scn.display_settings.display_device = "sRGB"
     scn.render.image_settings.file_format = "PNG"
@@ -173,12 +187,19 @@ def setup(job: dict) -> list:
     scn.render.image_settings.color_depth = "8"
     cams = {name: camera(f"ML_Cam_{name}", spec) for name, spec in job["views"].items()}
     scn.camera = next(iter(cams.values()))
-    return cams
+    return cams, {"lights": lights, "bg": bg, "strength": look["hdri_strength"]}
+
+
+def lit(rig: dict, on: bool) -> None:
+    """The showcase lights on, or all off for a ``dark`` view (an emitter by its own light)."""
+    for o in rig["lights"]:
+        o.hide_render = not on
+    rig["bg"].inputs["Strength"].default_value = rig["strength"] if on else 0.0
 
 
 def run(job_path: Path) -> None:
     job = json.loads(job_path.read_text(encoding="utf-8"))
-    cams = setup(job)
+    cams, rig = setup(job)
     scn = bpy.context.scene
     device = blender_render.pick_device(scn)      # last: it renders, so the scene must be set
     out = Path(job["out_dir"])
@@ -186,6 +207,7 @@ def run(job_path: Path) -> None:
     seconds = {}
     for name, cam in cams.items():
         scn.camera = cam
+        lit(rig, not job["views"][name].get("dark"))
         scn.render.filepath = str(out / f"{name}.png")
         t = time.perf_counter()
         bpy.ops.render.render(write_still=True)

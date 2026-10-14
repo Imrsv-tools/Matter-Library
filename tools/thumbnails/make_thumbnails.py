@@ -101,7 +101,7 @@ def make(name: str, rend: dict | None, force: bool, draft: bool) -> tuple[Path, 
     folder = (S.OUT_ROOT / "_draft" if draft else S.OUT_ROOT) / art.name
     want = None
     if not draft:
-        want = S.record(art.path, art.textures.values(), rend, spec["views"], subject, look())
+        want = S.record(art.path, art.textures.values(), rend, list(spec["views"]), subject, look())
         why = S.stale(folder, want)
         if not why and not force:
             return folder, "fresh"
@@ -110,8 +110,10 @@ def make(name: str, rend: dict | None, force: bool, draft: bool) -> tuple[Path, 
     (folder / "record.json").unlink(missing_ok=True)   # no record while the pictures are in doubt
     scene = jobmod.write_setting_scene(art, {"id": "defaults", "set": {}}, work / "scene.usda")
     tj = {"article": {"name": art.name, "path": str(art.path), "master": art.master},
-          "scene": str(scene), "keep": spec["keep"],
-          "views": {v: S.CAMERAS[v] for v in spec["views"]}, "look": look(),
+          "meters_per_tile": art.meters_per_tile, "subject": subject,
+          "scene": str(scene), "keep": spec["keep"], "build": spec["build"], "lift": spec.get("lift", 0.0),
+          "exposure": spec.get("exposure", 0.0),
+          "views": spec["views"], "look": look(),
           "samples": 32 if draft else S.SAMPLES, "seed": S.SEED, "size": 384 if draft else S.SIZE,
           "out_dir": str(folder)}
     jp = work / "thumb_job.json"
@@ -125,7 +127,7 @@ def make(name: str, rend: dict | None, force: bool, draft: bool) -> tuple[Path, 
     if got["device"] != rend["device"] or got["blender"] != rend["blender"]:
         raise SystemExit(f"{art.name}: rendered on {got['device']} / {got['blender']}, but the probe "
                          f"said {rend['device']} / {rend['blender']}; no record written")
-    rec = S.record(art.path, art.textures.values(), rend, spec["views"], subject, look(), got["seconds"])
+    rec = S.record(art.path, art.textures.values(), rend, list(spec["views"]), subject, look(), got["seconds"])
     (folder / "record.json").write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8")
     per = ", ".join(f"{v} {s:.1f} s" for v, s in got["seconds"].items())
     return folder, f"made ({'forced' if force and not why else '; '.join(why)}): {per}; Blender {took:.0f} s in all"
@@ -148,7 +150,7 @@ def sheet(folders: list[Path], name: str) -> Path:
         views = [p for p in sorted(f.glob("*.png"))]
         rec = json.loads((f / "record.json").read_text()) if (f / "record.json").is_file() else {}
         order = rec.get("views") or [p.stem for p in views]
-        order = [v for v in S.CAMERAS if v in order] + [v for v in order if v not in S.CAMERAS]
+        order = [v for v in S.VIEW_ORDER if v in order] + [v for v in order if v not in S.VIEW_ORDER]
         rows.append((f, [f / f"{v}.png" for v in order], rec))
     big = max((Image.open(p).size[0] for _, ps, _ in rows for p in ps if p.is_file()), default=S.SIZE)
     half, head = big // 2, 70

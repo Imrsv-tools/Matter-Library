@@ -81,5 +81,31 @@ try:
 finally:
     shutil.rmtree(tmp, ignore_errors=True)
 
+print("== the subject an article is pictured on (17.2) ==")
+M = S.REPO / "MatterLibrary" / "materials"
+for rel, master, want_subject in [
+        ("engineered/metal/StainlessSteel_Polished_Clean_Base_s01_v01.mtlx", "Opaque", "sphere_cube"),
+        ("natural/stone/Granite_Polished_Clean_Base_s1_v01.mtlx", "Opaque", "sphere_cube"),
+        ("natural/stone/Slate_Cleft_Clean_Base_s1_v01.mtlx", "Opaque", "slab"),
+        ("engineered/cementitious/Terrazzo_Polished_Clean_Base_s1_v01.mtlx", "Opaque", "slab"),
+        ("engineered/cementitious/Concrete_BoardFormed_Clean_Base_s1_v01.mtlx", "Opaque", "wall"),
+        ("natural/soil/Loam_Natural_Clean_Base_s1_v01.mtlx", "Opaque", "slab"),
+        ("engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx", "TranslucentThin", "pane"),
+        ("natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx", "TranslucentThick", "gem"),
+        ("utility/emissive/Neon_Signage_Clean_Base_s01_v01.mtlx", "Emissive", "tube"),
+        ("synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx", "Masked", "lace"),
+        ("synthetic/textile/Canvas_Natural_Clean_Base_s001_v01.mtlx", "Opaque", "drape"),
+        ("utility/virtual/GreyCard_Neutral18_Clean_Base_s01_v01.mtlx", "Opaque", "card"),
+        ("environmental/vegetation/OakLeaf_Natural_Clean_Base_s01_v01.mtlx", "Masked", "leaf")]:
+    got = S.subject_for(master, M / rel)
+    check(got == want_subject, f"{Path(rel).stem.split('_Clean')[0]}: {got}")
+try:
+    S.subject_for("Subsurface", M / "character/humanoid/Skin_FitzpatrickIII_Clean_Base_s001_v01.mtlx")
+    check(False, "a Character article is refused until 17.3 builds its views")
+except S.NotYet:
+    check(True, "a Character article is refused until 17.3 builds its views")
+check(all(set(v) <= set(S.VIEW_ORDER) for v in (s["views"] for s in S.SUBJECTS.values())),
+      "every subject's views are named in VIEW_ORDER (the sheet's order)")
+
 print(f"\n{'PASS' if not fails else 'FAIL'}: {len(fails)} failed")
 raise SystemExit(1 if fails else 0)

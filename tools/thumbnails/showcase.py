@@ -60,24 +60,94 @@ SIZE = 1024                       # px, square: the master PNG (RD-P17-3)
 
 # ------------------------------------------------------------------ views and subjects
 
-# A camera: position, (pitch, yaw) in degrees, focal length in mm, on a 36 mm square aperture.
-CAMERAS = {
-    # both objects on the backdrop
-    "card": {"pos": (0.0, 0.46, 1.62), "rot": (-10.6, 0.0), "focal": 50.0},
-    # the cube's front face and top edge, where grain and wear read (the rig's close-up framing)
-    "close": {"pos": (0.10, 0.34, 0.58), "rot": (-20.2, -12.5), "focal": 50.0},
-}
+# A camera: position, and either (pitch, yaw) in degrees (``rot``, USD rotateXYZ order) or a point it
+# looks at (``aim``); focal length in mm, on a 36 mm square aperture. A view may be ``dark``: the
+# HDRI, the key and the rim off, so an emitter is seen by its own light (an Emissive article).
+SPHERE_CUBE_CARD = {"pos": (0.0, 0.46, 1.62), "rot": (-10.6, 0.0), "focal": 50.0}
+SPHERE_CUBE_CLOSE = {"pos": (0.10, 0.34, 0.58), "rot": (-20.2, -12.5), "focal": 50.0}
 
-# What each subject keeps of the rig's test scene, and which views it is pictured from.
-# 17.1 builds the first; 17.2 adds the rest (Brief §The subjects).
+# Each subject: the rig prims it keeps (``keep``), the geometry the Blender side builds for it
+# (``build``, sizes in metres), and its views. ``lift`` raises the kept prims (the rig's slab has
+# its top at y = 0, which is the backdrop's floor). The Brief's table (§The subjects), 17.2.
 SUBJECTS = {
-    "sphere_cube": {"keep": ["/World/Subjects/Sphere", "/World/Subjects/Cube"],
-                    "views": ["card", "close"]},
+    # metal, plastic, polymer, composite, ceramic, coating, wood, stone not underfoot; TwoLayer;
+    # Matter's Subsurface
+    "sphere_cube": {"keep": ["/World/Subjects/Sphere", "/World/Subjects/Cube"], "build": None,
+                    "views": {"card": SPHERE_CUBE_CARD, "close": SPHERE_CUBE_CLOSE}},
+    # soil, sand, stone and floors seen underfoot: the rig's 1 m slab, 2 cm thick, low camera
+    # Faces straight up into the sky and both lights: an 18 % grey lying flat read RGB 200-221 where
+    # it reads 149 standing, so the slab is shot a stop down (17.2; ``exposure`` adds to the look's)
+    "slab": {"keep": ["/World/Subjects/Floor"], "build": None, "lift": 0.02, "exposure": -1.0,
+             "views": {"card": {"pos": (0.0, 0.36, 1.30), "aim": (0.0, 0.0, -0.08), "focal": 50.0},
+                       "close": {"pos": (0.06, 0.17, 0.62), "aim": (0.0, 0.02, 0.18), "focal": 50.0}}},
+    # cementitious: a wall section, 1.0 x 0.8 x 0.12 m, turned to show its end
+    "wall": {"keep": [], "build": "wall",
+             "views": {"card": {"pos": (0.05, 0.52, 2.15), "aim": (0.0, 0.40, -0.10), "focal": 50.0},
+                       "close": {"pos": (0.50, 0.62, 0.78), "aim": (0.28, 0.50, 0.10), "focal": 50.0}}},
+    # TranslucentThin: a 6 mm pane, 0.45 x 0.60 m, in front of a patterned card
+    "pane": {"keep": [], "build": "pane",
+             "views": {"card": {"pos": (0.22, 0.42, 1.45), "aim": (0.0, 0.30, -0.05), "focal": 50.0},
+                       "close": {"pos": (0.30, 0.66, 0.50), "aim": (0.12, 0.52, 0.05), "focal": 50.0}}},
+    # TranslucentThick: a round brilliant 25 mm across, and a 35 mm block
+    "gem": {"keep": [], "build": "gem",
+            "views": {"card": {"pos": (0.0, 0.065, 0.20), "aim": (0.004, 0.012, 0.0), "focal": 50.0},
+                      "close": {"pos": (-0.035, 0.050, 0.085), "aim": (-0.022, 0.010, 0.0), "focal": 50.0}}},
+    # textile (Opaque): a cloth draped over a ball
+    "drape": {"keep": [], "build": "drape",
+              "views": {"card": {"pos": (0.0, 0.55, 1.30), "aim": (0.0, 0.08, 0.0), "focal": 50.0},
+                        "close": {"pos": (0.07, 0.25, 0.30), "aim": (0.02, 0.16, 0.06), "focal": 50.0}}},
+    # Masked textile (lace): the same drape over a dark ball, so the holes read
+    "lace": {"keep": [], "build": "lace",
+             "views": {"card": {"pos": (0.0, 0.55, 1.30), "aim": (0.0, 0.08, 0.0), "focal": 50.0},
+                       "close": {"pos": (0.07, 0.25, 0.30), "aim": (0.02, 0.16, 0.06), "focal": 50.0}}},
+    # Emissive: a tube bent into a ring, lit and in the dark
+    "tube": {"keep": [], "build": "tube",
+             "views": {"card": {"pos": (0.0, 0.24, 1.00), "aim": (0.0, 0.17, 0.0), "focal": 50.0},
+                       "dark": {"pos": (0.0, 0.24, 1.00), "aim": (0.0, 0.17, 0.0), "focal": 50.0,
+                                "dark": True}}},
+    # utility (virtual): a flat card, 0.3 m square, face on
+    "card": {"keep": [], "build": "card",
+             "views": {"card": {"pos": (0.0, 0.17, 0.95), "aim": (0.0, 0.16, 0.0), "focal": 50.0}}},
+    # vegetation: leaf cards, one lying and one leaning
+    "leaf": {"keep": [], "build": "leaf",
+             "views": {"card": {"pos": (0.0, 0.20, 0.42), "aim": (0.005, 0.025, 0.0), "focal": 50.0},
+                       "close": {"pos": (0.05, 0.12, 0.17), "aim": (0.02, 0.03, 0.0), "focal": 50.0}}},
 }
+VIEW_ORDER = ("card", "close", "dark")
+
+# Stone and floors seen underfoot: the scale tag cannot say (Granite_Polished and Slate_Cleft are
+# both s1), so it is settled here, article by article (17.2). Terrazzo is cementitious by class and
+# a floor by use.
+UNDERFOOT = {"Slate_Cleft", "Terrazzo_Polished"}
+
+
+class NotYet(Exception):
+    """An article whose subject a later step builds (Character: 17.3)."""
 
 
 def subject_for(master: str, path: Path) -> str:
-    """The subject an article is pictured on, from its master and class (17.2 widens this)."""
+    """The subject an article is pictured on, from its master, its class and its name."""
+    rel = path.resolve().relative_to(REPO / "MatterLibrary" / "materials").parts
+    domain, klass = rel[0], rel[1]
+    name = "_".join(path.stem.split("_")[:2])
+    if domain == "character":
+        raise NotYet(f"{path.stem}: a Character article is pictured on the character (17.3)")
+    if master == "Emissive":
+        return "tube"
+    if master == "TranslucentThin":
+        return "pane"
+    if master == "TranslucentThick":
+        return "gem"
+    if klass == "vegetation":
+        return "leaf"
+    if klass == "textile":
+        return "lace" if master == "Masked" else "drape"
+    if klass == "virtual":
+        return "card"
+    if name in UNDERFOOT or klass in ("soil", "sand"):
+        return "slab"
+    if klass == "cementitious":
+        return "wall"
     return "sphere_cube"
 
 
@@ -102,12 +172,14 @@ def masters_hash() -> str:
     return _sha(MASTERS.glob("*.py"))
 
 
-def scene_hash(look: dict) -> str:
-    """The scene as it is drawn: the look the job carries, the cameras, the subjects and the Blender
-    side. A number tuned without a ``SCENE_VERSION`` bump still makes every picture stale."""
-    h = hashlib.sha256(json.dumps({"look": look, "cameras": CAMERAS, "subjects": SUBJECTS},
+def scene_hash(look: dict, subject: str) -> str:
+    """The scene as it is drawn: the look the job carries, this subject (its geometry and cameras)
+    and the Blender side. A number tuned without a ``SCENE_VERSION`` bump still makes the pictures
+    it changes stale, and only those (a new tube leaves the oak alone)."""
+    h = hashlib.sha256(json.dumps({"look": look, "subject": SUBJECTS.get(subject)},
                                   sort_keys=True).encode())
-    h.update((HERE / "showcase_blender.py").read_bytes())
+    for f in ("showcase_blender.py", "subjects_blender.py"):
+        h.update((HERE / f).read_bytes())
     return h.hexdigest()
 
 
@@ -117,7 +189,7 @@ def record(mtlx: Path, textures, renderer: dict, views: list[str], subject: str,
     input, so it is written and never compared."""
     r = {"article": mtlx.stem, "article_sha256": article_hash(mtlx, textures),
          "masters_sha256": masters_hash(), "renderer": renderer,
-         "scene_version": SCENE_VERSION, "scene_sha256": scene_hash(look),
+         "scene_version": SCENE_VERSION, "scene_sha256": scene_hash(look, subject),
          "samples": SAMPLES, "size": SIZE,
          "subject": subject, "views": sorted(views)}
     if seconds is not None:
