@@ -11,9 +11,21 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase15 — Scale Grids — ACTIVE *(numbered Phase15 and opened by the lead 2026-10-14, "/discovery P15"; added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
+### Phase15 — Matter, Character and HDRI — SEEDED *(added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; **numbered Phase15 the same day, ahead of Scale Grids:** *"Lets make these the next phases (Before the scaled grid)"*, RD-DS-6; the library's half, with the site's and the platform's asked through the ledger)*
+**Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
+- `docs/Planning/Phases/Phase15_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
+### Phase16 — Every Entry Says What It Is — SEEDED *(added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file; numbered Phase16 the same day, RD-DS-6)*
+**Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
+- `docs/Planning/Phases/Phase16_EveryEntrySaysWhatItIs.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
+### Phase17 — Character Materials, Their Own Library — SEEDED *(added 2026-10-14, the same word, third of the three, RD-DS-4; Skin Maps and Skin Maps Beyond Colour are its first instances; numbered Phase17 the same day, RD-DS-6)*
+**Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
+- `docs/Planning/Phases/Phase17_CharacterLibrary.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
+
+### Phase18 — Scale Grids — BRIEF READY, after Phase15 – 17 *(numbered Phase15 and opened by the lead 2026-10-14, "/discovery P15"; **renumbered Phase18 the same day**, when the lead put the three above ahead of it, RD-DS-6; its discovery Pass 1 is kept; added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
-- `docs/Planning/Phases/Phase15_ScaleGrids.md`
+- `docs/Planning/Phases/Phase18_ScaleGrids.md`
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 
@@ -28,7 +40,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-01 (lead):** Library Coverage was numbered **Phase10**, and its discovery Pass 1 proposed colour on wear layers as a phase of its own. The lead: *"If 2 then we need to do that phase now instead."* **Coloured Wear Layers is Phase10**, and Library Coverage is un-numbered again, paused after Pass 1. The same day: *"The fixed times was ONE session... remove taht thought"*: the build loop has no schedule. Why: `docs/Planning/Phases/Complete/Phase11_LibraryCoverage.md` (F-LC-7, F-LC-8; numbered Phase11 on 2026-10-02).
 
-> **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign. *(The same day the lead numbered the head entry, Materials Described, as **Phase13**; it moved to `## Active`. Then HDRIs in the Library, the next entry, as **Phase14** ("/discovery P14"); it moved to `## Active` too. Then Scale Grids, the next entry, as **Phase15** ("/discovery P15"); it moved to `## Active` as well.)*
+> **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign. *(The same day the lead numbered the head entry, Materials Described, as **Phase13**; it moved to `## Active`. Then HDRIs in the Library, the next entry, as **Phase14** ("/discovery P14"); it moved to `## Active` too. Then Scale Grids, the next entry, as **Phase15** ("/discovery P15"); it moved to `## Active` as well. That evening the lead put three new phases ahead of it, *"Lets make these the next phases (Before the scaled grid)"*: **Phase15 – 17** are *Matter, Character and HDRI*, *Every Entry Says What It Is* and *Character Materials, Their Own Library*, and Scale Grids is **Phase18**. Before then, *Phase15* means Scale Grids; why: `docs/Planning/Research/261014_R_DownstreamPicture.md` RD-DS-6.)*
 
 ### The Library Service — SEEDED *(added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; *Thumbnails* and the team's console build on it; **2026-10-14: a material arrives as one package, tested and pictured on upload, RD-RO-1; its spec is defined beside the phases above it**)*
 **Outcome:** the library's work (the test rig, the build loop, thumbnails, the dev catalog the site's staging reads) runs on a permanent machine instead of the lead's laptop, and the IMRSV team reaches it from wherever they are.
@@ -93,18 +105,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Two Licences — SEEDED, withdrawn 2026-10-14 *(added 2026-10-14, the same word, RD-MP-1 and RD-MP-8: CC BY 4.0 beside CC0, CC0 the default; **withdrawn the same day, the lead: "material are CC0"**, RD-RO-2; kept so its intent survives)*
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
-
-### Matter, Character and HDRI — SEEDED *(added 2026-10-14 by `/research` on the lead's "yes record it and seed all three", the first of three in that order, RD-DS-5; the library's half, with the site's and the platform's asked through the ledger)*
-**Outcome:** the website, Studio and USDLiveView each show Matter, Character and HDRI as three separate things to browse, each by its own taxonomy, from what the library publishes.
-- `docs/Planning/Phases/Future/PhaseTBD_MatterCharacterHdri.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
-
-### Every Entry Says What It Is — SEEDED *(added 2026-10-14, the same word, second of the three, RD-DS-3: materials work like assets, the facts inside the file)*
-**Outcome:** every material and HDRI says who contributed it, its licence, its name and its place in the taxonomy, from inside its own file; Studio, USDLiveView and the website read it, and Forseti can tell who gave what and how each one is doing.
-- `docs/Planning/Phases/Future/PhaseTBD_EveryEntrySaysWhatItIs.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
-
-### Character Materials, Their Own Library — SEEDED *(added 2026-10-14, the same word, third of the three, RD-DS-4; Skin Maps and Skin Maps Beyond Colour are its first instances)*
-**Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
-- `docs/Planning/Phases/Future/PhaseTBD_CharacterLibrary.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).

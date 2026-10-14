@@ -1,6 +1,6 @@
-# Phase15 — Scale Grids
+# Phase18 — Scale Grids
 
-**Status:** BRIEF READY (2026-10-14) — discovery Pass 1 done; lane **build**; next **`/execute Phase15`**. Numbered Phase15 by the lead: *"/discovery P15"*. Seeded the same day by `/research` on the lead's word: *"a Material for every UV scale that "aligns" with eachtoehr … we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*.
+**Status:** BRIEF READY (2026-10-14) — discovery Pass 1 done; lane **build**; next **`/execute Phase18`**, after Phase15 – 17. Numbered Phase15 by the lead: *"/discovery P15"*; **renumbered Phase18 the same day**, when the lead put three phases ahead of it: *"Lets make these the next phases (Before the scaled grid)"*. Its ids (`F-P15-n`) and step numbers (`15.n`) were minted as Phase15 and are kept as minted. Seeded the same day by `/research` on the lead's word: *"a Material for every UV scale that "aligns" with eachtoehr … we can use for testing when apllying UVs to ensure they are to scale … can be it's own phase"*.
 
 ## Outcome
 
