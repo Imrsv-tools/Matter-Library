@@ -250,6 +250,15 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - **(b)** The lead directs this phase's `/execute` to make that one change in the USDLiveView checkout, committed there, and recorded as lead-directed cross-repo work.
   - **(c)** Act 1 is judged in stock `usdview`, launched by the agent with the search path set. USDLiveView follows in its own lane later. This is "a USD viewer", but not the surface the lead tests drafts on.
 
+## Execution ledger
+
+*`step · commits · result · next`. The commits carry the detail.*
+
+| Step | Commits | Result | Next |
+|---|---|---|---|
+| — | `2a8c0b1` | **IN EXECUTION**; the doc moved out of `Phases/Future/` (numbered). | 14.1 |
+| **14.1** ▶ **SCAFFOLD COMPLETE — sitting owed** | `764dd57` words + LFS · `aabf3d7` check, projector, guard, 14 units · `836422b` the first HDRI, its record, the default, the importer · `98c78db` the serve tool · `a2c530b` the contract specs | **The library's download is byte-identical to the sky every scene uses today** (sha256 `79c8cbb6…`), so no look changes. The dev install serves it by name: schema 3, 95 materials unchanged, `default_hdri`, a thumbnail. **Thumbnail fixed before the sitting:** a plain conversion clipped the sun (6,200 in linear) into a white disc; a tone curve now matches Poly Haven's own preview. `run_all.py`: the baseline's 15 PASS / 2 SKIP, both frozen catalogs byte-current. | **Act 2** now (the thumbnail). **Act 1** once USDLiveView's launcher change lands (RD-P14-3); its scene pair is built at `/tmp/claude-p14/sitting/`. |
+
 ## Consumers and the ledger
 
 The platform's side (its runtime, plugin and app; its web publish check; USDLiveView's launcher) is [PlatformDependencies](../PlatformDependencies.md) **M10**. At the close it gains what the dev install now serves, and the platform's HDRI phase can start building against it.
