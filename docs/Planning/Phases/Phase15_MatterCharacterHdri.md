@@ -1,6 +1,6 @@
 # Phase15 — Matter, Character and HDRI
 
-**Status:** BRIEF READY (2026-10-14), lane **build**. **One lead question comes before `/execute`: [Q-P15-1](#q-p15-1--where-characters-folder-sits-lead), where Character's folder sits.** Only step 15.1's move waits on it; nothing else in the Brief does. Discovery opened by the lead: *"/discovery P15"*. **Numbered Phase15 by the lead the same day:** *"Lets make these the next phases (Before the scaled grid)"*. A pointer-shell written by `/research` on the lead's word: *"yes record it and seed all three"*. It is the first of the sequence (RD-DS-5, RD-DS-7): this one, then *Every Entry Says What It Is* ([`Phase16_EveryEntrySaysWhatItIs.md`](Phase16_EveryEntrySaysWhatItIs.md)), The Library Service (Phase17), Thumbnails (Phase18), then *Character Materials, Their Own Library* ([`Phase19_CharacterLibrary.md`](Phase19_CharacterLibrary.md)).
+**Status:** IN EXECUTION (2026-10-14), lane **build**. Q-P15-1 → **RD-P15-8: option A** (the lead, 2026-10-14: *"A, then /execute Phase15"*). Discovery opened by the lead: *"/discovery P15"*. **Numbered Phase15 by the lead the same day:** *"Lets make these the next phases (Before the scaled grid)"*. A pointer-shell written by `/research` on the lead's word: *"yes record it and seed all three"*. It is the first of the sequence (RD-DS-5, RD-DS-7): this one, then *Every Entry Says What It Is* ([`Phase16_EveryEntrySaysWhatItIs.md`](Phase16_EveryEntrySaysWhatItIs.md)), The Library Service (Phase17), Thumbnails (Phase18), then *Character Materials, Their Own Library* ([`Phase19_CharacterLibrary.md`](Phase19_CharacterLibrary.md)).
 
 > **Ids.** `F-P15-1` to `F-P15-8` belong to *Scale Grids* (now [`Phase20_ScaleGrids.md`](Phase20_ScaleGrids.md)), minted while it held the number Phase15. **This doc's findings start at `F-P15-9`.** Its `Q-P15-n` and `RD-P15-n` series are its own (Scale Grids minted none).
 
@@ -140,7 +140,9 @@ Today only the website can tell Character from Matter, through a site-file field
 - **RD-P15-6** *(agent's call)*. **Only the dev catalog and the site file carry these fields.** The release projector is unchanged, because the frozen pilot must re-project byte-identically (the `catalog_freshness` lane). A frozen release gains them with the first release after this phase. This is how `master` was handled.
 - **RD-P15-7** *(agent's call)*. **The site file stays at schema 2.** The change is additive. The website's mirror checks the version number, so a bump would make it refuse `dev.4` the way it refuses `dev.3` today.
 
-### Q-P15-1 — where Character's folder sits `[lead]`
+### Q-P15-1 — where Character's folder sits → RD-P15-8
+
+> **RD-P15-8 — A: `materials/character/humanoid/<part>/`** (the lead, 2026-10-14, verbatim: *"A, then /execute Phase15"*). The Stage ask (walk every folder under `materials/`) goes into P25 at 15.2. Until Stage lands it, Studio cannot bind the 30 by bare name from the dev install.
 
 **Measured 2026-10-14 (F-P15-10, F-P15-12):**
 - **Stage** takes as search roots **exactly the folders two levels below `materials/`**.
