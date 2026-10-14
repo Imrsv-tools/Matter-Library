@@ -191,6 +191,69 @@ Every consumer reads what the library publishes, so the library's items come fir
 
 ---
 
+## Pass 4 — the lead's model: materials work like assets, and Character is its own library (2026-10-14)
+
+*Altitude: design, from the lead's rulings RD-DS-3 and RD-DS-4 (§Resolved). A logical sketch: it names no file to change.*
+
+### What the lead asked for, in one line each
+
+- **Same as assets.** Every entry (material, Character material, HDRI) says **who contributed it, its licence, its name and its place in the taxonomy**. Contributions are tracked for Forseti: who gave what, and how each thing does. None of this has to be shown all the time, but the library always knows it.
+- **No sidecars.** The facts travel **inside the file**: in the `.mtlx` for a material, and in the `.hdr` for an HDRI, which is entirely the library's to write.
+- **Character is its own library.** It has its own ontology that people can contribute to. Each piece fits a predefined part mesh, keeps its contributor's name, and is pictured on its own part.
+
+### F-DS-9 — Half of the "inside the file" route already exists
+
+- Every `.mtlx` already carries a metadata block, `imrsv_metadata`, with `master_material`, `scale_tag`, `meters_per_tile`, `domain` and `class`.
+- The dev catalog already reads `master` **out of the file** and projects it (since Phase07). That is the same shape the lead is asking for.
+- **So the sketch is short:** the block gains the contributor, the licence, the group (`matter` or `character`) and, for Character, its own taxonomy fields. The catalog projects them the way it already projects the master. An export of the `.mtlx` carries them with no extra step, because they are in the file.
+
+### F-DS-10 — An `.hdr` can carry its own facts (probe, 2026-10-14)
+
+- The Radiance format's header is text lines up to the first blank line. A reader looks for `FORMAT=` and skips any line it does not know.
+- **Probe:** a copy of `AristeaWreck_PureSky_v01.hdr` with four lines added (`MATTER_ID`, `MATTER_VERSION`, `MATTER_LICENSE`, `MATTER_BUILDER`) after `FORMAT=`. **Blender 5.2.2 loads the copy at 4096 × 2048 with pixels identical to the original's** (a checksum over sampled pixels: 2166.3125 for both).
+- **Not run:** USD's own image reader (`Hio` has no Python binding in the toolchain) and Unreal's importer. Both are checked in the build before anything ships.
+- **The cost:** writing into the file changes its bytes. The record's `sha256` then describes Poly Haven's original, not the library's file. Phase14's claim that the default HDRI is *byte-identical* to the copy scenes use today would stop being true, and every place that relies on it needs to know.
+- **Where the full credit goes:** a header line holds a short credit (contributor, role, licence). Poly Haven's long description and tags fit too, but whether that much should go into every file is a build choice.
+- **Reproduction** (Python 3, standard library only; Blender's check: load both files with `bpy.data.images.load` and compare `pixels`):
+
+  ```python
+  import sys
+  src, dst = sys.argv[1:]
+  b = open(src, 'rb').read()
+  i = b.index(b'\n\n')                       # end of the header
+  extra = (b'MATTER_ID=AristeaWreck_PureSky\nMATTER_VERSION=v01\n'
+           b'MATTER_LICENSE=CC0-1.0\n'
+           b'MATTER_BUILDER=Poly Haven: Greg Zaal (Original), Jarod Guest (Sky edits)\n')
+  open(dst, 'wb').write(b[:i + 1] + extra + b[i + 1:])
+  ```
+
+### F-DS-11 — What a sidecar is here, and what is not
+
+- **A sidecar, to remove from what ships:** any per-entry file a consumer would have to read beside the entry to learn who made it or under what licence. **Nothing shipped is one today.** Credit has simply not reached the consumer at all (F-DS-6).
+- **Not sidecars:**
+  - **The catalog.** It is the library's index: one file for the whole release, so the app browses without opening 95 materials. It is projected **from** the files, as it already is for the master. The lead's *"a solution to share metadata and taxonomy so the Studio can consume it"* is this index plus the in-file facts.
+  - **The site file.** It is the website's index, in the same way.
+- **To decide in the build:** the per-HDRI records in `library/provenance/sources/hdris/` and the material recipes. These are producer-side sources: they never ship, and they are how an import is reproduced. The facts that matter get **written into the file from them**, so a consumer never needs them.
+
+### F-DS-12 — Tracking *how it is doing* happens where the entry is used
+
+- The library can write who contributed and a stable id plus version into every file. **It cannot see use.**
+- A material applied in Studio or on a website download is counted where it happens, keyed by that id. The platform already does this for objects in a composition: each one carries its asset's id, version, maker and licence.
+- **The ask, for the ledger:** a Matter material bound in a composition carries its id, version, contributor and licence the same way, read from the `.mtlx`. So does an HDRI set as a scene's sky, read from the `.hdr`.
+
+### F-DS-13 — Character as its own library: what it means, against what exists
+
+| The lead's requirement | What exists today | Gap |
+|---|---|---|
+| **Its own ontology, open to contributors** | 30 articles under the `biological` domain, in Matter's grammar (`Skin_FitzpatrickIV_…_s001_v01`) | A Character taxonomy: species (humanoid now; canine, equine later), then part (skin, eye, teeth, tongue, gums, lips, nails, hair, …). Its own name grammar, which **keeps the contributor's name visible**. |
+| **Fits a predefined part mesh**, e.g. a set of teeth UV-mapped to the chosen teeth mesh | One approved human mesh (MakeHuman hm08, Glossary *Approved human mesh*). The rig already splits it into one mesh per substance (P15), and Skin Maps already plans *"skin maps per approved mesh version"*. Most of today's character articles are tiling Matter-style materials, which is why they read badly on a body. | Each part gets **its mesh named and versioned** as the target a contribution fits, and the maps are authored to that mesh's UVs. Skin Maps is the first instance of this rule, not a separate idea. |
+| **Pictured on its own part, never on a cube** | Ruled at Phase13 and in *Thumbnails*' subjects (skin on half a face and hands; an eye on an eyeball; teeth on teeth). Nothing is built. | One picture rig per part, on that part's mesh. |
+| **Generic biological stays in Matter** | — | A generic skin pattern or a generic hair, when one is made, is a Matter material that declares `group: matter`. |
+
+**What this changes in Pass 3's order:** items 1 and 2 merge into *the facts inside the file*. Character becomes **its own phase sequence** (below). It is not a field added to Matter.
+
+---
+
 ## Open questions
 
 | Id | Question | Recommendation |
@@ -201,12 +264,15 @@ Every consumer reads what the library publishes, so the library's items come fir
 | **Q-DS-4** | **Does the dev install get an identity of its own** (BI-A2), such as a content hash or the source commit plus a dirty flag, written into the served catalog or beside it? | Yes, beside the catalog, so the catalog's fields don't change. It is small, and it goes with (b) above. |
 | **Q-DS-5** | **Where do the fit pictures live in a real release?** | Under `textures/fit/`, as in the dev install, and staged even though no article names them. The *Release Bundle* phase owns it. |
 
-**A sequence, proposed as phases** (unnumbered, for the lead to cut):
-- **Library Groups in the Install.** Outcome: every consumer can tell Matter, Character and HDRI apart, and show each one's creator, licence and credit, from what the library serves. It covers Q-DS-1, Q-DS-2 and Q-DS-4. Then the Character rows reach the site.
-- **Release Bundle and Consumer Contract** (already seeded). It also carries Q-DS-5 and the BI layout answers.
+**A sequence, proposed as phases** (unnumbered, for the lead to cut; redrawn at Pass 4):
+- **Every Entry Says What It Is.** Outcome: every material and HDRI carries its contributor, licence, name and taxonomy inside its own file. Studio, USDLiveView and the website read it from the library, and Forseti can tell who gave what. *(Was "Library Groups in the Install".)*
+- **Character Materials, Their Own Library.** Outcome: a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part. Skin Maps and Skin Maps Beyond Colour become its first instances.
+- **Release Bundle and Consumer Contract** (already seeded). It also carries Q-DS-5 and the packaged-build layout answers.
 
 ## Resolved
 
+- **RD-DS-3 — Materials work like assets: tracked, licensed, browsable by a taxonomy, with the facts inside the file and no sidecars** (the lead, 2026-10-14, verbatim: *"I want Materials to work like Assets and Compositions.... same thing... people contribute they are tracked,, the is a license it is added,,, they can browse byt a taxolongy... same same same.... do it the same... Avoid sidecars, we can put things in MTLX, and in the case of HDRI... that is totally in our control. We are doing Materal tracking for FORSETI! we want to know who contributes, which things do well, Same as assets... We dont; need to show it all the time, but we shoudl know where it came from and how its doing."*; and on export: *"we have made them mtlx so I guess we could carry the metadata in those (so no sidecar on "export" which we have not implmented yet) I don't know how we share info about HDRI on export (or if we bother) but I assume when we are in our system (App pulling from OUR created and version library) there is a solution to share metadata and taxonomy so the Studio can consume it"*). **It refines RD-DS-2:** the fields' source is the file itself (`.mtlx`, `.hdr`), and the catalog projects them from there. How it reads: Pass 4.
+- **RD-DS-4 — Character materials are their own library, with their own clear ontology that people can contribute to** (the lead, 2026-10-14, verbatim: *"I do think we will have a genereic skin pattern in the future, but the characters dots do not use "matter" level materials very well.. they look like totall shit to be frank... We need to think about character materials differnly so they need to officiallbe handled in a another very clear taxonomy/ontology that people can participate in. the need to be able to craft a set of teeth that will uvmap to the predefined teeth mesh we picked, and that should keep their name so people can realize how great a teeth a particular contributor is and teeth need to not be dropped on a box for a thumbnail, they need to mapped to the teeth... same with Skin (showing half face nd hands as outlined in the doc) eyes need to be an eyeball, etc, etc), HDRIs just need to be the image."*). It extends RD-DS-1, and it **supersedes Pass 3's treatment of Character as a group field on Matter**. How it reads: F-DS-13.
 - **RD-DS-2 — Licence and name reach the engines the way the name and the class already do: as fields on each catalog entry** (the lead, 2026-10-14, on Q-DS-1: *"What do you mean how does the credit reach the engines? hwo does the name readh then egnies? how does the category reach the engine? use existing solutions to simple add licnese and name.. I thought we solves this with assets and compositions... same thing."*). This applies to materials and HDRIs alike, and the group goes the same way. **What it overrides:** the July rule that kept licence and provenance out of the runtime catalog (RuntimeCatalog §What the runtime catalog does NOT carry; the `no_projection_guard` gate lane), for these fields. The Site-file route this doc recommended is dropped. **Owed:** RuntimeCatalog gains the fields, the projector and the serve tool write them, and `no_projection_guard` is narrowed to what still stays out. That is a build, offered as a quick fix.
 - **RD-DS-1 — Three groups, served with their context through the whole network** (the lead, 2026-10-14, in a USDLiveView session, recorded there as that repo's own ruling; recorded here by date and content. Verbatim: *"We have 3 conecpts in the Matter Library now and it needs to seerve each one and provide the context of each one through the entier networok... the other things consumes what this library creates... those material concepts are Matter | Character | HDRI . It starts here. these have different thumbnail requriments, taxonomy, in the case of character we hav humiod today and there will be others in the future such as cananine, equene etc. and character materials will need to have a special rig for thumbnails based on if it is a skin, an eye, teeth, tounge, whatever. That said, we can KEEP biological for things like a gernic skin pattern (matter) and a generic hair material, but the comples maps that are moving to for the characters need to be in chracters.... in the end they all have basially the smae support info, whoe created it, license, a name and a strict taxonomy.... THEN,,,, Studio/Theater, Web, USDLiveView all need it, plus output stuff"*).
   - **Vocabulary:** the lead's *concept* is the library's **group** ([SiteFile](../../specs/Contract/SiteFile.md) §Groups). This doc uses *group*, so the library does not gain a second word for one idea.
@@ -215,16 +281,17 @@ Every consumer reads what the library publishes, so the library's items come fir
 
 ## Status
 
-- **Passes captured:** 3 (2026-10-14). Pass 1 audits what is loose (F-DS-1 to F-DS-8). Pass 2 lists what each downstream tool must take in. Pass 3 orders what the library owes.
+- **Passes captured:** 4 (2026-10-14). Pass 1 audits what is loose (F-DS-1 to F-DS-8). Pass 2 lists what each downstream tool must take in. Pass 3 orders what the library owes. Pass 4 sketches the lead's model: facts inside the file, like assets (F-DS-9 to F-DS-12), and Character as its own library (F-DS-13).
 - **Ruled:** RD-DS-1, recorded from a consumer's session, and the website's Character rows. Neither was in this repo before today.
 - **Merged on the way:** the platform's HDRI Pass 3 (A9, A10), at `bbbb6ab`. Its footer now lists A9 and A10 as open, for this doc's Q-DS-1.
-- **Ruled 2026-10-14:** RD-DS-2 (Q-DS-1: licence and name are catalog fields, like the class). **Withdrawn:** Q-DS-2, which had no use case. The group is a catalog field too.
+- **Ruled 2026-10-14:** RD-DS-2 (licence and name reach the engines like the class), refined by **RD-DS-3** (like assets; the facts inside the `.mtlx` and `.hdr`; no sidecars; tracked for Forseti). **RD-DS-4:** Character is its own library. **Withdrawn:** Q-DS-2.
+- **Current direction:** two phases, proposed unnumbered (§Open questions): *Every Entry Says What It Is*, and *Character Materials, Their Own Library*. The probe shows an `.hdr` carries its own facts and Blender reads it unchanged (F-DS-10).
 - **Open, for the lead:** Q-DS-3 to Q-DS-5, none urgent.
 - **Offered as a quick fix (doc-only, one sitting):** bring the specs and the ledger up to date, with no ruling needed:
   - the ReleaseModel layout gains `hdris/` and `thumbnails/hdris/` (F-DS-1);
   - P21's read path becomes the install's (F-DS-2);
   - dated notes on P3 and P19 from the packaged-build asks (F-DS-3);
   - new ledger rows for RD-DS-1 and the website's four asks, under the next free `M` ids (M11 and M12 as of this pass, F-DS-4, F-DS-7).
-- **Offered as a second quick fix (a build, after RD-DS-2):** each catalog entry, for materials and HDRIs alike, gains its licence, its credit and its group, in the dev install. The gate lane is narrowed to match, and RuntimeCatalog is updated. *(Was: "not offered", because `section` comes from the domain. Today's 30 biological materials are all character materials, so the domain gives the right answer for every one of them. The per-record override waits until a generic one is made.)*
+- ~~**Offered as a second quick fix (a build, after RD-DS-2):** each catalog entry, for materials and HDRIs alike, gains its licence, its credit and its group, in the dev install. The gate lane is narrowed to match, and RuntimeCatalog is updated. *(Was: "not offered", because `section` comes from the domain. Today's 30 biological materials are all character materials, so the domain gives the right answer for every one of them. The per-record override waits until a generic one is made.)*~~ **Withdrawn at Pass 4:** RD-DS-3 puts the facts in the file first, and RD-DS-4 makes Character its own library. Both are bigger than a quick fix.
 - **Owed elsewhere** (not this repo's to write): USDLiveView's record of RD-DS-1 names this file.
-- **▶ Next:** the lead's go or no-go on the two quick fixes: the doc-only one, and the catalog fields.
+- **▶ Next:** the lead cuts the two proposed phases (seed them, or not), and gives a go or no-go on the doc-only quick fix. That quick fix now also adds ledger rows for F-DS-12's ask: a bound material and a scene's sky carry their id, contributor and licence.
