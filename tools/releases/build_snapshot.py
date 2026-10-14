@@ -17,6 +17,10 @@ release gates glob that folder). It lists every article on disk, as the dev cata
     ``textures/<name>``, so it opens with no search path (the exporter's complete-portable form);
   * ``<identity>__thumbnail.webp``: each HDRI's 1024 x 512 thumbnail, tone-mapped (Phase14 14.3;
     the HDRI itself is not published: thumbnails and credit only, RD-P14-4);
+  * ``<identity>__thumbnail__<view>.webp``: each material's thumbnails, 1024 x 1024, the showcase
+    pictures ``tools/thumbnails/make_thumbnails.py`` makes in Cycles, labelled with their renderer
+    (Phase17 17.5). A Character material publishes these, its human-context pictures, and still
+    never a rig picture. A thumbnail older than its article or the masters is refused, not shipped;
   * ``SHA256SUMS``: every file above, in ``sha256sum -c`` form.
 
 The site file also relays what the site shows side by side (``groups``: Matter, Character and
@@ -59,8 +63,12 @@ from lcd_ports import LCD_MIN_EXCLUSIVE, LCD_PORTS, LCD_RANGES  # noqa: E402
 from project_runtime_catalog import derive_entry, derive_hdri_entry  # noqa: E402
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
+sys.path.insert(0, str(REPO / "tools" / "thumbnails"))
+import showcase as T  # noqa: E402  (Phase17: the thumbnails' record and its hashes)
+import job as jobmod  # noqa: E402  (the rig's article reader: the textures an article names)
 
 PARITY = REPO / "library" / "parity"
+THUMBS = REPO / "library" / "thumbnails"
 SNAPSHOTS = REPO / "library" / "snapshots"
 RECIPES = REPO / "tools" / "converters" / "recipes"
 PILOT_LOCK = REPO / "library" / "releases" / "matterlib-0.1.0.lock.yaml"
@@ -87,7 +95,42 @@ DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
 #   thumbnail - the HDRI's own 2:1 picture.
 # Phase15 (RD-P15-5): the list lives in tools/converters/groups.py, which the dev catalog reads
 # too, and each group names its taxonomy; Character's gains its rows (species, then parts).
-GROUPS = G.GROUPS
+# Phase17 (RD-P17-4): in the SITE FILE, Matter is shown by its own thumbnails, as an HDRI is; the
+# rig's pictures stay, as evidence. Only here: the dev catalog keeps groups.py's word (`rig`),
+# because the dev install does not serve thumbnails (Phase17 Not now, planned).
+GROUPS = [g | {"shown": "thumbnail"} if g["id"] == G.MATTER else g for g in G.GROUPS]
+
+
+class Stale(Exception):
+    """A thumbnail made from another article or other masters than the ones on disk."""
+
+
+def thumbnail_pictures(folder: Path, mtlx: Path, textures) -> list[tuple[str, Path, dict]]:
+    """(view, source, record) for each thumbnail ``folder``'s record lists; [] when it has none (not
+    made yet: left out, never stood in for). Raises Stale when the record was made from another
+    article or other masters than the ones on disk, or a view's picture is missing: the site would
+    label a picture of something else. The renderer and scene are the maker's to judge
+    (``make_thumbnails.py``); these two are the facts a picture can be wrong about."""
+    rec_path = folder / "record.json"
+    if not rec_path.is_file():
+        return []
+    rec = json.loads(rec_path.read_text(encoding="utf-8"))
+    if rec.get("article_sha256") != T.article_hash(mtlx, textures):
+        raise Stale(f"{folder.name}: made from another version of the article")
+    if rec.get("masters_sha256") != T.masters_hash():
+        raise Stale(f"{folder.name}: made on other Blender masters")
+    out = []
+    for v in rec["views"]:
+        src = folder / f"{v}.png"
+        if not src.is_file():
+            raise Stale(f"{folder.name}: its record lists {v}.png, which is not there")
+        out.append((v, src, rec))
+    return out
+
+
+def renderer_label(rec: dict) -> str:
+    r = rec.get("renderer", {})
+    return f"{r.get('engine', 'Cycles')} (Blender {r.get('blender', '?')})"
 
 
 def section(art: dict) -> str:
@@ -329,7 +372,7 @@ def build(tag: str, out: Path) -> dict:
         if old.is_file():
             old.unlink()
     pilot = pilot_provenance()
-    materials, assets = [], []
+    materials, assets, stale = [], [], []
     for art in working_tree.articles():
         identity, mtlx = art["identity"], art["mtlx"]
         recipe_path = RECIPES / f"{identity}.json"
@@ -380,8 +423,21 @@ def build(tag: str, out: Path) -> dict:
                 if verdicts:
                     parity["controls"] = verdicts
             rec["parity"] = parity
-        if pics:
+        try:
+            thumbs = thumbnail_pictures(THUMBS / identity, mtlx, jobmod.Article.read(mtlx).textures.values())
+        except Stale as e:
+            stale.append(str(e))
+            thumbs = []
+        if thumbs:                     # Phase17 17.5: the showcase pictures, first
             rec["pictures"] = []
+            for view, src, trec in thumbs:
+                name = f"{identity}__thumbnail__{view}.webp"
+                write_webp(src, out / name)
+                rec["pictures"].append({"role": "thumbnail", "view": view, "renderer": renderer_label(trec),
+                                        "file": name, "sha256": sha256(out / name)})
+                assets.append(name)
+        if pics:
+            rec.setdefault("pictures", [])
             for tool, view, src in pics:
                 name = f"{identity}__{tool}{'__close' if view == 'close' else ''}.webp"
                 write_webp(src, out / name)
@@ -396,6 +452,9 @@ def build(tag: str, out: Path) -> dict:
         assets.append(zname)
         materials.append(rec)
 
+    if stale:
+        raise SystemExit(f"{len(stale)} thumbnail(s) stale, not shipped (re-run "
+                         f"`uv run tools/thumbnails/make_thumbnails.py --all-kept`):\n  " + "\n  ".join(stale))
     hdris = []
     listed = H.on_disk()
     for h in listed:     # 14.3: thumbnails and credit only, never the .hdr (RD-P14-4)
@@ -425,7 +484,8 @@ def build(tag: str, out: Path) -> dict:
     swept = sum(1 for r in materials if "controls" in r.get("parity", {}))
     size = sum((out / a).stat().st_size for a in assets)
     described = sum(1 for r in materials if "summary" in r)
-    pictured = sum(1 for r in materials if r.get("pictures"))
+    pictured = sum(1 for r in materials if any(p["role"] == "rig" for p in r.get("pictures", [])))
+    thumbed = sum(1 for r in materials if any(p["role"] == "thumbnail" for p in r.get("pictures", [])))
     characters = sum(1 for r in materials if r["section"] == "character")
     notes = (
         f"A **dev snapshot** of the Matter Library, for its website's staging. Not a release: "
@@ -435,7 +495,12 @@ def build(tag: str, out: Path) -> dict:
         f"- Each material's `group` (and `section`): `matter`, or `character` ({characters}: eyes, hair, "
         f"skin, nails, teeth and mouth, each with its `species` and `part`), read from the material's "
         f"own file; Character is browsed apart and never shown on the rig's cubes.\n"
-        f"- Pictures: the parity rig's test scene in the tools that ran, for {pictured} Matter materials. "
+        f"- Thumbnails: {thumbed} materials, each shown at its best on a subject that suits it, in "
+        f"Cycles (Blender), 1024 px, labelled with their renderer: Matter on its own subject (a slab, "
+        f"a wall, a pane, a draped cloth, …), Character on the clothed character (half the face, the "
+        f"hand, the eye, the lips, the open mouth, the head). Matter's group is now shown by them.\n"
+        f"- Pictures: the parity rig's test scene in the tools that ran, for {pictured} Matter materials, "
+        f"as evidence. "
         f"A verdict per control for {swept} materials, each with the date it was measured.\n"
         f"- `<material>.zip`: the MaterialX file and every texture it uses.\n"
         f"- `SHA256SUMS`: a digest for every file.\n"
@@ -447,12 +512,12 @@ def build(tag: str, out: Path) -> dict:
           "Each HDRI carries its `when` and `sky`, Poly Haven's own words.\n"
         + (f"- Words: a plain name, a one-line summary and search words for {described} materials, "
            f"confirmed by the maintainer.\n\n" if described else "\n")
-        + f"Not yet in it: material thumbnails{'' if described else ', summaries and search words'}. "
-        f"Every material is CC0-1.0.\n")
+        + (f"Not yet in it: summaries and search words. " if not described else "")
+        + f"Every material is CC0-1.0.\n")
     (out / "NOTES.md").write_text(notes, encoding="utf-8")   # the release body; not an asset
     return {"out": str(out), "materials": len(materials), "character": characters, "hdris": len(hdris),
             "rigged": rigged,
-            "pictured": pictured, "swept": swept, "described": described, "assets": len(assets),
+            "pictured": pictured, "thumbnails": thumbed, "swept": swept, "described": described, "assets": len(assets),
             "bytes": size}
 
 

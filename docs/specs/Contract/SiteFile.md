@@ -22,7 +22,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
   "release": "0.2.0-dev.1",
   "made": "2026-10-14",
   "draft": true,
-  "groups": [ { "id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "rig" }, "…" ],
+  "groups": [ { "id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "thumbnail" }, "…" ],
   "materials": [ { "id": "engineered/metal/Copper_Verdigris_Aged_Base_s01", "…": "…" } ],
   "hdris": [ { "id": "IndustrialSunset02_PureSky", "…": "…" } ],
   "default_hdri": "IndustrialSunset02_PureSky"
@@ -73,7 +73,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | Field | Meaning |
 |---|---|
 | `parity` | Present when the parity rig has rendered the article. `tools` (which of `storm`, `blender`, `unreal` ran), `scene` (the rig's test scene), `measured` (the date of the rig's scorecard, absent if it has none) and `controls` (per port: `verdict`, the worst of its rows, and `rows[]` each with its `setting` and `verdict`). The words are the rig's own Moved verdicts: `moved alike` · `UNEVEN` · `ONE-SIDED` · `no change in any tool` ([_Architecture](../_Architecture.md) §LCD). **A control with no entry was not swept**, which is not a pass. **Evidence is published as measured:** a picture or verdict older than the current masters or Unreal runtime says so only through its date (Phase13 Q-P13-4). |
-| `pictures[]` | `role` (`rig` today; `thumbnail` once [Catalog](../Catalog/Catalog.md) §Thumbnails exist), `tool`, `view` (`wide` or `close`), `file` and `sha256`. **Only the test scene's default pictures** are published: never a character render, a sweep picture, or a rig log or job file. WebP, at the rig's 512 px. |
+| `pictures[]` | `role`: `thumbnail` or `rig`, thumbnails first. **`thumbnail`** *(since Phase17 17.5, first in `matterlib-0.2.0-dev.6`)*: the material shown at its best on a subject that suits it ([Catalog](../Catalog/Catalog.md) §Thumbnails), with its `view` (Matter: `card`, `close`, and `dark` for an emitter; Character: `face`, `hand`, `mouth`, `lips`, `eye` or `head`, never the whole body, the waist or the feet), the `renderer` named (`Cycles (Blender 5.2.2 LTS)`), `file` (`<identity>__thumbnail__<view>.webp`) and `sha256`; WebP at 1024 px. A material whose thumbnails are not made yet has none (a draft gets its own when it comes to review); a thumbnail older than its article or the masters is refused by the builder, never shipped. **`rig`**, the evidence: `tool`, `view` (`wide` or `close`), `file` and `sha256`. **Only the test scene's default pictures** are published: never a character render, a sweep picture, or a rig log or job file. WebP, at the rig's 512 px. |
 | `download` | `file` (`<identity>.zip`), `bytes`, `sha256` and `textures` (how many). The zip holds `<identity>.mtlx` with every texture reference rewritten to `textures/<name>`, and those textures, shared wear layers included, so it opens anywhere with no search path. **Fit-set pictures** (hair cards, eyes) are supplied when an article is bound to a mesh, never referenced by it, so they are not in the zip. |
 | `summary`, `search_words` | A one-line public description and the words a search should find it by, written by the agent and confirmed by the maintainer with the picture (F-MP-14). |
 
@@ -83,8 +83,8 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 
 | `id` | `label` | `list` | `section` | `shown` |
 |---|---|---|---|---|
-| `matter` | Matter | `materials` | `matter` | `rig`: on the parity rig's test scene (the cubes) |
-| `character` | Character | `materials` | `character` | `human`: in a human context (skin on a side face and hands, an eye on an eye), **never on the cubes** (RD-P13-2). No picture is published until one exists (*Thumbnails*). |
+| `matter` | Matter | `materials` | `matter` | `thumbnail`: by its own thumbnails, each on a subject that suits it *(since Phase17 17.5, RD-P17-4; until then `rig`, the parity rig's test scene, whose pictures stay as evidence)*. **Only in the site file:** the dev catalog keeps `rig`, because the dev install serves no thumbnails yet. |
+| `character` | Character | `materials` | `character` | `human`: in a human context (skin on a side face and hands, an eye on an eye), **never on the cubes** (RD-P13-2). Its pictures are its thumbnails, on the clothed character *(since Phase17 17.5)*; until then none was published. |
 | `hdris` | HDRIs | `hdris` | — | `thumbnail`: the HDRI's own 2:1 picture |
 
 **Since Phase15 (2026-10-14), each group also names its `taxonomy`**, the fields it is browsed by, in order (Matter `domain`, `material_class` · Character `species`, `part` · HDRIs `when`, `sky`), **and Character carries its `rows`**: per species, its parts' `id`s and `label`s in order (`humanoid`: Eyes, Hair, Skin, Nails, Teeth, Mouth; the website's ask M11 (1)). Additive: `schema_version` stays 2. The dev catalog carries the same list.
@@ -110,10 +110,11 @@ A group reads the list it names, filtered by `section` where it gives one. **A g
 
 ## Limits
 
-GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most seven per article (six pictures and a zip) and one per HDRI (its thumbnail): with 59 HDRIs that fits about 130 articles; the builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
+GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most nine per article (six rig pictures, two thumbnails and a zip; *until Phase17, seven*) and one per HDRI (its thumbnail): with 59 HDRIs that fits about 100 articles at worst, and `matterlib-0.2.0-dev.6` is 572 assets for 95. The builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
 
 ## History
 
 - 2026-10-14 — written as a DRAFT by Phase13 13.1, from the field list the website's builders sent (their research, and the ask recorded at [PlatformDependencies](../../Planning/PlatformDependencies.md) M9). First published in the dev snapshot `matterlib-0.2.0-dev.1`.
 - 2026-10-14 — schema 2, by Phase14 14.3: `groups[]` (what the site shows side by side, and how), `hdris[]` with Poly Haven's credit and tagging and a thumbnail each (no download), and `default_hdri`. First in the dev snapshot `matterlib-0.2.0-dev.3`.
 - 2026-10-14 — still schema 2 (additive), by Phase15 15.2: each material's `group` (and `section`) read from its own file, Character's `species` and `part`, each group's `taxonomy`, Character's `rows`, and each HDRI's `group`, `when` and `sky`. The 30 Character materials' `id`s follow their folder, `character/humanoid/<part>/`. First in the dev snapshot `matterlib-0.2.0-dev.4`.
+- 2026-10-14 — still schema 2 (additive), by Phase17 17.5: `pictures[]` gains `role: thumbnail`, each with its `view` and `renderer`, for Matter and Character; Matter's group is shown by them (`shown: thumbnail`), and a Character material publishes its human-context pictures (still never a rig picture). §Limits rises to nine per article. First in the dev snapshot `matterlib-0.2.0-dev.6`.

@@ -4,6 +4,7 @@ are taken, the portable rewrite, and the ranges' coverage.
 
     uv run tools/releases/test_build_snapshot.py        exit 0 = PASS
 """
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -105,8 +106,41 @@ check(G.taxonomy_path({"group": "character", "species": "humanoid", "part": "mou
 
 print("== groups (RD-P14-4) ==")
 check([g["id"] for g in B.GROUPS] == ["matter", "character", "hdris"], "Matter, Character and HDRIs, in browse order")
-check({g["id"]: g["shown"] for g in B.GROUPS} == {"matter": "rig", "character": "human", "hdris": "thumbnail"},
-      "each group says how it is shown: Character never on the rig's cubes (RD-P13-2)")
+check({g["id"]: g["shown"] for g in B.GROUPS} == {"matter": "thumbnail", "character": "human", "hdris": "thumbnail"},
+      "each group says how it is shown: Matter by its thumbnails (RD-P17-4), Character never on the rig's cubes (RD-P13-2)")
+check(next(g for g in G.GROUPS if g["id"] == "matter")["shown"] == "rig",
+      "the dev catalog's groups keep `rig`: the dev install serves no thumbnails (Phase17 Not now)")
+
+print("== thumbnails (Phase17 17.5) ==")
+with tempfile.TemporaryDirectory() as t:
+    t = Path(t)
+    mtlx, tex = t / "A_Test_Clean_Base_s01_v01.mtlx", t / "a.png"
+    mtlx.write_text("<materialx/>")
+    tex.write_bytes(b"px")
+    f = t / "thumbs"
+    f.mkdir()
+    check(B.thumbnail_pictures(f, mtlx, [tex]) == [], "no record: no thumbnail (left out, never stood in for)")
+    rec = {"article_sha256": B.T.article_hash(mtlx, [tex]), "masters_sha256": B.T.masters_hash(),
+           "views": ["card", "close"], "renderer": {"blender": "5.2.2 LTS", "engine": "Cycles", "device": "OPTIX"}}
+    (f / "record.json").write_text(json.dumps(rec))
+    for v in ("card", "close", "dark"):
+        (f / f"{v}.png").write_bytes(b"png")
+    got = B.thumbnail_pictures(f, mtlx, [tex])
+    check([v for v, _, _ in got] == ["card", "close"], "the record's views, and only those (not a stray dark.png)")
+    check(B.renderer_label(rec) == "Cycles (Blender 5.2.2 LTS)", "labelled with its renderer")
+    tex.write_bytes(b"other")
+    try:
+        B.thumbnail_pictures(f, mtlx, [tex])
+        check(False, "a thumbnail of another version of the article is refused")
+    except B.Stale:
+        check(True, "a thumbnail of another version of the article is refused")
+    tex.write_bytes(b"px")
+    (f / "close.png").unlink()
+    try:
+        B.thumbnail_pictures(f, mtlx, [tex])
+        check(False, "a record whose picture is missing is refused")
+    except B.Stale:
+        check(True, "a record whose picture is missing is refused")
 check({(g["list"], g.get("section")) for g in B.GROUPS} ==
       {("materials", "matter"), ("materials", "character"), ("hdris", None)},
       "Matter and Character are sections of materials; HDRIs are a list of their own")
