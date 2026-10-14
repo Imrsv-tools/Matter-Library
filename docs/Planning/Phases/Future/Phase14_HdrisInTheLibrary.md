@@ -1,6 +1,6 @@
 # Phase14 — HDRIs in the Library
 
-**Status:** DISCOVERY, Pass 2 — **Brief written (2026-10-14), lane `build`; Pass 2 widened 14.2 to all 59 Pure Skies, over-credited (RD-P14-2).** One question for the lead (Q-P14-1) gates act 1 of 14.1's TRY, not its build. **Numbered Phase14 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery P14"* (RD-P14-1). No phase carried 14, so the number goes to the entry heading `## Future` (RD-RO-3's order, after Materials Described took Phase13), and no ruling newer than that order undercuts it. Seeded the same day as a pointer-shell by `/research` on the lead's word (*"seed the phase"*).
+**Status:** DISCOVERY, Pass 3 — **Brief written (2026-10-14), lane `build`; Pass 2 widened 14.2 to all 59 Pure Skies, over-credited (RD-P14-2).** **No question is open:** Q-P14-1 was answered by RD-P14-3; act 1's sitting waits on USDLiveView's change, tracked in that repo. **Numbered Phase14 and opened by the lead, 2026-10-14:** the invocation, verbatim, *"/discovery P14"* (RD-P14-1). No phase carried 14, so the number goes to the entry heading `## Future` (RD-RO-3's order, after Materials Described took Phase13), and no ruling newer than that order undercuts it. Seeded the same day as a pointer-shell by `/research` on the lead's word (*"seed the phase"*).
 **Ids:** `Q-P14-n` · `F-P14-n` · `RD-P14-n`. Ids cited from research (`SKY-Fn`, `RD-SKY-n`, `F-RO-n`, `RD-MP-n`) keep their own stems.
 
 ## Outcome
@@ -38,7 +38,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - **The fixture carries the property in use.** `CubeAndCone_04` is lit by the sky every scene shows today (SKY-F1, A8).
   - **The instrument separates the cases** (F-P14-3, measured in Storm on this machine). Named by its bare name, with its folder on the search path, the sky draws the same as the copied-in file (RMSE 1.5 %). Off the path, the dome draws no sky (RMSE 84 %), with Storm's *"could not be resolved"* warning.
   - **USDLiveView draws a dome as the background by default** (F-P14-5; read in code, not run).
-  - **The act needs USDLiveView's launcher to put the HDRI folder on its search path (Q-P14-1).** Without that, it fails exactly as the unresolved probe did.
+  - **The act needs USDLiveView's launcher to put the HDRI folder on its search path (RD-P14-3).** Without that, it fails exactly as the unresolved probe did.
 - **Act 2:** `magick` reads the Radiance file and writes a 2:1 JPEG that reads as the sky (F-P14-6).
 - **Act 3:** Poly Haven's API lists all 59 with a 4k `.hdr` each, and serves them to this machine (F-P14-8, F-P14-10). The doer is the agent; the lead only picks and judges.
 - **Nothing in Not-now is needed** by any act.
@@ -68,7 +68,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 |---|---|
 | **Staging, freezing and activating a release that holds HDRIs.** A7's *"inside the release folder"* is written into the specs. | **(planned)**, built with the first release that holds one: *Release Bundle and Consumer Contract*. Pre-release, no release ceremony (`AI_WorkingAgreement.md` §Settled practices). The freeze guard above keeps the gap loud. |
 | **The app's half:** Stage's search path, the picker and the switch away from per-scene copies. | The platform's HDRI phase (M10). |
-| **USDLiveView's launcher change.** | USDLiveView's lane: its own ask doc already waits on this phase's folder (F-P14-1). Q-P14-1 says who does it and when. |
+| **USDLiveView's launcher change.** | USDLiveView's lane, **tracked there since 2026-10-14** (RD-P14-3): an issue on its tracker and Pass 2 of its research doc `261013_R_PlatformSkyAsk.md`, which give it the paths, the measurements and the one-look check. It is made by a `/quick-fix` in that repo once 14.1 lands the folder. |
 | **HDRIs on the library's website.** *(Was "not asked"; 2026-10-14, the lead wants the credits and tagging recorded because they *"will all be helpful when looking for HDRIs in the library on the site"*, RD-P14-2.)* | **This phase records everything the site will show; publishing it is a site-file change.** Phase13's site file lists materials only. **What it will consume from this phase:** each HDRI's record (name, description, contributors and roles, Poly Haven's tagging, its source links) and its thumbnail. The owner is the next change to the site file after Phase13's 13.1. |
 | **Storage beyond LFS** (the seed's open question on A7). | **All 59 come to about 1.06 GB at 4k, against 161 MB of textures in LFS today** (F-P14-10). The organisation is on metered LFS, so the lead weighs the cost (F-P14-13); LFS holds them unless the lead says otherwise. It joins the Parking lot's *Texture storage beyond Git LFS* and the LFS quota the site research flagged (`261014_R_TheLibrarysSite.md` WS-F1). |
 | **The rig or the preview tool lit by a library HDRI** (the seed's third open question). | A later question, as the seed said. The rig's flat dome is deliberate (Storm learnings S2, S4). |
@@ -105,6 +105,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 **This phase:**
 - **RD-P14-1 — Numbered Phase14 and opened by the lead**: *"/discovery P14"* (2026-10-14).
 - **RD-P14-2 — All of Poly Haven's Pure Skies, over-credited** (the lead, 2026-10-14, verbatim): *"what I would like to do this phase is ensure we are over crediting. I would like use to get all the HDRIs from https://polyhaven.com/hdris/pure-skies The PureSkys section in the format we want to use. Let's account for the tagging they have the and the contributors they list as well as indicateing these came from PolyHaven. this will all be helpful when looking for HDRIs in the library on the site..."* It supersedes 14.2's *"the lead's picks"* and refines Q-P14-4. *"The format we want to use"* is RD-SKY-3's: Radiance `.hdr`, 4096 × 2048.
+- **RD-P14-3 — USDLiveView's launcher change is asked in USDLiveView** (the lead, 2026-10-14, verbatim: *"Put a not into USDLiveView (either research GH Issue or both) to address it"*, then *"file it and push"*). It is Q-P14-1's option (a). The library wrote Pass 2 of USDLiveView's own ask doc, `261013_R_PlatformSkyAsk.md` (where HDRIs sit, the Storm measurements, the change and its one-look check), and filed an issue on USDLiveView's tracker; both are pushed there. The change is made in that repo's lane after 14.1 lands the folder. Act 1's sitting waits on it; `/execute` does not.
 - **Q-P14-2 — `schema_version` 3 only for a catalog that lists HDRIs.** *Decided, unless the lead says otherwise.*
   - **Why:** the freeze hash-locks each release's catalog (F-P14-4), and the catalog-freshness lane re-projects **every** lockfile with the one projector constant.
   - **What a global bump would do:** turn the committed 0.0.1 and 0.1.0 catalogs red. Re-projecting them would rewrite the approved pilot's frozen payload and owe a re-freeze and the maintainer's re-approval, for a release that holds no HDRI.
@@ -126,7 +127,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 - `run_all.py` `run_catalog_freshness`: it re-projects every lockfile, so the schema rule above.
 - `validate_manifest.py`, `project_runtime_catalog.py` and `no_projection_guard`: extended, not replaced.
 - `serve_to_stage.py`: it writes only into the runtime, and its links into the checkout.
-- USDLiveView's launcher: another repo (Q-P14-1).
+- USDLiveView's launcher: another repo (RD-P14-3).
 
 **Not touched:** authorisation, secrets, a destructive migration, the public edge. **The push publishes a 16 MB CC0 file through LFS:** irreversible and lead-gated, as every push here is.
 
@@ -143,7 +144,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
   - The Glossary headword, then the specs.
   - The importer, the HDRI check, and the first HDRI with its record and LFS rule.
   - The lockfile and projector support, the freeze guard, and the serve tool.
-  - *First clickable result:* **acts 1 and 2.** Act 1 also needs Q-P14-1's launcher change.
+  - *First clickable result:* **acts 1 and 2.** Act 1 also needs USDLiveView's launcher change (RD-P14-3).
 - **14.2 — All 59 Pure Skies, credited.** *(Was "the lead's picks" until RD-P14-2.)*
   - The importer takes Poly Haven's Pure Skies category and adds all 59, each named by rule (F-P14-11) and recorded with its full credit.
   - `CREDITS.md` and `LICENSE-CONTENT.md` gain Poly Haven.
@@ -158,7 +159,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 **The doers:**
 - **The agent:** downloads from Poly Haven (reachable, F-P14-8), serves, builds and opens the scene.
 - **The lead:** judges, and picks HDRIs.
-- **USDLiveView's lane:** the launcher (Q-P14-1).
+- **USDLiveView's lane:** the launcher (RD-P14-3).
 
 ### Compact build map
 
@@ -244,7 +245,7 @@ The library holds materials and nothing else: its specs, catalog, lockfile check
 
 ## Questions for the lead
 
-- **Q-P14-1 — Who makes USDLiveView's one launcher change, and when?** Act 1 cannot pass without it (F-P14-1, F-P14-2). The options:
+- ~~**Q-P14-1 — Who makes USDLiveView's one launcher change, and when?**~~ **Answered by RD-P14-3 (2026-10-14).** Act 1 cannot pass without it (F-P14-1, F-P14-2). The options:
   - **(a) Recommended:** a short session in the USDLiveView repo once 14.1 lands the folder: its own `/quick-fix` on its 2026-10-13 ask, with the paths in §Compact build map. Act 1 is judged after it lands; act 2 does not wait. The change belongs to that repo's lane, and its ask is already written and waiting on this phase.
   - **(b)** The lead directs this phase's `/execute` to make that one change in the USDLiveView checkout, committed there, and recorded as lead-directed cross-repo work.
   - **(c)** Act 1 is judged in stock `usdview`, launched by the agent with the search path set. USDLiveView follows in its own lane later. This is "a USD viewer", but not the surface the lead tests drafts on.
@@ -266,3 +267,6 @@ The platform's side (its runtime, plugin and app; its web publish check; USDLive
   - **Measured through Poly Haven's API:** the 59, their sizes, their credit and tagging fields, and the API's terms (F-P14-10, F-P14-12); the organisation's LFS billing (F-P14-13).
   - **The sweep found one name clash** (F-P14-11): the first HDRI is now `IndustrialSunset02_PureSky`.
   - The Brief still holds. 14.2 is bigger, and act 3 now also checks the credit.
+- **Pass 3 (2026-10-14):**
+  - **Q-P14-1 answered** (RD-P14-3): the launcher change is asked in USDLiveView, as a research pass and an issue there.
+  - **The lead asked whether HDRIs should become MaterialX documents.** No: MaterialX has no environment light (F-P14-14).
