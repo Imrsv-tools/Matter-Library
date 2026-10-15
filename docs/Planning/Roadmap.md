@@ -97,6 +97,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
 
+### UVs in Metres — SEEDED *(added 2026-10-15 by Phase19's execution, on the lead's RD-P19-4, "1 now, 4 as a next phase": the builder lays out UVs in metres so that any material picked maps to its real size)*
+
+- `docs/Planning/Phases/Future/PhaseTBD_UVsInMetres.md`
+
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).
 - Automated transformers (MaterialX → Blender / Unreal), after manual parity is proven. Parity-gate automation in CI. A Realm level above Domain. Texture storage beyond Git LFS (asset management, content-addressed pointers). Further engine targets. Personal saved variants, community scoring and contributor reputation (`docs/specs/Experience/Experience_MatterLibrary.md` §Future Layers). The planned roots in `docs/ToolingConventions.md` §Planned roots.

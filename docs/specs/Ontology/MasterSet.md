@@ -32,7 +32,7 @@ This spec is the **producer side** of the master contract: the masters, their to
 
 | Master token | Articles in `MatterLibrary/materials/` |
 |---|---|
-| `Opaque` | ABS_Matte · Limestone_Veined · Concrete_Smooth_Worn_Dusty · Copper_Verdigris_Aged · Diagnostic_UVGrid |
+| `Opaque` | ABS_Matte · Limestone_Veined · Concrete_Smooth_Worn_Dusty · Copper_Verdigris_Aged · Diagnostic_UVGrid · *(2026-10-15, Phase19)* the seven Diagnostic_ScaleGrid articles (`s0001` – `s100`, `sUKN`) |
 | `Masked` | Lace_Floral |
 | `Hair` *(2026-09-28)* | Hair_Natural |
 | `TranslucentThin` | Glass_Clear |

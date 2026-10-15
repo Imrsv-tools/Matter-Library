@@ -231,6 +231,13 @@ class MATTER_PT_scale_view(Panel):
         lay.operator(MATTER_OT_scale_view.bl_idname,
                      text="Scale view: ON (click to restore)" if on else "Scale view: OFF (click to check)",
                      depress=on).mode = "TOGGLE"
+        # RD-P19-4 (the lead, 2026-10-15): a grid dragged on by hand is not resized; the mesh's
+        # UVs set its size. UVs in metres, so any material maps to real size, is its own phase.
+        col = lay.column(align=True)
+        col.scale_y = 0.7
+        col.label(text="A grid dragged on draws one tile per UV unit:")
+        col.label(text="the mesh's UVs set its size. Scale view sizes")
+        col.label(text="each grid from the material it replaces.")
         raw = context.scene.get(REPORT)
         if not raw:
             return
