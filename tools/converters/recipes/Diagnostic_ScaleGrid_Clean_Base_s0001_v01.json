@@ -1,0 +1,36 @@
+{
+  "label": "Scale grid 1 mm (diagnostic)",
+  "summary": "A grid with a 1 mm tile, to check a model's UVs are at real size. Lines at 1 mm, 100 µm, 10 µm and 1 µm; each length is one colour in every grid.",
+  "search_words": [
+    "scale grid",
+    "scale test",
+    "1 mm",
+    "uv scale",
+    "real size",
+    "diagnostic",
+    "debug"
+  ],
+  "origin": [
+    "procedural",
+    "agent-drafted"
+  ],
+  "_comment": "Phase19 19.1 scale grid (RD-SP-1 to RD-SP-4). Base color = gen_scalegrid.py: a line's colour is its length in every grid, the background a dark shade of the tile's own colour, four line levels, the finest dim. meters_per_tile is exactly the tag (RD-P19-2). Master Opaque, as the UV grid's; matte so a highlight cannot hide a line.",
+  "name": "Diagnostic_ScaleGrid_Clean_Base_s0001_v01",
+  "contributor": "MatterBot",
+  "path": "utility/virtual/Diagnostic_ScaleGrid_Clean_Base_s0001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "utility",
+  "class": "virtual",
+  "scale_tag": "s0001",
+  "meters_per_tile": 0.001,
+  "base_color_tex": "../../../textures/base/utility/virtual/ScaleGrid_basecolor_s0001.png",
+  "roughness_const": 0.8,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation"
+  ]
+}

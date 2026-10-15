@@ -148,6 +148,7 @@ RECIPE_FIXTURES = {
     "fit_unknown_mesh.json": "G2",       # fits names no part mesh (the schema's enum)
     "fit_wrong_size.json": "G8",         # 1024 for a 2048 mesh
     "fit_island_bare.json": "G8",        # one island left unpainted
+    "off_scale.json": "G9",              # Phase19 (RD-P19-2): a 0.8 m tile tagged s1
 }
 
 

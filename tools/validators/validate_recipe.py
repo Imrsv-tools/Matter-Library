@@ -15,6 +15,8 @@ RECIPE, before its mistakes can hide inside a valid-looking article:
   G8  fitted picture   — (Phase18) a Character article's own picture fits the part mesh it
                          names: a known mesh of its species and part, a square sRGB RGB PNG at the
                          mesh's map size, covering every UV island (library/meshes/<mesh>_islands.png)
+  G9  scale fit        — (Phase19, RD-P19-2) meters_per_tile is exactly its scale tag's length
+                         (sUKN: 0.0); the articles off their tag when the rule was made are named
 
 (G4, a class -> master lookup, was dropped in discovery: the article declares its master.)
 
@@ -297,7 +299,58 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
     if (dom, cls) == ("utility", "virtual") and (overlays or "maskset_tex" in d):
         errs.append("G7 a utility/virtual reference carries no wear layers (it stays pure; C1)")
     errs += fitted_errors(d)
+    errs += scale_fit_errors(d)
     return errs
+
+
+# --- G9 ---------------------------------------------------------------------------------
+# Phase19 (RD-P19-2), the lead: "We will want to be as firm as we can be that scale fits exactly
+# into our scale options ... we should STRONGLY avoid fractions of that... worth noting for any of
+# our generation toolsets." An article's tile is exactly its tag's length; an sUKN article tiles
+# nothing and authors 0.0. Never stretch a source to fit: re-make it at a scale option's size.
+TAG_METRES = {"s0001": 0.001, "s001": 0.01, "s01": 0.1, "s1": 1.0, "s10": 10.0, "s100": 100.0}
+# The articles already off their tag when the rule was made (Phase19 F-P15-1, 2026-10-15), each
+# with its recorded size. Each is a redo row in library/wishlist.yaml; a redo that lands on its
+# tag must leave this list, and nothing joins it.
+OFF_SCALE_KNOWN = {
+    "Concrete_BoardFormed_Clean_Base_s1_v01": 2.0,
+    "Concrete_Polished_Clean_Base_s1_v01": 3.0,
+    "Terrazzo_Polished_Clean_Base_s1_v01": 0.8,
+    "MildSteel_Raw_Clean_Base_s01_v01": 0.3,
+    "Rust_OnSteel_Flaking_Base_s01_v01": 0.5,
+    "BeachSand_Dry_Clean_Base_s1_v01": 1.5,
+    "OakLeaf_Natural_Clean_Base_s01_v01": 0.12,
+    "Loam_Natural_Clean_Base_s1_v01": 1.4,
+    "Granite_Polished_Clean_Base_s1_v01": 0.4,
+    "Marble_Veined_Polished_Base_s01_v01": 0.5,
+    "Onyx_Polished_Clean_Base_s01_v01": 0.3,
+    "Slate_Cleft_Clean_Base_s1_v01": 0.5,
+    "Oak_Natural_Clean_Base_s1_v01": 0.8,
+    "Paint_OnMetal_Chipped_Base_s01_v01": 0.3,
+    "Lace_Floral_Clean_Base_s01_v01": 0.25,
+}
+
+
+def scale_fit_errors(d: dict) -> list:
+    """G9 for one recipe: its meters_per_tile is exactly its scale tag's length (RD-P19-2)."""
+    tag, mpt, name = d.get("scale_tag"), d.get("meters_per_tile"), d["name"]
+    if tag == "sUKN":
+        return [] if not mpt else [f"G9 an sUKN article tiles nothing: meters_per_tile must be 0.0, not {mpt}"]
+    if tag not in TAG_METRES or mpt is None:
+        return []                       # the tag itself is the grammar's (G2 / the materials lane)
+    want = TAG_METRES[tag]
+    on_tag = abs(mpt - want) <= 1e-9 * want
+    if name in OFF_SCALE_KNOWN:
+        if on_tag:
+            return [f"G9 {name} is on its tag now: remove it from OFF_SCALE_KNOWN"]
+        if mpt != OFF_SCALE_KNOWN[name]:
+            return [f"G9 {name} is a known off-scale article at {OFF_SCALE_KNOWN[name]} m, now {mpt} m: "
+                    f"a redo lands on its tag ({want} m), never on another fraction"]
+        return []
+    if not on_tag:
+        return [f"G9 meters_per_tile {mpt} is not its tag's length: {tag} is exactly {want} m "
+                "(RD-P19-2). Re-make the source at a scale option's size; never stretch it to fit"]
+    return []
 
 
 def main(argv=None) -> int:

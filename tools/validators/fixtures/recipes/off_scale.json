@@ -1,0 +1,19 @@
+{
+  "_comment": "RED fixture (Phase19, RD-P19-2): a 0.8 m tile tagged s1, the shape a scan's own size and the nearest tag produced (F-P19-8). Must be REJECTED by G9 alone.",
+  "name": "ABS_Matte_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "path": "synthetic/plastic/ABS_Matte_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "plastic",
+  "scale_tag": "s1",
+  "meters_per_tile": 0.8,
+  "base_color_const": "0.85, 0.84, 0.82",
+  "roughness_const": 0.55,
+  "metalness_const": 0.0,
+  "specular_ior": 1.46,
+  "lcd_ports": [
+    "base_color_tint",
+    "roughness_bias"
+  ]
+}
