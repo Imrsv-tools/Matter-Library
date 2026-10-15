@@ -1,6 +1,6 @@
 # Phase18 — Character Materials, Their Own Library
 
-**Status:** DISCOVERY — Pass 1 done, **Brief written, two lead calls open** (Q-P18-1, Q-P18-2; §Blockers). Lane **build**. Opened by the lead 2026-10-15: *"/discovery p18"*. The Brief is written to the recommended answers. If you choose otherwise, only the steps that call says it reaches change. *(Seeded 2026-10-14 by `/research` on the lead's word: *"yes record it and seed all three"* (RD-DS-5). Numbered Phase17, then Phase19 (RD-DS-6, RD-DS-7), and Phase18 since RD-DS-8. It follows Thumbnails ([`Phase17_Thumbnails.md`](Complete/Phase17_Thumbnails.md)), whose character views it pictures each part with.)* **This phase's ids start at `Q-P18-1`, `F-P18-1` and `RD-P18-1`.** None existed before this pass (searched 2026-10-15).
+**Status:** BRIEF READY (2026-10-15) — both lead calls answered: the lead, *"A on both, then /execute P18"* (Q-P18-1 → **RD-P18-9**, Q-P18-2 → **RD-P18-10**). Lane **build**. Opened by the lead 2026-10-15: *"/discovery p18"*. The Brief is written to the recommended answers. If you choose otherwise, only the steps that call says it reaches change. *(Seeded 2026-10-14 by `/research` on the lead's word: *"yes record it and seed all three"* (RD-DS-5). Numbered Phase17, then Phase19 (RD-DS-6, RD-DS-7), and Phase18 since RD-DS-8. It follows Thumbnails ([`Phase17_Thumbnails.md`](Complete/Phase17_Thumbnails.md)), whose character views it pictures each part with.)* **This phase's ids start at `Q-P18-1`, `F-P18-1` and `RD-P18-1`.** None existed before this pass (searched 2026-10-15).
 
 ## Outcome
 
@@ -79,7 +79,7 @@ Every tool any click uses is Blender, `gh` or the thumbnail tool, and all three 
 | **The part meshes, named and versioned** (RD-P18-1): `MakeHuman_Body_v01` (hm08), `MakeHuman_Eyes_v01` (the high-poly eye), `MakeHuman_Teeth_v01` (`teeth_base` and its five shapes), `MakeHuman_Tongue_v01`. Each is recorded with its source in the pinned pack, its UV-layout hash, and the rig parts it yields. | 18.1 |
 | **A kit per mesh version** (RD-P18-4): the mesh with its UVs, its layout picture, and the spec page. It is made from the pinned pack into a git-ignored folder. | 18.1 |
 | **A Character article declares the mesh it fits:** `fits` in its recipe and its `imrsv_metadata` (RD-P18-2). | 18.2 |
-| **A fitted article carries its own picture** (Q-P18-1 A). The assembler writes the recipe's picture as `base_color_map`'s value. Every other article assembles byte-identically. A binding can still supply its own (Carrier rule). | 18.2 |
+| **A fitted article carries its own picture** (RD-P18-9). The assembler writes the recipe's picture as `base_color_map`'s value. Every other article assembles byte-identically. A binding can still supply its own (Carrier rule). | 18.2 |
 | **The check against the UVs**, in the existing recipe lane (RD-P18-5): a known mesh version, the picture's size and format, and every UV island covered. | 18.2 |
 | **The targets take the article's own picture** when the binding supplies none: Blender's loader, the rig's job, and so the Blender asset library. Storm reads it natively. | 18.2 |
 | **The fixture: a set of teeth**, `Teeth_Natural_Clean_Base_sUKN_v01` (RD-P18-6, RD-P18-8). It is bound on the Teeth and Gums parts, as `Eye_Natural` is bound on three eye parts. | 18.2 |
@@ -95,7 +95,7 @@ Every tool any click uses is Blender, `gh` or the thumbnail tool, and all three 
 
 | What | Why not now | What it will consume from this phase |
 |---|---|---|
-| **Skin maps: a skin that fits the body** | Q-P18-2, recommended (A): *Skin Maps* is its own phase, straight after this one. It owes its own work: the six skins re-assembled (F-SKM-19), Blender's map-following scatter (F-SKM-23), and the calibration (F-SKM-20, F-SKM-25). | `MakeHuman_Body_v01` and its kit, `fits`, the article-carried picture, the coverage check, and the `face` and `hand` thumbnail binding. Its draft spec's Q-SKM-4 is answered here. |
+| **Skin maps: a skin that fits the body** | RD-P18-10 (the lead chose A): *Skin Maps* is its own phase, straight after this one. It owes its own work: the six skins re-assembled (F-SKM-19), Blender's map-following scatter (F-SKM-23), and the calibration (F-SKM-20, F-SKM-25). | `MakeHuman_Body_v01` and its kit, `fits`, the article-carried picture, the coverage check, and the `face` and `hand` thumbnail binding. Its draft spec's Q-SKM-4 is answered here. |
 | **Skin Maps Beyond Colour** | Parked (RD-DS-8). | The same, plus each new input it adds. |
 | **Moving today's fit pictures into articles** (the nine eye colours and the hairstyles) | Studio reads them from the fit set today (P21). Moving them changes what a consumer binds. Nothing in the Outcome needs it. | The rule and the check. A move is one article per picture. |
 | **Hair That Reads as Hair** (RD-P18-7) | A card is fitted per hairstyle and has its own research. Strands are the real path (MAP-RD4). | The mesh registry and the rule, for a hairstyle's cards. |
@@ -143,7 +143,7 @@ Every tool any click uses is Blender, `gh` or the thumbnail tool, and all three 
 - **RD-P17-1:** Thumbnails built the views. This phase changes which mesh a part is, not how a part is pictured.
 - **RD-RO-2:** CC0 only.
 - **Pre-release:** no release ceremony gates anything. A push and a publication are the lead's word.
-- **CM2** (substance in Matter, fit beside it) **and RD-DS-1 meet at Q-P18-1.** Neither is resolved here.
+- **CM2** (substance in Matter, fit beside it) **and RD-DS-1 met at Q-P18-1. The lead resolved it: A (RD-P18-9).** For the Character group, a fitted picture lives in its article; CM2 stands for Matter.
 
 **Minted here, closed with a recommendation, unless you say otherwise:**
 - **RD-P18-1 — A mesh version is a UV layout, named `<Family>_<Mesh>_vNN`.**
@@ -170,7 +170,7 @@ Every tool any click uses is Blender, `gh` or the thumbnail tool, and all three 
 - **RD-P18-6 — The first instances are a set of teeth and an eye.**
   - **The teeth are the full journey.** The teeth are a flat colour today, and the CC0 pack has the teeth's own atlas.
   - **The eye shows the rule on a second mesh, at almost no cost.** Its CC0 picture already fits.
-  - **Skin is Q-P18-2.**
+  - **Skin is its own phase, next (RD-P18-10).**
   - The teeth picture is prepared from the pack's teeth atlas as Phase09 prepared the eye pictures. RD-SKM-2's rule on photographs of people binds skin. Execute looks at the teeth atlas before using it.
 - **RD-P18-7 — *Hair That Reads as Hair* is not folded in.** Cards fit per hairstyle, strands are the real path (MAP-RD4), and it has its own research. *(The seed's third question.)*
 - **RD-P18-8 — A fitted article's scale tag is `sUKN` when it tiles nothing** (Identity: *"Not defined / not relevant"*, the fit set's tag). One that also tiles a detail, such as pores, keeps that tile's tag. *Scale Grids* (Phase19) re-verifies against this (F-P18-9).
@@ -223,7 +223,7 @@ No authorization, no secrets, no destructive migration, no data loss, and no pub
 - **New content:**
   - the teeth set's recipe, picture and provenance;
   - the eye's recipe and provenance.
-  - The pictures go under `MatterLibrary/textures/fit/makehuman/<mesh>/`, where pictures on a layout already live. The Glossary's *Fit set* wording follows Q-P18-1.
+  - The pictures go under `MatterLibrary/textures/fit/makehuman/<mesh>/`, where pictures on a layout already live. The Glossary's *Fit set* wording follows RD-P18-9.
 - **Seams to watch:**
   - **Blender B1:** a material naming a UV map the kit's mesh lacks draws one texel.
   - **B10 and B11:** the lead's Blender.
@@ -234,7 +234,13 @@ No authorization, no secrets, no destructive migration, no data loss, and no pub
 
 ---
 
-## Blockers — two lead calls
+## The two lead calls — answered 2026-10-15
+
+**The lead, verbatim: *"A on both, then /execute P18"*.**
+- **RD-P18-9 — Q-P18-1 → A: a contributed fitted picture lives inside its Character article** (its `base_color_map` value, with `fits`). This supersedes, for the Character group only, CM2's *"fit beside it"* and LCDSchema's *"empty in the article"*. The fit set and CM2 stand for everything else.
+- **RD-P18-10 — Q-P18-2 → A: *Skin Maps* is its own phase, straight after this one**, built on this phase's registry, kit, rule, check and picture binding.
+
+*The questions as they were put, kept for the record:*
 
 ### Q-P18-1 — Where does a contributed fitted picture live? **Two of your rulings meet here.**
 
@@ -269,7 +275,7 @@ The seed made this your call: *"Whether they run inside this phase or ahead of i
 
 - **F-P18-1 — Two lead rulings meet on where a fitted picture lives** (Q-P18-1).
   - **The SkinMaps draft spec marks *"a skin map is a fit-set picture … supplied when bound"* as *Ruled (F-SKM-10)*.** F-SKM-10 is a finding, written at 14:40 on 2026-10-14 within CM2's frame. It came about four hours before RD-DS-1 and RD-DS-4.
-  - Its label is corrected at the close, whichever way Q-P18-1 goes.
+  - Its label is corrected at the close (RD-P18-9: the lead chose A).
 - **F-P18-2 — The fitted-picture mechanism exists in every target; the entry does not.**
   - `base_color_map` (Phase09) is sampled on the mesh's `st` in the articles, the Blender masters and the Unreal masters. The eye's nine pictures and the hairstyles' ride it.
   - What a fitted picture lacks is a name, a contributor, a catalog row and a place in a release (F-DS-2).
