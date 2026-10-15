@@ -26,7 +26,7 @@ The Matter Library organizes materials into a tight, deep taxonomy: **6 Domains*
 The boundaries:
 - **Plant matter** stays in `natural/wood` and `environmental/vegetation`.
 - **Leather** is processed hide, so it stays in `synthetic/textile`.
-- **A body is not matter**, just as a wall is not (§Growth model). Only the *substance* lives here. Anything bound to one mesh, such as a region mask, a painted skin atlas or a hair card's cut-out, stays outside the taxonomy (research `260927_R_CharacterMaterials_MPFB2.md`, CM2).
+- **A body is not matter**, just as a wall is not (§Growth model). Only the *substance* lives here. Anything bound to one mesh, such as a region mask, a painted skin atlas or a hair card's cut-out, stays outside the taxonomy (research `260927_R_CharacterMaterials_MPFB2.md`, CM2). *(Refined 2026-10-15, Phase18, RD-P18-9: that holds for Matter. A picture painted for one part mesh is now a **Character** article of its own, in §Character, carrying the picture and the mesh it `fits`.)*
 
 **`ceramic`** *(added 2026-09-23, lead)* is **fired-clay matter**: brick clay, terracotta, earthenware, stoneware and porcelain, glazed or unglazed. The boundaries:
 - **Unfired clay** stays in `natural/soil`.
@@ -65,7 +65,7 @@ Base textures mirror the same hierarchy under `textures/base/`; cross-domain ove
 | `humanoid` | `eyes` · `hair` · `skin` · `nails` · `teeth` · `mouth` |
 
 - **The parts are the six rows the lead ruled** (Eyes, Hair, Skin, Nails, Teeth, Mouth). Today's articles fall in them by their Material token: eyes = Cornea, Eye, Iris, Pupil, Sclera · hair = Hair · skin = Skin · nails = Nail · teeth = Enamel · mouth = Lips, Gum, Tongue (RD-P15-1).
-- **Other species** (canine, equine, …) are added beside `humanoid` when the first article for one is made (additive, like a Class). Which mesh a part fits is added by *Character Materials, Their Own Library* (Phase18).
+- **Other species** (canine, equine, …) are added beside `humanoid` when the first article for one is made (additive, like a Class). Which mesh a part fits is added by *Character Materials, Their Own Library* (Phase18). **Shipped 2026-10-15 (Phase18):** each part is painted on a **part mesh**, named for its UV layout, `<Family>_<Mesh>_vNN` (a new layout is a new version; a new shape on the same layout is not): `MakeHuman_Body_v01` (skin, mouth, nails), `MakeHuman_Eyes_v01` (eyes), `MakeHuman_Teeth_v01` (teeth) and `MakeHuman_Tongue_v01`, listed with each part in `tools/converters/groups.py` (`PART_MESHES`). A Character article painted for one declares it as `fits` ([LCDSchema](../Contract/LCDSchema.md) §Base colour map); one with no picture of its own declares none. Hair's cards fit per hairstyle and are not part meshes yet (*Hair That Reads as Hair*).
 - **The group lives in the file.** A Character article declares `group`, `species` and `part` in its `imrsv_metadata` ([MaterialXTemplate](../Contract/MaterialXTemplate.md)); **a file with no `group` is Matter**. The group is never worked out from the domain: a generic skin pattern is `biological`, and Matter (F-DS-5).
 - **A Character article keeps its `domain` and `class`** as what it is made of (`biological` / `tissue`, …). They no longer decide where it is browsed.
 - **Its folder is `materials/character/<species>/<part>/`** (RD-P15-8), and the recipe gate (G5) refuses a folder that disagrees with what the file declares. The list of species and parts is `tools/converters/groups.py`.

@@ -32,3 +32,9 @@
 
 **B15 — Headless cloth: step the frames, then freeze the evaluated mesh.** *(Phase17 17.2, F-P17-20.)* `scene.frame_set(f)` for each frame runs the cloth simulation in `-b`, and `bpy.data.meshes.new_from_object(obj.evaluated_get(depsgraph))` keeps the draped shape and its UVs. Self-collision on a cloth larger than its support heaped the spare cloth and took a minute; a cloth just big enough to reach the floor needs none. A thin-walled glass on a **closed box** is drawn twice (front face and back): one sheet is the whole pane.
 
+
+**B16 — An image no datablock uses is dropped when the file is saved.** *(Phase18 18.1.)* A picture loaded only so a later view can show it (a kit's UV layout, opened in the UV editor after the file is reopened) has no user at save, and the reopened file has lost it. Set `image.use_fake_user = True` on anything loaded for a view rather than for a material.
+
+**B17 — An Asset Browser area's `params` exist only after it has drawn.** *(Phase18 18.2.)* A script that switches an area to the Asset Browser and sets its library or search in the same call finds `space.params` is `None`. Set them in a later timer (`bpy.app.timers.register`); the library enum's value is the library's own name (here `asset_library`), not its path.
+
+**B18 — With every face selected in edit mode, the UV editor and the 3D view draw an orange sheet over the picture.** *(Phase18 18.1; seen in the sitting's own screenshot before the lead looked.)* Entering edit mode to frame the UVs leaves all selected, which hides the layout being shown. Deselect after framing, with UV sync on, so the islands show their edges over the picture.

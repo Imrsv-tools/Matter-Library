@@ -11,10 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase18 — Character Materials, Their Own Library — BRIEF READY *(**discovery opened by the lead 2026-10-15**, "/discovery p18"; lane build; its first instances are a set of teeth and an eye; the lead, "A on both": a fitted picture lives in its Character article (RD-P18-9), and Skin Maps runs straight after (RD-P18-10); **renumbered Phase18 2026-10-14**, RD-DS-8; renumbered Phase19 the same evening, after Thumbnails, whose per-part picture rig it builds on**, RD-DS-7; added 2026-10-14, the same word, third of the three, RD-DS-4; Skin Maps and Skin Maps Beyond Colour are its first instances *(Reevaluate 2026-10-15: Q-P18-2)*; numbered Phase17 the same day, RD-DS-6)*
-**Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
-- `docs/Planning/Phases/Phase18_CharacterLibrary.md` · research `docs/Planning/Research/261014_R_DownstreamPicture.md`
-
 ### Phase19 — Scale Grids — BRIEF READY, after Phase18 *(**re-verified 2026-10-15** by discovery Pass 2, the lead's "/discovery P19": the Brief holds against Phase15 – 18, and it holds whether *Skin Maps*, ruled straight after Phase18 (RD-P18-10), runs before it or after; **renumbered Phase19 2026-10-14**, RD-DS-8; renumbered Phase20 earlier the same evening, RD-DS-7; numbered Phase15 and opened by the lead 2026-10-14, "/discovery P15"; **renumbered Phase18 the same day**, when the lead put the three above ahead of it, RD-DS-6; its discovery Pass 1 is kept; added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
 - `docs/Planning/Phases/Phase19_ScaleGrids.md`
@@ -194,3 +190,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** every kept material has thumbnails that show it at its best, on a subject that suits it (skin on a hand and a face, hair on a head, glass in front of a backdrop), ready for the website and the team's console.
 - `docs/Planning/Phases/Complete/Phase17_Thumbnails.md`
 *Closed 2026-10-15: 82 kept materials pictured in Cycles, published as baseline JPEG (`matterlib-0.2.0-dev.7`) and served in the dev install; the comparison pictures are seeded as research.*
+
+### Phase18 — Character Materials, Their Own Library — COMPLETE
+**Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
+- `docs/Planning/Phases/Complete/Phase18_CharacterLibrary.md`
+*Closed 2026-10-15: four named part meshes with a kit each, a fitted teeth set and eye checked against their UVs and pictured on their parts, published in `matterlib-0.2.0-dev.8`; the skin is* Skin Maps*', next (RD-P18-10).*

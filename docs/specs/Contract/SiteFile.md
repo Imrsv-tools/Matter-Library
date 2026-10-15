@@ -66,6 +66,7 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `licence` | `CC0-1.0`, every article (RD-RO-2). Read from the article's own `.mtlx` since Phase16 (2026-10-14). |
 | `sources[]` | The recipe's sources: `kind` (`ambientcg`, `physicallybased`, `procedural`, `judgement`) with what that kind records (an `asset` and `url`, the values used, a `why`). For a pilot article whose recipe has none, its textures' lockfile provenance (`kind`, `license`, `url`), wear layers excepted: like a recipe's, these sources are the article's own, and its wear layers are under `wear_layers`. Absent when nothing is recorded. |
 | `contributor` | A contributor's handle, when one was given: credit as a courtesy and for the platform's Forseti tracking, never a licence condition (RD-RO-2). **Since Phase16 (2026-10-14, `matterlib-0.2.0-dev.5`)** read from the article's own `.mtlx` (its `imrsv_metadata`); the library's own articles say `MatterBot` (RD-P16-11). Left out when the file declares none. |
+| `fits` | *(2026-10-15, Phase18, `matterlib-0.2.0-dev.8`)* The part mesh a fitted Character material's own picture is painted for (`MakeHuman_Teeth_v01`, …), read from its `.mtlx`; its kit is the `kits[]` entry with that `id` (§Kits). Left out on every other material. |
 | `origin` | Where the article came from, any of: `scan` (a scanned source, e.g. ambientCG), `procedural` (a generator), `measured` (measured values, e.g. Physically Based), `agent-drafted` (an agent wrote the recipe). Derived from its sources at 13.2, kept in the recipe, confirmed by the maintainer (F-MP-18). Absent until written. |
 
 **Per material — evidence and pictures:**
@@ -108,9 +109,13 @@ A group reads the list it names, filtered by `section` where it gives one. **A g
 | `captured` | `date_taken`, `whitebalance`, `evs_cap`, `coords`, where the source gives them. |
 | `pictures[]` | One entry: `role: thumbnail`, `file` (`<identity>__thumbnail.jpg`, 1024 × 512, tone-mapped from the HDRI by `tools/releases/hdris.py`) and `sha256`. |
 
+## Kits *(2026-10-15, Phase18)*
+
+`kits[]` (top level, absent when there is none): **what a contributor paints a Character material against**, one entry per part mesh, in `tools/converters/groups.py`'s order. `id` (`MakeHuman_Teeth_v01`), `family`, `species`, `what` (a sentence), `parts` (the Character parts it serves), `rig_parts` (the pieces the rig and Studio split it into), `map_size` (the picture's side, px), `uv_sha256` (the layout's hash: what makes it this version), `file` (`kit__<id>.zip`, a release asset) and its `sha256`. The zip holds the mesh with its UVs (USD and OBJ, metres, Y up), its layout picture, its islands picture and a README. CONTRIBUTING.md §3.1 is the path.
+
 ## Limits
 
-GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most nine per article (six rig pictures, two thumbnails and a zip; *until Phase17, seven*) and one per HDRI (its thumbnail): with 59 HDRIs that fits about 100 articles at worst, and `matterlib-0.2.0-dev.6` is 572 assets for 95. The builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
+GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publishes at most nine per article (six rig pictures, two thumbnails and a zip; *until Phase17, seven*), one per HDRI (its thumbnail) and one per kit: with 59 HDRIs that fits about 100 articles at worst, and `matterlib-0.2.0-dev.8` is 580 assets for 97 and four kits. The builder fails rather than drop an asset past the limit. Splitting belongs to the release-bundle phase (F-MP-30).
 
 ## History
 
@@ -119,3 +124,4 @@ GitHub allows up to 1000 assets a release, each under 2 GiB. A dev snapshot publ
 - 2026-10-14 — still schema 2 (additive), by Phase15 15.2: each material's `group` (and `section`) read from its own file, Character's `species` and `part`, each group's `taxonomy`, Character's `rows`, and each HDRI's `group`, `when` and `sky`. The 30 Character materials' `id`s follow their folder, `character/humanoid/<part>/`. First in the dev snapshot `matterlib-0.2.0-dev.4`.
 - 2026-10-14 — still schema 2 (additive), by Phase17 17.5: `pictures[]` gains `role: thumbnail`, each with its `view` and `renderer`, for Matter and Character; Matter's group is shown by them (`shown: thumbnail`), and a Character material publishes its human-context pictures (still never a rig picture). §Limits rises to nine per article. First in the dev snapshot `matterlib-0.2.0-dev.6`.
 - 2026-10-14 — still schema 2, by Phase17 (the lead's ruling after `dev.6`): **every picture is a baseline JPEG**, where every one was WebP. Thumbnails `<identity>__thumbnail__<view>.jpg`, rig pictures `<identity>__<tool>[__close].jpg`, HDRI thumbnails `<identity>__thumbnail.jpg`. A reader that takes `file` from the entry needs no change. First in `matterlib-0.2.0-dev.7`.
+- 2026-10-15 — still schema 2 (additive), by Phase18 18.4: a fitted Character material's `fits`, and `kits[]` (§Kits), each kit a release asset. First in `matterlib-0.2.0-dev.8`.

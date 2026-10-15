@@ -1,6 +1,6 @@
 # PhaseTBD — Skin Maps
 
-**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead ruled the same day (RD-SKM-2 to RD-SKM-4). The probe ran on the laptop (Pass 5) and the AI route was explored (Pass 6). The lead's answer to Q-SKM-7 comes before `/discovery`.
+**Status:** SEEDED (2026-10-14) — not numbered. A pointer-shell written by `/research` on the lead's word (*"Seed all the TBD phases we discovered here"*). **The industry survey is done** (`261014_R_SkinMaps.md` Passes 3–4, 2026-10-14). The lead ruled the same day (RD-SKM-2 to RD-SKM-4). The probe ran on the laptop (Pass 5) and the AI route was explored (Pass 6). ~~The lead's answer to Q-SKM-7 comes before `/discovery`.~~ *(Answered 2026-10-14: RD-SKM-5, the library-made map ships first. Corrected at Phase18's close, 2026-10-15. Phase18 also answered Q-SKM-4 and moved the map into its Character article (RD-P18-9, RD-P18-10: this phase runs straight after it).)*
 
 **Owed here, found by the probe:**
 - re-assemble the six skin articles to take a map (F-SKM-19);

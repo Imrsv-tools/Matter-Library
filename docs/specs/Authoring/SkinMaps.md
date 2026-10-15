@@ -11,7 +11,7 @@
 
 A **skin map** is a painted picture of a body's skin, drawn on the approved human mesh's UV layout ([Glossary](../../Glossary.md) *Skin map*, *Approved human mesh*). It gives skin the variation a single tone cannot: lips that blend into the face, warmer cheeks, ears and fingertips, and darker creases.
 
-- **It is a picture of the MESH, not part of the material.** The skin **article** (`Skin_FitzpatrickI` … `VI`) keeps the substance: its measured tone, scatter, coat, fuzz and the tiling pores (`Skin_Pores`). The map is a **fit-set** picture, supplied when the article is bound, as the eye's and the hairstyle's pictures are (CM2; [LCDSchema §Base colour map](../Contract/LCDSchema.md#base-colour-map-the-meshs-picture-supplied-at-binding)). **Ruled** (F-SKM-10).
+- **It is a picture of the MESH, not part of the material.** The skin **article** (`Skin_FitzpatrickI` … `VI`) keeps the substance: its measured tone, scatter, coat, fuzz and the tiling pores (`Skin_Pores`). ~~The map is a **fit-set** picture, supplied when the article is bound, as the eye's and the hairstyle's pictures are (CM2). **Ruled** (F-SKM-10).~~ *(Corrected 2026-10-15, Phase18 F-P18-1: F-SKM-10 was a finding written within CM2's frame, never a ruling, and the lead has since ruled the other way.)* **The map lives in its own Character skin article**, as that article's `base_color_map` value, and the article declares the mesh it `fits` (`MakeHuman_Body_v01`); a binding that supplies a picture still wins ([LCDSchema §Base colour map](../Contract/LCDSchema.md#base-colour-map-the-meshs-picture-supplied-at-binding)). **Ruled** (RD-P18-9, the lead, 2026-10-15). Whether one article carries both the tone and its map, or the map is an article of its own beside the tone, is *Skin Maps*' to settle: **Open**.
 - **It reaches every renderer through the existing input**, `base_color_map`: `base = base_color_const × base_color_map × base_color_tint`. There is no new input for colour. **Ruled** (RD-SKM-3).
 - **It is colour only, for now.** Maps for normal, roughness, cavity or scatter would each need a new input. *(planned: the phase* Skin Maps Beyond Colour*, [`PhaseTBD_SkinMapsBeyondColour.md`](../../Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md), seeded 2026-10-14)*
 
@@ -20,7 +20,7 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 - **The approved human mesh is MakeHuman's hm08 body** (CC0), rigged to the Manny skeleton.
 - **A map made for it fits every character built from it**, whatever its shape, skeleton or weights, because those leave the UV layout where it is.
 - **A future mesh version gets its own skin maps.** A map can be moved to a new layout by baking, with some loss.
-- **How a mesh version is named and recorded, so each map says which mesh it fits:** **Open** (Q-SKM-4). Today the family is `makehuman` and hm08 is its first version.
+- **How a mesh version is named and recorded, so each map says which mesh it fits:** ~~**Open** (Q-SKM-4).~~ **Answered 2026-10-15 (Phase18, RD-P18-1):** a mesh version is a UV layout, named `<Family>_<Mesh>_vNN` and pinned by its layout hash in `tools/converters/groups.py` (`PART_MESHES`). hm08 is **`MakeHuman_Body_v01`**, at 2048 × 2048; a map declares it as `fits`, and the recipe gate (G8) checks the map against it. Its kit is `kit__MakeHuman_Body_v01.zip` ([Glossary](../../Glossary.md) *Part mesh*).
 
 ## One map per skin tone — **Ruled** (RD-SKM-3)
 
@@ -45,7 +45,7 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 - **Layout:** hm08's single 0–1 UV atlas, with at least **16 pixels of bleed** past each UV island's edge, as the probe baked.
 - **Size:** **2048 × 2048** (MakeHuman's atlases and the probe). At that size the face gets about a 441-pixel square (F-SKM-26). Whether close-ups need a larger atlas, or a face map of its own: **Open**.
 - **File:** an RGB **PNG**, read as **sRGB** (`srgb_texture`, as every `base_color_map` is: LCDSchema).
-- **Where it lives:** the fit set, beside the eyes, e.g. `MatterLibrary/textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png`, scale tag `sUKN` (the fit set's tag). The exact path waits on the mesh-version naming: **Open** (Q-SKM-4).
+- **Where it lives:** the fit set, beside the eyes, e.g. `MatterLibrary/textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png`, scale tag `sUKN` (the fit set's tag). ~~The exact path waits on the mesh-version naming: **Open** (Q-SKM-4).~~ *(2026-10-15: the naming is answered, and the picture is named by its article as its `base_color_map` value (RD-P18-9); its folder stays `MatterLibrary/textures/fit/makehuman/skin/`, as the fitted teeth's is `…/teeth/`.)*
 
 ## Calibration: the measured tone stays the average — **Proposed** (F-SKM-20, F-SKM-25)
 

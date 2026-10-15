@@ -40,7 +40,7 @@
     },
     {
       "kind": "judgement",
-      "why": "One article for enamel and gum, so each value sits between their articles: IOR 1.5 (enamel 1.63, wet mucosa 1.4), roughness 0.25 (enamel 0.15, gum 0.3). Coat 0.5 at 0.1, IOR 1.336: saliva, as Gum_Natural. Scatter at half weight and a 2 mm radius with skin's radius scale: the gums glow, the enamel stays crisp (Gum_Natural scatters fully at 4.8 mm; Enamel_Natural is Opaque). Not yet looked at in any renderer at these values."
+      "why": "One article for enamel and gum, so each value sits between their articles: IOR 1.5 (enamel 1.63, wet mucosa 1.4), roughness 0.25 (enamel 0.15, gum 0.3). Coat 0.5 at 0.1, IOR 1.336: saliva, as Gum_Natural. Scatter at half weight and a 2 mm radius with skin's radius scale: the gums glow, the enamel stays crisp (Gum_Natural scatters fully at 4.8 mm; Enamel_Natural is Opaque). Looked at in Storm and Blender on the rig's mouth view, and in Cycles on the thumbnail's, and passed by the maintainer (Phase18 clicks 2 and 3, 2026-10-15); Unreal not yet."
     }
   ]
 }
