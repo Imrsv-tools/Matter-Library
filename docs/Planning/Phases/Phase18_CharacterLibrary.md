@@ -1,6 +1,6 @@
 # Phase18 — Character Materials, Their Own Library
 
-**Status:** BRIEF READY (2026-10-15) — both lead calls answered: the lead, *"A on both, then /execute P18"* (Q-P18-1 → **RD-P18-9**, Q-P18-2 → **RD-P18-10**). Lane **build**. Opened by the lead 2026-10-15: *"/discovery p18"*. The Brief is written to the recommended answers. If you choose otherwise, only the steps that call says it reaches change. *(Seeded 2026-10-14 by `/research` on the lead's word: *"yes record it and seed all three"* (RD-DS-5). Numbered Phase17, then Phase19 (RD-DS-6, RD-DS-7), and Phase18 since RD-DS-8. It follows Thumbnails ([`Phase17_Thumbnails.md`](Complete/Phase17_Thumbnails.md)), whose character views it pictures each part with.)* **This phase's ids start at `Q-P18-1`, `F-P18-1` and `RD-P18-1`.** None existed before this pass (searched 2026-10-15).
+**Status:** IN EXECUTION (2026-10-15, the lead: *"/execute P18"*). Brief ready the same day — both lead calls answered: the lead, *"A on both, then /execute P18"* (Q-P18-1 → **RD-P18-9**, Q-P18-2 → **RD-P18-10**). Lane **build**. Opened by the lead 2026-10-15: *"/discovery p18"*. The Brief is written to the recommended answers. If you choose otherwise, only the steps that call says it reaches change. *(Seeded 2026-10-14 by `/research` on the lead's word: *"yes record it and seed all three"* (RD-DS-5). Numbered Phase17, then Phase19 (RD-DS-6, RD-DS-7), and Phase18 since RD-DS-8. It follows Thumbnails ([`Phase17_Thumbnails.md`](Complete/Phase17_Thumbnails.md)), whose character views it pictures each part with.)* **This phase's ids start at `Q-P18-1`, `F-P18-1` and `RD-P18-1`.** None existed before this pass (searched 2026-10-15).
 
 ## Outcome
 
@@ -329,3 +329,11 @@ The seed made this your call: *"Whether they run inside this phase or ahead of i
   - **Learnings in play:** Blender B1, B2, B10, B11, B12; Storm S9; MaterialX M4. GitHub G1 applies at the publish. Unreal is not run here.
   - **Measured:** the gate baseline, the machine, and the teeth meshes' layouts (F-P18-4).
   - **Rulings newer than the Roadmap:** none about this phase since RD-DS-8. `git log` since the seed's last edit holds only Phase16–17's work and retros.
+
+## Execution Log
+
+**Tree at start (2026-10-15):** `main` at `48b5fad`, the library machine; two commits unpushed (a retro and this phase's discovery). Six Refiner-lane files are modified by a sibling session; not touched. **Gate:** `run_all.py` 15 PASS, 2 SKIP, 0 FAIL (measured at discovery, same tree).
+
+| Step | Landed | Result | Next |
+|---|---|---|---|
+| **18.1** | the 18.1 commit | `groups.PART_MESHES`: four part meshes, each pinned by its layout hash (`make_kits.layout_sha256`). `teeth_shape03`'s hash equals `teeth_base`'s, and the low-poly eye's differs, so the hash tells layouts apart and ignores shape. `make_kits.py` writes the four kits to `library/kits/` (USD, OBJ, the layout picture, the island picture, README) and commits the island pictures to `library/meshes/` (9–75 KB). `kit_blender.py` builds a kit's `.blend` headless from the factory scene and opens the UV Editing view. Seen before the sitting: the first view drew an orange sheet over everything (all selected), then dropped the layout picture (no user at save); both fixed. **▶ SCAFFOLD COMPLETE — sitting owed (click 1).** | click 1 |

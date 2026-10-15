@@ -33,6 +33,40 @@ CHARACTER_TAXONOMY = {
 }
 SPECIES_LABELS = {"humanoid": "Humanoid"}
 
+# The PART MESHES (Phase18, RD-P18-1): the mesh a Character article's picture is drawn for, named
+# `<Family>_<Mesh>_vNN` and versioned. **A version is a UV layout**: a new layout is a new vNN, and
+# a new shape on the same layout is the same version (F-P18-4: MakeHuman's six teeth share one).
+# A fitted article declares the one it fits (`fits`, RD-P18-2), and its picture is checked against
+# that layout's islands (`library/meshes/<id>_islands.png`, RD-P18-5).
+#   source     the rig's mesh (tools/parity/scene/build_character.py MESHES), pinned there by sha256
+#   rig_parts  the parts the rig and Studio split it into, each bound to an article
+#   parts      the Character rows its parts are browsed under
+#   map_size   the picture's size, in pixels (square)
+#   uv_sha256  the layout's hash (tools/converters/fit/make_kits.py layout_sha256); a kit refuses
+#              any other, since another layout is another mesh version
+PART_MESHES = {
+    "MakeHuman_Body_v01": {
+        "family": "makehuman", "species": "humanoid", "source": "body",
+        "what": "the whole body's skin (hm08), with the lips and the nails",
+        "rig_parts": ["Lips", "Nails", "Body"], "parts": ["skin", "mouth", "nails"], "map_size": 2048,
+        "uv_sha256": "f2ec4e33d9371e1dfb0f3d857c2377b4be5d0de0554d8cdf8f29837224591b2f"},
+    "MakeHuman_Eyes_v01": {
+        "family": "makehuman", "species": "humanoid", "source": "eyes",
+        "what": "both eyeballs (MakeHuman's high-poly eye): the white, the iris and the pupil",
+        "rig_parts": ["Cornea", "Pupil", "Iris", "Sclera"], "parts": ["eyes"], "map_size": 1024,
+        "uv_sha256": "3b7f8d157b7c5baf6b5dd71428d5e68f17d4e572ad2912f33231bd4ba7043d65"},
+    "MakeHuman_Teeth_v01": {
+        "family": "makehuman", "species": "humanoid", "source": "teeth",
+        "what": "a set of teeth with its gums (MakeHuman's teeth_base and its five shapes)",
+        "rig_parts": ["Gums", "Teeth"], "parts": ["teeth", "mouth"], "map_size": 2048,
+        "uv_sha256": "51edbff6914b869d16a3e53628ae20222b07bf5687b890d558cd734f8021e206"},
+    "MakeHuman_Tongue_v01": {
+        "family": "makehuman", "species": "humanoid", "source": "tongue",
+        "what": "the tongue (MakeHuman's tongue01)",
+        "rig_parts": ["Tongue"], "parts": ["mouth"], "map_size": 1024,
+        "uv_sha256": "7b717e2ef4de7ada6967d5345e268555eb847e590fe636e773d6392b38548755"},
+}
+
 # What the groups are, in browse order: the site file's list (SiteFile.md §Groups), which the dev
 # catalog carries too (RD-P15-5). `taxonomy` names the fields a group is browsed by, in order;
 # Character's `rows` are its parts' labels and order, per species.
