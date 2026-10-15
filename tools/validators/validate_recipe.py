@@ -42,9 +42,12 @@ import groups as G  # noqa: E402  (Phase15: the groups and Character's taxonomy)
 
 SCHEMA_PATH = CONVERTERS / "recipe.schema.json"
 ISLANDS = ROOT / "library" / "meshes"          # Phase18: each part mesh's UV islands (make_kits.py)
-# G8: the share of a mesh's island pixels a picture may leave at its own background colour (the
-# colour outside every island). A picture that leaves one island unpainted leaves far more.
-UNCOVERED_MAX = 0.002
+# G8: the share of any ONE island a picture may leave at its own background colour (the colour
+# outside every island) before the island counts as unpainted. Measured 2026-10-15: MakeHuman's eye
+# pictures paint their background a grey that is also 0.3 % of each eyeball; a bare island is 100 %.
+# FALSE RED: 2026-10-15 — the first G8 counted bare pixels over the whole layout (limit 0.2 %) and
+# refused every CC0 eye picture for that grey; it now counts per island (Phase18 18.3).
+BARE_ISLAND = 0.5
 MATERIALS = ROOT / "MatterLibrary" / "materials"
 RECIPES = CONVERTERS / "recipes"
 
@@ -160,18 +163,20 @@ def picture_errors(picture: Path, mesh_id: str) -> list:
         if im.size != (n, n):
             return [f"G8 {picture.name} is {im.size[0]} x {im.size[1]}: {mesh_id}'s pictures are {n} x {n}"]
         px = np.asarray(im)
-    isl = np.asarray(Image.open(ISLANDS / f"{mesh_id}_islands.png").convert("L"))
-    inside, outside = isl >= 128, isl == 0
+    ids = np.asarray(Image.open(ISLANDS / f"{mesh_id}_islands.png")).astype(np.int64)  # 16-bit numbers
+    outside = ids == 0
     if not outside.any():
         return []
     colours, counts = np.unique(px[outside].reshape(-1, 3), axis=0, return_counts=True)
     bg = colours[counts.argmax()]
-    bare = (px[inside] == bg).all(axis=1)
-    share = bare.mean()
-    if share > UNCOVERED_MAX:
-        return [f"G8 {picture.name} leaves {bare.sum()} of {inside.sum()} island pixels ({share:.1%}) at its "
-                f"background colour {tuple(int(c) for c in bg)}: paint every island of {mesh_id}'s "
-                "layout (its kit's _islands.png)"]
+    bare = (px == bg).all(axis=2)
+    size = np.bincount(ids.ravel())
+    share = np.bincount(ids.ravel(), weights=bare.ravel(), minlength=len(size))[1:] / np.maximum(size[1:], 1)
+    empty = [k + 1 for k in np.flatnonzero((share > BARE_ISLAND) & (size[1:] > 0))]
+    if empty:
+        return [f"G8 {picture.name} leaves {len(empty)} of {int((size[1:] > 0).sum())} UV islands of {mesh_id} "
+                f"unpainted (over half at its background colour {tuple(int(c) for c in bg)}): paint every "
+                "island of the layout (its kit's _islands.png)"]
     return []
 
 

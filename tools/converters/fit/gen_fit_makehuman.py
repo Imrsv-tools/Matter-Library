@@ -197,28 +197,19 @@ def _part_masks(mesh_id: str, size: int) -> dict[str, np.ndarray]:
     from PIL import ImageDraw  # noqa: PLC0415
     import make_kits  # noqa: PLC0415 (the registry's mesh, split as the rig splits it)
     m = make_kits.load_mesh(mesh_id)
-    parent = {}
-
-    def find(a):
-        while parent.setdefault(a, a) != a:
-            parent[a] = parent[parent[a]]
-            a = parent[a]
-        return a
-    for f in m["faces"]:
-        for _, t in f[1:]:
-            parent[find(f[0][1])] = find(t)
+    island = make_kits.islands(m)
     part_of = {i: p for p, faces in m["split"].items() for i in faces}
     votes: dict[int, dict[str, int]] = {}
-    for i, f in enumerate(m["faces"]):
-        v = votes.setdefault(find(f[0][1]), {})
+    for i, k in enumerate(island):
+        v = votes.setdefault(k, {})
         v[part_of[i]] = v.get(part_of[i], 0) + 1
-    winner = {isl: max(v, key=v.get) for isl, v in votes.items()}
+    winner = {k: max(v, key=v.get) for k, v in votes.items()}
     out = {}
     for part in m["split"]:
         im = Image.new("L", (size, size), 0)
         d = ImageDraw.Draw(im)
-        for f in m["faces"]:
-            if winner[find(f[0][1])] == part:
+        for f, k in zip(m["faces"], island):
+            if winner[k] == part:
                 d.polygon(make_kits._poly(f, m["vt"], size), fill=255)
         out[part] = np.asarray(im) >= 128
     return out

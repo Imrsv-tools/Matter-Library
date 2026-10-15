@@ -1,0 +1,56 @@
+{
+  "label": "Green eye",
+  "summary": "A whole green eyeball, white, iris and pupil, painted for the character's eye mesh.",
+  "search_words": [
+    "eye",
+    "eyeball",
+    "iris",
+    "green",
+    "sclera",
+    "character",
+    "human"
+  ],
+  "origin": [
+    "agent-drafted"
+  ],
+  "_comment": "A FITTED eye (Phase18 18.3, RD-P18-6, RD-P18-9): Eye_Natural's substance with its own picture, MakeHuman's CC0 green eyeball (the fit set's Green, which Studio supplies at binding today), drawn for MakeHuman_Eyes_v01 and carried by the article itself, so it shows on any eye mesh of that layout with nothing supplied. It is the rule on a second part mesh after the teeth. Bound on the sclera, iris and pupil, as Eye_Natural is. sUKN: it tiles nothing (RD-P18-8). Eye_Natural and the fit set's nine pictures are kept.",
+  "name": "Eye_Green_Clean_Base_sUKN_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "character/humanoid/eyes/Eye_Green_Clean_Base_sUKN_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "group": "character",
+  "species": "humanoid",
+  "part": "eyes",
+  "fits": "MakeHuman_Eyes_v01",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "metalness_const": 0.0,
+  "base_color_const": "0.95, 0.93, 0.92",
+  "roughness_const": 0.3,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.002,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.5,
+  "coat_roughness": 0.1,
+  "coat_ior": 1.376,
+  "base_color_map": true,
+  "lcd_ports": [
+    "roughness_bias"
+  ],
+  "base_color_map_tex": "../../../../textures/fit/makehuman/eyes/Green_basecolor_sUKN.png",
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "The picture: the fit set's Green_basecolor_sUKN.png, MakeHuman's CC0 green eye as it is (tools/converters/fit/gen_fit_makehuman.py eyes; provenance library/provenance/sources/fit/makehuman/eyes.yaml). Every other value is Eye_Natural's, for the same reasons (its sources)."
+    },
+    {
+      "kind": "judgement",
+      "why": "The colour is the picture's (a photograph of an eye, CC0, MakeHuman), so the article's base is a near-white it multiplies (0.95, 0.93, 0.92: a plain white of the eye when no picture is supplied). Scatter as Sclera_Natural (Physically Based Eye (Sclera): the radius scale 1 / 0.351 / 0.226, forward anisotropy 0.8), at its full weight and a 2 mm radius (Sclera_Natural's 4.8 mm would blur the iris's fibres and ring across a 12 mm iris). First authored at half weight and 1 mm; the lead, 2026-10-05, looking at a consumer's character under a sun and a sky: 'Even with direct light on the eye, they look dead... they shoudl glow (with SSS)', and the ruling 'if there is, increase it'. So the weight goes to the sclera's and the radius doubles, still under half the sclera's. NOT looked at in any renderer at these values: whether the iris's fibres hold at 2 mm, and whether the eye now reads alive, are owed a look. Coat: the tear film, at the cornea's IOR 1.376, thin and soft (weight 0.5, roughness 0.1). First authored as a near-mirror (weight 1, roughness 0.02); the lead at Phase09 click 3: 'there is an un natural about of \"mirror\" going on... these highlight aboultly reflect and blow out the eyes'. With no cornea bulge (MAP-RD6), a mirror over the whole eyeball stretches the reflection across it; a real eye's sharp highlight is the cornea's alone. Softened, the lead: 'That helps... I think it will be something to kep an eye on... it might still be too much but will not know until we work with it a bit'. Roughness 0.3 and IOR 1.4 as Sclera_Natural."
+    }
+  ]
+}

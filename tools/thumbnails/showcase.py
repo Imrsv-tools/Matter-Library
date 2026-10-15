@@ -182,6 +182,8 @@ CHARACTER_FAMILIES = {
     "Sclera": (["Sclera"], ["eye"]),
     "Cornea": (["Cornea"], ["eye"]),
     "Enamel": (["Teeth"], ["mouth"]),
+    # Phase18 18.3: a fitted set of teeth is drawn for the whole teeth mesh, teeth and gums
+    "Teeth": (["Teeth", "Gums"], ["mouth"]),
     "Gum": (["Gums"], ["mouth"]),
     "Tongue": (["Tongue"], ["mouth"]),
     "Hair": (["Hair", "Brows", "Lashes"], ["head"]),

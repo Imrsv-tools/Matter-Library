@@ -14,8 +14,10 @@ paints against, written into the git-ignored ``library/kits/<mesh>/``:
   Studio split it into (``rig_parts``), each carrying the SOURCE UVs the picture is drawn on;
 * ``<mesh>_layout.png`` — the UV layout at the picture's size: each part's islands filled in its
   own light colour, every edge drawn, to paint over;
-* ``<mesh>_islands.png`` — one channel, white inside the islands: what the gate checks a picture
-  covers (RD-P18-5). Its committed copy is ``library/meshes/<mesh>_islands.png``;
+* ``<mesh>_islands.png`` — one channel, white inside the islands: what a picture must cover;
+* the gate's copy, committed as ``library/meshes/<mesh>_islands.png``, is the same picture with
+  each UV island numbered (16-bit, 0 outside), so the gate (G8, RD-P18-5) can tell a whole island
+  left bare from a background colour that also appears inside one;
 * ``README.md`` — what the picture must be, and how it gets into the library.
 
 The meshes come from MakeHuman's CC0 pack, pinned by URL and sha256 in the rig's character builder
@@ -77,6 +79,36 @@ def load_mesh(mesh_id: str) -> dict:
                          f"{sorted(spec['rig_parts'])}")
     return {"points": pts, "faces": faces, "vt": vt, "split": split,
             "uv_sha256": layout_sha256(faces, vt)}
+
+
+def islands(m: dict) -> list[int]:
+    """Each face's UV island (1, 2, ...): faces sharing a UV corner are one island, numbered in
+    the order their first face appears (deterministic)."""
+    parent: dict[int, int] = {}
+
+    def find(a):
+        while parent.setdefault(a, a) != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+    for f in m["faces"]:
+        for _, t in f[1:]:
+            parent[find(f[0][1])] = find(t)
+    number: dict[int, int] = {}
+    return [number.setdefault(find(f[0][1]), len(number) + 1) for f in m["faces"]]
+
+
+def island_ids_png(m: dict, size: int):
+    """The gate's islands: each island's pixels hold its number (16-bit PNG), 0 outside."""
+    from PIL import Image, ImageDraw  # noqa: PLC0415
+    ids = islands(m)
+    if max(ids) > 65535:
+        raise SystemExit("more islands than a 16-bit picture holds")
+    im = Image.new("I", (size, size), 0)
+    d = ImageDraw.Draw(im)
+    for f, k in zip(m["faces"], ids):
+        d.polygon(_poly(f, m["vt"], size), fill=k)
+    return im.convert("I;16")
 
 
 def _poly(f, vt, size):
@@ -189,10 +221,9 @@ def make(mesh_id: str) -> Path:
     (out / f"{mesh_id}.usda").write_text(usda(mesh_id, m, parts), encoding="utf-8")
     (out / f"{mesh_id}.obj").write_text(obj(mesh_id, m, parts), encoding="utf-8")
     layout_png(m, size, parts).save(out / f"{mesh_id}_layout.png", optimize=True)
-    isl = islands_png(m, size)
-    isl.save(out / f"{mesh_id}_islands.png", optimize=True)
+    islands_png(m, size).save(out / f"{mesh_id}_islands.png", optimize=True)
     ISLANDS.mkdir(parents=True, exist_ok=True)
-    isl.save(ISLANDS / f"{mesh_id}_islands.png", optimize=True)
+    island_ids_png(m, size).save(ISLANDS / f"{mesh_id}_islands.png", optimize=True)
     (out / "README.md").write_text(README.format(
         mesh_id=mesh_id, what=spec["what"], sha=m["uv_sha256"], parts=", ".join(parts), size=size),
         encoding="utf-8")
