@@ -14,7 +14,7 @@ Schema (Contract/RuntimeCatalog.md):
 
 Each material field is derived from the qualified `id` + `version`:
   * id              — the qualified Matter identity (Domain/Class path + name incl. sNN); the resolution key
-  * display_name    — the qualified leaf name with the sNN scale tag dropped
+  * display_name    — the qualified leaf name with the sNN (or sUKN) scale tag dropped
   * domain/class    — the first two path segments of id
   * scale           — the sNN tag off the leaf (empty for an off-grammar system material)
   * payload_path    — `materials/<id>_<version>.mtlx` (bare `materials/<id>.mtlx` off-grammar), relative to the catalog file
@@ -49,7 +49,10 @@ SCHEMA_VERSION = 2  # 1->2 (Phase 60sq1 Step 4): adds the durable `creator_selec
 # lists HDRIs (Q-P14-2): every release catalog is frozen with its payload and re-projected by the
 # catalog-freshness lane, so a catalog without HDRIs must keep projecting byte-identically at 2.
 SCHEMA_VERSION_HDRIS = 3
-SCALE_RE = re.compile(r"_(s\d+)$")
+# The closed set's tags (NamingConventions.md): sNN, and sUKN for an article that tiles nothing.
+# Phase18 (RD-P18-8): the first sUKN articles (the fitted teeth and eye) were read as off-grammar
+# by `s\d+` alone, so they were served at a version-less path with no scale.
+SCALE_RE = re.compile(r"_(s\d+|sUKN)$")
 
 
 def _default_materials_root(lockfile: Path) -> Path:

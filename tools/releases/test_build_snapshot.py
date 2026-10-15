@@ -244,6 +244,14 @@ check(fitted == {"Teeth_Natural_Clean_Base_sUKN_v01": "MakeHuman_Teeth_v01",
                  "Eye_Green_Clean_Base_sUKN_v01": "MakeHuman_Eyes_v01"},
       f"the two fitted articles, and only those, declare the mesh they fit ({sorted(fitted)})")
 check(set(fitted.values()) <= set(G.PART_MESHES), "every fits names a known part mesh")
+e3 = B.derive_entry({"id": "character/humanoid/teeth/Teeth_Natural_Clean_Base_sUKN", "version": "v01",
+                     "status": "draft"})
+check(e3["scale"] == "sUKN" and e3["display_name"] == "teeth/Teeth_Natural_Clean_Base"
+      and e3["payload_path"] == "materials/character/humanoid/teeth/Teeth_Natural_Clean_Base_sUKN_v01.mtlx",
+      f"an sUKN article is on the grammar: its scale, its name without the tag, its versioned file ({e3['payload_path']})")
+check({a["identity"]: a["display_name"] for a in arts if a["fits"]}
+      == {"Teeth_Natural_Clean_Base_sUKN_v01": "Teeth_Natural_Clean_Base", "Eye_Green_Clean_Base_sUKN_v01": "Eye_Green_Clean_Base"},
+      "the working tree drops sUKN from the name as it drops sNN")
 kits = [B.kit_entry(m, rec_, "0" * 64) for m, rec_ in G.PART_MESHES.items()]
 check([k["id"] for k in kits] == ["MakeHuman_Body_v01", "MakeHuman_Eyes_v01", "MakeHuman_Teeth_v01",
                                   "MakeHuman_Tongue_v01"], "four kits, one per part mesh")

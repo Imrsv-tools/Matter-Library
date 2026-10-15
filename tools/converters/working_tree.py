@@ -29,7 +29,7 @@ MATERIALS = REPO / "MatterLibrary" / "materials"
 RECIPES = REPO / "tools" / "converters" / "recipes"
 RELEASE_CATALOG = REPO / "library" / "releases" / "matterlib-0.1.0.catalog.json"   # read only
 VERSION_RE = re.compile(r"^(?P<leaf>.+)_(?P<ver>v\d+)$")
-SCALE_RE = re.compile(r"_(s\d+)$")      # the same rule as project_runtime_catalog.SCALE_RE
+SCALE_RE = re.compile(r"_(s\d+|sUKN)$")  # the same rule as project_runtime_catalog.SCALE_RE
 SYSTEM = {"IMRSV_MissingMaterial"}
 STATUSES = ("draft", "candidate", "approved", "deprecated", "retired")
 

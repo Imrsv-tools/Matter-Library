@@ -90,6 +90,8 @@ def working_tree_catalog() -> dict:
         # Phase16 (RD-P16-11, RD-DS-2) and Phase18 (RD-P18-2): who gave it, its licence and the
         # part mesh its own picture fits, read from the FILE (working_tree.declared)
         entry.update(working_tree.declared(art))
+        # CAUGHT: 2026-10-15 — the first sUKN articles (Phase18's fitted teeth and eye) projected
+        # to a version-less payload path: SCALE_RE read only sNN (fixed in project_runtime_catalog)
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)
