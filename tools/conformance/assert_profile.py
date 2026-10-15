@@ -116,12 +116,13 @@ def main() -> int:
               f"found {[p.name for p in stray[:5]]}")
     else:
         pkg = usda.parent
-        stem = ids[0] if ids else ""
-        has_mtlx = (pkg / f"{stem}.mtlx").is_file()
+        # every identity's .mtlx (Phase19 19.4: the golden carries two, Copper and the 1 m grid)
+        missing = sorted({s for s in ids if not (pkg / f"{s}.mtlx").is_file()})
+        has_mtlx = bool(ids) and not missing
         tex = list((pkg / "textures").glob("*")) if (pkg / "textures").is_dir() else []
         check(has_mtlx and len(tex) >= 1,
               "portable package is self-contained (.mtlx + textures/ materialized)",
-              f"mtlx={has_mtlx} textures={len(tex)}")
+              f"mtlx={has_mtlx} (missing {missing}) textures={len(tex)}")
 
     print(f"  => {mode}: {'CONFORMS' if fails == 0 else f'{fails} VIOLATION(S)'}")
     return 1 if fails else 0
