@@ -202,7 +202,7 @@ A picture painted on this UV layout fits every character built from it, whatever
 
 **How it gets into the library:** a recipe that names the picture and declares
 `"fits": "{mesh_id}"`, with your handle as `contributor`. The gate checks the picture against this
-layout. See `CONTRIBUTING.md` (§Character materials) and `docs/specs/Contract/LCDSchema.md`
+layout. See `CONTRIBUTING.md` (§3.1 A Character material) and `docs/specs/Contract/LCDSchema.md`
 (§Base colour map).
 """
 
