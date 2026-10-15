@@ -355,6 +355,8 @@ def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path])
 
 
 KIT_FILES = (".usda", ".obj", "_layout.png", "_islands.png")
+CONTRIBUTING_CHARACTER = ("https://github.com/Imrsv-tools/Matter-Library/blob/main/CONTRIBUTING.md"
+                          "#31-a-character-material-a-picture-painted-for-a-part-mesh")
 KIT_FIELDS = ("family", "species", "what", "parts", "rig_parts", "map_size", "uv_sha256")
 
 
@@ -529,9 +531,21 @@ def build(tag: str, out: Path) -> dict:
     pictured = sum(1 for r in materials if any(p["role"] == "rig" for p in r.get("pictures", [])))
     thumbed = sum(1 for r in materials if any(p["role"] == "thumbnail" for p in r.get("pictures", [])))
     characters = sum(1 for r in materials if r["section"] == "character")
+    fitted = [r for r in materials if r.get("fits")]
+    contribute = "" if not kits else (       # Phase18 (RD-P18-4): where an outside contributor starts
+        "### Paint a Character material\n\n"
+        "A set of teeth, an eye or a skin is painted for **one part mesh** of the character, on its "
+        "own UVs, and keeps its painter's name. Download the kit for the part, paint over its layout, "
+        f"and follow [CONTRIBUTING.md §3.1]({CONTRIBUTING_CHARACTER}).\n\n"
+        + "".join(f"- `{k['file']}`: {k['what']}. Paint at {k['map_size']} × {k['map_size']}.\n" for k in kits)
+        + ("\nPainted this way so far: "
+           + ", ".join(f"**{r['label']}** (`{r['display_name']}`, fits `{r['fits']}`, by {r.get('contributor', '?')})"
+                       for r in fitted) + ".\n" if fitted else "")
+        + "\n### What is in this snapshot\n\n")
     notes = (
         f"A **dev snapshot** of the Matter Library, for its website's staging. Not a release: "
         f"nothing here is versioned or approved, and every material shows its own status.\n\n"
+        + contribute +
         f"- `{site_name}`: every material on disk ({len(materials)}), with what the library knows "
         f"about each. A field it does not know yet is left out, never made up.\n"
         f"- Each material's `group` (and `section`): `matter`, or `character` ({characters}: eyes, hair, "
