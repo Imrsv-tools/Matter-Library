@@ -129,7 +129,8 @@ def write_provenance(set_name: str, rows: list[tuple[str, dict]]) -> None:
     src = build_character.SOURCES[PACK]
     lines = [
         "# Provenance for one fit set (Phase09 RD-P09-2): pictures on MakeHuman's own UV layouts,",
-        "# supplied when an article is bound, never inside it. Written by the tool named in `evidence`.",
+        "# supplied when an article is bound (Phase09), or a fitted Character article's own picture",
+        "# (Phase18, RD-P18-9). Written by the tool named in `evidence`.",
         f"id: fit/makehuman/{set_name}",
         "version: v01",
         "files:",
@@ -151,6 +152,10 @@ def write_provenance(set_name: str, rows: list[tuple[str, dict]]) -> None:
     for name, r in rows:
         extra = (f", p95_linear: {r['p95_linear']:.5f}, flat: {'true' if r['flat'] else 'false'}"
                  if "p95_linear" in r else "")
+        for part in ("teeth", "gums"):          # Phase18: each region held to its article's colour
+            if part in r:
+                extra += (f", {part}: {{target: {r[part]['target']}, "
+                          f"factor: {r[part]['factor']}}}")
         lines.append(f"  {name}: {{member: {r['member']}{extra}}}")
     (PROVENANCE / f"{set_name}.yaml").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -176,7 +181,98 @@ def write_eyes() -> list[tuple[str, dict]]:
     return rows
 
 
-SETS = {"hair": write_hair, "eyes": write_eyes}
+TEETH_MESH = "MakeHuman_Teeth_v01"
+BLEED = 16                      # pixels of colour past each island's edge (the kit's README asks it)
+RECIPES = REPO / "tools" / "converters" / "recipes"
+# Each part of the teeth mesh, and the article whose measured colour its region's average is held
+# to (the skin-map rule, F-SKM-20/F-SKM-25: the picture varies, its average stays the measurement).
+TEETH_TARGETS = {"Teeth": "Enamel_Natural_Clean_Base_s001_v01", "Gums": "Gum_Natural_Clean_Base_s001_v01"}
+
+
+def _part_masks(mesh_id: str, size: int) -> dict[str, np.ndarray]:
+    """Each rig part of a part mesh, rasterized on its layout (True inside), BY UV ISLAND: an
+    island (faces sharing UV corners) is one substance, and goes whole to the part most of its
+    faces are in. The rig splits by each face's centre, so a few faces at an island's edge land in
+    the other part; a picture made per part would carry that ragged edge."""
+    from PIL import ImageDraw  # noqa: PLC0415
+    import make_kits  # noqa: PLC0415 (the registry's mesh, split as the rig splits it)
+    m = make_kits.load_mesh(mesh_id)
+    parent = {}
+
+    def find(a):
+        while parent.setdefault(a, a) != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+    for f in m["faces"]:
+        for _, t in f[1:]:
+            parent[find(f[0][1])] = find(t)
+    part_of = {i: p for p, faces in m["split"].items() for i in faces}
+    votes: dict[int, dict[str, int]] = {}
+    for i, f in enumerate(m["faces"]):
+        v = votes.setdefault(find(f[0][1]), {})
+        v[part_of[i]] = v.get(part_of[i], 0) + 1
+    winner = {isl: max(v, key=v.get) for isl, v in votes.items()}
+    out = {}
+    for part in m["split"]:
+        im = Image.new("L", (size, size), 0)
+        d = ImageDraw.Draw(im)
+        for f in m["faces"]:
+            if winner[find(f[0][1])] == part:
+                d.polygon(make_kits._poly(f, m["vt"], size), fill=255)
+        out[part] = np.asarray(im) >= 128
+    return out
+
+
+def bleed(lin: np.ndarray, covered: np.ndarray, px: int) -> np.ndarray:
+    """Grow the covered colour ``px`` pixels outward (each new pixel the mean of its covered
+    4-neighbours), so filtering at an island's edge never samples the background."""
+    lin, covered = lin.copy(), covered.copy()
+    for _ in range(px):
+        acc = np.zeros_like(lin)
+        n = np.zeros(covered.shape)
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            c = np.roll(covered, (dy, dx), axis=(0, 1))
+            acc += np.roll(lin, (dy, dx), axis=(0, 1)) * c[..., None]
+            n += c
+        new = ~covered & (n > 0)
+        lin[new] = acc[new] / n[new][:, None]
+        covered |= new
+    return lin
+
+
+def write_teeth() -> list[tuple[str, dict]]:
+    """A set of teeth for ``MakeHuman_Teeth_v01`` (Phase18 18.2): the pack's teeth atlas, the
+    enamel and gum regions each scaled per channel so its average is its article's measured colour
+    (Enamel_Natural, Gum_Natural), then bled past the islands. It is the picture a FITTED article
+    carries (RD-P18-9: ``Teeth_Natural``'s own ``base_color_map``), not one supplied at binding.
+    The source's baked shadow between the teeth is kept (it is the source's)."""
+    import json  # noqa: PLC0415
+    member = "teeth/teeth_base/teeth.png"
+    im = Image.open(io.BytesIO(build_character.source(PACK, member))).convert("RGB")
+    n = im.size[0]
+    lin = _srgb_to_linear(np.asarray(im, dtype=np.float64) / 255.0)
+    masks = _part_masks(TEETH_MESH, n)          # by island: each island one substance
+    covered = masks["Teeth"] | masks["Gums"]
+    stats = {"member": member}
+    for part, art in TEETH_TARGETS.items():
+        want = np.array([float(c) for c in json.loads((RECIPES / f"{art}.json").read_text())
+                         ["base_color_const"].split(",")])
+        region = masks[part]
+        mean = lin[region].mean(axis=0)
+        lin[region] = lin[region] * (want / mean)
+        stats[part.lower()] = {"target": art, "source_mean": [round(float(v), 4) for v in mean],
+                               "factor": [round(float(v), 3) for v in want / mean]}
+        print(f"fit/teeth {part}: source mean {np.round(mean, 4)} -> {want} (x {np.round(want / mean, 3)})")
+    lin = np.clip(bleed(np.where(covered[..., None], lin, 0.0), covered, BLEED), 0.0, 1.0)
+    out_dir = FIT / "teeth"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    srgb = np.round(_linear_to_srgb(lin) * 255.0).astype(np.uint8)
+    Image.fromarray(srgb, "RGB").save(out_dir / f"Teeth_Natural_basecolor_{TAG}.png", optimize=True)
+    return [("Teeth_Natural", stats)]
+
+
+SETS = {"hair": write_hair, "eyes": write_eyes, "teeth": write_teeth}
 
 
 def main(argv=None) -> int:

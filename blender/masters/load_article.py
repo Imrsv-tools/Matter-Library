@@ -56,6 +56,10 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     """
     build_masters.ensure_all()
     art = read(path)
+    # Phase18 (RD-P18-9): a fitted Character article names its own picture; a binding that
+    # supplies one still wins (the Carrier rule), and with neither the article is its own colour
+    if base_color_map is None:
+        base_color_map = art.maps.get("base_color_map")
     if art.master not in build_masters.MASTERS:
         raise NotImplementedError(f"{art.name}: master {art.master!r} has no Blender version yet")
     ports = dict(art.ports)

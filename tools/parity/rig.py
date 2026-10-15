@@ -531,8 +531,20 @@ def main(argv=None) -> int:
             raise SystemExit("--sweep runs on the test scene; the character renders the defaults")
         art = jobmod.Article.read(jobmod.find_article(args.article or CHARACTER_SKIN))
         out = Path(args.out) if args.out else OUT_ROOT / f"Character__{art.name}"
-        cast = {"Body": art} | {p: jobmod.Article.read(jobmod.find_article(a))
-                                for p, a in cast_for(art.name).items()}
+        if art.fits:
+            # Phase18 (RD-P18-2): a fitted article goes on its part mesh's parts (the cornea is
+            # hidden in every view); the skin and the rest of the cast are the rig's own
+            skin = jobmod.Article.read(jobmod.find_article(CHARACTER_SKIN))
+            cast = {"Body": skin} | {p: jobmod.Article.read(jobmod.find_article(a))
+                                     for p, a in cast_for(skin.name).items()}
+            sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "converters"))
+            import groups  # noqa: PLC0415
+            parts = [p for p in groups.PART_MESHES[art.fits]["rig_parts"]
+                     if f"/World/Character/{p}" not in jobmod.CHARACTER_HIDE_ALWAYS]
+            cast |= {p: art for p in parts}
+        else:
+            cast = {"Body": art} | {p: jobmod.Article.read(jobmod.find_article(a))
+                                    for p, a in cast_for(art.name).items()}
         job_path = jobmod.write_character_job(cast, out, args.width, args.samples)
     else:
         if not args.article:

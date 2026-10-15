@@ -64,6 +64,12 @@ class Article:
     meters_per_tile: float
     ports: dict[str, tuple[str, str]] = field(default_factory=dict)  # port -> (mtlx type, value)
     textures: dict[str, Path] = field(default_factory=dict)          # node name -> file
+    fits: str | None = None        # Phase18 (RD-P18-2): the part mesh a fitted article is drawn for
+
+    def own_maps(self) -> dict[str, Path]:
+        """The pictures the article names for its picture inputs (Phase18): input -> file."""
+        return {port: (self.path.parent / value).resolve()
+                for port, (typ, value) in self.ports.items() if typ == "filename" and value}
 
     @classmethod
     def read(cls, path: Path) -> "Article":
@@ -73,11 +79,12 @@ class Article:
                     for f in n.findall("input[@name='file']")
                     if f.get("value")}     # a cut-out's file is the binding's, not the article's
         meta = {i.get("name"): i.get("value") for i in root.iter("input")
-                if i.get("name") in ("master_material", "meters_per_tile")}
+                if i.get("name") in ("master_material", "meters_per_tile", "fits")}
         ng = root.find("nodegraph")
         ports = {i.get("name"): (i.get("type"), i.get("value")) for i in ng.findall("input")} if ng is not None else {}
         mpt = float(meta.get("meters_per_tile") or 0) or 1.0
-        return cls(path, path.stem, meta.get("master_material", "Opaque"), mpt, ports, textures)
+        return cls(path, path.stem, meta.get("master_material", "Opaque"), mpt, ports, textures,
+                   meta.get("fits"))
 
 
 def _usd_value(mtype: str, value) -> str:
@@ -205,10 +212,13 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
 
 
 def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) -> dict[str, Path]:
-    """The mesh's maps for this binding (``cutout_map``, ``base_color_map``): each one the part
-    has and the article declares as an input."""
-    return {port: path for port, path in meshmaps.get(f"/World/Character/{part}", {}).items()
-            if port in art.ports}
+    """The maps for this binding (``cutout_map``, ``base_color_map``): each one the part has and
+    the article declares as an input, and over them the article's OWN picture where it names one
+    (Phase18, RD-P18-9: a fitted Character article is drawn for this mesh; the mesh's own fit-set
+    picture would cover the contribution, so the rig never supplies it over the article's)."""
+    supplied = {port: path for port, path in meshmaps.get(f"/World/Character/{part}", {}).items()
+                if port in art.ports}
+    return supplied | art.own_maps()
 
 
 def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:

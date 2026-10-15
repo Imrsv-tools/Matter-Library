@@ -90,8 +90,11 @@ MESHES = {
              "split": [("Cornea", {"alpha": True}),
                        ("Pupil", {"circles": [(0.705, 0.700, 0.034), (0.290, 0.288, 0.034)]}),
                        ("Iris", {"circles": [(0.705, 0.700, 0.118), (0.290, 0.288, 0.118)]})]},
+    # Phase18 (RD-P18-9): `atlas` keeps the parts' source st, as a fit part's: a fitted teeth set
+    # (groups.PART_MESHES MakeHuman_Teeth_v01) is drawn on it. No fit-set picture is supplied here;
+    # the articles on these parts today are constants, which no st moves.
     "teeth": {"proxy": "teeth/teeth_base/teeth_base", "texture": "teeth/teeth_base/teeth.png",
-              "rest": "Teeth", "split": [("Gums", {"red": True})]},
+              "rest": "Teeth", "split": [("Gums", {"red": True})], "atlas": True},
     "tongue": {"proxy": "tongue/tongue01/tongue01", "rest": "Tongue"},
     # Clothing (7.5.2): a T-shirt and jeans on one atlas (the jeans are its lower-left island),
     # and leather shoes. `delete` drops the body faces a garment's .mhclo marks as covered, as
@@ -399,7 +402,7 @@ def load_parts() -> dict:
                 raise SystemExit(f"part {name!r}: its rule selected no faces")
             p_pts, p_nrm, p_faces = subset(pts, normals, [faces[i] for i in sel])
             d = uv_density(p_pts, p_faces, vt)
-            k = 1.0 if name in _fit_parts(spec) else d[1]     # a fit part keeps its atlas
+            k = 1.0 if name in _atlas_parts(spec) else d[1]   # a fit part keeps its atlas
             st = [(vt[ti][0] * k, vt[ti][1] * k) for f in p_faces for _, ti in f]
             parts[name] = {"points": p_pts, "normals": p_nrm, "faces": p_faces, "st": st, "density": d,
                            "cutout": bool(spec.get("cutout"))}     # a card: doubleSided
@@ -502,7 +505,8 @@ def build(parts: dict) -> str:
         "    The CC0 MakeHuman body, one mesh per substance. st is in METRES per part (source UVs x the\n"
         "    part's median density); a render job rescales st by the article's meters_per_tile.\n"
         "    Hair, Brows, Lashes, Sclera, Iris and Pupil keep their source atlas st: their fit-set\n"
-        "    maps (MatterLibrary/textures/fit/makehuman/) are drawn on it.\n"
+        "    maps (MatterLibrary/textures/fit/makehuman/) are drawn on it. So do Teeth and Gums: a\n"
+        "    fitted teeth set's picture is (Phase18).\n"
         f"{dens}\n    Sources (CC0):\n{srcs}\n"
         '    """\n'
         f'    defaultPrim = "World"\n    upAxis = "{build_scene.UP_AXIS}"\n'
@@ -532,11 +536,19 @@ def _fit_parts(spec: dict) -> list[str]:
     return (spec.get("fit_parts") or [spec["rest"]]) if spec.get("fit") else []
 
 
+def _atlas_parts(spec: dict) -> list[str]:
+    """The parts of a mesh whose st is its source atlas: its fit parts, or every part of a mesh
+    marked ``atlas`` (Phase18: a fitted article's picture is drawn on it)."""
+    if spec.get("atlas"):
+        return [s for s, _ in spec.get("split", [])] + [spec["rest"]]
+    return _fit_parts(spec)
+
+
 def atlas_parts() -> set[str]:
     """The prims whose st is their source atlas (the fit parts): a job neither rescales it by the
     article's ``meters_per_tile`` nor lets the article's UV placement move the maps drawn on it.
     The ONE copy of the rule (Phase09 F-P09-15): ``job.py`` and ``drivers/unreal.py`` read it."""
-    return {f"/World/Character/{p}" for spec in MESHES.values() for p in _fit_parts(spec)}
+    return {f"/World/Character/{p}" for spec in MESHES.values() for p in _atlas_parts(spec)}
 
 
 def cutout_maps() -> dict[str, Path]:

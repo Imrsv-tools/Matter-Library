@@ -65,7 +65,9 @@ def build(kit: Path, out: Path, bindings: list[str]) -> None:
     print(f"wrote {out}: parts {sorted(parts)}")
 
 
-def view() -> None:
+def view(assets: str | None = None) -> None:
+    """``assets``: the left area shows that Asset-Browser library, searched for the kit's part
+    (a sitting on a contribution), in place of the UV layout."""
     mesh_id = bpy.context.scene.get("matter_kit")
     if not mesh_id:
         raise SystemExit(f"{bpy.data.filepath!r} is not a kit's .blend (no matter_kit): refusing to act")
@@ -100,6 +102,19 @@ def view() -> None:
             bpy.ops.view3d.view_selected()
             bpy.ops.mesh.select_all(action="DESELECT")
             view3d.spaces[0].shading.type = "MATERIAL"
+        if assets:
+            with bpy.context.temp_override(window=win, area=view3d, region=region):
+                bpy.ops.object.mode_set(mode="OBJECT")      # the materials, not the edit wire
+            image.ui_type = "ASSETS"
+
+            def browse():          # the browser's params exist only once it has drawn
+                sp = image.spaces[0]
+                sp.params.asset_library_reference = assets
+                sp.params.filter_search = mesh_id.split("_")[1]  # "Teeth"
+                sp.show_region_tool_props = True           # the sidebar: Author, License
+                image.tag_redraw()
+            bpy.app.timers.register(browse, first_interval=1.0)
+            return None
         image.spaces[0].image = img
         image.spaces[0].use_image_pin = True   # else the editor shows the active material's image
         iregion = next(r for r in image.regions if r.type == "WINDOW")
@@ -115,7 +130,8 @@ if __name__ == "__main__":
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     if argv[:1] == ["build"] and len(argv) >= 3:
         build(Path(argv[1]).resolve(), Path(argv[2]).resolve(), argv[3:])
-    elif argv == ["view"]:
-        view()
+    elif argv[:1] == ["view"] and len(argv) <= 2:
+        view(argv[1] if len(argv) == 2 else None)
     else:
-        raise SystemExit("usage: -- build <kit dir> <out.blend> [Part=<article.mtlx>[@<picture>] ...] | -- view")
+        raise SystemExit("usage: -- build <kit dir> <out.blend> [Part=<article.mtlx>[@<picture>] ...] "
+                         "| -- view [<asset library name>]")

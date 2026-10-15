@@ -12,6 +12,9 @@ RECIPE, before its mistakes can hide inside a valid-looking article:
   G6  plausibility     — albedo, roughness, metalness … inside physical ranges
   G7  layer assignment — every layer texture exists; overlays within the assembler's cap;
                          a mask only where it has something to gate; utility/virtual pure
+  G8  fitted picture   — (Phase18) a Character article's own picture fits the part mesh it
+                         names: a known mesh of its species and part, a square sRGB RGB PNG at the
+                         mesh's map size, covering every UV island (library/meshes/<mesh>_islands.png)
 
 (G4, a class -> master lookup, was dropped in discovery: the article declares its master.)
 
@@ -38,6 +41,10 @@ from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, M
 import groups as G  # noqa: E402  (Phase15: the groups and Character's taxonomy)
 
 SCHEMA_PATH = CONVERTERS / "recipe.schema.json"
+ISLANDS = ROOT / "library" / "meshes"          # Phase18: each part mesh's UV islands (make_kits.py)
+# G8: the share of a mesh's island pixels a picture may leave at its own background colour (the
+# colour outside every island). A picture that leaves one island unpainted leaves far more.
+UNCOVERED_MAX = 0.002
 MATERIALS = ROOT / "MatterLibrary" / "materials"
 RECIPES = CONVERTERS / "recipes"
 
@@ -132,7 +139,65 @@ def schema_drift(schema: dict) -> list:
             for k in sorted(spec - allowed)]
     errs += [f"schema drift: recipe.schema.json key {k!r} is neither a MaterialSpec field nor metadata"
              for k in sorted(allowed - spec - METADATA_KEYS)]
+    fits = set(schema["properties"]["fits"]["enum"])          # Phase18: the one list is groups.py's
+    if fits != set(G.PART_MESHES):
+        errs.append(f"schema drift: fits enum {sorted(fits)} is not groups.PART_MESHES {sorted(G.PART_MESHES)}")
     return errs
+
+
+# --- G8: a fitted picture against its part mesh's layout (Phase18, RD-P18-5) --------------
+def picture_errors(picture: Path, mesh_id: str) -> list:
+    """What is wrong with a picture drawn for a part mesh ([] when it fits): its format, its size,
+    and whether it covers every UV island (``library/meshes/<mesh>_islands.png``)."""
+    import numpy as np  # noqa: PLC0415 (only a fitted article needs them)
+    from PIL import Image  # noqa: PLC0415
+    mesh = G.PART_MESHES[mesh_id]
+    n = mesh["map_size"]
+    with Image.open(picture) as im:
+        if im.format != "PNG" or im.mode != "RGB":
+            return [f"G8 {picture.name} is {im.format} {im.mode}: a fitted picture is an RGB PNG "
+                    "(read as sRGB; no alpha)"]
+        if im.size != (n, n):
+            return [f"G8 {picture.name} is {im.size[0]} x {im.size[1]}: {mesh_id}'s pictures are {n} x {n}"]
+        px = np.asarray(im)
+    isl = np.asarray(Image.open(ISLANDS / f"{mesh_id}_islands.png").convert("L"))
+    inside, outside = isl >= 128, isl == 0
+    if not outside.any():
+        return []
+    colours, counts = np.unique(px[outside].reshape(-1, 3), axis=0, return_counts=True)
+    bg = colours[counts.argmax()]
+    bare = (px[inside] == bg).all(axis=1)
+    share = bare.mean()
+    if share > UNCOVERED_MAX:
+        return [f"G8 {picture.name} leaves {bare.sum()} of {inside.sum()} island pixels ({share:.1%}) at its "
+                f"background colour {tuple(int(c) for c in bg)}: paint every island of {mesh_id}'s "
+                "layout (its kit's _islands.png)"]
+    return []
+
+
+def fitted_errors(d: dict) -> list:
+    """G8 for one recipe: a fitted picture and the part mesh it names (Phase18, RD-P18-2)."""
+    fits, pic = d.get("fits"), d.get("base_color_map_tex")
+    if not fits and not pic:
+        return []
+    errs = []
+    if (d.get("group") or G.DEFAULT_GROUP) != G.CHARACTER:
+        errs.append("G8 a fitted picture belongs to a Character article (group character)")
+    if bool(fits) != bool(pic):
+        return errs + ["G8 base_color_map_tex and fits come together: the picture is drawn for the "
+                       "part mesh fits names"]
+    if not d.get("base_color_map"):
+        errs.append("G8 base_color_map_tex is the base_color_map input's value: declare base_color_map")
+    mesh = G.PART_MESHES.get(fits)
+    if mesh is None:
+        return errs + [f"G8 fits {fits!r} is not a part mesh (have {sorted(G.PART_MESHES)})"]
+    if d.get("species") != mesh["species"] or d.get("part") not in mesh["parts"]:
+        errs.append(f"G8 {fits} is drawn for {mesh['species']} {mesh['parts']}; this article is "
+                    f"{d.get('species')} {d.get('part')}")
+    f = ((MATERIALS / d["path"]).parent / pic).resolve()
+    if not f.is_file():
+        return errs + [f"G8 base_color_map_tex {pic!r} does not exist (resolved from the article's folder)"]
+    return errs + picture_errors(f, fits)
 
 
 # --- G3 / G5 / G6 / G7 -------------------------------------------------------------------
@@ -226,6 +291,7 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
         errs.append("G7 a mask needs the maskset_blend port (its master strength)")
     if (dom, cls) == ("utility", "virtual") and (overlays or "maskset_tex" in d):
         errs.append("G7 a utility/virtual reference carries no wear layers (it stays pure; C1)")
+    errs += fitted_errors(d)
     return errs
 
 

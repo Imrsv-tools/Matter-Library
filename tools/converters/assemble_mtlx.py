@@ -201,6 +201,9 @@ class MaterialSpec:
     opacity_cutoff: Optional[float] = None        # Masked; thresholds the geometry_opacity source
     cutout_map: bool = False                      # Masked; declares the mesh-supplied cut-out input
     base_color_map: bool = False                  # declares the mesh-supplied picture (Phase09)
+    # Phase18 (RD-P18-9): a fitted Character article's OWN picture, drawn for the part mesh it
+    # `fits`: the input's value in the article (relative path). A binding may still supply its own.
+    base_color_map_tex: Optional[str] = None
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -227,6 +230,9 @@ class MaterialSpec:
     # Phase16 (RD-P16-6, RD-P16-11): who brought the article into the library, as a handle. The
     # recipe gate requires it; the library's own articles say "MatterBot".
     contributor: Optional[str] = None
+    # Phase18 (RD-P18-2): the part mesh a fitted article's picture is drawn for
+    # (tools/converters/groups.py PART_MESHES), written into imrsv_metadata when declared
+    fits: Optional[str] = None
 
     @staticmethod
     def from_dict(d: dict) -> "MaterialSpec":
@@ -339,6 +345,12 @@ def _check_spec(spec: MaterialSpec) -> None:
                              "of the substance, like lace) or the mesh's cutout_map, not both")
         if spec.master == "Masked" and spec.opacity_cutoff is None:
             raise ValueError("cutout_map needs opacity_cutoff: Masked thresholds its source")
+    if spec.base_color_map_tex and not spec.base_color_map:
+        raise ValueError("base_color_map_tex is the article's own picture for its base_color_map "
+                         "input: declare base_color_map too")
+    if bool(spec.base_color_map_tex) != bool(spec.fits):
+        raise ValueError("a fitted picture and `fits` come together: the picture is drawn for the "
+                         "part mesh `fits` names (Phase18, RD-P18-2)")
     if spec.base_color_map and spec.master not in BASE_COLOR_MAP_MASTERS:
         raise ValueError("base_color_map is an input of the masters "
                          f"{sorted(BASE_COLOR_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
@@ -391,7 +403,7 @@ def assemble(spec: MaterialSpec) -> str:
     author_values = {
         "opacity_cutoff": spec.opacity_cutoff,
         "cutout_map": None,                  # the binding supplies it; the article's is empty
-        "base_color_map": None,              # the binding supplies it; the article's is empty
+        "base_color_map": spec.base_color_map_tex,   # empty (the binding's), or a fitted article's own
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -925,6 +937,8 @@ def assemble(spec: MaterialSpec) -> str:
                 _add_input(nd, key, "string", value=getattr(spec, key), attrs={"uniform": "true"})
         if spec.contributor:                              # Phase16 (RD-P16-11)
             _add_input(nd, "contributor", "string", value=spec.contributor, attrs={"uniform": "true"})
+        if spec.fits:                                     # Phase18 (RD-P18-2)
+            _add_input(nd, "fits", "string", value=spec.fits, attrs={"uniform": "true"})
         _add_input(nd, "licence", "string", value=LICENCE, attrs={"uniform": "true"})  # RD-P16-1
         # addNodeDef(..., "string", ...) already declares the implicit "out" output.
 

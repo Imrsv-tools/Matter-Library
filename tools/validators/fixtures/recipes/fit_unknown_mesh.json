@@ -1,0 +1,22 @@
+{
+  "name": "Teeth_Fixture_Clean_Base_sUKN_v01",
+  "contributor": "Fixture",
+  "path": "character/humanoid/teeth/Teeth_Fixture_Clean_Base_sUKN_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "bone",
+  "group": "character",
+  "species": "humanoid",
+  "part": "teeth",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "base_color_const": "1.0, 1.0, 1.0",
+  "subsurface_weight": 0.5,
+  "base_color_map": true,
+  "lcd_ports": [
+    "roughness_bias"
+  ],
+  "_comment": "RED (Phase18, G2): fits names no part mesh (the schema's enum is groups.PART_MESHES).",
+  "fits": "MakeHuman_Teeth_v02",
+  "base_color_map_tex": "../../../../../tools/validators/fixtures/recipes/pictures/teeth_1024.png"
+}

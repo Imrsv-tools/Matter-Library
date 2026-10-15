@@ -36,6 +36,9 @@ class ArticleData:
     textures: dict[str, tuple[Path, str]] = field(default_factory=dict)  # role -> (file, cs)
     layer_scale: dict[str, float] = field(default_factory=dict)  # role -> tilesize / imagesize
     consts: dict[str, list[float]] = field(default_factory=dict)      # role -> value
+    # Phase18 (RD-P18-9): a picture the ARTICLE names for an input the binding may supply
+    # (`base_color_map`): a fitted Character article carries its own. input -> resolved file.
+    maps: dict[str, Path] = field(default_factory=dict)
 
 
 def read(path: Path) -> ArticleData:
@@ -47,6 +50,11 @@ def read(path: Path) -> ArticleData:
     ng = root.find("nodegraph")
     if ng is not None:
         for i in ng.findall("input"):
+            if i.get("type") == "filename":       # a picture input: a path, never a number
+                art.ports[i.get("name")] = []
+                if i.get("value"):
+                    art.maps[i.get("name")] = (path.parent / i.get("value")).resolve()
+                continue
             art.ports[i.get("name")] = _floats(i.get("value"))
         for node in ng:
             name = node.get("name", "")

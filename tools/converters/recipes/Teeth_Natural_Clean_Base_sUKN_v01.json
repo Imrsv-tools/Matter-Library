@@ -1,0 +1,46 @@
+{
+  "label": "Teeth and gums",
+  "summary": "A whole set of teeth with its gums, painted for the character's teeth mesh.",
+  "search_words": ["teeth", "tooth", "gums", "enamel", "mouth", "character", "human"],
+  "origin": ["agent-drafted"],
+  "_comment": "The first FITTED Character article (Phase18 18.2, RD-P18-9): a set of teeth drawn for MakeHuman_Teeth_v01 (tools/converters/groups.py PART_MESHES), its picture its own base_color_map, sampled on the mesh's own UVs. One article on both parts of the teeth mesh, Teeth and Gums, as Eye_Natural is on three eye parts. The picture is MakeHuman's CC0 teeth atlas, each region held to its article's measured colour (Enamel_Natural, Gum_Natural), so the article's own colour is white: the picture is the colour. SUBSURFACE, so the gums scatter; the enamel at a short radius. sUKN: it tiles nothing (RD-P18-8). Enamel_Natural and Gum_Natural are kept. No tint port: Blender cannot yet draw a tinted base whose scatter follows its picture (F-SKM-23), as Eye_Natural carries none.",
+  "name": "Teeth_Natural_Clean_Base_sUKN_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "character/humanoid/teeth/Teeth_Natural_Clean_Base_sUKN_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "bone",
+  "group": "character",
+  "species": "humanoid",
+  "part": "teeth",
+  "fits": "MakeHuman_Teeth_v01",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "metalness_const": 0.0,
+  "base_color_const": "1.0, 1.0, 1.0",
+  "roughness_const": 0.25,
+  "specular_ior": 1.5,
+  "subsurface_weight": 0.5,
+  "subsurface_radius": 0.002,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.5,
+  "coat_roughness": 0.1,
+  "coat_ior": 1.336,
+  "base_color_map": true,
+  "base_color_map_tex": "../../../../textures/fit/makehuman/teeth/Teeth_Natural_basecolor_sUKN.png",
+  "lcd_ports": [
+    "roughness_bias"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "The picture: MakeHuman's system assets (CC0, makehuman_system_assets_cc0.zip sha256 b542127a...0107), teeth/teeth_base/teeth.png, made by tools/converters/fit/gen_fit_makehuman.py teeth: the enamel islands scaled per channel (x 2.32, 2.43, 2.20) so their mean linear colour is Enamel_Natural's (0.70, 0.67, 0.60), the gum islands (x ~1) to Gum_Natural's (0.194, 0.038, 0.045), then bled 16 px past the islands. The source's baked shadow between the teeth is kept; about 7 % of the island pixels clip at white. Provenance: library/provenance/sources/fit/makehuman/teeth.yaml."
+    },
+    {
+      "kind": "judgement",
+      "why": "One article for enamel and gum, so each value sits between their articles: IOR 1.5 (enamel 1.63, wet mucosa 1.4), roughness 0.25 (enamel 0.15, gum 0.3). Coat 0.5 at 0.1, IOR 1.336: saliva, as Gum_Natural. Scatter at half weight and a 2 mm radius with skin's radius scale: the gums glow, the enamel stays crisp (Gum_Natural scatters fully at 4.8 mm; Enamel_Natural is Opaque). Not yet looked at in any renderer at these values."
+    }
+  ]
+}

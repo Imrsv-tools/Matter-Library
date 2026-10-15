@@ -144,6 +144,10 @@ RECIPE_FIXTURES = {
     "deposit_wrong_slot.json": "G7",     # Phase10: a deposit's colour is its own slot's port
     "set_port_wrong_master.json": "G7",  # Phase12: the see-through colour port off its masters
     "missing_contributor.json": "G2",    # Phase16: every article says who gave it (RD-P16-11)
+    # Phase18 (RD-P18-5): a fitted picture against its part mesh; pictures in fixtures/recipes/pictures/
+    "fit_unknown_mesh.json": "G2",       # fits names no part mesh (the schema's enum)
+    "fit_wrong_size.json": "G8",         # 1024 for a 2048 mesh
+    "fit_island_bare.json": "G8",        # one island left unpainted
 }
 
 
