@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Deterministically generate the scale grids' base-colour textures (Phase19 19.1).
 
-One grid per scale tag (RD-SP-1), plus the ``sUKN`` hatch. The rules are the lead's (RD-SP-4):
+One grid per scale tag (RD-SP-1), plus the ``sUKN`` hatch. A grid is a CHECK grid: it tells
+whether an object's UV matches its scale (the lead, RD-P19-3: "Gridliines have colors... that is
+all... we are trying to verify that the mareails UV is MATCHING SCALE"). So:
 
-* **a line's colour is its LENGTH**, the same in every grid (blue is 1 m, the lead's example);
-* **a grid's background is a dark shade of its own tile length's colour**, so from across the
-  room each grid still reads as its own colour;
+* **a line's colour is its LENGTH**, the same in every grid (blue is 1 m, the lead's example,
+  RD-SP-4), and only the lines carry colour;
+* **the background is one neutral grey, the same in every grid** (RD-P19-3; until then it was a
+  dark shade of the tile's own colour, which made each grid read as a coloured square);
 * **four line levels**: the tile's edge, then each tenth below it, three times. Weight and
   brightness step down with the level, so a colour-blind eye still reads which level a line is.
-  The finest level is drawn DIM (D-3): drawn at full strength it takes the grid's colour over
-  once the tile is a few hundred pixels across (F-P15-8).
+  The two finer levels are drawn faint, so that once they are too small to resolve they fade into
+  the grey instead of tinting it (measured: the average stays near neutral, Phase19 19.1).
 
 Lines sit at exact metric positions (``k / 10**level`` of the tile), anti-aliased by pixel
 coverage, and wrap at the tile's edge, so the edge line is split across the seam and a tiled
@@ -50,15 +53,14 @@ COLOUR = {
     10.0: (255, 140, 0),        # 10 m   orange
     100.0: (230, 35, 35),       # 100 m  red
 }
-BACKGROUND = 0.35               # a grid's background: its tile colour at this fraction
+BACKGROUND = (30, 30, 30)       # neutral, the same in every grid (RD-P19-3)
 
 # Per level (0 = the tile's edge): the line's full width in pixels at SIZE, and its strength.
-# Tuned so each grid's AVERAGE colour (what it reads as from across the room, F-P15-8) stays
-# within 11 degrees of hue of its own tile colour (Phase19 19.1, measured at 4096 px): the
-# finest level's 1 px lines fall every 4.1 px and cover about half the tile, so at the first
-# setting (background 0.22, strengths 1/0.9/0.7/0.3) the grids drifted up to 36 degrees.
+# The finest level's 1 px lines fall every 4.1 px and cover about half the tile, so any real
+# strength there tints the whole grid once it no longer resolves; the next level covers about a
+# tenth. Both are kept faint (D-3).
 WIDTH_PX = (12.0, 5.0, 2.0, 1.0)
-STRENGTH = (1.0, 0.85, 0.5, 0.18)  # the finest drawn dim (D-3)
+STRENGTH = (1.0, 0.85, 0.35, 0.08)
 
 # The sUKN hatch: two neutral greys in 45-degree bands, a period that divides SIZE (seamless).
 HATCH = ((38, 38, 38), (92, 92, 92))
@@ -81,7 +83,7 @@ def line_coverage(size: int, divisions: int, width_px: float) -> np.ndarray:
 def grid(tag: str, size: int = SIZE) -> Image.Image:
     tile = TILE_M[tag]
     img = np.empty((size, size, 3), dtype=np.float64)
-    img[:] = np.array(COLOUR[length_key(tile)], dtype=np.float64) * BACKGROUND
+    img[:] = np.array(BACKGROUND, dtype=np.float64)
     for level in (3, 2, 1, 0):                  # finest first; coarser lines drawn over it
         cov1 = line_coverage(size, 10 ** level, WIDTH_PX[level])
         cov = np.maximum(cov1[None, :], cov1[:, None])[..., None] * STRENGTH[level]

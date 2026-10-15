@@ -25,7 +25,7 @@
 
 **Where:** the library machine, in the lead's own Blender 5.2 (Material Preview), plus two pictures the agent opens for him. Every scene is built headless from the factory scene into its own file, rendered and looked at by the agent first, then opened detached (Learnings Blender B10, B11). The lead judges by eye; every machine-checkable click is the agent's.
 
-1. **(19.1) The grids, side by side.** A scene with the 1 m reference cube in the 1 m grid and one object per grid, each at its grid's own size, plus the `sUKN` hatch. The lead judges: the same length is the same colour in every grid; the four line levels read up close; **from across the room each grid still reads as its own background colour** (F-P15-8); the hatch reads *"size unknown"*. He then finds the seven grids in his Asset Browser under *utility / virtual* and drags one onto an object.
+1. **(19.1) The grids, scaling down** *(as it passed, 2026-10-15: six squares side by side, each exactly its grid's tile, 100 m to 1 mm, one view per step; the form first written here, below, was superseded at the sitting)*. ~~A scene with the 1 m reference cube in the 1 m grid and one object per grid, each at its grid's own size, plus the `sUKN` hatch.~~ The lead judges: the same length is the same colour in every grid; the four line levels read up close; **from across the room each grid still reads as its own background colour** (F-P15-8); the hatch reads *"size unknown"*. He then finds the seven grids in his Asset Browser under *utility / virtual* and drags one onto an object.
 2. **(19.2) Scale view on.** A *scale test* scene of objects at real size, each wearing a library material (Matter or Character), with errors planted in it. One action turns on scale view: every object wearing a library material wears the grid nearest that material's size. **The lead names the wrong objects before reading the fixture's record.** Two off-tag articles read *right* in size (Oak at 0.8 m, Concrete_Polished at 3 m), and the view lists them as off their scale option (RD-P19-2). The fitted teeth set (`Teeth_Natural`, `sUKN`) reads the hatch, which is also right: it tiles nothing (RD-P18-8).
 3. **(19.2) Scale view off.** Every object wears its own material again, exactly as before.
 4. **(19.3) The character in the rig.** The rig's sheet of the MakeHuman body in scale view, in Storm and Blender: each part in its grid. The lead judges that both tools draw the same grid at the same size, and sees where the skin's size varies across the body (F-P15-2). A part on its own mesh's atlas draws one grid tile per atlas unit, which is the truth about a tiled article on an atlas. A part wearing a fitted `sUKN` article draws the hatch (F-P19-5). The cast is the rig's own (`rig.py` `cast_for`), read at execute, since Phase18 may change it.
@@ -33,7 +33,7 @@
 
 **Each click's surface can show what it judges:**
 - Clicks 1–3 compare one tool, Blender, which renders here (5.2.2).
-- Click 1's camera puts about 1,000 px across the cube's face, so the 10 cm and 1 cm lines resolve. A second, far view tests the background tint.
+- Click 1's camera puts about 1,000 px across the cube's face, so the 10 cm and 1 cm lines resolve. ~~A second, far view tests the background tint.~~ *(Superseded by RD-P19-3: the background is neutral.)*
 - Click 2's errors are **read from the fixture's own record** (a JSON written beside the `.blend` by the builder), never inferred from object names. The planted errors are:
   - Copper on Blender's default 0–1 UVs (its grid 10× too large beside the cube);
   - MakeHuman's skin on the raw body atlas (the 170× case: the 1 cm grid drawn at about 1.7 m);
@@ -96,7 +96,7 @@
 - **RD-SP-3** — *"exact name execpt scale"*: `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`. It is 38–41 characters and has six tokens, so it passes [Identity](../../specs/Ontology/Identity.md) as written. The `sUKN` grid is `Diagnostic_ScaleGrid_Clean_Base_sUKN_v01`.
 - **RD-SP-4** — *"consistant scale colors in the grid … if each scale had that is its base then someting like 4 thicknessed of grid … like Blue is 1 meter in all of them (for example)"*:
   - a line's colour is its length, in every grid;
-  - a grid's background is a dark shade of its own tile length's colour;
+  - ~~a grid's background is a dark shade of its own tile length's colour;~~ *(this was the agent's reading of "if each scale had that is its base"; superseded by RD-P19-3: the background is neutral, only the lines carry colour)*
   - four line levels: the tile's edge, then each tenth below it, three times.
 
 **The lead's, at Pass 2** (2026-10-15, in this session; the lead's words, then the reading):
@@ -105,6 +105,11 @@
   - How an option ships is not ruled here. That is *Version Management*'s, and this ruling is carried there at the close.
 - **RD-P19-2** — *"We will want to be as firm as we can be that scale fits exactly into our scale options. I think we are providing an excellent structrue of metric scale - we should STRONGLY avoid fractions of that... worth noting for any of our generation toolsets."*
   - *Reading:* an article's `meters_per_tile` is exactly its tag's length (1 mm, 1 cm, 10 cm, 1 m, 10 m or 100 m), and the generation tools hold to it (D-9).
+
+**The lead's, at execute** (2026-10-15, click 1):
+- **RD-P19-3** — *"NO! NO NO... you are not understnding the assignment... Gridliines have colors... that is all... I look at an object and see grid lines that match or don't mathc... coloring things does NOT help... we are not making a pantone series... wer are making a check grid validataion and I keep seeing colored squares... This set could be helpful to ID why KIND of scale is added to an object.. .that is NOT the mission.. we are trying to verify that the mareails UV is MATCHING SCALE"*. Asked just before it: *"are you putting a background color or something on this materials?"*
+  - *Reading:* only the lines carry colour (a line's colour is its length, RD-SP-4). The background is neutral, the same in every grid. A grid is a check grid: it tells whether an object's UV matches its scale, never which scale it is.
+  - **This supersedes** this doc's reading of RD-SP-4's *"if each scale had that is its base"* as a background in the tile's colour: D-2's *"they are also the backgrounds"*, D-3's *"blends into the grid's own colour"*, and the far-colour tuning recorded at 19.1. A finer level too small to resolve should fade into the neutral background, not tint it.
 
 **Closed at this discovery** (each the agent's call, recorded so the executor need not re-derive it; the lead may overrule any):
 - **D-1 — Where and how:**
@@ -115,10 +120,10 @@
 - **D-2 — The palette:**
   - It covers **nine lengths**, 1 µm to 100 m, the finest line of the `s0001` grid to the `s100` tile.
   - Blue is 1 m, the lead's example.
-  - The six tile lengths take the most distinct hues, since they are also the backgrounds.
+  - The six tile lengths take the most distinct hues. ~~since they are also the backgrounds~~ *(RD-P19-3)*
   - Weight and brightness step with the level too, so a colour-blind eye still reads which level a line is.
   - The executor proposes it; the lead judges it at click 1.
-- **D-3 — The finest level is drawn dim.** Its line is about 1 px and low in contrast against the background, so that at a distance it blends into the grid's own colour (F-P15-8). The four levels are kept.
+- **D-3 — The finest level is drawn dim.** Its line is about 1 px and low in contrast against the background, so that at a distance it fades into the neutral grey instead of tinting it (F-P15-8; *"the grid's own colour"* superseded by RD-P19-3). The four levels are kept.
 - **D-4 — The swap rule** (written once, in [LCDSchema](../../specs/Contract/LCDSchema.md) beside *"the mesh's UV unit must be the article's tile"*, the rule a grid tests, SP-F1):
   - **Which grid:** each article's grid is the tag nearest its `meters_per_tile` on a log scale; a tie goes to the larger grid.
   - **Its size:** the binding's `uv_scale` becomes the old value × (grid tile ÷ article `meters_per_tile`).
@@ -253,7 +258,7 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
 - **F-P19-4 — The grids owe thumbnails, drawn at true size.**
   - `make_thumbnails.kept()` takes every `approved` or `candidate` article that is Creator-selectable. Since the grids are `candidate`, all seven are kept.
   - `showcase.subject_for` gives class `virtual` the `card` subject, a 0.3 m card face on. The subjects divide `st` by `meters_per_tile`, so every article is pictured at true size.
-  - On a 0.3 m card, the `s10` and `s100` grids read as their background colour, and the `s0001` grid as a haze of 1 mm tiles. That is what the grid is designed to show from a distance (D-2, D-3). It is kept as every article's rule, with no per-grid exception.
+  - On a 0.3 m card, the `s10` and `s100` grids show only their finer lines on grey, and the `s0001` grid near-neutral grey (RD-P19-3). That is what the grid is designed to show from a distance (D-2, D-3). It is kept as every article's rule, with no per-grid exception.
 - **F-P19-5 — Atlas parts in the rig keep their source UVs.** Since Phase18, `build_character.atlas_parts()` is the one copy of the rule. The character scene neither rescales such a part's `st` by the article's tile nor lets the article's UV placement move it (`job.py`, `k = 1.0`). In the rig's scale view, then, a tiled article on an atlas part shows its grid one tile per atlas unit, and an `sUKN` article shows the hatch.
 - **F-P19-6 — The consumers were swept read-only** (`LOCAL_DELTAS.md` §Separation; each fetched 2026-10-15): the platform's docs, Stage, the website, USDLiveView and the asset library. Nothing in them is about the library's scale grids or a scale view.
 - **F-P19-7 — *Matter* names a group now** (Glossary *Group*, Phase15): Matter, Character and HDRIs. Pass 1 wrote *"Matter objects"* to mean any library material. The scale view covers Matter and Character alike, as click 2's skin and click 4's character already assumed, and the Brief now says so.
@@ -270,7 +275,7 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
   - One UV unit is one tile. The UV ports are fixed inside the per-article `MatterLCD_` group (`ML_Place2D`) and are never exported ("Studio-side only", the add-on's header).
   - A material carries `ml_article` but not its `meters_per_tile`: hence D-5.
 - **F-P15-4 — The Matter add-on is not enabled in the lead's Blender 5.2; the library is registered, set to Append.** Read from his preferences on 2026-10-14, and again on 2026-10-15: still true, with the library named `asset_library`. Nothing was saved either time. Hence D-6's session registration.
-- **F-P15-5 — Unreal's default material is itself a world grid** (Learnings Unreal U7). A scale grid must never read as it. The dark background in the grid's own colour is the tell, and click 4 shows it once the Unreal column exists.
+- **F-P15-5 — Unreal's default material is itself a world grid** (Learnings Unreal U7). A scale grid must never read as it. ~~The dark background in the grid's own colour is the tell,~~ *(RD-P19-3: the background is neutral; the coloured lines are the tell)* and click 4 shows it once the Unreal column exists.
 - **F-P15-6 — The grids reach the website without further work.** `tools/releases/build_snapshot.py` takes every article on disk, and puts `utility` in the `matter` section, as it does the UV grid. The next dev snapshot carries the grids and their words; nothing in this phase publishes.
 - **F-P15-7 — The golden pins `matterlib-0.1.0`, which has no grid, and the conformance check does not care.** It resolves against the working tree (`check_conformance.sh`, `PXR_AR_DEFAULT_SEARCH_PATH` over `MatterLibrary/materials`). So 19.4 needs no release.
 - **F-P15-8 — Drawn at full strength, the finest level takes the grid's colour over** (probe, 2026-10-14; a throwaway PIL script, nothing kept in the repo).
@@ -293,3 +298,11 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
   - **Rulings newer than Pass 1:** RD-P18-8 and RD-P18-10 (F-P19-1). Neither reverses a decision here. **Sequencing:** RD-P18-10 puts *Skin Maps* straight after Phase18, while this phase holds the number 19. The Brief holds under either order, so which runs first is the lead's call and blocks nothing here.
   - **The lead's rulings in this session**, after a sketch of the grids was shown (a throwaway picture, nothing kept): RD-P19-1 (a resolution is an option of one material) and RD-P19-2 (sizes fit the scale options exactly). From RD-P19-2: D-9, F-P19-8, click 2's list, and the in-now and not-now bullets.
   - **Questions:** none is with the lead.
+
+## Execution Log
+
+**Tree at start (2026-10-15):** `main` at `1e1e3d9`, the library machine, 5 commits unpushed. Six Refiner-lane files (`.ai/commands/LOCAL_DELTAS.md`, `.claude/**`, `AGENTS.md`, `_RefinementBacklog.md`) are modified by a sibling session from 2026-10-14 15:34; not touched. Gate 15 PASS, 2 SKIP, 0 FAIL.
+
+| Step | Landed | Result | Next |
+|---|---|---|---|
+| **19.1** (in progress) | `9cb062e` (WIP) | The seven grids, G9 and its RED fixture, the library regenerated (gate 15/2/0). **❌ Click 1, the lead (2026-10-15):** *"I am not sure what I should be judging here... I can tell if this is everything we have an issue because it does not solve what I am trying to achieve... these are a bunch of different colored squares and I see not relation of grid size between them"*. Read against the scene: each grid on its own 1 m card, seen from across the room. The finer grids' lines are a fixed fraction of their tile, so they vanish and those cards read as flat colour. The tile edge is drawn in the tile's colour on a dark shade of that colour, so it hides. The same 10 cm line is also 4× thinner in the 10 cm grid than in the 1 m grid. Second form, the lead's: *"there is a 10 meter square with a 10 meter material ... then a 1 meter square next to it ... the square exampel needs to change so we are seeing it scale down"*: six squares, each its grid's tile, side by side. Then RD-P19-3: the background goes neutral, and only the lines carry colour. **✅ Click 1, the lead (2026-10-15):** *"YES! NOW we can see the colos of the grid clearly..."* | finish 19.1; click 2 (the match-or-don't scene) |
