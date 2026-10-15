@@ -355,6 +355,17 @@ def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path])
 
 
 KIT_FILES = (".usda", ".obj", "_layout.png", "_islands.png")
+KIT_FIELDS = ("family", "species", "what", "parts", "rig_parts", "map_size", "uv_sha256")
+
+
+def kit_name(mesh_id: str) -> str:
+    return f"kit__{mesh_id}.zip"
+
+
+def kit_entry(mesh_id: str, mesh: dict, digest: str) -> dict:
+    """A kit's row in the site file: the part mesh's record and its zip's name and sha256."""
+    return {"id": mesh_id, **{k: mesh[k] for k in KIT_FIELDS},
+            "file": kit_name(mesh_id), "sha256": digest}
 
 
 def write_kit_zip(dest: Path, mesh_id: str) -> None:
@@ -412,11 +423,9 @@ def build(tag: str, out: Path) -> dict:
             "status": entry["status"], "creator_selectable": entry["creator_selectable"],
             "controls": controls(mtlx),
         }
-        # Phase16 (RD-P16-11): who gave it and its licence, read from its own file; a field the
-        # file does not declare is left out (not known yet, RD-WS-1).
-        rec.update({k: art[k] for k in ("licence", "contributor") if art[k]})
-        if art["fits"]:                                      # Phase18 (RD-P18-2)
-            rec["fits"] = art["fits"]
+        # Phase16 (RD-P16-11) and Phase18 (RD-P18-2): who gave it, its licence and the part mesh
+        # its own picture fits, read from its own file (working_tree.declared)
+        rec.update(working_tree.declared(art))
         if art["group"] == G.CHARACTER:                      # Phase15: Character's own taxonomy
             rec.update(species=art["species"], part=art["part"])
         for key in ("summary", "search_words", "origin"):    # the words (13.2), when written
@@ -489,12 +498,9 @@ def build(tag: str, out: Path) -> dict:
 
     kits = []
     for mesh_id, mesh in G.PART_MESHES.items():      # Phase18 (RD-P18-4): what a contributor paints on
-        kname = f"kit__{mesh_id}.zip"
+        kname = kit_name(mesh_id)
         write_kit_zip(out / kname, mesh_id)
-        kits.append({"id": mesh_id, "family": mesh["family"], "species": mesh["species"],
-                     "what": mesh["what"], "parts": mesh["parts"], "rig_parts": mesh["rig_parts"],
-                     "map_size": mesh["map_size"], "uv_sha256": mesh["uv_sha256"],
-                     "file": kname, "sha256": sha256(out / kname)})
+        kits.append(kit_entry(mesh_id, mesh, sha256(out / kname)))
         assets.append(kname)
 
     site_name = f"matterlib-{release}.site.json"

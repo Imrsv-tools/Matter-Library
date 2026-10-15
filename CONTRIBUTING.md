@@ -40,12 +40,26 @@ Every article follows the same contract. **Read these first:**
 - [`docs/specs/Contract/MaterialXTemplate.md`](docs/specs/Contract/MaterialXTemplate.md): what the `.mtlx` must contain.
 
 1. **Name it.** Use `Material_Variant_Condition_Detail_sNN_vNN`: ≤63 characters of `[A-Za-z0-9_]`, with a real-world scale tag. A new article starts at `v01`.
-2. **Place it.** It goes under `MatterLibrary/materials/<domain>/<class>/`; its textures go under `MatterLibrary/textures/base/<domain>/<class>/…`, or `shared/` for overlays and masks. **Textures are tracked with Git LFS**, so install `git lfs` before you commit them.
+2. **Place it.** A Matter material goes under `MatterLibrary/materials/<domain>/<class>/` (a Character material is different: see §3.1); its textures go under `MatterLibrary/textures/base/<domain>/<class>/…`, or `shared/` for overlays and masks. **Textures are tracked with Git LFS**, so install `git lfs` before you commit them.
 3. **Write a recipe, not a `.mtlx`.** Articles are *generated*: add `tools/converters/recipes/<Stem>.json` (copy the closest existing recipe), then run `python tools/converters/build_proof_subset.py tools/converters/recipes/<Stem>.json` to assemble the article deterministically. Don't hand-edit the generated `.mtlx`. The recipe's keys and types are in `tools/converters/recipe.schema.json`.
    *Or ask an agent:* in Claude Code at the repo root, `/matter-generate <what you want>` follows these same steps and leaves an uncommitted draft for you to keep or discard.
 4. **Record provenance** for every new texture: source, licence (`CC0-1.0`), and evidence (a URL and a hash, or the generator script). Before a release pins it, a texture set's record lives at `library/provenance/sources/<texture-id>.yaml`. See `library/provenance/`.
 5. **Run the checks** (§Checks) and include the output in your pull request.
 6. **Open a pull request.** Include the affirmation line from §1, a render or screenshot of the material, and the check output.
+
+### 3.1 A Character material: a picture painted for a part mesh
+
+A Character material is a set of teeth, an eye or a skin painted for **one part mesh** of the character: its picture is drawn on that mesh's own UVs, not tiled. Your name stays on it: the material shows its contributor wherever it is shown.
+
+1. **Get the kit for the part.** Each part mesh is named for its UV layout, `<Family>_<Mesh>_vNN` (for example `MakeHuman_Teeth_v01`), and listed in `tools/converters/groups.py` (`PART_MESHES`). Its **kit** is attached to each dev snapshot's release page as `kit__<mesh>.zip`, or you can make it yourself with `uv run tools/converters/fit/make_kits.py <mesh>` (it writes `library/kits/<mesh>/`). The kit holds the mesh with its UVs (`.usda` and `.obj`), the layout picture to paint over, the islands picture, and a README.
+2. **Paint the picture.** It must be a square RGB PNG at the mesh's map size (the README says which), and it must cover **every UV island**: an island left bare is refused. Put it under `MatterLibrary/textures/fit/<family>/<part>/`, and record its provenance as in step 4 above. The shipped-pixel rule (§2) holds, and **a skin is never a photograph of a person**.
+3. **Write the recipe** as in step 3, in the `character` group, with its `species` and `part`, and three keys more:
+   - `"fits": "<mesh>"`, the part mesh it is painted for;
+   - `"base_color_map": true` and `"base_color_map_tex": "<the picture's path, relative to the article>"`: the picture is the material's own;
+   - `"contributor": "<your handle>"`. Your handle stays in the file, not in the material's name.
+
+   Its scale tag is `sUKN` when it tiles nothing. The fitted teeth, `tools/converters/recipes/Teeth_Natural_Clean_Base_sUKN_v01.json`, is the example to copy.
+4. **Run the checks.** The recipe lane's **G8** checks the picture against its mesh: a known `fits`, the size and format, and every island covered.
 
 **Changing an existing material?** Once a material version has shipped in a release it is **frozen**. Make a new version (`vNN+1`); never edit the old file in place ([Manifest](docs/specs/Contract/Manifest.md) §Immutability).
 

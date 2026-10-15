@@ -225,6 +225,31 @@ arts = working_tree.articles()
 check(arts and all(a["contributor"] == "MatterBot" and a["licence"] == "CC0-1.0" for a in arts),
       f"every article's file says MatterBot and CC0-1.0 ({len(arts)})")
 
+print("== Phase18: the mesh a fitted article fits, and the kits ==")
+with tempfile.TemporaryDirectory() as t:
+    f = Path(t) / "A_Teeth_Clean_Base_sUKN_v01.mtlx"
+    f.write_text('<materialx><nodedef name="ND_m" node="imrsv_metadata">'
+                 '<input name="contributor" type="string" value="AnotherHand" />'
+                 '<input name="licence" type="string" value="CC0-1.0" />'
+                 '<input name="fits" type="string" value="MakeHuman_Teeth_v01" /></nodedef></materialx>')
+    md_ = working_tree.metadata_of(f)
+    other = working_tree.declared({"contributor": md_.get("contributor", ""), "licence": md_.get("licence", ""),
+                                   "fits": md_.get("fits", ""), "group": "character"})
+check(other == {"contributor": "AnotherHand", "licence": "CC0-1.0", "fits": "MakeHuman_Teeth_v01"},
+      "any contributor's handle and the mesh it fits reach the entry as the file declares them (not only MatterBot)")
+check(working_tree.declared({"contributor": "MatterBot", "licence": "", "fits": ""}) == {"contributor": "MatterBot"},
+      "a fact the file does not declare is left out, never published empty (RD-WS-1)")
+fitted = {a["identity"]: a["fits"] for a in arts if a["fits"]}
+check(fitted == {"Teeth_Natural_Clean_Base_sUKN_v01": "MakeHuman_Teeth_v01",
+                 "Eye_Green_Clean_Base_sUKN_v01": "MakeHuman_Eyes_v01"},
+      f"the two fitted articles, and only those, declare the mesh they fit ({sorted(fitted)})")
+check(set(fitted.values()) <= set(G.PART_MESHES), "every fits names a known part mesh")
+kits = [B.kit_entry(m, rec_, "0" * 64) for m, rec_ in G.PART_MESHES.items()]
+check([k["id"] for k in kits] == ["MakeHuman_Body_v01", "MakeHuman_Eyes_v01", "MakeHuman_Teeth_v01",
+                                  "MakeHuman_Tongue_v01"], "four kits, one per part mesh")
+check(all(k["file"] == f"kit__{k['id']}.zip" and k["sha256"] == "0" * 64 and k["uv_sha256"] and k["map_size"]
+          for k in kits), "each kit names its zip and its zip's sha256, with the layout hash and map size it is checked by")
+
 print("== ranges ==")
 check(set(LCD_RANGES) == set(LCD_PORTS), "every Creator port has a range, and no range names a non-port")
 

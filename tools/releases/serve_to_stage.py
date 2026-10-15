@@ -87,12 +87,9 @@ def working_tree_catalog() -> dict:
                      display_name=art["display_name"])
         if art["group"] == "character":
             entry.update(species=art["species"], part=art["part"])
-        # Phase16 (RD-P16-11, RD-DS-2): who gave it and its licence, read from the FILE; a field
-        # the file does not declare is left out (not known yet, RD-WS-1).
-        entry.update({k: art[k] for k in ("contributor", "licence") if art[k]})
-        # Phase18 (RD-P18-2): the part mesh a fitted article's own picture is drawn for
-        if art["fits"]:
-            entry["fits"] = art["fits"]
+        # Phase16 (RD-P16-11, RD-DS-2) and Phase18 (RD-P18-2): who gave it, its licence and the
+        # part mesh its own picture fits, read from the FILE (working_tree.declared)
+        entry.update(working_tree.declared(art))
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)

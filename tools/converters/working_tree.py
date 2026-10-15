@@ -111,3 +111,13 @@ def articles() -> list[dict]:
             **taxonomy_of(mtlx, rel), "identity": mtlx.stem, "mtlx": mtlx,
         })
     return rows
+
+
+DECLARED = ("contributor", "licence", "fits")
+
+
+def declared(art: dict) -> dict:
+    """The facts an article's own file declares that every projection carries: who gave it, its
+    licence (Phase16, RD-P16-11) and the part mesh its own picture fits (Phase18, RD-P18-2). A
+    field the file does not declare is left out, never published empty (RD-WS-1)."""
+    return {k: art[k] for k in DECLARED if art.get(k)}
