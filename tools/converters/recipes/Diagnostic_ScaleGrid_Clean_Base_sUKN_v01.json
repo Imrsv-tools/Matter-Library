@@ -15,6 +15,7 @@
   ],
   "_comment": "Phase19 19.1: the sUKN hatch (RD-SP-1), two neutral greys in 45-degree bands (gen_scalegrid.py). No metric size: meters_per_tile 0.0, as every sUKN article authors it. Master Opaque, matte.",
   "name": "Diagnostic_ScaleGrid_Clean_Base_sUKN_v01",
+  "status": "candidate",
   "contributor": "MatterBot",
   "path": "utility/virtual/Diagnostic_ScaleGrid_Clean_Base_sUKN_v01.mtlx",
   "master": "Opaque",

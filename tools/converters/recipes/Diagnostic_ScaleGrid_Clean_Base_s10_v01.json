@@ -16,6 +16,7 @@
   ],
   "_comment": "Phase19 19.1 scale grid (RD-SP-1 to RD-SP-4). Base color = gen_scalegrid.py: a line's colour is its length in every grid, the background a dark shade of the tile's own colour, four line levels, the finest dim. meters_per_tile is exactly the tag (RD-P19-2). Master Opaque, as the UV grid's; matte so a highlight cannot hide a line.",
   "name": "Diagnostic_ScaleGrid_Clean_Base_s10_v01",
+  "status": "candidate",
   "contributor": "MatterBot",
   "path": "utility/virtual/Diagnostic_ScaleGrid_Clean_Base_s10_v01.mtlx",
   "master": "Opaque",
