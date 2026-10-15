@@ -144,6 +144,15 @@ CHARACTER_COLOURS = {"Body": (1, 0, 0), "Lips": (1, 0, 1), "Nails": (0, 1, 1),
 CHARACTER_VIEWS = {"wide": ("/World/Cam", "whole body"), "face": ("/World/CamFace", "face"),
                    "hand": ("/World/CamHand", "hand"), "mouth": ("/World/CamMouth", "mouth, face hidden"),
                    "waist": ("/World/CamWaist", "waist"), "feet": ("/World/CamFeet", "feet")}
+# Phase19 19.3: the scale view's views. The swatches (build_character.swatch_cameras) are each
+# 3 cm across, where a 1 cm grid resolves; whole body and face show the atlas parts' grids, and
+# the mouth the fitted teeth's hatch
+SWATCH_VIEWS = {"cheek": ("/World/CamSwatchCheek", "cheek, 3 cm across"),
+                "forearm": ("/World/CamSwatchForearm", "forearm, 3 cm across"),
+                "backhand": ("/World/CamSwatchHand", "hand, 3 cm across"),
+                "chest": ("/World/CamSwatchShirt", "shirt, 3 cm across"),
+                "thigh": ("/World/CamSwatchTrousers", "jeans, 3 cm across")}
+SCALE_VIEW_VIEWS = {v: CHARACTER_VIEWS[v] for v in ("wide", "face", "mouth")} | SWATCH_VIEWS
 # prims a view hides (the teeth, gums and tongue sit behind closed lips on MakeHuman's body)
 CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
 # prims every view hides: the high-poly eye's cornea shell, which Studio's eye does not have
@@ -221,8 +230,13 @@ def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) ->
     return supplied | art.own_maps()
 
 
-def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int) -> Path:
-    """A character job: the defaults only (sliders are swept on the test scene), every view."""
+def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int,
+                        scale_view: dict | None = None) -> Path:
+    """A character job: the defaults only (sliders are swept on the test scene), every view.
+
+    ``scale_view`` (Phase19 19.3, ``rig.py --scale-view``): the bindings are scale grids, and this
+    records which article each stands for and which are off their scale option. A driver ignores
+    it; the scorecard prints it."""
     import build_character  # noqa: PLC0415
     out_dir = out_dir.resolve()          # JOB_FORMAT.md: absolute (a driver runs in its own cwd)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -246,7 +260,7 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
         "camera": CHARACTER_VIEWS["wide"][0],
         "views": {v: {"camera": c, "suffix": view_suffix(v), "label": label}
                   | {"hide": CHARACTER_HIDE.get(v, []) + CHARACTER_HIDE_ALWAYS}
-                  for v, (c, label) in CHARACTER_VIEWS.items()},
+                  for v, (c, label) in (SCALE_VIEW_VIEWS if scale_view else CHARACTER_VIEWS).items()},
         "subjects": [f"/World/Character/{p}" for p in bindings],
         # the mask: one flat colour per subject; compare.py scores each colour as a region
         "mask_colours": {f"/World/Character/{p}": list(CHARACTER_COLOURS[p]) for p in bindings},
@@ -256,6 +270,8 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
         "settings": [{"id": "defaults", "label": "defaults", "set": {}, "scene": str(scene)}],
         "out_dir": str(out_dir),
     }
+    if scale_view:
+        job["scale_view"] = scale_view
     p = out_dir / "job.json"
     p.write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8")
     return p

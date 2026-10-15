@@ -473,6 +473,30 @@ def cast_for(skin: str) -> dict:
     return cast
 
 
+def scale_view_cast(cast: dict) -> tuple[dict, dict, list[str]]:
+    """Phase19 19.3 (D-7): each part's article swapped for the scale grid nearest its size.
+
+    The rule is D-4's (LCDSchema §Scale view), read from the add-on's pure module, the one copy
+    the Blender scale view uses too. Binding the grid is all the swap needs here: the setting
+    scene divides a part's st by the BOUND article's tile (the grid's), so no ``uv_scale``
+    correction is written, and an atlas part keeps its source st (``build_character.atlas_parts``),
+    so its grid draws one tile per atlas unit and an ``sUKN`` article the hatch (F-P19-5).
+    Returns (part -> grid article, part -> the article it stands for, the off-option articles).
+    """
+    sys.path.insert(0, str(jobmod.REPO / "blender" / "addons" / "imrsv_lcd_export"))
+    import scale_view_rules as R  # noqa: PLC0415 (pure: no bpy)
+    grids, stands_for, off = {}, {}, []
+    for part, art in cast.items():
+        tag = R.tag_of(art.name)
+        # Article.read draws a 0.0 as 1.0 (F-P19-3); the tag says when there is no size
+        g = R.grid_for(art.meters_per_tile, tag)
+        grids[part] = jobmod.Article.read(jobmod.find_article(R.grid_article(g)))
+        stands_for[part] = art.name
+        if R.off_scale(art.meters_per_tile, tag) and art.name not in off:
+            off.append(art.name)
+    return grids, stands_for, off
+
+
 def region_colours(job: dict) -> dict | None:
     """A character job's regions: part name -> mask colour (None for the test scene)."""
     mc = job.get("mask_colours")
@@ -483,8 +507,21 @@ def write_character_scorecard(job: dict, scores: dict, ref: str = "blender") -> 
     out = Path(job["out_dir"])
     sc = scores["defaults"]["views"]
     parts = {b["subject"].rsplit("/", 1)[1]: b["article"] for b in job["bindings"]}
-    lines = [f"# Parity scorecard — the character ({', '.join(f'{p}: {a['name']}' for p, a in parts.items())})",
-             "", f"{job['width']} px · Cycles {job['samples']} samples · "
+    sv = job.get("scale_view")
+    title = "the character in scale view" if sv else \
+        f"the character ({', '.join(f'{p}: {a['name']}' for p, a in parts.items())})"
+    lines = [f"# Parity scorecard — {title}", ""]
+    if sv:
+        lines += ["Each part wears the scale grid nearest its own article's size (Phase19 D-4, "
+                  "LCDSchema §Scale view). A part on its mesh's atlas draws one grid tile per "
+                  "atlas unit; an article with no size draws the hatch.", "",
+                  "| Part | Its article | The grid it wears |", "|---|---|---|"]
+        lines += [f"| {p} | {sv['stands_for'][p]} | {a['name']} |" for p, a in parts.items()]
+        if sv["off_scale"]:
+            lines += ["", "Off their scale option (RD-P19-2), swapped at their real size: "
+                      + ", ".join(sv["off_scale"]) + "."]
+        lines.append("")
+    lines += [f"{job['width']} px · Cycles {job['samples']} samples · "
              f"written {time.strftime('%Y-%m-%d %H:%M')}", "",
              f"ΔE2000 between {TOOL_NAMES['storm']} and {TOOL_NAMES[ref]}, per bound part, "
              "per view: a diagnostic (the character renders the defaults only, so there is no slider "
@@ -512,6 +549,9 @@ def main(argv=None) -> int:
                     help=f"the article (with --character: the skin; default {CHARACTER_SKIN})")
     ap.add_argument("--character", action="store_true",
                     help="the MakeHuman body instead of the test scene: whole body, face, hand")
+    ap.add_argument("--scale-view", action="store_true",
+                    help="with --character: each part wears the scale grid nearest its article's "
+                         "size (Phase19 D-7), into <out>__scale_view")
     ap.add_argument("--sweep", action="store_true", help="every declared slider through its range")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--samples", type=int, default=128)
@@ -545,8 +585,16 @@ def main(argv=None) -> int:
         else:
             cast = {"Body": art} | {p: jobmod.Article.read(jobmod.find_article(a))
                                     for p, a in cast_for(art.name).items()}
-        job_path = jobmod.write_character_job(cast, out, args.width, args.samples)
+        scale_view = None
+        if args.scale_view:
+            cast, stands_for, off = scale_view_cast(cast)
+            scale_view = {"stands_for": stands_for, "off_scale": off}
+            if not args.out:
+                out = out.with_name(out.name + "__scale_view")
+        job_path = jobmod.write_character_job(cast, out, args.width, args.samples, scale_view)
     else:
+        if args.scale_view:
+            ap.error("--scale-view goes with --character (the test scene is right by construction)")
         if not args.article:
             ap.error("an article is required (or --character)")
         art = jobmod.Article.read(jobmod.find_article(args.article))

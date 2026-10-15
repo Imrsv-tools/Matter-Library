@@ -479,7 +479,41 @@ def cameras(parts: dict) -> dict:
     sp = parts["Shoes"]["points"] + parts["Soles"]["points"]     # the whole shoe (8.3 split)
     fc =tuple((min(p[k] for p in sp) + max(p[k] for p in sp)) / 2 for k in range(3))
     cams["CamFeet"] = ((fc[0], fc[1] + 0.20, fc[2] + 0.20 / half), fc)
+    cams |= swatch_cameras(parts, half, top, face, xmax)
     return cams
+
+
+# Phase19 19.3: the scale view's swatches. A scale grid's lines are a fixed fraction of its tile
+# (gen_scalegrid.WIDTH_PX), so a 1 cm grid reads only where a centimetre spans a few hundred
+# pixels: whole-body, it is a grey haze. Each swatch is SWATCH_M across, square on to the surface,
+# so the frame is its own ruler (a 1 cm grid shows three cells across where the UVs are right).
+SWATCH_M = 0.03
+
+
+def swatch_cameras(parts: dict, half: float, top: float, face: tuple, xmax: float) -> dict:
+    """Close views square on to a surface point near each target: cheek, forearm, the back of the
+    hand, the shirt's chest, the jeans' thigh. The point is the nearest one whose normal faces the
+    front (z over 0.6), nearest across the body (x and y), and of those within 5 mm the frontmost;
+    the camera sits on that normal."""
+    def at(part, target):
+        front = [(p, n) for p, n in zip(parts[part]["points"], parts[part]["normals"]) if n[2] > 0.6]
+        xy = lambda pn: math.hypot(pn[0][0] - target[0], pn[0][1] - target[1])   # noqa: E731
+        best = min(xy(pn) for pn in front)
+        p, n = max((pn for pn in front if xy(pn) < best + 0.005), key=lambda pn: pn[0][2])
+        ln = math.sqrt(sum(c * c for c in n))
+        d = SWATCH_M / 2 / half
+        return (tuple(p[k] + n[k] / ln * d for k in range(3)), tuple(p))
+    body = parts["Body"]["points"]
+    zmax = max(p[2] for p in body)
+
+    def centre(lo, hi):        # the body's points between two x (the character's left arm)
+        sel = [p for p in body if lo < p[0] < hi]
+        return tuple((min(p[k] for p in sel) + max(p[k] for p in sel)) / 2 for k in (0, 1)) + (zmax,)
+    return {"CamSwatchCheek": at("Body", (face[0] + 0.045, face[1] - 0.01, zmax)),
+            "CamSwatchForearm": at("Body", centre(xmax - 0.32, xmax - 0.20)),
+            "CamSwatchHand": at("Body", centre(xmax - 0.10, xmax - 0.04)),
+            "CamSwatchShirt": at("Shirt", (0.08, top * 0.72, zmax)),
+            "CamSwatchTrousers": at("Trousers", (0.09, top * 0.40, zmax))}
 
 
 def camera_block(name: str, pos, target) -> str:
