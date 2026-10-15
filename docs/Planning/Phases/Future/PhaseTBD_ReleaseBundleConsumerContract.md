@@ -1,6 +1,6 @@
 # PhaseTBD — Release Bundle and Consumer Contract
 
-**Status:** SEEDED — not numbered. Discovery Pass 1 is done (2026-09-25) and kept; **resumes after the material-building phases** (L1, ruled). History: seeded as Phase04 on 2026-09-25 when the lead's `/discovery P4` numbered the head of `## Future`, then un-numbered the same day when the lead re-sequenced (L1 (b)). The Phase04 number went to the material work.
+**Status:** SEEDED — not numbered. **Narrowed 2026-10-15** (`../../Research/261015_R_ServerWithoutTheGpu.md` F-SV-2): publishing on GitHub with a digest, one zip per material and the site file already run in the dev snapshots (`tools/releases/build_snapshot.py`, `matterlib-0.2.0-dev.1` onward). What this phase still owes: the written consumer contract, the trust anchor, activation without the repo, the master token as data, the compressed textures and the first real release. Discovery Pass 1 is done (2026-09-25) and kept; **resumes after the material-building phases** (L1, ruled). History: seeded as Phase04 on 2026-09-25 when the lead's `/discovery P4` numbered the head of `## Future`, then un-numbered the same day when the lead re-sequenced (L1 (b)). The Phase04 number went to the material work.
 
 ## Outcome
 

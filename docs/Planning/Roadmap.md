@@ -31,23 +31,25 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-14 (lead):** the order below, top to bottom, is cut from `docs/Planning/Research/261014_R_RoadmapOrder.md` (the lead: *"yep! Good... quickix and push"*). Library work that runs now comes first, then the library service and what runs on it, then the first real release and its consumers; after them the platform's consumer outcomes, the held entries and the withdrawn one. **Nothing is numbered:** numbers are the lead's to assign. *(The same day the lead numbered the head entry, Materials Described, as **Phase13**; it moved to `## Active`. Then HDRIs in the Library, the next entry, as **Phase14** ("/discovery P14"); it moved to `## Active` too. Then Scale Grids, the next entry, as **Phase15** ("/discovery P15"); it moved to `## Active` as well. That evening the lead put three new phases ahead of it, *"Lets make these the next phases (Before the scaled grid)"*: **Phase15 – 17** are *Matter, Character and HDRI*, *Every Entry Says What It Is* and *Character Materials, Their Own Library*, and Scale Grids is **Phase18**. Before then, *Phase15* means Scale Grids; why: `docs/Planning/Research/261014_R_DownstreamPicture.md` RD-DS-6. Later the same evening the lead pulled The Library Service and Thumbnails ahead of Scale Grids too, *"Actually lets pull the library service and thumbnails before Scale grids as well so we can get the entire chain establsihed recategorized, documented and working correctly before we add more materials"*, and put Character after Thumbnails: **Phase17** The Library Service, **Phase18** Thumbnails, **Phase19** Character Materials, **Phase20** Scale Grids (RD-DS-7). In that evening's commits *Phase17* first meant Character Materials and *Phase18* Scale Grids. **Later still**, Hetzner had no GPU server, and the lead: *"We have to rethink and stay local for now"* (RD-MP-14), then *"Make this phase TBD, move the others forward, Thumbnails become Phase 17, skin detail stay parked TBD"* (RD-DS-8). The Library Service is TBD again, at the head of this list, the place it held in the lead's cut. **Phase17** is Thumbnails, **Phase18** Character Materials and **Phase19** Scale Grids. Before RD-DS-8, *Phase17* means The Library Service, *Phase18* Thumbnails, *Phase19* Character Materials and *Phase20* Scale Grids. **The Library Service keeps the `Q-P17-1…7` and `F-P17-1…7` ids it minted** (frozen once committed); Thumbnails' own `P17` ids start at 8.)*
 
-### The Library Service — ON HOLD, Brief kept *(**unnumbered again 2026-10-14**, RD-DS-8: *"Make this phase TBD"*, after the lead's *"We have to rethink and stay local for now"*, RD-MP-14: Hetzner had no GPU server; its discovery Brief is written for when a server exists; it was Phase17 for part of that day; added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; a material arrives as one package, tested and pictured on upload, RD-RO-1)*
-**Outcome:** a person on the team hands the library service one material package, from any machine on the team's private network, and it comes back gated and rigged in Storm, Blender and Unreal, waiting for review, on a rented server, not the lead's laptop.
-- `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md`
+> **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
-### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey is done (2026-10-14); three questions for the lead and a probe come before discovery**; was "Skin That Reads as Skin" for part of that day)*
+### Skin Maps — SEEDED *(research opened and the phase seeded 2026-10-14; the lead on today's tone-per-part skin: "it is pretty terrible in fact (the line between lips and face and no variation)... I think we need to plan to move to SkinMaps"; skin maps are made per approved mesh version, today MakeHuman's hm08 on the Manny skeleton, RD-SKM-1; **the industry survey is done (2026-10-14); three questions for the lead and a probe come before discovery**; was "Skin That Reads as Skin" for part of that day; **next after Phase19 Scale Grids**, RD-SV-1, 2026-10-15)*
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
 - `docs/Planning/Phases/Future/PhaseTBD_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
-### Skin Maps Beyond Colour — SEEDED, **parked** *(the lead, 2026-10-14: "skin detail stay parked TBD", RD-DS-8; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first)*
-**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
-- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
+### The Library Service — SEEDED, re-scoped 2026-10-15 *(**no GPU: the library's own service on the platform's web server, on the team's private network; the laptop pulls the rig work from its queue**, RD-SV-2; its Brief for a rented GPU server is kept as a later step; **unnumbered again 2026-10-14**, RD-DS-8: *"Make this phase TBD"*, after the lead's *"We have to rethink and stay local for now"*, RD-MP-14: Hetzner had no GPU server; its discovery Brief is written for when a server exists; it was Phase17 for part of that day; added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; a material arrives as one package, tested and pictured on upload, RD-RO-1)*
+**Outcome:** the library's server, with no GPU, checks every push and every material package and queues the rig work, and the laptop works through the queue when it is on. *(Was, and kept as the later step when a GPU server exists: "a person on the team hands the library service one material package, from any machine on the team's private network, and it comes back gated and rigged in Storm, Blender and Unreal, waiting for review, on a rented server, not the lead's laptop.")*
+- `docs/Planning/Phases/Future/PhaseTBD_LibraryService.md` · research `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`
 
-### The Library Console — SEEDED *(added 2026-10-14, the same word, RD-MP-7; runs on The Library Service)*
+### The Library Console — SEEDED *(added 2026-10-14, the same word, RD-MP-7; runs on The Library Service, which needs no GPU since 2026-10-15, RD-SV-2)*
 **Outcome:** the IMRSV team opens one page to review new materials and keep or send back each one, choose which materials go into each library version, and see each material's provenance.
 - `docs/Planning/Phases/Future/PhaseTBD_LibraryConsole.md`
 
-### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept)*
+### Contribution Path — RESEARCH
+**Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md` · `docs/Planning/Research/261014_R_MaterialPipeline.md` F-MP-28 (a contributed generator script runs as code on the library service: a sandbox or a maintainer's read before a run) · `261014_R_RoadmapOrder.md` F-RO-23 (a contribution is one material package, tested on upload, RD-RO-1; this entry keeps what is specific to outsiders) · `261015_R_ServerWithoutTheGpu.md` F-SV-9 (it opens the service's package inbox to outsiders)
+
+### Release Bundle and Consumer Contract — SEEDED *(un-numbered 2026-09-25: the lead re-sequenced the material work ahead of it; discovery Pass 1 kept; **narrowed 2026-10-15:** publishing on GitHub with digests already runs in the dev snapshots; left are the written contract, the trust anchor, activation without the repo, the master token as data, the compressed textures and the first real release, `261015_R_ServerWithoutTheGpu.md` F-SV-2)*
 **Outcome:** a consumer can download one versioned, verifiable release of the library and use it without ever touching this repository.
 - `docs/Planning/Phases/Future/PhaseTBD_ReleaseBundleConsumerContract.md`
 
@@ -63,37 +65,37 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** IMRSV Studio, and any other Unreal user, renders library materials with one package of the Matter masters taken from a release, each master making its materials look as good as Unreal can. *(Was: "an Unreal user outside IMRSV can drop in a package…".)*
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (Pass 9, option B; R14 "B later") · `docs/Planning/Phases/Complete/Phase06_UnrealTestRuntime.md`
 
-### Contribution Path — RESEARCH
-**Outcome:** an outside contributor can submit a material and get an automatic verdict, with only maintainers able to put it in a release.
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 8) · `CONTRIBUTING.md` · `docs/Planning/Research/261014_R_MaterialPipeline.md` F-MP-28 (a contributed generator script runs as code on the library service: a sandbox or a maintainer's read before a run) · `261014_R_RoadmapOrder.md` F-RO-23 (a contribution is one material package, tested on upload, RD-RO-1; this entry keeps what is specific to outsiders)
-
-### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
-**Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
-- `docs/Planning/PlatformDependencies.md` (P1–P4, P10)
-
-### See the Library — RESEARCH *(2026-10-14, lead: the library's website is built and run by IMRSV's web platform from published releases; the library publishes a file for the site and a preview set beside each release, RD-WS-1 to RD-WS-4; **a consumer outcome since 2026-10-14:** the library's halves are Materials Described, Thumbnails and the release publish, `261014_R_RoadmapOrder.md` F-RO-6)*
-**Outcome:** anyone can browse what is in a release, with a preview image of every material.
-- `docs/Planning/Research/261014_R_TheLibrarysSite.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails · `docs/Planning/PlatformDependencies.md` (P24, M9)
+### Comparison Pictures in Each Tool — RESEARCH *(added 2026-10-14 by Phase17's execution, on the lead's "we have to revamp this test... lets either seed a phase to do this or setup a research", with the website's ask for a real comparison set; Pass 1 owed; absorbs Parity Baselines, 2026-10-15)*
+**Outcome:** each material's pictures in Storm, Blender and Unreal can be compared by a person: one readable scene (a standard shader ball, a neutral backdrop, a dome whose reflections read), each tool's own renderer named, differences shown and not tuned away, current or not shipped.
+- `docs/Planning/Research/261014_R_ComparisonPictures.md`
 
 ### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4; **held 2026-10-14:** research, after the Skin Maps survey)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Author a Material End to End — RESEARCH *(`Reevaluate (2026-10-14)`: The Library Console is its maintainer half, and the Creator's half lives in each consumer, `261014_R_RoadmapOrder.md` F-RO-6)*
-**Outcome:** a contributor can go from an idea to a validated material in the library in minutes, using one tool (the first cut of the Matter Manager).
-- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 7)
+### Skin Maps Beyond Colour — SEEDED, **parked** *(the lead, 2026-10-14: "skin detail stay parked TBD", RD-DS-8; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first)*
+**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
-### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here; `Reevaluate (2026-10-14)`: Materials Described carries the parity verdict per Creator port to the site, `261014_R_RoadmapOrder.md` F-RO-6)*
+### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
+**Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
+- `docs/Planning/PlatformDependencies.md` (P1–P4, P10)
+
+### See the Library — RESEARCH *(2026-10-14, lead: the library's website is built and run by IMRSV's web platform from published releases; the library publishes a file for the site and a preview set beside each release, RD-WS-1 to RD-WS-4; **a consumer outcome since 2026-10-14:** the library's halves are Materials Described, Thumbnails and the release publish, `261014_R_RoadmapOrder.md` F-RO-6; **the library's side complete 2026-10-15:** the site file, the groups, each entry's facts and the thumbnails, published with digests in the dev snapshots, `261015_R_ServerWithoutTheGpu.md` F-SV-2; the public launch comes with the first versionable release)*
+**Outcome:** anyone can browse what is in a release, with a preview image of every material.
+- `docs/Planning/Research/261014_R_TheLibrarysSite.md` · `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 5) · `docs/specs/Catalog/Catalog.md` §Thumbnails · `docs/Planning/PlatformDependencies.md` (P24, M9)
+
+### Parity Baselines — RESEARCH *(its build is Phase05 + Phase06, 2026-09-26; publishing the results for anyone to see stays here; `Reevaluate (2026-10-14)`: Materials Described carries the parity verdict per Creator port to the site; **folded 2026-10-15 into Comparison Pictures in Each Tool**: the rig's pictures and per-port verdicts ship in every dev snapshot, and making them readable is that entry's work, `261015_R_ServerWithoutTheGpu.md` F-SV-2, `261014_R_RoadmapOrder.md` F-RO-6)*
 **Outcome:** anyone can see, for each kind of material, how closely its MaterialX, Blender and Unreal renders match.
 - `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 10) · `docs/specs/Tooling/CompressedDistribution.md` · `docs/Planning/Phases/Complete/Phase05_TestRig.md`
+
+### Author a Material End to End — RESEARCH *(`Reevaluate (2026-10-14)`: The Library Console is its maintainer half, and the Creator's half lives in each consumer, `261014_R_RoadmapOrder.md` F-RO-6; **folded 2026-10-15** into The Library Console and Contribution Path, `261015_R_ServerWithoutTheGpu.md` F-SV-2)*
+**Outcome:** a contributor can go from an idea to a validated material in the library in minutes, using one tool (the first cut of the Matter Manager).
+- `docs/Planning/Research/260923_R_StandaloneSetup.md` (seed 7)
 
 ### Two Licences — SEEDED, withdrawn 2026-10-14 *(added 2026-10-14, the same word, RD-MP-1 and RD-MP-8: CC BY 4.0 beside CC0, CC0 the default; **withdrawn the same day, the lead: "material are CC0"**, RD-RO-2; kept so its intent survives)*
 **Outcome:** a material can be published under CC0 or CC BY 4.0, and every consumer shows each material's licence and the credit a CC BY material asks for.
 - `docs/Planning/Phases/Future/PhaseTBD_TwoLicences.md`
-
-### Comparison Pictures in Each Tool — RESEARCH *(added 2026-10-14 by Phase17's execution, on the lead's "we have to revamp this test... lets either seed a phase to do this or setup a research", with the website's ask for a real comparison set; Pass 1 owed)*
-**Outcome:** each material's pictures in Storm, Blender and Unreal can be compared by a person: one readable scene (a standard shader ball, a neutral backdrop, a dome whose reflections read), each tool's own renderer named, differences shown and not tuned away, current or not shipped.
-- `docs/Planning/Research/261014_R_ComparisonPictures.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).

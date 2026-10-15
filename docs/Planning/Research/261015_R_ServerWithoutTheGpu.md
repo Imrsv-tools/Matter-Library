@@ -176,12 +176,13 @@ The dev catalog for the site's staging needs no server: it is a GitHub pre-relea
 | ~~Q-SV-1~~ → RD-SV-2 | **Re-scope *The Library Service* to a server without a GPU** (the gate on push, the package inbox, the queue), with the laptop as a worker that pulls rig jobs (F-SV-7)? | **Yes.** It moves everything that needs no GPU off the laptop now, keeps RD-MP-12, and a GPU server later is one more worker. |
 | ~~Q-SV-2~~ → RD-SV-2 | **Where that server runs:** (a) the platform's existing web server, as the library's own service on the private network; (b) a small server of the library's own; or (c) GitHub alone (F-SV-8)? | **(a) to start, (b) if it pinches.** |
 | ~~Q-SV-3~~ → RD-SV-1 | **What runs after Phase18:** Skin Maps (RD-P18-10, *"straight after this one"*) or Phase19 Scale Grids (RD-DS-8)? | The lead's call. Scale Grids is small and has its Brief ready; Skin Maps follows on from Phase18's body kit. |
-| Q-SV-4 | **Tidy the Roadmap to Pass 1** (F-SV-2): See the Library's library side marked complete; Parity Baselines and Author a Material End to End marked folded; Release Bundle narrowed; ledger M9 updated (F-SV-3)? | **Yes, as one quick fix** once Q-SV-1 to Q-SV-3 are cut. |
+| ~~Q-SV-4~~ → RD-SV-3 | **Tidy the Roadmap to Pass 1** (F-SV-2): See the Library's library side marked complete; Parity Baselines and Author a Material End to End marked folded; Release Bundle narrowed; ledger M9 updated (F-SV-3)? | **Yes, as one quick fix** once Q-SV-1 to Q-SV-3 are cut. |
 
 ## Resolved
 
 - **RD-SV-1 — After Phase19 Scale Grids (started), Skin Maps, then Pass 3's order as listed** (the lead, 2026-10-15: *"Scale grids have started, Skin maps then as you list"*). Closes Q-SV-3. It settles F-SV-4's two claims on the slot after Phase18: Scale Grids took it, and Skin Maps follows.
 - **RD-SV-2 — *The Library Service* is re-scoped to a server without a GPU, run as the library's own service on the platform's web server, on the team's private network; the laptop pulls rig jobs from it** (read from the lead's question, 2026-10-15: *"So we would run the library service on the same box as IMRSVWeb I presume?"*; restated to him for correction). Closes Q-SV-1 and Q-SV-2 at (a). F-SV-12's conditions bind; (b) stays the exit if it pinches.
+- **RD-SV-3 — The Roadmap is tidied to Pass 1 and Pass 3, as a quick fix, and pushed** (the lead, 2026-10-15: *"Tidy the Roadmap as a quick fix and push"*). Closes Q-SV-4.
 
 ## Status
 
@@ -194,7 +195,12 @@ The dev catalog for the site's staging needs no server: it is a GitHub pre-relea
   - the service, with no GPU, runs the gate on push, the package inbox and the queue;
   - the console follows on the same box;
   - the server holds no git credentials (F-SV-11).
-- **Open:** Q-SV-4, the Roadmap tidy to Pass 1 and Pass 3, which is ready to run.
-- **Next step:**
-  - Q-SV-4 as a lead-directed `/quick-fix`;
-  - `/discovery` on the re-scoped *Library Service* after Skin Maps. It adds the PlatformDependencies ask (F-SV-13).
+- **Graduated, 2026-10-15 (RD-SV-3):** the lead's *"Tidy the Roadmap as a quick fix and push"*. The quick fix landed:
+  - `## Future` reordered, Skin Maps first;
+  - *The Library Service* re-scoped in the Roadmap and its stub, with the GPU-server Brief kept as a later step;
+  - *See the Library*'s library side marked complete;
+  - *Parity Baselines* and *Author a Material End to End* marked folded, and kept;
+  - *Release Bundle* narrowed, in the Roadmap and its stub;
+  - ledger M9 marked done for the dev snapshots.
+- **Open:** nothing in this doc.
+- **Next step:** `/discovery` on the re-scoped *Library Service* after Skin Maps. It adds the PlatformDependencies ask (F-SV-13) and measures the web server's headroom.
