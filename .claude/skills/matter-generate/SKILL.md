@@ -54,7 +54,7 @@ uv run tools/converters/import_ambientcg.py import <AssetId> --set <Material>_<V
 ```
 
 - **Pick by the tags and the physical size**, and say which asset and why in the plan. Name only what the source states: "oak", not "white oak", unless it says the species.
-- `import` writes the maps (`basecolor`, `roughness`, `normal` as NormalGL, `metalness`, `opacity`) flat into the class folder, records provenance under `library/provenance/sources/`, adds the CREDITS.md row, and prints `meters_per_tile` from the asset's real size. Use that value, and the nearest scale tag.
+- `import` writes the maps (`basecolor`, `roughness`, `normal` as NormalGL, `metalness`, `opacity`) flat into the class folder, records provenance under `library/provenance/sources/`, adds the CREDITS.md row, and prints `meters_per_tile` from the asset's real size, and whether it is a scale option. **Use a scan only at a scale option's size** (Phase19 D-9; the lead, RD-P19-2: *"we should STRONGLY avoid fractions"*): its `meters_per_tile` is exactly its tag's length (0.001, 0.01, 0.1, 1, 10 or 100 m). A scan at another size (0.8 m, 3 m) is re-made at an option's size or not used, **never stretched to fit**; the gate's `recipe` lane (G9) refuses it. A generated texture (L2) is made at the option's size from the start.
 - It fetches only from ambientCG (CC0) and refuses to overwrite. Physically Based rarely has an entry for a scanned matter; record any constant you add (e.g. `specular_ior`) as judgement.
 
 ## 2b. Generated base textures (L2)

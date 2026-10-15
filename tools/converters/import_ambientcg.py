@@ -22,7 +22,8 @@ pixel cannot arrive through it (the phase's residual risk, Brief §Risk lane).
      library/provenance/sources/base/<domain>/<class>/<SetName>.yaml: the `provenance:` block a
      release lock will carry, with the shipped-source-set evidence (source_provenance.py).
   4. adds a row to CREDITS.md §Texture sources.
-  5. prints `meters_per_tile` from the asset's physical size, for the recipe.
+  5. prints `meters_per_tile` from the asset's physical size, for the recipe, and whether it is a
+     scale option (Phase19 D-9: a scan off every option is re-made at one's size, never stretched).
 
 It refuses to overwrite any existing file. Standard library + Pillow + PyYAML only.
 """
@@ -93,9 +94,26 @@ def cmd_info(asset_id: str) -> int:
     print(f"{a['assetId']}  {HOST}/view?id={a['assetId']}")
     print(f"  tags:  {', '.join(a.get('tags', []))}")
     print(f"  maps:  {', '.join(a.get('maps', []))}")
-    print(f"  size:  {a.get('dimensionX')} x {a.get('dimensionY')} cm "
-          f"(meters_per_tile {(a.get('dimensionX') or 0) / 100:g})")
+    print(f"  size:  {a.get('dimensionX')} x {a.get('dimensionY')} cm")
+    print(f"  {size_line(a)}")
     return 0
+
+
+# Phase19 D-9 (the lead, RD-P19-2: "we should STRONGLY avoid fractions"): an article's tile is
+# exactly its scale tag's length. Identity.md §Scale tags; the recipe lane's G9 holds it.
+TAG_METRES = {"s0001": 0.001, "s001": 0.01, "s01": 0.1, "s1": 1.0, "s10": 10.0, "s100": 100.0}
+
+
+def size_line(a: dict) -> str:
+    """The scan's real size per tile, and whether it is a scale option (D-9). Never stretch a
+    scan to fit: one whose size is not an option is re-made at an option's size, or not used."""
+    m = (a.get("dimensionX") or 0) / 100
+    tag = next((t for t, v in TAG_METRES.items() if abs(m - v) <= 1e-9 * v), None)
+    if tag:
+        return f"meters_per_tile {m:g}: a scale option ({tag})"
+    return (f"meters_per_tile {m:g}: NOT a scale option. Use this scan only re-made at an option's "
+            f"size ({', '.join(f'{t} {v:g} m' for t, v in TAG_METRES.items())}), never stretched "
+            f"(Phase19 D-9); the recipe lane refuses an article off its tag")
 
 
 def cmd_import(asset_id: str, set_name: str, slot: str, scale: str, article: str) -> int:
@@ -160,8 +178,7 @@ def cmd_import(asset_id: str, set_name: str, slot: str, scale: str, article: str
     # the table's last row ends with "|\n", then a blank line, then the anchor sentence
     credits.write_text(text.replace("|\n" + anchor, "|\n" + row + anchor, 1), encoding="utf-8")
     print(f"  CREDITS.md row added for {asset_id}")
-    print(f"  meters_per_tile {(a.get('dimensionX') or 0) / 100:g}  (asset is "
-          f"{a.get('dimensionX')} x {a.get('dimensionY')} cm)")
+    print(f"  {size_line(a)}  (asset is {a.get('dimensionX')} x {a.get('dimensionY')} cm)")
     return 0
 
 

@@ -75,6 +75,8 @@ Every base texture uses a **real-world physical scale** — meters per UV tile �
 | `s100`  | 100 m   | Macro | Geological scale, landscapes, cliffs |
 | `sUKN`  | Unknown | Unknown | Not defined / not relevant |
 
+**An article's size is exactly its tag's length** *(2026-10-15, Phase19 D-9; the lead, RD-P19-2: "we should STRONGLY avoid fractions")*. Its `meters_per_tile` is 0.001, 0.01, 0.1, 1, 10 or 100, as its tag names, and an `sUKN` article authors `0.0`. A resolution option of an article keeps its size (RD-P19-1). **A source is never stretched to fit:** a scan whose real size is not a scale option is re-made at an option's size, or not used, and a generated texture is made at the option's size from the start. The `recipe` lane refuses a recipe off its tag; the 15 articles already off theirs are named there as known, each a redo row in `library/wishlist.yaml`.
+
 **Shared layers (overlays and masksets) are sampled at the size their tag names** (Phase04, 2026-09-26; [MasterSet §Scale](MasterSet.md)). So a shared layer's tag is not a label but its rendered size: it is authored at exactly that size, and `sUKN` is not allowed on one. The assembler refuses an untagged or `sUKN` layer.
 
 Changing what a scale tag *means* is a library semver-**major** change (see [_Architecture](../_Architecture.md) §Versioning).
