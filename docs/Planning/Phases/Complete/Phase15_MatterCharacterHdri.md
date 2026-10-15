@@ -2,7 +2,7 @@
 
 **Status:** 🎉 COMPLETE (closed 2026-10-14) — **the library's half of the Outcome**: the three groups in each file, the dev catalog and the site file (`matterlib-0.2.0-dev.4`), Blender's library by group, and each consumer told what to change. Studio's, USDLiveView's and the website's own browse are their phases (P25, P27). Lane **build**. Q-P15-1 → **RD-P15-8: option A** (the lead, 2026-10-14: *"A, then /execute Phase15"*). Discovery opened by the lead: *"/discovery P15"*. **Numbered Phase15 by the lead the same day:** *"Lets make these the next phases (Before the scaled grid)"*. A pointer-shell written by `/research` on the lead's word: *"yes record it and seed all three"*. It is the first of the sequence (RD-DS-5, RD-DS-7): this one, then *Every Entry Says What It Is* ([`Phase16_EveryEntrySaysWhatItIs.md`](Phase16_EveryEntrySaysWhatItIs.md)), The Library Service (Phase17), Thumbnails (Phase18), then *Character Materials, Their Own Library* ([`Phase18_CharacterLibrary.md`](Phase18_CharacterLibrary.md)).
 
-> **Ids.** `F-P15-1` to `F-P15-8` belong to *Scale Grids* (now [`Phase19_ScaleGrids.md`](../Phase19_ScaleGrids.md)), minted while it held the number Phase15. **This doc's findings start at `F-P15-9`.** Its `Q-P15-n` and `RD-P15-n` series are its own (Scale Grids minted none).
+> **Ids.** `F-P15-1` to `F-P15-8` belong to *Scale Grids* (now [`Phase19_ScaleGrids.md`](Phase19_ScaleGrids.md)), minted while it held the number Phase15. **This doc's findings start at `F-P15-9`.** Its `Q-P15-n` and `RD-P15-n` series are its own (Scale Grids minted none).
 
 ## Outcome
 

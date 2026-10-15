@@ -1,6 +1,6 @@
 # Phase19 — Scale Grids
 
-**Status:** IN EXECUTION (2026-10-15, the lead: *"/execute P19"*, after Phase18 closed; it runs ahead of *Skin Maps*, which RD-P18-10 had put next). Brief ready and **re-verified 2026-10-15** by discovery Pass 2, which the lead opened: *"/discovery P19"*. Lane **build**. Pass 1 (2026-10-14) was written when this phase was Phase15, before Phase15 – 18 ran. Pass 2 re-measured it against them, and the Brief below is the result (F-P19-1 to F-P19-8). In the same session the lead ruled that a higher resolution is an option of one material (RD-P19-1), and that a size fits the scale options exactly (RD-P19-2, D-9).
+**Status:** 🎉 COMPLETE (closed 2026-10-15, the lead: *"close"*; see *CLOSE — DONE* in the Execution Log). Executed from 2026-10-15 (the lead: *"/execute P19"*, after Phase18 closed; it runs ahead of *Skin Maps*, which RD-P18-10 had put next). Brief ready and **re-verified 2026-10-15** by discovery Pass 2, which the lead opened: *"/discovery P19"*. Lane **build**. Pass 1 (2026-10-14) was written when this phase was Phase15, before Phase15 – 18 ran. Pass 2 re-measured it against them, and the Brief below is the result (F-P19-1 to F-P19-8). In the same session the lead ruled that a higher resolution is an option of one material (RD-P19-1), and that a size fits the scale options exactly (RD-P19-2, D-9).
 - **Ids:** `F-P15-1` to `F-P15-8` were minted while this phase was Phase15 and are kept (Phase15's own start at `F-P15-9`). Pass 2 mints `F-P19-n`.
 - **Steps are `19.n` since Pass 2.** They were `15.n`, which Phase15's own commits now use.
 - *Numbering:* Phase15 by the lead's *"/discovery P15"*, then Phase18, Phase20 and Phase19, all on 2026-10-14 (RD-DS-6 to RD-DS-8; the lead's words are in the Roadmap's §Future note).
@@ -15,7 +15,7 @@
 
 **Anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.**
 
-*Why it is a phase:* today a material's size is checked in one place, the rig's ruler check: a number, for one article, in one test scene. Errors happen in UVs and bindings on real meshes, and nothing shows them by eye: UVs in the wrong unit, a binding that forgot its UV scale, an object imported at the wrong size, an article with no recorded size. The skin detail once drawn about 170 times too large on a character's own atlas was one of these ([LCDSchema](../../specs/Contract/LCDSchema.md) §Creator-adjustable subset).
+*Why it is a phase:* today a material's size is checked in one place, the rig's ruler check: a number, for one article, in one test scene. Errors happen in UVs and bindings on real meshes, and nothing shows them by eye: UVs in the wrong unit, a binding that forgot its UV scale, an object imported at the wrong size, an article with no recorded size. The skin detail once drawn about 170 times too large on a character's own atlas was one of these ([LCDSchema](../../../specs/Contract/LCDSchema.md) §Creator-adjustable subset).
 
 ---
 
@@ -48,7 +48,7 @@
   - each grid through the rig in Storm and Blender;
   - the Blender library regenerated, so they appear in the Asset Browser;
   - a thumbnail for each grid. They are `candidate`, so they are kept, and every kept article is pictured (Phase17). Each is drawn on the `card` subject at true size, as every article is (F-P19-4);
-  - the Glossary's *Scale grid* loses *(planned)*, and the grids join the [Catalog](../../specs/Catalog/Catalog.md) and [MasterSet](../../specs/Ontology/MasterSet.md) tables.
+  - the Glossary's *Scale grid* loses *(planned)*, and the grids join the [Catalog](../../../specs/Catalog/Catalog.md) and [MasterSet](../../../specs/Ontology/MasterSet.md) tables.
 - **Scale view in Blender** (19.2): turns on and off in the lead's Blender; the swap rule is written once in a spec.
 - **Scale view in the rig** (19.3), on the character.
 - **The golden's 1 m cube wears the 1 m grid** (19.4), with `build_portable.py` carrying more than one article.
@@ -81,19 +81,19 @@
 | the cube in the golden | `build_portable.py`, taught a list of articles instead of one | — |
 
 **Standards touched:**
-- [Identity](../../specs/Ontology/Identity.md): six tokens, ≤63 characters.
-- [Taxonomy](../../specs/Ontology/Taxonomy.md): `utility/virtual`.
+- [Identity](../../../specs/Ontology/Identity.md): six tokens, ≤63 characters.
+- [Taxonomy](../../../specs/Ontology/Taxonomy.md): `utility/virtual`.
 - MaterialX 1.39 / OpenPBR through the assembler.
 - The LCD `place2d` semantics: `uv_scale` **divides**.
-- [CreatorAssetProfile](../../specs/Contract/CreatorAssetProfile.md), for the golden (19.4).
+- [CreatorAssetProfile](../../../specs/Contract/CreatorAssetProfile.md), for the golden (19.4).
 - The Blender 5.1+ API.
 
 ### Decisions that bind
 
-**The lead's, from research** ([`261014_R_ScaleProbes.md`](../Research/261014_R_ScaleProbes.md) §Resolved, quoted there in full):
+**The lead's, from research** ([`261014_R_ScaleProbes.md`](../../Research/261014_R_ScaleProbes.md) §Resolved, quoted there in full):
 - **RD-SP-1** — *"a Material for every UV scale that "aligns" with eachtoehr … can be it's own phase"*: one grid per scale tag, `s0001` to `s100`, plus the `sUKN` hatch.
 - **RD-SP-2** — *"Yes ship in releases... very useful in all locations when trouble shooting"*: library content.
-- **RD-SP-3** — *"exact name execpt scale"*: `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`. It is 38–41 characters and has six tokens, so it passes [Identity](../../specs/Ontology/Identity.md) as written. The `sUKN` grid is `Diagnostic_ScaleGrid_Clean_Base_sUKN_v01`.
+- **RD-SP-3** — *"exact name execpt scale"*: `Diagnostic_ScaleGrid_Clean_Base_<sNN>_v01`. It is 38–41 characters and has six tokens, so it passes [Identity](../../../specs/Ontology/Identity.md) as written. The `sUKN` grid is `Diagnostic_ScaleGrid_Clean_Base_sUKN_v01`.
 - **RD-SP-4** — *"consistant scale colors in the grid … if each scale had that is its base then someting like 4 thicknessed of grid … like Blue is 1 meter in all of them (for example)"*:
   - a line's colour is its length, in every grid;
   - ~~a grid's background is a dark shade of its own tile length's colour;~~ *(this was the agent's reading of "if each scale had that is its base"; superseded by RD-P19-3: the background is neutral, only the lines carry colour)*
@@ -127,7 +127,7 @@
   - Weight and brightness step with the level too, so a colour-blind eye still reads which level a line is.
   - The executor proposes it; the lead judges it at click 1.
 - **D-3 — The finest level is drawn dim.** Its line is about 1 px and low in contrast against the background, so that at a distance it fades into the neutral grey instead of tinting it (F-P15-8; *"the grid's own colour"* superseded by RD-P19-3). The four levels are kept.
-- **D-4 — The swap rule** (written once, in [LCDSchema](../../specs/Contract/LCDSchema.md) beside *"the mesh's UV unit must be the article's tile"*, the rule a grid tests, SP-F1):
+- **D-4 — The swap rule** (written once, in [LCDSchema](../../../specs/Contract/LCDSchema.md) beside *"the mesh's UV unit must be the article's tile"*, the rule a grid tests, SP-F1):
   - **Which grid:** each article's grid is the tag nearest its `meters_per_tile` on a log scale; a tie goes to the larger grid.
   - **Its size:** the binding's `uv_scale` becomes the old value × (grid tile ÷ article `meters_per_tile`).
   - **Kept:** `uv_offset` and `uv_rotation`.
@@ -151,9 +151,9 @@
 - **D-8 — The golden cube:**
   - its UVs become one tile per face (`[0,1]`, the 1 m grid's real scale), not `[0,10]` with a `uv_scale` override, because Blender exports no UV ports;
   - the table keeps its two Copper instances;
-  - [CreatorAssetProfile](../../specs/Contract/CreatorAssetProfile.md) §History records the change.
+  - [CreatorAssetProfile](../../../specs/Contract/CreatorAssetProfile.md) §History records the change.
 - **D-9 — Holding the scale options firm (RD-P19-2)** *(added at Pass 2, 2026-10-15)*:
-  - **The rule, written once,** in [Identity](../../specs/Ontology/Identity.md) §Scale tags:
+  - **The rule, written once,** in [Identity](../../../specs/Ontology/Identity.md) §Scale tags:
     - `meters_per_tile` is exactly the tag's length;
     - an `sUKN` article authors `0.0`;
     - a resolution option keeps its article's size (RD-P19-1).
@@ -273,6 +273,7 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
 - **F-P19-9 — Unreal's grid wanders where the UVs are large** (click 4, 2026-10-15; the lead: *"on the first (of the 5 rows) the grid of UE looks much more warped than the other two"*).
   - **Measured:** the scale view's `st` in 1 cm tiles at each swatch: cheek up to 137, forearm 122, shirt 97, hand 96, jeans 62. Only the cheek passes 128, where a 16-bit float's step doubles to 1/8 of a tile (1.25 mm); the others are at 0.3–0.6 mm.
   - **Hypothesis, not yet tested:** the runtime builds its meshes with `UProceduralMeshComponent` (`MatterRuntimeGameMode.cpp`), and nothing in the repo asks it for full-precision UVs. Unreal stores mesh UVs as half floats by default. Storm and Blender use 32-bit UVs.
+  - **Filed as [Matter-Library#5](https://github.com/Imrsv-tools/Matter-Library/issues/5)** at the close.
   - **The test** is on the machine with Unreal: build the runtime with full-precision UVs and re-run `rig.py --character Teeth_Natural_Clean_Base_sUKN_v01 --scale-view`. Scale agreed in all three tools, so click 4 does not wait on it. *UVs in Metres* would make the values small (its open questions).
 - **F-P19-10 — The rig's ruler check cannot measure most of the grids** (19.1's rig, 2026-10-15).
   - **Measured:** `s10`, `s100` and `sUKN` read size 1.00 in Storm, Blender and Unreal, matches 0.80–1.00. `s0001`, `s001`, `s01` and `s1` read **OFF**, matches 0.15–0.48. For `s0001` and `s001` all three tools find about 2.6–2.8; for `s01` and `s1` Blender and Unreal find 1.00 and Storm 0.54 or 3.00.
@@ -324,14 +325,42 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
 | **19.4** | `73cff74` | The golden cube wears the 1 m grid. `check_conformance.sh` PASS, `check_exporter.sh` PASS, gate 15/2/0. **✅ Click 5, the lead (2026-10-15):** *"YEP looks correct"*. | — |
 | **19.1** tail | `cdb034f`, then the 19.1 candidate commit | D-9 is written (Identity, the importer, `/matter-generate`, the 15 redo rows). Each grid went through the rig in Storm, Blender and Unreal, and all three draw alike; the ruler check cannot measure four of them (F-P19-10). The seven are `candidate`, with thumbnails (`library/thumbnails/_sheets/p19_grids.png`, 86 s of GPU). **Seen in the thumbnails, against F-P19-4's prediction:** the card sits at the tile's corner, so `s10` shows its 10 m edge as a 2.9 cm orange band and `s100` is mostly its 29 cm red edge, not finer lines on grey. True to the article, but `s100`'s picture reads as a red material. Put to the lead, not changed. Gate 15/2/0. **The lead (2026-10-15), on seeing them:** *"ok"*, read as keep the rule as it is (F-P19-4), `s100` included; confirm at the close. | the close |
 | **19.1** click 1's drag | the RD-P19-4 commit | **✅ The drag, the lead (2026-10-15):** *"I tried a few.. they work... they do not change scale tho.. they all add to the 1meter cube as if they were each 1m materials"*. Read in his Blender (read-only): the grids went onto the Copper box, whose UVs are 0–1 per 1 m face, so each grid drew one tile per face. That is the UV-unit rule, and RD-P19-4 keeps it. The Matter panel and the Glossary now say so, and *UVs in Metres* is seeded. `check_exporter.sh` PASS after the panel edit. | — |
-| **19.1** docs (in progress) | — | **Deviation (a false premise):** the Brief's *"the grids join the Catalog"*. [Catalog](../../specs/Catalog/Catalog.md) is a view of a **release** (its one table is `matterlib-0.1.0`), and no working-tree article is listed there. The grids join it with the first release that carries them. MasterSet, Glossary and Identity (D-9) are edited and not yet committed: Identity's line names the redo rows, which are not written yet. | 19.1's tail |
+| **19.1** docs (in progress) | — | **Deviation (a false premise):** the Brief's *"the grids join the Catalog"*. [Catalog](../../../specs/Catalog/Catalog.md) is a view of a **release** (its one table is `matterlib-0.1.0`), and no working-tree article is listed there. The grids join it with the first release that carries them. MasterSet, Glossary and Identity (D-9) are edited and not yet committed: Identity's line names the redo rows, which are not written yet. | 19.1's tail |
 
-### Resume (2026-10-15, after 19.3 and 19.4 landed; clicks 4 and 5 owed)
+### CLOSE — DONE (2026-10-15)
+
+**The Outcome, verbatim:** *"Anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious."*
+
+**Against it:**
+- **In Blender, it holds.** The scale view swaps every slot wearing a library material (Matter and Character) and back. A material that is not a library article is left alone and listed: it has no material size to swap by (D-4).
+- **At click 2 the lead named all three planted errors before reading the record.**
+- **The rig shows the same on the character** (click 4), and the golden carries the 1 m grid (click 5).
+- **A grid dragged on by hand is not resized** (RD-P19-4). The Outcome is about the scale view, which does resize, and the panel says so.
+
+**Deferral ledger:**
+
+| Item | Disposition |
+|---|---|
+| A scale view in Studio and USDLiveView | ruled out (Brief, *Not now*). The ledger row is offered as [PlatformDependencies](../../PlatformDependencies.md) P29. |
+| The grids in the [Catalog](../../../specs/Catalog/Catalog.md) | ruled out by a false premise. The page lists a release; the grids join it with the first release that carries them (19.1 ledger row). |
+| RD-P19-1, how a resolution option ships | carried to *Version Management* (its *Carried in* list), as the Brief said. |
+| *UVs in Metres*: any material maps to its real size | deferred as an addition, on the lead's RD-P19-4 (*"1 now, 4 as a next phase"*). Seeded: `Future/PhaseTBD_UVsInMetres.md`. |
+| Unreal's grid wanders on the cheek (F-P19-9) | deferred as an addition: older than this phase, in the runtime's meshes, and scale agrees. [Matter-Library#5](https://github.com/Imrsv-tools/Matter-Library/issues/5), for the machine with Unreal. |
+| Unreal's mouth view: hair cards one-sided under an Opaque grid | deferred as an addition. It is the Opaque master's one-sidedness, older than this phase; recorded in the 19.3 row. |
+| The rig's ruler check cannot measure most grids (F-P19-10) | ruled out: the check stays a measurement for textured articles. |
+| The `s100` / `s10` thumbnails read as their edge colour | already routed: the lead saw them and said *"ok"*, read as keep the rule (F-P19-4). |
+| The 15 off-option articles | fixed as redo rows (D-9). Re-making them is `/matter-batch`'s, not this phase's (Brief, *Not now*). |
+| Installing the Matter add-on permanently | offered in the close's handback (Brief, *Not now*: *Blender from a Release* owns installing). |
+| The five Blender learnings | fixed: `docs/Learnings/Blender/` B19–B21. |
+
+**Gates at the close:** `run_all.py` 15 PASS, 2 SKIP (compression and staging: no encoder), 0 FAIL, the same set as the baseline. `check_exporter.sh` PASS after the last add-on edit. `check_conformance.sh` PASS. The `--smoke` scale test PASS, 9 of 9. There is no running CI (`LOCAL_DELTAS.md`), so this local run is the evidence.
+
+### Resume (2026-10-15, after 19.3 and 19.4 landed; historical since the close)
 
 - **Where:** all five clicks passed, and the click-1 drag is done (RD-P19-4). 19.2, 19.3 and 19.4 are complete. 19.1's tail is not done, and no sitting is owed.
 - **Next:** 19.1's tail, as listed below: rig each grid, mark them `candidate`, the seven thumbnails, D-9's tool wording, and the 15 redo rows. Commit Identity's D-9 line with the redo rows. Then the close (the lead's to start): the five Blender learnings below; the consumer ledger row; RD-P19-1 carried to *Version Management*; F-P19-9 for the machine with Unreal; the permanent add-on install offered.
 
-### Resume (2026-10-15, at the act boundary after clicks 1–3; kept for its 19.1 list)
+### Resume (2026-10-15, at the act boundary after clicks 1–3; historical since the close)
 
 - **Where:** clicks 1, 2 and 3 passed. Steps 19.1 and 19.2 have their sittings done; each has owed tail work that needs no sitting.
 - **Next, in order:**

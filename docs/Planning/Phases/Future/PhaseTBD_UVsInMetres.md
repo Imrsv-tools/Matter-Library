@@ -1,6 +1,6 @@
 # PhaseTBD — UVs in Metres
 
-**Status:** SEEDED (2026-10-15) — not numbered. A pointer-shell written by Phase19's execution on the lead's ruling RD-P19-4 (`../Phase19_ScaleGrids.md`, *Decisions that bind*), when he chose *"1 now, 4 as a next phase"*. `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** SEEDED (2026-10-15) — not numbered. A pointer-shell written by Phase19's execution on the lead's ruling RD-P19-4 (`../Complete/Phase19_ScaleGrids.md`, *Decisions that bind*), when he chose *"1 now, 4 as a next phase"*. `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
 
 ## Outcome
 

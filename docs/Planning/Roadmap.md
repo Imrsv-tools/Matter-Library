@@ -11,12 +11,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase19 — Scale Grids — BRIEF READY, after Phase18 *(**re-verified 2026-10-15** by discovery Pass 2, the lead's "/discovery P19": the Brief holds against Phase15 – 18, and it holds whether *Skin Maps*, ruled straight after Phase18 (RD-P18-10), runs before it or after; **renumbered Phase19 2026-10-14**, RD-DS-8; renumbered Phase20 earlier the same evening, RD-DS-7; numbered Phase15 and opened by the lead 2026-10-14, "/discovery P15"; **renumbered Phase18 the same day**, when the lead put the three above ahead of it, RD-DS-6; its discovery Pass 1 is kept; added 2026-10-14 by `/research` on the lead's "can be it's own phase": one material per UV scale, all aligned, to test that UVs are applied to scale, RD-SP-1)*
-**Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
-- `docs/Planning/Phases/Phase19_ScaleGrids.md`
+*No active phase (Phase19 closed 2026-10-15). Next in the Future list: Skin Maps (RD-SV-1).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
-*(**Held 2026-10-14 until Phase15 – 19 are done**, Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
+*(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
 
 ==================================================================================
 ## Future
@@ -201,3 +199,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a contributor can craft a set of teeth, a skin or an eye that fits the character's own part mesh, keep their name on it, and see it pictured on that part.
 - `docs/Planning/Phases/Complete/Phase18_CharacterLibrary.md`
 *Closed 2026-10-15: four named part meshes with a kit each, a fitted teeth set and eye checked against their UVs and pictured on their parts, published in `matterlib-0.2.0-dev.8`; the skin is* Skin Maps*', next (RD-P18-10).*
+
+### Phase19 — Scale Grids — COMPLETE
+**Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
+- `docs/Planning/Phases/Complete/Phase19_ScaleGrids.md`
+*Closed 2026-10-15: seven scale grids, the scale view in Blender and the rig, the golden's cube in the 1 m grid; UVs in metres seeded as its own phase (RD-P19-4).*

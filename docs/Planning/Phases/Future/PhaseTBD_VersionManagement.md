@@ -47,6 +47,7 @@ The release machinery exists and has cut one pilot (`matterlib-0.1.0`). What has
 
 - **Retiring an article must not break the compositions that use it** (`261014_R_MaterialPipeline.md` F-MP-31). The old release stays installable, and the composition's pin finds it. What a consumer tells the Creator is open (`Experience_MatterLibrary.md` §Open Experience Questions).
 - **The team's console** (*The Library Console*, seeded 2026-10-14) is where a maintainer cuts the next release. This phase owns the rules it follows.
+- **A higher resolution is an option of one material, not a new one** (carried 2026-10-15 from [Phase19](../Complete/Phase19_ScaleGrids.md), RD-P19-1). The lead, asked whether an 8k copy of a 2k texture is a new material: *"New resoution option of one material."* A resolution option never changes the article's identity or its size (`meters_per_tile`; [Identity](../../../specs/Ontology/Identity.md) §Scale tags). **How an option ships** (in the manifest, the catalog, the install, and what a consumer picks) is this phase's to settle.
 
 ## Dependencies / related
 

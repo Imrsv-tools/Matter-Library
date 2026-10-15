@@ -111,7 +111,7 @@ Defaults are OpenPBR's (weight 0; coat IOR 1.6; coat darkening 1; fuzz roughness
 
 ## Scale view (the swap rule a scale grid tests)
 
-*(Phase19, 2026-10-15; D-4 in `docs/Planning/Phases/Phase19_ScaleGrids.md`.)* A **scale view** swaps every library material in a scene for the [scale grid](../../Glossary.md) nearest that material's real size, so that a mesh breaking the UV-unit rule above shows by eye: its grid lines do not match its neighbours'. The grids are `Diagnostic_ScaleGrid_Clean_Base_<tag>_v01`, one per scale tag, plus the `sUKN` hatch. A consumer that builds a scale view applies this rule unchanged:
+*(Phase19, 2026-10-15; D-4 in `docs/Planning/Phases/Complete/Phase19_ScaleGrids.md`.)* A **scale view** swaps every library material in a scene for the [scale grid](../../Glossary.md) nearest that material's real size, so that a mesh breaking the UV-unit rule above shows by eye: its grid lines do not match its neighbours'. The grids are `Diagnostic_ScaleGrid_Clean_Base_<tag>_v01`, one per scale tag, plus the `sUKN` hatch. A consumer that builds a scale view applies this rule unchanged:
 
 - **Which grid:** the scale tag nearest the article's `meters_per_tile` on a log scale; a tie goes to the larger grid.
 - **Its size:** the binding's `uv_scale` becomes the old value × (the grid's tile ÷ the article's `meters_per_tile`). `uv_scale` divides, so the grid then draws at true size wherever the article would have.
