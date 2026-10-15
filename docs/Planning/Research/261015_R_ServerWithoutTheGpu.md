@@ -144,32 +144,57 @@ The dev catalog for the site's staging needs no server: it is a GitHub pre-relea
 
 ---
 
+## Pass 4 — The service on the platform's web server: what it takes (2026-10-15)
+
+**The lead, verbatim:** *"Scale grids have started, Skin maps then as you list. So we would run the library service on the same box as IMRSVWeb I presume?"*
+
+- **F-SV-10 — The gate is light enough for a box without a GPU.**
+  - `run_all.py` builds its own environment with `uv`, from `pyproject.toml` (Python 3.12, MaterialX 1.39.5 from pip; `ToolingConventions.md` §Entry points).
+  - It does not reference the from-source USD toolchain: a grep of `tools/validators/run_all.py` for `USD_TOOLS` and `toolchain` finds nothing.
+  - Its encoder lanes SKIP without `compressonatorcli` and say so (§Environment).
+
+  So the server runs the gate with no toolchain build. **Unverified until discovery:** which of the 17 lanes skip there and why. Every skip is reported, never counted as a pass.
+- **F-SV-11 — The server needs no git credentials.**
+  - The repo is public, so the server reads it with no secret.
+  - **The laptop's worker, which already commits, writes the accepted package into git** after the rig, and a push stays the lead's word.
+  - The only things on the box are the inbox, the queue, the results at web size, and its place on the team's private network.
+
+  This is stronger than F-RO-10's exclusion: nothing on the box can write to the repo.
+- **F-SV-12 — What makes it safe to share the platform's box:**
+  - **Its own service, from this repo's code.** It is not part of the platform's app. If it ever pinches, it moves to (b) as the same service.
+  - **Private network only.** No public door until *Contribution Path* opens one.
+  - **Low priority under the site.** It shares the box with the platform's website, so it runs below it.
+  - **No agent sessions and no contributor code** (F-RO-10, F-MP-28).
+- **F-SV-13 — It is the platform's box, so it is an ask across repos.** "Host the library's service on the web server" goes in PlatformDependencies as an ask from the library to IMRSV, when the service's discovery opens. The lead owns both repos, so his word settles it. The row records it for the platform's own sessions, which deploy to that box.
+
+---
+
 ## Open questions
 
 | Id | Question | Recommendation |
 |---|---|---|
-| Q-SV-1 | **Re-scope *The Library Service* to a server without a GPU** (the gate on push, the package inbox, the queue), with the laptop as a worker that pulls rig jobs (F-SV-7)? | **Yes.** It moves everything that needs no GPU off the laptop now, keeps RD-MP-12, and a GPU server later is one more worker. |
-| Q-SV-2 | **Where that server runs:** (a) the platform's existing web server, as the library's own service on the private network; (b) a small server of the library's own; or (c) GitHub alone (F-SV-8)? | **(a) to start, (b) if it pinches.** |
-| Q-SV-3 | **What runs after Phase18:** Skin Maps (RD-P18-10, *"straight after this one"*) or Phase19 Scale Grids (RD-DS-8)? | The lead's call. Scale Grids is small and has its Brief ready; Skin Maps follows on from Phase18's body kit. |
+| ~~Q-SV-1~~ → RD-SV-2 | **Re-scope *The Library Service* to a server without a GPU** (the gate on push, the package inbox, the queue), with the laptop as a worker that pulls rig jobs (F-SV-7)? | **Yes.** It moves everything that needs no GPU off the laptop now, keeps RD-MP-12, and a GPU server later is one more worker. |
+| ~~Q-SV-2~~ → RD-SV-2 | **Where that server runs:** (a) the platform's existing web server, as the library's own service on the private network; (b) a small server of the library's own; or (c) GitHub alone (F-SV-8)? | **(a) to start, (b) if it pinches.** |
+| ~~Q-SV-3~~ → RD-SV-1 | **What runs after Phase18:** Skin Maps (RD-P18-10, *"straight after this one"*) or Phase19 Scale Grids (RD-DS-8)? | The lead's call. Scale Grids is small and has its Brief ready; Skin Maps follows on from Phase18's body kit. |
 | Q-SV-4 | **Tidy the Roadmap to Pass 1** (F-SV-2): See the Library's library side marked complete; Parity Baselines and Author a Material End to End marked folded; Release Bundle narrowed; ledger M9 updated (F-SV-3)? | **Yes, as one quick fix** once Q-SV-1 to Q-SV-3 are cut. |
 
 ## Resolved
 
-*(none yet)*
+- **RD-SV-1 — After Phase19 Scale Grids (started), Skin Maps, then Pass 3's order as listed** (the lead, 2026-10-15: *"Scale grids have started, Skin maps then as you list"*). Closes Q-SV-3. It settles F-SV-4's two claims on the slot after Phase18: Scale Grids took it, and Skin Maps follows.
+- **RD-SV-2 — *The Library Service* is re-scoped to a server without a GPU, run as the library's own service on the platform's web server, on the team's private network; the laptop pulls rig jobs from it** (read from the lead's question, 2026-10-15: *"So we would run the library service on the same box as IMRSVWeb I presume?"*; restated to him for correction). Closes Q-SV-1 and Q-SV-2 at (a). F-SV-12's conditions bind; (b) stays the exit if it pinches.
 
 ## Status
 
-- **Passes captured:** 3 (2026-10-15): the audit, the split, the draft order.
+- **Passes captured:** 4 (2026-10-15): the audit, the split, the draft order, and the service on the web server.
+- **Ruled:**
+  - **RD-SV-1:** Phase19 Scale Grids runs now, then Skin Maps, then Pass 3's order;
+  - **RD-SV-2:** the service is re-scoped to a server without a GPU, on the platform's web server, on the private network, with the laptop pulling rig jobs. This one is read from the lead's question and restated for correction.
 - **Current direction:**
   - the GPU work stays on the laptop;
-  - a server without a GPU takes everything else, starting with the gate on push and the package inbox;
-  - the laptop pulls rig jobs from it;
-  - the console follows;
-  - *See the Library*, *Parity Baselines* and part of *Release Bundle* are already largely done.
-- **Open:**
-  - Q-SV-1 and Q-SV-2 shape the next phase;
-  - Q-SV-3 is the slot after Phase18;
-  - Q-SV-4 is the tidy, once the others are cut.
-- **Next step:** the lead cuts. The ruling lands in `## Resolved` first. Then:
+  - the service, with no GPU, runs the gate on push, the package inbox and the queue;
+  - the console follows on the same box;
+  - the server holds no git credentials (F-SV-11).
+- **Open:** Q-SV-4, the Roadmap tidy to Pass 1 and Pass 3, which is ready to run.
+- **Next step:**
   - Q-SV-4 as a lead-directed `/quick-fix`;
-  - `/discovery` on the re-scoped *Library Service* when its turn comes.
+  - `/discovery` on the re-scoped *Library Service* after Skin Maps. It adds the PlatformDependencies ask (F-SV-13).
