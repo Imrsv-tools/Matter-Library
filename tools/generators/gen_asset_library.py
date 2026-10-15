@@ -48,6 +48,15 @@ out_dir = post[0] if post else os.path.join(REPO, "blender/asset_library")
 os.makedirs(out_dir, exist_ok=True)
 
 
+def meters_per_tile(mtlx):
+    """The article's recorded tile size (``imrsv_metadata`` ``meters_per_tile``), or None."""
+    import xml.etree.ElementTree as ET
+    for el in ET.parse(mtlx).getroot().iter("input"):
+        if el.get("name") == "meters_per_tile":
+            return float(el.get("value"))
+    return None
+
+
 def selectable_articles():
     """Every Creator-selectable article in the WORKING TREE (RD-5: creator_selectable), with
     its status (Phase07 7.2). It read `matterlib-0.1.0`'s frozen catalog until then, so a new
@@ -103,6 +112,12 @@ def main():
         notes = None
 
         mat[IDENTITY_PROP] = a["identity"]          # §1 durable carrier
+        # Phase19 D-5: the scale view needs each material's real size, and a material otherwise
+        # reaches Blender with only its name, whose tag misreports the 15 off-tag articles. Stamped
+        # HERE, not in blender/masters/load_article.py, whose hash every thumbnail keys on (F-P19-2).
+        mpt = meters_per_tile(a["mtlx"])
+        if mpt is not None:
+            mat["ml_meters_per_tile"] = mpt
         if mat.asset_data is None:
             mat.asset_mark()
         ad = mat.asset_data

@@ -49,6 +49,7 @@ from bpy_extras.io_utils import ExportHelper
 from . import lcd_usd_edit
 from . import lcd_sparse
 from . import lcd_portable
+from . import scale_view
 from .lcd_sparse import LCD_TRAVEL_PORTS, _COLOR3_PORTS
 
 bl_info = {
@@ -351,9 +352,11 @@ def _menu_func_export(self, context):
 def register():
     bpy.utils.register_class(WM_OT_imrsv_lcd_usd_export)
     bpy.types.TOPBAR_MT_file_export.append(_menu_func_export)
+    scale_view.register()          # Phase19 19.2: the Matter tab's scale view (D-6)
 
 
 def unregister():
+    scale_view.unregister()
     bpy.types.TOPBAR_MT_file_export.remove(_menu_func_export)
     bpy.utils.unregister_class(WM_OT_imrsv_lcd_usd_export)
 
