@@ -324,3 +324,10 @@ Read against the tree on 2026-10-14, and again on 2026-10-15 (Pass 2, with Phase
   4. **19.4:** the golden cube in the 1 m grid (D-8), then click 5.
 - **Sitting files** (scratch, not committed): `/tmp/claude-p19/click1/build_powers.py` (click 1 as it passed); `/tmp/claude-p19/click2/` (`scale_test.blend`, its record, and `view_scale_test.py`, which registers the add-on for a session). Rebuild them from the builders; do not trust them to survive a reboot.
 - **Unresolved:** none with the lead. Click 1's first scene (each grid on a 1 m card), then a checker, were rejected; the powers-of-ten form and a neutral background passed.
+- **Owed from click 1, not exercised:** the Asset Browser drag (find the grids under *Matter / Utility / Virtual*, drag one onto an object). The scene changed form at the sitting, and the drag was never done. Ask for it at the next sitting. The line hues (D-2, blue 1 m) were seen, never judged on their own: *"NOW we can see the colos of the grid clearly"*.
+- **Learnings owed at the close** (`docs/Learnings/Blender/`, found driving the lead's Blender 5.2.2 at click 1):
+  - Each factory workspace carries a mode: *Texture Paint* opens in paint mode with half the window an image editor, and *Sculpting* opens in sculpt mode. Set `workspace.object_mode = "OBJECT"` on any workspace built for a viewer.
+  - `bpy.ops.workspace.duplicate()` from a script, then a rename in the same call, crashed the GUI (*"Couldn't find layout in this workspace"*).
+  - `bpy.ops.screen.area_close()` with an area override works from a script, and its neighbours expand into the space.
+  - In camera view, `view_camera_zoom` did not frame the camera from a script. A perspective view copied from the camera does, with the viewport `lens` at twice the camera's to match its field (measured here).
+  - A bpy struct's Python wrapper is new on each access, so compare with `!=`, never `is`.
