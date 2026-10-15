@@ -90,6 +90,9 @@ def working_tree_catalog() -> dict:
         # Phase16 (RD-P16-11, RD-DS-2): who gave it and its licence, read from the FILE; a field
         # the file does not declare is left out (not known yet, RD-WS-1).
         entry.update({k: art[k] for k in ("contributor", "licence") if art[k]})
+        # Phase18 (RD-P18-2): the part mesh a fitted article's own picture is drawn for
+        if art["fits"]:
+            entry["fits"] = art["fits"]
         if not (SOURCE / entry["payload_path"]).is_file():
             raise SystemExit(f"cannot serve {art['mtlx']}: expected payload {entry['payload_path']}")
         entries.append(entry)

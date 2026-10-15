@@ -106,6 +106,7 @@ def articles() -> list[dict]:
             "master": master_of(mtlx),
             "contributor": metadata_of(mtlx).get("contributor", ""),     # Phase16 (RD-P16-11)
             "licence": metadata_of(mtlx).get("licence", ""),             # Phase16 (RD-P16-1)
+            "fits": metadata_of(mtlx).get("fits", ""),                   # Phase18 (RD-P18-2)
             "creator_selectable": mtlx.stem not in SYSTEM,
             **taxonomy_of(mtlx, rel), "identity": mtlx.stem, "mtlx": mtlx,
         })

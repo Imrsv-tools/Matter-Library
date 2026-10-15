@@ -354,6 +354,24 @@ def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path])
     os.replace(tmp, dest)
 
 
+KIT_FILES = (".usda", ".obj", "_layout.png", "_islands.png")
+
+
+def write_kit_zip(dest: Path, mesh_id: str) -> None:
+    """A part mesh's kit (Phase18, RD-P18-4), made from the pinned pack and zipped with fixed
+    times, so the same pack gives the same bytes: the mesh, its layout, its islands, the README."""
+    sys.path.insert(0, str(REPO / "tools" / "converters" / "fit"))
+    import make_kits  # noqa: PLC0415 (heavy: parses the pinned CC0 pack)
+    kit = make_kits.make(mesh_id)
+    tmp = dest.with_name(dest.name + ".tmp")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+        for name in [f"{mesh_id}{s}" for s in KIT_FILES] + ["README.md"]:
+            info = zipfile.ZipInfo(f"{mesh_id}/{name}", ZIP_TIME)
+            info.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(info, (kit / name).read_bytes())
+    os.replace(tmp, dest)
+
+
 def write_jpeg(src: Path, dest: Path, size: int | None = None) -> None:
     """A baseline sRGB JPEG of ``src``, resized to ``size`` px square when given."""
     im = Image.open(src).convert("RGB")
@@ -397,6 +415,8 @@ def build(tag: str, out: Path) -> dict:
         # Phase16 (RD-P16-11): who gave it and its licence, read from its own file; a field the
         # file does not declare is left out (not known yet, RD-WS-1).
         rec.update({k: art[k] for k in ("licence", "contributor") if art[k]})
+        if art["fits"]:                                      # Phase18 (RD-P18-2)
+            rec["fits"] = art["fits"]
         if art["group"] == G.CHARACTER:                      # Phase15: Character's own taxonomy
             rec.update(species=art["species"], part=art["part"])
         for key in ("summary", "search_words", "origin"):    # the words (13.2), when written
@@ -467,11 +487,23 @@ def build(tag: str, out: Path) -> dict:
         hdris.append(hdri_entry(h, thumb, sha256(out / thumb)))
         assets.append(thumb)
 
+    kits = []
+    for mesh_id, mesh in G.PART_MESHES.items():      # Phase18 (RD-P18-4): what a contributor paints on
+        kname = f"kit__{mesh_id}.zip"
+        write_kit_zip(out / kname, mesh_id)
+        kits.append({"id": mesh_id, "family": mesh["family"], "species": mesh["species"],
+                     "what": mesh["what"], "parts": mesh["parts"], "rig_parts": mesh["rig_parts"],
+                     "map_size": mesh["map_size"], "uv_sha256": mesh["uv_sha256"],
+                     "file": kname, "sha256": sha256(out / kname)})
+        assets.append(kname)
+
     site_name = f"matterlib-{release}.site.json"
     site = {"schema_version": SITE_SCHEMA_VERSION, "release": release,
             "made": dt.date.today().isoformat(), "draft": True,
             "groups": GROUPS,
             "materials": sorted(materials, key=lambda r: r["id"])}
+    if kits:
+        site["kits"] = kits
     if hdris:
         site["hdris"] = sorted(hdris, key=lambda r: r["id"])
         site["default_hdri"] = H.default(listed)
