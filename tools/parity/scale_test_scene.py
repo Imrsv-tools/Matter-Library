@@ -27,6 +27,7 @@ import bpy
 REPO = Path(__file__).resolve().parent.parent.parent
 LIB = REPO / "blender" / "asset_library" / "MatterLibrary.blend"
 KIT = REPO / "library" / "kits" / "MakeHuman_Body_v01" / "MakeHuman_Body_v01.usda"
+TEETH_KIT = REPO / "library" / "kits" / "MakeHuman_Teeth_v01" / "MakeHuman_Teeth_v01.usda"
 ARGS = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = Path(ARGS[0])
 SMOKE = "--smoke" in ARGS
@@ -106,6 +107,24 @@ def plane(name, w, h, loc, rot, mat, uv_tile):
     return ob
 
 
+def import_kit(kit, keep=None):
+    """A part-mesh kit's meshes (those named ``keep*``, or all), unparented with their world
+    transform kept (the importer's Y-up rotation lives on the parent); everything else removed."""
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.ops.wm.usd_import(filepath=str(kit))
+    imported = list(bpy.context.selected_objects)
+    meshes = [o for o in imported if o.type == "MESH" and (keep is None or o.name.startswith(keep))]
+    bpy.context.view_layer.update()
+    for o in meshes:
+        world = o.matrix_world.copy()
+        o.parent = None
+        o.matrix_world = world
+    for o in imported:
+        if o not in meshes:
+            bpy.data.objects.remove(o, do_unlink=True)
+    return meshes
+
+
 def light():
     """Material Preview's own default studio HDRI, so a render matches the lead's view."""
     sc = bpy.context.scene
@@ -137,23 +156,30 @@ def build():
     ob = box("Copper_box", (1, 1, 1), (-0.4, 0.0, 0), m[COPPER], None)
     note(ob, COPPER, "Blender's default 0-1 UVs on a 1 m box: one 10 cm tile across each face",
          "WRONG: its 10 cm grid drawn 10x too large (one 10 cm cell per metre)")
-    ob = box("Teeth_on_a_plinth", (0.3, 0.3, 0.3), (0.9, -0.8, 0), m[TEETH], 1.0)
-    note(ob, TEETH, None, "the hatch: a fitted picture tiles nothing (RD-P18-8), so it has no grid size")
+    # the fitted teeth on their own part mesh (the lead, click 2: teeth on a plain box "is just
+    # strange"); drawn enlarged so they can be seen across the set: the hatch has no size to judge
+    teeth = import_kit(TEETH_KIT)
+    bpy.context.view_layer.update()
+    pts = [o.matrix_world @ v.co for o in teeth for v in o.data.vertices]
+    width = max(p.x for p in pts) - min(p.x for p in pts)
+    grow = round(0.35 / width)
+    cx = (max(p.x for p in pts) + min(p.x for p in pts)) / 2
+    cy = (max(p.y for p in pts) + min(p.y for p in pts)) / 2
+    for o in teeth:
+        o.name = f"MakeHuman_{o.name.split('.')[0].lower()}"
+        o.scale = [s * grow for s in o.scale]
+        o.location = ((o.location.x - cx) * grow + 0.9, (o.location.y - cy) * grow - 0.8,
+                      (o.location.z - min(p.z for p in pts)) * grow)
+        o.data.materials.clear()
+        o.data.materials.append(m[TEETH])
+        note(o, TEETH, None, f"the hatch: a fitted picture tiles nothing (RD-P18-8), so it has no "
+             f"grid size (the teeth part mesh, drawn {grow}x real size so it can be seen)")
     ob = box("Steel_crate", (0.6, 0.6, 0.6), (3.3, 0.2, 0), m[STEEL], 0.3)
     ob.scale = (2.5, 2.5, 2.5)
     note(ob, STEEL, "a 0.6 m crate with right UVs, brought in at 2.5x its size (1.5 m)",
          "WRONG: its 10 cm grid drawn 2.5x too large")
 
-    bpy.ops.wm.usd_import(filepath=str(KIT))
-    imported = list(bpy.context.selected_objects)          # the kit brings Body, Lips and Nails
-    body = next(o for o in imported if o.type == "MESH" and o.name.startswith("Body"))
-    bpy.context.view_layer.update()
-    world = body.matrix_world.copy()          # the importer's Y-up rotation lives on the parent
-    body.parent = None
-    body.matrix_world = world
-    for o in imported:
-        if o != body:
-            bpy.data.objects.remove(o, do_unlink=True)
+    body = import_kit(KIT, keep="Body")[0]     # the kit brings Body, Lips and Nails
     body.name = "MakeHuman_body"
     body.location = (1.9, 0.3, 0)
     body.data.materials.clear()
