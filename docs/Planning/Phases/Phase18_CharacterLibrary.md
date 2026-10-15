@@ -349,7 +349,7 @@ The seed made this your call: *"Whether they run inside this phase or ahead of i
   2. `CONTRIBUTING.md`: a Character path (the kit, `fits`, `base_color_map_tex`, G8; F-P18-8).
   3. Re-serve the dev install (`serve_to_stage.py`) and read `fits` on the two fitted entries.
   4. Build `matterlib-0.2.0-dev.8` (`build_snapshot.py --tag matterlib-0.2.0-dev.8`); count the assets (`dev.7` + 2 articles' files + 4 kits).
-  5. Publishing needs the commits on `origin/main`: ask the lead for **push and publish dev.8** (one word covers both). 8 commits are unpushed (`git log origin/main..HEAD`).
+  5. Publishing needs the commits on `origin/main`: ask the lead for **push and publish dev.8** (one word covers both). 7 commits are unpushed at the suspend (a P17 retro and this phase's six; re-check with `git log origin/main..HEAD`).
   6. Ledger: claim the next free `P` id (P28 as of this suspend) for Stage — read an article's own `base_color_map` value when the binding supplies none (RD-P18-9) — and a note on M11 (`fits`, `kits[]`); tell the website's live session.
   7. Click 4 on dev.8's release page. Then the close (`execute_close.md`), which conforms the specs listed in §In now's last row and corrects the SkinMaps draft's F-SKM-10 label (F-P18-1).
 - **Open items carried:** the masters' hash covers `blender/masters/article.py` and `load_article.py`, so any edit there re-makes all 82 thumbnails (~45 min); a candidate for the close's deferral ledger. The kits' `.blend` sitting files in `library/kits/` are git-ignored and need no clean-up.
