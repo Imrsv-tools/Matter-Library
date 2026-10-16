@@ -77,15 +77,15 @@ The #5 set runs `rig.py <article> --no-blender` and `rig.py --character Teeth_Na
 ## Resolved
 
 - **RD-UEA-1 — take the diamond test, then #5, in this sitting** (the lead, 2026-10-16: *"continue"*, answering the `▶` *"Go: the diamond test, then #5 as a quick fix"*). *Read as:* the go-ahead for both, and for making `index` the default on a yes. The precedent for that is already recorded: *"A yes makes this the repair and the solid master's default, at a new runtime build"* (ledger M6, 2026-10-05). The publish and the push are not covered by it.
+- **RD-UEA-2 — merge, push, publish, and close #5** (the lead, 2026-10-16: *"Yes, Merge, Push, Publish, comment, close"*). Carried out the same day: merge `6612b01`, `unreal-runtime-v5`, Issue #5 commented on and closed.
 
 ## Status
 
 - **Passes captured:** 4, all 2026-10-16. A sweep, the grid's wander read in the engine source, the probe's shape, and the probe and both repairs run.
-- **Current direction.** All three of this machine's faults are dealt with in the tree. The grid's wander is fixed (`2d32a4c`), and the solid master bends (`5504252`). The solid master's colour with depth is still unmeasured. **Both fixes are built and run here, and neither has reached a caller:** the pin is still `unreal-runtime-v4`. The local package at `unreal/dist/MatterRuntime-Linux.tar.gz` is built from both.
+- **Current direction.** Two of this machine's three faults are fixed and published. The grid's wander is fixed (`2d32a4c`), and the solid master bends (`5504252`). The solid master's colour with depth is still unmeasured. **Published 2026-10-16** (RD-UEA-2): pushed to `6612b01` (a merge of the sibling's label work, its ledger conflict resolved by keeping both sides' rows), `unreal-runtime-v5` published from it and pinned. Fetched through the pin, it draws byte for byte as the build tested before it (Diamond, GreyCard, Granite, and the character scale view, all views). Issue #5 is commented on and closed.
 - **Owed, in order:**
-  1. The lead: push, then `bash unreal/publish.sh 5`, then commit and push `unreal/RUNTIME.json`. `publish.sh` uploads the tarball already built at `unreal/dist/` and tags `HEAD`, which carries both fixes. It does not package.
-  2. Issue #5: a comment with the fix and close it, once the runtime is published.
-  3. The library machine: the Blender column for the three solid stones, to judge how far they bend.
-  4. Unmeasured: the solid master's colour with depth (U13).
+  1. The library machine: the Blender column for the three solid stones, to judge how far they bend. It takes `unreal-runtime-v5` on its next rig run.
+  2. Unmeasured: the solid master's colour with depth (U13).
+  *(Was: "the lead's push and publish; Issue #5 closed after it". Done 2026-10-16.)*
 - **Owed to the platform:** written on the ledger. MA-Q7's answer is on M6, and the half-float note for a consumer's scale view is on P29.
 - **Open questions:** none for the lead.

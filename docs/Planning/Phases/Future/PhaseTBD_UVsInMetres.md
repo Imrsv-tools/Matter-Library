@@ -26,7 +26,7 @@ The change reaches the contract, every article, the kits, the masters in three t
 ## Open questions (settle during this phase)
 
 - How existing meshes and scenes migrate, and whether the two conventions coexist for a while.
-- Whether Unreal's mesh UVs need full precision. Small metre values may make Phase19's half-float finding (F-P19-9) moot. *(2026-10-16: since Issue #5's fix, the library's runtime keeps its UVs at full precision (`docs/Learnings/Unreal/Unreal.md` U14), so the rig no longer needs small values. It reaches the pinned runtime at the next publish. A consumer's own Unreal meshes still start at half precision.)*
+- Whether Unreal's mesh UVs need full precision. Small metre values may make Phase19's half-float finding (F-P19-9) moot. *(2026-10-16: since Issue #5's fix, the library's runtime keeps its UVs at full precision (`docs/Learnings/Unreal/Unreal.md` U14), so the rig no longer needs small values. It is in the pinned runtime from `unreal-runtime-v5` (published 2026-10-16). A consumer's own Unreal meshes still start at half precision.)*
 - What existing tools do about real-world material size (the lead's question). A `/research` before discovery may answer it.
 
 ## Discovery Log
