@@ -1,6 +1,6 @@
-# PhaseTBD — The File Name Is the Name
+# Phase20 — The File Name Is the Name
 
-**Status:** SEEDED (2026-10-16) — not numbered. A pointer-shell written by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"*. It is placed first in `## Future` by that word. `/discovery` fills it. **Starting discovery is a deliberate gate, the lead's call, never a slide.**
+**Status:** ACTIVE — IN DISCOVERY (2026-10-16). Numbered **Phase20** by the lead's *"/discovery P20 The File Name Is the Name"*, which also opened discovery. Seeded the same day by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"* (RD-LBL-8). *(In 2026-10-14 commits, Phase20 means Scale Grids, RD-DS-7; it closed as Phase19.)*
 
 ## Outcome
 
