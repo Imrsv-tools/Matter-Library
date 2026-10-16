@@ -19,7 +19,9 @@ You are generating **one candidate article** for the Matter Library, for a human
 
 ## 1. Plan — state it BEFORE writing anything
 
-Read what you need, then tell the maintainer your plan in a short block and continue (don't wait unless something is genuinely ambiguous):
+**Read `reference.md` (beside this skill) first, not the specs.** It holds the masters and the keys each needs, the name grammar and the layer rules in a few KB, and `uv run tools/converters/wishlist.py rules` prints the closed sets (taxonomy, scale tags, ports, layers on disk) from the gate's own tables; the specs the table below names are 90 KB together. Open a spec only for a question the sheet does not answer, and only the section it names. For a wish-list row, `uv run tools/converters/wishlist.py brief <row>` replaces the lookups: the row, what is on disk, its layers, the nearest recipe for its master and the Physically Based matches.
+
+Then tell the maintainer your plan in a short block and continue (don't wait unless something is genuinely ambiguous):
 
 | Decide | From |
 |---|---|

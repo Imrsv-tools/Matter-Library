@@ -3,6 +3,8 @@
 
     uv run tools/converters/wishlist.py next [N]           the next N rows to work (redo first, then proving order)
     uv run tools/converters/wishlist.py show <name>
+    uv run tools/converters/wishlist.py brief <name> [--no-pb]   a row's start: disk, layers, nearest recipe, Physically Based
+    uv run tools/converters/wishlist.py rules             the closed sets a recipe is checked against, from the validators
     uv run tools/converters/wishlist.py mark <name> <state> [--why TEXT] [--batch ID] [--name NEW]
     uv run tools/converters/wishlist.py verdict <name>     the rig's Moved verdict per slider, from its scorecard
     uv run tools/converters/wishlist.py keep <name>        the lead keeps it: row kept, recipe status set (below)
@@ -23,6 +25,7 @@ Storm and Blender agree. It never touches a release (``promote_release.py`` is t
 from __future__ import annotations
 
 import argparse
+import http.client
 import json
 import re
 import sys
@@ -35,6 +38,9 @@ REPO = Path(__file__).resolve().parents[2]
 LIST = REPO / "library" / "wishlist.yaml"
 RECIPES = REPO / "tools" / "converters" / "recipes"
 PARITY = REPO / "library" / "parity"
+sys.path.insert(0, str(REPO / "tools" / "validators"))   # validate_recipe's tables (imported lazily)
+MATERIALS = REPO / "MatterLibrary" / "materials"
+SHARED = REPO / "MatterLibrary" / "textures" / "shared"
 STATES = ("queued", "built", "stuck", "kept", "redo")
 KINDS = ("build", "rejudge")
 TOOLS3 = ("storm", "blender", "unreal")
@@ -141,6 +147,90 @@ def next_rows(rows: list[Row], n: int) -> list[Row]:
     return sorted(work, key=key)[:n]                    # sorted() is stable: list order breaks ties
 
 
+# --- a row's brief and the rules: what a build starts from, in one call each (token budget, 2026-10-16)
+
+def row_line(row: Row) -> str:
+    return dumps([row]).splitlines()[-1].strip()[2:]
+
+
+def material_words(name: str) -> list[str]:
+    """The Material token's words, most specific last: CarraraMarble -> ['Carrara', 'Marble']."""
+    token = name.split("_")[0]
+    return re.findall(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+", token) or [token]
+
+
+def layer_files(layers, shared: Path = SHARED) -> dict:
+    """Each named layer -> its file in shared/overlays or shared/masks, or None when it is not made yet."""
+    found = {}
+    for layer in filter(None, layers or ()):
+        hit = sorted(shared.glob(f"overlays/{layer}_overlay_*.png")) or sorted(shared.glob(f"masks/{layer}_*.png"))
+        found[layer] = hit[0].relative_to(shared).as_posix() if hit else None
+    return found
+
+
+def nearest_recipe(row: Row, recipes: Path = RECIPES) -> Path | None:
+    """The recipe to copy the shape of: same master, then same slot, then same domain, then kept over draft."""
+    domain, _, cls = (row.slot or "/").partition("/")
+    ranked = []
+    for f in sorted(recipes.glob("*.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if f.stem != row.name and d.get("master") == row.master and d.get("group", "matter") == "matter":
+            ranked.append(((d.get("domain") == domain and d.get("class") == cls, d.get("domain") == domain,
+                            d.get("status") in ("approved", "candidate")), f))
+    return max(ranked, key=lambda kf: kf[0])[1] if ranked else None    # max keeps the first of a tie
+
+
+def pb_matches(words: list[str]) -> list[str]:
+    """Physically Based entries matching any of the words, the most specific word's first."""
+    import lookup_physically_based as pb  # noqa: E402
+    items = pb.load_cached().get("data", [])
+    return list(dict.fromkeys(n for w in reversed(words) for n in pb.search(items, w)))
+
+
+def brief(row: Row, recipes: Path = RECIPES, materials: Path = MATERIALS, shared: Path = SHARED,
+          pb: bool = True) -> list[str]:
+    stem = row.name.rsplit("_", 1)[0]
+    on_disk = ", ".join(p.name for p in sorted(recipes.glob(f"{stem}_v*.json"))) or "none"
+    mtlx = ", ".join(sorted(p.relative_to(materials).as_posix() for p in materials.rglob(f"{stem}_v*.mtlx"))) or "none"
+    out = ["row      " + row_line(row), f"on disk  recipes: {on_disk} · mtlx: {mtlx}"]
+    layers = layer_files(row.layers, shared)
+    if layers:
+        out.append("layers   " + " · ".join(f"{k} {v or 'MISSING: make it first (/matter-generate 3a)'}"
+                                         for k, v in layers.items()))
+    near = nearest_recipe(row, recipes)
+    out.append(f"nearest  recipes/{near.name}" if near else "nearest  none (no recipe declares this master yet)")
+    if pb:
+        try:
+            hits = ", ".join(pb_matches(material_words(row.name))[:12]) or "no entry; judgement"
+        except (OSError, http.client.HTTPException, ValueError) as e:   # offline, a cut-short download
+            hits = f"unreachable ({type(e).__name__}); run lookup_physically_based.py search <word> later"
+        out.append("pb       " + hits)
+    if row.redo:
+        out.append(f"REDO     {row.redo}")
+    return out
+
+
+_TAG_METRES = {"s0001": "1 mm", "s001": "1 cm", "s01": "10 cm", "s1": "1 m", "s10": "10 m", "s100": "100 m",
+               "sUKN": "tiles nothing"}
+
+
+def rules(shared: Path = SHARED) -> list[str]:
+    """The closed sets a recipe is checked against, read from the validators and the schema, never copied."""
+    import validate_recipe as V  # noqa: E402  (its TAXONOMY is G3's; MAX_OVERLAYS is assemble_mtlx's)
+    props = json.loads((REPO / "tools" / "converters" / "recipe.schema.json").read_text(encoding="utf-8"))["properties"]
+    tags = props["scale_tag"]["enum"]
+    names = lambda pat: ", ".join(sorted(f.name for f in shared.glob(pat))) or "none"  # noqa: E731
+    return [
+        "masters      " + ", ".join(props["master"]["enum"]),
+        "taxonomy     " + " · ".join(f"{d}: {', '.join(sorted(c))}" for d, c in V.TAXONOMY.items()),
+        "scale tags   " + " · ".join(f"{t} = {_TAG_METRES.get(t, '?')}" for t in tags),
+        f"overlay cap  {V.MAX_OVERLAYS} overlays + 1 mask",
+        "lcd_ports    " + ", ".join(props["lcd_ports"]["items"]["enum"]),
+        "overlays     " + names("overlays/*.png"),
+        "masks        " + names("masks/*.png"),
+    ]
+
+
 # --- the rig's verdict (reused: tools/parity/rig.py moved_verdict, Phase06 D9) -------------------
 
 def _rig():
@@ -208,6 +298,9 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("next"); p.add_argument("n", nargs="?", type=int, default=5)
     p = sub.add_parser("show"); p.add_argument("name")
+    p = sub.add_parser("brief"); p.add_argument("name")
+    p.add_argument("--no-pb", action="store_true", help="skip the Physically Based lookup (offline)")
+    sub.add_parser("rules")
     p = sub.add_parser("mark"); p.add_argument("name"); p.add_argument("state", choices=STATES)
     p.add_argument("--why"); p.add_argument("--batch"); p.add_argument("--name", dest="new_name")
     p.add_argument("--lane", choices=("L1", "L2", "L3"), help="the way it was actually made, when it differs")
@@ -220,10 +313,16 @@ def main(argv=None) -> int:
     rows = load()
     if a.cmd == "next":
         for r in next_rows(rows, a.n):
-            print(dumps([r]).splitlines()[-1].strip()[2:])
+            print(row_line(r))
         return 0
     if a.cmd == "show":
-        print(dumps([find(rows, a.name)]).splitlines()[-1].strip()[2:])
+        print(row_line(find(rows, a.name)))
+        return 0
+    if a.cmd == "brief":
+        print("\n".join(brief(find(rows, a.name), pb=not a.no_pb)))
+        return 0
+    if a.cmd == "rules":
+        print("\n".join(rules()))
         return 0
     if a.cmd == "verdict":
         v = verdict(a.name)
