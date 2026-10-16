@@ -65,9 +65,24 @@ CREDIT_SCALARS = ("title", "source", "source_url", "asset_url", "edited_from_nam
 CREDIT_LISTS = {"authors": "AUTHOR", "sponsors": "SPONSOR"}
 
 
+def _settings() -> dict:
+    return (yaml.safe_load(SETTINGS.read_text(encoding="utf-8")) or {}) if SETTINGS.is_file() else {}
+
+
+def published(source_id: str, drop: str | None) -> str:
+    """The id the library publishes for a source HDRI id (RD-LBL-5): ``<Name>_<Variant>`` without
+    the Variant ``drop`` names (``AristeaWreck_PureSky`` -> ``AristeaWreck``); unchanged when
+    ``drop`` is unset or is not its Variant. The source file keeps its name either way."""
+    name, _, variant = source_id.partition("_")
+    return name if drop and variant == drop else source_id
+
+
 def on_disk() -> list[dict]:
-    """Every HDRI on disk: id, version, identity (the file stem), path and record ({} if none)."""
+    """Every HDRI on disk: id and identity as PUBLISHED (RD-LBL-5; the source's own when
+    ``published_drop_variant`` is unset), source_id, version, path (the source file) and record
+    ({} if none; keyed by the source id)."""
     files = sorted(p for p in HDRIS.iterdir() if p.is_file()) if HDRIS.is_dir() else []
+    drop = _settings().get("published_drop_variant")
     out = []
     for hdr in files:
         errs = vm.check_hdri(hdr)
@@ -76,17 +91,23 @@ def on_disk() -> list[dict]:
         hid, version = vm.hdri_id_version(hdr)
         rec_path = RECORDS / f"{hid}.yaml"
         record = (yaml.safe_load(rec_path.read_text(encoding="utf-8")) or {}) if rec_path.is_file() else {}
-        out.append({"id": hid, "version": version, "identity": hdr.stem, "path": hdr, "record": record})
+        pid = published(hid, drop)
+        out.append({"id": pid, "source_id": hid, "version": version, "identity": f"{pid}_{version}",
+                    "path": hdr, "record": record})
+    seen = [h["identity"] for h in out]
+    if len(seen) != len(set(seen)):
+        raise SystemExit(f"{SETTINGS.relative_to(REPO)}: published_drop_variant makes two HDRIs one name")
     return out
 
 
 def default(listed: list[dict]) -> str | None:
-    """The default HDRI's id; refuses one that names no listed HDRI."""
-    name = (yaml.safe_load(SETTINGS.read_text(encoding="utf-8")) or {}).get("default") \
-        if SETTINGS.is_file() else None
-    if listed and name not in {h["id"] for h in listed}:
+    """The default HDRI's published id. The setting names the source id (RD-LBL-5); one that names
+    no listed HDRI is refused."""
+    name = _settings().get("default")
+    by_source = {h.get("source_id", h["id"]): h["id"] for h in listed}
+    if listed and name not in by_source:
         raise SystemExit(f"{SETTINGS.relative_to(REPO)}: default {name!r} names no HDRI on disk")
-    return name
+    return by_source.get(name, name)
 
 
 def stale(src: Path, dst: Path) -> bool:

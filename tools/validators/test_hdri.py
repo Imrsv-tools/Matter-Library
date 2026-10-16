@@ -129,8 +129,9 @@ record = {
 }
 row = {"id": "Test_PureSky", "version": "v01", "record": record}
 f = H.facts(row)
-check(f["contributor"] == "MatterBot" and f["licence"] == "CC0-1.0" and f["name"] == "Ünïcode Sky (Pure Sky)",
-      "an HDRI's contributor is MatterBot, its licence and name come from its record")
+check(f["contributor"] == "MatterBot" and f["licence"] == "CC0-1.0" and "name" not in f
+      and f["credit"]["title"] == "Ünïcode Sky (Pure Sky)",
+      "an HDRI's contributor is MatterBot, its licence comes from its record, and the source's title is credit, not a name (RD-LBL-1)")
 check(f["credit"]["edited_from_name"] == "Snow Field 2"
       and f["credit"]["edited_from_url"] == "https://polyhaven.com/a/snow_field_2"
       and f["credit"]["edited_from"].startswith("Edited sky-only"),
@@ -166,10 +167,10 @@ with tempfile.TemporaryDirectory() as tmp:
     again = Path(tmp) / "again.hdr"
     H.stamp(dst, again, f)
     check(again.read_bytes() == out, "stamping a stamped file replaces its MATTER_ lines (idempotent)")
-    renamed = {**f, "name": "Another Name"}
+    renamed = {**f, "credit": {**f["credit"], "title": "Another Title"}}
     check(H.stamp_stale(src, dst, renamed), "a changed record makes the stamp stale, with no clock")
     try:
-        H.stamp(src, dst, {**f, "name": "two\nlines"})
+        H.stamp(src, dst, {**f, "contributor": "two\nlines"})
         check(False, "a value with a line break is refused")
     except ValueError as exc:
         check("line break" in str(exc), "a value with a line break is refused, for that reason")
