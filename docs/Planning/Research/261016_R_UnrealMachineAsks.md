@@ -45,14 +45,47 @@
 - **F-UEA-9 — the library can answer MA-Q7 itself, without waiting on the platform's look.** Build the masters with `index`, run the rig on `Diamond_Brilliant` in editor mode with `--no-blender`, then rebuild at the defaults. Look at the side view in both runs: does the wall behind the face sit in a different place? It is a disposable probe: no tracked file changes, and the masters go back to their defaults afterwards. **If it bends**, `index` becomes the solid master's default. That changes what the masters draw, so a new runtime is owed, the same publish as F-UEA-7's.
 - **F-UEA-10 — the solid master's flat colour rides the same probe.** All three articles on it (`Diamond_Brilliant`, `Sapphire_Natural`, `LeadCrystal_Clear`) can be read from the same two runs. Whether the colour deepens with thickness under `index` is unmeasured. It may be a second, separate fault in Epic's function (TG-Q5).
 
+## Pass 4 — the probe and the two repairs, built and run (2026-10-16)
+
+**Lead-directed graduation.** The lead answered the handback's `▶` (*"Go: the diamond test, then #5 as a quick fix"*) with *"continue"*, read as that go-ahead. Two `/quick-fix` commits and this record. Studio was running in game mode at the first check (15:49) and had exited by the next. Every Unreal launch was preceded by `ps -ef | grep "[U]nrealEditor"`, and none overlapped.
+
+- **F-UEA-11 — MA-Q7: yes, `index` bends the solid stones.** Editor mode, the masters built each way (`unreal/build.sh masters`, about 10 s each), the rig run `--no-blender` on Diamond, Sapphire and LeadCrystal. Under `function` the wall in the side view runs straight through all three, and they read as thin glass. Under `index` the wall behind the face moves, and the sphere shows an inverted image. The four thin articles drew **the same to the pixel** under both. Storm refracts nothing, so how far a stone *should* bend is judged against Blender, which this machine cannot render. **Q-UEA-1 answered.** Landed as the builder's default: `5504252`.
+- **F-UEA-12 — #5 fixed, by a run-time `UStaticMesh`, not `UDynamicMeshComponent`.** A third route turned up in the source: `UStaticMesh::BuildFromMeshDescriptions` with `bFastBuild` takes the given normals, tangents and binormal signs as they are, and a per-LOD override sets `bUseFullPrecisionUVs`. It keeps the 8-bit tangent basis, so only the UVs change, where the dynamic mesh would also have changed the tangents (F-UEA-7). Landed: `2d32a4c`. Packaged against the pinned v4, packaged to packaged (v4 renders byte-identical twice):
+  - **The character scale view** (#5's own command): Storm-to-Unreal ΔE2000 on the 3 cm swatches, cheek 6.35 → 3.68, forearm 5.26 → 2.89, hand 5.24 → 3.45, shirt 6.49 → 3.36, jeans 6.61 → 2.99. The cheek's lines now run as straight as Storm's. Half floats were costing precision below 128 too, not only on the cheek.
+  - **What should not move:** GreyCard inside its mask, 0 pixels in the full view and 2 pixels by 2 levels close up. Textured articles at their full view, at most 1 to 4 levels. Close up, more: Granite up to 76 levels on 3,051 pixels, and Glass_Reeded's normal-mapped flutes up to 94 levels on 7,277 pixels.
+  - **The two repairs do not interact:** #5's package with and without the refraction default is byte-identical on every article in the set above.
+- **F-UEA-13 — packaging on this machine needs `/usr/bin` first on `PATH`.** `RunUAT`'s staging runs `env`, and `~/.local/bin/env` (uv's shell snippet, not executable) answered first: *"Permission denied"*, after the Shipping binary was built. `docs/Learnings/Unreal/Unreal.md` U15.
+- **What was not run:** the whole Unreal column (104 articles). The set above is chosen to separate the two changes: one untextured article, four textured ones, a thin normal-mapped glass, the character, three solid and three thin see-through articles. The Blender column. The solid master's colour with depth (F-UEA-10, U13) was not measured.
+
+**The probe's scripts** (run from the job's scratch, all paths absolute). The refraction probe:
+
+```bash
+R=/home/peter/Documents/IMRSV_GITrepos/Matter-Library
+export UE=/home/peter/Documents/Unreal/Linux_Unreal_Engine_5.8.0
+export MATTER_UNREAL_EDITOR=$UE/Engine/Binaries/Linux/UnrealEditor
+for mode in function index; do
+  MATTER_MASTERS_REFRACTION=$mode bash $R/unreal/build.sh masters
+  for a in Diamond_Brilliant_Clean_Base_s01_v01 Sapphire_Natural_Clean_Base_s01_v01 LeadCrystal_Clear_Clean_Base_s01_v01; do
+    uv run --directory $R tools/parity/rig.py $a --no-blender --out <scratch>/$mode/$a
+  done
+done
+bash $R/unreal/build.sh masters      # back to the defaults
+```
+
+The #5 set runs `rig.py <article> --no-blender` and `rig.py --character Teeth_Natural_Clean_Base_sUKN_v01 --scale-view --no-blender`, once with nothing set (the pinned v4) and once with `MATTER_UNREAL_RUNTIME=$R/unreal/MatterRuntime/Packaged/Linux/MatterRuntime.sh` after `PATH=/usr/bin:$PATH UE=… bash unreal/build.sh package`. The comparison is per view, `unreal/defaults*.png` against the same view's `mask*.png` (above 127 is the article): the count of pixels whose largest channel difference passes 4, and the mean. The rig's own `scorecard.md` gives the ΔE above.
+
+## Resolved
+
+- **RD-UEA-1 — take the diamond test, then #5, in this sitting** (the lead, 2026-10-16: *"continue"*, answering the `▶` *"Go: the diamond test, then #5 as a quick fix"*). *Read as:* the go-ahead for both, and for making `index` the default on a yes. The precedent for that is already recorded: *"A yes makes this the repair and the solid master's default, at a new runtime build"* (ledger M6, 2026-10-05). The publish and the push are not covered by it.
+
 ## Status
 
-- **Passes captured:** 3, all 2026-10-16. A sweep, the grid's wander read in the engine source, and the diamond probe's shape.
-- **Current direction.** Three faults need this machine. All three are the library's own faults, and the platform's materials phase now leans on them: the grid's wander (#5), and the solid see-through master's bend and colour (M6). **Both repairs can end in one new runtime, `unreal-runtime-v5`, published at the lead's word.** Nothing else in the ledger is owed from this machine (F-UEA-1 to F-UEA-5).
-- **The offer, cheapest first.**
-  1. **The diamond probe** (F-UEA-9, F-UEA-10). Two masters builds and two rig runs of one article. No tracked change. It answers MA-Q7 for both repos.
-  2. **#5 as a `/quick-fix`** (F-UEA-6, F-UEA-7). The runtime's meshes move to `UDynamicMeshComponent`; a runtime build; the scale-view command from #5 re-run; the whole Unreal column re-run against the v4 pictures.
-  3. **One runtime publish** carrying whichever of the two landed. `unreal/publish.sh 5` is the lead's.
-- **Open questions:** none for the lead. Q-UEA-1, *does `index` bend the diamond?*, is answered by the probe.
-- **Not run:** everything in Pass 2 is read from the source. Nothing was built, launched or rendered.
-- **Owed to the platform, once landed:** F-UEA-8 as a note on P29; MA-Q7's answer on M6.
+- **Passes captured:** 4, all 2026-10-16. A sweep, the grid's wander read in the engine source, the probe's shape, and the probe and both repairs run.
+- **Current direction.** All three of this machine's faults are dealt with in the tree. The grid's wander is fixed (`2d32a4c`), and the solid master bends (`5504252`). The solid master's colour with depth is still unmeasured. **Both fixes are built and run here, and neither has reached a caller:** the pin is still `unreal-runtime-v4`. The local package at `unreal/dist/MatterRuntime-Linux.tar.gz` is built from both.
+- **Owed, in order:**
+  1. The lead: push, then `bash unreal/publish.sh 5`, then commit and push `unreal/RUNTIME.json`. `publish.sh` uploads the tarball already built at `unreal/dist/` and tags `HEAD`, which carries both fixes. It does not package.
+  2. Issue #5: a comment with the fix and close it, once the runtime is published.
+  3. The library machine: the Blender column for the three solid stones, to judge how far they bend.
+  4. Unmeasured: the solid master's colour with depth (U13).
+- **Owed to the platform:** written on the ledger. MA-Q7's answer is on M6, and the half-float note for a consumer's scale view is on P29.
+- **Open questions:** none for the lead.
