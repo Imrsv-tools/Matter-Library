@@ -78,6 +78,7 @@
 **What a second project tells the Unreal master builder (environment variables, all optional; 2026-10-05, `PlatformDependencies.md` M7):** `unreal/MatterRuntime/Scripts/build_masters.py` reads them, and its head is the owner of what each does. Unset, the build is the library's own runtime's, and the runtime published from here is built with none set. A value the builder does not know stops the build.
 - `MATTER_MASTERS_ROOT` — where the masters and their default textures are written: a package path, `/Game/<path>` or a plugin's content mount point (default `/Game/Masters`).
 - `MATTER_MASTERS_SKINNED=1` — the masters also draw on a skinned mesh with morph targets.
+- `MATTER_MASTERS_INSTANCED=1` — the masters also draw on an instanced static mesh (one mesh drawn many times, as Studio draws a USD prototype). Added by the platform, 2026-10-16 (`e8421df`); off by default, so the library's own runtime is unchanged and no new runtime is owed.
 - `MATTER_MASTERS_MESH_V=unreal` — the meshes' UVs are Unreal's (`v = 1 − t`), not USD's `st`.
 - `MATTER_MASTERS_MESH_BINORMAL=unreal` — the meshes' binormal runs along `+v`, so the normal map's green is turned.
 - `MATTER_MASTERS_SKY=0` — leave out the rig's Sky.
