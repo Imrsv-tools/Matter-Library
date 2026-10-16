@@ -84,11 +84,23 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 
 | Id | Question | Recommendation |
 |---|---|---|
-| Q-LBL-1 | **One readable name per material:** (a) as today, the website only; (b) derived from the file name by a better rule, shown everywhere; or (c) the confirmed hand labels moved into each material's file, shown everywhere? | **(b)**. One source, no drift; an override only where a rule cannot read. |
+| Q-LBL-2 | **HDRIs too?** Is an HDRI's name its file name (`AristeaWreck_PureSky_v01`, shown as *"AristeaWreck PureSky"*), with Poly Haven's title kept only as its credit? That answers the platform's ask A12 with no label. | **Yes.** It is the same rule, applied to both kinds of entry. |
+| Q-LBL-3 | **The one-line summary and the search words:** keep them? They describe a material without renaming it. | **Keep.** They are not names; the website and search use them. |
+| ~~Q-LBL-1~~ → RD-LBL-1 | **One readable name per material:** (a) as today, the website only; (b) derived from the file name by a better rule, shown everywhere; or (c) the confirmed hand labels moved into each material's file, shown everywhere? | **(b)**. One source, no drift; an override only where a rule cannot read. |
 
 ## Resolved
 
-*(none yet)*
+- **RD-LBL-1 — The file name is the name. The library makes no other name for a material, and never rearranges the file name's words.** A consumer may show the underscores as spaces, or as the breaks between the name's sections (Material · Variant · Condition · Detail). The words and their order stay the file's. (The lead, 2026-10-16, verbatim: *"I dont think we should be having name added. the name is the file name that is the description, we can remove (in studio etc) the underscoreds to the sections that define categories .... but we should not be rearanging filename words to make new names of materials... that will be SUPER confusing."*)
+  - **None of (a), (b) or (c):** it rules out the hand-written labels (a, c) and the reordered derived name (b, F-LBL-6).
+  - **It reverses RD-P13-3 for the labels only.** RD-P13-3, *"Confirmed as drafted"*, covered the words; this ruling withdraws the label part.
+  - Closes Q-LBL-1.
+  - **What it owes** (not done here):
+    - the site file's `label` is withdrawn, and consumers show `display_name`. [SiteFile](../../specs/Contract/SiteFile.md) §`label` gets a dated withdrawal note;
+    - the 85 hand labels leave the recipes;
+    - `/matter-batch` stops writing them;
+    - the website is told, through ledger M9, since it shows `label` today;
+    - a dev snapshot without labels, published at the lead's word.
+  - Whether it also covers HDRIs and the one-line summaries is put to the lead (Q-LBL-2, Q-LBL-3).
 
 ## Status
 
@@ -98,7 +110,19 @@ Either way, (a)'s split, where the website and Studio name a material differentl
   - it is kept in the recipe, not the `.mtlx`;
   - only the website sees it;
   - every material has a hand label, though the spec says "only where it reads badly".
-- **Open:** Q-LBL-1. **Since Pass 3 it also answers the platform's open ask A12** (a readable HDRI name in the dev catalog) and notes that A11 is answered in practice (F-LBL-8 to F-LBL-10).
+- **Ruled:** RD-LBL-1, 2026-10-16: the file name is the name; no added or rearranged names.
+- **Open:**
+  - Q-LBL-2: HDRIs follow the same rule, which answers the platform's A12;
+  - Q-LBL-3: keep the summaries and search words.
+
+  A11 is answered in practice (F-LBL-10).
+- **Owed by RD-LBL-1:** one quick fix:
+  - withdraw the site file's `label`;
+  - remove the 85 recipe labels;
+  - stop `/matter-batch` writing them. Its SKILL.md has a sibling session's uncommitted edit as of 2026-10-16, so that line waits for, or is filtered around, that session;
+  - tell the website through M9.
+
+  Then a dev snapshot, at the lead's word.
 - **Next step:**
   - the lead picks (a), (b) or (c);
   - (b) or (c) is a small phase or a `/quick-fix`, depending on whether the catalog gains a field. (c) is a contract change.
