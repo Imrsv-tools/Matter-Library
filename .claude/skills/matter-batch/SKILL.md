@@ -43,7 +43,7 @@ Run `/matter-generate` §1–5 with **the row as the brief**: its name, slot, ma
   - `"summary"`: one plain public line, 160 characters at most: what the matter is and where it is found (*"Bare mill-finish aluminium, a bright pale silver straight from the rolls, with no polish or anodising."*). No authoring talk (masters, lanes, phases); that stays in `_comment`.
   - `"search_words"`: lowercase words a person would type, synonyms included (`"aluminium", "aluminum", "bare metal", "metal"`).
   - `"origin"`: from its sources: `scan` (an ambientCG scan) · `procedural` (a generator) · `measured` (Physically Based values) · and always `agent-drafted`.
-  - `"label"` **only** where the name derived from the tokens reads badly (`Glass_Clear` derives "Glass clear": write `"Clear glass"`).
+  - **No `"label"`** (RD-LBL-1, 2026-10-16): the name is the file name. Never write a second name, and never rearrange the file name's words.
   - **Biological is not Matter** (RD-P13-2): its words name the body part it is for; never use it as an example.
 - **A scan with no physical size** (`import_ambientcg.py` prints `meters_per_tile 0`; common for stone): set `meters_per_tile` by judgement from the feature size (grain, bands), record it as a `judgement` source, and say so on the summary.
 - **A planned name that differs from the row's** (the skill's §1 re-plans it): `wishlist.py mark <old> queued --name <new>` before you continue. **A different way of making it** (no scan names the matter, so L3 becomes L2): `--lane L2`, and say why on the summary.
