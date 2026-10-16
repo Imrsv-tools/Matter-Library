@@ -77,8 +77,35 @@ red, not orange or pale pink.
 - **Any master change** a look-tuning loop at the sitting shows is needed. The platform makes no master of its own; a
   change is an ask here.
 
+## The exit sitting's looks — appended 2026-10-16
+
+Seen by the platform's lead in the platform's app, Desktop, on the masters as the library builds them. The platform
+changes no article and no master for these; each is the library's to tune.
+
+- **MA-Q7, the `index` build:** a solid gem (`Diamond_Brilliant`) bends and breaks up what is behind it — *"It breaks
+  up"*. The `REFRACTION=function` look on the same cube is still owed.
+- **Coat, fuzz, the stretched highlight** (`Porcelain_Glazed`, `Felt_Natural`, `Aluminium_Brushed`): read as intended
+  (*"I think so"*).
+
+**Q-PMU-4 — skin still reads as plastic.** On the Fitzpatrick skin articles, at the articles' start values and with
+the Creator's overlay, rotation and roughness controls moved across their range, the lead saw *"still plastic / no
+change I can see"*. *Ask:* a skin look that reads as skin under the platform's renderer — the library's call where it
+lies (the articles' values, their pictures, or the Subsurface master).
+
+**Q-PMU-5 — Felt's Roughness control moves nothing visible.** Measured: `Felt_Natural`'s roughness picture spans
+**0.88 – 0.94** (mean 0.91); the article adds the Creator's bias to it and clamps, under a fuzz weight of 0.9. A bias
+up clamps at 1; a bias down to ~0.6 stays under the fuzz. On `Aluminium_Brushed` the same control visibly changes the
+look. *Ask:* a felt whose Roughness control has room to show — or a note that the control is inert on high-fuzz cloth.
+
+**Q-PMU-6 — Felt's pattern is out of scale.** The lead: *"Felt looks out of scale"* on a 2 m cube — the fibres read
+centimetres long. *Ask:* check the article's `s001` tile size against its picture.
+
+**Q-PMU-7 — the eyes.** Only two eye articles exist (Green, Natural); *"Natural … looks scary"*. *Ask:* more eye
+colours, and a Natural eye that reads calm.
+
 ## Status
 
 - **Reports:** R-PMU-1 – 5 (P11, P17, P29, F-P19-9, P21).
-- **Asks:** Q-PMU-1 – 3 (a fit-set picture's carrier, the lips, the LED body and brightness).
-- **Owed to the library:** the exit sitting's looks (above).
+- **Asks:** Q-PMU-1 – 7 (a fit-set picture's carrier, the lips, the LED body and brightness, skin, Felt's roughness,
+  Felt's scale, the eyes).
+- **Owed to the library:** the `REFRACTION=function` look (MA-Q7).
