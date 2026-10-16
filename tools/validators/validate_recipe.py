@@ -321,7 +321,6 @@ OFF_SCALE_KNOWN = {
     "BeachSand_Dry_Clean_Base_s1_v01": 1.5,
     "OakLeaf_Natural_Clean_Base_s01_v01": 0.12,
     "Loam_Natural_Clean_Base_s1_v01": 1.4,
-    "Granite_Polished_Clean_Base_s1_v01": 0.4,
     "Marble_Veined_Polished_Base_s01_v01": 0.5,
     "Onyx_Polished_Clean_Base_s01_v01": 0.3,
     "Oak_Natural_Clean_Base_s1_v01": 0.8,
