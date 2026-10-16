@@ -324,7 +324,6 @@ OFF_SCALE_KNOWN = {
     "Granite_Polished_Clean_Base_s1_v01": 0.4,
     "Marble_Veined_Polished_Base_s01_v01": 0.5,
     "Onyx_Polished_Clean_Base_s01_v01": 0.3,
-    "Slate_Cleft_Clean_Base_s1_v01": 0.5,
     "Oak_Natural_Clean_Base_s1_v01": 0.8,
     "Paint_OnMetal_Chipped_Base_s01_v01": 0.3,
     "Lace_Floral_Clean_Base_s01_v01": 0.25,
