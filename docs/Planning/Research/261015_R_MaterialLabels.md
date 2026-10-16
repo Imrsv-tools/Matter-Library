@@ -66,6 +66,18 @@
 
 Either way, (a)'s split, where the website and Studio name a material differently, should end.
 
+## Pass 3 — The platform already asked for the same thing for HDRIs (2026-10-16)
+
+**Found while checking the platform's requests at the lead's word** (*"can you pull everything and check.. I think platfrom has a request"*).
+
+- **F-LBL-8 — Ask A12 is open and is this doc's question for HDRIs.** `261013_R_PlatformSkyAsks.md`, Pass 5 (2026-10-14) asks for *"a name a person reads on each HDRI (`hdris[].label`, Poly Haven's title without (Pure Sky))"*, in the dev catalog and the site file. Its footer: *"The library's to rule."* Measured at `cdacf44`:
+  - the site file carries an HDRI `label`, the source's own name with *(Pure Sky)* ([SiteFile](../../specs/Contract/SiteFile.md) §HDRIs);
+  - **the dev catalog carries none:** `serve_to_stage.py` writes `group`, `when`, `sky`, `licence`, `contributor` and `credit`.
+- **F-LBL-9 — Studio's material list reads what the dev catalog carries, by presence:** the picture, the contributor, the licence, the group, species, part and master. A `label` added there would reach Studio's picker as soon as Studio reads it. That is (b)'s and (c)'s "shown everywhere", on the platform's side.
+- **F-LBL-10 — Ask A11** (the HDRI rows' grouping in what the dev install serves) **looks answered in practice.** Since Phase15, the dev catalog gives every HDRI its `group` and the catalog its `groups[]`. The sky doc's footer still calls it open; its owed library pass can say so.
+
+**So Q-LBL-1 decides one rule for both kinds of entry.** Materials and HDRIs get a readable name from the same place, in the dev catalog and the site file alike. The HDRI version of (b) is the source's name with *(Pure Sky)* dropped, which is what the platform asked for.
+
 ---
 
 ## Open questions
@@ -80,13 +92,13 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 
 ## Status
 
-- **Passes captured:** 2 (2026-10-15): how it works today, and the choices.
+- **Passes captured:** 3: how it works today and the choices (2026-10-15), and the platform's matching HDRI ask (2026-10-16).
 - **Found:**
   - the label is the agent's draft, confirmed by the lead (RD-P13-3);
   - it is kept in the recipe, not the `.mtlx`;
   - only the website sees it;
   - every material has a hand label, though the spec says "only where it reads badly".
-- **Open:** Q-LBL-1.
+- **Open:** Q-LBL-1. **Since Pass 3 it also answers the platform's open ask A12** (a readable HDRI name in the dev catalog) and notes that A11 is answered in practice (F-LBL-8 to F-LBL-10).
 - **Next step:**
   - the lead picks (a), (b) or (c);
   - (b) or (c) is a small phase or a `/quick-fix`, depending on whether the catalog gains a field. (c) is a contract change.
