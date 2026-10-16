@@ -49,17 +49,21 @@ script was run in the library's own project the same day: its "built ..." lines 
 build before the switches, byte for byte. MATTER_MASTERS_INSTANCED came later (2026-10-10) and
 sets one usage only, as the skinned switch does.
 
-Two more are CANDIDATES, each for a question that is still open. The refraction one compiles and
-leaves the thin master right; whether the solid one then bends is not settled. The colour-sampler
-one has never been built:
+One more is a CANDIDATE, for a question that is still open. It has never been built:
 
   MATTER_MASTERS_COLOUR_SAMPLER=srgb    the colour slots sample an sRGB texture (a block-compressed
                                         colour picture carries its decode in its own flag, which a
                                         linear sampler refuses). Default linear
-  MATTER_MASTERS_REFRACTION=index       the Refraction input takes the article's index on the solid
-                                        see-through master and 1.0 on the thin one, in place of
-                                        the output of Epic's function, which bends nothing on
-                                        either (M6). Default function
+
+And one keeps the build that came before, to compare against:
+
+  MATTER_MASTERS_REFRACTION=function    the Refraction input takes the output of Epic's function,
+                                        which bends nothing on either see-through master (M6).
+                                        Default index: the article's index on the solid master
+                                        and 1.0 on the thin one. The default since 2026-10-16:
+                                        in the rig's side view the solid master then bends the
+                                        wall behind it, and the thin master's pictures are the
+                                        same to the pixel (research 261016_R_UnrealMachineAsks)
 """
 
 import os
@@ -88,7 +92,7 @@ MESH_V = _told("MATTER_MASTERS_MESH_V", "st", {"st", "unreal"})
 MESH_BINORMAL = _told("MATTER_MASTERS_MESH_BINORMAL", "st", {"st", "unreal"})
 SKY = _told("MATTER_MASTERS_SKY", "1", {"0", "1"}) == "1"
 COLOUR_SAMPLER = _told("MATTER_MASTERS_COLOUR_SAMPLER", "linear", {"linear", "srgb"})
-REFRACTION = _told("MATTER_MASTERS_REFRACTION", "function", {"function", "index"})
+REFRACTION = _told("MATTER_MASTERS_REFRACTION", "index", {"function", "index"})
 FN_OPAQUE = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque"
 FN_TRANSLUCENT = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Translucent"
 
@@ -655,12 +659,12 @@ def build_master(token, white, no_wear, flat, white_colour=None):
     if spec["blend"] == "translucent":
         # refraction by the index of refraction (MasterSet: TranslucentThin / Thick)
         if REFRACTION == "index":
-            # A CANDIDATE for M6. Seen live in a second project (2026-10-05): with the function's
-            # output here, neither see-through master bends, so the solid one is wrong. With this
-            # switch it compiles and the thin master is right; the solid one's bend is not settled.
-            # MasterSet's rule, wired directly: a solid bends by the article's index; a thin wall
-            # is not deflected, and an index of 1.0 removes the bend while the distortion pass
-            # still blurs by roughness.
+            # M6. Seen live in a second project (2026-10-05): with the function's output here,
+            # neither see-through master bends, so the solid one is wrong. MasterSet's rule, wired
+            # directly: a solid bends by the article's index; a thin wall is not deflected, and an
+            # index of 1.0 removes the bend while the distortion pass still blurs by roughness.
+            # The default since 2026-10-16: the rig's side view shows the solid master bending,
+            # and the four thin articles' pictures unchanged to the pixel.
             ior_src, ior = (g.node(M.MaterialExpressionConstant, 2, r=1.0) if spec.get("thin")
                             else params["specular_ior"]), ""
         else:
