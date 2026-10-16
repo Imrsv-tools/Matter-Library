@@ -9,3 +9,5 @@
 *(Inferred, not tried:* re-running `gh release create` for the same tag is the wrong recovery, since a draft creates no tag, so `create` would see no existing release by that tag and start a second draft.*)*
 
 **So:** resume the draft. Read its assets from the **assets endpoint**, never the list. Delete each one not `uploaded`, upload only the missing files (`gh release upload <tag> …`), then `gh release edit <tag> --draft=false`. `build_snapshot.py --publish` does exactly this. The release stays invisible until the last step, so an interruption publishes nothing half-made.
+
+*(Seen again 2026-10-16, Phase20, `matterlib-0.2.0-dev.10`, with no local interruption: GitHub answered one asset upload `404` and then `502` to `gh`'s own attempt to delete the draft, so `gh release create` exited 1 and left a draft of 361 of 636. Re-running `--publish` resumed it: 275 sent, all 636 `uploaded`. **And `--publish` uploads only an already-built folder:** run the build without it first, or it stops with "nothing built".)*

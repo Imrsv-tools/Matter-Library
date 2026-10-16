@@ -189,6 +189,11 @@ The controls this phase touches, each one read:
   - **Click 1 is agent-checked, not the lead's.** The materials list needs Stage editing that scene, and Stage had another session's scene open ("editing off"). What it shows is unchanged by this phase: the served catalog's `display_name`, which USDLiveView shows with underscores as spaces (F-P20-4).
   - **Owed:** click 4 (Studio, on the machine with Unreal; needs a push) and click 5 (the website; needs 20.3).
 - **20.1 · `89ba1a6` · done** (no click: the gate's own output).
+- **Pushed and published (the lead: *"yes"*, to "publish and push", 2026-10-16):**
+  - **The push:** `ab8e2a3..3a007f9`. It also carried two commits from the lead's other sessions that day, the seed `caf9e15` and the P18 retro `f81c03b`.
+  - **20.3:** [`matterlib-0.2.0-dev.10`](https://github.com/Imrsv-tools/Matter-Library/releases/tag/matterlib-0.2.0-dev.10) at `3a007f9`. 636 assets, all `uploaded`. The site file was fetched back byte-identical (sha256 `1d9fae37…`): 59 HDRIs, none named *PureSky*, no hidden old names, default `IndustrialSunset02`, 104 materials, no `label`.
+  - The first upload stopped on GitHub errors (a 404 on one asset, a 502 on `gh`'s own cleanup) and left a draft of 361 assets. `--publish` resumed it (GitHub learnings G1).
+- **Owed:** click 4 (Studio's sky picker, on the machine with Unreal, after that machine pulls and re-serves) and click 5's library half (done: the site file). The website showing it is the platform's mirror run plus P30.
 - **Gate, 20.1 and 20.2 in the tree:** 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL. That is the baseline set plus `tool_tests` (11 of 11 scripts PASS on the library machine).
 
 ## Discovery Log
