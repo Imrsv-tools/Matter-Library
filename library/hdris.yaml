@@ -6,3 +6,13 @@
 # lockfile carries it as `default_hdri`. It is the sky every scene used before the library held
 # HDRIs, byte-identical to it (Phase14 14.1), so no scene's look changes.
 default: IndustrialSunset02_PureSky
+#
+# published_drop_variant: the Variant token every PUBLISHED name drops (RD-LBL-5, the lead
+# 2026-10-16: "We don't need to reanme the source files... but yes - we need to rename the others
+# that are published"). The files above keep their names, as do their records and `default`
+# (both name the source); the catalog id, the served file, the header's MATTER_ID, the thumbnail
+# and the site file take the published name (AristeaWreck_PureSky_v01 -> AristeaWreck_v01).
+# UNSET UNTIL THE CUTOVER (Q-LBL-5 (a)): the platform's scenes name each sky by its file name, so
+# this line is set the day the platform's rename of its references is ready, then the dev install
+# is re-served and a snapshot published. Setting it is the cutover.
+# published_drop_variant: PureSky

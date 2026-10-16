@@ -96,6 +96,27 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 
   Every one names the sky by its file name, so the rename and their updates land together.
 
+## Pass 5 — The published HDRI name, built and off (2026-10-16, RD-LBL-7)
+
+- **F-LBL-13 — What landed:**
+  - **The setting:** `library/hdris.yaml` documents `published_drop_variant`, left unset.
+  - **`tools/releases/hdris.py`:** `published()` drops the named Variant. `on_disk()` gives each HDRI its published `id` and `identity` beside its `source_id`, and keeps the source path and record. Two HDRIs that would publish one name are refused. `default()` maps the setting's source name to the published id.
+  - **`tools/releases/serve_to_stage.py`:** the served copy is named by the published identity, and the thumbnail is made from the source file (it was found by the catalog's payload path, which the rename would break).
+  - **The tests:** `published()` both ways.
+  - **Spec and ledger:** [Identity](../../specs/Ontology/Identity.md) §HDRI names, the published name; ledger M10, the ask, with the cutover day the lead's.
+  - **The earlier quick fix's miss, fixed:** `tools/validators/test_hdri.py` still expected `name` in the HDRI facts. `c4055d6` removed it (RD-LBL-1), and `run_all.py` does not run that file, so its gate stayed green. Its three checks now use the credit's title and the contributor. It passes, as does every test that touches HDRIs or snapshots.
+  - **Verified, setting unset:** the gate gives 15 PASS, 2 SKIP, 0 FAIL, the same as the baseline. A fresh build's HDRIs and materials are identical to `dev.9`'s.
+  - **Verified, setting on, in scratch folders only** (never the live dev install; the setting restored after):
+    - no published id carries *PureSky*, and the default is `IndustrialSunset02`;
+    - 59 served copies under the new names, every catalog payload path resolves, and each header's id is the new one;
+    - 59 thumbnails made from the sources.
+- **F-LBL-14 — The old → new list** (all 59, every one `_PureSky_` → `_`): `AristeaWreck_PureSky_v01` → `AristeaWreck_v01` · `AutumnField_PureSky_v01` → `AutumnField_v01` · `BelfastSunset_PureSky_v01` → `BelfastSunset_v01` · `CitrusOrchardRoad_PureSky_v01` → `CitrusOrchardRoad_v01` · `CitrusOrchard_PureSky_v01` → `CitrusOrchard_v01` · `DrackensteinQuarry_PureSky_v01` → `DrackensteinQuarry_v01` · `DrakensbergSolitaryMountain_PureSky_v01` → `DrakensbergSolitaryMountain_v01` · `EveningRoad01_PureSky_v01` → `EveningRoad01_v01` · `FarmField_PureSky_v01` → `FarmField_v01` · `HillyTerrain01_PureSky_v01` → `HillyTerrain01_v01` · `IndustrialSunset02_PureSky_v01` → `IndustrialSunset02_v01` · `IndustrialSunset_PureSky_v01` → `IndustrialSunset_v01` · `Kloofendal28dMisty_PureSky_v01` → `Kloofendal28dMisty_v01` · `Kloofendal38dPartlyCloudy_PureSky_v01` → `Kloofendal38dPartlyCloudy_v01` · `Kloofendal43dClear_PureSky_v01` → `Kloofendal43dClear_v01` · `Kloofendal48dPartlyCloudy_PureSky_v01` → `Kloofendal48dPartlyCloudy_v01` · `KloofendalMistyMorning_PureSky_v01` → `KloofendalMistyMorning_v01` · `KloofendalOvercast_PureSky_v01` → `KloofendalOvercast_v01` · `Kloppenheim01_PureSky_v01` → `Kloppenheim01_v01` · `Kloppenheim02_PureSky_v01` → `Kloppenheim02_v01` · `Kloppenheim03_PureSky_v01` → `Kloppenheim03_v01` · `Kloppenheim05_PureSky_v01` → `Kloppenheim05_v01` · `Kloppenheim06_PureSky_v01` → `Kloppenheim06_v01` · `Kloppenheim07_PureSky_v01` → `Kloppenheim07_v01` · `LonelyRoadAfternoon_PureSky_v01` → `LonelyRoadAfternoon_v01` · `MpumalangaVeld_PureSky_v01` → `MpumalangaVeld_v01` · `MudRoad_PureSky_v01` → `MudRoad_v01` · `OvercastSoil_PureSky_v01` → `OvercastSoil_v01` · `PizzoPernice_PureSky_v01` → `PizzoPernice_v01` · `Quarry01_PureSky_v01` → `Quarry01_v01` · `Quarry04_PureSky_v01` → `Quarry04_v01` · `QwantaniAfternoon_PureSky_v01` → `QwantaniAfternoon_v01` · `QwantaniDawn_PureSky_v01` → `QwantaniDawn_v01` · `QwantaniDusk1_PureSky_v01` → `QwantaniDusk1_v01` · `QwantaniDusk2_PureSky_v01` → `QwantaniDusk2_v01` · `QwantaniLateAfternoon_PureSky_v01` → `QwantaniLateAfternoon_v01` · `QwantaniMidMorning_PureSky_v01` → `QwantaniMidMorning_v01` · `QwantaniMoonNoon_PureSky_v01` → `QwantaniMoonNoon_v01` · `QwantaniMoonrise_PureSky_v01` → `QwantaniMoonrise_v01` · `QwantaniMorning_PureSky_v01` → `QwantaniMorning_v01` · `QwantaniNight_PureSky_v01` → `QwantaniNight_v01` · `QwantaniNoon_PureSky_v01` → `QwantaniNoon_v01` · `QwantaniSunrise_PureSky_v01` → `QwantaniSunrise_v01` · `QwantaniSunset_PureSky_v01` → `QwantaniSunset_v01` · `Qwantani_PureSky_v01` → `Qwantani_v01` · `RockyRidge_PureSky_v01` → `RockyRidge_v01` · `RosendalParkSunset_PureSky_v01` → `RosendalParkSunset_v01` · `RustigKoppie_PureSky_v01` → `RustigKoppie_v01` · `ScythianTombs_PureSky_v01` → `ScythianTombs_v01` · `SnowField2_PureSky_v01` → `SnowField2_v01` · `SnowField_PureSky_v01` → `SnowField_v01` · `Sunflowers_PureSky_v01` → `Sunflowers_v01` · `Syferfontein0dClear_PureSky_v01` → `Syferfontein0dClear_v01` · `Syferfontein18dClear_PureSky_v01` → `Syferfontein18dClear_v01` · `Syferfontein1dClear_PureSky_v01` → `Syferfontein1dClear_v01` · `Syferfontein6dClear_PureSky_v01` → `Syferfontein6dClear_v01` · `TableMountain1_PureSky_v01` → `TableMountain1_v01` · `TableMountain2_PureSky_v01` → `TableMountain2_v01` · `WastelandClouds_PureSky_v01` → `WastelandClouds_v01`.
+- **The cutover, in order, on the day the lead names:**
+  1. the platform's sessions rename their references (ledger M10);
+  2. the library sets `published_drop_variant: PureSky` in `library/hdris.yaml` and commits;
+  3. `serve_to_stage.py` re-serves the dev install. The old served copies are removed by the stamp step; the old HDRI thumbnails under `thumbnails/hdris/` are left behind, unread, and are removed by hand;
+  4. the next dev snapshot is published, at the lead's word.
+
 ---
 
 ## Open questions
@@ -105,7 +126,7 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 | ~~Q-LBL-2~~ → RD-LBL-2 | **HDRIs too?** Is an HDRI's name its file name (`AristeaWreck_PureSky_v01`, shown as *"AristeaWreck PureSky"*), with Poly Haven's title kept only as its credit? That answers the platform's ask A12 with no label. | **Yes.** It is the same rule, applied to both kinds of entry. |
 | ~~Q-LBL-3~~ → RD-LBL-3 | **The one-line summary and the search words:** keep them? They describe a material without renaming it. | **Keep.** They are not names; the website and search use them. |
 | ~~Q-LBL-4~~ → RD-LBL-5 | **Drop *PureSky* from the 59 HDRI file names** (RD-LBL-2's wish)? It renames the HDRI files, and every place that names one (F-LBL-12). | **Yes, as one coordinated change:** the library's rename and its own references, plus a ledger ask for the platform to update its scenes, fixtures and goldens in the same window. That is *"Fix forward only... we have no legacy projects yet"* (Version Management's precedent). |
-| Q-LBL-5 | **The cutover for RD-LBL-5.** The library's half:
+| ~~Q-LBL-5~~ → RD-LBL-7 | **The cutover for RD-LBL-5.** The library's half:
 - the published name drops *PureSky* (`hdris.py`'s listing gives each HDRI a published id beside its source one);
 - the name grammar check (`validate_manifest`) takes `<Name>_vNN` for a published HDRI;
 - [Identity](../../specs/Ontology/Identity.md) §HDRI names;
@@ -136,6 +157,7 @@ The moment the dev install is re-served, **every scene that names `…_PureSky_v
   - **What is published becomes `AristeaWreck_v01`:** the catalog `id`, the served file name, the header's `MATTER_ID`, the thumbnail's file name, the site file's identity, and the default.
   - **It is a contract change for every consumer that names a sky by its file name** (F-LBL-12). Its cutover is Q-LBL-5.
 - **RD-LBL-6 — The next dev snapshot is published** (the lead, 2026-10-16: *"1) Yes"*). `matterlib-0.2.0-dev.9` was published 2026-10-16 at `79a8a82`: 636 assets, no `label`, 59 HDRI `credit.title`. Its site file was fetched back byte-identical.
+- **RD-LBL-7 — The cutover is (a): build the library's half now, switch together** (the lead, 2026-10-16: *"a"*). Closes Q-LBL-5. The library's half is built and off (Pass 5); the switch is the lead's day.
 - **RD-LBL-4 — Carry RD-LBL-1 to RD-LBL-3 out as a quick fix, and push** (the lead, 2026-10-16: *"yes please"*). Landed: Pass 4.
 
 ## Status
@@ -146,9 +168,8 @@ The moment the dev install is re-served, **every scene that names `…_PureSky_v
   - it is kept in the recipe, not the `.mtlx`;
   - only the website sees it;
   - every material has a hand label, though the spec says "only where it reads badly".
-- **Ruled (2026-10-16):** RD-LBL-1 to RD-LBL-4. The file name is the name, for materials and HDRIs; the summaries and search words stay; carried out as a quick fix (Pass 4).
+- **Ruled (2026-10-16):** RD-LBL-1 to RD-LBL-7. The file name is the name, for materials and HDRIs; the summaries and search words stay; carried out as a quick fix (Pass 4); `dev.9` published; the published HDRI names drop *PureSky*, built and off until the cutover day (Pass 5).
 - **Published:** `matterlib-0.2.0-dev.9` (RD-LBL-6). The website shows the file names from its next mirror run.
-- **Open:** Q-LBL-5, the cutover for dropping *PureSky* from the published HDRI names.
+- **Open:** nothing. **Waiting on:** the lead's cutover day for the published HDRI names (Pass 5's four steps).
 - **Next step:**
-  - the lead answers Q-LBL-5;
-  - then the library's half of RD-LBL-5 as a quick fix, and the ledger ask to the platform.
+  - the cutover, on the lead's day (Pass 5).

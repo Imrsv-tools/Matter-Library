@@ -137,7 +137,7 @@ def stamp_hdris(dev: Path) -> int:
     build.mkdir(exist_ok=True)
     want, made = set(), 0
     for h in H.on_disk():
-        f, dst = H.facts(h), build / h["path"].name
+        f, dst = H.facts(h), build / f"{h['identity']}.hdr"    # the published name (RD-LBL-5)
         want.add(dst.name)
         if H.stamp_stale(h["path"], dst, f):
             H.stamp(h["path"], dst, f)
@@ -154,8 +154,9 @@ def stamp_hdris(dev: Path) -> int:
 def make_thumbnails(dev: Path, entries: list[dict]) -> int:
     """A 2:1 JPEG per HDRI in the runtime (never in git: RD-MP-6), remade when stale."""
     made = 0
+    source = {h["id"]: h["path"] for h in H.on_disk()}   # published id -> source file (RD-LBL-5)
     for e in entries:
-        src, dst = SOURCE / e["payload_path"], dev / e["thumbnail_path"]
+        src, dst = source[e["id"]], dev / e["thumbnail_path"]
         if H.stale(src, dst):
             H.thumbnail(src, dst)
             made += 1

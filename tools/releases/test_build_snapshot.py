@@ -183,6 +183,11 @@ check(bare["status"] == "draft" and "label" not in bare
       and not {"credit", "description", "tagging", "captured"} & set(bare),
       "with no record: status draft, no label, and nothing invented")
 
+print("== RD-LBL-5: the published HDRI name ==")
+check(B.H.published("AristeaWreck_PureSky", None) == "AristeaWreck_PureSky", "unset: the source's own name")
+check(B.H.published("AristeaWreck_PureSky", "PureSky") == "AristeaWreck", "set: the Variant is dropped")
+check(B.H.published("Studio_Softbox", "PureSky") == "Studio_Softbox", "another Variant is kept")
+
 print("== Phase16: who gave it, its credit and its description ==")
 import re  # noqa: E402
 H, working_tree = B.H, B.working_tree
