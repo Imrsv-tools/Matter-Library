@@ -51,6 +51,7 @@ import unreal as unreal_driver  # noqa: E402  (drivers/unreal.py, Phase06)
 
 OUT_ROOT = jobmod.REPO / "library" / "parity"
 BLENDER_DRIVER = HERE / "drivers" / "blender_render.py"
+TOOLS = ("storm", "blender", "unreal")        # the sheet's columns, in order; Storm is always rendered
 
 # THE VERDICT is the "Moved" agreement (_Architecture.md §LCD; Phase06 D9): does each slider move
 # every tool the same way, by about the same amount? Picture ΔE2000 between the tools is a
@@ -561,10 +562,16 @@ def main(argv=None) -> int:
                     help="re-score the pictures already rendered (no Storm, no Blender)")
     ap.add_argument("--serial", action="store_true",
                     help="render the tools one after another (default: all at once)")
+    ap.add_argument("--tools", default=",".join(TOOLS),
+                    help="the columns to render, Storm always among them (default: all three). "
+                         "Without Blender, Storm is compared with Unreal, on Unreal's own mask")
     ap.add_argument("--no-blender", action="store_true",
-                    help="skip Blender (a machine whose Blender cannot render parity: Storm is then "
-                         "compared with Unreal, on Unreal's own mask)")
+                    help="the same as leaving blender out of --tools (a machine whose Blender cannot "
+                         "render parity)")
     args = ap.parse_args(argv)
+    want = [t.strip() for t in args.tools.split(",") if t.strip() and not (args.no_blender and t.strip() == "blender")]
+    if set(want) - set(TOOLS) or "storm" not in want:
+        ap.error(f"--tools takes storm plus any of blender, unreal (got {args.tools!r})")
 
     if args.character:
         if args.sweep:
@@ -606,17 +613,19 @@ def main(argv=None) -> int:
     took = {}
     if not args.score_only:
         keep_awake()
-        renders = {"storm": lambda: storm.run(job_path)}
-        if not args.no_blender:
-            renders["blender"] = lambda: run_blender(job_path)
-        renders["unreal"] = lambda: run_unreal(job_path)
-        results = render_all(renders, args.serial, took)
+        renders = {"storm": lambda: storm.run(job_path),
+                   "blender": lambda: run_blender(job_path),
+                   "unreal": lambda: run_unreal(job_path)}
+        results = render_all({t: renders[t] for t in want}, args.serial, took)
+    if "unreal" not in want:
+        unreal_skip = "not asked for (--tools)"
+    elif not args.score_only:
         unreal_skip = results["unreal"]
         if unreal_skip:
             print(f"unreal: skipped — {unreal_skip}")
     else:
         unreal_skip = None if (out / "unreal" / "defaults.png").is_file() else "not rendered"
-    blender_on = not args.no_blender and (out / "blender" / "defaults.png").is_file()
+    blender_on = "blender" in want and (out / "blender" / "defaults.png").is_file()
     tools = ("storm",) + (("blender",) if blender_on else ()) + (("unreal",) if unreal_skip is None else ())
     if len(tools) < 2:
         raise SystemExit(f"nothing to compare Storm with (Blender skipped; Unreal: {unreal_skip})")
@@ -652,7 +661,7 @@ def main(argv=None) -> int:
                   "seams": {n: compare.seam(p) for n, p in art.textures.items()}}
         card = write_scorecard(job, scores, checks, tools)
     if took:
-        print(" · ".join(f"{t} {took[t]:.1f}s" for t in ("storm", "blender", "unreal") if t in took)
+        print(" · ".join(f"{t} {took[t]:.1f}s" for t in TOOLS if t in took)
               + f" · all {took['all']:.1f}s ({'one after another' if args.serial else 'at once'})")
     print(f"sheet     {sheet}")
     print(f"scorecard {card}")

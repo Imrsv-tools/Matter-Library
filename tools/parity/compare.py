@@ -12,6 +12,7 @@ per subject (sphere red, cube green, floor blue), from the same camera.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -20,12 +21,29 @@ from PIL import Image
 REGIONS = {"sphere": 0, "cube": 1, "floor": 2}     # mask channel per subject
 
 
+@lru_cache(maxsize=32)
+def _read_rgb(p: Path, mtime_ns: int) -> np.ndarray:
+    a = np.asarray(Image.open(p).convert("RGB"), dtype=np.float64) / 255.0
+    a.setflags(write=False)        # shared between callers: the rig scores each default and mask many times
+    return a
+
+
 def read_rgb(p: Path) -> np.ndarray:
-    return np.asarray(Image.open(p).convert("RGB"), dtype=np.float64) / 255.0
+    """A picture as sRGB-encoded floats in 0..1, decoded once per file version (read-only)."""
+    p = Path(p)
+    return _read_rgb(p, p.stat().st_mtime_ns)
+
+
+def srgb_to_linear(rgb: np.ndarray) -> np.ndarray:
+    return np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
+
+
+def linear_to_srgb(lin: np.ndarray) -> np.ndarray:
+    return np.where(lin <= 0.0031308, 12.92 * lin, 1.055 * np.power(lin, 1 / 2.4) - 0.055)
 
 
 def srgb_to_lab(rgb: np.ndarray) -> np.ndarray:
-    lin = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
+    lin = srgb_to_linear(rgb)
     m = np.array([[0.4124564, 0.3575761, 0.1804375],
                   [0.2126729, 0.7151522, 0.0721750],
                   [0.0193339, 0.1191920, 0.9503041]])
@@ -87,12 +105,9 @@ def masks(mask_png: Path, colours: dict | None = None) -> dict[str, np.ndarray]:
     m = read_rgb(mask_png)
     if colours:
         # the mask is an emission render through a plain sRGB encode: 0.5 is written as 0.735
-        def enc(c):
-            c = np.array(c, dtype=np.float64)
-            return np.where(c <= 0.0031308, 12.92 * c, 1.055 * c ** (1 / 2.4) - 0.055)
         out = {}
         for name, c in colours.items():
-            match = np.all(np.abs(m - enc(c)) < 0.1, axis=-1)
+            match = np.all(np.abs(m - linear_to_srgb(np.array(c, dtype=np.float64))) < 0.1, axis=-1)
             hit = match.copy()
             # ...and its 8 neighbours too: an anti-aliased edge between two parts blends their
             # colours, and a blend can equal a THIRD part's colour (body red + lips magenta =
@@ -185,8 +200,7 @@ def _bilinear(img: np.ndarray, x: np.ndarray, y: np.ndarray, wrap: bool = False)
 
 
 def _lum_linear(rgb: np.ndarray) -> np.ndarray:
-    lin = np.where(rgb <= 0.04045, rgb / 12.92, ((rgb + 0.055) / 1.055) ** 2.4)
-    return lin @ np.array([0.2126, 0.7152, 0.0722])
+    return srgb_to_linear(rgb) @ np.array([0.2126, 0.7152, 0.0722])
 
 
 # The floor band sampled: in front of the objects, behind the ruler (z = 0.40).

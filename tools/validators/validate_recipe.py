@@ -39,7 +39,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 CONVERTERS = ROOT / "tools" / "converters"
 sys.path.insert(0, str(CONVERTERS))
-from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, MaterialSpec, SET_PORTS  # noqa: E402
+from assemble_mtlx import MAX_OVERLAYS, RECIPE_METADATA_KEYS as METADATA_KEYS, SCALE_TAG_METRES, MaterialSpec, SET_PORTS  # noqa: E402
 import groups as G  # noqa: E402  (Phase15: the groups and Character's taxonomy)
 
 SCHEMA_PATH = CONVERTERS / "recipe.schema.json"
@@ -308,7 +308,7 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
 # into our scale options ... we should STRONGLY avoid fractions of that... worth noting for any of
 # our generation toolsets." An article's tile is exactly its tag's length; an sUKN article tiles
 # nothing and authors 0.0. Never stretch a source to fit: re-make it at a scale option's size.
-TAG_METRES = {"s0001": 0.001, "s001": 0.01, "s01": 0.1, "s1": 1.0, "s10": 10.0, "s100": 100.0}
+TAG_METRES = SCALE_TAG_METRES          # the assembler's table (Identity.md §Scale tags)
 # The articles already off their tag when the rule was made (Phase19 F-P15-1, 2026-10-15), each
 # with its recorded size. Each is a redo row in library/wishlist.yaml; a redo that lands on its
 # tag must leave this list, and nothing joins it.

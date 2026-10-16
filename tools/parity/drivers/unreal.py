@@ -65,6 +65,7 @@ sys.path.insert(0, str(HERE.parent / "scene"))
 sys.path.insert(0, str(REPO / "blender" / "masters"))
 import article  # noqa: E402  (the shared reader: plain XML, no bpy)
 import build_scene  # noqa: E402
+import compare  # noqa: E402  (tools/parity: the rig's sRGB transfer and region reader)
 
 TOOL = "unreal"
 PROJECT = REPO / "unreal" / "MatterRuntime" / "MatterRuntime.uproject"
@@ -572,7 +573,19 @@ def pinned_package(fetch: bool = True) -> Path | None:
     return launcher
 
 
-def run_runtime(cmd: list[str], ujob: Path, log: Path) -> None:
+def _last_errors(*logs: Path, n: int = 3) -> str:
+    """The last few lines that say error, from the editor's log and the app's own record."""
+    hits = []
+    for log in logs:
+        if log.is_file():
+            hits += [ln.strip() for ln in log.read_text(encoding="utf-8", errors="replace").splitlines()
+                     if "error" in ln.lower()]
+    return "\n  ".join(hits[-n:]) or "no error line in either log"
+
+
+def run_runtime(cmd: list[str], ujob: Path, log: Path, expect: list[Path] = ()) -> None:
+    """Run the runtime on a job; fail, quoting its own error, when it exits non-zero or writes
+    fewer pictures than asked (an editor that cannot compile its shaders exits 0, 2026-10-16)."""
     packaged = "-game" not in cmd
     env = dict(os.environ)
     if packaged:        # a package runs with no display at all, on SDL's dummy driver (UR-F8)
@@ -584,8 +597,10 @@ def run_runtime(cmd: list[str], ujob: Path, log: Path) -> None:
     record.unlink(missing_ok=True)
     with log.open("w", encoding="utf-8") as fh:
         rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S).returncode
-    if rc != 0:
-        raise SystemExit(f"Unreal runtime failed (exit {rc}); see {record} and {log}")
+    missing = [p for p in expect if not p.is_file()]
+    if rc != 0 or missing:
+        why = f"exit {rc}" if rc != 0 else f"exit 0 but {len(missing)} of {len(expect)} pictures missing"
+        raise SystemExit(f"Unreal runtime failed ({why}); see {record} and {log}\n  {_last_errors(log, record)}")
 
 
 def read_pfm(path: Path) -> np.ndarray:
@@ -605,9 +620,7 @@ def linear(path: Path, exposure: float = 0.0) -> np.ndarray:
 
 
 def srgb8(lin: np.ndarray) -> np.ndarray:
-    x = np.clip(lin, 0.0, 1.0)
-    enc = np.where(x <= 0.0031308, 12.92 * x, 1.055 * np.power(x, 1 / 2.4) - 0.055)
-    return (enc * 255.0 + 0.5).astype(np.uint8)
+    return (compare.linear_to_srgb(np.clip(lin, 0.0, 1.0)) * 255.0 + 0.5).astype(np.uint8)
 
 
 def run(job_path: Path) -> None:
@@ -618,13 +631,13 @@ def run(job_path: Path) -> None:
     out = Path(job["out_dir"]) / TOOL
     folder = out / "job"
     ujob = unreal_job(job, folder)
-    run_runtime(cmd, ujob, out / "unreal.log")
-    for s in job["settings"]:
-        for spec in job["views"].values():
-            lin = linear(folder / "raw" / f"{s['id']}{spec['suffix']}.pfm", float(spec.get("exposure", 0.0)))
-            png = out / f"{s['id']}{spec['suffix']}.png"
-            Image.fromarray(srgb8(lin)).save(png)
-            print(f"unreal: wrote {png}")
+    pictures = [(s, spec) for s in job["settings"] for spec in job["views"].values()]
+    run_runtime(cmd, ujob, out / "unreal.log",
+                [folder / "raw" / f"{s['id']}{spec['suffix']}.pfm" for s, spec in pictures])
+    for s, spec in pictures:
+        lin = linear(folder / "raw" / f"{s['id']}{spec['suffix']}.pfm", float(spec.get("exposure", 0.0)))
+        Image.fromarray(srgb8(lin)).save(out / f"{s['id']}{spec['suffix']}.png")
+    print(f"unreal: wrote {len(pictures)} pictures to {out}")
     cols = mask_colours(job, [p.rsplit("/", 1)[1] for p in job["subjects"]])
     for spec in job["views"].values():
         write_mask(folder / "raw" / f"{MASK_ID}{spec['suffix']}.pfm", out / f"mask{spec['suffix']}.png", cols)
@@ -647,7 +660,6 @@ def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
     the Phase05 close Storm and Blender agreed on the grey card to 0.35 dE2000.
     """
     global EXPOSURE_K
-    import compare  # noqa: PLC0415  (tools/parity: the rig's own region reader)
     job = json.loads(job_path.read_text(encoding="utf-8"))
     out = Path(job["out_dir"])
     ref = out / ref_tool / "defaults.png"
@@ -671,16 +683,16 @@ def calibrate(job_path: Path, ref_tool: str = "storm") -> None:
     spec["views"] = [spec["views"][0], {"suffix": "__sky", "location": [0, 0, 300], "forward": [0, 0, 1],
                                         "up": [1, 0, 0], "fov": 30.0, "near": 2.0, "hide": []}]
     ujob.write_text(json.dumps(spec, indent=1) + "\n", encoding="utf-8")
-    run_runtime(cmd, ujob, folder / "unreal.log")
-
     raw = folder / "raw"
+    run_runtime(cmd, ujob, folder / "unreal.log",
+                [raw / f"{k}.pfm" for k in ("both", "sun", "dome", "mirror", MASK_ID)] + [raw / "both__sky.pfm"])
+
     sky = read_pfm(raw / "both__sky.pfm")
     EXPOSURE_K = float(sky.mean() / build_scene.DOME_RADIANCE)
     mask = folder / "mask.png"
     write_mask(raw / f"{MASK_ID}.pfm", mask, mask_colours(job, names))
     both, sun, dome, mir = (linear(raw / f"{k}.pfm") for k in ("both", "sun", "dome", "mirror"))
-    r8 = np.asarray(Image.open(ref).convert("RGB"), dtype=np.float64) / 255.0
-    refl = np.where(r8 <= 0.04045, r8 / 12.92, ((r8 + 0.055) / 1.055) ** 2.4)
+    refl = compare.srgb_to_linear(compare.read_rgb(ref))
     regions = compare.masks(mask)
     on = regions["subjects"] & (refl.max(axis=2) < 0.98)
     # The dome from the white mirror, which reflects exactly the dome's radiance in any correct
