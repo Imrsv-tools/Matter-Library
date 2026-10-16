@@ -8,7 +8,6 @@ class FJsonObject;
 class UDirectionalLightComponent;
 class UMaterialInstanceDynamic;
 class UMaterialInterface;
-class UProceduralMeshComponent;
 class USceneCaptureComponent2D;
 class USkyLightComponent;
 class UStaticMeshComponent;
@@ -61,7 +60,7 @@ private:
 	UPROPERTY() TObjectPtr<USkyLightComponent> SkyComp;
 	UPROPERTY() TObjectPtr<UDirectionalLightComponent> SunComp;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> SkySphere;
-	UPROPERTY() TMap<FString, TObjectPtr<UProceduralMeshComponent>> Meshes;
+	UPROPERTY() TMap<FString, TObjectPtr<UStaticMeshComponent>> Meshes;
 	UPROPERTY() TMap<FString, TObjectPtr<UMaterialInterface>> Masters;
 	UPROPERTY() TMap<FString, TObjectPtr<UTexture2D>> Textures;
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mids;

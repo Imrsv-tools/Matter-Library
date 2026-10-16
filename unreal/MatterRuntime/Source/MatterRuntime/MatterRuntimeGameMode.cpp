@@ -25,12 +25,13 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
-#include "ProceduralMeshComponent.h"
+#include "MeshDescription.h"
 #include "RenderingThread.h"
 #include "RHIGlobals.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "ShaderCompiler.h"
+#include "StaticMeshAttributes.h"
 #include "TextureResource.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogMatter, Log, All);
@@ -268,33 +269,80 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 	}
 	const float* F = reinterpret_cast<const float*>(Bytes.GetData());
 	const int32* I = reinterpret_cast<const int32*>(Bytes.GetData() + int64(N) * 12 * 4);
-	TArray<FVector> P, Nrm;
-	TArray<FProcMeshTangent> T;
-	TArray<FVector2D> UV;
-	P.SetNumUninitialized(N);
-	Nrm.SetNumUninitialized(N);
-	T.SetNumUninitialized(N);
-	UV.SetNumUninitialized(N);
+
+	// A static mesh built here, not a UProceduralMeshComponent: the procedural mesh keeps its UVs
+	// as half floats and has no switch for it, so past 128 tiles a UV steps by 1/8 of a tile and a
+	// fine grid wanders (Issue #5, the cheek at 137). The static mesh's fast build takes these
+	// normals, tangents and signs as given, as the procedural mesh did, and is told to keep the
+	// UVs at full precision. The tangent basis stays 8-bit, as before.
+	FMeshDescription MD;
+	FStaticMeshAttributes Attr(MD);
+	Attr.Register();
+	TVertexAttributesRef<FVector3f> Pos = Attr.GetVertexPositions();
+	TVertexInstanceAttributesRef<FVector3f> Nrm = Attr.GetVertexInstanceNormals();
+	TVertexInstanceAttributesRef<FVector3f> Tan = Attr.GetVertexInstanceTangents();
+	TVertexInstanceAttributesRef<float> Sign = Attr.GetVertexInstanceBinormalSigns();
+	TVertexInstanceAttributesRef<FVector2f> UV = Attr.GetVertexInstanceUVs();
+	UV.SetNumChannels(1);
+	MD.ReserveNewVertices(N);
+	MD.ReserveNewVertexInstances(N);
+	MD.ReserveNewTriangles(M / 3);
 	for (int32 k = 0; k < N; ++k)
 	{
-		P[k] = FVector(F[3 * k], F[3 * k + 1], F[3 * k + 2]);
-		Nrm[k] = FVector(F[3 * N + 3 * k], F[3 * N + 3 * k + 1], F[3 * N + 3 * k + 2]);
-		T[k] = FProcMeshTangent(FVector(F[6 * N + 3 * k], F[6 * N + 3 * k + 1], F[6 * N + 3 * k + 2]),
-			F[11 * N + k] < 0.f);
-		UV[k] = FVector2D(F[9 * N + 2 * k], F[9 * N + 2 * k + 1]);
+		// one vertex and one instance per input vertex, so instance k is vertex k of the index list
+		const FVertexID V = MD.CreateVertex();
+		Pos[V] = FVector3f(F[3 * k], F[3 * k + 1], F[3 * k + 2]);
+		const FVertexInstanceID VI = MD.CreateVertexInstance(V);
+		Nrm[VI] = FVector3f(F[3 * N + 3 * k], F[3 * N + 3 * k + 1], F[3 * N + 3 * k + 2]);
+		Tan[VI] = FVector3f(F[6 * N + 3 * k], F[6 * N + 3 * k + 1], F[6 * N + 3 * k + 2]);
+		Sign[VI] = F[11 * N + k] < 0.f ? -1.f : 1.f;
+		UV.Set(VI, 0, FVector2f(F[9 * N + 2 * k], F[9 * N + 2 * k + 1]));
 	}
-	TArray<int32> Tris(I, M);
+	const FPolygonGroupID Group = MD.CreatePolygonGroup();
+	Attr.GetPolygonGroupMaterialSlotNames()[Group] = TEXT("Matter");
+	int32 Skipped = 0;
+	for (int32 t = 0; t + 2 < M; t += 3)
+	{
+		// a triangle naming one vertex twice has no area and draws nothing; a mesh description
+		// cannot hold it (its edges would join a vertex to itself)
+		if (I[t] == I[t + 1] || I[t + 1] == I[t + 2] || I[t] == I[t + 2])
+		{
+			++Skipped;
+			continue;
+		}
+		const FVertexInstanceID Tri[3] = {FVertexInstanceID(I[t]), FVertexInstanceID(I[t + 1]), FVertexInstanceID(I[t + 2])};
+		MD.CreateTriangle(Group, Tri);
+	}
 
 	AActor* Owner = GetWorld()->SpawnActor<AActor>(FVector::ZeroVector, FRotator::ZeroRotator);
-	UProceduralMeshComponent* PMC = NewObject<UProceduralMeshComponent>(Owner, *Name);
-	Owner->SetRootComponent(PMC);
-	PMC->RegisterComponent();
-	PMC->SetMobility(EComponentMobility::Movable);
-	PMC->CreateMeshSection(0, P, Tris, Nrm, UV, TArray<FColor>(), T, false);
-	PMC->SetCastShadow(false);
-	PMC->bVisibleInReflectionCaptures = false;
-	PMC->bVisibleInRealTimeSkyCaptures = false;
-	Meshes.Add(Name, PMC);
+	UStaticMesh* Mesh = NewObject<UStaticMesh>(Owner, *(Name + TEXT("_Mesh")));
+	Mesh->GetStaticMaterials().Add(FStaticMaterial(nullptr, TEXT("Matter")));
+	UStaticMesh::FBuildMeshDescriptionsParams Build;
+	Build.bMarkPackageDirty = false;
+	Build.bCommitMeshDescription = false;
+	Build.bFastBuild = true;
+	UStaticMesh::FBuildMeshDescriptionsLODParams Lod;
+	Lod.bUseFullPrecisionUVs = true;
+	Lod.bUseHighPrecisionTangentBasis = false;
+	Build.PerLODOverrides.Add(Lod);
+	if (!Mesh->BuildFromMeshDescriptions({&MD}, Build))
+	{
+		Note(FString::Printf(TEXT("MATTER mesh %s: the static mesh did not build"), *Name), true);
+		return false;
+	}
+	UStaticMeshComponent* SMC = NewObject<UStaticMeshComponent>(Owner, *Name);
+	SMC->SetStaticMesh(Mesh);
+	Owner->SetRootComponent(SMC);
+	SMC->RegisterComponent();
+	SMC->SetMobility(EComponentMobility::Movable);
+	SMC->SetCastShadow(false);
+	SMC->bVisibleInReflectionCaptures = false;
+	SMC->bVisibleInRealTimeSkyCaptures = false;
+	if (Skipped > 0)
+	{
+		Note(FString::Printf(TEXT("MATTER mesh %s: %d triangles name a vertex twice, left out"), *Name, Skipped), false);
+	}
+	Meshes.Add(Name, SMC);
 	MeshMaterial.Add(Name, Spec->GetStringField(TEXT("material")));
 	Note(FString::Printf(TEXT("MATTER mesh %s verts=%d tris=%d material=%s"), *Name, N, M / 3, *MeshMaterial[Name]), false);
 	return true;
@@ -617,7 +665,7 @@ bool AMatterRuntimeGameMode::CaptureView(const TSharedPtr<FJsonObject>& View, co
 	CaptureComp->HiddenComponents.Reset();
 	for (const TSharedPtr<FJsonValue>& H : View->GetArrayField(TEXT("hide")))
 	{
-		if (TObjectPtr<UProceduralMeshComponent>* Mesh = Meshes.Find(H->AsString()))
+		if (TObjectPtr<UStaticMeshComponent>* Mesh = Meshes.Find(H->AsString()))
 		{
 			CaptureComp->HiddenComponents.Add(Mesh->Get());
 		}
