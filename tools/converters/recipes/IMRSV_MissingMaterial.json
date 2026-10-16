@@ -1,5 +1,4 @@
 {
-  "label": "Missing material",
   "summary": "The bright magenta stand-in shown when a material cannot be found; not for use.",
   "search_words": ["missing", "fallback", "error", "magenta"],
   "origin": ["agent-drafted"],

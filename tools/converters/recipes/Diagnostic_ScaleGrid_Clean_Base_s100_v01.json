@@ -1,5 +1,4 @@
 {
-  "label": "Scale grid 100 m (diagnostic)",
   "summary": "A grid with a 100 m tile, to check a model's UVs are at real size. Lines at 100 m, 10 m, 1 m and 10 cm; each length is one colour in every grid.",
   "search_words": [
     "scale grid",

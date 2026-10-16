@@ -228,11 +228,17 @@ Until that phase writes them, this section is the authority.
 - **Safe for today's consumer:** the app reads each entry's fields by name and ignores a key it does not know; until `label` is served, it shows `display_name`.
 - **Nothing else changes:** `id`, `display_name` and the file names stay as they are; a scene still names `<id>_<version>.hdr`.
 
+## Pass 6 — the library's answers to A11 and A12 (2026-10-16)
+
+- **A11, the HDRI rows' grouping in what the dev install serves:** answered in practice since Phase15. Every HDRI in the dev catalog carries `group`, with `when` and `sky`, and the catalog carries `groups[]` with each group's taxonomy ([RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md)).
+- **A12, a name a person reads for each HDRI:** answered by the lead's ruling RD-LBL-1 (`261015_R_MaterialLabels.md`): *"the name is the file name"*. **The library publishes no label.** A reader shows `display_name` (`AristeaWreck_PureSky`), its underscores as spaces. Poly Haven's title is credit: `credit.title`, and `MATTER_CREDIT_TITLE` in a served header.
+  - The lead also asked to drop *PureSky*, since every HDRI is one. That is a rename of the files that the platform's scenes name, so it is held as its own question (`261015_R_MaterialLabels.md` Q-LBL-4).
+
 ## Status
 
 - **Passes:** 1 and its two addenda (the platform's side) · 2 (the library's review, 2026-10-14) · 3 (the platform's side: A9, A10) · 4 (the platform's side: A9, A10 seen served; A11) · 5 (the platform's side: A12).
-- **Open (Pass 4, 2026-10-14):** A11 — the HDRI rows' grouping in what the dev install serves, or a ruling that it stays each consumer's. The library's to rule.
-- **Open (Pass 5, 2026-10-14):** A12 — a name a person reads on each HDRI (`hdris[].label`, Poly Haven's title without *(Pure Sky)*, as the platform would like it). The library's to rule.
+- ~~**Open (Pass 4, 2026-10-14):** A11~~ *(answered in practice, Pass 6)* A11 — the HDRI rows' grouping in what the dev install serves, or a ruling that it stays each consumer's. The library's to rule.
+- ~~**Open (Pass 5, 2026-10-14):** A12~~ *(answered by RD-LBL-1, Pass 6: no label; the file name is the name)* A12 — a name a person reads on each HDRI (`hdris[].label`, Poly Haven's title without *(Pure Sky)*, as the platform would like it). The library's to rule.
 - **Ruled 2026-10-14 (§Resolved):** RD-SKY-1 – 4. That answers SKY-Q1, Q2, Q4, Q5 and A6's format; SKY-Q3 was answered 2026-10-13. **No question is open with the lead.**
 - ~~**Open:** A1 – A8 …~~ **Delivered 2026-10-14 by Phase14** (`docs/Planning/Phases/Complete/Phase14_HdrisInTheLibrary.md`): A1 – A6 and A8 in full, and A7 for the dev install. A release that holds HDRIs is planned. The Glossary's *HDRI* headword landed. The ledger row M10 says what the library serves.
 - ~~**Open (Pass 3, 2026-10-14):** A9 (each HDRI's credit) and A10 (each HDRI's tagging), in what the dev install serves. The library's to rule: where, and in what shape, beside the `no_projection_guard` rule. The library's pass on them is owed.~~ *(Answered and served — Phase16 and Phase15; seen in Pass 4.)*

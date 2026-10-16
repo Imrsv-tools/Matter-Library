@@ -24,17 +24,6 @@ def check(cond, what):
         fails.append(what)
 
 
-print("== label ==")
-for raw, want in [("Copper_Verdigris_Aged_Base", "Copper verdigris aged"),
-                  ("Oak_Natural_Clean_Base", "Oak"),
-                  ("ABS_Matte_Clean_Base", "ABS matte"),
-                  ("Paint_GradeI_Clean_Base", "Paint grade I"),          # a roman numeral keeps its capital
-                  ("Paint_GradeIV_Clean_Base", "Paint grade IV"),
-                  ("Diagnostic_UVGrid_Clean_Base", "Diagnostic UV grid"),
-                  ("Rust_OnSteel_Flaking_Base", "Rust on steel flaking"),
-                  ("GreyCard_Neutral18_Clean_Base", "Grey card neutral 18")]:
-    check(B.label(raw) == want, f"{raw} -> {B.label(raw)!r} (want {want!r})")
-
 print("== verdict per control ==")
 job = {"settings": [{"id": "defaults"},
                     {"id": "roughness_m05", "label": "roughness -0.5", "port": "roughness_bias"},
@@ -181,7 +170,8 @@ full = {"id": "IndustrialSunset02_PureSky", "version": "v01", "identity": "Indus
                               "info": "Edited sky-only version of X."},
                    "tagging": {"tags": ["pure skies"], "categories": ["outdoor"]}}}
 e = B.hdri_entry(full, "IndustrialSunset02_PureSky_v01__thumbnail.jpg", "ab" * 32)
-check(e["label"] == "Industrial Sunset 02 (Pure Sky)", "the label is Poly Haven's own name")
+check("label" not in e and e["credit"]["title"] == "Industrial Sunset 02 (Pure Sky)",
+      "no label (RD-LBL-1): the name is the file name, and Poly Haven's title is the credit's title")
 check(e["credit"]["authors"] == [{"name": "A", "role": "Original"}] and e["credit"]["edited_from"].startswith("Edited"),
       "the credit carries the contributors with their roles and what it was edited from")
 check("sponsors" not in e["credit"], "an empty sponsor list is left out, not published empty")
@@ -189,9 +179,9 @@ check(e["pictures"] == [{"role": "thumbnail", "file": "IndustrialSunset02_PureSk
       "one thumbnail picture")
 check("download" not in e, "no download: thumbnails and credit only (RD-P14-4)")
 bare = B.hdri_entry({"id": "Bare_PureSky", "version": "v01", "identity": "Bare_PureSky_v01", "record": {}}, "t.jpg", "0" * 64)
-check(bare["status"] == "draft" and bare["label"] == "Bare pure sky"
+check(bare["status"] == "draft" and "label" not in bare
       and not {"credit", "description", "tagging", "captured"} & set(bare),
-      "with no record: status draft, a derived label, and nothing invented")
+      "with no record: status draft, no label, and nothing invented")
 
 print("== Phase16: who gave it, its credit and its description ==")
 import re  # noqa: E402

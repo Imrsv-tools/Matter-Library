@@ -54,8 +54,9 @@ def page(snap: Path, title: str, mats: list[dict]) -> Image.Image:
     for m in mats:
         im.paste(picture(snap, m), (14, y))
         x = PIC + 34
-        d.text((x, y), m["label"], fill="white", font=BIG)
-        d.text((x + 8 + d.textlength(m["label"], font=BIG), y + 5), f"   {m['identity']}", fill=(140, 140, 140), font=SMALL)
+        name = m["display_name"].replace("_", " ")     # RD-LBL-1: the file name, its words untouched
+        d.text((x, y), name, fill="white", font=BIG)
+        d.text((x + 8 + d.textlength(name, font=BIG), y + 5), f"   {m['identity']}", fill=(140, 140, 140), font=SMALL)
         ty = y + 32
         for line in textwrap.wrap(m.get("summary", "(no summary)"), 105):
             d.text((x, ty), line, fill=(230, 230, 230), font=FONT)

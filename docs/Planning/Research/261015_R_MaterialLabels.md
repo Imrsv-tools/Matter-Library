@@ -78,14 +78,33 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 
 **So Q-LBL-1 decides one rule for both kinds of entry.** Materials and HDRIs get a readable name from the same place, in the dev catalog and the site file alike. The HDRI version of (b) is the source's name with *(Pure Sky)* dropped, which is what the platform asked for.
 
+## Pass 4 — What the quick fix landed (2026-10-16, RD-LBL-4)
+
+- **F-LBL-11 — No added names anywhere the library publishes:**
+  - **The site file:** `label` is gone from every material and HDRI (`tools/releases/build_snapshot.py`; the `label()` derivation and its tests are removed). A scratch build of 104 materials and 59 HDRIs carries no `label`. Every HDRI carries `credit.title`. The groups keep their own `label` (Matter, Character, HDRIs).
+  - **The recipes:** the hand labels are gone from all 86 (one line each, the `"label"` key).
+  - **The HDRI header:** `MATTER_NAME` is no longer stamped; the source's title is `MATTER_CREDIT_TITLE` (`tools/releases/hdris.py`). The dev catalog's HDRI `credit` gains `title`.
+  - **The words sheet** (`words_sheet.py`) shows the file name with spaces.
+  - **The specs:** [SiteFile](../../specs/Contract/SiteFile.md) `label` withdrawn (dated, kept) and `credit.title` added; [Identity](../../specs/Ontology/Identity.md)'s header list; [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md)'s `credit`.
+  - **The ledger:** M9 (the website) and M10 (HDRIs). The sky asks' A11 and A12 are answered (its Pass 6).
+  - **`/matter-batch`** stops writing `"label"`, in its own commit, staged around a sibling session's uncommitted edit to the same file.
+  - **The gate:** 15 PASS, 2 SKIP, 0 FAIL, the same as the baseline before the change. The snapshot's unit tests pass.
+  - **Not yet visible:** the website shows the change from the next dev snapshot, whose publish is the lead's word. The dev install's served HDRI headers are re-stamped at the next `serve_to_stage.py` run.
+- **F-LBL-12 — What dropping *PureSky* touches** (`git grep`, at origin where another repo, 2026-10-16):
+  - **here:** the 59 HDRI files and 77 other files;
+  - **the platform's repos:** Stage 42 files (its test goldens), USDLiveView 4, the Asset Library 4 (compositions that name the default sky), the website 6 (its mirror's test and a check fixture), the platform's docs 6.
+
+  Every one names the sky by its file name, so the rename and their updates land together.
+
 ---
 
 ## Open questions
 
 | Id | Question | Recommendation |
 |---|---|---|
-| Q-LBL-2 | **HDRIs too?** Is an HDRI's name its file name (`AristeaWreck_PureSky_v01`, shown as *"AristeaWreck PureSky"*), with Poly Haven's title kept only as its credit? That answers the platform's ask A12 with no label. | **Yes.** It is the same rule, applied to both kinds of entry. |
-| Q-LBL-3 | **The one-line summary and the search words:** keep them? They describe a material without renaming it. | **Keep.** They are not names; the website and search use them. |
+| ~~Q-LBL-2~~ → RD-LBL-2 | **HDRIs too?** Is an HDRI's name its file name (`AristeaWreck_PureSky_v01`, shown as *"AristeaWreck PureSky"*), with Poly Haven's title kept only as its credit? That answers the platform's ask A12 with no label. | **Yes.** It is the same rule, applied to both kinds of entry. |
+| ~~Q-LBL-3~~ → RD-LBL-3 | **The one-line summary and the search words:** keep them? They describe a material without renaming it. | **Keep.** They are not names; the website and search use them. |
+| Q-LBL-4 | **Drop *PureSky* from the 59 HDRI file names** (RD-LBL-2's wish)? It renames the HDRI files, and every place that names one (F-LBL-12). | **Yes, as one coordinated change:** the library's rename and its own references, plus a ledger ask for the platform to update its scenes, fixtures and goldens in the same window. That is *"Fix forward only... we have no legacy projects yet"* (Version Management's precedent). |
 | ~~Q-LBL-1~~ → RD-LBL-1 | **One readable name per material:** (a) as today, the website only; (b) derived from the file name by a better rule, shown everywhere; or (c) the confirmed hand labels moved into each material's file, shown everywhere? | **(b)**. One source, no drift; an override only where a rule cannot read. |
 
 ## Resolved
@@ -101,6 +120,9 @@ Either way, (a)'s split, where the website and Studio name a material differentl
     - the website is told, through ledger M9, since it shows `label` today;
     - a dev snapshot without labels, published at the lead's word.
   - Whether it also covers HDRIs and the one-line summaries is put to the lead (Q-LBL-2, Q-LBL-3).
+- **RD-LBL-2 — HDRIs follow the same rule: an HDRI's name is its file name, and Poly Haven's title is kept only as its credit. The lead would also drop *PureSky* from the names, since every HDRI is one** (the lead, 2026-10-16: *"Yes but we can also drop "PureSky" since they are all puresky and we have no plans to change that for a while"*). Closes Q-LBL-2. Dropping *PureSky* renames files other repos name, so it is held as Q-LBL-4 (F-LBL-12).
+- **RD-LBL-3 — The one-line summaries and the search words stay** (the lead, 2026-10-16: *"yes keep"*). Closes Q-LBL-3.
+- **RD-LBL-4 — Carry RD-LBL-1 to RD-LBL-3 out as a quick fix, and push** (the lead, 2026-10-16: *"yes please"*). Landed: Pass 4.
 
 ## Status
 
@@ -110,19 +132,8 @@ Either way, (a)'s split, where the website and Studio name a material differentl
   - it is kept in the recipe, not the `.mtlx`;
   - only the website sees it;
   - every material has a hand label, though the spec says "only where it reads badly".
-- **Ruled:** RD-LBL-1, 2026-10-16: the file name is the name; no added or rearranged names.
-- **Open:**
-  - Q-LBL-2: HDRIs follow the same rule, which answers the platform's A12;
-  - Q-LBL-3: keep the summaries and search words.
-
-  A11 is answered in practice (F-LBL-10).
-- **Owed by RD-LBL-1:** one quick fix:
-  - withdraw the site file's `label`;
-  - remove the 85 recipe labels;
-  - stop `/matter-batch` writing them. Its SKILL.md has a sibling session's uncommitted edit as of 2026-10-16, so that line waits for, or is filtered around, that session;
-  - tell the website through M9.
-
-  Then a dev snapshot, at the lead's word.
+- **Ruled (2026-10-16):** RD-LBL-1 to RD-LBL-4. The file name is the name, for materials and HDRIs; the summaries and search words stay; carried out as a quick fix (Pass 4).
+- **Open:** Q-LBL-4, dropping *PureSky* from the HDRI file names, a rename across repos (F-LBL-12).
 - **Next step:**
-  - the lead picks (a), (b) or (c);
-  - (b) or (c) is a small phase or a `/quick-fix`, depending on whether the catalog gains a field. (c) is a contract change.
+  - the lead answers Q-LBL-4;
+  - publish the next dev snapshot at the lead's word, so the website stops showing the hand labels.

@@ -1,5 +1,4 @@
 {
-  "label": "Scale grid, size unknown (diagnostic)",
   "summary": "A grey hatch for a material with no recorded size, or a picture painted for one mesh, when a scene is swapped to its scale grids.",
   "search_words": [
     "scale grid",

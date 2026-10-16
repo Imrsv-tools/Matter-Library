@@ -60,8 +60,8 @@ EDITED_FROM = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
 # catalog's. Credit fields are `MATTER_CREDIT_<FIELD>`; a field with several values (authors,
 # sponsors) repeats its key, each value one JSON object. Readers skip header lines they do not know.
 PREFIX = "MATTER_"
-SCALARS = ("id", "version", "name", "licence", "contributor", "group", "when", "sky")
-CREDIT_SCALARS = ("source", "source_url", "asset_url", "edited_from_name", "edited_from_url")
+SCALARS = ("id", "version", "licence", "contributor", "group", "when", "sky")   # no "name": RD-LBL-1
+CREDIT_SCALARS = ("title", "source", "source_url", "asset_url", "edited_from_name", "edited_from_url")
 CREDIT_LISTS = {"authors": "AUTHOR", "sponsors": "SPONSOR"}
 
 
@@ -115,6 +115,8 @@ def credit(record: dict) -> dict:
     hold is left out."""
     c = record.get("credit") or {}
     out = {k: c[k] for k in CREDIT_KEYS if c.get(k)}
+    if c.get("name"):      # RD-LBL-1 (2026-10-16): the source's title is credit, never the HDRI's name
+        out["title"] = c["name"]
     if c.get("info"):
         out["edited_from"] = c["info"]
         links = EDITED_FROM.findall(c["info"])
@@ -128,9 +130,6 @@ def facts(hdri: dict) -> dict:
     catalog's entry and the header stamp both take this, so the two cannot disagree."""
     rec = hdri["record"]
     out = {"id": hdri["id"], "version": hdri["version"]}
-    name = (rec.get("credit") or {}).get("name")
-    if name:
-        out["name"] = name
     licence = (rec.get("provenance") or {}).get("license")
     if licence:
         out["licence"] = licence

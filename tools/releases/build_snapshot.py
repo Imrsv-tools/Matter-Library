@@ -89,7 +89,6 @@ MAX_ASSETS = 1000                    # GitHub: up to 1000 assets a release
 # website, Blender and Unreal all read it; Unreal reads no WebP at all (PIC-F3). Until Phase17's
 # fix every picture here was WebP. Baseline, not progressive: the plainest JPEG every reader takes.
 JPEG_QUALITY = 90
-DEFAULT_TOKENS = {"Natural", "Clean", "Base"}
 # RD-P14-4 (the lead, 2026-10-14): the library relays what sits side by side on the site, and how
 # each is shown, so the site builds its navigation from the library. In browse order:
 #   rig       - on the parity rig's test scene (the cubes);
@@ -141,21 +140,6 @@ ZIP_TIME = (2026, 1, 1, 0, 0, 0)     # fixed, so a zip of the same files is byte
 
 
 # ------------------------------------------------------------------ pure parts (unit-tested)
-
-def label(display_name: str) -> str:
-    """A name a person reads, derived from the article's tokens: split the PascalCase, drop the
-    default tokens, sentence case. ``Copper_Verdigris_Aged_Base`` -> ``Copper verdigris aged``;
-    an acronym or a roman numeral keeps its capitals (``ABS``, ``Fitzpatrick III``)."""
-    words = []
-    for token in display_name.split("_"):
-        if token in DEFAULT_TOKENS:
-            continue
-        words += re.findall(r"[A-Z]+(?![a-z])|[A-Z]?[a-z]+|\d+", token)
-    out = [w if (w.isupper() and (len(w) > 1 or w in "IVX")) else w.lower() for w in words]
-    if out and not out[0].isupper():
-        out[0] = out[0][0].upper() + out[0][1:]
-    return " ".join(out)
-
 
 SEVERITY = {"ONE-SIDED": 3, "UNEVEN": 2, "moved alike": 1, "no change in any tool": 0}
 
@@ -219,15 +203,15 @@ def description(source: str) -> str:
 
 
 def hdri_entry(hdri: dict, thumb: str, thumb_sha: str) -> dict:
-    """One HDRI's site entry: its identity as the runtime catalog has it, Poly Haven's name as its
-    label, and every credit and tag its record holds; one thumbnail; no download (RD-P14-4). A
+    """One HDRI's site entry: its identity as the runtime catalog has it (its name is its file
+    name: no label, RD-LBL-1), and every credit and tag its record holds, Poly Haven's title as the
+    credit's ``title``; one thumbnail; no download (RD-P14-4). A
     field the record does not hold is left out."""
     rec = hdri["record"]
     cat = derive_hdri_entry({"id": hdri["id"], "version": hdri["version"], "status": rec.get("status") or "draft"})
-    c = rec.get("credit") or {}
     f = H.facts(hdri)      # Phase16 (RD-P16-2): the same facts the served .hdr is stamped with
     out = {"id": cat["id"], "version": cat["version"], "identity": hdri["identity"],
-           "label": c.get("name") or label(cat["display_name"]), "display_name": cat["display_name"],
+           "display_name": cat["display_name"],
            "status": cat["status"], "creator_selectable": cat["creator_selectable"],
            **{k: f[k] for k in ("licence", "contributor", "group", "when", "sky") if k in f},
            "pictures": [{"role": "thumbnail", "file": thumb, "sha256": thumb_sha}]}
@@ -417,7 +401,6 @@ def build(tag: str, out: Path) -> dict:
                               "creator_selectable": art["creator_selectable"]})
         rec = {
             "id": entry["id"], "version": entry["version"], "identity": identity,
-            "label": recipe.get("label") or label(art["display_name"]),
             "display_name": art["display_name"],
             "section": section(art), "group": art["group"],
             "domain": art["domain"], "material_class": art["material_class"],
@@ -539,7 +522,7 @@ def build(tag: str, out: Path) -> dict:
         f"and follow [CONTRIBUTING.md §3.1]({CONTRIBUTING_CHARACTER}).\n\n"
         + "".join(f"- `{k['file']}`: {k['what']}. Paint at {k['map_size']} × {k['map_size']}.\n" for k in kits)
         + ("\nPainted this way so far: "
-           + ", ".join(f"**{r['label']}** (`{r['display_name']}`, fits `{r['fits']}`, by {r.get('contributor', '?')})"
+           + ", ".join(f"**`{r['display_name']}`** (fits `{r['fits']}`, by {r.get('contributor', '?')})"
                        for r in fitted) + ".\n" if fitted else "")
         + "\n### What is in this snapshot\n\n")
     notes = (
