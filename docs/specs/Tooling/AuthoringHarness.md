@@ -75,6 +75,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `approval_binds_freeze` | a promoted approval references the release's actual frozen hashes |
 | `release_verify` | *(Since Phase03, a release's source textures are the ones its lock names, not every PNG on disk.)* Every **committed** freeze record (`library/releases/*.freeze.json`) still reproduces from the tree, naming any changed, missing or added file. A shipped file edited in place, or LFS pointer files in place of textures, fail here. The `.dds` set is included when the encoder or a staging tree is present. This is the hash mechanism only; the `vNN` immutability rule belongs to Version Management. |
 | `activation` | `activate_release.py` verifies install-readiness and switches the selector atomically |
+| `tool_tests` *(Phase20, 2026-10-16)* | every tool's own `test_*.py` under `tools/` and `blender/`, found by glob, each under the interpreter its imports need: Blender for `bpy` (as `check_exporter.sh` runs its selection test), the USD-tools Python for `pxr` (`USD_TOOLS_ENV`, `USD_TOOLS_ROOT`), this Python otherwise. A script whose interpreter is absent is a SKIP that names it, never a pass |
 
 > **Drift (2026-09-23), narrowed by Phase02:** the **gate** no longer reads a consumer's checkout (`fixture_sync` left `run_all.py`). **Promotion still does:** `promote_release.py` runs `check_fixture_sync` against IMRSV Stage's fixture mirror as one of its preconditions — owned by the release-bundle / consumer-contract phase (R1; `PlatformDependencies.md` P8).
 
@@ -193,4 +194,5 @@ proof subset through it. The **production tool-stack** (Matter Manager, a genera
 - 2026-06: the harness (assembler, per-material and manifest validators, determinism check, `run_all.py`) was stood up inside the IMRSV platform and used to author the proof subset.
 - 2026-07: the gate grew lanes for the runtime catalog, provenance, compression, staging, freeze, approval and activation, plus the conformance and Blender-generator tools.
 - 2026-09-23: brought home; tool list refreshed against the live tree.
+- 2026-10-16 (Phase20 20.1): the `tool_tests` lane (18 lanes). Until then the gate ran none of the tools' own test scripts, and a broken `test_hdri.py` stayed green.
 - 2026-09-25 (Phase03): the recipe lane (17 lanes), the recipe schema, the Physically Based lookup, the ambientCG importer, layer and base-set generators, the working headless preview; freeze and staging scoped to each release's lock.

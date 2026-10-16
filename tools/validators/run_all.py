@@ -34,6 +34,9 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
  13. activation             — activate_release.py verifies install-readiness + switches the
                                active-release selector ATOMICALLY (a failure leaves the prior
                                release active — RD-3/RD-5); skips pre-promotion
+ 14. tool tests             — every test_*.py under tools/ and blender/, under the interpreter
+                               its imports need (Blender for bpy, the USD-tools Python for pxr);
+                               SKIPs a script whose interpreter is absent, naming it (Phase20)
 
 Exit 0 iff no lane FAILs — and, with --strict, no lane SKIPs either (the full check before merging).
 """
@@ -703,6 +706,72 @@ def run_activation(root: Path) -> bool:
         _sh.rmtree(rt, ignore_errors=True)
 
 
+def _tool_test_runner(script: Path, scratch: Path):
+    """How to run one tool test script: (argv, env) or (None, the reason it cannot run here).
+    Chosen by what the script imports, never by a list of names, so a new test joins by itself:
+    ``bpy`` -> inside Blender (as check_exporter.sh runs its selection test); ``pxr`` -> the
+    USD-tools Python check_exporter.sh uses; anything else -> this Python."""
+    import os
+    import re
+    import shutil
+    text = script.read_text(encoding="utf-8")
+    if re.search(r"^\s*import bpy\b", text, re.M):
+        blender = shutil.which("blender")
+        if not blender:
+            return None, "needs Blender (`blender` not on PATH)"
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS",
+                            "PXR_AR_DEFAULT_SEARCH_PATH")}
+        return [blender, "--background", "--factory-startup", "--python", str(script), "--",
+                str(scratch)], env
+    if re.search(r"^\s*from pxr import\b", text, re.M):
+        envp = Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools"))
+        inst = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
+        py = envp / "bin" / "python"
+        if not (py.is_file() and (inst / "lib" / "python").is_dir()):
+            return None, f"needs the USD-tools Python ({py} with {inst / 'lib' / 'python'})"
+        return [str(py), str(script)], dict(os.environ, PYTHONPATH=str(inst / "lib" / "python"))
+    return [sys.executable, str(script)], None
+
+
+def run_tool_tests(root: Path):
+    """Phase20 20.1 (Q-P20-1, taken on the lead's go-ahead 2026-10-16): every tool's own test
+    script, `test_*.py` under tools/ and blender/, each run as its docstring says (exit 0 = PASS).
+    Until then the gate ran none of them, and a broken test_hdri.py stayed green (F-LBL-13).
+    FAIL if any ran and failed; SKIP (naming each) if none failed but one could not run here."""
+    import subprocess
+    import tempfile
+    print("== tool tests (Phase20) ==")
+    scripts = sorted(p for top in ("tools", "blender") for p in (root / top).rglob("test_*.py")
+                     if "__pycache__" not in p.parts)
+    if not scripts:
+        print("  [SKIP] no test_*.py under tools/ or blender/")
+        return SKIP
+    failed, unrun = [], []
+    for script in scripts:
+        rel = script.relative_to(root)
+        with tempfile.TemporaryDirectory(prefix="tool_test_") as scratch:
+            argv, env = _tool_test_runner(script, Path(scratch))
+            if argv is None:
+                print(f"  [SKIP] {rel}: {env}")
+                unrun.append(str(rel))
+                continue
+            proc = subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, timeout=600)
+        if proc.returncode == 0:
+            print(f"  [PASS] {rel}")
+        else:
+            failed.append(str(rel))
+            print(f"  [FAIL] {rel} (exit {proc.returncode}); its last lines:")
+            for line in (proc.stdout + proc.stderr).strip().splitlines()[-8:]:
+                print(f"      {line}")
+    if failed:
+        return False
+    if unrun:
+        print(f"  not run here: {', '.join(unrun)}")
+        return SKIP
+    return True
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
@@ -729,6 +798,7 @@ def main(argv=None) -> int:
         "approval_binds_freeze": run_approval_binds_freeze(root),
         "release_verify": run_release_verify(root),
         "activation": run_activation(root),
+        "tool_tests": run_tool_tests(root),
     }
     print("\n=== SUMMARY ===")
     for k, v in results.items():

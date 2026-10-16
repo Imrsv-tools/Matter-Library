@@ -48,13 +48,13 @@
 - **Python tools:** `snake_case.py`, verb-first where it is an action (`build_…`, `check_…`, `validate_…`, `gen_…`, `project_…`).
 - **Shell wrappers:** `check_*.sh`, `*-usd-tools.sh`.
 - **Fixtures:** under a sibling `fixtures/` folder; deliberately bad inputs are named for what they break.
-- **Tests:** `test_*.py` beside the code they test (`blender/addons/imrsv_lcd_export/`, `tools/conformance/`). Test documentation lives in the docstrings; there is no separate test-docs tree. That is the observed practice as of 2026-09-23, not yet a ruling: the first phase that ships a real test suite decides it here.
+- **Tests:** `test_*.py` beside the code they test (`blender/addons/imrsv_lcd_export/`, `tools/conformance/`). Test documentation lives in the docstrings; there is no separate test-docs tree. ~~That is the observed practice as of 2026-09-23, not yet a ruling: the first phase that ships a real test suite decides it here.~~ **Decided 2026-10-16 (Phase20 20.1, RD-P20-3, taken on the lead's go-ahead):** a test is a standalone `test_*.py` beside its code, run with `uv run <path>` (or the interpreter its docstring names), exit 0 = PASS, with no test framework. **The one command runs every one** (`run_all.py`'s `tool_tests` lane), so a new test joins the gate just by its name.
 
 ## Entry points
 
 | To… | Run |
 |---|---|
-| validate everything structural — **the one command** | `uv run tools/validators/run_all.py` (17 lanes, listed in [AuthoringHarness](specs/Tooling/AuthoringHarness.md)). From a fresh clone, uv builds `.venv/` from `pyproject.toml` + `uv.lock` (Python 3.12, MaterialX 1.39.5) first. Add `--strict` to fail on any skipped lane. Without uv: `python3.12 -m venv .venv && .venv/bin/pip install .`, then run the script with `.venv/bin/python`. |
+| validate everything structural — **the one command** | `uv run tools/validators/run_all.py` (18 lanes since Phase20's `tool_tests`, 2026-10-16; listed in [AuthoringHarness](specs/Tooling/AuthoringHarness.md)). From a fresh clone, uv builds `.venv/` from `pyproject.toml` + `uv.lock` (Python 3.12, MaterialX 1.39.5) first. Add `--strict` to fail on any skipped lane. Without uv: `python3.12 -m venv .venv && .venv/bin/pip install .`, then run the script with `.venv/bin/python`. |
 | (re)generate articles from recipes | `python tools/converters/build_proof_subset.py [<recipe.json> …]` |
 | **build the next materials on the wish list** (the standing material-making process, never a phase: RD-MP-13) | `/matter-batch` in a Claude Code session; `uv run tools/converters/wishlist.py next [N]` shows what it would take (redo rows first) |
 | re-project a catalog from its lockfile | `python tools/converters/project_runtime_catalog.py` |
