@@ -83,7 +83,13 @@ Seen by the platform's lead in the platform's app, Desktop, on the masters as th
 changes no article and no master for these; each is the library's to tune.
 
 - **MA-Q7, the `index` build:** a solid gem (`Diamond_Brilliant`) bends and breaks up what is behind it — *"It breaks
-  up"*. The `REFRACTION=function` look on the same cube is still owed.
+  up"*.
+- **MA-Q7, answered — two builds, one cube, one view:** under a `REFRACTION=function` rebuild the same gem reads as
+  plain glass — *"looks like glass. it has lost the fractioned view it had before"*; back on the `index` build, the
+  same view — *"Diamond is 'bent' again"*. Both takes resolved the gem to the solid master (`M_Matter_TranslucentThick`).
+  So the grid behind the gem sits in a different place under `index` than under `function`: **`index` is the build
+  that bends, and the platform keeps it.** The lead's ruling on the look: a solid gem reads refracted, a thin glass
+  reads as glass — met by `index` as built; no further master tuning is asked.
 - **Coat, fuzz, the stretched highlight** (`Porcelain_Glazed`, `Felt_Natural`, `Aluminium_Brushed`): read as intended
   (*"I think so"*).
 
@@ -108,4 +114,4 @@ colours, and a Natural eye that reads calm.
 - **Reports:** R-PMU-1 – 5 (P11, P17, P29, F-P19-9, P21).
 - **Asks:** Q-PMU-1 – 7 (a fit-set picture's carrier, the lips, the LED body and brightness, skin, Felt's roughness,
   Felt's scale, the eyes).
-- **Owed to the library:** the `REFRACTION=function` look (MA-Q7).
+- **Owed to the library:** nothing — MA-Q7 answered (`index` bends; `function` reads as glass).
