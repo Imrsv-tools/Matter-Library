@@ -6,6 +6,6 @@ public class MatterRuntime : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		PublicDependencyModuleNames.AddRange(new string[] {
-			"Core", "CoreUObject", "Engine", "RenderCore", "RHI", "ImageCore", "Json", "ProceduralMeshComponent" });
+			"Core", "CoreUObject", "Engine", "RenderCore", "RHI", "ImageCore", "Json", "MeshDescription", "StaticMeshDescription" });
 	}
 }

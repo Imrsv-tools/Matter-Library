@@ -7,7 +7,6 @@
 		{ "Name": "MatterRuntime", "Type": "Runtime", "LoadingPhase": "Default" }
 	],
 	"Plugins": [
-		{ "Name": "ProceduralMeshComponent", "Enabled": true },
 		{ "Name": "Interchange", "Enabled": true },
 		{ "Name": "NNEDenoiser", "Enabled": false },
 		{ "Name": "AndroidFileServer", "Enabled": false }
