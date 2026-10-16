@@ -158,7 +158,7 @@ The moment the dev install is re-served, **every scene that names `…_PureSky_v
   - **It is a contract change for every consumer that names a sky by its file name** (F-LBL-12). Its cutover is Q-LBL-5.
 - **RD-LBL-6 — The next dev snapshot is published** (the lead, 2026-10-16: *"1) Yes"*). `matterlib-0.2.0-dev.9` was published 2026-10-16 at `79a8a82`: 636 assets, no `label`, 59 HDRI `credit.title`. Its site file was fetched back byte-identical.
 - **RD-LBL-7 — The cutover is (a): build the library's half now, switch together** (the lead, 2026-10-16: *"a"*). Closes Q-LBL-5. The library's half is built and off (Pass 5); the switch is the lead's day.
-- **RD-LBL-8 — What is left is seeded as a phase, and it is next** (the lead, 2026-10-16: *"Seed a phase for what needs doing here and make it next"*). It is `PhaseTBD_FileNameIsTheName.md`, first in the Roadmap's `## Future`, unnumbered. It covers the cutover, the consumers' P30 and P31, and the gate gap that let a broken test stay green.
+- **RD-LBL-8 — What is left is seeded as a phase, and it is next** (the lead, 2026-10-16: *"Seed a phase for what needs doing here and make it next"*). It is `PhaseTBD_FileNameIsTheName.md`, first in the Roadmap's `## Future`, unnumbered. *(Numbered **Phase20** by the lead the same day: [`Phases/Phase20_FileNameIsTheName.md`](../Phases/Phase20_FileNameIsTheName.md).)* It covers the cutover, the consumers' P30 and P31, and the gate gap that let a broken test stay green.
 - **RD-LBL-4 — Carry RD-LBL-1 to RD-LBL-3 out as a quick fix, and push** (the lead, 2026-10-16: *"yes please"*). Landed: Pass 4.
 
 ## Status
@@ -173,4 +173,4 @@ The moment the dev install is re-served, **every scene that names `…_PureSky_v
 - **Published:** `matterlib-0.2.0-dev.9` (RD-LBL-6). The website shows the file names from its next mirror run.
 - **Open:** nothing. **Waiting on:** the lead's cutover day for the published HDRI names (Pass 5's four steps).
 - **Next step:**
-  - `/discovery` on *The File Name Is the Name* (RD-LBL-8), which carries the cutover (Pass 5).
+  - ~~`/discovery` on *The File Name Is the Name* (RD-LBL-8), which carries the cutover (Pass 5).~~ Done 2026-10-16: Phase20's Brief carries the cutover (Pass 5), with two questions for the lead (Q-P20-1, Q-P20-2).
