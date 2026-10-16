@@ -104,7 +104,16 @@ Either way, (a)'s split, where the website and Studio name a material differentl
 |---|---|---|
 | ~~Q-LBL-2~~ → RD-LBL-2 | **HDRIs too?** Is an HDRI's name its file name (`AristeaWreck_PureSky_v01`, shown as *"AristeaWreck PureSky"*), with Poly Haven's title kept only as its credit? That answers the platform's ask A12 with no label. | **Yes.** It is the same rule, applied to both kinds of entry. |
 | ~~Q-LBL-3~~ → RD-LBL-3 | **The one-line summary and the search words:** keep them? They describe a material without renaming it. | **Keep.** They are not names; the website and search use them. |
-| Q-LBL-4 | **Drop *PureSky* from the 59 HDRI file names** (RD-LBL-2's wish)? It renames the HDRI files, and every place that names one (F-LBL-12). | **Yes, as one coordinated change:** the library's rename and its own references, plus a ledger ask for the platform to update its scenes, fixtures and goldens in the same window. That is *"Fix forward only... we have no legacy projects yet"* (Version Management's precedent). |
+| ~~Q-LBL-4~~ → RD-LBL-5 | **Drop *PureSky* from the 59 HDRI file names** (RD-LBL-2's wish)? It renames the HDRI files, and every place that names one (F-LBL-12). | **Yes, as one coordinated change:** the library's rename and its own references, plus a ledger ask for the platform to update its scenes, fixtures and goldens in the same window. That is *"Fix forward only... we have no legacy projects yet"* (Version Management's precedent). |
+| Q-LBL-5 | **The cutover for RD-LBL-5.** The library's half:
+- the published name drops *PureSky* (`hdris.py`'s listing gives each HDRI a published id beside its source one);
+- the name grammar check (`validate_manifest`) takes `<Name>_vNN` for a published HDRI;
+- [Identity](../../specs/Ontology/Identity.md) §HDRI names;
+- the default setting;
+- the re-served dev install;
+- a snapshot.
+
+The moment the dev install is re-served, **every scene that names `…_PureSky_v01.hdr` loses its sky** until the platform renames its references (F-LBL-12: Stage 42 files, USDLiveView 4, the Asset Library 4, the website 6, the platform's docs 6). When does the library's half land? | **Build the library's half now, and hold the re-serve and the snapshot until the platform says its rename is ready.** Ledger M10 carries the ask with the exact old → new list. Then both land the same day. |
 | ~~Q-LBL-1~~ → RD-LBL-1 | **One readable name per material:** (a) as today, the website only; (b) derived from the file name by a better rule, shown everywhere; or (c) the confirmed hand labels moved into each material's file, shown everywhere? | **(b)**. One source, no drift; an override only where a rule cannot read. |
 
 ## Resolved
@@ -122,6 +131,11 @@ Either way, (a)'s split, where the website and Studio name a material differentl
   - Whether it also covers HDRIs and the one-line summaries is put to the lead (Q-LBL-2, Q-LBL-3).
 - **RD-LBL-2 — HDRIs follow the same rule: an HDRI's name is its file name, and Poly Haven's title is kept only as its credit. The lead would also drop *PureSky* from the names, since every HDRI is one** (the lead, 2026-10-16: *"Yes but we can also drop "PureSky" since they are all puresky and we have no plans to change that for a while"*). Closes Q-LBL-2. Dropping *PureSky* renames files other repos name, so it is held as Q-LBL-4 (F-LBL-12).
 - **RD-LBL-3 — The one-line summaries and the search words stay** (the lead, 2026-10-16: *"yes keep"*). Closes Q-LBL-3.
+- **RD-LBL-5 — The HDRI source files keep their names; every name the library *publishes* drops *PureSky*** (the lead, 2026-10-16, to Q-LBL-4: *"We don't need to reanme the source files... but yes - we need to rename the others that are published"*). Closes Q-LBL-4.
+  - `MatterLibrary/hdris/AristeaWreck_PureSky_v01.hdr` stays as it is, as do its record and its provenance.
+  - **What is published becomes `AristeaWreck_v01`:** the catalog `id`, the served file name, the header's `MATTER_ID`, the thumbnail's file name, the site file's identity, and the default.
+  - **It is a contract change for every consumer that names a sky by its file name** (F-LBL-12). Its cutover is Q-LBL-5.
+- **RD-LBL-6 — The next dev snapshot is published** (the lead, 2026-10-16: *"1) Yes"*). `matterlib-0.2.0-dev.9` was published 2026-10-16 at `79a8a82`: 636 assets, no `label`, 59 HDRI `credit.title`. Its site file was fetched back byte-identical.
 - **RD-LBL-4 — Carry RD-LBL-1 to RD-LBL-3 out as a quick fix, and push** (the lead, 2026-10-16: *"yes please"*). Landed: Pass 4.
 
 ## Status
@@ -133,7 +147,8 @@ Either way, (a)'s split, where the website and Studio name a material differentl
   - only the website sees it;
   - every material has a hand label, though the spec says "only where it reads badly".
 - **Ruled (2026-10-16):** RD-LBL-1 to RD-LBL-4. The file name is the name, for materials and HDRIs; the summaries and search words stay; carried out as a quick fix (Pass 4).
-- **Open:** Q-LBL-4, dropping *PureSky* from the HDRI file names, a rename across repos (F-LBL-12).
+- **Published:** `matterlib-0.2.0-dev.9` (RD-LBL-6). The website shows the file names from its next mirror run.
+- **Open:** Q-LBL-5, the cutover for dropping *PureSky* from the published HDRI names.
 - **Next step:**
-  - the lead answers Q-LBL-4;
-  - publish the next dev snapshot at the lead's word, so the website stops showing the hand labels.
+  - the lead answers Q-LBL-5;
+  - then the library's half of RD-LBL-5 as a quick fix, and the ledger ask to the platform.
