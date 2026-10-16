@@ -59,15 +59,24 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
 
 ```json
 {
-  "default_hdri": "IndustrialSunset02_PureSky",
+  "default_hdri": "IndustrialSunset02",
   "hdris": [
     {
       "creator_selectable": true,
+      "display_name": "IndustrialSunset02",
+      "id": "IndustrialSunset02",
+      "payload_path": "hdris/IndustrialSunset02_v01.hdr",
+      "status": "candidate",
+      "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_v01.jpg",
+      "version": "v01"
+    },
+    {
+      "creator_selectable": false,
       "display_name": "IndustrialSunset02_PureSky",
       "id": "IndustrialSunset02_PureSky",
       "payload_path": "hdris/IndustrialSunset02_PureSky_v01.hdr",
-      "status": "candidate",
-      "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_PureSky_v01.jpg",
+      "status": "deprecated",
+      "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_v01.jpg",
       "version": "v01"
     }
   ],
@@ -77,7 +86,9 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
 }
 ```
 
-*(Measured 2026-10-14: the entry above is the dev catalog's, as `tools/releases/serve_to_stage.py` writes it.)*
+*(Measured 2026-10-14: the entry above is the dev catalog's, as `tools/releases/serve_to_stage.py` writes it. **Updated 2026-10-16 (Phase20 20.2):** the published name drops* PureSky *([Identity](../Ontology/Identity.md) §HDRI names); the second entry is the name it was published by before, kept for old scenes, below. The credit, licence and taxonomy fields are left out of the example.)*
+
+**A name an HDRI was published by before** *(2026-10-16, Phase20, Q-P20-2 (b))*. When the published name changes (`published_drop_variant`), the dev catalog keeps the old one as a row with `status: deprecated` and `creator_selectable: false`. Its `payload_path` is the old file name, served as a link to the published copy, and its `thumbnail_path` and facts are the published HDRI's. **A consumer never offers it** (`creator_selectable`), and **a scene that names it still resolves** (the file is there, under the search path). The site file carries no such row, and a release carries none (planned, *Release Bundle*).
 
 | Field | Type | Meaning | Source |
 |-------|------|---------|--------|

@@ -1,6 +1,6 @@
 # Phase20 — The File Name Is the Name
 
-**Status:** ACTIVE — BRIEF READY, two lead questions open (Q-P20-1, Q-P20-2), 2026-10-16. Numbered **Phase20** by the lead's *"/discovery P20 The File Name Is the Name"*, which also opened discovery. Seeded the same day by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"* (RD-LBL-8). *(In 2026-10-14 commits, Phase20 means Scale Grids, RD-DS-7; it closed as Phase19.)*
+**Status:** ACTIVE — IN EXECUTION (2026-10-16, the lead's *"/execute P20"*). Q-P20-1 and Q-P20-2 were taken at their recommendations on that go-ahead (§Execution ledger). Numbered **Phase20** by the lead's *"/discovery P20 The File Name Is the Name"*, which also opened discovery. Seeded the same day by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"* (RD-LBL-8). *(In 2026-10-14 commits, Phase20 means Scale Grids, RD-DS-7; it closed as Phase19.)*
 **Lane:** `build` (§Risk lane). **Next:** `/execute` once the lead answers Q-P20-1 and Q-P20-2.
 **Measured at:** `b400a16`, on the library machine (no engine at `unreal/build.sh`'s `UE`).
 
@@ -168,6 +168,22 @@ The controls this phase touches, each one read:
 - **Nothing, for 20.1.**
 - **For 20.2:** under Q-P20-2 (a), the platform's word that its rename is ready (P31). Under (b), only the lead naming the day.
 - **For click 5's material half:** the platform's P30.
+
+## Execution ledger
+
+- **The two questions** (the lead's go-ahead, *"/execute P20"*, passed over both; both are reversible, so the agent took its recommendations and said so; **not rulings the lead spoke**):
+  - **Q-P20-1 → RD-P20-3 (taken):** the one command runs the tools' own test scripts (20.1).
+  - **Q-P20-2 → RD-P20-4 (taken): (b).** The old names stay resolvable, hidden and `deprecated`. This refines RD-LBL-5 for the dev install only. **Consequences stated to the lead:**
+    - old scenes keep their sky;
+    - the switch no longer waits for the platform's day, though the platform still renames (P31);
+    - 59 hidden rows stay in the dev install until the first release.
+- **Deviation, a Brief fact that was false:** the Stage on the library machine is a 2026-09-27 build. It cannot seed a scene with the library's default sky, which the platform added on 2026-10-14/15. So the prep is not *"create a scene through Stage"*. **The fixture is the platform's own Studio-saved composition** naming the default sky (`CubeAndCone_04/Composition_09`, at the platform's origin), in scratch copies outside that repo:
+  - **A** is as saved (`…_PureSky_v01.hdr`);
+  - **B** is renamed as the platform's P31 will write it (`IndustrialSunset02_v01.hdr`);
+  - **C** is a control naming a sky that does not exist.
+- **Deviation, found building:** `serve_to_stage.py --view` pointed USDLiveView at the checkout, which holds only the source names, so a scene naming a published sky would not resolve there. It now points at the dev install.
+- **Surface check:** USDLiveView draws the sky as the backdrop. Measured on the scratch copies: A shows the sunset; C shows a flat grey backdrop. A headless `usdrecord` render cannot show it (no image lighting, no backdrop) and was dropped as the instrument.
+- **Gate, 20.1 and 20.2 in the tree:** 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL. That is the baseline set plus `tool_tests` (11 of 11 scripts PASS on the library machine).
 
 ## Discovery Log
 

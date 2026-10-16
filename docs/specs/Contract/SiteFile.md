@@ -24,10 +24,12 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
   "draft": true,
   "groups": [ { "id": "matter", "label": "Matter", "list": "materials", "section": "matter", "shown": "thumbnail" }, "…" ],
   "materials": [ { "id": "engineered/metal/Copper_Verdigris_Aged_Base_s01", "…": "…" } ],
-  "hdris": [ { "id": "IndustrialSunset02_PureSky", "…": "…" } ],
-  "default_hdri": "IndustrialSunset02_PureSky"
+  "hdris": [ { "id": "IndustrialSunset02", "…": "…" } ],
+  "default_hdri": "IndustrialSunset02"
 }
 ```
+
+*(2026-10-16, Phase20 20.2: an HDRI's published id drops* PureSky *([Identity](../Ontology/Identity.md) §HDRI names), from the first snapshot after the switch; `dev.1` to `dev.9` carry `IndustrialSunset02_PureSky`. The site file never lists the old names the dev install keeps for old scenes.)*
 
 | Field | Type | Meaning | Source |
 |---|---|---|---|

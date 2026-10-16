@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase20 — The File Name Is the Name — ACTIVE (IN DISCOVERY) *(numbered 2026-10-16 by the lead's "/discovery P20 The File Name Is the Name"; it was the head of `## Future`, placed there by the lead's "make it next", RD-LBL-8. In 2026-10-14 commits *Phase20* means Scale Grids, RD-DS-7)*
+### Phase20 — The File Name Is the Name — ACTIVE (IN EXECUTION) *(numbered 2026-10-16 by the lead's "/discovery P20 The File Name Is the Name"; it was the head of `## Future`, placed there by the lead's "make it next", RD-LBL-8. In 2026-10-14 commits *Phase20* means Scale Grids, RD-DS-7)*
 **Outcome:** wherever a person meets a Matter material or HDRI (the website, Studio, USDLiveView), it is called by its file name's own words, the same in every app; HDRIs are named without PureSky, and every scene keeps its sky.
 - `docs/Planning/Phases/Phase20_FileNameIsTheName.md` · research `docs/Planning/Research/261015_R_MaterialLabels.md`
 

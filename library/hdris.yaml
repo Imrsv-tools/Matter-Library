@@ -12,7 +12,9 @@ default: IndustrialSunset02_PureSky
 # that are published"). The files above keep their names, as do their records and `default`
 # (both name the source); the catalog id, the served file, the header's MATTER_ID, the thumbnail
 # and the site file take the published name (AristeaWreck_PureSky_v01 -> AristeaWreck_v01).
-# UNSET UNTIL THE CUTOVER (Q-LBL-5 (a)): the platform's scenes name each sky by its file name, so
-# this line is set the day the platform's rename of its references is ready, then the dev install
-# is re-served and a snapshot published. Setting it is the cutover.
-# published_drop_variant: PureSky
+# SET 2026-10-16 (Phase20 20.2). A scene saved before then names the old name (…_PureSky_v01.hdr):
+# the dev install keeps each old name resolving, hidden and deprecated, a link to the published
+# copy (Q-P20-2 (b); tools/releases/hdris.py former()), so no scene loses its sky while the
+# platform renames its references (ledger P31). Was: unset until a cutover day shared with the
+# platform (Q-LBL-5 (a)).
+published_drop_variant: PureSky

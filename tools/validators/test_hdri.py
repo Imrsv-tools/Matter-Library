@@ -177,12 +177,34 @@ with tempfile.TemporaryDirectory() as tmp:
 
 print("== the catalog and the header agree, on the tree ==")
 entries, _ = sts.working_tree_hdris()
-facts = {h["id"]: H.facts(h) for h in H.on_disk()}
+facts = {}
+for h in H.on_disk():   # a hidden row (Phase20) keeps the source id, and its sky's facts
+    facts[h["id"]] = facts[h["source_id"]] = H.facts(h)
 agree = [e["id"] for e in entries
          if all(e.get(k) == facts[e["id"]].get(k)
                 for k in ("group", "when", "sky", "licence", "contributor", "credit"))]
-check(entries and len(agree) == len(entries) == len(facts),
+check(entries and len(agree) == len(entries),
       f"every served HDRI entry carries its facts ({len(agree)} of {len(entries)})")
+shown = [e for e in entries if e["creator_selectable"]]
+check(len(shown) == len(H.on_disk()), "every HDRI on disk is listed once to choose from")
+check(all(e["status"] == "deprecated" for e in entries if not e["creator_selectable"]),
+      "a row no one can choose is a deprecated old name (Phase20)")
+
+print("== Phase20: the names published before the switch stay resolvable, hidden ==")
+rows = [{"id": "AristeaWreck", "source_id": "AristeaWreck_PureSky", "version": "v01"},
+        {"id": "Studio_Softbox", "source_id": "Studio_Softbox", "version": "v01"}]
+check([h["source_id"] for h in H.former(rows)] == ["AristeaWreck_PureSky"],
+      "former(): only an HDRI whose published name changed keeps its old one")
+check(H.former([{**r, "id": r["source_id"]} for r in rows]) == [], "former(): none while the setting is unset")
+real = H.on_disk()
+old_rows = {e["id"]: e for e in entries if not e["creator_selectable"]}
+check(set(old_rows) == {h["source_id"] for h in H.former(real)},
+      f"the tree: one hidden row per renamed HDRI ({len(old_rows)})")
+by_source = {h["source_id"]: h for h in real}
+check(all(old_rows[s]["payload_path"] == f"hdris/{s}_{by_source[s]['version']}.hdr"
+          and old_rows[s]["thumbnail_path"] == f"thumbnails/hdris/{by_source[s]['identity']}.jpg"
+          for s in old_rows),
+      "a hidden row's file is its old name, and its picture is the published one's")
 check(all(e.get("contributor") and e.get("licence") and e.get("credit") for e in entries),
       "every served HDRI entry has a contributor, a licence and a credit")
 
