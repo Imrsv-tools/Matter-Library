@@ -196,6 +196,18 @@ The controls this phase touches, each one read:
 - **Owed:** click 4 (Studio's sky picker, on the machine with Unreal, after that machine pulls and re-serves) and click 5's library half (done: the site file). The website showing it is the platform's mirror run plus P30.
 - **Gate, 20.1 and 20.2 in the tree:** 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL. That is the baseline set plus `tool_tests` (11 of 11 scripts PASS on the library machine).
 
+## Hand-off — click 4 on the machine with Unreal (2026-10-16)
+
+Studio does not run on the library machine (no `IMRSV_Studio` beside the Stage checkout, which the platform's `scripts/build/deploy-to-studio.sh` defaults to), so click 4 is that machine's. For a session there:
+
+1. **Converge** this checkout with `origin/main` (it must hold `3a007f9`, 20.2's switch). `.claude/CLAUDE.md` §Git, the diverged-trunk row, says how.
+2. **Re-serve** the dev install: `uv run tools/releases/serve_to_stage.py` (`--runtime <the Stage runtime>`, or `IMRSV_STAGE_RUNTIME` set). It prints `hdris  59 served (+59 old names kept for old scenes, hidden), default IndustrialSunset02`. It restarts that Stage unless `--no-restart`, and that Stage may be serving other work, so ask the lead first.
+3. **The platform's deploy carries the dev catalog to Studio** (RuntimeCatalog §dev catalog: *"through the platform's deploy, Studio"*). Find the deploy step on that machine; it is not visible from here.
+4. **The click, the lead's:** open Studio's sky picker. Right looks like the skies listed as `IndustrialSunset02` and so on, with none saying *PureSky*, and the materials listed by their file names' words.
+   - Studio lists skies from the catalog only with the platform's Stage from 2026-10-14 on. An older Stage lists none, which is not this phase's defect: say so and record it.
+   - A scene saved with `…_PureSky_v01.hdr` should keep its sky (the hidden old name).
+5. **Record** the lead's words under §Execution ledger, verbatim. Then the close (`execute_close.md`).
+
 ## Discovery Log
 
 - **2026-10-16 — Pass 1 and the Brief.**
