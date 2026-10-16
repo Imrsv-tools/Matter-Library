@@ -183,6 +183,12 @@ The controls this phase touches, each one read:
   - **C** is a control naming a sky that does not exist.
 - **Deviation, found building:** `serve_to_stage.py --view` pointed USDLiveView at the checkout, which holds only the source names, so a scene naming a published sky would not resolve there. It now points at the dev install.
 - **Surface check:** USDLiveView draws the sky as the backdrop. Measured on the scratch copies: A shows the sunset; C shows a flat grey backdrop. A headless `usdrecord` render cannot show it (no image lighting, no backdrop) and was dropped as the instrument.
+- **20.2 · `676a2d8` · clicks 2 and 3, the lead in USDLiveView (2026-10-16, library machine):**
+  - **The lead, verbatim:** *"Ok... they look the same to me... is that what you want me to see?"*
+  - **The agent's reading:** a pass. The scene saved with the old sky name (`SavedBefore_OldSkyName`) and the same scene with the published name (`Renamed_NewSkyName`) show the same sunset sky; the agent's screenshots of both show it behind the objects, where the C control shows flat grey.
+  - **Click 1 is agent-checked, not the lead's.** The materials list needs Stage editing that scene, and Stage had another session's scene open ("editing off"). What it shows is unchanged by this phase: the served catalog's `display_name`, which USDLiveView shows with underscores as spaces (F-P20-4).
+  - **Owed:** click 4 (Studio, on the machine with Unreal; needs a push) and click 5 (the website; needs 20.3).
+- **20.1 · `89ba1a6` · done** (no click: the gate's own output).
 - **Gate, 20.1 and 20.2 in the tree:** 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL. That is the baseline set plus `tool_tests` (11 of 11 scripts PASS on the library machine).
 
 ## Discovery Log
