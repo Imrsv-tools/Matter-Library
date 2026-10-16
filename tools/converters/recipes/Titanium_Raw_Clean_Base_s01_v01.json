@@ -3,7 +3,7 @@
   "summary": "Bare mill-finish titanium, a warm darker grey than steel with a soft hazy sheen, as on aerospace parts, cookware and architectural cladding.",
   "search_words": ["titanium", "bare metal", "metal", "grey metal", "mill finish"],
   "origin": ["measured", "agent-drafted"],
-  "_comment": "Raw titanium: mill-finish titanium sheet, plate or bar as it leaves the rolls, with no polishing, brushing or anodising: a warm, slightly brownish mid-to-light grey, darker than aluminium or steel, with a soft hazy reflection (cladding, aerospace and marine parts, cookware, watch cases before finishing). Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. Base colour is titanium's published normal-incidence reflectance (judgement: the Physically Based download was cut short during the build). APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the broad corner band meant for a deposit, its A the open faces meant for handling marks, so dust takes slot 2 and fingerprints slot 3). Not carried: the tarnish (oxide interference) colour the wish list also wants.",
+  "_comment": "Raw titanium: mill-finish titanium sheet, plate or bar as it leaves the rolls, with no polishing, brushing or anodising: a warm, slightly brownish mid-to-light grey, darker than aluminium or steel, with a soft hazy reflection (cladding, aerospace and marine parts, cookware, watch cases before finishing). Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. Base colour is the Physically Based Titanium entry. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the broad corner band meant for a deposit, its A the open faces meant for handling marks, so dust takes slot 2 and fingerprints slot 3). Not carried: the tarnish (oxide interference) colour the wish list also wants.",
   "name": "Titanium_Raw_Clean_Base_s01_v01",
   "status": "draft",
   "contributor": "MatterBot",
@@ -13,7 +13,7 @@
   "class": "metal",
   "scale_tag": "s01",
   "meters_per_tile": 0.1,
-  "base_color_const": "0.616, 0.582, 0.544",
+  "base_color_const": "0.441, 0.4, 0.361",
   "roughness_const": 0.35,
   "metalness_const": 1,
   "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
@@ -24,6 +24,10 @@
   ],
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
   "sources": [
-    {"kind": "judgement", "why": "base colour 0.616, 0.582, 0.544 (linear sRGB) is titanium's normal-incidence reflectance as published (the Physically Based 'Titanium' entry, recalled; its API download failed with IncompleteRead on 2026-10-16, so it is not copied from a live lookup); roughness 0.35 for a mill finish, a touch duller than raw aluminium's 0.3, a soft glow with no readable image. No measured roughness."}
+    {"kind": "physicallybased", "entry": "Titanium", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610110901, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.441, 0.4, 0.361", "metalness_const": 1, "roughness_const": 0},
+     "not_carried": ["specularColor", "complexIor"],
+     "note": "roughness_const is not taken (the entry is an ideal mirror); the mill finish is the judgement below."},
+    {"kind": "judgement", "why": "roughness 0.35 for a mill finish, a touch duller than raw aluminium's 0.3: a soft glow with no readable image. No measured value."}
   ]
 }

@@ -108,7 +108,7 @@
       <input name="in2" type="float" nodename="overlay3_gate" />
     </multiply>
     <constant name="base_color_const" type="color3">
-      <input name="value" type="color3" value="0.616, 0.582, 0.544" />
+      <input name="value" type="color3" value="0.441, 0.4, 0.361" />
     </constant>
     <multiply name="base_color_tinted" type="color3">
       <input name="in1" type="color3" nodename="base_color_const" />
