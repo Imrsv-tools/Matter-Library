@@ -331,6 +331,12 @@ OFF_SCALE_KNOWN = {
 }
 
 
+def off_tag(d: dict) -> bool:
+    """Whether a recipe's tile is not its scale tag's length (G9's test; sUKN and a missing size are not judged here)."""
+    tag, mpt = d.get("scale_tag"), d.get("meters_per_tile")
+    return tag in TAG_METRES and mpt is not None and abs(mpt - TAG_METRES[tag]) > 1e-9 * TAG_METRES[tag]
+
+
 def scale_fit_errors(d: dict) -> list:
     """G9 for one recipe: its meters_per_tile is exactly its scale tag's length (RD-P19-2)."""
     tag, mpt, name = d.get("scale_tag"), d.get("meters_per_tile"), d["name"]
@@ -339,7 +345,7 @@ def scale_fit_errors(d: dict) -> list:
     if tag not in TAG_METRES or mpt is None:
         return []                       # the tag itself is the grammar's (G2 / the materials lane)
     want = TAG_METRES[tag]
-    on_tag = abs(mpt - want) <= 1e-9 * want
+    on_tag = not off_tag(d)
     if name in OFF_SCALE_KNOWN:
         if on_tag:
             return [f"G9 {name} is on its tag now: remove it from OFF_SCALE_KNOWN"]

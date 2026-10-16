@@ -49,4 +49,4 @@ The layers on disk are in `rules`; `brief` checks a row's own and names a missin
 
 `uv run tools/converters/lookup_physically_based.py search <word>`, then `show "<Exact Name>"`: copy `used` into the recipe and the `source` record into `sources`, unchanged. No entry: your own values, plus `{"kind": "judgement", "why": "…"}`. A scan: `import_ambientcg.py search`, `info`, `import` (CC0 only).
 
-**Start a row with `uv run tools/converters/wishlist.py brief <row>`**: the row, what is on disk for its stem, which of its layers exist, the nearest recipe for its master (copy its shape) and the Physically Based entries matching its Material token, in one call.
+**Start a row with `uv run tools/converters/wishlist.py brief <row>`**: the row, the job it asks for (new build, scale repair, a redo, review only), what is on disk for its stem, the gate's result on its recipe, its tag's length (and an off-tag recipe), the other articles of the same matter, which of its layers exist, the nearest recipe for its master (copy its shape) and the Physically Based entries matching its Material token, in one call.

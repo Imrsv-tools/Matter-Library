@@ -123,6 +123,21 @@ with tempfile.TemporaryDirectory() as tmp:
     check(lines[-1] == "REDO     too dark", "brief: a redo row ends with the maintainer's note")
     check(not any(ln.startswith("pb") for ln in lines), "brief --no-pb: no network line")
     check(any(ln == "nearest  recipes/Kept_A_Clean_Base_s1_v01.json" for ln in lines), "brief: names the nearest recipe")
+    check(any(ln.startswith("job      redo:") for ln in lines), "job: a redo on its tag follows the note")
+    check(any(ln.startswith("gate     FAIL") for ln in lines), "gate: an incomplete recipe fails, with its errors")
+    check("scale    s1 = 1 m" in lines, f"scale: the tag's length (got {[ln for ln in lines if ln.startswith('scale')]})")
+
+    recipe("Basalt_Flamed_Clean_Base_s1_v01", scale_tag="s1", meters_per_tile=0.4)
+    off = W.Row(name="Basalt_Flamed_Clean_Base_s1_v01", scale="s01", state="redo", redo="too small")
+    lines = W.brief(off, rec, mat, sh, pb=False)
+    check(any(ln.startswith("job      scale repair") for ln in lines), "job: a redo whose recipe is off its tag is a scale repair")
+    check(any("the row says s01" in ln and "recipe 0.4 m: OFF its tag" in ln for ln in lines),
+          "scale: the row's tag disagreeing with the name, and an off-tag recipe, are named")
+    check(any(ln.startswith("same     Basalt_Natural_Clean_Base_s1_v01 ") for ln in lines),
+          "same: the other articles of the Material token, never the row itself")
+    check(W.job(W.Row(name="X", kind="rejudge"), None).startswith("review only"), "job: a queued rejudge is review only")
+    check(W.job(W.Row(name="X"), None) == "new build", "job: a queued build with no recipe is a new build")
+    check(W.job(W.Row(name="X", state="kept"), None) == "nothing: the row is kept", "job: a finished row needs nothing")
 
 # rules: read from the validators and the schema, so it cannot drift from what the gate accepts
 got = "\n".join(W.rules())

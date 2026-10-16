@@ -25,7 +25,7 @@ You are running **one batch** of the build loop (Phase11 Library Coverage). The 
 ```sh
 uv run tools/converters/wishlist.py next 5      # redo rows first, then the proving batches, then list order
 uv run tools/converters/wishlist.py show <name>
-uv run tools/converters/wishlist.py brief <name>   # start each row here: the row, disk, layers, nearest recipe, Physically Based
+uv run tools/converters/wishlist.py brief <name>   # start each row here: the job, disk, gate, scale, same matter, layers, nearest recipe, PB
 uv run tools/converters/wishlist.py rules          # once per batch: the closed sets, from the gate's own tables
 ```
 

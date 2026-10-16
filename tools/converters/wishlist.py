@@ -3,7 +3,7 @@
 
     uv run tools/converters/wishlist.py next [N]           the next N rows to work (redo first, then proving order)
     uv run tools/converters/wishlist.py show <name>
-    uv run tools/converters/wishlist.py brief <name> [--no-pb]   a row's start: disk, layers, nearest recipe, Physically Based
+    uv run tools/converters/wishlist.py brief <name> [--no-pb]   a row's start: the job, disk, gate, scale, same matter, layers, nearest, PB
     uv run tools/converters/wishlist.py rules             the closed sets a recipe is checked against, from the validators
     uv run tools/converters/wishlist.py mark <name> <state> [--why TEXT] [--batch ID] [--name NEW]
     uv run tools/converters/wishlist.py verdict <name>     the rig's Moved verdict per slider, from its scorecard
@@ -187,12 +187,59 @@ def pb_matches(words: list[str]) -> list[str]:
     return list(dict.fromkeys(n for w in reversed(words) for n in pb.search(items, w)))
 
 
+def job(row: Row, recipe: dict | None, off_tag: bool = False) -> str:
+    """What the row asks for. A redo note outranks the row's kind; an off-tag recipe makes a redo a scale repair."""
+    if row.state not in ("queued", "redo"):
+        return f"nothing: the row is {row.state}"
+    if row.state == "redo":
+        if off_tag:
+            return "scale repair: re-make the source at the tag's size, never stretch it (the REDO note below)"
+        return "redo: what the REDO note below asks (a rebuild in place, or only a re-rig)"
+    if row.kind == "rejudge":
+        return "review only: rig the article on disk and review it, no build"
+    return "build over an existing recipe: check what it lacks first" if recipe else "new build"
+
+
+def scale_line(row: Row, recipe: dict | None, off_tag: bool) -> str:
+    tag = row.name.rsplit("_", 2)[-2]
+    out = f"{tag} = {_TAG_METRES[tag]}" if tag in _TAG_METRES else tag
+    if row.scale and row.scale != tag:
+        out += f" · the row says {row.scale}: the name wins, fix the row"
+    if off_tag:
+        out += f" · recipe {recipe['meters_per_tile']} m: OFF its tag"
+    return out
+
+
+def gate_line(recipe: dict, stem: str) -> str:
+    import validate_recipe as V  # noqa: E402
+    errs = V.check_recipe(recipe, V.load_schema(), stem)
+    return "PASS" if not errs else f"FAIL ({len(errs)}): " + "; ".join(errs[:3])
+
+
+def same_matter(row: Row, recipes: Path = RECIPES) -> list[str]:
+    """Other articles of the same Material token: a colour-only twin is a Creator setting, not a new article."""
+    token = row.name.split("_")[0]
+    return [f.stem for f in sorted(recipes.glob(f"{token}_*.json")) if f.stem != row.name]
+
+
 def brief(row: Row, recipes: Path = RECIPES, materials: Path = MATERIALS, shared: Path = SHARED,
           pb: bool = True) -> list[str]:
     stem = row.name.rsplit("_", 1)[0]
     on_disk = ", ".join(p.name for p in sorted(recipes.glob(f"{stem}_v*.json"))) or "none"
     mtlx = ", ".join(sorted(p.relative_to(materials).as_posix() for p in materials.rglob(f"{stem}_v*.mtlx"))) or "none"
-    out = ["row      " + row_line(row), f"on disk  recipes: {on_disk} · mtlx: {mtlx}"]
+    own = recipes / f"{row.name}.json"
+    recipe = json.loads(own.read_text(encoding="utf-8")) if own.exists() else None
+    import validate_recipe as V  # noqa: E402
+    off = recipe is not None and V.off_tag(recipe)
+    out = ["row      " + row_line(row), "job      " + job(row, recipe, off),
+           f"on disk  recipes: {on_disk} · mtlx: {mtlx}"]
+    if recipe is not None:
+        out.append("gate     " + gate_line(recipe, own.stem))
+    out.append("scale    " + scale_line(row, recipe, off))
+    twins = same_matter(row, recipes)
+    if twins:
+        out.append("same     " + ", ".join(twins[:8]) + (" …" if len(twins) > 8 else "")
+                   + " (same matter: a colour-only variant is a Creator setting, not a new article)")
     layers = layer_files(row.layers, shared)
     if layers:
         out.append("layers   " + " · ".join(f"{k} {v or 'MISSING: make it first (/matter-generate 3a)'}"
