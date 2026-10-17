@@ -135,4 +135,4 @@ Reviewed against the committed tools and one measured row, `Titanium_Raw_Clean_B
 6. **Caching.** At under a minute per sweep for a param-only row, not justified yet; revisit once textured rows are measured.
 7. **Grouped selection.** Open; a queue policy for the maintainer.
 
-Follow-up from the review: re-measure a sweep on a textured row and correct the 4–10 minute figure in `.claude/skills/matter-batch/SKILL.md`.
+Follow-up from the review: re-measure a sweep on a textured row and correct the 4–10 minute figure in `.claude/skills/matter-batch/SKILL.md`. **Done (2026-10-17):** batch 261016-2's sweeps, three renderers at once, took 41–49 s on the textured rows (Slate_Cleft, Granite_Polished, Rust_OnSteel) and 76–77 s on LED_WarmWhite, whose Blender and Unreal columns render an extra dim view. The skill now says about 45 s to 1.5 min. Rendering is not the largest cost of a row.

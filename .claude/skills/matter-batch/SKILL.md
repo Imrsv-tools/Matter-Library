@@ -59,7 +59,7 @@ A **`rejudge`** row skips this step: the article on disk is the subject.
 
 ```sh
 uv run tools/parity/rig.py <stem>                # a FIX run: the defaults only, a fraction of a sweep's time
-uv run tools/parity/rig.py <stem> --sweep        # the FINAL run: every slider, 4–10 minutes; ONE rig at a time (one GPU)
+uv run tools/parity/rig.py <stem> --sweep        # the FINAL run: every slider, about 45 s to 1.5 min (three tools at once); ONE rig at a time (one GPU)
 uv run tools/converters/wishlist.py verdict <stem>
 uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # the sheet's rows, readable
 ```
