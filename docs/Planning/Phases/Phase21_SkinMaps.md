@@ -1,6 +1,6 @@
 # Phase21 — Skin Maps
 
-**Status:** BRIEF READY (2026-10-20) — the lead answered Q-P21-1 with *"a,"* (RD-P21-6): colour only. *Was:* IN DISCOVERY, the Brief written with one lead question open. Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
+**Status:** IN EXECUTION (2026-10-20, `/execute P21`; at `a8d2787`, on the library machine). *Was:* BRIEF READY — the lead answered Q-P21-1 with *"a,"* (RD-P21-6): colour only. *Before that:* IN DISCOVERY, the Brief written with one lead question open. Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
 **Lane:** `build` (§Risk lane). **Next:** `/execute P21`.
 **Measured at:** `b2abdb5`, on the library machine (no engine at `unreal/build.sh`'s `UE`; Blender 5.2; an 8 GB GPU).
 
@@ -232,3 +232,17 @@ The controls this phase touches, each read:
     - Learnings M4, B5, B8, S8, U11 and U14.
   - **Measured:** today's skin on the character on v5 (F-P21-1), the pores' maps, the old sweep (F-P21-2, F-P21-3), the gate's G8 and G9, the release locks, the rig's UVs (F-P21-4).
   - **Decided by the agent unless the lead says otherwise:** RD-P21-1 to RD-P21-5. **Put to the lead:** Q-P21-1, answered the same day: *"a,"* (RD-P21-6).
+
+## Execution Log
+
+*A ledger: step · result · next. The commits carry the how.*
+
+- **21.1 — ▶ SCAFFOLD COMPLETE, sitting owed (clicks 1–2), 2026-10-20.**
+  - **Built:** the map maker `tools/converters/fit/gen_skin_maps.py` (the probe's v2 recipe, its calibration, `--picture` for a contributor); `FitzpatrickIV_basecolor_sUKN.png` and `skin.yaml`; `Skin_FitzpatrickIV` and `Lips_FitzpatrickIV` fitted (`base_color_const` 0.4546, 0.2406, 0.1389, the scatter colour following the base); Blender's tinted scatter (`load_article.py`); Unreal's (`build_masters.py`, built and not run here); the rig's fitted binding (`build_character.fitted_st`, the atlas st and `uv_scale` 0.006519 on the job).
+  - **Measured:** over the skin, the map × the constant averages to the tone (0.436, 0.227, 0.131) exactly; the lips average (0.327, 0.123, 0.076), against the lip rule's (0.349, 0.125, 0.079): the feathering pulls their red down about 6 %. 0.16 % of texels clip at the peak; no island texel is unpainted. The rig ran in all three tools in 29 s; Body ΔE (Storm vs Blender) at the face is 2.35, as today's. `run_all.py`: 18 lanes, 16 PASS, 2 SKIP, 0 FAIL, the baseline. Its first run was red on `test_build_snapshot.py`, whose two checks pinned the tree's fitted set to two articles; that is a FALSE RED, now held to the recipes.
+  - **Deviations, each small:**
+    - *The lips by face, not by island.* The maker rasterises the Body mesh's parts face by face. An island vote (the fitted teeth's way) put every lip texel in the skin, because the lips share the face's island: the first run measured an empty Lips mask.
+    - *A fitted skin is cast as a skin.* Phase18's rule put a fitted article on every part of its mesh, which put the skin on the lips and nails. `rig.py` now casts a fitted `skin` with its tone's lips and nails (`Article.part`).
+    - *Unreal tints only a scatter that follows its base.* The master gains `subsurface_follows_base` (0 by default; the driver sets 1), so a value an article pins stays untinted, as in Storm. On v5 a non-white tint on a Subsurface picture is refused by the driver (`RUNTIME_TINTS_SCATTER`), not drawn wrong.
+  - **The sitting's surface:** `library/parity/P21_Sitting/P21_SkinIV.blend` (git-ignored; built headless from the factory scene), in four Cycles views: faces on top, the back of the hand below; new on the left, today on the right. Real light: a side sun with shadows, a grey dome, full bounce. **Not** the rig's matched light, which has no shadows and could not show plastic. Today's articles are re-assembled from `HEAD` into `library/parity/P21_today/`.
+  - **Next:** the lead's clicks 1–2, then 21.2.

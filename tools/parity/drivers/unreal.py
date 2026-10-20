@@ -136,6 +136,13 @@ PASS_THROUGH = {"base_weight", "base_diffuse_roughness", "specular_weight",
 LINEAR_SPACES = {"lin_rec709", "raw", None}
 
 
+# Phase21 (RD-P21-4): masters built from build_masters.py at or after 21.1 tint a scatter colour
+# that follows its base (``subsurface_follows_base``). The pinned runtime (unreal/RUNTIME.json,
+# unreal-runtime-v5) was built before, so a tinted Subsurface picture is refused rather than drawn
+# untinted. Set True with the RUNTIME.json bump that carries the fix (Phase21 §Deferred).
+RUNTIME_TINTS_SCATTER = False
+
+
 class Unsupported(Exception):
     """The article needs a part of a master this runtime does not have yet."""
 
@@ -268,10 +275,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
             raise Unsupported(f"{art.name}: the {art.master} master has no base_color_map input")
         if art.master == "Subsurface" and "subsurface_weight" in art.shader:
             # the master scatters subsurface_color x the picture (F-P09-5): exact only for a
-            # subsurface colour CONNECTED to a base that is the constant x the picture alone
+            # subsurface colour CONNECTED to a base that is the constant x the picture alone (and
+            # the tint, on masters that carry Phase21's tinted scatter: below)
             why = ("its subsurface colour is its own value" if "subsurface_color" in art.shader else
-                   "its base has a texture" if "base_color" in art.textures else
-                   "its base is tinted" if "base_color_tint" in art.ports else None)
+                   "its base has a texture" if "base_color" in art.textures else None)
             if why:
                 raise Unsupported(f"{art.name}: a picture on Unreal's Subsurface master, but {why}")
     ports = {k: v for k, v in art.ports.items() if k not in (CUTOUT_PORT, BASE_MAP_PORT)}
@@ -279,6 +286,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         if k not in ports:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
         ports[k] = list(v) if isinstance(v, (list, tuple)) else [float(v)]
+    if (base_color_map is not None and art.master == "Subsurface" and not RUNTIME_TINTS_SCATTER
+            and [float(c) for c in ports.get("base_color_tint", [1.0, 1.0, 1.0])][:3] != [1.0, 1.0, 1.0]):
+        raise Unsupported(f"{art.name}: a tint on a Subsurface picture, and the pinned runtime's masters "
+                          "scatter it untinted (built before Phase21 21.1; RUNTIME_TINTS_SCATTER)")
     sh, scalars, vectors, textures = art.shader, {}, {}, {}
     for role, file_cs in art.textures.items():
         file, cs = file_cs
@@ -313,6 +324,7 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     # multiplies by the binding's picture (base_color_map_tex, white when none is bound).
     if art.master == "Subsurface" and "subsurface_weight" in sh and "subsurface_color" not in sh:
         vectors["subsurface_color"] = list(vectors.get("base_color", [0.8, 0.8, 0.8]))
+        scalars["subsurface_follows_base"] = 1.0    # Phase21: the scatter takes the tint too
     # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
     for k, v in ports.items():
         if k in COLOUR_SLIDERS:
@@ -413,17 +425,20 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
     meshes, unbound = [], {}
     for name, part in parts.items():
         b = bound.get(name)
-        k = 1.0 if (b is None or CHARACTER + name in atlas) else float(b["article"]["meters_per_tile"])
-        pts, nrm, uvs, faces = face_varying(part["points"], part["normals"], part["faces"], part["st"])
+        on_atlas = b is not None and b.get("st") == "atlas"     # Phase21: a fitted article's part
+        k = 1.0 if (b is None or on_atlas or CHARACTER + name in atlas) else float(b["article"]["meters_per_tile"])
+        st = part["atlas_st"] if on_atlas else part["st"]
+        pts, nrm, uvs, faces = face_varying(part["points"], part["normals"], part["faces"], st)
         meshes.append(write_mesh(meshes_dir, name, pts, nrm, [(s / k, t / k) for s, t in uvs], faces, name))
         if b is None:
             unbound[name] = preview_surface(0.18, roughness=0.6)     # /World/Looks/Unbound
     for s in settings:
         for name, b in bound.items():
             cut, pic = b.get("cutout_map"), b.get("base_color_map")
-            if pic and CHARACTER + name not in atlas:
+            if pic and CHARACTER + name not in atlas and b.get("st") != "atlas":
                 raise Unsupported(f"{name}: a base_color_map on a part whose st is not its atlas")
-            s["materials"][name] = article_material(Path(b["article"]["path"]), s.get("set"),
+            s["materials"][name] = article_material(Path(b["article"]["path"]),
+                                                    {**b.get("set", {}), **(s.get("set") or {})},
                                                     Path(cut) if cut else None,
                                                     Path(pic) if pic else None)
     # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3

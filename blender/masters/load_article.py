@@ -179,15 +179,27 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
 
     # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base
     # (no value on the shader: the assembler wires it to base_color_out) scatters the base's own
-    # colour, the picture included. ML_Subsurface blends the TINTED base toward an UNTINTED
-    # Subsurface Color, so this is exact only without a tint port; a tinted one is refused.
+    # colour, the picture included. ML_Subsurface tints its Base Color inside the master but takes
+    # Subsurface Color as given, so a tinted article's scatter is tinted HERE, by the same port
+    # (Phase21 RD-P21-4, F-P21-3: the assembler connects subsurface_color to base_color_out, which
+    # is after the tint, so Storm's scatter follows the tint; this was refused until then, F-SKM-23).
+    follow_tint = None
     if (art.master == "Subsurface" and "subsurface_weight" in art.shader
             and "subsurface_color" not in art.shader and "Subsurface Color" in master.inputs):
-        if "base_color_tint" in ports:
-            raise NotImplementedError(f"{art.name}: a subsurface colour following a TINTED base "
-                                      "is not mapped in Blender yet")
         bsock, ssock = master.inputs["Base Color"], master.inputs["Subsurface Color"]
-        if bsock.is_linked:
+        if "base_color_tint" in ports:
+            follow_tint = nt.nodes.new("ShaderNodeMix")    # base x the tint (wired to the port below)
+            follow_tint.data_type = "RGBA"
+            follow_tint.blend_type = "MULTIPLY"
+            follow_tint.clamp_result = False
+            follow_tint.inputs["Factor"].default_value = 1.0
+            follow_tint.location = (300, -400)
+            if bsock.is_linked:
+                L(bsock.links[0].from_socket, follow_tint.inputs["A"])
+            else:
+                follow_tint.inputs["A"].default_value = tuple(bsock.default_value)
+            L(follow_tint.outputs["Result"], ssock)
+        elif bsock.is_linked:
             L(bsock.links[0].from_socket, ssock)
         else:
             ssock.default_value = tuple(bsock.default_value)
@@ -279,6 +291,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
                                       socket_type="NodeSocketColor" if is_color else "NodeSocketFloat")
         s.default_value = _rgba(art.ports[p]) if is_color else art.ports[p][0]
         L(gin.outputs[p], master.inputs[p])
+        if p == "base_color_tint" and follow_tint is not None:
+            L(gin.outputs[p], follow_tint.inputs["B"])     # the scatter takes the Creator's tint too
 
     # the material: the article's group, with the sliders on it as a Creator would set them
     mnt = mat.node_tree
