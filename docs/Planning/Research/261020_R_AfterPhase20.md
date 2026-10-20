@@ -79,21 +79,33 @@ The ledger has not changed since 2026-10-16, and the next free id is **M14**.
 
 **Decision / next.** Nothing here forces work ahead of the lead's order. The requests sort into: one ledger quick fix (F-AFT-4, F-AFT-5 (a)), one ruling (Q-PCE-1), wish-list rows (F-AFT-5 (c)), and inputs to Skin Maps (F-AFT-5 (d)).
 
+## Resolved
+
+*The lead, 2026-10-20, in one line: "1 commit them, 2 yes close P20, 3 yes, 4 what does this mean? how many parts to an eye?"*
+
+- **RD-AFT-1 — the stale method edits are committed as the Refiner's** (*"1 commit them"*; Q-AFT-1). They are drain 3's held edits (`.claude/CLAUDE.md`, the two skills, the heritage re-sync, the backlog). Committed as `0277662` by this session, which did not author them. The checkout then merged `origin/main`.
+- **RD-AFT-2 — the platform's 2026-10-19 sitting counts as Phase20's click 4, and Phase20 closes** (*"2 yes close P20"*; Q-AFT-2). Closed as `53d31a4`, on the library's half.
+- **RD-AFT-3 — Skin Maps' discovery carries Q-PMU-4 (*"still plastic"*) as its own question** (*"3 yes"*; Q-AFT-3). That includes a first look at where the plastic lies: the articles' values, the pictures, or the Unreal Subsurface master's highlight. It is not assumed that the colour map answers it. Cross-referenced in `Phases/Future/PhaseTBD_SkinMaps.md`.
+
 ## Open questions
 
 | Id | Question | Recommendation |
 |---|---|---|
-| Q-AFT-1 | The six stale uncommitted method edits (F-AFT-1): commit them as the Refiner's, discard them, or leave them? Until then the checkout cannot converge. | The lead says which. A `/workflow-refiner` run is their owner. |
-| Q-AFT-2 | Does the platform's 2026-10-19 sitting count as Phase20's click 4 (F-AFT-3)? | **Yes.** It is the same picker on the same machine, at a library that holds the switch. Record it in the ledger with the platform's words, then close Phase20. |
-| Q-AFT-3 | Skin Maps' discovery: does it carry Q-PMU-4 (*plastic*) as its own question, including a first look at the Unreal Subsurface master's highlight? | **Yes.** Otherwise the colour map could ship and the platform still see plastic. |
-| Q-PCE-1 | Do the single-part eye articles stay `creator_selectable`? | **Keep them selectable** (F-AFT-5 (b)). |
+| ~~Q-AFT-1~~ → **RD-AFT-1** | ~~The six stale uncommitted method edits: commit, discard or leave?~~ | committed |
+| ~~Q-AFT-2~~ → **RD-AFT-2** | ~~Does the platform's sitting count as Phase20's click 4?~~ | yes; Phase20 closed |
+| ~~Q-AFT-3~~ → **RD-AFT-3** | ~~Does Skin Maps' discovery carry Q-PMU-4 as its own question?~~ | yes |
+| Q-PCE-1 | Do the single-part eye articles stay `creator_selectable`? *(The lead asked what it means, 2026-10-20; explained in the handback: an eye has four parts, and these articles each dress one.)* | **Keep them selectable** (F-AFT-5 (b)). |
 
 ## Status
 
-- **Passes captured:** 1 (the sweep, 2026-10-20, read at `origin/main` `92df0ca`).
-- **Current direction:** close Phase20, then `/discovery` on **Skin Maps**, which is next in the lead's order (RD-SV-1). Carry Q-PMU-2, Q-PMU-4 and Q-PCE-2's layout gap into it.
+- **Passes captured:** 1 (the sweep, 2026-10-20, read at `origin/main` `92df0ca`). The checkout has since converged.
+- **Ruled:** RD-AFT-1 to RD-AFT-3 (2026-10-20). The Refiner's edits are committed, Phase20 is closed, and Skin Maps carries *"plastic"*.
+- **Current direction:** `/discovery` on **Skin Maps**, which is next in the lead's order (RD-SV-1) and is the lead's gate. Carry into it:
+  - Q-PMU-2, the lips;
+  - Q-PMU-4, plastic (RD-AFT-3);
+  - Q-PCE-2's layout gap.
 - **Offered as `/quick-fix`es, none taken:**
   - the ledger: P11 and P17 to `DONE`, P29's Studio half closed, P21 seen, and M14 (PMU) and M15 (PCE) recording the asks and their answers;
   - the wish-list rows for the LED, Felt and eye asks.
-- **Open:** Q-AFT-1 to Q-AFT-3 and Q-PCE-1, all the lead's. The batch holds (F-AFT-6) are the maintainer's.
-- **Next step:** the lead's answers. Nothing is numbered or seeded by this doc.
+- **Open:** Q-PCE-1, the lead's. The batch holds (F-AFT-6) are the maintainer's.
+- **Next step:** the lead's answer on Q-PCE-1, and their word on the quick fixes and on Skin Maps' discovery. Nothing is numbered or seeded by this doc.

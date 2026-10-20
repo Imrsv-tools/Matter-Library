@@ -33,8 +33,9 @@ The authority until this phase writes its specs: [`261014_R_SkinMaps.md`](../../
 - ~~Q-SKM-3~~ → the probe runs on the laptop now: today's skin, a MakeHuman atlas (comparison only) and a library-made map.
 - ~~Q-SKM-5~~ → RD-SKM-2: library-made or AI-generated, never the photo atlases; the AI route is to be explored.
 - ~~Q-SKM-6~~ → RD-SKM-3: one colour map per tone.
-- Q-SKM-7: which ships, library-made or AI.
-- Q-SKM-4: naming a mesh version.
+- ~~Q-SKM-7: which ships, library-made or AI.~~ → RD-SKM-5 (2026-10-14): the library-made map first. *(Struck 2026-10-20; the status line above already said so.)*
+- ~~Q-SKM-4: naming a mesh version.~~ → RD-P18-1 (2026-10-15): `MakeHuman_Body_v01`. *(Struck 2026-10-20.)*
+- **Q-PMU-4, the platform's *"still plastic"*, is a question of this phase's own** (the lead, 2026-10-20, RD-AFT-3 in [`261020_R_AfterPhase20.md`](../../Research/261020_R_AfterPhase20.md)). Where the plastic lies (the articles' values, the pictures, or the Unreal Subsurface master) is found before the colour map is assumed to answer it. The lips' second form, Q-PMU-2, is an input here too ([`261016_R_PlatformPhase99Asks.md`](../../Research/261016_R_PlatformPhase99Asks.md)).
 
 ## Discovery Log
 
