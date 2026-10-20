@@ -86,6 +86,7 @@ The ledger has not changed since 2026-10-16, and the next free id is **M14**.
 - **RD-AFT-1 — the stale method edits are committed as the Refiner's** (*"1 commit them"*; Q-AFT-1). They are drain 3's held edits (`.claude/CLAUDE.md`, the two skills, the heritage re-sync, the backlog). Committed as `0277662` by this session, which did not author them. The checkout then merged `origin/main`.
 - **RD-AFT-2 — the platform's 2026-10-19 sitting counts as Phase20's click 4, and Phase20 closes** (*"2 yes close P20"*; Q-AFT-2). Closed as `53d31a4`, on the library's half.
 - **RD-AFT-3 — Skin Maps' discovery carries Q-PMU-4 (*"still plastic"*) as its own question** (*"3 yes"*; Q-AFT-3). That includes a first look at where the plastic lies: the articles' values, the pictures, or the Unreal Subsurface master's highlight. It is not assumed that the colour map answers it. Cross-referenced in `Phases/Future/PhaseTBD_SkinMaps.md`.
+- **RD-AFT-4 — the single-part eye articles stay `creator_selectable`** (the lead, 2026-10-20: *"keep them selectable"*; Q-PCE-1). `Cornea_`, `Iris_`, `Pupil_` and `Sclera_` stay in every browse (Blender's Asset Browser included). Offering whole-eye looks only is the platform app's own choice, and the spec (`RuntimeCatalog` `creator_selectable`: `false` only on `IMRSV_MissingMaterial`) is unchanged. The ledger row that tells the platform is the offered quick fix (M15).
 
 ## Open questions
 
@@ -94,12 +95,12 @@ The ledger has not changed since 2026-10-16, and the next free id is **M14**.
 | ~~Q-AFT-1~~ → **RD-AFT-1** | ~~The six stale uncommitted method edits: commit, discard or leave?~~ | committed |
 | ~~Q-AFT-2~~ → **RD-AFT-2** | ~~Does the platform's sitting count as Phase20's click 4?~~ | yes; Phase20 closed |
 | ~~Q-AFT-3~~ → **RD-AFT-3** | ~~Does Skin Maps' discovery carry Q-PMU-4 as its own question?~~ | yes |
-| Q-PCE-1 | Do the single-part eye articles stay `creator_selectable`? *(The lead asked what it means, 2026-10-20; explained in the handback: an eye has four parts, and these articles each dress one.)* | **Keep them selectable** (F-AFT-5 (b)). |
+| ~~Q-PCE-1~~ → **RD-AFT-4** | ~~Do the single-part eye articles stay `creator_selectable`?~~ | kept selectable |
 
 ## Status
 
 - **Passes captured:** 1 (the sweep, 2026-10-20, read at `origin/main` `92df0ca`). The checkout has since converged.
-- **Ruled:** RD-AFT-1 to RD-AFT-3 (2026-10-20). The Refiner's edits are committed, Phase20 is closed, and Skin Maps carries *"plastic"*.
+- **Ruled:** RD-AFT-1 to RD-AFT-4 (2026-10-20). The Refiner's edits are committed, Phase20 is closed, Skin Maps carries *"plastic"*, and the single-part eye articles stay selectable.
 - **Current direction:** `/discovery` on **Skin Maps**, which is next in the lead's order (RD-SV-1) and is the lead's gate. Carry into it:
   - Q-PMU-2, the lips;
   - Q-PMU-4, plastic (RD-AFT-3);
@@ -107,5 +108,5 @@ The ledger has not changed since 2026-10-16, and the next free id is **M14**.
 - **Offered as `/quick-fix`es, none taken:**
   - the ledger: P11 and P17 to `DONE`, P29's Studio half closed, P21 seen, and M14 (PMU) and M15 (PCE) recording the asks and their answers;
   - the wish-list rows for the LED, Felt and eye asks.
-- **Open:** Q-PCE-1, the lead's. The batch holds (F-AFT-6) are the maintainer's.
-- **Next step:** the lead's answer on Q-PCE-1, and their word on the quick fixes and on Skin Maps' discovery. Nothing is numbered or seeded by this doc.
+- **Open:** nothing of the lead's from this doc. The batch holds (F-AFT-6) are the maintainer's.
+- **Next step:** `/discovery` on Skin Maps (the lead, 2026-10-20: *"push, then /discovery Skin Maps"*). The quick fixes wait for the lead's word. Nothing is numbered or seeded by this doc.
