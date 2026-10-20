@@ -1,6 +1,6 @@
 # Skin Maps — what a contributed skin map is, and how to make one
 
-> **⚠ DRAFT (planned, 2026-10-14).** No skin map ships yet, and nothing below is built except the probe. This draft exists so contributors can try their hand now (the lead, 2026-10-14: *"we need to start documenting a spec for this so other contributors can maybe also try thier hand at crafting these"*, RD-SKM-6). The *Skin Maps* phase hardens it ([`PhaseTBD_SkinMaps.md`](../../Planning/Phases/Future/PhaseTBD_SkinMaps.md)). Until then, the authority is the research's `## Resolved` ([`261014_R_SkinMaps.md`](../../Planning/Research/261014_R_SkinMaps.md)).
+> **⚠ DRAFT (planned, 2026-10-14).** No skin map ships yet, and nothing below is built except the probe. This draft exists so contributors can try their hand now (the lead, 2026-10-14: *"we need to start documenting a spec for this so other contributors can maybe also try thier hand at crafting these"*, RD-SKM-6). The *Skin Maps* phase hardens it ([`Phase21_SkinMaps.md`](../../Planning/Phases/Phase21_SkinMaps.md)). Until then, the authority is the research's `## Resolved` ([`261014_R_SkinMaps.md`](../../Planning/Research/261014_R_SkinMaps.md)).
 >
 > **Three marks are used here, and they mean different things:**
 > - **Ruled:** the lead has decided it. It changes only by a new ruling.
