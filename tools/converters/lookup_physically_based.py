@@ -23,7 +23,9 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 import urllib.request
+from pathlib import Path
 
 API = "https://api.physicallybased.info/v2/materials"
 COLOR_SPACE = "srgb-linear"
@@ -36,6 +38,26 @@ def _load(path: str | None) -> dict:
     req = urllib.request.Request(API, headers={"User-Agent": "matter-library-tools"})
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.load(resp)
+
+
+CACHE = Path.home() / ".cache" / "matter-library" / "physicallybased.json"
+
+
+def load_cached(max_age_hours: float = 24) -> dict:
+    """The API response, fetched at most once a day per machine (wishlist.py brief calls it per row)."""
+    if CACHE.exists() and time.time() - CACHE.stat().st_mtime < max_age_hours * 3600:
+        return json.loads(CACHE.read_text(encoding="utf-8"))
+    data = _load(None)
+    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    CACHE.write_text(json.dumps(data), encoding="utf-8")
+    return data
+
+
+def search(items: list, text: str) -> list[str]:
+    """Entry names whose name or a tag contains the text, ignoring case."""
+    q = text.lower()
+    return [m["name"] for m in items
+            if q in m["name"].lower() or any(q in t.lower() for t in m.get("tags", []))]
 
 
 def _linear(entries) -> list | None:
@@ -115,9 +137,7 @@ def main(argv=None) -> int:
     header, items = data.get("header", {}), data.get("data", [])
 
     if args.cmd == "search":
-        q = args.text.lower()
-        hits = [m["name"] for m in items if q in m["name"].lower()
-                or any(q in t.lower() for t in m.get("tags", []))]
+        hits = search(items, args.text)
         print("\n".join(hits) if hits else f"no entry matches {args.text!r}")
         return 0 if hits else 1
 

@@ -8,12 +8,12 @@ provenance:
   evidence:
     url: https://ambientcg.com/view?id=Granite001A
     sha256_scope: shipped_source_set
-    sha256: eeb7519327783f94277ceb0c99cffdaefd5095e86c6801f282bcbb6f8b17f435
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Granite001A_1K-PNG download. sha256 attests the shipped release-source set.
+    sha256: f433e7584f5caed24d1c765992c3818ee01fff06146ac6d686e2443f85075772
+    note: Shipped source textures are processed derivatives of the ambientCG Granite001A_1K-PNG maps, not byte-identical to the download. Re-made at the s1 scale option (2026-10-16, Phase19 D-9) by tools/converters/base/quilt_scan.py (Granite_Polished --src-m 0.4 --out-m 1.0 --scale s1), which quilts the 0.4 m scan into an exact 1 m tile at 2048 px; until then the shipped maps were the download's own (set digest eeb7519327783f94277ceb0c99cffdaefd5095e86c6801f282bcbb6f8b17f435). sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_basecolor_s1.png
-      sha256: e1fef2019a79371b89df03cc5f16d153228d223c774d12d878892eb56e5aa7f6
+      sha256: c425c5f339bfe3e0504a7bf8817efbdb8c173199329563ec397e5d63b8f18e26
     - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_normal_s1.png
-      sha256: 1f6f01b779741029d7a6cfcaef47798a7142eef6740db767d5fa0b28afd4f975
+      sha256: 614ffc17a0dcec4f9c7427e7c44d9cbb9a9b5a9f5b570f579dcb389fde9e6830
     - path: MatterLibrary/textures/base/natural/stone/Granite_Polished_roughness_s1.png
-      sha256: 7d79dd5667e99e57fbabb3e9a819a5e0451e85552550e38e0126c99000e7b85e
+      sha256: ca837691cb30e39b0a0ed7b79c71c3609e6856429cb94876ce1f228022483ed9

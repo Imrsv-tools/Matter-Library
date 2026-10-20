@@ -33,15 +33,13 @@ except OSError:   # DejaVu is not on every Linux (Fedora ships Noto); Pillow's o
         SMALL = ImageFont.truetype("/usr/share/fonts/google-noto/NotoSans-Regular.ttf", 14)
     except OSError:
         FONT, SMALL = ImageFont.load_default(18), ImageFont.load_default(14)
-sys.path.insert(0, str(REPO / "tools" / "releases"))
-from build_snapshot import label as derived_label  # noqa: E402
 
 
 def words(stem):
     """The words a keep confirms (Phase13 13.3): name, summary, search words, origin, from the recipe."""
     p = RECIPES / f"{stem}.json"
     rec = json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
-    name = rec.get("label") or derived_label(stem.rsplit("_", 2)[0])
+    name = stem.rsplit("_", 2)[0].replace("_", " ")   # the file name is the name (RD-LBL-1)
     if not rec.get("summary"):
         return f"{name} — NO WORDS YET: the row owes a summary, search words and origin", None
     return (f"{name} — {rec['summary']}",

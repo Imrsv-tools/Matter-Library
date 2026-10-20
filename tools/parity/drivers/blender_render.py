@@ -207,7 +207,7 @@ def subjects(job: dict) -> list:
 
 
 @contextlib.contextmanager
-def hide(job: dict, spec: dict):
+def hide(spec: dict):
     """Hide a view's `hide` prims from the render for the duration (a character's mouth view)."""
     objs = [bpy.data.objects.get(p.rsplit("/", 1)[1]) for p in spec.get("hide", [])]
     if None in objs:
@@ -283,13 +283,14 @@ def run(job_path: Path) -> None:
         scn.camera = cams[v]
         hidden = set(spec.get("hide", []))
         shown = [(p, o, c) for p, o, c in zip(job["subjects"], objs, mask_colours(job, objs)) if p not in hidden]
-        with hide(job, spec):
+        with hide(spec):
             render_mask([o for _, o, _ in shown], Path(job["out_dir"]) / f"mask{spec['suffix']}.png",
                         [c for _, _, c in shown])
     # what goes on which subject: a character job binds one article per part (Phase07 7.4);
     # the test scene binds the one article to all three subjects
     bindings = job.get("bindings") or [{"subject": p, "article": job["article"]} for p in job["subjects"]]
     by_prim = {p: o for p, o in zip(job["subjects"], objs)}
+    wrote = 0
     for s in job["settings"]:
         built = {}
         for b in bindings:
@@ -312,10 +313,11 @@ def run(job_path: Path) -> None:
             scn.view_settings.exposure = float(spec.get("exposure", 0.0))
             png = out / f"{s['id']}{spec['suffix']}.png"
             scn.render.filepath = str(png)
-            with hide(job, spec):
+            with hide(spec):
                 bpy.ops.render.render(write_still=True)
-            print(f"blender: wrote {png}")
+            wrote += 1
         scn.view_settings.exposure = 0.0
+    print(f"blender: wrote {wrote} pictures to {out}")
 
 
 if __name__ == "__main__":

@@ -12,9 +12,11 @@ a dark blue-grey roofing slate); Physically Based has no slate entry. Everything
 varies around it.
 
 Writes MatterLibrary/textures/base/natural/stone/Slate_Cleft_<channel>_s1.png:
-basecolor (sRGB-encoded), roughness and normal (linear data, NormalGL). Scale `s1`: a 0.5 m
-tile, so about 9 ragged terraces cross the tile (steps a few cm apart, running along U) and
-the cleavage ripple is about a centimetre. Seamless (periodic noise; the terraces are a floor() of periodic noise),
+basecolor (sRGB-encoded), roughness and normal (linear data, NormalGL). Scale `s1`: exactly
+a 1 m tile (Phase19 D-9), 2048 px, so about 18 ragged terraces cross it (steps a few cm apart,
+running along U) and the cleavage ripple is about a centimetre. Until 2026-10-16 the set was
+a 0.5 m tile at 1024 px; it is made at 1 m now, never stretched: every feature keeps its
+size in metres and in pixels, and the tile holds twice as many of each (REPEAT). Seamless (periodic noise; the terraces are a floor() of periodic noise),
 fixed seed, no network.
 
     gen_slate_cleft.py [--out DIR]
@@ -39,8 +41,9 @@ SET = "Slate_Cleft"
 SCALE = "s1"
 SEED = 733
 SLATE = np.array([0.065, 0.072, 0.085])  # judgement: dark blue-grey slate, linear sRGB
-STEPS = 9                                 # terraces across the tile
-SIZE = tl.SIZE
+STEPS = 9                                 # terraces per half metre
+REPEAT = 2                                # half-metre cycles across the 1 m tile
+SIZE = 2048                               # 0.5 mm a pixel, as at 0.5 m and 1024 px
 
 
 def noise2(sx: int, sy: int, seed: int, size: int = SIZE) -> np.ndarray:
@@ -61,6 +64,16 @@ def noise2(sx: int, sy: int, seed: int, size: int = SIZE) -> np.ndarray:
     return rows[:, x0] * (1 - fx)[None, :] + rows[:, x1] * fx[None, :]
 
 
+def n2(sx: int, sy: int, seed: int) -> np.ndarray:
+    """noise2 with REPEAT x the cycles across the tile."""
+    return noise2(sx * REPEAT, sy * REPEAT, seed)
+
+
+def fbm(scales: tuple, seed: int) -> np.ndarray:
+    """tileable.fbm with REPEAT x the cycles across the tile."""
+    return tl.fbm(tuple(sc * REPEAT for sc in scales), seed, SIZE)
+
+
 def hash01(k: np.ndarray, salt: float) -> np.ndarray:
     """A fixed pseudo-random value in [0, 1) per integer k (one tone per terrace)."""
     return np.modf(np.abs(np.sin(k * 12.9898 + salt) * 43758.5453))[0]
@@ -70,20 +83,20 @@ def maps() -> dict:
     # Terraces: the floor of a periodic field, so step edges wander and the tile wraps.
     # Long along U (the cleavage's strike), wandering along V; a ragged high-frequency term
     # breaks the step edges into flaky, broken lines rather than smooth contours.
-    field = (0.60 * noise2(1, 4, SEED) + 0.25 * noise2(2, 9, SEED + 1)
-             + 0.10 * noise2(6, 20, SEED + 2) + 0.05 * noise2(48, 64, SEED + 8))
+    field = (0.60 * n2(1, 4, SEED) + 0.25 * n2(2, 9, SEED + 1)
+             + 0.10 * n2(6, 20, SEED + 2) + 0.05 * n2(48, 64, SEED + 8))
     s = field * STEPS
     level = np.floor(s)
     frac = s - level
     edge = np.clip((frac - 0.80) / 0.20, 0, 1)            # the soft riser of each step
     edge = edge * edge * (3 - 2 * edge)
     terrace = level + edge
-    ripple = noise2(5, 48, SEED + 3)                      # cleavage ripple, long along U
-    swell = tl.fbm((2, 3), SEED + 9)                      # broad undulation of the split face
-    grain = tl.fbm((64, 128), SEED + 4)                   # fine mineral grain
-    stain = np.clip((noise2(5, 5, SEED + 5) - 0.78) * 4.5, 0, 1) * noise2(23, 23, SEED + 6)
-    drift = tl.fbm((2, 4), SEED + 7)
-    mottle = tl.fbm((8, 16, 32), SEED + 10)
+    ripple = n2(5, 48, SEED + 3)                      # cleavage ripple, long along U
+    swell = fbm((2, 3), SEED + 9)                      # broad undulation of the split face
+    grain = fbm((64, 128), SEED + 4)                   # fine mineral grain
+    stain = np.clip((n2(5, 5, SEED + 5) - 0.78) * 4.5, 0, 1) * n2(23, 23, SEED + 6)
+    drift = fbm((2, 4), SEED + 7)
+    mottle = fbm((8, 16, 32), SEED + 10)
 
     tone = hash01(level, 1.7) - 0.5                       # each layer a shade apart
     fresh = edge * (1 - edge) * 4                         # step risers: freshly broken

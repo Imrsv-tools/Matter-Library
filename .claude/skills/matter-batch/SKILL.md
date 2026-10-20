@@ -25,7 +25,11 @@ You are running **one batch** of the build loop (Phase11 Library Coverage). The 
 ```sh
 uv run tools/converters/wishlist.py next 5      # redo rows first, then the proving batches, then list order
 uv run tools/converters/wishlist.py show <name>
+uv run tools/converters/wishlist.py brief <name>   # start each row here: the job, disk, gate, scale, same matter, layers, nearest recipe, PB
+uv run tools/converters/wishlist.py rules          # once per batch: the closed sets, from the gate's own tables
 ```
+
+**Keep the context small.** Never read `library/wishlist.yaml` whole (57 KB): `next`, `show` and `brief` answer from it. Never open a driver log whole (`unreal.log` runs to 180 KB): tail its last 40 lines. Plan from `/matter-generate`'s `reference.md`, not the specs.
 
 Name the batch `<YYMMDD>-<n>` (the next free `n` for today in `library/batches/`). Say which rows you took, in one line each.
 
@@ -54,12 +58,15 @@ A **`rejudge`** row skips this step: the article on disk is the subject.
 ## 3. Rig it, read it
 
 ```sh
-uv run tools/parity/rig.py <stem> --sweep        # 4–10 minutes, three tools, ONE rig at a time (one GPU)
+uv run tools/parity/rig.py <stem>                # a FIX run: the defaults only, a fraction of a sweep's time
+uv run tools/parity/rig.py <stem> --sweep        # the FINAL run: every slider, about 45 s to 1.5 min (three tools at once); ONE rig at a time (one GPU)
 uv run tools/converters/wishlist.py verdict <stem>
 uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # the sheet's rows, readable
 ```
 
-**Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read the crops** of the rows that matter (the defaults, every layer at 1, any row `verdict` flags); add `--full` to judge a gloss, a coat or a polish, whose small sharp highlight can vanish at half size. Judge:
+**Sweep once, on the run you will commit.** The first run of a row and every fix run (§4) render the defaults only: does it read as the matter, its colour, gloss and texture size. A fix to colour, gloss, scale or a texture shows there. When nothing fixable is left at defaults, run the sweep: it judges the sliders and the layers, and it is the sheet the summary and the review use. A fault the sweep finds (a layer in the wrong slot, a slider that disagrees) is fixed and swept again, within the 3 runs. *(Was: every run swept.)*
+
+**Run the rig in the background and wait for its completion notice; do not poll it.** The whole sheet (`library/parity/<stem>/sheet.png`) is too tall to read: **Read only the crops the verdict points at**: on a defaults run, the defaults; on a sweep, the defaults and the rows `verdict` flags (ONE-SIDED, UNEVEN, a seam, the ruler), and a layer at 1 only where it is new in this row or flagged. Add `--full` to judge a gloss, a coat or a polish, whose small sharp highlight can vanish at half size. Judge:
 - **Does it read as the matter?** Colour, gloss, translucency, texture size against the floor's ruler.
 - **The verdict per slider:** *moved alike* in all three is the bar. **ONE-SIDED** or **UNEVEN** names a tool that disagrees: find whether the material (fix it) or a renderer's known limit (report it) is the cause.
 - **Seams and scale:** `verdict` prints both, and every slider that **moved nothing in any tool**. A seam flag the render does not show (a generator that tiles by construction, a ratio just over the check's threshold) is reported as a **flag, not confirmed**, with what you looked at; never shift a texture to pass the check. **The ruler cannot measure a near-flat or cut-out base texture** (a leaf, lace): a ruler OFF on one is a flag, not a finding. **A re-judge changes no files:** what it finds missing (C1 layers, a deposit's `color_port`) goes on its Verdict line as what a redo would add.
@@ -80,7 +87,7 @@ uv run tools/parity/crop_sheet.py <stem> defaults "wear 3 at 1" "<a label>"   # 
 
 **Check against a reference where one exists:** the Physically Based entry's colour and roughness (`lookup_physically_based.py show`), the scan's own preview image (ambientCG), the generator's stated anchor. Say what you compared against, and how far off the render is.
 
-Fix the **recipe** (or the texture or layer you made in this row) and re-assemble (`build_proof_subset.py <recipe>`), then re-rig. After the third rig run, stop: mark the row `built` if what is left is only limits, or `stuck` with why, in one sentence a person can act on. The summary's **Tries** line says what each run changed and what the render showed.
+Fix the **recipe** (or the texture or layer you made in this row) and re-assemble (`build_proof_subset.py <recipe>`), then re-rig: at defaults while you are still fixing, with `--sweep` for the run you mean to commit (§3). A row is never marked `built` or `stuck` without a sweep, so **the third run is always the sweep**: if the defaults still need fixing after two runs, sweep anyway and report what is left. After the third rig run, stop: mark the row `built` if what is left is only limits, or `stuck` with why, in one sentence a person can act on. The summary's **Tries** line says what each run changed and what the render showed.
 
 ## 5. Mark and commit the row
 
