@@ -268,14 +268,21 @@ The controls this phase touches, each read:
   - **F-P21-10 — The six maps are one picture.** Every term of the recipe multiplies the tone, so the map ÷ the tone is identical for every tone (six byte-identical PNGs; Git LFS stores one). The map still carries hue (redder cheeks and lips), so RD-SKM-3's reason holds. **Kept as six files**, each named by its article, so a contributor can replace one tone's map alone (RD-SKM-3: one map per tone).
   - **Resolved:** the orange fingers in click 2's tinted live view were the viewport before it converged. A converged render shows the whole hand tinted, only the nails (their own article) untinted.
 
-### Resume (2026-10-20, after 21.2)
+- **21.3 — ▶ SCAFFOLD COMPLETE — click 4 owed (2026-10-20).**
+  - **Built:** the thumbnails place a fitted article's tiling layers on the atlas, as the rig does (`50ed85b`). Before it, the thumbnail job built every article with no sliders, so a fitted skin's pores would have stretched one tile over the whole atlas. The twelve skins' and lips' thumbnails were re-made.
+  - **Written:** `SkinMaps.md` in force, LCDSchema's two dated notes (a skin map's average is its tone; a writer marks a supplied picture `srgb_texture`), the Glossary's *Skin map*, Storm S10 (F-P21-9), and ledger row **P32** (Q-PMU-1, -2 and -4 answered; F-P21-9 owed by every writer).
+  - **Served:** the dev install, with 32 thumbnails from this machine. All twelve articles carry `fits: MakeHuman_Body_v01` in the served catalog.
+  - **Deviation, small:** **the other twenty Character thumbnails were re-made too** (the nails, eyes, teeth, gums, tongue, hair and `Lips_Natural`). Each one's scene wears a Fitzpatrick skin (its tone's, or the rig's Skin III), so its record went stale with the skins. Left stale, the serve would have fallen back to `matterlib-0.2.0-dev.10`'s pictures of the old skin. The other thumbnails are stale by `masters_sha256` only (21.1's `load_article.py`), which changes nothing they draw at a white tint. They are served from the snapshot as before.
+  - **The sheet:** `library/parity/P21_Thumbnails_sheet.jpg`, today's thumbnails (kept in `library/parity/P21_today_thumbs/`) beside the new ones. Two things it shows that this phase does not change: the `hand` view reads lighter than the `face` (the key lights the back of the hand and leaves the left cheek in partial shade, Phase17's look), and a faint centre line and facets on the chin in `lips` (the mesh's shading, also in today's).
+  - `run_all.py`: 18 lanes, 16 PASS, 2 SKIP, 0 FAIL (the baseline set).
+  - **Next:** click 4; the dev snapshot at the lead's word.
 
-- **Done:** 21.1 ✅ (`a9debc4`, `6dd14fd`), 21.2 ✅ (`f93e680`, then the verdict commit).
-- **Next: 21.3, click 4.** Its build map is in the Brief. Three additions from execution:
-  - **The ledger row (`PlatformDependencies.md`) carries F-P21-9.** A writer that sets a fitted article's `base_color_map`, its own picture included, authors `colorSpace = "srgb_texture"` on the asset, or Storm draws it raw. It also carries Q-PMU-1, -2 and -4 as the Brief says, with click 1's *"still reads plastic"* for Q-PMU-4.
-  - **`SkinMaps.md` gains three things:** the six-maps-are-one finding (F-P21-10), and how the maker is run (`gen_skin_maps.py`, `--picture`). Its *How to try one today* section (the probe) is superseded, not deleted.
-  - **A Storm learning (F-P21-9)** belongs in `docs/Learnings/Storm/`.
-- **Scratch for the sittings** (git-ignored, `library/parity/`): `P21_Sitting/P21_SkinIV.blend` (the click 1–2 scene; builder `/tmp/p21_sitting_build.py`, not kept), `P21_today/<tone>/` (`HEAD`'s articles and their rigs) and `P21_SixTones_sheet.jpg`. The `P21_Storm*` and `P21_CS_*` folders are the F-P21-9 probes.
+### Resume (2026-10-20, after 21.3's scaffold)
+
+- **Done:** 21.1 ✅ (`a9debc4`, `6dd14fd`), 21.2 ✅ (`f93e680`, `84e012c`), 21.3 ▶ scaffold complete (`50ed85b`, then the docs commit).
+- **Next: click 4** on `library/parity/P21_Thumbnails_sheet.jpg`. Transcribe the verdict here. Then the dev snapshot (`build_snapshot.py --publish`), only at the lead's word. Then the close (`execute_close.md`), the lead's to start.
+- **Scratch for the sittings** (git-ignored, `library/parity/`): `P21_Sitting/P21_SkinIV.blend` (the click 1–2 scene; builder `/tmp/p21_sitting_build.py`, not kept), `P21_today/<tone>/` (`HEAD`'s articles and their rigs), `P21_SixTones_sheet.jpg`, `P21_today_thumbs/` and `P21_Thumbnails_sheet.jpg` (builder `/tmp/p21_thumb_sheet.py`, not kept). The `P21_Storm*` and `P21_CS_*` folders are the F-P21-9 probes.
 - **Unresolved, none blocking:**
-  - Unreal's tinted scatter waits for a runtime built on the machine with Unreal (§Deferred; set `RUNTIME_TINTS_SCATTER` with that `RUNTIME.json` bump).
+  - Unreal's tinted scatter waits for a runtime built on the machine with Unreal (§Deferred; M7's *runtime owed* line; set `RUNTIME_TINTS_SCATTER` with that `RUNTIME.json` bump).
   - *"Still reads plastic"* is the lead's evidence for *Skin Maps Beyond Colour*. Which phase runs next is the lead's call.
+  - Studio wearing the skins is the platform's sitting (P32).
