@@ -28,6 +28,7 @@ The six Fitzpatrick skin articles become **fitted** Character articles. Each car
      - the cheeks, ears, nose and knuckles are warmer, and the eye sockets slightly darker;
      - the skin's overall tone is today's tone;
      - **does it still read as plastic?** If it does, your words are the evidence to un-park *Skin Maps Beyond Colour* next, roughness first (RD-P21-6).
+   - **Optional, on the lead's ask at the sitting: the scatter amount as a diagnostic.** The same skin at half and at double its scatter distance (`subsurface_radius`), beside it, in probe copies that are never committed. It shows whether the doll look is too much scatter, too little, or neither (F-P21-1 points at the shine). The lead, 2026-10-20: *"I thought maybe playing with the SSS might help see if the plastic / rubber / doll effet was too much or not enough SSS"*.
    - **The surface can show it:** Cycles at the probe's face framing gives the face about a 441-pixel square of map (F-SKM-26). The lips' edge fills a good part of the frame. The fixture is the rig's own character, the mesh the platform builds from (F-SKM-8).
 2. **The tint works (21.1).** In the same scene, the agent sets the skin's tint to a strong colour and back.
    - *Judge:* the skin takes the tint. Today it does not, in any tool (F-P21-3).
@@ -73,6 +74,13 @@ Every tool runs on the library machine: Blender, Storm, and Unreal from the pinn
 - **`Lips_Natural` and `Nail_Natural`:** no `Skin_Natural` exists to share a map with them. **The nails** wear no map (the spec: *"not the map's job"*).
 - **Studio's side:** the platform's, through the ledger.
 - **A release:** *Release Bundle*.
+- **A Creator scatter control in Studio** (asked by the lead, 2026-10-20, *"could we or should we add a SSS slider to Studio and make part of the LCD controls?"*; *"nah... all good"* after the answer).
+  - **Could:** an additive Creator port, as Phase12's were. That is a lead ruling on the frozen vocabulary, and a phase of its own.
+  - **Not now, for three reasons:**
+    - F-P21-1 puts the plastic in the shine, not the scatter;
+    - Storm's subsurface is a per-pixel approximation (F-SKM-18) and ignores anisotropy (Storm S8), so the control might not move all three tools alike. That is unmeasured;
+    - on skin, scatter is physical, not a style choice.
+  - **Where it would earn its place:** jade, marble, wax and onyx (the `NephriteJade` redo asks for *"more translucency"*), as a multiplier on the scatter distance. A rig probe would test parity first.
 
 ### The reuse check
 
