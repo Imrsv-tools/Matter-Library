@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase21 — Skin Maps — ACTIVE (IN DISCOVERY) *(numbered 2026-10-20 as discovery opened, the lead's "push, then /discovery Skin Maps"; the head of `## Future` since RD-SV-1; seeded 2026-10-14)*
+### Phase21 — Skin Maps — ACTIVE (BRIEF READY) *(numbered 2026-10-20 as discovery opened, the lead's "push, then /discovery Skin Maps"; the head of `## Future` since RD-SV-1; seeded 2026-10-14)*
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
 - `docs/Planning/Phases/Phase21_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 

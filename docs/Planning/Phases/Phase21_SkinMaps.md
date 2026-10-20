@@ -1,14 +1,14 @@
 # Phase21 — Skin Maps
 
-**Status:** IN DISCOVERY — **Brief written, one lead question open (Q-P21-1)** (2026-10-20). Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
-**Lane:** `build` (§Risk lane). **Next:** `/execute P21` once Q-P21-1 is answered.
+**Status:** BRIEF READY (2026-10-20) — the lead answered Q-P21-1 with *"a,"* (RD-P21-6): colour only. *Was:* IN DISCOVERY, the Brief written with one lead question open. Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
+**Lane:** `build` (§Risk lane). **Next:** `/execute P21`.
 **Measured at:** `b2abdb5`, on the library machine (no engine at `unreal/build.sh`'s `UE`; Blender 5.2; an 8 GB GPU).
 
 ## Outcome
 
 **A character's skin varies across the body as real skin does,** with lips that blend into the face and redder cheeks and knuckles, in Blender, a USD viewer and Unreal. **Every character built from the approved human mesh wears it.**
 
-*(Verbatim from the seed. Whether skin also stops reading as plastic is Q-P21-1. See F-P21-1, which measures that a colour map alone does not reach it.)*
+*(Verbatim from the seed. It does not promise that skin stops reading as plastic: F-P21-1 measures that a colour map alone does not reach the even sheen, and RD-P21-6 keeps the roughness map out of this phase. Click 1 asks the lead whether it still reads as plastic.)*
 
 ---
 
@@ -27,7 +27,7 @@ The six Fitzpatrick skin articles become **fitted** Character articles. Each car
      - the lips blend into the face, with no line of colour **and no line of shine** at the lip edge (RD-P21-2's premise);
      - the cheeks, ears, nose and knuckles are warmer, and the eye sockets slightly darker;
      - the skin's overall tone is today's tone;
-     - **does it still read as plastic?** Your words decide Q-P21-1's follow-up.
+     - **does it still read as plastic?** If it does, your words are the evidence to un-park *Skin Maps Beyond Colour* next, roughness first (RD-P21-6).
    - **The surface can show it:** Cycles at the probe's face framing gives the face about a 441-pixel square of map (F-SKM-26). The lips' edge fills a good part of the frame. The fixture is the rig's own character, the mesh the platform builds from (F-SKM-8).
 2. **The tint works (21.1).** In the same scene, the agent sets the skin's tint to a strong colour and back.
    - *Judge:* the skin takes the tint. Today it does not, in any tool (F-P21-3).
@@ -67,7 +67,7 @@ Every tool runs on the library machine: Blender, Storm, and Unreal from the pinn
 
 ### Not now
 
-- **Maps beyond colour** (normal, roughness, cavity, scatter): *Skin Maps Beyond Colour*, parked (RD-DS-8), **unless Q-P21-1 is (b)**.
+- **Maps beyond colour** (normal, roughness, cavity, scatter): *Skin Maps Beyond Colour*, parked (RD-DS-8; kept parked by RD-P21-6).
 - **The AI fine-detail layer** (RD-SKM-5): later, on the library service's GPU.
 - **A larger face map, or a face map of its own** (F-SKM-26): the 2048² atlas stays (decided below).
 - **`Lips_Natural` and `Nail_Natural`:** no `Skin_Natural` exists to share a map with them. **The nails** wear no map (the spec: *"not the map's job"*).
@@ -100,8 +100,8 @@ Every tool runs on the library machine: Blender, Storm, and Unreal from the pinn
 - **RD-SKM-4:** plain skin at the genitals and groin; the areolae keep their natural variation.
 - **RD-SKM-6:** a spec contributors can work from. 21.3 takes `SkinMaps.md` out of draft.
 - **RD-P18-9:** a fitted Character picture lives inside its article. **RD-P18-10:** this phase builds on Phase18's registry, kit, rule, check and picture binding.
-- **RD-DS-8:** *"skin detail stay parked TBD"*. Maps beyond colour stay in their own parked phase unless the lead says otherwise (Q-P21-1).
-- **RD-AFT-3** (the lead, 2026-10-20, *"3 yes"*): this discovery carries Q-PMU-4 (*"still plastic"*) as its own question. → F-P21-1, Q-P21-1.
+- **RD-DS-8:** *"skin detail stay parked TBD"*. Maps beyond colour stay in their own parked phase (RD-P21-6).
+- **RD-AFT-3** (the lead, 2026-10-20, *"3 yes"*): this discovery carries Q-PMU-4 (*"still plastic"*) as its own question. → F-P21-1, RD-P21-6.
 - **RD-RO-2:** *"material are CC0"*. The maps are CC0.
 - **Pre-release, no versioning** (`AI_WorkingAgreement.md` §Settled practices): the twelve articles are rebuilt in place at `v01`. **None is in a frozen release** (`library/releases/*.lock.yaml`, grepped 2026-10-20), so no release lane moves.
 - **RD-P21-1 — One article carries both the tone and its map** *(closes the spec's Open, unless the lead says otherwise)*. The six `Skin_Fitzpatrick*` are re-assembled in place.
@@ -118,6 +118,7 @@ Every tool runs on the library machine: Blender, Storm, and Unreal from the pinn
   - **Why:** the second way (a map normalised to its mean) needs a picture format that holds values above 1, which is a contract change.
   - `fuzz_color` is pinned to the tone today, and is re-pinned to the calibrated average.
 - **RD-P21-4 — The tint is fixed, not dropped.** Dropping the port would delete a shipped Creator control (the project's HARD RULE). Fixing it makes the control work for the first time (F-P21-3).
+- **RD-P21-6 — Colour only; the roughness map waits for its own phase** (the lead, 2026-10-20: *"a,"*, answering Q-P21-1). RD-DS-8 holds. Click 1 asks whether skin still reads as plastic, and a yes is the evidence to un-park *Skin Maps Beyond Colour*, roughness first. The platform's *"still plastic"* (Q-PMU-4) is answered in part here, by the variation, and the ledger row says so (21.3).
 - **RD-P21-5 — The atlas stays 2048²** (MakeHuman's, the probe's; G8 already checks the Body at 2048). A face map of its own is a later question on the same mesh version (F-SKM-26).
 
 ### Risk lane — `build`
@@ -153,7 +154,9 @@ The controls this phase touches, each read:
 
 ### Open for the lead
 
-- **Q-P21-1 — Skin will very likely still read as plastic after this phase. Does this phase also take a roughness map, or does that wait for its own phase?** *(RD-AFT-3 asked where the plastic lies. Measured in F-P21-1: in the sheen, not the colour.)*
+*Nothing open (2026-10-20).*
+
+- ~~**Q-P21-1**~~ → **RD-P21-6 (the lead, *"a,"*): (a), colour only.** *As asked:* **Q-P21-1 — Skin will very likely still read as plastic after this phase. Does this phase also take a roughness map, or does that wait for its own phase?** *(RD-AFT-3 asked where the plastic lies. Measured in F-P21-1: in the sheen, not the colour.)*
   - **(a) Colour only, as seeded (recommended).** RD-DS-8 holds. Click 1 asks you, on the character, whether it still reads as plastic. If it does, that is the evidence to un-park *Skin Maps Beyond Colour* next, with its roughness map first.
     - The cost: the platform's *"still plastic"* is likely answered only partly here, by the variation.
     - The gain: this phase stays on one machine with no contract change.
@@ -175,7 +178,7 @@ The controls this phase touches, each read:
     - the colour is one tone, which the map fixes;
     - `Skin_Pores`' roughness picture spans only 0.46–0.56 around 0.5, under a uniform coat (0.1 at a fixed 0.3), so the sheen is even;
     - the pores' 1 cm tile at 1024 px is finer than a pixel at the face view, so their relief averages away. That is correct physics: pores read only up close.
-  - **What reads at face distance** is regional variation in colour (this phase) and in shine (a roughness map: *Beyond Colour*). → Q-P21-1.
+  - **What reads at face distance** is regional variation in colour (this phase) and in shine (a roughness map: *Beyond Colour*). → RD-P21-6.
 - **F-P21-2 — The platform's Roughness control "moves nothing visible" on skin, and the rig agrees it moves little.** The Skin III sweep (2026-10-01): roughness −0.5 moved 0.6–1.4 ΔE and +0.5 moved 0.4–0.9 ΔE, *moved alike* in all three, but small. Q-PMU-4's *"no change I can see"* is measured, not a consumer fault.
 - **F-P21-3 — The Creator's tint on skin is inert in every tool today.** In the same sweep, *tint blue* scored **"no change in any tool"** (Storm 0.00, Blender 0.00, Unreal 0.13 ΔE).
   - **Why:** each skin pins `subsurface_color` to its tone at `subsurface_weight` 1.0, and OpenPBR mixes the (tinted) base fully toward that constant (Learnings M4).
@@ -191,7 +194,7 @@ The controls this phase touches, each read:
 - **F-P21-8 — The asks this phase answers** (from `261016_R_PlatformPhase99Asks.md` and `261019_R_PlatformCharacterEyeAsks.md`):
   - **Q-PMU-1** (where a fit-set picture is carried): by RD-P18-9, in the article's own `base_color_map`, as this phase does.
   - **Q-PMU-2** (the lips): RD-P21-2.
-  - **Q-PMU-4** (plastic): F-P21-1 and Q-P21-1.
+  - **Q-PMU-4** (plastic): F-P21-1 and RD-P21-6, in part.
   - **Q-PCE-2's layout gap** (how a consumer learns its mesh's layout) does not arise while every character is hm08. It stays the ask's.
 
 ## Deferred
@@ -199,7 +202,7 @@ The controls this phase touches, each read:
 | What | To | What it consumes from this phase |
 |---|---|---|
 | A runtime built with Unreal's tinted scatter (the rig's `tint` row in Unreal; Studio's masters through the platform's builder, M7) | the next work on the machine with Unreal; the platform | `build_masters.py`'s `subsurface_color` branch; the twelve articles as served |
-| A roughness map (and the other maps beyond colour) | *Skin Maps Beyond Colour* (parked, RD-DS-8), unless Q-P21-1 is (b) | `MakeHuman_Body_v01`, the map maker and its calibration, the fitted skins, the rig's atlas switch |
+| A roughness map (and the other maps beyond colour) | *Skin Maps Beyond Colour* (parked, RD-DS-8; RD-P21-6). Its trigger: click 1's verdict on plastic | `MakeHuman_Body_v01`, the map maker and its calibration, the fitted skins, the rig's atlas switch |
 | A face map of its own, or a larger atlas | a later question on the same mesh version | the map maker; G8's size rule |
 | Studio wearing the skins | the platform, ledger row (21.3) | the dev install's twelve articles and their pictures; P28; R-PCE-2's names |
 
@@ -220,4 +223,4 @@ The controls this phase touches, each read:
     - the platform's PMU and PCE asks;
     - Learnings M4, B5, B8, S8, U11 and U14.
   - **Measured:** today's skin on the character on v5 (F-P21-1), the pores' maps, the old sweep (F-P21-2, F-P21-3), the gate's G8 and G9, the release locks, the rig's UVs (F-P21-4).
-  - **Decided by the agent unless the lead says otherwise:** RD-P21-1 to RD-P21-5. **Put to the lead:** Q-P21-1.
+  - **Decided by the agent unless the lead says otherwise:** RD-P21-1 to RD-P21-5. **Put to the lead:** Q-P21-1, answered the same day: *"a,"* (RD-P21-6).
