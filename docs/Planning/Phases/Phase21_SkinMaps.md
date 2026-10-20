@@ -249,3 +249,21 @@ The controls this phase touches, each read:
     - *Unreal tints only a scatter that follows its base.* The master gains `subsurface_follows_base` (0 by default; the driver sets 1), so a value an article pins stays untinted, as in Storm. On v5 a non-white tint on a Subsurface picture is refused by the driver (`RUNTIME_TINTS_SCATTER`), not drawn wrong.
   - **The sitting's surface:** `library/parity/P21_Sitting/P21_SkinIV.blend` (git-ignored; built headless from the factory scene), in four Cycles views: faces on top, the back of the hand below; new on the left, today on the right. Real light: a side sun with shadows, a grey dome, full bounce. **Not** the rig's matched light, which has no shadows and could not show plastic. Today's articles are re-assembled from `HEAD` into `library/parity/P21_today/`.
   - **Next:** the lead's clicks 1–2, then 21.2.
+- **21.2 — ▶ SCAFFOLD COMPLETE, sitting owed (click 3), 2026-10-20.**
+  - **Built:** the other five maps, and their skins and lips fitted, with `base_color_const`:
+    - I: 0.8832, 0.6762, 0.5854
+    - II: 0.8331, 0.514, 0.368
+    - III: 0.6496, 0.4589, 0.3638
+    - V: 0.2951, 0.1569, 0.0838
+    - VI: 0.0938, 0.053, 0.0212
+  - **Measured:** each map × its constant averages to its tone over the skin, exactly (to 4 places, inside the Brief's 2 %). G8 passes for all twelve recipes; no island is unpainted.
+    - **The rig, twelve runs** (six tones, new and today's, after the F-P21-9 fix): Storm–Blender face ΔE for the skin holds at today's (2.1–3.9). For the lips it is within 0.2 of today's (3.1–4.4).
+    - On the face, each tool's mean stays within about 3 % of today's and goes slightly redder, alike in all three tools.
+    - The sheet is `library/parity/P21_SixTones_sheet.jpg`. `run_all.py`: 18 lanes, 16 PASS, 2 SKIP, 0 FAIL.
+  - **F-P21-9 — Storm read every picture supplied through an article's interface input RAW, not sRGB.** Older than this phase; it is why the probe's Storm lips looked pale. Measured on IV's character:
+    - A uniform sRGB-128 map against a 255 one rendered at 0.52–0.60 in Storm and 0.28–0.41 in Blender.
+    - `colorSpace = "srgb_texture"` on the USD asset value brought Storm to 0.275, Blender's.
+    - A `colorspace` on the `.mtlx` interface input, or on the image's `file` input, changed nothing: UsdMtlx does not carry it. Neither did leaving the article's own default in place (raw too).
+    - **Fixed in the rig** (`job.MAP_COLORSPACE`). This also moves Storm's eye, hair and teeth pictures, which were raw before (the iris's 15.8 ΔE). **Owed to the platform** (21.3 ledger row): a writer that sets a fitted article's `base_color_map`, its own picture included, authors `colorSpace = "srgb_texture"`, or a Storm-based viewer draws it washed out.
+  - **F-P21-10 — The six maps are one picture.** Every term of the recipe multiplies the tone, so the map ÷ the tone is identical for every tone (six byte-identical PNGs; Git LFS stores one). The map still carries hue (redder cheeks and lips), so RD-SKM-3's reason holds. **Kept as six files**, each named by its article, so a contributor can replace one tone's map alone (RD-SKM-3: one map per tone).
+  - **Resolved:** the orange fingers in click 2's tinted live view were the viewport before it converged. A converged render shows the whole hand tinted, only the nails (their own article) untinted.

@@ -161,6 +161,14 @@ CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
 CHARACTER_HIDE_ALWAYS = ["/World/Character/Cornea"]
 
 
+# Phase21 (F-P21-9): Storm reads a picture supplied as a USD asset value RAW unless the attribute
+# says its colour space. The image node's own `colorspace="srgb_texture"` does not reach it through
+# the nodegraph's interface input, and UsdMtlx authors no colorSpace (measured 2026-10-20: a uniform
+# sRGB 128 map rendered at 0.52-0.60 of a 255 one in Storm, against 0.28-0.41 in Blender; with this
+# metadata Storm read 0.275, Blender's). A cut-out is data and stays raw.
+MAP_COLORSPACE = {"base_color_map": ' (\n                    colorSpace = "srgb_texture"\n                )'}
+
+
 def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     """The character's defaults scene (Phase07 7.4): one article bound per part.
 
@@ -198,7 +206,7 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
             vals = [(f"float2 inputs:{k}", f"({v[0]:g}, {v[1]:g})") for k, v in placed]
             body = ('        over "Materials"\n        {\n'
                     f'            over "{name}"\n            {{\n'
-                    + "".join(f'                asset inputs:{port} = @{path.as_posix()}@\n'
+                    + "".join(f'                asset inputs:{port} = @{path.as_posix()}@{MAP_COLORSPACE.get(port, "")}\n'
                               for port, path in maps)
                     + "".join(f'                {decl} = {v}\n' for decl, v in vals)
                     + f'                over "NG_{name}"\n                {{\n'

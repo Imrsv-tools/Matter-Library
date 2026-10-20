@@ -2,7 +2,7 @@
   "summary": "Human skin, type VI on the Fitzpatrick scale, with light scattering under the surface and fine pores.",
   "search_words": ["skin", "character", "human", "fitzpatrick", "skin tone"],
   "origin": ["procedural", "measured", "agent-drafted"],
-  "_comment": "Human skin, Fitzpatrick type VI (Phase07 step 7.3). SUBSURFACE: skin's look is light scattering inside it. Topology-free (CM2): a tone plus a tiling micro-surface at real size, so it works on any mesh. Values from Physically Based `Skin VI` (albedo, IOR 1.4, roughness 0.5, scatter distance). `subsurface_radius` is in metres (OpenPBR scene units; Learnings/MaterialX M4): Physically Based gives the diffuse mean free path in cm (0.367, 0.137, 0.068), so 3.67 mm red, with the channels over it as the scale. `subsurface_weight` 1.0 and `subsurface_color` = the albedo (judgement): skin is a scattering body throughout, and OpenPBR mixes the diffuse colour towards `subsurface_color` by the weight, so an unset colour (OpenPBR's light grey) would wash the tone out. The shared `Skin_Pores` micro-surface (pores and furrows at a 1 cm tile) is the article's OWN normal and roughness, not a wear overlay: an overlay ships at 0 (C1) and would leave the skin plastic by default. Wear layers at 0 (C1): scratches (overlay 1, damage) and dust/dirt (overlay 2).",
+  "_comment": "FITTED (Phase21, RD-P21-1): the article carries its tone AND its skin map, drawn for MakeHuman_Body_v01 (hm08; RD-SKM-1), as its own base_color_map. The map is the tone's colour picture stored as a multiplier (brightest ~1) and base_color_const is the tone raised by the same factor, so the skin renders its measured tone on average (RD-P21-3; tools/converters/fit/gen_skin_maps.py). The scatter colour follows the base, the picture and the Creator's tint included (RD-P21-4). On another mesh, a binding that supplies a white picture gives the tone alone (the Carrier rule). The pores still tile at 1 cm through the placement (s001); the map samples the mesh's own UVs. Before Phase21: Human skin, Fitzpatrick type VI (Phase07 step 7.3). SUBSURFACE: skin's look is light scattering inside it. Topology-free (CM2): a tone plus a tiling micro-surface at real size, so it works on any mesh. Values from Physically Based `Skin VI` (albedo, IOR 1.4, roughness 0.5, scatter distance). `subsurface_radius` is in metres (OpenPBR scene units; Learnings/MaterialX M4): Physically Based gives the diffuse mean free path in cm (0.367, 0.137, 0.068), so 3.67 mm red, with the channels over it as the scale. `subsurface_weight` 1.0 and `subsurface_color` = the albedo (judgement): skin is a scattering body throughout, and OpenPBR mixes the diffuse colour towards `subsurface_color` by the weight, so an unset colour (OpenPBR's light grey) would wash the tone out. The shared `Skin_Pores` micro-surface (pores and furrows at a 1 cm tile) is the article's OWN normal and roughness, not a wear overlay: an overlay ships at 0 (C1) and would leave the skin plastic by default. Wear layers at 0 (C1): scratches (overlay 1, damage) and dust/dirt (overlay 2).",
   "name": "Skin_FitzpatrickVI_Clean_Base_s001_v01",
   "contributor": "MatterBot",
   "status": "candidate",
@@ -13,15 +13,15 @@
   "group": "character",
   "species": "humanoid",
   "part": "skin",
+  "fits": "MakeHuman_Body_v01",
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
-  "base_color_const": "0.09, 0.05, 0.02",
+  "base_color_const": "0.0938, 0.053, 0.0212",
   "roughness_tex": "../../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
   "normal_tex": "../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
   "metalness_const": 0.0,
   "specular_ior": 1.4,
   "subsurface_weight": 1.0,
-  "subsurface_color": "0.09, 0.05, 0.02",
   "subsurface_radius": 0.00367,
   "subsurface_radius_scale": "1, 0.373, 0.185",
   "subsurface_scatter_anisotropy": 0.8,
@@ -31,6 +31,8 @@
   "fuzz_weight": 0.1,
   "fuzz_color": "0.09, 0.05, 0.02",
   "fuzz_roughness": 0.5,
+  "base_color_map": true,
+  "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickVI_basecolor_sUKN.png",
   "overlays": [
     {
       "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s001.png",
@@ -54,6 +56,12 @@
   ],
   "sources": [
     {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_skin_maps.py",
+      "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
+      "note": "the skin map (Phase21): CC0 parts only (MPFB2's region masks and thickness map, an AO bake of hm08, 3D noise; RD-SKM-2), its average over the skin held to the Physically Based tone below; base_color_const is that tone x the map's peak factor, fuzz_color stays the tone (the average the skin renders)"
+    },
+    {
       "kind": "physicallybased",
       "entry": "Skin VI",
       "api": "https://api.physicallybased.info/v2/materials",
@@ -72,7 +80,7 @@
     },
     {
       "kind": "judgement",
-      "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone."
+      "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone. Phase21 (RD-P21-1, RD-P21-4): the scatter colour now FOLLOWS the base (subsurface_color connected to base_color_out), so it takes the map and the tint; before, it was pinned to the albedo and the tint was inert on skin in every tool (F-P21-3)."
     },
     {
       "kind": "judgement",
