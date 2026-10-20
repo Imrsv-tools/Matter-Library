@@ -249,7 +249,7 @@ The controls this phase touches, each read:
     - *Unreal tints only a scatter that follows its base.* The master gains `subsurface_follows_base` (0 by default; the driver sets 1), so a value an article pins stays untinted, as in Storm. On v5 a non-white tint on a Subsurface picture is refused by the driver (`RUNTIME_TINTS_SCATTER`), not drawn wrong.
   - **The sitting's surface:** `library/parity/P21_Sitting/P21_SkinIV.blend` (git-ignored; built headless from the factory scene), in four Cycles views: faces on top, the back of the hand below; new on the left, today on the right. Real light: a side sun with shadows, a grey dome, full bounce. **Not** the rig's matched light, which has no shadows and could not show plastic. Today's articles are re-assembled from `HEAD` into `library/parity/P21_today/`.
   - **Next:** the lead's clicks 1–2, then 21.2.
-- **21.2 — ▶ SCAFFOLD COMPLETE, sitting owed (click 3), 2026-10-20.**
+- **21.2 — ✅ (click 3 sat, 2026-10-20).** **The lead:** *"each tone reads as its own, tools move alike"*. The six-tone sheet: today's beside the new, in Storm, Blender and Unreal.
   - **Built:** the other five maps, and their skins and lips fitted, with `base_color_const`:
     - I: 0.8832, 0.6762, 0.5854
     - II: 0.8331, 0.514, 0.368
@@ -267,3 +267,15 @@ The controls this phase touches, each read:
     - **Fixed in the rig** (`job.MAP_COLORSPACE`). This also moves Storm's eye, hair and teeth pictures, which were raw before (the iris's 15.8 ΔE). **Owed to the platform** (21.3 ledger row): a writer that sets a fitted article's `base_color_map`, its own picture included, authors `colorSpace = "srgb_texture"`, or a Storm-based viewer draws it washed out.
   - **F-P21-10 — The six maps are one picture.** Every term of the recipe multiplies the tone, so the map ÷ the tone is identical for every tone (six byte-identical PNGs; Git LFS stores one). The map still carries hue (redder cheeks and lips), so RD-SKM-3's reason holds. **Kept as six files**, each named by its article, so a contributor can replace one tone's map alone (RD-SKM-3: one map per tone).
   - **Resolved:** the orange fingers in click 2's tinted live view were the viewport before it converged. A converged render shows the whole hand tinted, only the nails (their own article) untinted.
+
+### Resume (2026-10-20, after 21.2)
+
+- **Done:** 21.1 ✅ (`a9debc4`, `6dd14fd`), 21.2 ✅ (`f93e680`, then the verdict commit).
+- **Next: 21.3, click 4.** Its build map is in the Brief. Three additions from execution:
+  - **The ledger row (`PlatformDependencies.md`) carries F-P21-9.** A writer that sets a fitted article's `base_color_map`, its own picture included, authors `colorSpace = "srgb_texture"` on the asset, or Storm draws it raw. It also carries Q-PMU-1, -2 and -4 as the Brief says, with click 1's *"still reads plastic"* for Q-PMU-4.
+  - **`SkinMaps.md` gains three things:** the six-maps-are-one finding (F-P21-10), and how the maker is run (`gen_skin_maps.py`, `--picture`). Its *How to try one today* section (the probe) is superseded, not deleted.
+  - **A Storm learning (F-P21-9)** belongs in `docs/Learnings/Storm/`.
+- **Scratch for the sittings** (git-ignored, `library/parity/`): `P21_Sitting/P21_SkinIV.blend` (the click 1–2 scene; builder `/tmp/p21_sitting_build.py`, not kept), `P21_today/<tone>/` (`HEAD`'s articles and their rigs) and `P21_SixTones_sheet.jpg`. The `P21_Storm*` and `P21_CS_*` folders are the F-P21-9 probes.
+- **Unresolved, none blocking:**
+  - Unreal's tinted scatter waits for a runtime built on the machine with Unreal (§Deferred; set `RUNTIME_TINTS_SCATTER` with that `RUNTIME.json` bump).
+  - *"Still reads plastic"* is the lead's evidence for *Skin Maps Beyond Colour*. Which phase runs next is the lead's call.
