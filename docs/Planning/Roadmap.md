@@ -11,11 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase20 — The File Name Is the Name — ACTIVE (IN EXECUTION) *(numbered 2026-10-16 by the lead's "/discovery P20 The File Name Is the Name"; it was the head of `## Future`, placed there by the lead's "make it next", RD-LBL-8. In 2026-10-14 commits *Phase20* means Scale Grids, RD-DS-7)*
-**Outcome:** wherever a person meets a Matter material or HDRI (the website, Studio, USDLiveView), it is called by its file name's own words, the same in every app; HDRIs are named without PureSky, and every scene keeps its sky.
-- `docs/Planning/Phases/Phase20_FileNameIsTheName.md` · research `docs/Planning/Research/261015_R_MaterialLabels.md`
-
-*Next in the Future list: Skin Maps (RD-SV-1).*
+*No active phase (2026-10-20: Phase20 closed). Next in the Future list: Skin Maps (RD-SV-1).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -208,3 +204,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** anyone applying UVs can swap every object in a scene to the scale grid of its own material and see at once whether a metre is a metre: a wrong scale is obvious.
 - `docs/Planning/Phases/Complete/Phase19_ScaleGrids.md`
 *Closed 2026-10-15: seven scale grids, the scale view in Blender and the rig, the golden's cube in the 1 m grid; UVs in metres seeded as its own phase (RD-P19-4).*
+
+### Phase20 — The File Name Is the Name — COMPLETE
+**Outcome:** wherever a person meets a Matter material or HDRI (the website, Studio, USDLiveView), it is called by its file name's own words, the same in every app; HDRIs are named without PureSky, and every scene keeps its sky.
+- `docs/Planning/Phases/Complete/Phase20_FileNameIsTheName.md`
+*Closed 2026-10-20 on the library side: skies published without PureSky (`matterlib-0.2.0-dev.10`), former names kept hidden in the dev install, and the tools' tests in the one command; the website's half is the platform's (P30, P31).*

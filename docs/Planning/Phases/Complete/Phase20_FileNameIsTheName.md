@@ -1,7 +1,7 @@
 # Phase20 — The File Name Is the Name
 
-**Status:** ACTIVE — IN EXECUTION (2026-10-16, the lead's *"/execute P20"*). Q-P20-1 and Q-P20-2 were taken at their recommendations on that go-ahead (§Execution ledger). Numbered **Phase20** by the lead's *"/discovery P20 The File Name Is the Name"*, which also opened discovery. Seeded the same day by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"* (RD-LBL-8). *(In 2026-10-14 commits, Phase20 means Scale Grids, RD-DS-7; it closed as Phase19.)*
-**Lane:** `build` (§Risk lane). **Next:** `/execute` once the lead answers Q-P20-1 and Q-P20-2.
+**Status:** 🎉 COMPLETE (closed 2026-10-20) — on the library's half (RD-P20-2), at the lead's *"yes close P20"*. Click 4 was seen in the platform's own Desktop sitting of 2026-10-19 (§Execution ledger, *CLOSE — DONE*). The website's half is the platform's (P30, P31). *Was:* ACTIVE — IN EXECUTION (2026-10-16, the lead's *"/execute P20"*). Q-P20-1 and Q-P20-2 were taken at their recommendations on that go-ahead (§Execution ledger). Numbered **Phase20** by the lead's *"/discovery P20 The File Name Is the Name"*, which also opened discovery. Seeded the same day by `/research` on the lead's word: *"Seed a phase for what needs doing here and make it next"* (RD-LBL-8). *(In 2026-10-14 commits, Phase20 means Scale Grids, RD-DS-7; it closed as Phase19.)*
+**Lane:** `build` (§Risk lane). **Next:** none; the phase is closed. *(Was: `/execute` once the lead answers Q-P20-1 and Q-P20-2, which were taken on the go-ahead.)*
 **Measured at:** `b400a16`, on the library machine (no engine at `unreal/build.sh`'s `UE`).
 
 ## Outcome
@@ -44,7 +44,7 @@ The library stopped publishing a second name on 2026-10-16 (RD-LBL-1, `matterlib
 | The gate runs the tools' own `test_*.py` (if Q-P20-1 is yes), and `ToolingConventions.md` records the first ruling on tests | 20.1 |
 | `published_drop_variant: PureSky` set; the dev install re-served under the published names; the old HDRI thumbnails removed | 20.2 |
 | Scenes saved before the switch keep their sky (Q-P20-2 (b)) | 20.2 |
-| The specs say what is now in force: [Identity](../../specs/Ontology/Identity.md) §HDRI names (dated) and its "a rename is a new article" Reevaluate line (this is the rename in place it anticipates, RD-LBL-5); the published-name examples in [RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md), [SiteFile](../../specs/Contract/SiteFile.md) and [Manifest](../../specs/Contract/Manifest.md) (F-P20-8) | 20.2 |
+| The specs say what is now in force: [Identity](../../../specs/Ontology/Identity.md) §HDRI names (dated) and its "a rename is a new article" Reevaluate line (this is the rename in place it anticipates, RD-LBL-5); the published-name examples in [RuntimeCatalog](../../../specs/Contract/RuntimeCatalog.md), [SiteFile](../../../specs/Contract/SiteFile.md) and [Manifest](../../../specs/Contract/Manifest.md) (F-P20-8) | 20.2 |
 | Ledger P31 and M10 updated: the day, and what a late rename now costs | 20.2 |
 | A dev snapshot published with the published HDRI names, at the lead's word | 20.3 |
 | P30 for Studio and USDLiveView marked as verified conforming in the ledger, while the website's half stays open | *at the close* |
@@ -60,7 +60,7 @@ The library stopped publishing a second name on 2026-10-16 (RD-LBL-1, `matterlib
 
 *What does the stack already provide, and which contracts are touched?*
 - **The switch is built** (`dc9bde6`): `hdris.py` `published()` and `on_disk()`, the stamped served copies, the collision refusal and the published default. It was verified with the setting on in scratch folders (research Pass 5). 20.2 sets the line and re-serves; it writes no new mechanism for the rename.
-- **Keeping old scenes lit (Q-P20-2 (b)) uses fields the catalog already has.** An old name becomes an `hdris[]` row with `status: deprecated` and `creator_selectable: false` ([RuntimeCatalog](../../specs/Contract/RuntimeCatalog.md) §HDRIs; both fields exist). This is [Identity](../../specs/Ontology/Identity.md)'s own lifecycle for a renamed entry: *"the old one is marked `deprecated` ('kept for old scenes; prefer a newer material'), so scenes naming it still resolve."* The platform's lookup already honours it (F-P20-3). There is no schema bump and no platform change. **The gap that justifies it:** without it, any scene saved outside the platform's repos loses its sky (F-P20-2).
+- **Keeping old scenes lit (Q-P20-2 (b)) uses fields the catalog already has.** An old name becomes an `hdris[]` row with `status: deprecated` and `creator_selectable: false` ([RuntimeCatalog](../../../specs/Contract/RuntimeCatalog.md) §HDRIs; both fields exist). This is [Identity](../../../specs/Ontology/Identity.md)'s own lifecycle for a renamed entry: *"the old one is marked `deprecated` ('kept for old scenes; prefer a newer material'), so scenes naming it still resolve."* The platform's lookup already honours it (F-P20-3). There is no schema bump and no platform change. **The gap that justifies it:** without it, any scene saved outside the platform's repos loses its sky (F-P20-2).
 - **The gate lane (Q-P20-1)** runs scripts that already exist and already report exit 0 for a pass. It needs no test framework: the project has no `pytest`, and every script is a standalone `uv run` (F-P20-7).
 - **Contracts touched:** Identity §HDRI names and the runtime catalog's `hdris[]`, both additive under (b); the site file's HDRI ids (the ruled rename); the gate's lane set (`ToolingConventions.md` §Gates and CI).
 
@@ -195,8 +195,33 @@ The controls this phase touches, each one read:
   - The first upload stopped on GitHub errors (a 404 on one asset, a 502 on `gh`'s own cleanup) and left a draft of 361 assets. `--publish` resumed it (GitHub learnings G1).
 - **Owed:** click 4 (Studio's sky picker, on the machine with Unreal, after that machine pulls and re-serves) and click 5's library half (done: the site file). The website showing it is the platform's mirror run plus P30.
 - **Gate, 20.1 and 20.2 in the tree:** 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL. That is the baseline set plus `tool_tests` (11 of 11 scripts PASS on the library machine).
+- **Click 4 · seen in the platform's sitting (2026-10-19, the machine with Unreal; recorded 2026-10-20):**
+  - **Where:** the platform's library-window phase ran its own Desktop sitting in Studio. It served this library at `092df05`, which holds 20.2's switch (`3a007f9`). That stood in for this hand-off's steps 1–3.
+  - **What it showed:** Studio's sky picker opened, a sky was pressed, and the log read `Sky applied: Kloppenheim07_v01.hdr`, `Kloppenheim02_v01.hdr`. Those are published names, with no *PureSky*.
+  - **The lead, verbatim, on that sitting:** *"Amazing! it all looks good."*
+  - **Counted as click 4 by the lead** (2026-10-20, *"2 yes close P20"*, answering *"Does the platform's 2026-10-19 sitting count as Phase20's click 4?"*, `261020_R_AfterPhase20.md` Q-AFT-2).
+  - **Not clicked in Studio:** a scene saved with `…_PureSky_v01.hdr` keeping its sky. The platform's own fixture and test of the hidden former names cover it, and USDLiveView showed it at clicks 2 and 3.
+- **CLOSE — DONE (2026-10-20, library machine; a `/research` session entering the close on the lead's *"yes close P20"*):**
+  - **Gate:** `run_all.py`, 18 lanes: 16 PASS, 2 SKIP (compression, staging), 0 FAIL, the same as 20.1's. This is the close's evidence, since CI is parked (`LOCAL_DELTAS.md`). The close landed no code.
+  - **The Outcome against what shipped:**
+    - *"called by its file name's own words, the same in every app"* holds in Studio and USDLiveView (F-P20-4; Studio was seen at click 4). The website's half is P30, the platform's (RD-P20-2).
+    - *"HDRIs are named without PureSky"* holds in the dev install, the site file (20.3) and Studio.
+    - *"every scene keeps its sky"* holds **in the dev install**, through the hidden former names (RD-P20-4). A release carries only the published names (§Deferred), so a scene still naming a former name loses its sky there unless it is renamed (P31).
+  - **Deferral ledger:**
 
-## Hand-off — click 4 on the machine with Unreal (2026-10-16)
+    | Item | Disposition |
+    |---|---|
+    | Click 5's material half, the website | ruled out at plan (RD-P20-2, §Not now): P30, the platform's |
+    | The website's HDRI addresses and the platform's references | ruled out at plan: P31, the platform's |
+    | A release that lists HDRIs; `validate_manifest.py` taking published names | ruled out at plan: §Deferred → *Release Bundle* |
+    | Click 4's old-scene half, not clicked in Studio | already routed (the handback the lead answered with *"yes close P20"*); covered by the platform's test and by clicks 2–3 |
+    | Click 1, agent-checked, not the lead's | recorded at 20.2; it shows nothing this phase changed |
+  - **Still not the lead's spoken word:** RD-P20-3 (the `tool_tests` lane) and RD-P20-4 (option (b)) were taken at their recommendations on *"/execute P20"*. Both are reversible, and the handback asks for them to be ratified.
+  - **The close's own row:** P30's Studio and USDLiveView halves are marked conforming in the ledger, and the website's half stays open. P31 records click 4.
+
+## Hand-off — click 4 on the machine with Unreal (2026-10-16) — HISTORICAL
+
+*(Superseded 2026-10-20: the platform's sitting of 2026-10-19 stood in for these steps; see §Execution ledger. Nothing here is owed.)*
 
 Studio does not run on the library machine (no `IMRSV_Studio` beside the Stage checkout, which the platform's `scripts/build/deploy-to-studio.sh` defaults to), so click 4 is that machine's. For a session there:
 
