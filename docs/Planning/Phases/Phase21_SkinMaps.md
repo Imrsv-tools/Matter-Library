@@ -209,7 +209,7 @@ The controls this phase touches, each read:
 
 | What | To | What it consumes from this phase |
 |---|---|---|
-| A runtime built with Unreal's tinted scatter (the rig's `tint` row in Unreal; Studio's masters through the platform's builder, M7) | the next work on the machine with Unreal; the platform | `build_masters.py`'s `subsurface_color` branch; the twelve articles as served |
+| A runtime built with Unreal's tinted scatter (the rig's `tint` row in Unreal; Studio's masters through the platform's builder, M7) | the next work on the machine with Unreal; the platform. **Requested 2026-10-20 (the lead): the dated *runtime owed* line in `PlatformDependencies.md` M7, `unreal-runtime-v6`** | `build_masters.py`'s `subsurface_color` branch (`subsurface_follows_base`); the driver's `RUNTIME_TINTS_SCATTER`; the twelve articles as served |
 | A roughness map (and the other maps beyond colour) | *Skin Maps Beyond Colour* (parked, RD-DS-8; RD-P21-6). Its trigger: click 1's verdict on plastic | `MakeHuman_Body_v01`, the map maker and its calibration, the fitted skins, the rig's atlas switch |
 | A face map of its own, or a larger atlas | a later question on the same mesh version | the map maker; G8's size rule |
 | Studio wearing the skins | the platform, ledger row (21.3) | the dev install's twelve articles and their pictures; P28; R-PCE-2's names |
