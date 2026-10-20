@@ -27,9 +27,9 @@
       <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
     </tiledimage>
     <tiledimage name="overlay1_tex" type="color4" colorspace="lin_rec709">
-      <input name="file" type="filename" value="../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png" />
+      <input name="file" type="filename" value="../../../textures/shared/overlays/HairlineScratches01_overlay_s01.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />
-      <input name="realworldimagesize" type="vector2" value="0.01, 0.01" />
+      <input name="realworldimagesize" type="vector2" value="0.1, 0.1" />
       <input name="realworldtilesize" type="vector2" value="0.1, 0.1" />
     </tiledimage>
     <tiledimage name="overlay2_tex" type="color4" colorspace="lin_rec709">

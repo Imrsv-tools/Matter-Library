@@ -20,7 +20,7 @@
   "maskset_tex": "../../../textures/shared/masks/Edges01_s01.png",
   "overlays": [
     {
-      "texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s001.png",
+      "texture": "../../../textures/shared/overlays/HairlineScratches01_overlay_s01.png",
       "density_port": "overlay1_density"
     },
     {

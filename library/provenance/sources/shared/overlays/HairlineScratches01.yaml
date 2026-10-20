@@ -4,7 +4,7 @@
 id: shared/overlays/HairlineScratches01   # PACKED DATA (normal/roughness/density)
 version: v01
 files:
-  - MatterLibrary/textures/shared/overlays/HairlineScratches01_overlay_s001.png
+  - MatterLibrary/textures/shared/overlays/HairlineScratches01_overlay_s01.png
 provenance:
   source: procedural
   license: CC0-1.0
