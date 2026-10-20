@@ -25,7 +25,7 @@ both passages quoted. Everything else is one tally line.
 
 ## Absorbed
 
-*Drain 3 (2026-10-14): the 6 retros of 2026-10-14 (MatterSitePipeline, P09, P11 close, PlatformAsks, RoadmapOrder, SetAsks). Portable half on the upstream branch `matterlib-drain3`, not yet pushed (Upstream queue).*
+*Drain 3 (2026-10-14): the 6 retros of 2026-10-14 (MatterSitePipeline, P09, P11 close, PlatformAsks, RoadmapOrder, SetAsks). Portable half upstream `8108e84` + `9de2459`, pushed 2026-10-14.*
 
 | Item | Landed in |
 |---|---|
@@ -38,6 +38,7 @@ both passages quoted. Everything else is one tally line.
 | A close ordered by a ruling that names its own steps (a sitting, a rebuild), against *"by the close the lead has seen everything"* | `execute_close.md` Prerequisite |
 | Row B's *"one level deeper"* false here: Phases 09, 10, 11, 13 and 14 were numbered and left in `Phases/Future/` (14 while this drain ran). Source: upstream's own `research.md` seeded numbered stubs into `Future/`, the template Roadmap modelled it, and the Workflow's `ACTIVE` row coupled the move to status | `research.md` seed path · `discovery.md` numbering act · Workflow `ACTIVE` row · Glossary `ACTIVE` row (here and the template) · template Roadmap. Row B was right; no `LOCAL_DELTAS` row |
 | The consumer handshake: a ruling made in a consumer's session never arriving (CC0), an ask filed in the consumer's own phase doc, owed asks found by reading everything, a drafted ledger id gone stale, a ruling binding both repos, a private fact past the id grep (6 items, 3 runs) | `LOCAL_DELTAS` §Separation |
+| A pathspec commit and the shared index (the restore dance only before a commit from the index; a new file is `git add`ed first; read-back chained with `&&`) · backticks in any double-quoted argument, as an Editing rule · the search-mode line first · a private fact past the id grep · the skills' unconditional never-push · the preview cannot judge scale · a batch's owed lines. Held for the classifier, applied on the lead's go-ahead the same day | `.claude/CLAUDE.md` §Git, §Editing, §Codebase search, *The repo is PUBLIC* · `/matter-generate` hard rules and §6 · `/matter-batch` hard rules and hand back |
 | Support docs (lead-directed, this drain): no Glossary rows for the rig, the Moved verdict, `rejudge` rows, scale grids, HDRIs; `CodingStandards.md` still the template's banner pointing at `docs/architecture/` | `docs/Glossary.md` · `docs/CodingStandards.md` |
 
 *Drain 2 (2026-10-11): the 18 retros of 2026-09-28 → 10-11. Portable items are upstream `996437d`; `d271d0c` restores a sibling drain's commit that the re-landing overwrote.*
@@ -143,7 +144,7 @@ A rule is cut when the flags say it is dead weight *across runs* — not on one 
 | `quick-fix.md` §from an Issue, *remove the `status:*` label* | 1 | master adoption | Tally. This repo's issues carry no labels. |
 | `execute.md` read in full (43.5 KB) for a run whose argument names the close | 1 | P11 | Tally. Fix when it lands: the `/execute` pointer routes a close straight to `execute_close.md`, which cites `execute.md` by section ten times, so those are read on demand. |
 
-**Byte budget, drain 3** (before → after; `.claude/CLAUDE.md` and the skills are held): `research.md` 15,953 → 16,739 · `discovery.md` 28,291 → 28,344 · `execute_close.md` 26,170 → 26,410 · `LOCAL_DELTAS.md` 15,913 → 16,796 · `AI_WorkingAgreement.md` 22,809 → 24,020 · Workflow +5. **Grew again, by about 3.2 KB:** every item that landed passed the bar, and the cuts that would pay for them are the streamlining pass (Open 2), which needs the lead.
+**Byte budget, drain 3** (before → after): `research.md` 15,953 → 16,739 · `discovery.md` 28,291 → 28,344 · `execute_close.md` 26,170 → 26,410 · `LOCAL_DELTAS.md` 15,913 → 16,796 · `AI_WorkingAgreement.md` 22,809 → 24,020 · Workflow +5 · `.claude/CLAUDE.md` 17,417 → 18,192 · `/matter-generate` 16,769 → 17,160 · `/matter-batch` 11,973 → 12,234. **Grew again, by about 4.6 KB:** every item that landed passed the bar, and the cuts that would pay for them are the streamlining pass (Open 2), which needs the lead.
 
 **Byte budget** (drain 1 → drain 2): `execute.md` 40,658 → 43,503 · `discovery.md` 25,336 → 28,123 · `execute_close.md` 24,983 → 26,069 · `plan.md` 33,922 → 34,137 · `research.md` 11,332 → 15,680 · `quick-fix.md` 11,987 → 14,000 · `retro.md` 11,204 → 11,397 · `LOCAL_DELTAS.md` 12,564 → 15,567 · `AI_WorkingAgreement.md` 21,825 → 22,809 · `.claude/CLAUDE.md` 13,887 → 17,417. About a third of the growth in `execute.md`, `discovery.md` and `research.md` is upstream's own since drain 1. **Every doc grew; no drain here has ended at or below where it started.**
 
@@ -154,7 +155,6 @@ A rule is cut when the flags say it is dead weight *across runs* — not on one 
 | Item | Held until | Ready-to-apply fix |
 |---|---|---|
 | The rig baseline and scratch rule (tally, last row) | A run on the library machine confirms the `/tmp` quota and a home-disk scratch path | One clause in the `LOCAL_DELTAS` RUN row |
-| **Drain 3's `.claude/` edits** — the auto-mode classifier refused them as self-modification (2026-10-14), as it did drain 1's | The lead's go-ahead, then the same edits here and in upstream's `templates/.claude/CLAUDE.md` | **`.claude/CLAUDE.md`** (all but the last shared with upstream): (1) §Git index paragraph — a pathspec commit takes only the paths it names, so leave a sibling's staged path alone; it refuses an untracked path (`git add` first), so chain its read-back with `&&`; the restore-and-re-add dance only before a commit FROM THE INDEX (probe-verified 2026-10-14; RoadmapOrder 4, PlatformAsks 4). (2) The *ANY double-quoted argument* sentence moves from §Git to §Editing, widened: doc text a script writes travels in a file or a quoted heredoc, never `python3 -c "…"` (MatterSitePipeline 2). (3) §Codebase search opens with *your FIRST message names your search mode*; the two later copies go (RoadmapOrder 6, a second miss). (4) *The repo is PUBLIC*: a fact read from a private doc (hardware, cost, schedules), and an id grep cannot see one (MatterSitePipeline 4; `LOCAL_DELTAS` §Separation already says it). **Skills:** (5) both: *never push unasked; on the lead's word, by §Git's push row*, and `/matter-generate` *never commit unasked* (SetAsks 6, a contradiction with `LOCAL_DELTAS` §Weighting). (6) `/matter-generate` §6: the preview is Storm only and tiles twice round the sphere whatever the tile size (`make_preview.py` `UV_REPEAT = 2.0`; the retro said one tile), so it never judges scale; run `rig.py <Stem>` at defaults for scale and the other two tools (SetAsks 3). (7) `/matter-batch` hand back: grep `docs/Planning` for the batch's stems and offer each still-owed line as a one-line fix (SetAsks 5). |
 
 *(Drain 1's held `.claude/CLAUDE.md` patch landed 2026-10-11: the classifier that refused it accepted the edits in this session. Its *loop unit* item is closed: Phase11 took the shape, a phase whose deliverable is a running loop.)*
 
@@ -184,7 +184,7 @@ the recorded SHA in `AGENTS.md` §Heritage — **and treat an unpushed upstream 
 landed: check `git merge-base --is-ancestor <sha> origin/main` in the upstream clone at the
 start of each drain.**
 
-- **Drain 3 awaits a push** (2026-10-14): branch `matterlib-drain3` in the shared clone, one commit on `origin/main` `ef1a8b8` — push it as `main` on the lead's word, then bump `AGENTS.md` §Heritage. It carries everything shared above except the held `templates/.claude/CLAUDE.md` edits. It was built in a private clone, so the shared clone's checkout was never touched.
+- Nothing awaits a push (2026-10-14: drain 3 pushed as `8108e84` + `9de2459`, built in a private clone so the shared clone's checkout was never touched; `AGENTS.md` §Heritage bumped).
 - **The shared clone's `main` sits on `c723ba4`, ahead 1 and behind 10** — drain 1's commit that never reached upstream, re-landed there as `691f3df`. Not reset: it was not this drain's to discard. A drain that needs the clone's `main` asks the lead first.
 - **IMRSV's note 3 (`ef1a8b8`) landed a three-line question form in its own repo, unproven:** what a user does and what happens today · the choices as the lead would see them · `Checked:`. Drain 3's plain-words sentence is the same fault seen from here; when IMRSV's form proves out upstream, it replaces that sentence rather than sitting beside it.
 - **A cross-repo session's retro** (MatterSitePipeline's question): friction with this repo's machinery is filed here; friction met in a sibling repo goes to that repo's inbox.
