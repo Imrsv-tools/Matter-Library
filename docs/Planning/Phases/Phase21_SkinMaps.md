@@ -268,7 +268,7 @@ The controls this phase touches, each read:
   - **F-P21-10 — The six maps are one picture.** Every term of the recipe multiplies the tone, so the map ÷ the tone is identical for every tone (six byte-identical PNGs; Git LFS stores one). The map still carries hue (redder cheeks and lips), so RD-SKM-3's reason holds. **Kept as six files**, each named by its article, so a contributor can replace one tone's map alone (RD-SKM-3: one map per tone).
   - **Resolved:** the orange fingers in click 2's tinted live view were the viewport before it converged. A converged render shows the whole hand tinted, only the nails (their own article) untinted.
 
-- **21.3 — ▶ SCAFFOLD COMPLETE — click 4 owed (2026-10-20).**
+- **21.3 — ✅ (click 4 sat, 2026-10-20).** **The lead:** *"yes they look fine, ship them"* (the thumbnail sheet, today's beside the new).
   - **Built:** the thumbnails place a fitted article's tiling layers on the atlas, as the rig does (`50ed85b`). Before it, the thumbnail job built every article with no sliders, so a fitted skin's pores would have stretched one tile over the whole atlas. The twelve skins' and lips' thumbnails were re-made.
   - **Written:** `SkinMaps.md` in force, LCDSchema's two dated notes (a skin map's average is its tone; a writer marks a supplied picture `srgb_texture`), the Glossary's *Skin map*, Storm S10 (F-P21-9), and ledger row **P32** (Q-PMU-1, -2 and -4 answered; F-P21-9 owed by every writer).
   - **Served:** the dev install, with 32 thumbnails from this machine. All twelve articles carry `fits: MakeHuman_Body_v01` in the served catalog.
