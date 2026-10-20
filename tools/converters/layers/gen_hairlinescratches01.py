@@ -4,9 +4,10 @@
 A DAMAGE overlay (slot 1) for polished and brushed metal, gems, clear and glossy plastics,
 lacquer and glass: hundreds of hairline scratches, finer and far denser than Scratches01,
 mostly running one way (the wipe or polish direction) with a few strays across them, each
-a shallow groove tapering out at both ends. They gather in worn patches rather than covering
-the tile evenly, so the surface hazes unevenly instead of going uniformly matte. Frozen
-overlay contract (MasterSet.md):
+a shallow groove tapering out at both ends. They cover the tile evenly: worn patches inside
+a 1 cm tile repeat every centimetre and read as a grid on highlights (Phase11 F-P11-14), so
+any unevenness is left to a mask, which works at a larger size. Frozen overlay contract
+(MasterSet.md):
 
     R/G = normal XY (0.5 = flat)  ·  B = roughness bias (only roughens)  ·  A = density
 
@@ -45,16 +46,13 @@ STRAY = 0.10           # share of scratches at any angle (and shorter)
 
 def scratches() -> tuple:
     rng = np.random.RandomState(SEED)
-    wear = tl.fbm((3, 6, 12), SEED + 1)                          # worn patches
-    lo, hi = np.quantile(wear, [0.30, 0.85])
-    accept = np.clip((wear - lo) / (hi - lo), 0.06, 1.0)
+    rows = rng.permutation(SCRATCHES)                            # one band each, in random order:
     groove = np.zeros((SIZE, SIZE))
     cover = np.zeros((SIZE, SIZE))
     placed = 0
     while placed < SCRATCHES:
-        cx, cy = rng.rand(2) * SIZE
-        if rng.rand() > accept[int(cy), int(cx)]:
-            continue
+        cx = rng.rand() * SIZE                                   # evenly: no patches (F-P11-14), and
+        cy = (rows[placed] + rng.rand()) / SCRATCHES * SIZE      # no bunching across the wipe direction
         placed += 1
         stray = rng.rand() < STRAY
         if stray:
