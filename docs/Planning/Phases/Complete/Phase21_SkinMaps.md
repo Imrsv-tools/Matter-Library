@@ -1,7 +1,7 @@
 # Phase21 — Skin Maps
 
-**Status:** IN EXECUTION (2026-10-20, `/execute P21`; at `a8d2787`, on the library machine). *Was:* BRIEF READY — the lead answered Q-P21-1 with *"a,"* (RD-P21-6): colour only. *Before that:* IN DISCOVERY, the Brief written with one lead question open. Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
-**Lane:** `build` (§Risk lane). **Next:** `/execute P21`.
+**Status:** 🎉 COMPLETE (closed 2026-10-20; the lead: *"close, push, publish"*). Published in `matterlib-0.2.0-dev.12`. *Was:* IN EXECUTION (2026-10-20, `/execute P21`; at `a8d2787`, on the library machine). *Before that:* BRIEF READY — the lead answered Q-P21-1 with *"a,"* (RD-P21-6): colour only. *Before that:* IN DISCOVERY, the Brief written with one lead question open. Opened by the lead's *"push, then /discovery Skin Maps"*. **Numbered Phase21 by the agent** as discovery opened, because it was the head of `## Future` (RD-SV-1), as Phases 13–20 were numbered. Renumbering is the lead's, and it is free until execute commits ids. Seeded 2026-10-14 by `/research` (*"Seed all the TBD phases we discovered here"*). Before this date, the stub was `Phases/Future/PhaseTBD_SkinMaps.md`.
+**Lane:** `build` (§Risk lane). **Next:** none; the next phase is the lead's call (*Skin Maps Beyond Colour* has the evidence, RD-P21-6).
 **Measured at:** `b2abdb5`, on the library machine (no engine at `unreal/build.sh`'s `UE`; Blender 5.2; an 8 GB GPU).
 
 ## Outcome
@@ -276,8 +276,13 @@ The controls this phase touches, each read:
   - **The sheet:** `library/parity/P21_Thumbnails_sheet.jpg`, today's thumbnails (kept in `library/parity/P21_today_thumbs/`) beside the new ones. Two things it shows that this phase does not change: the `hand` view reads lighter than the `face` (the key lights the back of the hand and leaves the left cheek in partial shade, Phase17's look), and a faint centre line and facets on the chin in `lips` (the mesh's shading, also in today's).
   - `run_all.py`: 18 lanes, 16 PASS, 2 SKIP, 0 FAIL (the baseline set).
   - **Next:** click 4; the dev snapshot at the lead's word.
+  - **Shipped:** every kept thumbnail re-made on 21.1's masters (57 made, 3 more by name), because the snapshot refuses a thumbnail made on other masters. **Published as `matterlib-0.2.0-dev.12`.** The first attempt, as `dev.11`, failed mid-upload (GitHub refused a duplicate asset name inside `gh`'s retry), and its own cleanup got a 502. **An unpublished `dev.11` draft (untagged, private, release id `418874559`) remains on GitHub**, which GitHub refuses to delete whole (502); deleting its files one at a time works. Cleanup is owed and blocks nothing. `dev.11` is skipped.
+- **CLOSE — DONE (2026-10-20).** The lead: *"close, push, publish, print document finish end"*.
+  - **Goal re-read:** the six tones vary across the body, with lips that blend and warmer cheeks, in Blender, Storm and Unreal (clicks 1–3). Every body built from `MakeHuman_Body_v01` wears its skin's map by default (P28: the article's own picture wins where a binding supplies none).
+  - **Disposed:** Unreal's tint, a runtime owed from the machine with Unreal (M7, requested by the lead); Studio wearing the skins, the platform's sitting (P32); maps beyond colour and a face map, ruled out by the Brief (RD-P21-6, RD-P21-5).
+  - **Evidence:** `run_all.py` locally (no CI runs, `LOCAL_DELTAS.md`), in the `🎉` body.
 
-### Resume (2026-10-20, after 21.3's scaffold)
+### Resume (2026-10-20, after 21.3's scaffold) — *historical: the phase closed the same day*
 
 - **Done:** 21.1 ✅ (`a9debc4`, `6dd14fd`), 21.2 ✅ (`f93e680`, `84e012c`), 21.3 ▶ scaffold complete (`50ed85b`, then the docs commit).
 - **Next: click 4** on `library/parity/P21_Thumbnails_sheet.jpg`. Transcribe the verdict here. Then the dev snapshot (`build_snapshot.py --publish`), only at the lead's word. Then the close (`execute_close.md`), the lead's to start.

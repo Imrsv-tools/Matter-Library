@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase21 — Skin Maps — ACTIVE (BRIEF READY) *(numbered 2026-10-20 as discovery opened, the lead's "push, then /discovery Skin Maps"; the head of `## Future` since RD-SV-1; seeded 2026-10-14)*
-**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
-- `docs/Planning/Phases/Phase21_SkinMaps.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
+*No active phase (2026-10-20, Phase21 closed). Which phase runs next is the lead's call.*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -207,3 +205,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** wherever a person meets a Matter material or HDRI (the website, Studio, USDLiveView), it is called by its file name's own words, the same in every app; HDRIs are named without PureSky, and every scene keeps its sky.
 - `docs/Planning/Phases/Complete/Phase20_FileNameIsTheName.md`
 *Closed 2026-10-20 on the library side: skies published without PureSky (`matterlib-0.2.0-dev.10`), former names kept hidden in the dev install, and the tools' tests in the one command; the website's half is the platform's (P30, P31).*
+
+### Phase21 — Skin Maps — COMPLETE
+**Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
+- `docs/Planning/Phases/Complete/Phase21_SkinMaps.md`
+*Closed 2026-10-20: six skin maps on the fitted skins and lips, the tint working, published in `matterlib-0.2.0-dev.12`; still reads plastic, the evidence for* Skin Maps Beyond Colour*.*
