@@ -119,9 +119,13 @@ def character_spec(art) -> tuple[dict, list[Path], dict]:
             c["pos"] = (c["pos"][0], round(c["pos"][1] + extra["raise"], 4), c["pos"][2])
         c["hide"] = sorted(set(c.get("hide", []) + hide_always + extra.get("hide", [])))
         view_specs[v] = c
+    # Phase21: a fitted article's part is on its atlas, so its tiling layers (the skin's pores) are
+    # placed by the binding's own sliders, as the rig's job carries them (``job.binding_set``)
+    fitted = B.fitted_st({p: a.fits for p, a in arts.items()})
     bindings = [{"subject": f"/World/Character/{p}",
                  "article": {"name": a.name, "path": str(a.path), "master": a.master}}
                 | {port: str(path) for port, path in jobmod.maps_for(p, a, meshmaps).items()}
+                | ({"set": {k: list(v) for k, v in jobmod.binding_set(p, a, fitted)}} if p in fitted else {})
                 for p, a in arts.items()]
     spec = {"keep": [f"/World/Character/{p}" for p in B.PARTS], "build": None, "views": view_specs,
             "bindings": bindings, "on": parts_of}
