@@ -237,7 +237,10 @@ The controls this phase touches, each read:
 
 *A ledger: step · result · next. The commits carry the how.*
 
-- **21.1 — ▶ SCAFFOLD COMPLETE, sitting owed (clicks 1–2), 2026-10-20.**
+- **21.1 — ✅ (clicks 1–2 sat, 2026-10-20).**
+  - **Click 1, the lead:** *"lips blend, cheeks warmer, still reads plastic...Left (the one you tinted) blends better than the right"* (left: the new skin; right: today's).
+    - **"Still reads plastic"** is the evidence RD-P21-6 named for un-parking *Skin Maps Beyond Colour*, roughness first. Which phase runs next is the lead's call; it is recorded here, not taken.
+  - **Click 2, the lead:** *"seen, put it back"*. The agent set the new skin's tint to (0.2, 0.4, 1.0) in the lead's Blender. The skin took it on the face, neck and hands; the lips and nails kept their own colour (their own articles, tint white). Set back to white.
   - **Built:** the map maker `tools/converters/fit/gen_skin_maps.py` (the probe's v2 recipe, its calibration, `--picture` for a contributor); `FitzpatrickIV_basecolor_sUKN.png` and `skin.yaml`; `Skin_FitzpatrickIV` and `Lips_FitzpatrickIV` fitted (`base_color_const` 0.4546, 0.2406, 0.1389, the scatter colour following the base); Blender's tinted scatter (`load_article.py`); Unreal's (`build_masters.py`, built and not run here); the rig's fitted binding (`build_character.fitted_st`, the atlas st and `uv_scale` 0.006519 on the job).
   - **Measured:** over the skin, the map × the constant averages to the tone (0.436, 0.227, 0.131) exactly; the lips average (0.327, 0.123, 0.076), against the lip rule's (0.349, 0.125, 0.079): the feathering pulls their red down about 6 %. 0.16 % of texels clip at the peak; no island texel is unpainted. The rig ran in all three tools in 29 s; Body ΔE (Storm vs Blender) at the face is 2.35, as today's. `run_all.py`: 18 lanes, 16 PASS, 2 SKIP, 0 FAIL, the baseline. Its first run was red on `test_build_snapshot.py`, whose two checks pinned the tree's fitted set to two articles; that is a FALSE RED, now held to the recipes.
   - **Deviations, each small:**
