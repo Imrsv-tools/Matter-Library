@@ -76,7 +76,9 @@ for _mask, _sha in (("lips", "572630c2b4bb061dfd3b5bb75228615527442296b0db40feff
 # rule's own UV selection by that many rings of neighbouring faces (sharing a vertex): on a
 # loop-modelled mesh, whole edge loops.
 MESHES = {
-    "body": {"group": "body", "rest": "Body",
+    # Phase21: `fits` names the part mesh (groups.PART_MESHES) a FITTED article may be drawn for;
+    # a part bound to such an article takes its atlas st (``fitted_st``)
+    "body": {"group": "body", "rest": "Body", "fits": "MakeHuman_Body_v01",
              "split": [("Lips", {"mask": ["mpfb_lips.jpg"]}),
                        ("Nails", {"mask": ["mpfb_fingernails.jpg", "mpfb_toenails.jpg"]})]},
     # The HIGH-poly eye has an outer shell (the cornea), mapped to a disc of its texture that is
@@ -94,7 +96,8 @@ MESHES = {
     # (groups.PART_MESHES MakeHuman_Teeth_v01) is drawn on it. No fit-set picture is supplied here;
     # the articles on these parts today are constants, which no st moves.
     "teeth": {"proxy": "teeth/teeth_base/teeth_base", "texture": "teeth/teeth_base/teeth.png",
-              "rest": "Teeth", "split": [("Gums", {"red": True})], "atlas": True},
+              "rest": "Teeth", "split": [("Gums", {"red": True})], "atlas": True,
+              "fits": "MakeHuman_Teeth_v01"},
     "tongue": {"proxy": "tongue/tongue01/tongue01", "rest": "Tongue"},
     # Clothing (7.5.2): a T-shirt and jeans on one atlas (the jeans are its lower-left island),
     # and leather shoes. `delete` drops the body faces a garment's .mhclo marks as covered, as
@@ -405,6 +408,7 @@ def load_parts() -> dict:
             k = 1.0 if name in _atlas_parts(spec) else d[1]   # a fit part keeps its atlas
             st = [(vt[ti][0] * k, vt[ti][1] * k) for f in p_faces for _, ti in f]
             parts[name] = {"points": p_pts, "normals": p_nrm, "faces": p_faces, "st": st, "density": d,
+                           "atlas_st": [tuple(vt[ti]) for f in p_faces for _, ti in f],
                            "cutout": bool(spec.get("cutout"))}     # a card: doubleSided
     # feet on the ground: shift every part by the lowest point of all of them
     y0 = min(p[1] for part in parts.values() for p in part["points"])
@@ -583,6 +587,26 @@ def atlas_parts() -> set[str]:
     article's ``meters_per_tile`` nor lets the article's UV placement move the maps drawn on it.
     The ONE copy of the rule (Phase09 F-P09-15): ``job.py`` and ``drivers/unreal.py`` read it."""
     return {f"/World/Character/{p}" for spec in MESHES.values() for p in _atlas_parts(spec)}
+
+
+def fitted_st(bindings: dict[str, str | None]) -> dict[str, tuple[list, float]]:
+    """Phase21: the parts whose bound article is FITTED to the part's own mesh (``bindings`` maps a
+    part name to its article's ``fits``). Each gets ``(its source atlas st, the mesh's metres per
+    UV unit)``: the article's picture is drawn on the atlas, and its tiling layers (the skin's
+    pores) are placed on it by ``uv_scale = meters_per_tile / that density`` (the platform's own
+    per-mesh scale, P18's stopgap; the probe's F-SKM-27). The density is the mesh's REST part's
+    median, one value for the whole layout. The ONE copy of the rule: ``job.py`` and
+    ``drivers/unreal.py`` read it. A part of an ``atlas`` mesh keeps its st either way."""
+    parts = load_parts()
+    out = {}
+    for spec in MESHES.values():
+        fits = spec.get("fits")
+        if not fits:
+            continue
+        for p in [s for s, _ in spec.get("split", [])] + [spec["rest"]]:
+            if p in bindings and bindings[p] == fits:
+                out[p] = (parts[p]["atlas_st"], parts[spec["rest"]]["density"][1])
+    return out
 
 
 def cutout_maps() -> dict[str, Path]:

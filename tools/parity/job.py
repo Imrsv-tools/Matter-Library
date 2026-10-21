@@ -65,6 +65,7 @@ class Article:
     ports: dict[str, tuple[str, str]] = field(default_factory=dict)  # port -> (mtlx type, value)
     textures: dict[str, Path] = field(default_factory=dict)          # node name -> file
     fits: str | None = None        # Phase18 (RD-P18-2): the part mesh a fitted article is drawn for
+    part: str | None = None        # Phase21: the taxonomy part (a fitted ``skin`` is cast as a skin)
 
     def own_maps(self) -> dict[str, Path]:
         """The pictures the article names for its picture inputs (Phase18): input -> file."""
@@ -79,12 +80,12 @@ class Article:
                     for f in n.findall("input[@name='file']")
                     if f.get("value")}     # a cut-out's file is the binding's, not the article's
         meta = {i.get("name"): i.get("value") for i in root.iter("input")
-                if i.get("name") in ("master_material", "meters_per_tile", "fits")}
+                if i.get("name") in ("master_material", "meters_per_tile", "fits", "part")}
         ng = root.find("nodegraph")
         ports = {i.get("name"): (i.get("type"), i.get("value")) for i in ng.findall("input")} if ng is not None else {}
         mpt = float(meta.get("meters_per_tile") or 0) or 1.0
         return cls(path, path.stem, meta.get("master_material", "Opaque"), mpt, ports, textures,
-                   meta.get("fits"))
+                   meta.get("fits"), meta.get("part"))
 
 
 def _usd_value(mtype: str, value) -> str:
@@ -160,6 +161,14 @@ CHARACTER_HIDE = {"mouth": ["/World/Character/Body", "/World/Character/Lips"]}
 CHARACTER_HIDE_ALWAYS = ["/World/Character/Cornea"]
 
 
+# Phase21 (F-P21-9): Storm reads a picture supplied as a USD asset value RAW unless the attribute
+# says its colour space. The image node's own `colorspace="srgb_texture"` does not reach it through
+# the nodegraph's interface input, and UsdMtlx authors no colorSpace (measured 2026-10-20: a uniform
+# sRGB 128 map rendered at 0.52-0.60 of a 255 one in Storm, against 0.28-0.41 in Blender; with this
+# metadata Storm read 0.275, Blender's). A cut-out is data and stays raw.
+MAP_COLORSPACE = {"base_color_map": ' (\n                    colorSpace = "srgb_texture"\n                )'}
+
+
 def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     """The character's defaults scene (Phase07 7.4): one article bound per part.
 
@@ -178,26 +187,33 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     uvs = build_character.part_uvs()
     atlas = build_character.atlas_parts()
     meshmaps = build_character.mesh_maps()
-    libs, lib_of = [], {}           # one Library per (article, the mesh's maps)
+    fitted = build_character.fitted_st({p: a.fits for p, a in bindings.items()})
+    libs, lib_of = [], {}           # one Library per (article, the mesh's maps, its placement)
     for part, art in bindings.items():
-        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())))
+        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())), binding_set(part, art, fitted))
         if key not in lib_of:
             lib_of[key] = len(libs)
             libs.append(key + (art,))
     text = ["#usda 1.0\n(\n    subLayers = [@" + CHARACTER_SCENE.as_posix() + "@]\n"
             f'    upAxis = "{build_scene.UP_AXIS}"\n    metersPerUnit = {build_scene.METERS_PER_UNIT}\n)\n\n'
             'over "World"\n{\n']
-    for i, (name, maps, art) in enumerate(libs):
+    for i, (name, maps, placed, art) in enumerate(libs):
         body = ""
-        if maps:
+        if maps or placed:
             mat = f"/World/Library_{i}/Materials/{name}"
+            # Phase21: a fitted article's placement on the atlas (uv_scale) rides the same way as
+            # a map: a value on the Material, connected into the article's nodegraph
+            vals = [(f"float2 inputs:{k}", f"({v[0]:g}, {v[1]:g})") for k, v in placed]
             body = ('        over "Materials"\n        {\n'
                     f'            over "{name}"\n            {{\n'
-                    + "".join(f'                asset inputs:{port} = @{path.as_posix()}@\n'
+                    + "".join(f'                asset inputs:{port} = @{path.as_posix()}@{MAP_COLORSPACE.get(port, "")}\n'
                               for port, path in maps)
+                    + "".join(f'                {decl} = {v}\n' for decl, v in vals)
                     + f'                over "NG_{name}"\n                {{\n'
                     + "".join(f'                    asset inputs:{port}.connect = <{mat}.inputs:{port}>\n'
                               for port, _ in maps)
+                    + "".join(f'                    {decl}.connect = <{mat}.inputs:{k}>\n'
+                              for (decl, _), (k, _) in zip(vals, placed))
                     + '                }\n            }\n        }\n')
         text.append(f'    def "Library_{i}" (\n        prepend references = @{art.path.as_posix()}@</MaterialX>\n'
                     '    )\n    {\n' + body + '    }\n')
@@ -206,9 +222,12 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
         prim = f"/World/Character/{part}"
         if prim not in uvs:
             raise SystemExit(f"no character part {part!r} (have {sorted(p.rsplit('/', 1)[1] for p in uvs)})")
-        k = 1.0 if prim in atlas else art.meters_per_tile
-        st = ", ".join(f"({s / k:.5f}, {t / k:.5f})" for s, t in uvs[prim])
-        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())))
+        if part in fitted:          # Phase21: the atlas the article's picture is drawn on
+            st = ", ".join(f"({s:.6f}, {t:.6f})" for s, t in fitted[part][0])
+        else:
+            k = 1.0 if prim in atlas else art.meters_per_tile
+            st = ", ".join(f"({s / k:.5f}, {t / k:.5f})" for s, t in uvs[prim])
+        key = (art.name, tuple(sorted(maps_for(part, art, meshmaps).items())), binding_set(part, art, fitted))
         text.append(f'        over "{part}"\n        {{\n'
                     f'            texCoord2f[] primvars:st = [{st}] (\n'
                     '                interpolation = "faceVarying"\n            )\n'
@@ -218,6 +237,17 @@ def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text("".join(text), encoding="utf-8")
     return out
+
+
+def binding_set(part: str, art: "Article", fitted: dict) -> tuple:
+    """Phase21: the sliders a binding itself sets, as sorted (port, value) pairs: on a part that
+    takes a FITTED article's atlas (``build_character.fitted_st``), the article's tiling layers
+    placed by ``uv_scale = meters_per_tile / the mesh's metres per UV unit`` (where it declares the
+    port; the lips tile nothing)."""
+    if part not in fitted or "uv_scale" not in art.ports:
+        return ()
+    s = round(art.meters_per_tile / fitted[part][1], 6)
+    return (("uv_scale", (s, s)),)
 
 
 def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) -> dict[str, Path]:
@@ -242,6 +272,7 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
     out_dir.mkdir(parents=True, exist_ok=True)
     scene = write_character_scene(bindings, out_dir / "scenes" / "defaults.usda")
     meshmaps = build_character.mesh_maps()
+    fitted = build_character.fitted_st({p: a.fits for p, a in bindings.items()})
     first = next(iter(bindings.values()))
     job = {
         "format": 1,
@@ -255,6 +286,9 @@ def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: in
                       {"name": a.name, "path": str(a.path), "master": a.master,
                        "meters_per_tile": a.meters_per_tile}}
                      | {port: str(path) for port, path in maps_for(p, a, meshmaps).items()}
+                     # Phase21: a fitted article's part is on its atlas, placed by `set`
+                     | ({"st": "atlas", "set": {k: list(v) for k, v in binding_set(p, a, fitted)}}
+                        if p in fitted else {})
                      for p, a in bindings.items()],
         "scene": str(CHARACTER_SCENE),
         "camera": CHARACTER_VIEWS["wide"][0],

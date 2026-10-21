@@ -1,0 +1,32 @@
+# Provenance for the skin maps (Phase21): one colour map per Fitzpatrick tone, drawn on
+# MakeHuman_Body_v01 (hm08), each a fitted Character article's own picture (RD-P18-9,
+# RD-P21-1). Made from CC0 parts only, no photograph (RD-SKM-2). Written by `evidence`.
+id: fit/makehuman/skin
+version: v01
+files:
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickI_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickII_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickIII_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickV_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickVI_basecolor_sUKN.png
+provenance:
+  source: derived
+  license: CC0-1.0
+  upstream:
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/3dobjs/base.obj, sha256: 8e761e6624b8f54536409135d1636da63b32486a90d4897f84e121d144f6fb4c}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_face.jpg, sha256: 6f2d7abee30d63378b7b4214cf43a47d4cae65d967c12b34e365e058448b96df}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_lips.jpg, sha256: 572630c2b4bb061dfd3b5bb75228615527442296b0db40feffffb0d439e8c203}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_ears.jpg, sha256: 8c1becd3887b65df50720de87e91807667155107d23a6da9f5142d84142b724b}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_eyelids.jpg, sha256: 2b6f41d6c51f1a991f715025f87a0c8626c889201c8fe9c12514fcc579710532}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_aureolae.jpg, sha256: bc69ca4c397a721c8e47fb854028649dd1c5aeb2d184b60c984f3eb6d53e2de7}
+    - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/sss.png, sha256: d433f15c7240c5b0c91c6fafa482d9c380504efd6ad4d1504b4d7da32d1eec42}
+  upstream_licence: "CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh and its textures)"
+  evidence: tools/converters/fit/gen_skin_maps.py
+members:
+  FitzpatrickI: {made: procedural, tone: [0.847, 0.638, 0.552], base_color_const: [0.8832, 0.6762, 0.5854], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6361, 0.3458, 0.3221]}
+  FitzpatrickII: {made: procedural, tone: [0.799, 0.485, 0.347], base_color_const: [0.8331, 0.514, 0.368], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6, 0.2629, 0.2025]}
+  FitzpatrickIII: {made: procedural, tone: [0.623, 0.433, 0.343], base_color_const: [0.6496, 0.4589, 0.3638], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.4679, 0.2347, 0.2001]}
+  FitzpatrickIV: {made: procedural, tone: [0.436, 0.227, 0.131], base_color_const: [0.4546, 0.2406, 0.1389], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.3274, 0.1231, 0.0764]}
+  FitzpatrickV: {made: procedural, tone: [0.283, 0.148, 0.079], base_color_const: [0.2951, 0.1569, 0.0838], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.2125, 0.0802, 0.0461]}
+  FitzpatrickVI: {made: procedural, tone: [0.09, 0.05, 0.02], base_color_const: [0.0938, 0.053, 0.0212], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.0676, 0.0271, 0.0117]}

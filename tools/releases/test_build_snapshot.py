@@ -4,6 +4,8 @@ are taken, the portable rewrite, and the ranges' coverage.
 
     uv run tools/releases/test_build_snapshot.py        exit 0 = PASS
 """
+# FALSE RED: 2026-10-20 — two checks pinned the working tree's fitted articles to a list of two;
+# Phase21 21.1 fitted Skin/Lips_FitzpatrickIV, so they now hold to the recipes that declare `fits`.
 import json
 import sys
 import tempfile
@@ -235,17 +237,23 @@ check(other == {"contributor": "AnotherHand", "licence": "CC0-1.0", "fits": "Mak
 check(working_tree.declared({"contributor": "MatterBot", "licence": "", "fits": ""}) == {"contributor": "MatterBot"},
       "a fact the file does not declare is left out, never published empty (RD-WS-1)")
 fitted = {a["identity"]: a["fits"] for a in arts if a["fits"]}
-check(fitted == {"Teeth_Natural_Clean_Base_sUKN_v01": "MakeHuman_Teeth_v01",
-                 "Eye_Green_Clean_Base_sUKN_v01": "MakeHuman_Eyes_v01"},
-      f"the two fitted articles, and only those, declare the mesh they fit ({sorted(fitted)})")
+# Phase21: the set GROWS (the skins and lips are fitted), so it is held to the recipes that declare
+# `fits`, not to a list: the entry carries exactly what each recipe declares, and no more
+_recipes = [json.loads(r.read_text()) for r in (B.REPO / "tools" / "converters" / "recipes").glob("*.json")]
+declared_fits = {r["name"]: r["fits"] for r in _recipes if r.get("fits")}
+check(fitted == declared_fits and {"Teeth_Natural_Clean_Base_sUKN_v01": "MakeHuman_Teeth_v01",
+                                   "Eye_Green_Clean_Base_sUKN_v01": "MakeHuman_Eyes_v01"}.items() <= fitted.items(),
+      f"every fitted article, and only those, declares the mesh it fits, as its recipe does ({sorted(fitted)})")
 check(set(fitted.values()) <= set(G.PART_MESHES), "every fits names a known part mesh")
 e3 = B.derive_entry({"id": "character/humanoid/teeth/Teeth_Natural_Clean_Base_sUKN", "version": "v01",
                      "status": "draft"})
 check(e3["scale"] == "sUKN" and e3["display_name"] == "teeth/Teeth_Natural_Clean_Base"
       and e3["payload_path"] == "materials/character/humanoid/teeth/Teeth_Natural_Clean_Base_sUKN_v01.mtlx",
       f"an sUKN article is on the grammar: its scale, its name without the tag, its versioned file ({e3['payload_path']})")
-check({a["identity"]: a["display_name"] for a in arts if a["fits"]}
-      == {"Teeth_Natural_Clean_Base_sUKN_v01": "Teeth_Natural_Clean_Base", "Eye_Green_Clean_Base_sUKN_v01": "Eye_Green_Clean_Base"},
+_names = {a["identity"]: a["display_name"] for a in arts if a["fits"]}
+check(_names.get("Teeth_Natural_Clean_Base_sUKN_v01") == "Teeth_Natural_Clean_Base"
+      and _names.get("Eye_Green_Clean_Base_sUKN_v01") == "Eye_Green_Clean_Base"
+      and all(n == re.sub(r"_s(?:UKN|[0-9]+)_v[0-9]+$", "", i) for i, n in _names.items()),
       "the working tree drops sUKN from the name as it drops sNN")
 kits = [B.kit_entry(m, rec_, "0" * 64) for m, rec_ in G.PART_MESHES.items()]
 check([k["id"] for k in kits] == ["MakeHuman_Body_v01", "MakeHuman_Eyes_v01", "MakeHuman_Teeth_v01",

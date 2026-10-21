@@ -298,10 +298,13 @@ def run(job_path: Path) -> None:
             # one material per (article, the binding's maps), as the USD side has one Material
             # instance per map (Phase07 7.6: the cut-out; Phase09 9.1: the picture)
             cut, pic = b.get("cutout_map"), b.get("base_color_map")
-            key = (a["name"], cut, pic)
+            # Phase21: a binding's own sliders (a fitted article's placement on the atlas), under
+            # the setting's
+            sliders = {**b.get("set", {}), **s.get("set", {})}
+            key = (a["name"], cut, pic, repr(sorted(sliders.items())))
             if key not in built:
                 tag = f"__{Path(cut or pic).stem}" if (cut or pic) else ""
-                built[key] = load_article.build(Path(a["path"]), s.get("set", {}),
+                built[key] = load_article.build(Path(a["path"]), sliders,
                                                 name=f"{a['name']}__{s['id']}{tag}",
                                                 cutout_map=Path(cut) if cut else None,
                                                 base_color_map=Path(pic) if pic else None)

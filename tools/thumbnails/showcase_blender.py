@@ -201,10 +201,11 @@ def bind(bindings: list) -> None:
     for b in bindings:
         a = b["article"]
         cut, pic = b.get("cutout_map"), b.get("base_color_map")
-        key = (a["name"], cut, pic)
+        sliders = b.get("set", {})      # Phase21: a fitted article's placement on the atlas
+        key = (a["name"], cut, pic, repr(sorted(sliders.items())))
         if key not in built:
             tag = f"__{Path(cut or pic).stem}" if (cut or pic) else ""
-            built[key] = load_article.build(Path(a["path"]), {}, name=f"{a['name']}__thumbnail{tag}",
+            built[key] = load_article.build(Path(a["path"]), sliders, name=f"{a['name']}__thumbnail{tag}",
                                             cutout_map=Path(cut) if cut else None,
                                             base_color_map=Path(pic) if pic else None)
         o = bpy.data.objects.get(b["subject"].rsplit("/", 1)[1])

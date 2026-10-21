@@ -557,6 +557,14 @@ def build_master(token, white, no_wear, flat, white_colour=None):
             # 1 - subsurface_weight of its strength (the white Unreal eye of 9.2). The driver sets
             # this parameter to the article's base constant then; with no picture bound it is x 1.
             p = g.op(M.MaterialExpressionMultiply, p, base_map, 5, b_out="RGB")
+            # ... and the Creator's tint, as the base takes it, where the scatter FOLLOWS the base
+            # (Phase21 RD-P21-4, F-P21-3: Storm's follows base_color_out, after the tint; a value
+            # the article pins stays untinted, as in Storm). `subsurface_follows_base` is 0 by
+            # default and the tint white, so a master built with this draws nothing differently
+            # at its defaults (no runtime owed, the lead 2026-10-05); the driver sets it to 1.
+            follow = g.scalar("subsurface_follows_base", 0.0, col=6)
+            p = g.op(M.MaterialExpressionMultiply, p,
+                     g.lerp_from_one(g.vector("base_color_tint", (1.0, 1.0, 1.0)), follow, 5), 5)
             # A black texel (the eye picture's pupil) would scatter a colour of exactly 0, which
             # HANGS THE GPU (learning U11: Xid 109 in SubsurfaceScattering, 9.3; the floor alone
             # cleared it, the job otherwise identical)

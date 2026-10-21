@@ -12,7 +12,7 @@ You are running **one batch** of the build loop (Phase11 Library Coverage). The 
 ## Hard rules
 
 - **Build by `/matter-generate` §1–5. Read that skill; do not work from memory.** Its rules hold here (recipe, never MaterialX · say what you could not do · run from the repo root with `uv run`), **except two, which this skill replaces:**
-  - **You commit each built row as `draft`, locally** (lead, 2026-10-02, RD-P11-2). **Never push.** Never touch `library/releases/`.
+  - **You commit each built row as `draft`, locally** (lead, 2026-10-02, RD-P11-2). **Never push unasked** (on the lead's word: `.claude/CLAUDE.md` §Git's push row). Never touch `library/releases/`.
   - **The judge is the rig, not the Storm preview,** and there is no USDLiveView hand-off (`/matter-generate` §6a). Its §6 critique is still written, from the rig's sheet.
 - **Never overwrite what exists, except your own `redo` row**, which is rebuilt in place (`v01`; no versioning before the first release).
 - **Never fudge a recipe to make the tools agree.** A difference a renderer causes (Storm draws see-through matter as transparency, not refraction; Phase05) is reported, not hidden. Fix the material only where the material is wrong.
@@ -134,3 +134,4 @@ uv run tools/converters/wishlist.py redo <stem> --note "<their words>"
 - **The batch:** `library/batches/<batch>.md`, one line per row (built / stuck / re-judged, the verdict).
 - **What to look at first:** a stuck row, or a sheet that disagrees.
 - **Next:** `wishlist.py counts`, and the next rows `next` would take.
+- **Owed lines:** grep `docs/Planning` for the batch's stems; a line still naming one as owed (a ledger row, a footer) is offered as a one-line fix — the batch itself touches no planning doc.

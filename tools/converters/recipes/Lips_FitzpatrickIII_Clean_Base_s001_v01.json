@@ -2,7 +2,7 @@
   "summary": "Lips to match skin type III: redder, smoother and moister than the skin.",
   "search_words": ["lips", "mouth", "skin", "character", "human"],
   "origin": ["agent-drafted"],
-  "_comment": "Lip mucosa for skin type III (Phase08 8.2, RD-P08-3): paired with Skin_FitzpatrickIII_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, as skin, but redder, smoother and moist. Derived from the skin by one rule (sources).",
+  "_comment": "FITTED (Phase21, RD-P21-2): the lips carry Skin_FitzpatrickIII's map and its base_color_const, drawn for MakeHuman_Body_v01, so the colour runs across the lip edge with no line; the lip colour is IN the map (its lip region, feathered into the face), and the lips keep their own finish (roughness, coat). The scatter colour follows the base and the tint (RD-P21-4). Before Phase21: Lip mucosa for skin type III (Phase08 8.2, RD-P08-3): paired with Skin_FitzpatrickIII_Clean_Base_s001_v01 by the shared Variant token. SUBSURFACE, as skin, but redder, smoother and moist. Derived from the skin by one rule (sources).",
   "name": "Lips_FitzpatrickIII_Clean_Base_s001_v01",
   "contributor": "MatterBot",
   "status": "candidate",
@@ -13,13 +13,13 @@
   "group": "character",
   "species": "humanoid",
   "part": "mouth",
+  "fits": "MakeHuman_Body_v01",
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
   "metalness_const": 0.0,
-  "base_color_const": "0.498, 0.238, 0.206",
+  "base_color_const": "0.6496, 0.4589, 0.3638",
   "roughness_const": 0.35,
   "specular_ior": 1.4,
-  "subsurface_color": "0.498, 0.238, 0.206",
   "subsurface_weight": 1.0,
   "subsurface_radius": 0.00482,
   "subsurface_radius_scale": "1.0, 0.351, 0.226",
@@ -27,11 +27,19 @@
   "coat_weight": 0.3,
   "coat_roughness": 0.2,
   "coat_ior": 1.336,
+  "base_color_map": true,
+  "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIII_basecolor_sUKN.png",
   "lcd_ports": [
     "base_color_tint",
     "roughness_bias"
   ],
   "sources": [
+    {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_skin_maps.py",
+      "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
+      "note": "Phase21: the colour is Skin_FitzpatrickIII's map x its base_color_const; the map's lip region carries the derivation rule below (the skin's tone x (0.80, 0.55, 0.60), 0.498, 0.238, 0.206 before Phase21), feathered into the face"
+    },
     {
       "kind": "judgement",
       "why": "Phase08 8.2 derivation rule (judgement; no measured lip albedo exists, F-P08-1): lips = the skin's albedo x (0.80, 0.55, 0.60), i.e. the skin's own melanin with blood showing through a thinner stratum corneum (red kept, green and blue drop). On Skin III this gives (0.50, 0.24, 0.21), the shipped Lips_Natural (0.52, 0.26, 0.24) within 0.03. Every other value is Lips_Natural's (roughness 0.35 and coat 0.3 at 0.2, IOR 1.336: MPFB2's lips and a film of saliva); the scatter radius and its per-channel scale are the skin's own (Physically Based). Inputs: Skin_FitzpatrickIII_Clean_Base_s001_v01 base_color_const (0.623, 0.433, 0.343)."
