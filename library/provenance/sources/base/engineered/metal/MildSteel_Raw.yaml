@@ -8,14 +8,22 @@ provenance:
   evidence:
     url: https://ambientcg.com/view?id=Metal002
     sha256_scope: shipped_source_set
-    sha256: 901b22121af8eb3dd55076b6f0faeb3f7ac76d88022618d3025d0b49dd45dcb0
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Metal002_1K-PNG download. sha256 attests the shipped release-source set.
+    sha256: 7296e516c738c1428360bffa7b34d7c7e014670c422592b1e911a3408728dda2
+    note: The _s01 maps are byte-identical copies of the ambientCG Metal002_1K-PNG maps (the scan, judged 0.3 m across), kept for Paint_OnMetal_Chipped_Base_s01_v01. The _s1 maps are processed derivatives: the scan re-made at the s1 scale option (2026-10-22, Phase19 D-9) by tools/converters/base/quilt_scan.py (MildSteel_Raw --src-m 0.3 --out-m 1.0 --scale s1 --size 2048 --resample 1152), an exact 1 m tile, nothing stretched; until then the set was the _s01 maps alone (set digest 901b22121af8eb3dd55076b6f0faeb3f7ac76d88022618d3025d0b49dd45dcb0). sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_basecolor_s01.png
       sha256: bce2d7d65c5083dc4a071681a3edc34ade398544c82651921feab0b325697043
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_basecolor_s1.png
+      sha256: c81fe028a74ee644a71646ef621651b9b32ebb6320ee034060c011ca569e07f4
     - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_metalness_s01.png
       sha256: ee6f32c7c88f4592b3cb18e7f90bdd8e2102cc0656c41cbad0a1347cc7bb1695
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_metalness_s1.png
+      sha256: a0eb38b55fed028103d4aeda15748e4becd7b3e389dd1867826679a9531f6f58
     - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_normal_s01.png
       sha256: d82268e4079a36b0bc403545eae88c70d3be01e9773db013776dc1d3695bf321
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_normal_s1.png
+      sha256: ce41e0867b20dbc43e1e7a7e346c5cc8fc8f4530c8274b5b25b72c6fec6f251d
     - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_roughness_s01.png
       sha256: a97df5e449b57348e63793ea2d195a849fccd3504247c4f8b8e56a6630a2bd4b
+    - path: MatterLibrary/textures/base/engineered/metal/MildSteel_Raw_roughness_s1.png
+      sha256: a084f6b8ba024e351391e8d2051119e161a4b3b90e749d79508f0b71bfc5b4e8

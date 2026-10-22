@@ -26,7 +26,7 @@ Every shipped texture's source, licence and evidence is recorded in `library/pro
 | [ambientCG](https://ambientcg.com): [Granite001A](https://ambientcg.com/view?id=Granite001A) | CC0-1.0 | `Granite_Polished_Clean_Base_s1` |
 | [ambientCG](https://ambientcg.com): [Onyx007](https://ambientcg.com/view?id=Onyx007) | CC0-1.0 | `Onyx_Polished_Clean_Base_s01` |
 | [ambientCG](https://ambientcg.com): [Ground048](https://ambientcg.com/view?id=Ground048) | CC0-1.0 | `Loam_Natural_Clean_Base_s1` |
-| [ambientCG](https://ambientcg.com): [Metal002](https://ambientcg.com/view?id=Metal002) | CC0-1.0 | `MildSteel_Raw_Clean_Base_s01` |
+| [ambientCG](https://ambientcg.com): [Metal002](https://ambientcg.com/view?id=Metal002) | CC0-1.0 | `MildSteel_Raw_Clean_Base_s1` |
 | [ambientCG](https://ambientcg.com): [Concrete045](https://ambientcg.com/view?id=Concrete045) | CC0-1.0 | `Concrete_BoardFormed_Clean_Base_s1` |
 | [ambientCG](https://ambientcg.com): [Ground055S](https://ambientcg.com/view?id=Ground055S) | CC0-1.0 | `BeachSand_Dry_Clean_Base_s1` |
 | [ambientCG](https://ambientcg.com): [Terrazzo019L](https://ambientcg.com/view?id=Terrazzo019L) | CC0-1.0 | `Terrazzo_Polished_Clean_Base_s1` |

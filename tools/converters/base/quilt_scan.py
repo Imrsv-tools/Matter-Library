@@ -25,9 +25,9 @@ as vectors and renormalised. The quilt is built at the scan's own pixel density,
 resized to `--size` with a wrapped border, so it stays seamless: that changes the
 resolution, never the size in metres (RD-P19-1).
 
-    quilt_scan.py <SET> --src DIR --src-m 0.4 --out-m 1.0 --scale s1 [--size 2048] [--patch 160 --overlap 32] [--no-flatten] --out DIR
+    quilt_scan.py <SET> --src DIR --src-m 0.4 --out-m 1.0 --scale s1 [--size 2048] [--patch 160 --overlap 32] [--resample PX] [--no-flatten] --out DIR
 
-Reads DIR/<SET>_<channel>_*.png (basecolor, roughness, normal; those present) and writes
+Reads DIR/<SET>_<channel>_*.png (basecolor, roughness, normal, metalness; those present) and writes
 <SET>_<channel>_<scale>.png. Fixed seed, no network. It refuses to overwrite an existing
 file (AI_WorkingAgreement §Build Safety).
 """
@@ -42,7 +42,7 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
-CHANNELS = ("basecolor", "roughness", "normal")
+CHANNELS = ("basecolor", "roughness", "normal", "metalness")
 SEED = 1901
 PATCH = 160            # patch side, in scan pixels
 OVERLAP = 32           # the strip a patch shares with its neighbours
@@ -197,6 +197,9 @@ def main(argv=None) -> int:
     ap.add_argument("--patch", type=int, default=PATCH, help="patch side, in scan pixels")
     ap.add_argument("--overlap", type=int, default=OVERLAP,
                     help="the strip a patch shares with its neighbours; patch - overlap must divide the quilt")
+    ap.add_argument("--resample", type=int, default=0,
+                    help="resize the scan's maps to N px first: a resolution change, never a size "
+                         "change, for a quilt whose pixel count no patch step divides")
     ap.add_argument("--no-flatten", dest="flatten", action="store_false",
                     help="quilt the scan's broad tone too (a scan with none)")
     ap.add_argument("--out", required=True)
@@ -209,7 +212,9 @@ def main(argv=None) -> int:
         found = sorted(src.glob(f"{args.set}_{ch}_*.png"))
         if found:
             maps[ch] = load(found[0])
-            if args.flatten and ch != "normal":
+            if args.resample:
+                maps[ch] = resize_wrapped(maps[ch], args.resample)
+            if args.flatten and ch in ("basecolor", "roughness"):   # not relief, not a metal mask
                 maps[ch] = flatten(maps[ch])
     if "basecolor" not in maps:
         print(f"no {args.set}_basecolor_*.png in {src}", file=sys.stderr)
