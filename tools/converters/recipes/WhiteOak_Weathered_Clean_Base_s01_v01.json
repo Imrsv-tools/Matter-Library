@@ -2,7 +2,7 @@
   "summary": "Silver-grey oak left outdoors for years, its grain standing up in ribs, as on a fence or deck.",
   "search_words": ["oak", "weathered wood", "grey wood", "wood", "deck", "fence", "barn"],
   "origin": ["procedural", "agent-drafted"],
-  "_comment": "Weathered white oak: flat-sawn oak left outdoors for years, bleached to a silver-grey, the soft earlywood washed out so the latewood stands as raised ribs, open dark pores and pale ray flecks along the grain: a fence rail, deck board or barn timber. Opaque: a solid, matte dielectric. Base textures are generated (L2, tools/converters/base/gen_whiteoak_weathered.py), not scanned: ambientCG has no asset that says white oak or weathered oak (its weathered woods are siding shingles, an assembly), and the library names only what a source states. Condition stays Clean: the drying checks are the Cracks01 wear layer (overlay 1, damage), at 0 (C1), with dust as a deposit (Phase10), gated by the Crevice mask. Built by the Phase11 batch.",
+  "_comment": "Weathered white oak: flat-sawn oak left outdoors for years, bleached to a silver-grey, the soft earlywood washed out so the latewood stands as raised ribs, open dark pores and pale ray flecks along the grain: a fence rail, deck board or barn timber. Opaque: a solid, matte dielectric. Base textures are generated (L2, tools/converters/base/gen_whiteoak_weathered.py), not scanned: ambientCG has no asset that says white oak or weathered oak (its weathered woods are siding shingles, an assembly), and the library names only what a source states. Condition stays Clean: the weathering checks are the Checks01 wear layer (overlay 1, damage; long splits along the grain, which runs along U), at 0 (C1), with dust as a deposit (Phase10), gated by the Crevice mask. Built by the Phase11 batch. Redone 2026-10-22 on the maintainer's note (Cracks01 is crazing, wrong for wood): Checks01 made and put in its place.",
   "name": "WhiteOak_Weathered_Clean_Base_s01_v01",
   "contributor": "MatterBot",
   "status": "draft",
@@ -19,7 +19,7 @@
   "specular_ior": 1.5,
   "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Cracks01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Checks01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
   ],
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
