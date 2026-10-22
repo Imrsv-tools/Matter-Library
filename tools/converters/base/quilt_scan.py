@@ -25,7 +25,7 @@ as vectors and renormalised. The quilt is built at the scan's own pixel density,
 resized to `--size` with a wrapped border, so it stays seamless: that changes the
 resolution, never the size in metres (RD-P19-1).
 
-    quilt_scan.py <SET> --src DIR --src-m 0.4 --out-m 1.0 --scale s1 [--size 2048] [--no-flatten] --out DIR
+    quilt_scan.py <SET> --src DIR --src-m 0.4 --out-m 1.0 --scale s1 [--size 2048] [--patch 160 --overlap 32] [--no-flatten] --out DIR
 
 Reads DIR/<SET>_<channel>_*.png (basecolor, roughness, normal; those present) and writes
 <SET>_<channel>_<scale>.png. Fixed seed, no network. It refuses to overwrite an existing
@@ -186,6 +186,7 @@ def resize_wrapped(img: np.ndarray, size: int) -> np.ndarray:
 
 
 def main(argv=None) -> int:
+    global PATCH, OVERLAP, FLATTEN                             # one quilt per run: set once, below
     ap = argparse.ArgumentParser(description="Re-make a scanned texture set at a scale option's size.")
     ap.add_argument("set", help="the texture set's name, e.g. Granite_Polished")
     ap.add_argument("--src", required=True, help="the folder holding the scan's maps")
@@ -193,10 +194,14 @@ def main(argv=None) -> int:
     ap.add_argument("--out-m", type=float, required=True, help="the scale option's length, in metres")
     ap.add_argument("--scale", required=True, help="the scale tag in the written names, e.g. s1")
     ap.add_argument("--size", type=int, default=2048, help="the written resolution, in pixels")
+    ap.add_argument("--patch", type=int, default=PATCH, help="patch side, in scan pixels")
+    ap.add_argument("--overlap", type=int, default=OVERLAP,
+                    help="the strip a patch shares with its neighbours; patch - overlap must divide the quilt")
     ap.add_argument("--no-flatten", dest="flatten", action="store_false",
                     help="quilt the scan's broad tone too (a scan with none)")
     ap.add_argument("--out", required=True)
     args = ap.parse_args(argv)
+    PATCH, OVERLAP, FLATTEN = args.patch, args.overlap, 2 * args.patch
 
     src, out = Path(args.src), Path(args.out)
     maps = {}
@@ -213,7 +218,7 @@ def main(argv=None) -> int:
     work = round(side * args.out_m / args.src_m)               # the quilt at the scan's own density
     step = PATCH - OVERLAP
     if work % step:
-        print(f"{work} px is not a whole number of {step} px steps; pick another PATCH or OVERLAP", file=sys.stderr)
+        print(f"{work} px is not a whole number of {step} px steps; pick another --patch or --overlap", file=sys.stderr)
         return 1
     targets = {ch: out / f"{args.set}_{ch}_{args.scale}.png" for ch in maps}
     if any(p.exists() for p in targets.values()):

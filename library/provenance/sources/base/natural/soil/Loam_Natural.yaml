@@ -8,12 +8,12 @@ provenance:
   evidence:
     url: https://ambientcg.com/view?id=Ground048
     sha256_scope: shipped_source_set
-    sha256: cdb6979e5fe6dc7248349f9127bc30b065b76611da36a52ee9cb079e83fe03d8
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Ground048_1K-PNG download. sha256 attests the shipped release-source set.
+    sha256: a661172744497dd455c38b8bf742dc76bcc2e58867544ec6d0f2134fc0bf2b92
+    note: Shipped source textures are processed derivatives of the ambientCG Ground048_1K-PNG maps, not byte-identical to the download. Re-made at the s1 scale option (2026-10-22, Phase19 D-9) by tools/converters/base/quilt_scan.py (Loam_Natural --src-m 1.4 --out-m 1.0 --scale s1 --size 1024 --patch 75 --overlap 32), which quilts the 1.4 m scan into an exact 1 m tile; until then the shipped maps were the download's own (set digest cdb6979e5fe6dc7248349f9127bc30b065b76611da36a52ee9cb079e83fe03d8). sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_basecolor_s1.png
-      sha256: 6e24580b495fbb006bfaeb9261cf3ef093ff20147a984cc1fedea328b33406ec
+      sha256: e01369ce68eaab6c9f73979a3e80a8b1d5fd103b135ff66c6a94944d8ae35b8a
     - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_normal_s1.png
-      sha256: 1eee1b97886083e6cb5c22aa7b10c2295260efbe0545024432ec4cb2f1cea274
+      sha256: bbe7989625d2bd5080d7f30bd478148cb07b044766d6612320c20c76117b7742
     - path: MatterLibrary/textures/base/natural/soil/Loam_Natural_roughness_s1.png
-      sha256: 3525f5ba02b709e65e5236201b8ac8d4a9a9221165764762fe08857bb08653d3
+      sha256: 07eb40ec730079132982eef4ffdd714a1f8f4b2f3248a855bcbabaacc297d6f2
