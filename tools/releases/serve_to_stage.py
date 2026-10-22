@@ -73,6 +73,7 @@ SERVED_RELEASE = "0.1.0"
 SELECTOR = "active-release.json"
 BACKUP = "active-release.before-dev.json"
 PORT = 8081
+STAGE_EXE = "IMRSV_Stage.exe" if os.name == "nt" else "IMRSV_Stage"
 
 
 def working_tree_catalog() -> dict:
@@ -216,7 +217,7 @@ def link(path: Path, target: Path) -> None:
 
 
 def stage_pids(runtime: Path) -> list[int]:
-    exe = (runtime / "IMRSV_Stage").resolve()
+    exe = (runtime / STAGE_EXE).resolve()
     pids = []
     for proc in Path("/proc").iterdir():
         if proc.name.isdigit():
@@ -249,7 +250,7 @@ def restart_stage(runtime: Path) -> int:
     env["PXR_PLUGINPATH_NAME"] = f"{runtime / 'lib' / 'usd'}:{runtime / 'plugin' / 'usd'}"
     env["LD_LIBRARY_PATH"] = str(runtime)
     log = open(runtime / "stage.log", "ab")
-    proc = subprocess.Popen([str(runtime / "IMRSV_Stage")], cwd=runtime, env=env,
+    proc = subprocess.Popen([str(runtime / STAGE_EXE)], cwd=runtime, env=env,
                             stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
     for _ in range(100):
         if port_open():
@@ -284,14 +285,17 @@ def main(argv=None) -> int:
     ap.add_argument("--view", metavar="COMPOSITION", help="then open USDLiveView on this composition")
     ap.add_argument("--off", action="store_true", help="put the previous active release back")
     args = ap.parse_args(argv)
+    if os.name == "nt" and not args.no_restart:
+        # stage_pids / restart_stage read /proc and set LD_LIBRARY_PATH: POSIX only.
+        ap.error("on Windows pass --no-restart: the daemon restart is POSIX-only (Studio starts Stage)")
 
     if not args.runtime:
         print("no Stage runtime: set IMRSV_STAGE_RUNTIME or pass --runtime", file=sys.stderr)
         return 1
     runtime = Path(args.runtime).expanduser().resolve()
     lib = runtime / "MatterLibrary"
-    if not (runtime / "IMRSV_Stage").is_file():
-        print(f"not a Stage runtime (no IMRSV_Stage): {runtime}", file=sys.stderr)
+    if not (runtime / STAGE_EXE).is_file():
+        print(f"not a Stage runtime (no {STAGE_EXE}): {runtime}", file=sys.stderr)
         return 1
     lib.mkdir(exist_ok=True)
     selector, backup = lib / SELECTOR, lib / BACKUP
