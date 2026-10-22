@@ -5,7 +5,7 @@
   "_comment": "Polished nephrite jade: a felted mass of fine amphibole fibres, polished to a soft, waxy lustre; a deep, saturated green, cloudy rather than banded, with paler and deeper green clouds, a faint fibrous streak and the odd black speck. SUBSURFACE: jade's look is light getting into it, a few millimetres, green travelling furthest. subsurface_color is ONE constant, the texture's mean linear albedo (the library cannot drive a textured article's scatter colour from its texture), so at subsurface_weight 0.75 the clouds keep about 25 % of their contrast, and the generator draws them strongly for it. Redone 2026-10-22 on the maintainer's note (reads sage: a deeper, more saturated jade green, more translucency): the colour anchor went from (0.055, 0.14, 0.065) to (0.020, 0.135, 0.036), the weight from 0.6 to 0.75 (0.85 flattened the clouds away) and the radius from 4 to 6 mm. Base textures are generated (L2, tools/converters/base/gen_nephritejade_polished.py), as the wish list plans: ambientCG has no jade asset. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "NephriteJade_Polished_Clean_Base_s01_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "natural/stone/NephriteJade_Polished_Clean_Base_s01_v01.mtlx",
   "master": "Subsurface",
   "domain": "natural",
