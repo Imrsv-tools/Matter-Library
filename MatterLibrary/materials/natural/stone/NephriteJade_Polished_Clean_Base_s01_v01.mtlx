@@ -310,7 +310,7 @@
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
     <mix name="subsurface_weight_deposit2" type="float">
-      <input name="bg" type="float" value="0.6" />
+      <input name="bg" type="float" value="0.75" />
       <input name="fg" type="float" value="0.0" />
       <input name="mix" type="float" nodename="overlay2_effect" />
     </mix>
@@ -324,8 +324,8 @@
     <input name="specular_ior" type="float" value="1.61" />
     <input name="geometry_normal" type="vector3" nodegraph="NG_NephriteJade_Polished_Clean_Base_s01_v01" output="normal_out" />
     <input name="subsurface_weight" type="float" nodegraph="NG_NephriteJade_Polished_Clean_Base_s01_v01" output="subsurface_weight_out" />
-    <input name="subsurface_color" type="color3" value="0.055, 0.14, 0.065" />
-    <input name="subsurface_radius" type="float" value="0.004" />
+    <input name="subsurface_color" type="color3" value="0.020, 0.135, 0.036" />
+    <input name="subsurface_radius" type="float" value="0.006" />
     <input name="subsurface_radius_scale" type="color3" value="0.45, 1.0, 0.55" />
   </open_pbr_surface>
   <surfacematerial name="NephriteJade_Polished_Clean_Base_s01_v01" type="material">

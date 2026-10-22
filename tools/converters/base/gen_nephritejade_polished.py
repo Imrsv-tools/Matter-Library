@@ -6,8 +6,9 @@ soft, waxy lustre. Its look is a deep leaf-green, cloudy rather than banded: pal
 green clouds drift through it, a faint fibrous streak runs one way, and the odd small black
 speck (a chromite or magnetite grain, as in "spinach" nephrite) sits in it. No scan fits: the
 wish list plans it generated (L2), and ambientCG has no jade asset. The colour is a JUDGEMENT,
-not invented per pixel: the texture's mean linear albedo is anchored to (0.055, 0.14, 0.065)
-(sRGB about 66, 105, 72, a medium-green nephrite); Physically Based has no jade entry.
+not invented per pixel: the texture's mean linear albedo is anchored to (0.020, 0.135, 0.036)
+(sRGB about 39, 103, 53, a deep, saturated nephrite green; the maintainer's redo, 2026-10-22:
+the first anchor, sRGB 66, 105, 72, "reads sage"); Physically Based has no jade entry.
 Everything here only varies around it.
 
 Writes MatterLibrary/textures/base/natural/stone/NephriteJade_Polished_<channel>_s01.png:
@@ -36,7 +37,7 @@ OUT = ROOT / "MatterLibrary" / "textures" / "base" / "natural" / "stone"
 SET = "NephriteJade_Polished"
 SCALE = "s01"
 SEED = 1217
-JADE = np.array([0.055, 0.14, 0.065])     # judgement: medium-green nephrite, linear sRGB
+JADE = np.array([0.020, 0.135, 0.036])    # judgement: deep, saturated nephrite green, linear sRGB
 SIZE = tl.SIZE
 
 
@@ -80,10 +81,10 @@ def maps() -> dict:
     inky = np.clip((tl.fbm((6, 12, 24), SEED + 6) - 0.52) * 3.5, 0, 1)   # deeper green mottles
     dark = specks(12, SEED + 5) * tl.fbm((64, 128), SEED + 7)
 
-    shade = (1.0 + 0.70 * (clouds - 0.5) + 0.18 * (wisps - 0.5) + 0.08 * (felt - 0.5)
-             - 0.45 * inky)
+    shade = (1.0 + 1.20 * (clouds - 0.5) + 0.18 * (wisps - 0.5) + 0.08 * (felt - 0.5)
+             - 0.60 * inky)                               # strong: the scatter mutes it (recipe)
     albedo = JADE[None, None, :] * shade[..., None]
-    milky = np.array([0.20, 0.27, 0.19])                  # a paler, greyer green
+    milky = np.array([0.10, 0.25, 0.12])                  # a paler, still clearly green
     albedo = albedo * (1 - 0.6 * pale[..., None]) + milky[None, None, :] * 0.6 * pale[..., None]
     albedo = albedo * (1 - 0.85 * dark[..., None])        # near-black specks
     albedo *= JADE / albedo.reshape(-1, 3).mean(0)        # re-anchor the MEAN exactly
