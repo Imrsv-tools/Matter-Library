@@ -32,7 +32,7 @@ their generator script.
 | `base/natural/stone/Marble_Veined` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
 | `base/engineered/metal/Rust_OnSteel` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
 | `shared/overlays/Dust01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
-| `shared/overlays/Scratches01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
+| `shared/overlays/Scratches01` | procedural | CC0-1.0 | `tools/converters/layers/gen_scratches01.py` |
 | `shared/masks/Verdigris01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
 | `shared/masks/RustBloom01` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
 | `shared/masks/Grime01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |

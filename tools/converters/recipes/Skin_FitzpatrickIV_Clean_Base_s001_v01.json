@@ -35,7 +35,7 @@
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png",
   "overlays": [
     {
-      "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s001.png",
+      "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png",
       "density_port": "overlay1_density"
     },
     {

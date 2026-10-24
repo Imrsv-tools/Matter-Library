@@ -9,21 +9,21 @@
     "manifest": [
       {
         "path": "library/releases/matterlib-0.1.0.lock.yaml",
-        "sha256": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb"
+        "sha256": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9"
       }
     ],
     "mtlx": [
       {
         "path": "MatterLibrary/materials/engineered/cementitious/Concrete_Smooth_Worn_Dusty_s1_v01.mtlx",
-        "sha256": "b0c089e3b0c1bdbe91b8ef6f9902ca86f1dda5b19c2e705aa865a188a0d36480"
+        "sha256": "359d8e183606010b3b30d75424fc162fd9ee5d2681f1a0f634ba9331344d3d56"
       },
       {
         "path": "MatterLibrary/materials/engineered/glass/Glass_Clear_Clean_Base_s01_v01.mtlx",
-        "sha256": "22c5e19d31535e9a2452325e91cf50de14c9e0a1d61298f282f43961078fae07"
+        "sha256": "5164ee6e4b14c70145688574c791b2951c98887968125449f259a0b31a52ff95"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Copper_Verdigris_Aged_Base_s01_v01.mtlx",
-        "sha256": "26f0de1f514edde573c80bfc02b29ada7b56ac1f270e7ae9995c37a73a838752"
+        "sha256": "3012299d8161b3b872371bcc38822fe3ad0b16d2e46fff82a0361189215b3b7e"
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
@@ -180,17 +180,17 @@
         "sha256": "a5532824aa6fabdea539035a7989a5b509d2ef585d74f92bcc02e7e5da26d8f0"
       },
       {
-        "path": "MatterLibrary/textures/shared/overlays/Scratches01_overlay_s001.png",
-        "sha256": "0291daa203c16ae7a06746d2e480edff573ba802db887e3f51f39e738051568a"
+        "path": "MatterLibrary/textures/shared/overlays/Scratches01_overlay_s01.png",
+        "sha256": "efb7748f6b789d5d15b91c689329fdd6dda67931ac97e768d342e1ac3c68471c"
       }
     ]
   },
-  "payload_digest": "622126cad18814f76dbb218ce77d9014ec0e4b06321cbdbf45a98a7d608ab9e7",
+  "payload_digest": "87ba4f5f55e4148d317da6e317413139df697c85e6a492eec9582098cf960483",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
-    "manifest": "f1e474003f81ad89b3ed2f0b43831352574f5bd65e15dadd4eee6068796d0fbb",
-    "mtlx_set": "898255851eff4246c087f576a3bdc3106e1abad5e87fc43a2f3655ba063122e3",
-    "source_textures_set": "39bc67dbb3f0947a358e034f37bf421872b87f2756b8809474f8d5bc4ed63c5e"
+    "manifest": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9",
+    "mtlx_set": "e558eae18a66a536de419c389183729e25e2d9b075ed6f77c840842f5b753a6a",
+    "source_textures_set": "46cfe75d4bbc3a52122a6040b68742f5d6fb04d99763b7645c6780d0599f7b98"
   },
   "release": "0.1.0"
 }

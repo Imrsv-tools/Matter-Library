@@ -18,7 +18,7 @@
   "maskset_tex": "../../../textures/shared/masks/Verdigris01_s01.png",
   "overlays": [
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay1_density", "color_port": "overlay1_color"},
-    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay2_density"}
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay2_density"}
   ],
   "specular_ior": 1.5,
   "lcd_defaults": {"base_color_tint": "0.95, 0.64, 0.54", "maskset_blend": "0.35", "overlay1_density": "0.45", "overlay2_density": "0.30"},

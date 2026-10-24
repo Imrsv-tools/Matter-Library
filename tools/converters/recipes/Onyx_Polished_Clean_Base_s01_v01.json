@@ -23,7 +23,7 @@
   "subsurface_radius_scale": "1.0, 0.75, 0.45",
   "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
     {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
   ],

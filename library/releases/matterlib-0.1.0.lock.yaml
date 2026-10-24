@@ -155,7 +155,7 @@ textures:
     provenance:
       source: procedural
       license: CC0-1.0
-      evidence: tools/converters/gen_shared_textures.py
+      evidence: tools/converters/layers/gen_scratches01.py
   - id: shared/masks/Verdigris01
     version: v01
     status: approved

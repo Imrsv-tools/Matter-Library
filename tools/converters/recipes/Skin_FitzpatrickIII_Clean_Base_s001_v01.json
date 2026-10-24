@@ -34,7 +34,7 @@
   "base_color_map": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIII_basecolor_sUKN.png",
   "overlays": [
-    {"texture": "../../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
   ],
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "roughness_bias", "overlay2_color"],

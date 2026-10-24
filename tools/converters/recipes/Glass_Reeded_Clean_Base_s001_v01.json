@@ -22,7 +22,7 @@
   "normal_tex": "../../../textures/base/engineered/glass/Glass_Reeded_normal_s001.png",
   "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
     {"texture": "../../../textures/shared/overlays/Fingerprints01_overlay_s01.png", "density_port": "overlay3_density"}
   ],

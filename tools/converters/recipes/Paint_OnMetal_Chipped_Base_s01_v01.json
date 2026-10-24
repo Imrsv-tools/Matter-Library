@@ -22,7 +22,7 @@
   "layer2_normal_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_normal_s01.png",
   "maskset_tex": "../../../textures/shared/masks/PaintChip01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
   ],
   "lcd_defaults": {"maskset_blend": "1.0"},

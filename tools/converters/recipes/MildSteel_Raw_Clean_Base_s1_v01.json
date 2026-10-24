@@ -5,7 +5,7 @@
   "_comment": "Raw mild steel: bare, uncoated carbon-steel sheet or plate as it comes from the stockholder, light grey, unpolished, with faint handling scratches and a few small spots of fresh oxide (ambientCG Metal002, CC0; tagged steel, scratches, silver, bumpy). Opaque: a solid metal; the scan's metalness map is 1 except in the oxide spots. The source says steel, not mild steel; ordinary bare structural steel is mild steel, so the name keeps the wish list's word. The source states no physical size: the scan is judged 0.3 m across from its oxide spots (2-5 mm), and is quilted into an exact 1 m tile (tools/converters/base/quilt_scan.py, 2026-10-22, Phase19 D-9), every patch at the scan's own size, nothing stretched. Renamed from MildSteel_Raw_Clean_Base_s01_v01: a 0.1 m tile of this scan repeated its sparse oxide spots as a grid and cut its long scratches, so it takes the 1 m option. The scan's own _s01 maps stay for Paint_OnMetal_Chipped, which still uses them. APPROXIMATE: no metal edge tint (F82 specular_color) or complex IOR (F-LC-6). Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), pitting (overlay 2, corrosion pits), dust as a deposit (Phase10), gated by the Grime mask. Built by the Phase11 batch.",
   "name": "MildSteel_Raw_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "candidate",
+  "status": "approved",
   "path": "engineered/metal/MildSteel_Raw_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",
@@ -18,7 +18,7 @@
   "metalness_tex": "../../../textures/base/engineered/metal/MildSteel_Raw_metalness_s1.png",
   "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
   "overlays": [
-    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
     {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay2_density"},
     {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
   ],

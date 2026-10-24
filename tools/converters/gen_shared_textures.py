@@ -84,18 +84,9 @@ def main() -> int:
     )
     dust.save(SHARED / "overlays" / "Dust01_overlay_s001.png", "PNG", optimize=True)
 
-    # ── Overlay 2 — SCRATCHES. High-frequency directional streaks: sharp normal relief, a
-    # narrow roughened line, and a SPARSE mask (a scratch is a thin mark, not a wash).
-    scr_h = _value_noise(SIZE, 512, seed=17)
-    streak = _value_noise(SIZE, 24, seed=23)                 # low-freq anisotropy -> streaking
-    scr_h = np.clip(scr_h * 0.35 + streak * 0.65, 0, 1)
-    snx, sny = _gradients(scr_h, strength=14.0)              # scratches bite deeper than dust
-    scr = _pack(
-        nx=snx, ny=sny,
-        rough_bias=0.55 * np.clip((scr_h - 0.55) * 3.0, 0, 1),
-        density=np.clip((scr_h - 0.62) * 4.0, 0, 1),         # sparse
-    )
-    scr.save(SHARED / "overlays" / "Scratches01_overlay_s001.png", "PNG", optimize=True)
+    # ── Overlay 2 — SCRATCHES moved to layers/gen_scratches01.py (2026-10-25): a 10 cm tile
+    # of drawn scratches (`s01`). The 1 cm value-noise tile made here (`s001`) repeated on the
+    # parity rig and its line-masked roughness bias read UNEVEN, strongest in Blender (F-P11-14).
 
     # ── MaskSet — VERDIGRIS. Blotchy patina coverage. R is the layer-2 coverage (what a
     # TwoLayer article blends by); G/B gate where each overlay is ALLOWED to appear. Giving
@@ -126,7 +117,6 @@ def main() -> int:
     grime.save(MASKS_DIR / "Grime01_s01.png", "PNG", optimize=True)
 
     for p in ("overlays/Dust01_overlay_s001.png",
-              "overlays/Scratches01_overlay_s001.png",
               "masks/Verdigris01_s01.png",
               "masks/Grime01_s01.png"):
         print("wrote", SHARED / p)
