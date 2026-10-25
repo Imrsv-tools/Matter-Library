@@ -181,16 +181,16 @@
       },
       {
         "path": "MatterLibrary/textures/shared/overlays/Scratches01_overlay_s01.png",
-        "sha256": "efb7748f6b789d5d15b91c689329fdd6dda67931ac97e768d342e1ac3c68471c"
+        "sha256": "561e90fe3c973f6e4d5d62f2df1cf43e058d8022aea3f0c36a572222dd83ce94"
       }
     ]
   },
-  "payload_digest": "87ba4f5f55e4148d317da6e317413139df697c85e6a492eec9582098cf960483",
+  "payload_digest": "869dd43c7133962aa7b29df81313c19303a7e698bf0b4a4ad06598e6cae3e745",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
     "manifest": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9",
     "mtlx_set": "e558eae18a66a536de419c389183729e25e2d9b075ed6f77c840842f5b753a6a",
-    "source_textures_set": "46cfe75d4bbc3a52122a6040b68742f5d6fb04d99763b7645c6780d0599f7b98"
+    "source_textures_set": "1f845402dedc96c0045cc24b8ffc970f4e7d7a00333ed83baf08f51d9ee9b7cd"
   },
   "release": "0.1.0"
 }

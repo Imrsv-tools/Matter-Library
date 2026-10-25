@@ -18,9 +18,11 @@ Scale `s01` (10 cm tile, 2048 px, 0.05 mm per pixel; the lead, 2026-10-25): scra
 long and 20-100 µm wide, so most are about a pixel wide and are drawn as anti-aliased lines
 whose strength stands for their width. Was a 1 cm tile of value noise in
 `gen_shared_textures.py` (`s001`), which repeated every 14 px of the parity rig's close-up and
-read UNEVEN, strongest in Blender, as the 1 cm HairlineScratches01 did (F-P11-14). Matched to
-it, filtered to 0.1 and 0.5 mm per pixel, so the articles that carry it keep their look: mean
-density 0.068, density x roughness bias 0.022. Segments wrap toroidally, so the tile is
+read UNEVEN, strongest in Blender, as the 1 cm HairlineScratches01 did (F-P11-14). First matched
+to it (mean density 0.068, density x roughness bias 0.022), at which it moved nothing in any tool
+on 25 of the 33 articles that carry it; then made about 2.5 times stronger (the lead, 2026-10-25:
+more scratches, and the roughness bias of HairlineScratches01 and Checks01). Every article
+carries it at 0, so no article's default look changes. Segments wrap toroidally, so the tile is
 seamless. Fixed seed, no network: byte-stable.
 
     gen_scratches01.py [--out DIR]       # default: MatterLibrary/textures/shared/overlays/
@@ -44,11 +46,9 @@ NAME = "Scratches01_overlay_s01.png"
 SEED = 1701
 SIZE = 2048            # over 10 cm: 0.049 mm per pixel
 PX_MM = 100 / SIZE
-SCRATCHES = 1500       # per 10 cm tile
-# Matched to the 1 cm version, filtered to 0.1 and 0.5 mm per pixel: mean density 0.068,
-# mean density x roughness bias 0.022 (2026-10-25).
+SCRATCHES = 2200       # per 10 cm tile (was 1500, matched to the 1 cm version)
 COVER_GAIN = 1.0       # density per pixel of width
-ROUGH = 0.32           # mean roughness bias
+ROUGH = 0.55           # mean roughness bias (was 0.32)
 STRENGTH = 2.0         # normal strength
 
 

@@ -158,7 +158,7 @@ rows:
   - {name: Plasma_Blue_Clean_Base_s01_v01, slot: utility/energy, master: Emissive, lane: L2, scale: s01, layers: [Ripples01, Scratches01, null, Patches01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: (treated as a surface; S6 may remove)"}
   - {name: Hologram_Cyan_Clean_Base_s01_v01, slot: utility/energy, master: Emissive, lane: L2, scale: s01, layers: [Ripples01, Scratches01, null, Patches01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: (treated as a surface; S6 may remove)"}
   - {name: Forcefield_Hex_Clean_Base_s01_v01, slot: utility/energy, master: Emissive, lane: L2, scale: s01, layers: [Ripples01, Scratches01, null, Patches01], kind: build, state: queued, note: "research 2026-09-25: Now; also wanted: (treated as a surface; S6 may remove)"}
-  - {name: ABS_Glossy_Clean_Base_s01_v01, slot: synthetic/plastic, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
+  - {name: ABS_Glossy_Clean_Base_s01_v01, slot: synthetic/plastic, master: Opaque, kind: rejudge, state: kept, note: "on disk, status candidate"}
   - {name: ABS_Matte_Clean_Base_s01_v01, slot: synthetic/plastic, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
   - {name: Canvas_Natural_Clean_Base_s001_v01, slot: synthetic/textile, master: Opaque, kind: rejudge, state: queued, note: "on disk, status candidate"}
   - {name: Concrete_Smooth_Worn_Dusty_s1_v01, slot: engineered/cementitious, master: Opaque, kind: rejudge, state: queued, note: "on disk, status approved"}
