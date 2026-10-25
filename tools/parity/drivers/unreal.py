@@ -137,10 +137,10 @@ LINEAR_SPACES = {"lin_rec709", "raw", None}
 
 
 # Phase21 (RD-P21-4): masters built from build_masters.py at or after 21.1 tint a scatter colour
-# that follows its base (``subsurface_follows_base``). The pinned runtime (unreal/RUNTIME.json,
-# unreal-runtime-v5) was built before, so a tinted Subsurface picture is refused rather than drawn
-# untinted. Set True with the RUNTIME.json bump that carries the fix (Phase21 §Deferred).
-RUNTIME_TINTS_SCATTER = False
+# that follows its base (``subsurface_follows_base``). The pinned runtime (unreal/RUNTIME.json) is
+# unreal-runtime-v6, the first built with it. False refuses a tinted Subsurface picture rather than
+# draw it untinted: set it so only for a runtime older than v6 (v5 and before).
+RUNTIME_TINTS_SCATTER = True
 
 
 class Unsupported(Exception):
