@@ -7,8 +7,8 @@ exercised them. These are the maps those articles need:
     Lace     (Masked)     an OPACITY mask — the thing the cutoff thresholds. Without a
                           connected geometry_opacity source a cutoff has nothing to cut.
     Marble   (Subsurface) base colour / roughness / normal — veined, polished.
-    Rust     (TwoLayer)   TWO complete layers (steel + rust: base colour, roughness,
-                          metalness, normal each) + the maskset that says WHERE layer 2 sits.
+    Rust     (TwoLayer)   the shared maskset RustBloom01. Its two layers are made by
+                          base/gen_rust_onsteel.py since batch 261016-2.
 
     Diamond  (Thick)   and   Neon (Emissive)   are param-only — no maps.
 
@@ -125,40 +125,18 @@ def gen_marble() -> None:
 
 
 # ── Rust on steel (TwoLayer) ──────────────────────────────────────────────────
-# The defining observable is TWO LAYERS THAT ARE VISIBLY TWO. Layer 1 is clean, bright,
-# polished steel (metal=1, smooth); layer 2 is dark orange flaking rust (metal=0, very rough).
-# The two are about as far apart as a PBR surface can get — that separation IS the gate.
+# The Phase71 rust: TWO LAYERS THAT ARE VISIBLY TWO, steel and rust. Its layers left this
+# script in batch 261016-2; the shared mask it made stays.
 
 def gen_rust() -> None:
-    metal_dir = BASE / "engineered" / "metal"
-
-    # Layer 1 — steel: cool, bright, brushed, metallic.
-    brush = _value_noise(SIZE, 8, seed=301) * 0.25 + _value_noise(SIZE, 512, seed=303) * 0.75
-    _save(_rgb(0.55 + 0.06 * brush, 0.56 + 0.06 * brush, 0.60 + 0.06 * brush),
-          metal_dir / "Rust_OnSteel_layer1_basecolor_s01.png")
-    _save(_gray(0.18 + 0.10 * brush), metal_dir / "Rust_OnSteel_layer1_roughness_s01.png")
-    _save(_gray(np.ones((SIZE, SIZE))), metal_dir / "Rust_OnSteel_layer1_metalness_s01.png")
-    _save(_normal_from_height(brush * 0.12, strength=1.0),
-          metal_dir / "Rust_OnSteel_layer1_normal_s01.png")
-
-    # Layer 2 — rust: warm dark orange, crusty, NON-metallic (oxide is a dielectric).
-    crust = _value_noise(SIZE, 128, seed=311)
-    flake = _value_noise(SIZE, 320, seed=313)
-    ox = np.clip(crust * 0.7 + flake * 0.3, 0, 1)
-    _save(_rgb(0.42 + 0.22 * ox, 0.17 + 0.13 * ox, 0.06 + 0.05 * ox),
-          metal_dir / "Rust_OnSteel_layer2_basecolor_s01.png")
-    _save(_gray(0.78 + 0.20 * ox), metal_dir / "Rust_OnSteel_layer2_roughness_s01.png")
-    _save(_gray(np.zeros((SIZE, SIZE))), metal_dir / "Rust_OnSteel_layer2_metalness_s01.png")
-    _save(_normal_from_height(ox, strength=5.0),
-          metal_dir / "Rust_OnSteel_layer2_normal_s01.png")
-
+    # Rust_OnSteel's two layers are made by base/gen_rust_onsteel.py now (batch 261016-2), and
+    # its mask is RustFlake01 (layers/gen_rustflake01.py). Only the shared RustBloom01 is left.
     # The maskset. R = layer-2 coverage — WHERE the rust sits. Built with a hard, blotchy,
     # high-contrast edge so the boundary between steel and rust is unmistakable at the smoke
     # (and so layer_blend_balance/contrast visibly MOVE that boundary, which is what the two
     # blend controls exist to prove).
     # Phase04 4.1: the maskset is a SHARED layer sampled at its own size, so it must tile;
-    # periodic noise (tileable.py), same seeds and scales. The per-article textures above
-    # are unchanged.
+    # periodic noise (tileable.py), same seeds and scales.
     bloom = tileable.noise(20, 321, SIZE)
     creep = tileable.noise(72, 323, SIZE)
     coverage = np.clip((bloom * 0.75 + creep * 0.25 - 0.30) * 2.6, 0, 1)

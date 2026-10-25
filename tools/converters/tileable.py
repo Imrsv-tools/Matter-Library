@@ -44,6 +44,34 @@ def fbm(scales: tuple, seed: int, size: int = SIZE) -> np.ndarray:
     return acc / total
 
 
+
+def cells(n: int, seed: int, size: int = SIZE, warp: tuple = None) -> tuple:
+    """Periodic cell (Worley) noise: one jittered point in each of n x n grid squares, wrapped.
+    Per pixel: the distance to the nearest point and to the second-nearest (in grid units),
+    and the nearest point's cell id (0 .. n*n-1), for a value per cell. `warp` (dx, dy), in
+    grid units per pixel and periodic itself, bends the cells into irregular shapes."""
+    rng = np.random.RandomState(seed)
+    jit = rng.rand(n, n, 2)
+    u = (np.arange(size) + 0.5) * n / size
+    U, V = np.broadcast_to(u[None, :], (size, size)), np.broadcast_to(u[:, None], (size, size))
+    if warp is not None:
+        U, V = U + warp[0], V + warp[1]
+    gx, gy = np.floor(U).astype(int), np.floor(V).astype(int)
+    fx, fy = U - gx, V - gy
+    d1 = np.full((size, size), np.inf)
+    d2 = np.full((size, size), np.inf)
+    cid = np.zeros((size, size), dtype=int)
+    for oy in (-2, -1, 0, 1, 2):          # 5 x 5: the second-nearest point can be two squares off
+        for ox in (-2, -1, 0, 1, 2):
+            cy, cx = (gy + oy) % n, (gx + ox) % n
+            d = np.hypot(ox + jit[cy, cx, 0] - fx, oy + jit[cy, cx, 1] - fy)
+            closer = d < d1
+            d2 = np.where(closer, d1, np.minimum(d2, d))
+            cid = np.where(closer, cy * n + cx, cid)
+            d1 = np.where(closer, d, d1)
+    return d1, d2, cid
+
+
 def grad(height: np.ndarray) -> tuple:
     """Wrap-around central differences (d/dx, d/dy)."""
     dx = (np.roll(height, -1, axis=1) - np.roll(height, 1, axis=1)) * 0.5
