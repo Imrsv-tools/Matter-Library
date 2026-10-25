@@ -4,7 +4,7 @@
   "origin": ["measured", "agent-drafted"],
   "_comment": "Polished brass: bare, freshly buffed brass (copper with zinc) with no lacquer or tarnish, the metal of door handles, instrument bells, lamps and ship fittings. Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. Base colour from Physically Based 'Brass'. APPROXIMATE: OpenPBR's metal edge tint (specular_color, the F82 tint) and the complex IOR are not carried by the library (F-LC-6), so the colour toward grazing angles is the base colour's Schlick fade, not brass's measured one. Tarnish (the darkening film brass grows in air) is not carried: the library has no tarnish layer. Carries every relevant wear layer at 0 (C1): hairline scratches (overlay 1, damage), dust as a deposit (Phase10), fingerprints, gated by the Edges mask (its B channel is the broad corner band meant for a deposit, its A the open faces meant for handling marks, so dust takes slot 2 and fingerprints slot 3). Built by the Phase11 batch.",
   "name": "Brass_Polished_Clean_Base_s01_v01",
-  "status": "candidate",
+  "status": "approved",
   "contributor": "MatterBot",
   "path": "engineered/metal/Brass_Polished_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
