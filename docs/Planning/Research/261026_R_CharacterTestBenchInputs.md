@@ -40,6 +40,12 @@ Each round changes one of the three and holds the other two fixed. A fixed cast 
 | **CTB-Q3** | Plan for a **`Body_v02` part mesh** (the render mesh) when it exists: its own UV hash and kit. Fit-set pictures are re-baked from the 3D-authored sources. | The library already says *"a version is a UV layout"*; this names the expected next version early. |
 | **CTB-Q4** | Record bench verdicts in the **batch-row form** (Verdict line + verbatim Review line). | It lets a verdict made on a character in the app be read here, and the reverse. |
 
+### The lead's answer (2026-10-26)
+
+On OMF's question *"Make 'author skins in 3D or on the cage, bake per UV layout' a Matter Library rule now?"* the lead answered **"yes"**.
+- **CTB-Q1 is lead-ruled.** The library writes it into its own skin-maps authoring spec at its next skin session, in its own words.
+- In the same answer, the lead adopted the **two-level body** (cage + regionally dense render mesh) as OMF's base-mesh strategy. So CTB-Q3's `Body_v02` is now expected, not hypothetical.
+
 ## What the library can send back
 
 Its judgement of the synthetic skins **on the bench's cast**, rather than on the single default shape; and, once CTB-Q1 is ruled, the bake step's inputs, so OMF's render-mesh work knows what it must carry.
