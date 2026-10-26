@@ -168,16 +168,16 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 | `Skin_FitzpatrickVI_Clean_SynthVeins_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"The viens look plausable"* |
 | `Skin_FitzpatrickVI_Clean_SynthMarks_s001_v01` | Storm = Unreal; marks barely show (F-SYN-10) | 2026-10-26, round 1: *"the marks look plausable (but lack any depth which I think is expected"* |
 | `Skin_FitzpatrickVI_Clean_SynthAll_s001_v01` | Storm = Unreal | round 1 judged by layer (the rows above); round 2: its freckles re-made, its veins and marks now exactly the single layers' |
-| `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthHazel_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthGreen_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthGrey_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthBlue_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthLightBlue_Clean_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthBrown_Bloodshot_Base_sUKN_v01` | Storm = Unreal | — |
-| `Eye_SynthBlue_Bloodshot_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthHazel_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthGreen_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthGrey_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthLightBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthBrown_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthBlue_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
 
 **How a round comes in, and goes back out:**
 1. A tuning round (the makers re-run on the library machine) or a bench body arrives with a pull, or, for a body, a copy into OMF's git-ignored folder (bench input doc, CTB-6).
@@ -207,6 +207,23 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 - **Seen by the agent, not the lead** (`…_skins.jpg` re-made): a fine, even sprinkle over the nose and upper cheeks on II and IV. Storm = Unreal as before (II 2.3 / 2.9, IV 2.1 / 2.5, VI 1.4 / 1.4).
 - **"Lack any depth" is expected, as the lead says.** The marks are colour only: no relief, no change in shine. A raised mole or papule needs the normal and roughness inputs of *Skin Maps Beyond Colour* (RD-SYN-3; F-SYN-8).
 
+## Pass 6 — Round 3: the whites of the eyes take the measured sclera colour (2026-10-26)
+
+**The lead, verbatim:** *"The eye all look quite bright to me...but maybe that is OK? hard to tell"*, then *"yes, run round 3"*. Recorded on Pass 4's eye rows.
+
+- **F-SYN-14 — What reads bright is the white, and its colour, not its brightness.** Measured on the pictures, linear, times the articles' own constant:
+  - **Irises:** in MakeHuman's range (DarkBrown 0.01 … LightBlue 0.22, against MakeHuman's 0.02 … 0.30).
+  - **Whites:** 0.50, against MakeHuman's pictures at 0.34, and Physically Based's measured *Eye (Sclera)* (the library's `Sclera_Natural`, linear 0.652, 0.5, 0.394) at 0.52. **So the brightness is the measured one, and MakeHuman's are about a third darker.**
+  - **Colour:** red/blue 1.18, near-neutral, against the measured sclera's 1.65, a warm ivory. A white with no warmth reads bright at a correct brightness.
+- **Round 3** (`gen_synth_eyes.py`):
+  - the white takes the measured sclera's colour at round 1's brightness;
+  - the edge keeps its darkening toward the hidden side;
+  - irises, vessels and the bloodshot flush are unchanged (iris pixels identical to round 1).
+  - **Tried first and dropped the same day:** keeping round 1's pinker edge on top of the warm colour gave red/blue 1.88. It read peach on the character, close to the skin colour.
+  - **Result:** whites at 0.51, red/blue 1.66; the bloodshot pair 0.44–0.45 and redder, as before. Storm = Unreal on the white as before (≈ 2.6).
+- **Pictures:** [`261026_R_SyntheticSkinAndEyes_eyes_round3.jpg`](261026_R_SyntheticSkinAndEyes_eyes_round3.jpg) shows four eyes as round 1, the dropped try and round 3, side by side on the character. `…_eyes.jpg` is re-made.
+- **What the material cannot fix:** a real white sits in the lids' and lashes' shadow and behind a wet dome. The rig has neither, and both are lighting and eye geometry (CHQ's wet-dome eye, F-SYN-8), not the picture.
+
 ## Resolved
 
 - **RD-SYN-1 (the lead, 2026-10-26, "1) yes"):** AI makes **no whole skin map**. It may make the **tone-free detail layer** RD-SKM-5 describes, and content such as tattoo designs. A whole-face AI map is only ever a **judged comparison, never shipped**. *(The lead answered "yes" to the recommendation "not yet: AI for the detail layer and content, a whole-face AI map only as a comparison arm"; recorded as that reading.)*
@@ -221,7 +238,8 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - Pass 3: how the library should do it.
   - Pass 4: the first look, prepared (renders, pictures, the verdict rows).
   - Pass 5: round 2, the freckles re-made from the lead's first look.
-- **The lead's first look (2026-10-26):** freckles too large and oddly placed (re-made in round 2; the lead on round 2: *"Yep... better"*); veins plausible; marks plausible, lacking depth as expected. The eyes and the plain `Synth` bases have no words yet.
+  - Pass 6: round 3, the whites of the eyes warmed to the measured sclera.
+- **The lead's first look (2026-10-26):** freckles too large and oddly placed (re-made in round 2; the lead on round 2: *"Yep... better"*); veins plausible; marks plausible, lacking depth as expected. Eyes: *"quite bright … hard to tell"*, whites warmed in round 3 (**owed the lead's look**). The plain `Synth` bases have no words yet.
 - **Built:**
   - the test set: 15 skins and 10 eyes, drafts;
   - two makers;
@@ -234,6 +252,6 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - thumbnails for the 25, from the library machine (F-SYN-11);
   - the AI detail layer and the whole-face comparison, which need a GPU machine with the AI tooling.
 - **▶ Next, after the lead's look:**
-  1. ~~the lead's look at round 2's freckles~~ seen, *"Yep... better"*; next, VI's marks, if the lead agrees with F-SYN-10, and words on the eyes;
+  1. ~~the lead's look at round 2's freckles~~ seen, *"Yep... better"*; then the lead's look at round 3's eyes (`…_eyes_round3.jpg`, or Studio); next, VI's marks, if the lead agrees with F-SYN-10;
   2. *Beyond Colour* discovery (RD-SYN-3);
   3. pick which of Pass 3's phases go next.

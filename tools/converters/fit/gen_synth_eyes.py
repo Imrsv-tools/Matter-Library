@@ -19,7 +19,8 @@ pupil's dark ruff. Each colourway (``PRESETS``) sets the colours of those layers
 low-melanin irises, where the colour is scattering in a pale stroma (Lam & Baranoski 2006), so
 their fibres are the lightest part; brown is melanin, so its fibres are barely lighter than its base.
 
-**The white** is warm off-white, pinker toward the edge, with vessels grown inward from the edge as
+**The white** has the measured sclera's warm colour (Physically Based, round 3), a little darker toward
+the hidden edge, with vessels grown inward from the edge as
 thinning branching walks that fade before the iris. ``Bloodshot`` has more, thicker, redder vessels
 reaching nearer the iris, over a pink flush.
 
@@ -77,6 +78,25 @@ BLOODSHOT_OF = ("Brown", "Blue")            # the test's bloodshot pair: one dar
 
 def lin(c):
     return gsm._srgb_to_linear(np.asarray(c, dtype=np.float64))
+
+
+# The white's colour. Round 3 (2026-10-26; the lead: "The eye all look quite bright to me"): round 1's
+# near-neutral white (red/blue 1.18) read bright at a measured brightness. The white now takes the
+# measured sclera's warm colour, Physically Based "Eye (Sclera)" (linear 0.652, 0.5, 0.394, the
+# library's Sclera_Natural; red/blue 1.65), at round 1's brightness. The edge keeps round 1's darkening
+# toward the hidden side but not its pink: on top of a measured warm white the pink counted the warmth
+# twice and read peach on the character (tried and seen the same day).
+SCLERA_PB = np.array((0.652, 0.5, 0.394))
+ARTICLE_CONST = np.array((0.95, 0.93, 0.92))   # the eye articles' base_color_const, which the picture multiplies
+
+
+def _lum(c):
+    return float(np.dot(c, (0.2126, 0.7152, 0.0722)))
+
+
+_ROUND1_CENTRE, _ROUND1_EDGE = lin((0.84, 0.81, 0.78)), lin((0.80, 0.70, 0.66))
+WHITE_CENTRE = SCLERA_PB * (_lum(_ROUND1_CENTRE * ARTICLE_CONST) / _lum(SCLERA_PB)) / ARTICLE_CONST
+WHITE_EDGE = WHITE_CENTRE * (_lum(_ROUND1_EDGE) / _lum(_ROUND1_CENTRE))
 
 
 def polar(cx, cy):
@@ -177,7 +197,7 @@ def vessels(rng, cx, cy, count, width, reach, seed):
 
 def eye_picture(colour: str, condition: str):
     rng = np.random.default_rng(SEED + sum(map(ord, colour)) * 7 + (1 if condition == "Bloodshot" else 0))
-    white_c, white_e = lin((0.84, 0.81, 0.78)), lin((0.80, 0.70, 0.66))
+    white_c, white_e = WHITE_CENTRE, WHITE_EDGE
     vessel_c = lin((0.55, 0.12, 0.10))
     out = np.zeros((N, N, 3)) + lin((0.70, 0.66, 0.64))      # beyond the islands: a neutral white
     for k, (cx, cy) in enumerate(CENTRES):
