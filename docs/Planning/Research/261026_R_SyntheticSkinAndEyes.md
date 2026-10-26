@@ -168,16 +168,16 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 | `Skin_FitzpatrickVI_Clean_SynthVeins_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"The viens look plausable"* |
 | `Skin_FitzpatrickVI_Clean_SynthMarks_s001_v01` | Storm = Unreal; marks barely show (F-SYN-10) | 2026-10-26, round 1: *"the marks look plausable (but lack any depth which I think is expected"* |
 | `Skin_FitzpatrickVI_Clean_SynthAll_s001_v01` | Storm = Unreal | round 1 judged by layer (the rows above); round 2: its freckles re-made, its veins and marks now exactly the single layers' |
-| `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthHazel_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthGreen_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthGrey_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthLightBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthBrown_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
-| `Eye_SynthBlue_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6); round 3 not yet seen |
+| `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthHazel_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthGreen_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthGrey_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthLightBlue_Clean_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthBrown_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
+| `Eye_SynthBlue_Bloodshot_Base_sUKN_v01` | Storm = Unreal | 2026-10-26, round 1: *"The eye all look quite bright to me...but maybe that is OK? hard to tell"* → whites warmed in round 3 (Pass 6). Round 3, 2026-10-26: *"better"* |
 
 **How a round comes in, and goes back out:**
 1. A tuning round (the makers re-run on the library machine) or a bench body arrives with a pull, or, for a body, a copy into OMF's git-ignored folder (bench input doc, CTB-6).
@@ -239,7 +239,7 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - Pass 4: the first look, prepared (renders, pictures, the verdict rows).
   - Pass 5: round 2, the freckles re-made from the lead's first look.
   - Pass 6: round 3, the whites of the eyes warmed to the measured sclera.
-- **The lead's first look (2026-10-26):** freckles too large and oddly placed (re-made in round 2; the lead on round 2: *"Yep... better"*); veins plausible; marks plausible, lacking depth as expected. Eyes: *"quite bright … hard to tell"*, whites warmed in round 3 (**owed the lead's look**). The plain `Synth` bases have no words yet.
+- **The lead's first look (2026-10-26):** freckles too large and oddly placed (re-made in round 2; the lead on round 2: *"Yep... better"*); veins plausible; marks plausible, lacking depth as expected. Eyes: *"quite bright … hard to tell"*, whites warmed in round 3; the lead on round 3: *"better"*. The plain `Synth` bases have no words yet.
 - **Built:**
   - the test set: 15 skins and 10 eyes, drafts;
   - two makers;
@@ -252,6 +252,6 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - thumbnails for the 25, from the library machine (F-SYN-11);
   - the AI detail layer and the whole-face comparison, which need a GPU machine with the AI tooling.
 - **▶ Next, after the lead's look:**
-  1. ~~the lead's look at round 2's freckles~~ seen, *"Yep... better"*; then the lead's look at round 3's eyes (`…_eyes_round3.jpg`, or Studio); next, VI's marks, if the lead agrees with F-SYN-10;
+  1. ~~the lead's look at round 2's freckles~~ seen, *"Yep... better"*; round 3's eyes seen, *"better"*; next, VI's marks, if the lead agrees with F-SYN-10;
   2. *Beyond Colour* discovery (RD-SYN-3);
   3. pick which of Pass 3's phases go next.
