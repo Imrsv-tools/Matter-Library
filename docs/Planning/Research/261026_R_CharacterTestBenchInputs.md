@@ -107,7 +107,8 @@ Its judgement of the synthetic skins **on the bench's cast**, rather than on the
 
 ## Resolved
 
-- **2026-10-26 — CTB-Q1, ruled "yes" by the lead** on OMF's question *"Make 'author skins in 3D or on the cage, bake per UV layout' a Matter Library rule now?"*. Owed: the rule in `SkinMaps.md` (CTB-5), by a lead-directed `/quick-fix`.
+- **2026-10-26 — CTB-Q1, ruled "yes" by the lead** on OMF's question *"Make 'author skins in 3D or on the cage, bake per UV layout' a Matter Library rule now?"*. ~~Owed: the rule in `SkinMaps.md` (CTB-5), by a lead-directed `/quick-fix`.~~ **Landed the same day** in `docs/specs/Authoring/SkinMaps.md` §*Authored on the body, baked per layout*, by a lead-directed `/quick-fix` (the lead: *"go - re-serve and do the spec fix"*).
+- **2026-10-26 — Q-CTB-5, a contributor's painted picture: accepted, bound to its layout.** It fits `MakeHuman_Body_v01` only and is not carried to the next body; the library's own makers follow CTB-Q1. *(The lead's "go" on the spec fix, which carried this recommendation; recorded as that reading.)*
 - **2026-10-26 — the two-level body** (an identity cage + a regionally dense render mesh with its own UV layout), adopted in the same answer as OMF's base-mesh strategy. For the library this makes `Body_v02` expected (CTB-7).
 
 ## Status
@@ -115,13 +116,11 @@ Its judgement of the synthetic skins **on the bench's cast**, rather than on the
 - **Passes:**
   - Pass 1: the input as written from OMF's side.
   - Pass 2: the library's review of the four asks.
-- **Ruled:** CTB-Q1 (see Resolved).
+- **Ruled:** CTB-Q1 and Q-CTB-5 (see Resolved). **CTB-Q1 is in the spec** (`SkinMaps.md`, 2026-10-26), with the makers' six hm08-atlas inputs as a dated Todo there.
 - **Owed:**
-  - the CTB-Q1 rule in `SkinMaps.md`, by a lead-directed `/quick-fix` (CTB-5);
   - the bench bodies copied to the machine with Unreal, OMF's side (CTB-6).
 - **Open:**
-  - Q-CTB-5, the contributor's painted picture (the lead's);
-  - CTB-Q2, `rig.py --character --body`: one sitting, offered as a `/quick-fix` (CTB-6);
+  - CTB-Q2, `rig.py --character --body`: one sitting, **offered for when the bodies are on this machine** (CTB-6);
   - CTB-Q3, waits for the render mesh (CTB-7);
   - CTB-Q4, answered by the rows in `261026_R_SyntheticSkinAndEyes.md` Pass 4 (CTB-8).
 - **▶ Next:** the lead's pick among the offers; the test set's first look (`261026_R_SyntheticSkinAndEyes.md`).

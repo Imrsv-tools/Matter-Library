@@ -19,7 +19,7 @@
 
 None has a photograph or AI in it, and none touches a shipped article. To see them: pull, run `uv run tools/releases/serve_to_stage.py` (a new article needs one re-serve), and pick them in Studio's material window under Character › Skin and Character › Eyes.
 
-**Rendered 2026-10-26 (Pass 4).** All 25 render alike in Storm and Unreal. The comparison pictures are beside this doc (`…_skins.jpg`, `…_eyes.jpg`), and the verdict rows wait for the lead's words. **On tone VI the layers barely show.** On the machine with Unreal, Studio needs one re-serve before it lists them.
+**Rendered 2026-10-26 (Pass 4).** All 25 render alike in Storm and Unreal. The comparison pictures are beside this doc (`…_skins.jpg`, `…_eyes.jpg`), and the verdict rows wait for the lead's words. **On tone VI the layers barely show.** On the machine with Unreal they are served (re-served 2026-10-26), with no thumbnails yet.
 
 **How the library should make skins from here on (proposed, Pass 3):**
 - **Skin colour comes from pigment amounts, not paint.** Each texel gets melanin and blood amounts, and a skin model turns them into colour. One structure then gives each tone its own regional colour, which today's six identical maps can't (F-P21-10).
@@ -205,7 +205,7 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - the look pictures and their script (Pass 4).
 - **Rendered by the agent, 2026-10-26,** in Storm and Unreal on the rig's character: all 25 agree across the two tools (F-SYN-9). On tone VI the layers barely show (F-SYN-10). **Not yet seen by the lead.**
 - **Owed:**
-  - **a re-serve on the machine with Unreal**, on the lead's word: it restarts Stage (F-SYN-11);
+  - ~~a re-serve on the machine with Unreal, on the lead's word: it restarts Stage (F-SYN-11)~~ **done 2026-10-26** on the lead's *"go - re-serve"*: the served catalog lists 133 articles, the 25 synthetic ones among them, and Stage restarted cleanly;
   - the lead's look in Studio, with the words on Pass 4's rows. The skins are best judged beside `Skin_Fitzpatrick<tone>_Clean_Base` and, for the bar, beside CHQ's `CHQ_EmilySkin`. The eyes beside `Eye_Green`, ideally on CHQ's wet-dome eye;
   - thumbnails for the 25, from the library machine (F-SYN-11);
   - the AI detail layer and the whole-face comparison, which need a GPU machine with the AI tooling.

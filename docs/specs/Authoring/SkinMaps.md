@@ -13,14 +13,22 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 
 - **It is a picture of the MESH, not part of the material.** The skin **article** (`Skin_FitzpatrickI` … `VI`) keeps the substance: its measured tone, scatter, coat, fuzz and the tiling pores (`Skin_Pores`). ~~The map is a **fit-set** picture, supplied when the article is bound, as the eye's and the hairstyle's pictures are (CM2). **Ruled** (F-SKM-10).~~ *(Corrected 2026-10-15, Phase18 F-P18-1: F-SKM-10 was a finding written within CM2's frame, never a ruling, and the lead has since ruled the other way.)* **The map lives in its own Character skin article**, as that article's `base_color_map` value, and the article declares the mesh it `fits` (`MakeHuman_Body_v01`); a binding that supplies a picture still wins ([LCDSchema §Base colour map](../Contract/LCDSchema.md#base-colour-map-the-meshs-picture-supplied-at-binding)). **Ruled** (RD-P18-9, the lead, 2026-10-15). ~~Whether one article carries both the tone and its map, or the map is an article of its own beside the tone, is *Skin Maps*' to settle: **Open**.~~ **One article carries both the tone and its map** (RD-P21-1, Phase21, 2026-10-20): each `Skin_Fitzpatrick*` is a fitted article, so every body built from the approved mesh wears the map, and Studio and the website list six skins, not twelve. **Using the tone on another mesh is kept:** a binding that supplies a white picture wins over the article's own (the Carrier rule), so a consumer can still bind the tone alone.
 - **It reaches every renderer through the existing input**, `base_color_map`: `base = base_color_const × base_color_map × base_color_tint`. There is no new input for colour. **Ruled** (RD-SKM-3).
-- **It is colour only, for now.** Maps for normal, roughness, cavity or scatter would each need a new input. *(planned: the phase* Skin Maps Beyond Colour*, [`PhaseTBD_SkinMapsBeyondColour.md`](../../Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md), seeded 2026-10-14; kept parked by RD-P21-6. A colour map does not take away skin's plastic look: Phase21 measured the even sheen as the cause (F-P21-1), and the lead, on the mapped skin: "still reads plastic". The roughness map comes first there.)*
+- **It is colour only, for now.** Maps for normal, roughness, cavity or scatter would each need a new input. *(planned: the phase* Skin Maps Beyond Colour*, [`PhaseTBD_SkinMapsBeyondColour.md`](../../Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md), seeded 2026-10-14; kept parked by RD-P21-6; **un-parked by the lead 2026-10-26**, RD-SYN-3 in [`261026_R_SyntheticSkinAndEyes.md`](../../Planning/Research/261026_R_SyntheticSkinAndEyes.md). A colour map does not take away skin's plastic look: Phase21 measured the even sheen as the cause (F-P21-1), and the lead, on the mapped skin: "still reads plastic". The roughness map comes first there.)*
 
 ## Which mesh it fits — **Ruled** (RD-SKM-1)
 
 - **The approved human mesh is MakeHuman's hm08 body** (CC0), rigged to the Manny skeleton.
 - **A map made for it fits every character built from it**, whatever its shape, skeleton or weights, because those leave the UV layout where it is.
-- **A future mesh version gets its own skin maps.** A map can be moved to a new layout by baking, with some loss.
+- **A future mesh version gets its own skin maps.** A map can be moved to a new layout by baking, with some loss. **The library's own maps are instead re-made from their source on the body,** one bake per layout ([below](#authored-on-the-body-baked-per-layout--ruled-2026-10-26)). *(2026-10-26: a next mesh version is now expected, a denser render body with its own UV layout, riding an hm08-class cage: [`261026_R_CharacterTestBenchInputs.md`](../../Planning/Research/261026_R_CharacterTestBenchInputs.md) CTB-7.)*
 - **How a mesh version is named and recorded, so each map says which mesh it fits:** ~~**Open** (Q-SKM-4).~~ **Answered 2026-10-15 (Phase18, RD-P18-1):** a mesh version is a UV layout, named `<Family>_<Mesh>_vNN` and pinned by its layout hash in `tools/converters/groups.py` (`PART_MESHES`). hm08 is **`MakeHuman_Body_v01`**, at 2048 × 2048; a map declares it as `fits`, and the recipe gate (G8) checks the map against it. Its kit is `kit__MakeHuman_Body_v01.zip` ([Glossary](../../Glossary.md) *Part mesh*).
+
+## Authored on the body, baked per layout — **Ruled** (2026-10-26)
+
+**The library makes a skin map on the body, in 3D, and treats each UV-layout picture as a bake of it: a cache, one per mesh version.** Every texel's colour comes from where it sits on the body: its 3D position and normal, the body's anatomy, noise in 3D. **No map the library makes is painted directly in a UV layout.** *(The lead, 2026-10-26, "yes" to "make 'author skins in 3D or on the cage, bake per UV layout' a Matter Library rule now?"; recorded in [`261026_R_CharacterTestBenchInputs.md`](../../Planning/Research/261026_R_CharacterTestBenchInputs.md) §Resolved.)*
+
+- **Why:** a new mesh version then costs a re-run of the maker, not a re-paint. Moving a finished picture from one layout to another loses detail.
+- **Where the makers stand.** `gen_skin_maps.py` and the test set's `gen_synth_skin.py` both compute in 3D. **But both still read six pictures drawn on hm08's atlas:** MPFB2's face, lips, ears, eyelids and areolae masks, and its thickness map (`sss.png`). **Todo (2026-10-26):** carry those onto the body (for example as values per hm08 vertex) before the next mesh version's maps are made (CTB-5).
+- **A contributor's picture painted on hm08's atlas is still accepted, bound to its layout.** It fits `MakeHuman_Body_v01` only and is not carried to the next mesh version (§How to make one). **Ruled** (the lead's go on this recommendation, 2026-10-26: the research doc's Q-CTB-5).
 
 ## One map per skin tone — **Ruled** (RD-SKM-3)
 
@@ -78,7 +86,7 @@ The probe's main lesson. Its first library-made map turned the whole body red, b
     uv run tools/converters/fit/gen_skin_maps.py          # every tone
     uv run tools/converters/fit/gen_skin_maps.py IV       # one tone
 
-**Your own picture**, painted (or made) as the absolute skin colour on hm08's atlas, under the rules above:
+**Your own picture**, painted (or made) as the absolute skin colour on hm08's atlas, under the rules above. It is bound to `MakeHuman_Body_v01` and is not carried to a later mesh version (§Authored on the body):
 
     uv run tools/converters/fit/gen_skin_maps.py IV --picture my_skin.png
 
@@ -118,3 +126,4 @@ The probe's sheet is a diagnostic. Published pictures of skin show the face and 
 
 - 2026-10-14 — drafted from the research's Passes 1–6 and rulings RD-SKM-1 to RD-SKM-6 (lead-directed quick fix, RD-SKM-6).
 - 2026-10-20 — in force (Phase21 21.3): the *Proposed* marks settled as built and seen; the article question answered (RD-P21-1), the lips (RD-P21-2), the calibration (RD-P21-3), the atlas size (RD-P21-5); the CC BY line corrected (F-P21-6); the six-maps-are-one finding (F-P21-10), Storm's colour space (F-P21-9), and how the maker is run.
+- 2026-10-26 — *Authored on the body, baked per layout* (the lead's ruling on OMF's ask): the rule, the makers' six hm08-atlas inputs as a Todo, and a contributor's painted picture accepted as bound to its layout; *Beyond Colour* marked un-parked (lead-directed quick fix).
