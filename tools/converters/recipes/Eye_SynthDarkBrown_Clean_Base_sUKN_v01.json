@@ -1,0 +1,59 @@
+{
+  "summary": "A whole dark brown eyeball, made procedurally: layered iris, white with fine vessels, painted for the character's eye mesh.",
+  "search_words": [
+    "eye",
+    "eyeball",
+    "iris",
+    "dark brown",
+    "sclera",
+    "character",
+    "human",
+    "synthetic"
+  ],
+  "origin": [
+    "procedural",
+    "agent-drafted"
+  ],
+  "_comment": "A SYNTHETIC test eye (the lead's spike, 2026-10-26; OMF research 261026_R_SyntheticSkinAndEyeSets): Eye_Green's fitted-eye substance with a procedural picture, no photograph and no AI. The iris is built in layers as an ocularist paints one (stroma, radial fibres, crypts, collarette, furrows, limbal ring, pupil ruff; tools/converters/fit/gen_synth_eyes.py), here the dark brown colourway. A draft to be judged in Studio beside the MakeHuman eyes; nothing it replaces.",
+  "name": "Eye_SynthDarkBrown_Clean_Base_sUKN_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "character/humanoid/eyes/Eye_SynthDarkBrown_Clean_Base_sUKN_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "group": "character",
+  "species": "humanoid",
+  "part": "eyes",
+  "fits": "MakeHuman_Eyes_v01",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "metalness_const": 0.0,
+  "base_color_const": "0.95, 0.93, 0.92",
+  "roughness_const": 0.3,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.002,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.5,
+  "coat_roughness": 0.1,
+  "coat_ior": 1.376,
+  "base_color_map": true,
+  "lcd_ports": [
+    "roughness_bias"
+  ],
+  "base_color_map_tex": "../../../../textures/fit/makehuman/eyes/SynthDarkBrown_basecolor_sUKN.png",
+  "sources": [
+    {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_synth_eyes.py",
+      "provenance": "library/provenance/sources/fit/makehuman/synth_eyes.yaml",
+      "note": "the picture: a procedural iris and white on MakeHuman_Eyes_v01's layout (CC0, no photograph, no AI)"
+    },
+    {
+      "kind": "judgement",
+      "why": "The colour is the picture's (a photograph of an eye, CC0, MakeHuman), so the article's base is a near-white it multiplies (0.95, 0.93, 0.92: a plain white of the eye when no picture is supplied). Scatter as Sclera_Natural (Physically Based Eye (Sclera): the radius scale 1 / 0.351 / 0.226, forward anisotropy 0.8), at its full weight and a 2 mm radius (Sclera_Natural's 4.8 mm would blur the iris's fibres and ring across a 12 mm iris). First authored at half weight and 1 mm; the lead, 2026-10-05, looking at a consumer's character under a sun and a sky: 'Even with direct light on the eye, they look dead... they shoudl glow (with SSS)', and the ruling 'if there is, increase it'. So the weight goes to the sclera's and the radius doubles, still under half the sclera's. NOT looked at in any renderer at these values: whether the iris's fibres hold at 2 mm, and whether the eye now reads alive, are owed a look. Coat: the tear film, at the cornea's IOR 1.376, thin and soft (weight 0.5, roughness 0.1). First authored as a near-mirror (weight 1, roughness 0.02); the lead at Phase09 click 3: 'there is an un natural about of \"mirror\" going on... these highlight aboultly reflect and blow out the eyes'. With no cornea bulge (MAP-RD6), a mirror over the whole eyeball stretches the reflection across it; a real eye's sharp highlight is the cornea's alone. Softened, the lead: 'That helps... I think it will be something to kep an eye on... it might still be too much but will not know until we work with it a bit'. Roughness 0.3 and IOR 1.4 as Sclera_Natural."
+    }
+  ]
+}

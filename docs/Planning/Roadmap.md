@@ -67,9 +67,21 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
 
-### Skin Maps Beyond Colour — SEEDED, **parked** *(the lead, 2026-10-14: "skin detail stay parked TBD", RD-DS-8; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first)*
+### Skin Maps Beyond Colour — SEEDED, **un-parked 2026-10-26** *(the lead, "3) yes", RD-SYN-3, `261026_R_SyntheticSkinAndEyes.md`; ~~parked 2026-10-14: "skin detail stay parked TBD", RD-DS-8~~; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first; starting discovery stays the lead's call)*
 **Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
 - `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
+
+### Synthetic Skin Sets — RESEARCH *(seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2; kick off `/discovery` when ready)*
+**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1)
+
+### Skin Layers — RESEARCH *(seeded 2026-10-26, the same word)*
+**Outcome:** a Creator adds freckles, veins, moles, blemishes, scars or makeup to any character's skin, each a library article placed on the body, without a new skin per combination.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 3)
+
+### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
+**Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
 
 ### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
 **Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.

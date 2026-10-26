@@ -1,0 +1,21 @@
+# Provenance for the SYNTHETIC eye test pictures (the lead's spike, 2026-10-26): drafts beside
+# the fit set's nine MakeHuman eyes, on MakeHuman_Eyes_v01. Procedural only: no photograph, no
+# AI. Written by `evidence`.
+id: fit/makehuman/synth_eyes
+version: v01
+files:
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthAmber_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthBlueBloodshot_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthBlue_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthBrownBloodshot_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthBrown_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthDarkBrown_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthGreen_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthGrey_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthHazel_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/eyes/SynthLightBlue_basecolor_sUKN.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/fit/gen_synth_eyes.py
+  method: "iris layers after Lefohn et al. 2003 (CG&A 23(6)); light irises fibrous, brown smooth (Berard et al. 2016); low-melanin colour as stromal scattering (Lam & Baranoski 2006); values judgement"
