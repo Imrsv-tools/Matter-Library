@@ -19,6 +19,8 @@
 
 None has a photograph or AI in it, and none touches a shipped article. To see them: pull, run `uv run tools/releases/serve_to_stage.py` (a new article needs one re-serve), and pick them in Studio's material window under Character › Skin and Character › Eyes.
 
+**Rendered 2026-10-26 (Pass 4).** All 25 render alike in Storm and Unreal. The comparison pictures are beside this doc (`…_skins.jpg`, `…_eyes.jpg`), and the verdict rows wait for the lead's words. **On tone VI the layers barely show.** On the machine with Unreal, Studio needs one re-serve before it lists them.
+
 **How the library should make skins from here on (proposed, Pass 3):**
 - **Skin colour comes from pigment amounts, not paint.** Each texel gets melanin and blood amounts, and a skin model turns them into colour. One structure then gives each tone its own regional colour, which today's six identical maps can't (F-P21-10).
 - **Maps are authored in 3D,** so there are no seams and features land on anatomy.
@@ -111,6 +113,78 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 - the calibration (RD-P21-3);
 - CC0, with no photograph of a person (RD-SKM-2, RD-RO-2).
 
+## Pass 4 — The first look, prepared on the machine with Unreal (2026-10-26)
+
+**Asked by the lead,** verbatim: *"There was lots of reserach today about the look of characters, skins etc including feedback from OMF and som test skins... can you look into this and lets prepare to share the tests that will come int"*. The bench side of the same ask is [`261026_R_CharacterTestBenchInputs.md`](261026_R_CharacterTestBenchInputs.md) Pass 2.
+
+**Done:** every draft, plus the shipped skins and eye it is judged against, rendered on the rig's character in Storm and Unreal (`rig.py --character --no-blender`; Blender cannot render parity on this machine). 29 runs, all clean, about 40 s each.
+
+**Two pictures, committed beside this doc** so a session on the other machine (which renders nothing) can see them after a pull:
+- [`261026_R_SyntheticSkinAndEyes_skins.jpg`](261026_R_SyntheticSkinAndEyes_skins.jpg): tones II, IV and VI × the shipped base and the five layer sets. Face, then the hand and forearm (where the veins are).
+- [`261026_R_SyntheticSkinAndEyes_eyes.jpg`](261026_R_SyntheticSkinAndEyes_eyes.jpg): per eye, the iris as drawn (its fit-set picture), then the eye rendered (a crop of the 512 px face view, enlarged and soft).
+- Re-made by [`261026_R_SyntheticSkinAndEyes_look.py`](261026_R_SyntheticSkinAndEyes_look.py), whose doc string holds the render loop. **Each tuning round re-runs it,** so a round is compared with the last.
+
+- **F-SYN-9 — The renderers agree on every draft as closely as on the shipped article it sits beside.** This is Storm against Unreal, ΔE2000 median over the bound part:
+  - skins: II 2.3 whole body / 2.9 face; IV 2.1 / 2.5; VI 1.4 / 1.4. Each is within 0.1 of its tone's shipped base.
+  - eyes: iris 0.8–2.1, white 2.6. The shipped `Eye_Green` is 1.5 / 2.4.
+  - **No draft draws differently in the two tools.**
+- **F-SYN-10 — What the pictures show** (the agent's reading, **not a verdict**; the lead's look decides):
+  - **Base → Synth:** the synthetic base adds mottling and uneven regional colour. On II it reads slightly more sallow than the shipped base, whose cheeks are pinker.
+  - **Freckles:** strong on II, clear on IV, nearly gone on VI, as designed (F-SYN-6).
+  - **Veins:** soft grey-green walks on the inner forearm and the back of the hand, on II and IV. At the hand camera they read as veins, not lines.
+  - **Marks:** moles and acne show on II and IV. One mole sits on the right brow in every Marks and All set.
+  - **⚠ Tone VI: the five layer sets look almost alike.** Measured on the maps, VI's marks darken about as much *relatively* as II's (up to 39 % against 54 %, over the same ~0.1 % of the skin). On skin that dark the same relative change all but vanishes in the render. **Hypothesis for tuning:** post-acne marks are commonly *more* visible on dark skin, so VI's marks may want a stronger melanin delta, not the same one.
+  - **Eyes:**
+    - the colour families read as irises, and Hazel's brown collarette over green works;
+    - the light irises (grey, blue, light blue) carry visible fibres;
+    - DarkBrown is nearly featureless, flat and in the render;
+    - the shipped Green is more fibrous than any synthetic one;
+    - bloodshot shows as a pink inner corner on the blue eye and is faint on the brown.
+  - In the render the lids clip every iris top and bottom, the shipped one too: that is the rig's eye, not the drafts.
+- **F-SYN-11 — Studio cannot show them yet on this machine.**
+  - The dev install's served catalog (rebuilt 17:37 the same day, before this session merged `4438c1f`) lists 108 articles and **none of the 25**; the checkout holds 133.
+  - **One re-serve fixes it:** `uv run tools/releases/serve_to_stage.py`. It **restarts the Stage daemon**, so it waits for the lead's word: when checked, Stage was running and Studio was not.
+  - **They will have no thumbnail in Studio's material window.** Thumbnails come from Cycles (`make_thumbnails.py`), which this machine cannot render. They come from the library machine, or from a published dev snapshot.
+- **F-SYN-12 — The rig's character fails in Storm above 512 px on this machine.** `--width 1024` and `2048` both stop with OpenUSD's *"HdStVBOSimpleMemoryManager can't reassign ranges"*, on every eye tried; 512 works. So eyes are judged soft here, and **a close look at an iris is the lead's, in Studio**.
+
+### The verdict rows (the batch row's two lines, as columns)
+
+**Verdict** is the tools' agreement (F-SYN-9). **Review** takes the lead's words verbatim, with the date. A row judged on a bench body names the body. Compare each skin with its tone's `Skin_Fitzpatrick<tone>_Clean_Base` and, for the bar, CHQ's Emily skin. Compare each eye with `Eye_Green`.
+
+| Article | Verdict | Review |
+|---|---|---|
+| `Skin_FitzpatrickII_Clean_Synth_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickII_Clean_SynthFreckles_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickII_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickII_Clean_SynthMarks_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickII_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_Synth_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_SynthFreckles_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_SynthMarks_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickVI_Clean_Synth_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickVI_Clean_SynthFreckles_s001_v01` | Storm = Unreal; freckles near-invisible by design | — |
+| `Skin_FitzpatrickVI_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickVI_Clean_SynthMarks_s001_v01` | Storm = Unreal; marks barely show (F-SYN-10) | — |
+| `Skin_FitzpatrickVI_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthHazel_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthGreen_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthGrey_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthBlue_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthLightBlue_Clean_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthBrown_Bloodshot_Base_sUKN_v01` | Storm = Unreal | — |
+| `Eye_SynthBlue_Bloodshot_Base_sUKN_v01` | Storm = Unreal | — |
+
+**How a round comes in, and goes back out:**
+1. A tuning round (the makers re-run on the library machine) or a bench body arrives with a pull, or, for a body, a copy into OMF's git-ignored folder (bench input doc, CTB-6).
+2. On the machine with Unreal: the look file's render loop, then the pictures; then a re-serve, and the lead looks in Studio.
+3. The lead's words go on the rows above, verbatim, and the pictures are re-committed.
+4. OMF and the platform read the rows by content (bench input doc, CTB-4, CTB-8). A push is the lead's word, as always.
+
 ## Resolved
 
 - **RD-SYN-1 (the lead, 2026-10-26, "1) yes"):** AI makes **no whole skin map**. It may make the **tone-free detail layer** RD-SKM-5 describes, and content such as tattoo designs. A whole-face AI map is only ever a **judged comparison, never shipped**. *(The lead answered "yes" to the recommendation "not yet: AI for the detail layer and content, a whole-face AI map only as a comparison arm"; recorded as that reading.)*
@@ -119,19 +193,23 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 
 ## Status
 
-- **Passes:** 3.
+- **Passes:** 4.
   - Pass 1: what is settled.
   - Pass 2: the test set and what tuning taught.
   - Pass 3: how the library should do it.
+  - Pass 4: the first look, prepared (renders, pictures, the verdict rows).
 - **Built:**
   - the test set: 15 skins and 10 eyes, drafts;
   - two makers;
-  - the pigment table and its provenance.
-- **Not yet seen by anyone in a renderer.**
+  - the pigment table and its provenance;
+  - the look pictures and their script (Pass 4).
+- **Rendered by the agent, 2026-10-26,** in Storm and Unreal on the rig's character: all 25 agree across the two tools (F-SYN-9). On tone VI the layers barely show (F-SYN-10). **Not yet seen by the lead.**
 - **Owed:**
-  - the lead's look in Studio. The skins are best judged beside `Skin_Fitzpatrick<tone>_Clean_Base` and, for the bar, beside CHQ's `CHQ_EmilySkin`. The eyes beside `Eye_Green`, ideally on CHQ's wet-dome eye.
-  - The AI detail layer and the whole-face comparison need a GPU machine (not this one).
+  - **a re-serve on the machine with Unreal**, on the lead's word: it restarts Stage (F-SYN-11);
+  - the lead's look in Studio, with the words on Pass 4's rows. The skins are best judged beside `Skin_Fitzpatrick<tone>_Clean_Base` and, for the bar, beside CHQ's `CHQ_EmilySkin`. The eyes beside `Eye_Green`, ideally on CHQ's wet-dome eye;
+  - thumbnails for the 25, from the library machine (F-SYN-11);
+  - the AI detail layer and the whole-face comparison, which need a GPU machine with the AI tooling.
 - **▶ Next, after the lead's look:**
-  1. *Beyond Colour* discovery (RD-SYN-3);
-  2. tune the set from the lead's notes;
+  1. tune the set from the lead's notes (VI's marks first, if the lead agrees with F-SYN-10), then re-run the look file;
+  2. *Beyond Colour* discovery (RD-SYN-3);
   3. pick which of Pass 3's phases go next.
