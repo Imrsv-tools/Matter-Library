@@ -1,0 +1,107 @@
+{
+  "summary": "Human skin, type II on the Fitzpatrick scale, with a synthetic skin map: the base with moles, acne, post-acne marks and a flushed nose and cheeks.",
+  "search_words": [
+    "character",
+    "fitzpatrick",
+    "human",
+    "marks",
+    "skin",
+    "skin tone",
+    "synthetic"
+  ],
+  "origin": [
+    "procedural",
+    "measured",
+    "agent-drafted"
+  ],
+  "_comment": "A SYNTHETIC test skin (the lead's spike, 2026-10-26; OMF research 261026_R_SyntheticSkinAndEyeSets): Skin_FitzpatrickII's substance with a procedural map, the base with moles, acne, post-acne marks and a flushed nose and cheeks. The map's colour comes from melanin and blood amounts per texel through a tabulated two-chromophore skin model, placed on the body in 3D (sun-exposed parts darker, palms and soles lighter, cheeks, nose, ears, fingertips and knuckles redder), so each tone gets its own regional colour; its average is held to the tone by the library's own calibration (tools/converters/fit/gen_synth_skin.py). No photograph, no AI. A draft to be judged in Studio beside Skin_FitzpatrickII_Clean_Base; the Detail token names the layer set. The lips and nails pair with the tone's own articles.",
+  "name": "Skin_FitzpatrickII_Clean_SynthMarks_s001_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "character/humanoid/skin/Skin_FitzpatrickII_Clean_SynthMarks_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "group": "character",
+  "species": "humanoid",
+  "part": "skin",
+  "fits": "MakeHuman_Body_v01",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_const": "0.8366, 0.5256, 0.3845",
+  "roughness_tex": "../../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
+  "normal_tex": "../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "coat_weight": 0.1,
+  "coat_roughness": 0.3,
+  "coat_ior": 1.5,
+  "fuzz_weight": 0.1,
+  "fuzz_color": "0.799, 0.485, 0.347",
+  "fuzz_roughness": 0.5,
+  "base_color_map": true,
+  "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIISynthMarks_basecolor_sUKN.png",
+  "overlays": [
+    {
+      "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_synth_skin.py",
+      "provenance": "library/provenance/sources/fit/makehuman/synth_skin.yaml",
+      "note": "the synthetic skin map (layers: marks): CC0 parts only (hm08, MPFB2's region masks and thickness map), a tabulated two-chromophore skin model (melanin 0.0119, blood 0.02 at the tone), seeded procedural noise and point processes; its average over the skin held to the Physically Based tone below; base_color_const is that tone x the map's peak factor"
+    },
+    {
+      "kind": "physicallybased",
+      "entry": "Skin II",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.799, 0.485, 0.347",
+        "metalness_const": 0,
+        "roughness_const": 0.5,
+        "specular_ior": 1.4,
+        "subsurface_radius": 0.00482,
+        "subsurface_radius_scale": "1, 0.351, 0.226"
+      },
+      "note": "roughness 0.5 is the MEAN of the Skin_Pores roughness map"
+    },
+    {
+      "kind": "judgement",
+      "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone. Phase21 (RD-P21-1, RD-P21-4): the scatter colour now FOLLOWS the base (subsurface_color connected to base_color_out), so it takes the map and the tint; before, it was pinned to the albedo and the tint was inert on skin in every tool (F-P21-3)."
+    },
+    {
+      "kind": "judgement",
+      "why": "Phase07 7.3. Coat 0.1 at roughness 0.3 is MPFB2's 'enhanced skin' clearcoat (skin oil; CC0 shader settings, research Pass 3); coat_ior 1.5 is the value MPFB2 inherits from Blender (sebum is ~1.47). subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_skin_pores.py",
+      "provenance": "library/provenance/sources/base/biological/tissue/Skin_Pores.yaml"
+    }
+  ]
+}
