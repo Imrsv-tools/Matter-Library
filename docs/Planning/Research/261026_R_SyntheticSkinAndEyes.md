@@ -154,20 +154,20 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 | Article | Verdict | Review |
 |---|---|---|
 | `Skin_FitzpatrickII_Clean_Synth_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickII_Clean_SynthFreckles_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickII_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickII_Clean_SynthMarks_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickII_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickII_Clean_SynthFreckles_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"the freckles on the face read really large and oddly placed"* → re-made in round 2 (Pass 5); round 2 not yet seen |
+| `Skin_FitzpatrickII_Clean_SynthVeins_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"The viens look plausable"* |
+| `Skin_FitzpatrickII_Clean_SynthMarks_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"the marks look plausable (but lack any depth which I think is expected"* |
+| `Skin_FitzpatrickII_Clean_SynthAll_s001_v01` | Storm = Unreal | round 1 judged by layer (the rows above); round 2: its freckles re-made, its veins and marks now exactly the single layers' |
 | `Skin_FitzpatrickIV_Clean_Synth_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickIV_Clean_SynthFreckles_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickIV_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickIV_Clean_SynthMarks_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickIV_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickIV_Clean_SynthFreckles_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"the freckles on the face read really large and oddly placed"* → re-made in round 2 (Pass 5); round 2 not yet seen |
+| `Skin_FitzpatrickIV_Clean_SynthVeins_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"The viens look plausable"* |
+| `Skin_FitzpatrickIV_Clean_SynthMarks_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"the marks look plausable (but lack any depth which I think is expected"* |
+| `Skin_FitzpatrickIV_Clean_SynthAll_s001_v01` | Storm = Unreal | round 1 judged by layer (the rows above); round 2: its freckles re-made, its veins and marks now exactly the single layers' |
 | `Skin_FitzpatrickVI_Clean_Synth_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickVI_Clean_SynthFreckles_s001_v01` | Storm = Unreal; freckles near-invisible by design | — |
-| `Skin_FitzpatrickVI_Clean_SynthVeins_s001_v01` | Storm = Unreal | — |
-| `Skin_FitzpatrickVI_Clean_SynthMarks_s001_v01` | Storm = Unreal; marks barely show (F-SYN-10) | — |
-| `Skin_FitzpatrickVI_Clean_SynthAll_s001_v01` | Storm = Unreal | — |
+| `Skin_FitzpatrickVI_Clean_SynthFreckles_s001_v01` | Storm = Unreal; freckles near-invisible by design | 2026-10-26, round 1: *"the freckles on the face read really large and oddly placed"* → re-made in round 2 (Pass 5); round 2 not yet seen |
+| `Skin_FitzpatrickVI_Clean_SynthVeins_s001_v01` | Storm = Unreal | 2026-10-26, round 1: *"The viens look plausable"* |
+| `Skin_FitzpatrickVI_Clean_SynthMarks_s001_v01` | Storm = Unreal; marks barely show (F-SYN-10) | 2026-10-26, round 1: *"the marks look plausable (but lack any depth which I think is expected"* |
+| `Skin_FitzpatrickVI_Clean_SynthAll_s001_v01` | Storm = Unreal | round 1 judged by layer (the rows above); round 2: its freckles re-made, its veins and marks now exactly the single layers' |
 | `Eye_SynthDarkBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
 | `Eye_SynthBrown_Clean_Base_sUKN_v01` | Storm = Unreal | — |
 | `Eye_SynthAmber_Clean_Base_sUKN_v01` | Storm = Unreal | — |
@@ -185,6 +185,28 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 3. The lead's words go on the rows above, verbatim, and the pictures are re-committed.
 4. OMF and the platform read the rows by content (bench input doc, CTB-4, CTB-8). A push is the lead's word, as always.
 
+## Pass 5 — Round 2: the freckles re-made from the lead's first look (2026-10-26)
+
+**The lead, verbatim:** *"the freckles on the face read really large and oddly placed, The viens look plausable, the marks look plausable (but lack any depth which I think is expected."* Recorded on Pass 4's rows. A lead-directed tuning round, as offered in the handback (*"tell me what you think and I'll run the first tuning round here as a quick fix"*).
+
+- **F-SYN-13 — Why round 1's face freckles read large and oddly placed** (read in `gen_synth_skin.py`):
+  - **Large:** radii drawn around 1.1 mm with a tail to 4 mm, each a soft blob two to three times its radius wide, in clumps of nine that merged into patches.
+  - **Odd places:** the face's density was a ±5 cm band at nose-tip height running ear to ear, and the face's share came as a few clumps drawn for the whole body, so they landed one-sided.
+- **Round 2, the freckles only:**
+  - **The face:** a butterfly over the nose bridge and the upper cheeks under the eyes, on the forward-facing surface. It is symmetric by construction (centres from each eye and the nose), not clustered, with a sparse scatter elsewhere on the face. Radii around 0.55 mm (0.3–1.1 mm).
+  - **The body:** the same regions, in smaller, looser clusters (5 per cluster, not 9; radii around 0.8 mm).
+- **Each layer now draws from its own seeded generator.**
+  - **`Synth`, `SynthVeins` and `SynthMarks` are pixel-identical to round 1 on every tone** (compared with `HEAD`).
+  - **`SynthAll` is now exactly the three single layers together.** In round 1 its veins and marks sat elsewhere, moved by the freckles' draws.
+- **What changed on disk:**
+  - 6 maps (Freckles and All × II, IV, VI);
+  - their recipes' `base_color_const`, re-calibrated by under 0.001;
+  - their 6 articles, one line each;
+  - the provenance record.
+  - The 9 unchanged maps were re-encoded with identical pixels but different PNG bytes, so the committed bytes were kept.
+- **Seen by the agent, not the lead** (`…_skins.jpg` re-made): a fine, even sprinkle over the nose and upper cheeks on II and IV. Storm = Unreal as before (II 2.3 / 2.9, IV 2.1 / 2.5, VI 1.4 / 1.4).
+- **"Lack any depth" is expected, as the lead says.** The marks are colour only: no relief, no change in shine. A raised mole or papule needs the normal and roughness inputs of *Skin Maps Beyond Colour* (RD-SYN-3; F-SYN-8).
+
 ## Resolved
 
 - **RD-SYN-1 (the lead, 2026-10-26, "1) yes"):** AI makes **no whole skin map**. It may make the **tone-free detail layer** RD-SKM-5 describes, and content such as tattoo designs. A whole-face AI map is only ever a **judged comparison, never shipped**. *(The lead answered "yes" to the recommendation "not yet: AI for the detail layer and content, a whole-face AI map only as a comparison arm"; recorded as that reading.)*
@@ -193,11 +215,13 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 
 ## Status
 
-- **Passes:** 4.
+- **Passes:** 5.
   - Pass 1: what is settled.
   - Pass 2: the test set and what tuning taught.
   - Pass 3: how the library should do it.
   - Pass 4: the first look, prepared (renders, pictures, the verdict rows).
+  - Pass 5: round 2, the freckles re-made from the lead's first look.
+- **The lead's first look (2026-10-26):** freckles too large and oddly placed (re-made, round 2: **owed the lead's look**); veins plausible; marks plausible, lacking depth as expected. The eyes and the plain `Synth` bases have no words yet.
 - **Built:**
   - the test set: 15 skins and 10 eyes, drafts;
   - two makers;
@@ -210,6 +234,6 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
   - thumbnails for the 25, from the library machine (F-SYN-11);
   - the AI detail layer and the whole-face comparison, which need a GPU machine with the AI tooling.
 - **▶ Next, after the lead's look:**
-  1. tune the set from the lead's notes (VI's marks first, if the lead agrees with F-SYN-10), then re-run the look file;
+  1. the lead's look at round 2's freckles (Studio picks up the new maps through the dev install's links; no re-serve needed); then VI's marks, if the lead agrees with F-SYN-10;
   2. *Beyond Colour* discovery (RD-SYN-3);
   3. pick which of Pass 3's phases go next.

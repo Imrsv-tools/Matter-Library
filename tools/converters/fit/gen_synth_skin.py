@@ -344,21 +344,46 @@ def compose(tone, roman, layers, F, lut, rng_seed):
     so2 = so2 - 0.25 * under_eye                                   # the bluish shadow under the eyes
     dmel = np.zeros(P.shape[:2])
 
+    # Each layer draws from its own generator, seeded alike, so SynthAll is exactly the single layers
+    # together (round 2, 2026-10-26; before, SynthAll's veins and marks moved with the freckles' draws).
     if "freckles" in layers:
-        dens = (1.0 * face * np.clip(1 - np.abs(P[..., 1] - nose[1]) / 0.05, 0, 1)   # nose and cheeks
-                + 0.15 * face + 0.7 * upper_back + 0.35 * parts["upperarm"] * (1 - under_arm)
+        rng = np.random.default_rng(rng_seed)
+        # Round 2 (2026-10-26; the lead: "the freckles on the face read really large and oddly placed").
+        # The face: a butterfly over the nose bridge and the upper cheeks, on the surface that faces
+        # forward (the sun), symmetric by construction and not clustered; elsewhere on the face, sparse.
+        # Round 1 put a +-5 cm band at nose-tip height from ear to ear and drew the face's freckles in
+        # a few clumps of nine, which landed one-sided.
+        def surface(x, y):
+            near = Fp[(np.abs(Fp[:, 0] - x) < 0.006) & (np.abs(Fp[:, 1] - y) < 0.006)]
+            return np.array([x, y, near[:, 2].max() if len(near) else nose[2] - 0.02])
+        lid = P[(masks["eyelids"] > 0.5) & cover]
+        eye_l, eye_r = lid[lid[:, 0] < fx].mean(0), lid[lid[:, 0] >= fx].mean(0)
+        eye_y = (eye_l[1] + eye_r[1]) / 2
+        facing = np.clip(Nr[..., 2] + 0.15, 0, 1)
+        butterfly = gauss3(P, surface(fx, eye_y - 0.4 * (eye_y - nose[1])), 0.016)
+        for e in (eye_l, eye_r):
+            out_x = e[0] + np.sign(e[0] - fx) * 0.006
+            butterfly = np.maximum(butterfly, gauss3(P, surface(out_x, e[1] - 0.024), 0.022))
+        fdens = face * facing * (butterfly + 0.06)
+        fc, _ = sample_points(rng, fdens, P, cover, 420)
+        fr_r = np.exp(rng.normal(np.log(0.00055), 0.3, len(fc))).clip(0.0003, 0.0011)
+        # The body: the shoulders, upper back, arms and hands, in small loose clusters.
+        dens = (0.7 * upper_back + 0.35 * parts["upperarm"] * (1 - under_arm)
                 + 0.55 * parts["forearm"] * (1 - under_arm) + 0.3 * parts["hand"] * (1 - palm)
                 + 0.25 * parts["trunk"] * np.clip(Nr[..., 2], 0, 1) * np.clip((P[..., 1] - J["neck"][1] + 0.18) / 0.1, 0, 1))
-        parents, _ = sample_points(rng, dens, P, cover, 260)
-        kids = np.repeat(parents, 9, axis=0) + rng.normal(0, 0.012, (len(parents) * 9, 3))
-        kids = np.concatenate([kids, sample_points(rng, dens, P, cover, 900)[0]])
-        radii = np.exp(rng.normal(np.log(0.0011), 0.45, len(kids))).clip(0.0004, 0.004)
-        amps = rng.uniform(0.35, 1.0, len(kids))
-        fr = splat(P, cover, kids, radii, amps, rng, roughen=0.45, sharp=2.2)
-        dmel += 0.085 * np.clip(fr, 0, 1.4) * (0.6 + 0.4 * gsm.blur(dens, 20) / max(dens.max(), 1e-6))
+        parents, _ = sample_points(rng, dens, P, cover, 240)
+        kids = np.repeat(parents, 5, axis=0) + rng.normal(0, 0.008, (len(parents) * 5, 3))
+        kids = np.concatenate([kids, sample_points(rng, dens, P, cover, 700)[0]])
+        kr = np.exp(rng.normal(np.log(0.0008), 0.3, len(kids))).clip(0.0004, 0.0016)
+        centres, radii = np.concatenate([fc, kids]), np.concatenate([fr_r, kr])
+        amps = rng.uniform(0.5, 1.0, len(centres))
+        fr = splat(P, cover, centres, radii, amps, rng, roughen=0.35, sharp=2.2)
+        allw = fdens + dens
+        dmel += 0.085 * np.clip(fr, 0, 1.2) * (0.6 + 0.4 * gsm.blur(allw, 20) / max(allw.max(), 1e-6))
 
     vein = np.zeros(P.shape[:2])
     if "veins" in layers:
+        rng = np.random.default_rng(rng_seed)
         starts, dirs, lens, ws = [], [], [], []
         for s in "lr":
             elbow, wrist = J[f"{s}-elbow"], J[f"{s}-hand"]
@@ -388,6 +413,7 @@ def compose(tone, roman, layers, F, lut, rng_seed):
         vein = gsm.blur(vein, 2)
 
     if "marks" in layers:
+        rng = np.random.default_rng(rng_seed)
         # moles: sparse, densest on the arms and the back
         mdens = 0.6 * parts["trunk"] * np.clip(-Nr[..., 2] + 0.4, 0, 1.4) + 0.5 * parts["upperarm"] + 0.5 * parts["forearm"] \
             + 0.35 * parts["thigh"] + 0.3 * face + 0.25 * parts["neck"] + 0.2 * parts["shin"]

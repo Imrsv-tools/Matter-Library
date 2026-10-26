@@ -48,7 +48,7 @@
       <input name="in2" type="float" nodename="overlay2_density_mask" />
     </multiply>
     <constant name="base_color_const" type="color3">
-      <input name="value" type="color3" value="0.1444, 0.1160, 0.0754" />
+      <input name="value" type="color3" value="0.1443, 0.1159, 0.0753" />
     </constant>
     <texcoord name="base_color_map_uv" type="vector2">
       <input name="index" type="integer" value="0" />
