@@ -31,7 +31,31 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
-> **Re-sequenced 2026-10-27 (lead):** the character materials run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
+> **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
+
+### Skin Maps Beyond Colour — SEEDED, **un-parked 2026-10-26** *(the lead, "3) yes", RD-SYN-3, `261026_R_SyntheticSkinAndEyes.md`; ~~parked 2026-10-14: "skin detail stay parked TBD", RD-DS-8~~; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first; starting discovery stays the lead's call)*
+**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
+
+### Synthetic Skin Sets — RESEARCH *(seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2; kick off `/discovery` when ready)*
+**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1)
+
+### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
+**Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
+
+### Skin Layers — RESEARCH *(seeded 2026-10-26, the same word; **widened 2026-10-27**: makeup and marks on the whole body and per mark, cosmetics and film effects, each piece working on every character, RD-CMT-1/-2, `261027_R_CharacterMaterials.md`; pairs with the platform's stack bake)*
+**Outcome:** a Creator adds makeup and marks (freckles, veins, moles, blemishes, scars, wounds, bruises, tattoos, dirt, blood, or makeup from blush to film effects) to any character's skin, anywhere on the body and per mark, each a library article placed on the body that works on every character, without a new skin per combination.
+- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 3) · `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 4, Makeup and marks; RD-CMT-2 the inclusion test)
+
+### Hair Colour by Region — RESEARCH *(seeded 2026-10-27 by `/research` on the lead's cut of the order, RD-CMT-3; `261027_R_CharacterMaterials.md` Pass 6)*
+**Outcome:** a character's brows and lashes take their own colour from its hair pigment, and its stubble and body hair arrive as skin layers.
+- `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 4, Hair colour)
+
+### Character Materials Guide — RESEARCH *(seeded 2026-10-27; **last, after the pipeline above has been built and used**, the lead: "after we have done it and eaten our own dogfood", RD-CMT-3; a lead-directed `/quick-fix` when it comes, not a phase)*
+**Outcome:** a contributor finds every kind of character material, what gets into the library (a piece that works on every character, RD-CMT-2) and how to make each, with the library's Blender kit or without it, on one page.
+- `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 5)
 
 ### The Library Service — SEEDED, re-scoped 2026-10-15 *(**no GPU: the library's own service on the platform's web server, on the team's private network; the laptop pulls the rig work from its queue**, RD-SV-2; its Brief for a rented GPU server is kept as a later step; **unnumbered again 2026-10-14**, RD-DS-8: *"Make this phase TBD"*, after the lead's *"We have to rethink and stay local for now"*, RD-MP-14: Hetzner had no GPU server; its discovery Brief is written for when a server exists; it was Phase17 for part of that day; added 2026-10-14 by `/research` on the lead's "I guess that is ALSO a new pahse to seed", RD-MP-11; a material arrives as one package, tested and pictured on upload, RD-RO-1)*
 **Outcome:** the library's server, with no GPU, checks every push and every material package and queues the rig work, and the laptop works through the queue when it is on. *(Was, and kept as the later step when a GPU server exists: "a person on the team hands the library service one material package, from any machine on the team's private network, and it comes back gated and rigged in Storm, Blender and Unreal, waiting for review, on a rented server, not the lead's laptop.")*
@@ -65,33 +89,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** each material's pictures in Storm, Blender and Unreal can be compared by a person: one readable scene (a standard shader ball, a neutral backdrop, a dome whose reflections read), each tool's own renderer named, differences shown and not tuned away, current or not shipped.
 - `docs/Planning/Research/261014_R_ComparisonPictures.md`
 
-### Hair That Reads as Hair — RESEARCH *(seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4; **held 2026-10-14:** research, after the Skin Maps survey)*
+### Hair That Reads as Hair — RESEARCH *(`Reevaluate (2026-10-27)`: the one-hair ruling of 2026-10-25 makes the groom (strands, and cards made from it) the Asset Library's, through the Asset Workshop, and its colour this library's (*Hair Colour by Region*); what is left here is the library's part of hair, `261027_R_CharacterMaterials.md` RD-CMT-1; seeded 2026-09-28 from Phase08: the lead on the interim hair: "eventuall this needs to be reseerached and fixed.. this is not usable"; **2026-09-29: cards are the one exception, each style's picture shading one light hair article; strands are the real path**, MAP-RD3/RD4; **held 2026-10-14:** research, after the Skin Maps survey)*
 **Outcome:** a character's hair looks like real hair (soft, alive, lit through), in Blender, a USD viewer and Unreal, on cards now and on strands later.
 - `docs/Planning/Research/260928_R_HairAndNailRendering.md` (H4 card maps, H5 strands) · `docs/Planning/Research/260929_R_CharacterMaps.md` (Pass 7, MAP-Q9/Q10)
-
-### Skin Maps Beyond Colour — SEEDED, **un-parked 2026-10-26** *(the lead, "3) yes", RD-SYN-3, `261026_R_SyntheticSkinAndEyes.md`; ~~parked 2026-10-14: "skin detail stay parked TBD", RD-DS-8~~; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first; starting discovery stays the lead's call)*
-**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
-- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
-
-### Synthetic Skin Sets — RESEARCH *(seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2; kick off `/discovery` when ready)*
-**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
-- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1)
-
-### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
-**Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
-- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
-
-### Skin Layers — RESEARCH *(seeded 2026-10-26, the same word; **widened 2026-10-27**: makeup and marks on the whole body and per mark, cosmetics and film effects, each piece working on every character, RD-CMT-1/-2, `261027_R_CharacterMaterials.md`; pairs with the platform's stack bake)*
-**Outcome:** a Creator adds makeup and marks (freckles, veins, moles, blemishes, scars, wounds, bruises, tattoos, dirt, blood, or makeup from blush to film effects) to any character's skin, anywhere on the body and per mark, each a library article placed on the body that works on every character, without a new skin per combination.
-- `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 3) · `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 4, Makeup and marks; RD-CMT-2 the inclusion test)
-
-### Hair Colour by Region — RESEARCH *(seeded 2026-10-27 by `/research` on the lead's cut of the order, RD-CMT-3; `261027_R_CharacterMaterials.md` Pass 6)*
-**Outcome:** a character's brows and lashes take their own colour from its hair pigment, and its stubble and body hair arrive as skin layers.
-- `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 4, Hair colour)
-
-### Character Materials Guide — RESEARCH *(seeded 2026-10-27; **last, after the pipeline above has been built and used**, the lead: "after we have done it and eaten our own dogfood", RD-CMT-3; a lead-directed `/quick-fix` when it comes, not a phase)*
-**Outcome:** a contributor finds every kind of character material, what gets into the library (a piece that works on every character, RD-CMT-2) and how to make each, with the library's Blender kit or without it, on one page.
-- `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 5)
 
 ### IMRSV Consumes Releases — RESEARCH *(integration; numbered on the IMRSV platform's line)*
 **Outcome:** IMRSV Studio users get Matter materials from an installed release, including in packaged builds, with no copy of this repository involved.
