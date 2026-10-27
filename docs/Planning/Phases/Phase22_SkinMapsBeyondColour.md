@@ -1,7 +1,7 @@
 # Phase22 — Skin Maps Beyond Colour
 
-**Status:** ACTIVE (IN DISCOVERY) — **BRIEF READY, with one lead question open (Q-P22-2, raised by the lead at the session's `/retro`)** (Pass 2, 2026-10-27: the lead answered Q-P22-1 by rejecting Blender as the look surface and proposing the library's Unreal test runtime, RD-P22-11). Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
-**Lane:** `build` (§Risk lane). **Next:** the lead answers Q-P22-2, then `/execute P22`.
+**Status:** ACTIVE (IN EXECUTION) — `/execute P22` opened 2026-10-27; the lead answered Q-P22-2 with (b) at kickoff (RD-P22-13). *Before:* BRIEF READY, with one lead question open (Q-P22-2, raised by the lead at the session's `/retro`) (Pass 2, 2026-10-27: the lead answered Q-P22-1 by rejecting Blender as the look surface and proposing the library's Unreal test runtime, RD-P22-11). Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
+**Lane:** `build` (§Risk lane). **Next:** 22.1 (see §Execution ledger).
 **Measured at:** `49da20e`, on **the machine with Unreal**: Unreal 5.8 at the path `unreal/build.sh` takes as `UE`, and the official Blender 5.2.2 as `MATTER_BLENDER` (Learnings B22).
 **Builds on:** *Skin Maps* ([`Phase21_SkinMaps.md`](Complete/Phase21_SkinMaps.md)), which shipped the colour map. **Research:** [`261014_R_SkinMaps.md`](../Research/261014_R_SkinMaps.md) (the survey, F-SKM-11 … 18) · [`261026_R_SyntheticSkinAndEyes.md`](../Research/261026_R_SyntheticSkinAndEyes.md) (RD-SYN-3) · [`261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (the order, RD-CMT-1 … 4, F-CMT-9).
 
@@ -83,7 +83,7 @@ The look is judged in **a shadowed look view added to the library's own Unreal t
 | **All six tones and lips** wearing the shared maps; the rig's sheet over six tones | 22.4 |
 | **Thumbnails re-made** (every kept one: the masters' hash moves with `load_article.py`, F-P22-6); the dev install re-served | 22.4 |
 | **Written down:** LCDSchema (the new inputs, a section of their own), `SkinMaps.md` (*colour only, for now* becomes the shine maps, with how to make one), the Glossary (*shine map*), and Learnings where a trap is found | 22.4 |
-| **Ledger:** a row asking Studio to carry the three maps (F-P22-8), filed as soon as `roughness_map` is in the contract, so a platform session can work alongside. Its id is claimed when it is written | 22.1 |
+| **Ledger:** a row asking Studio to carry the three maps (F-P22-8), filed as soon as `roughness_map` is in the contract, so a platform session can work alongside. Its id is claimed when it is written. *Filed at kickoff as **P34**, ahead of the contract, at the lead's ask (2026-10-27)* | 22.1 (filed at kickoff) |
 | **`unreal-runtime-v7`** and a dev snapshot, each at the lead's word, with `HEAD` pushed | 22.4 |
 
 ### Not now
@@ -175,6 +175,11 @@ The look is judged in **a shadowed look view added to the library's own Unreal t
 - **RD-P22-12 — The close does not wait for Studio** *(unless the lead says otherwise)*.
   - Studio needs platform work per map (F-P22-8) and a look-dev scene that does not exist yet (P33). The library files the ask at 22.1, so the work can run alongside.
   - The Studio sitting is the platform's, recorded in the ledger, as Studio's side did not hold Phase21's close.
+  - *Reversed 2026-10-27 by RD-P22-13: the close now waits for one Studio click.*
+- **RD-P22-13 — The runtime's look view first, Studio as the last click** (answers Q-P22-2, the lead at `/execute` kickoff, 2026-10-27, choosing option (b)).
+  - Clicks 1–4 are judged in the runtime's look view (RD-P22-11) and on the rig, as the Brief has them.
+  - **One click is added at the end: the six tones in Studio**, once the platform has carried the maps (the 22.1 ledger row). **The close waits for that click** (RD-P22-12 reversed).
+  - No step before it waits on another repo.
 
 ### Risk lane — `build`
 
@@ -257,7 +262,9 @@ The controls this phase touches, each read on 2026-10-27:
 
 ### Open for the lead
 
-1. **Q-P22-2 — Test the skins in Studio directly?** *(Raised by the lead with `/retro`, 2026-10-27, after Pass 2, verbatim: "And irt sounds like we just test the skins in studio directly?". Recorded at the run's end, not resolved: it may reverse RD-P22-11 and RD-P22-12.)*
+*None open.*
+
+- ~~**Q-P22-2 — Test the skins in Studio directly?**~~ → **RD-P22-13**: the lead chose (b) at `/execute` kickoff, 2026-10-27. *(Raised by the lead with `/retro`, 2026-10-27, after Pass 2, verbatim: "And irt sounds like we just test the skins in studio directly?". Recorded at the run's end, not resolved: it may reverse RD-P22-11 and RD-P22-12.)*
    - **What "Studio directly" takes** (F-P22-8): per map, the platform re-runs its masters build from this repo's builder, has Stage carry the map as it carries `base_color_map`, binds it as linear data with a neutral default, and, for the normal map, builds MikkTSpace-compatible tangents. Then a shadowed look-dev scene to judge in (P33), which does not exist yet. All of it is platform work in its own repo.
    - **(a) Studio is the look surface, and this phase waits for it.** The library builds the maps and the inputs; each look click is sat in Studio once the platform has carried that map. The runtime's look view (RD-P22-11) is dropped, or kept only as the agent's own early check. The close waits on the platform (RD-P22-12 reversed). The ledger row at 22.1 becomes the critical path.
    - **(b) The runtime's look view first, Studio as the last click.** As Pass 2 has it, with one added click at the end: the six tones in Studio, once the platform has carried the maps. The close waits for that click.
@@ -362,3 +369,9 @@ The controls this phase touches, each read on 2026-10-27:
   - **Read at the platform's origin:** how Studio builds its Matter masters and binds their textures, how Stage carries `base_color_map`, and whether a look-dev scene exists. → F-P22-8 corrected.
   - **Read in the tree:** the runtime's lighting (F-P22-11).
   - **Changed:** the look surface becomes the runtime's shadowed look view (RD-P22-11; RD-P22-9 superseded). The ledger row moves to 22.1. The close does not wait for Studio (RD-P22-12, unless the lead says otherwise). The First human test is rewritten: today's skin in the look view first.
+
+## Execution ledger
+
+*`step · commit · result · next`. Opened 2026-10-27 at `728cab0`, tree clean, on the machine with Unreal. The lead is away for the first stretch: work runs through to click 1 and the pictures are batched.*
+
+- **Kickoff** · this commit · Q-P22-2 answered (b) → RD-P22-13; the Studio ledger row **P34 filed ahead of 22.1** at the lead's ask (*"Have you documented what Studio needs to do to see the new maps? I can start it on that"*), from F-P22-8 and RD-P22-3 … 6, 8 · next: 22.1, the look view first.
