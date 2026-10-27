@@ -102,18 +102,22 @@ DETAIL = {"III": {"fine": (3.0, 2.0), "coarse": (1.3, 1.0), "dots": (0.9, 0.5), 
 # one structure for every tone; the numbers are per fit, as ``DETAIL``'s are. III's fit is solved to
 # the bar's region colours over the trunk; IV's to the same colours at half their log contrast (no
 # dark-skin reference exists: the agent's judgement, for the lead's eye at IV and V). Measured on the
-# atlas, 2026-10-27: every region within 0.13 (III) and 0.02 (IV) in log of its target. The bar's face
+# atlas, 2026-10-27: each region within 0.18 (III; nose and tear trough the worst) and 0.04 (IV) in log
+# of its target. The face's level is matched over the whole face core; the under-eye ring on the bar's
+# gradient straight down from the eye (2-12 mm against 16-23 mm below its centre), not on an average. The bar's face
 # is lighter and cooler than its trunk (pink, where today's face was a darker tan from sun melanin).
 # On III's fit that needs melanin out (its pheomelanin is the yellow); blood out alone reads cream.
 FACE = {  # fit: {region: (dlog melanin, dlog blood, d so2, depth)}
-    "III": {"face": (-1.106, -0.368, 0.150, -0.105), "forehead": (-0.108, -0.372, -0.130, -0.250),
-            "cheek": (-3.000, -1.105, 0.150, -0.250), "nose": (-3.000, -1.200, 0.150, -0.250),
-            "alae": (-1.262, 0.061, 0.150, -0.250), "under_eye": (-3.000, -0.135, 0.150, 0.053),
-            "eyelid": (-0.588, 1.200, 0.150, 0.067), "chin": (-1.676, 0.203, 0.150, -0.025)},
-    "IV": {"face": (-0.360, -0.040, 0.031, -0.055), "forehead": (-0.001, -0.089, -0.062, -0.121),
-           "cheek": (-0.283, -0.185, -0.091, -0.171), "nose": (-0.328, -0.294, -0.148, -0.250),
-           "alae": (-0.013, 0.035, 0.038, -0.091), "under_eye": (-0.182, 0.067, 0.082, 0.022),
-           "eyelid": (-0.151, 0.607, 0.150, 0.036), "chin": (0.010, 0.133, 0.108, -0.001)},
+    "III": {"face": (-1.428, -0.363, 0.150, -0.146), "forehead": (0.016, -0.403, -0.220, -0.214),
+            "cheek": (-3.000, -1.131, 0.150, -0.229), "nose": (-3.000, -1.200, 0.150, -0.250),
+            "alae": (-2.784, 0.157, 0.150, -0.237), "under_eye": (0.600, 1.200, 0.090, 0.059),
+            "tear_trough": (-0.897, 0.442, 0.150, -0.004), "upper_lid": (0.098, 1.098, 0.150, 0.077),
+            "eyelid": (-1.125, 1.200, 0.150, 0.084), "chin": (-3.000, 0.265, 0.150, 0.014)},
+    "IV": {"face": (-0.379, -0.047, 0.028, -0.072), "forehead": (0.021, -0.085, -0.062, -0.100),
+           "cheek": (-0.263, -0.180, -0.091, -0.148), "nose": (-0.303, -0.285, -0.142, -0.250),
+           "alae": (0.008, 0.048, 0.045, -0.068), "under_eye": (0.241, 0.511, 0.150, 0.051),
+           "tear_trough": (-0.117, 0.215, 0.150, 0.015), "upper_lid": (0.131, 0.415, 0.150, 0.055),
+           "eyelid": (-0.174, 0.628, 0.137, 0.041), "chin": (0.032, 0.141, 0.112, 0.021)},
 }
 # The lips over the tone, per fit: III's the bar's measured lips over its trunk (pink-mauve, where the
 # library's rule, Phase08 8.2, reads brown-red on the new face); IV's keeps the rule.
@@ -310,6 +314,45 @@ def face_landmarks(P, masks, cover) -> dict:
     return {"Fp": Fp, "nose": nose, "fx": fx, "eyes": eyes, "mouth": mouth, "on_face": on_face}
 
 
+def _eye_frame(P, e, fx):
+    """Offsets from one eye's centre (metres): toward the nose, up, out of the face."""
+    d = P - np.asarray(e)
+    return np.sign(fx - e[0]) * d[..., 0], d[..., 1], d[..., 2]
+
+
+def tear_trough(P, e, fx):
+    """The groove from the eye's inner corner running down and outward (23.2.9; the lead: "now fix
+    the under-eye ring"). Placed where the bar is darker than its surround, measured in 3D around
+    both its eyes: from 18 mm toward the nose and 3 mm down, to 3 mm toward the nose and 20 mm down;
+    about 4 mm wide, fading at both ends."""
+    m, y, z = _eye_frame(P, e, fx)
+    a, b = np.array([0.018, -0.003]), np.array([0.003, -0.020])
+    q = np.stack([m, y], -1) - a
+    ab = b - a
+    t = np.clip((q @ ab) / (ab @ ab), 0, 1)
+    dist = np.linalg.norm(q - t[..., None] * ab, axis=-1)
+    return np.exp(-(dist / 0.004) ** 2) * np.sin(np.pi * np.clip(t * 0.9 + 0.05, 0, 1)) * np.exp(-(z / 0.02) ** 2)
+
+
+def under_eye(P, e, fx):
+    """The violet ring under the lower lid: the bar is darkest and most violet from 2 to 12 mm below
+    the eye's centre and lightens by 17 mm, reaching ~3 mm deeper on the nose side (a profile straight
+    down from both its eyes, 3 mm steps, in three bands across the eye)."""
+    m, y, z = _eye_frame(P, e, fx)
+    zf = np.exp(-(z / 0.02) ** 2)
+    main = np.exp(-((m / 0.016) ** 2 + ((y + 0.006) / 0.006) ** 2))
+    inner = np.exp(-(((m - 0.009) / 0.006) ** 2 + ((y + 0.010) / 0.005) ** 2))
+    outer = np.exp(-(((m + 0.017) / 0.006) ** 2 + ((y + 0.004) / 0.007) ** 2))   # up to the outer corner
+    return np.maximum(np.maximum(main, inner), outer) * zf
+
+
+def upper_lid(P, e, fx):
+    """The crease between the eye and the brow, which the bar has darker (a render-space difference
+    against the bar, 23.2.9)."""
+    m, y, z = _eye_frame(P, e, fx)
+    return np.exp(-((m / 0.016) ** 2 + ((y - 0.010) / 0.005) ** 2 + (z / 0.02) ** 2))
+
+
 def face_regions(P, masks, cover, head=None) -> dict:
     """Each FACE region's soft weight (0..1), placed from the landmarks (23.2.7). The face's own level
     reaches over the whole head (``head``, the body part) and fades into the neck, so it does not stop
@@ -323,13 +366,14 @@ def face_regions(P, masks, cover, head=None) -> dict:
     W["cheek"] = sum(ellipse3(P, at(fx + s * 0.040, n[1] - 0.004), (0.020, 0.017, 0.02)) for s in (-1, 1))
     W["nose"] = gauss3(P, n, 0.010)
     W["alae"] = sum(gauss3(P, at(n[0] + s * 0.014, n[1] - 0.006), 0.007) for s in (-1, 1))
-    W["under_eye"] = sum(ellipse3(P, at(e[0] + np.sign(e[0] - fx) * 0.002, e[1] - 0.015), (0.015, 0.007, 0.012))
-                         for e in (el, er)) * (1 - lids)
+    W["under_eye"] = np.maximum(under_eye(P, el, fx), under_eye(P, er, fx)) * (1 - lids)
+    W["tear_trough"] = np.maximum(tear_trough(P, el, fx), tear_trough(P, er, fx)) * (1 - lids)
+    W["upper_lid"] = np.maximum(upper_lid(P, el, fx), upper_lid(P, er, fx)) * (1 - lids)
     W["eyelid"] = lids
     W["chin"] = ellipse3(P, at(fx, mo[1] - 0.034), (0.018, 0.013, 0.02))
-    for k in W:
-        if k != "face":
-            W[k] = np.clip(W[k], 0, 1) * face
+    for k in W:          # MPFB's face mask is near 0 around the eyes (measured 23.2.9), so the regions
+        if k != "face":  # take the head-wide weight; with the mask, the ring kept 0.04 of its shape
+            W[k] = np.clip(W[k], 0, 1) * W["face"]
     return W
 
 
