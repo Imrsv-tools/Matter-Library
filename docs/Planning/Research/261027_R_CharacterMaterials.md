@@ -159,6 +159,33 @@
 
 **Waits outside the library:** the shadowed look-dev scene as a durable place to judge (the platform); OMF's render body (a re-bake here); the stack bake and controls (the platform).
 
+## Pass 7 — The numbering, and the rest of the Roadmap after this (2026-10-27)
+
+**Asked by the lead:** *"so if we number these what is the order (as a list)"*, and *"I assume the rest of the roadmap is sitll relevant after this?"*, naming The Library Service, The Library Console, Contribution Path, Release Bundle, Version Management, Blender from a Release and Unreal Reference Masters.
+
+- **F-CMT-9 — The numbering, if the order is numbered as it stands.** Nothing is active, and the last number used was Phase21 *Skin Maps*. The order would number:
+  - **Phase22** *Skin Maps Beyond Colour*;
+  - **Phase23** *Synthetic Skin Sets*;
+  - **Phase24** *Eyes in the Shader*;
+  - **Phase25** *Skin Layers*;
+  - **Phase26** *Hair Colour by Region*;
+  - then the *Character Materials Guide*, a quick fix with no number.
+
+  **Not numbered yet; numbering is the lead's.** A numbered entry needs its own phase doc (never in `Future/`), so the light path is to number each as it starts: `/discovery Phase22 Skin Maps Beyond Colour`.
+- **F-CMT-10 — The rest of the Roadmap stays relevant; the character work adds to some entries and retires none:**
+
+  | Entry | What the character work adds |
+  |---|---|
+  | *The Library Service* | Its rig queue can run on either machine now that the machine with Unreal renders all three columns (2026-10-27). It checks tool agreement only; a character piece's look verdict stays in the look-dev scene (RD-CMT-4). |
+  | *The Library Console* | Where a character piece is kept or sent back against the inclusion test (RD-CMT-2). |
+  | *Contribution Path* | The submission half; the *Character Materials Guide* is the how-to-make half. Its "automatic verdict" cannot judge a character piece's look. |
+  | *Release Bundle and Consumer Contract* | Unchanged; later, it carries the new skin and eye inputs. |
+  | *Version Management* | Unchanged. |
+  | *Blender from a Release* | Gains a job: the Blender kit for makeup pieces (RD-CMT-2) ships in the add-on. |
+  | *Unreal Reference Masters* | More relevant: *Beyond Colour* and *Eyes in the Shader* change the masters Studio adopts. |
+
+  Nothing here needs a Roadmap edit; each phase records the link in its own discovery.
+
 ## Open questions (plain)
 
 *All five answered 2026-10-27; see §Resolved (RD-CMT-1 … 4).*
@@ -204,13 +231,14 @@ Each would be fixed in the Glossary by the phase that first builds it.
 
 ## Status
 
-- **Passes:** 6 (2026-10-27).
+- **Passes:** 7 (2026-10-27).
   - Pass 1: the audit, per kind.
   - Pass 2: the levers learned elsewhere, and whose each is.
   - Pass 3: one shape for every kind.
   - Pass 4: each kind sketched.
   - Pass 5: how others take part.
   - Pass 6: a suggested order.
+  - Pass 7: the numbering if numbered as it stands (Phase22 … 26, not yet the lead's), and the rest of the Roadmap still relevant.
 - **Current direction:**
   - The library makes the pieces (skin, eyes, makeup and marks, hair colour); the platform makes how a character wears them.
   - The largest gain left is the shine maps (*Beyond Colour*).
@@ -221,6 +249,6 @@ Each would be fixed in the Glossary by the phase that first builds it.
   - ~~`Roadmap.md`: *Skin Layers*' Outcome widened; *Hair Colour by Region* and the participation page added, last~~ **landed 2026-10-27** by a lead-directed `/quick-fix` (*"yes do the quick fix and push"*): the re-sequence note, *Eyes in the Shader* moved above *Skin Layers*, *Skin Layers* widened, *Hair Colour by Region* and the *Character Materials Guide* seeded, last;
   - ~~`PlatformDependencies.md`: a row asking for a draft in the look-dev scene~~ **landed the same commit as P33** (RD-CMT-4);
   - the inclusion test (RD-CMT-2) in a spec — **the participation page, last** (RD-CMT-3); until then this doc's §Resolved is its authority.
-- **▶ Next:** `/discovery Skin Maps Beyond Colour`.
+- **▶ Next:** `/discovery Phase22 Skin Maps Beyond Colour`, which numbers it (F-CMT-9).
 
   Resume with `/research CharacterMaterials`.
