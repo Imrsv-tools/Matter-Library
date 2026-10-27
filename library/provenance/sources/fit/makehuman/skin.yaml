@@ -37,4 +37,4 @@ members:
   Skin_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.62, "skin_range": [0.518, 0.686], "uncovered_islands": 0, "tzone_average": 0.4548, "cheeks_average": 0.7018}
   Skin_normal: {"made": "procedural", "space": "linear", "neutral": [0.5, 0.5, 1.0], "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal", "xy_rms_skin": 0.0451, "xy_rms_face": 0.0706, "xy_p99_skin": 0.14, "unit_error_max": 0.005}
   Skin_cavity: {"made": "procedural", "space": "linear", "neutral": 1.0, "rule": "specular_weight x map", "skin_average": 0.9537, "skin_p1": 0.78}
-  Skin_scatter: {"made": "procedural", "space": "linear", "neutral": 0.0, "rule": "subsurface_radius x (1 + 4 x map)", "skin_share_raised": 0.0187, "ears_average": 0.681, "max": 1.0}
+  Skin_scatter: {"made": "procedural", "space": "linear", "neutral": 0.0, "rule": "subsurface_radius x (1 + 4 x map)", "skin_share_raised": 0.0147, "ears_average": 0.681, "max": 1.0}

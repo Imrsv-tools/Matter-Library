@@ -95,7 +95,15 @@ CAVITY_DEPTH = 450e-6  # a groove this deep dims the specular to CAVITY_FLOOR
 CAVITY_FLOOR = 0.5
 # The scatter map (22.3, RD-P22-18): where the body is thin, so light passes through it. The
 # radius becomes subsurface_radius x (1 + 4 x map) (LCDSchema §Shine maps): 1 = x5.
-SCATTER = {"ears": 1.0, "fingertips": 0.6, "nose_wings": 0.4, "eyelids": 0.5, "toes": 0.4}
+# The nose's wings and the eyelids were 0.4 and 0.5 until 22.4: on the darker tones, Blender (Cycles'
+# random walk) drew them as an orange ring round the eyes and orange nostrils in FRONT light (the
+# eye ring is there at today's radius too; the map tripled it), and Unreal showed nothing there. The
+# Outcome asks for ears and fingers; the regions stay in the code at 0 so a later look can raise them.
+# The fingertips were 0.6 (x3.4) until 22.4: on Fitzpatrick VI, Cycles turned the last two phalanges
+# orange in front light (its one homogeneous medium carries red through a dark skin that real melanin
+# would absorb); 0.3 (x2.2) keeps the warmth at the tip. One map serves every tone, so the darkest sets it.
+# The toes keep their two-thirds of the fingertips (0.4 until 22.4).
+SCATTER = {"ears": 1.0, "fingertips": 0.3, "nose_wings": 0.0, "eyelids": 0.0, "toes": 0.2}
 CREASE_CAVITY = 0.25   # the mesh's own creases (its concavity) dim it this much more at the deepest
 
 

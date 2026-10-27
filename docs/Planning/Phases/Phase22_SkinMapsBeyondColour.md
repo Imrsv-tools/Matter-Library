@@ -200,6 +200,10 @@ The look is judged in **a shadowed look view added to the library's own Unreal t
   - **`scatter_map`**, a lane-B author-tier input on Subsurface like the other three: linear greyscale on the mesh's UVs, `subsurface_radius × (1 + 4 × map)`, **default black (×1)**. It is named by what it does to the scatter, not "thickness": OpenPBR has no thickness input (F-P22-4), and the radius is the carrier the probe found in both tools.
   - **Placed in 3D by anatomy** (the maker): the ears (MPFB2's ear mask, graded by its thickness map so the rim is thinnest; up to ×5), the last two phalanges rising to the fingertips (0.6, ×3.4), the eyelids (0.5), the nose's wings and the toes' tips (0.4). Everything else 0. MPFB2's thickness map alone is too flat to confine it (the body sits at ~0.9 of its own 99th percentile, the ears ~1.1).
   - **Unreal needs a light that casts shadows to show it** (22.3.1); the look view's backlit ear asks for rim shadows. Storm barely moves (F-SKM-18, the LCD principle).
+- **RD-P22-19 — The scatter map raises only the ears and the fingertips, and the fingertips by less** (decided by the agent at 22.4, 2026-10-27; refines RD-P22-18).
+  - **Seen on the six-tone rig sheet:** on the darker tones (V, VI), Blender drew an orange ring round the eyes, orange nostrils and orange last phalanges, in the rig's FRONT light. The eye ring is there in today's skin too (Cycles' random walk at the authored radius); the map tripled it. Unreal showed none of it. Cycles models skin as one even medium, so it carries red light through a dark skin that real melanin would absorb.
+  - **So:** the eyelids and the nose's wings go to 0 (kept in the maker's table, so a later look can raise them); the fingertips 0.6 → **0.3** (×2.2); the toes keep two-thirds of the fingertips (0.2). The ears are unchanged (×5 at the rim), so click 3's ear stands. One map serves every tone (RD-P22-2), so the darkest tone sets it.
+  - Measured on VI in Blender, today / 22.4 first run / now: the eye ring back to about today's, the nostrils as today's, the fingertips warmer than today's but no longer orange.
 
 ### Risk lane — `build`
 
