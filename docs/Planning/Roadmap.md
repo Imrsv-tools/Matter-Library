@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (2026-10-27, Phase22 closed).*
+### Phase23 — Synthetic Skin Sets — ACTIVE (BRIEF READY) *(numbered 2026-10-27 by the lead's "/discovery P23", as the head of `## Future` (RD-CMT-3, F-CMT-9), and opened by "yes. synth skin"; discovery Pass 1 wrote the Brief the same day; seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2)*
+**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
+- `docs/Planning/Phases/Phase23_SyntheticSkinSets.md` · research `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1) · `docs/Planning/Research/261027_R_CharacterMaterials.md`
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -32,10 +34,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
-
-### Phase23 — Synthetic Skin Sets — SEEDED *(numbered 2026-10-27 by the lead's "/discovery P23", as the head of `## Future` (RD-CMT-3, F-CMT-9); the phase doc written then, discovery's Pass 1 next; seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2)*
-**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
-- `docs/Planning/Phases/Phase23_SyntheticSkinSets.md` · research `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1) · `docs/Planning/Research/261027_R_CharacterMaterials.md`
 
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
