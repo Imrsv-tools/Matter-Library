@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase22 — Skin Maps Beyond Colour — ACTIVE (IN DISCOVERY) *(numbered 2026-10-27 as discovery opened, the lead's "/discovery Phase22 Skin Maps Beyond Colour"; the head of `## Future` since RD-CMT-3; seeded 2026-10-14, un-parked 2026-10-26, RD-SYN-3)*
-**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
-- `docs/Planning/Phases/Phase22_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md` · `docs/Planning/Research/261027_R_CharacterMaterials.md`
+*No active phase (2026-10-27, Phase22 closed).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -230,3 +228,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a character's skin varies across the body as real skin does (lips that blend into the face, redder cheeks and knuckles), in Blender, a USD viewer and Unreal, and every character built from the approved human mesh wears it.
 - `docs/Planning/Phases/Complete/Phase21_SkinMaps.md`
 *Closed 2026-10-20: six skin maps on the fitted skins and lips, the tint working, published in `matterlib-0.2.0-dev.12`; still reads plastic, the evidence for* Skin Maps Beyond Colour*.*
+
+### Phase22 — Skin Maps Beyond Colour — COMPLETE
+**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Complete/Phase22_SkinMapsBeyondColour.md`
+*Closed 2026-10-27: four shine maps on all six skins in three tools, `unreal-runtime-v7`, `matterlib-0.2.0-dev.13`; the lead: "totally fake but better", so the building continues.*
