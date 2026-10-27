@@ -301,13 +301,15 @@ def run(job_path: Path) -> None:
             # Phase21: a binding's own sliders (a fitted article's placement on the atlas), under
             # the setting's
             sliders = {**b.get("set", {}), **s.get("set", {})}
-            key = (a["name"], cut, pic, repr(sorted(sliders.items())))
+            rmap = b.get("roughness_map")      # Phase22: the mesh's shine map (LCDSchema §Shine maps)
+            key = (a["name"], cut, pic, rmap, repr(sorted(sliders.items())))
             if key not in built:
                 tag = f"__{Path(cut or pic).stem}" if (cut or pic) else ""
                 built[key] = load_article.build(Path(a["path"]), sliders,
                                                 name=f"{a['name']}__{s['id']}{tag}",
                                                 cutout_map=Path(cut) if cut else None,
-                                                base_color_map=Path(pic) if pic else None)
+                                                base_color_map=Path(pic) if pic else None,
+                                                roughness_map=Path(rmap) if rmap else None)
             o = by_prim[b["subject"]]
             o.data.materials.clear()
             o.data.materials.append(built[key])

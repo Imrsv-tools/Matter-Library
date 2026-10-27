@@ -44,7 +44,8 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
 
 
 def build(path: Path, sliders: dict | None = None, name: str | None = None,
-          cutout_map: Path | None = None, base_color_map: Path | None = None):
+          cutout_map: Path | None = None, base_color_map: Path | None = None,
+          roughness_map: Path | None = None):
     """A new material for ``path`` with ``sliders`` applied; returns the material.
 
     ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
@@ -53,6 +54,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     ``base_color_map`` is the mesh's picture (LCDSchema §Base colour map, Phase09), supplied the
     same way and sampled the same way; it multiplies the article's base colour ahead of the
     master, whose own tint (and Hair's light through the card) then acts on the product.
+    ``roughness_map`` (Phase22, LCDSchema §Shine maps) is the mesh's roughness offset, linear, on
+    the mesh's own UVs: ``roughness + (map - 0.5)``, ahead of the master's bias and clamp.
     """
     build_masters.ensure_all()
     art = read(path)
@@ -60,6 +63,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     # supplies one still wins (the Carrier rule), and with neither the article is its own colour
     if base_color_map is None:
         base_color_map = art.maps.get("base_color_map")
+    if roughness_map is None:
+        roughness_map = art.maps.get("roughness_map")
     if art.master not in build_masters.MASTERS:
         raise NotImplementedError(f"{art.name}: master {art.master!r} has no Blender version yet")
     ports = dict(art.ports)
@@ -175,6 +180,34 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
             mul.inputs["A"].default_value = tuple(sock.default_value)
         L(tex.outputs["Color"], mul.inputs["B"])
         L(mul.outputs["Result"], sock)
+        y -= 300
+
+    if roughness_map is not None:
+        if "roughness_map" not in art.ports:
+            raise KeyError(f"{art.name} does not declare the shine input (roughness_map)")
+        img = bpy.data.images.load(str(roughness_map), check_existing=True)
+        img.colorspace_settings.name = "Non-Color"
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(uv.outputs["UV"], tex.inputs["Vector"])     # the mesh's UVs, unplaced
+        off = nt.nodes.new("ShaderNodeMath")           # roughness_map_offset: map - 0.5
+        off.operation = "SUBTRACT"
+        off.inputs[1].default_value = 0.5
+        off.location = (0, y)
+        L(tex.outputs["Color"], off.inputs[0])
+        add = nt.nodes.new("ShaderNodeMath")           # roughness_mapped (the master biases, clamps)
+        add.operation = "ADD"
+        add.location = (200, y)
+        sock = master.inputs["Roughness"]
+        if sock.is_linked:                             # the pores' roughness
+            L(sock.links[0].from_socket, add.inputs[0])
+        else:
+            add.inputs[0].default_value = sock.default_value
+        L(off.outputs["Value"], add.inputs[1])
+        L(add.outputs["Value"], sock)
         y -= 300
 
     # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base

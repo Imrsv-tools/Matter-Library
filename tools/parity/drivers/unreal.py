@@ -99,6 +99,10 @@ BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "Tran
 BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
 CUTOUT_PORT = "cutout_map"   # not a slider: the mesh's map, supplied per binding (LCDSchema §Cut-out map)
 BASE_MAP_PORT = "base_color_map"   # not a slider: the mesh's picture, per binding (Phase09 RD-P09-1)
+# Phase22 (LCDSchema §Shine maps): the mesh's shine maps -> the master's <port>_tex, linear; an
+# article without one gets an exact neutral constant (the slot's own default is 128, 0.502)
+SHINE_PORTS = {"roughness_map": 0.5}
+SHINE_MASTERS = {"Subsurface"}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)
 IMAGE_ROLES = ("base_color", "roughness", "metalness", "normal",
@@ -145,6 +149,17 @@ LINEAR_SPACES = {"lin_rec709", "raw", None}
 # unreal-runtime-v6, the first built with it. False refuses a tinted Subsurface picture rather than
 # draw it untinted: set it so only for a runtime older than v6 (v5 and before).
 RUNTIME_TINTS_SCATTER = True
+
+# Phase22 22.1: masters built from build_masters.py at or after 22.1.3 carry roughness_map_tex. The
+# pinned unreal-runtime-v6 does not, and Unreal ignores a parameter a master lacks, so it would draw
+# the skin without its map and say nothing. Until a runtime with it is pinned (v7), a shine map is
+# drawn only by a local build (MATTER_UNREAL_RUNTIME or MATTER_UNREAL_EDITOR); else it is refused.
+PINNED_RUNTIME_HAS_SHINE = False
+
+
+def runtime_has_shine() -> bool:
+    return PINNED_RUNTIME_HAS_SHINE or bool(os.environ.get("MATTER_UNREAL_RUNTIME")
+                                            or os.environ.get("MATTER_UNREAL_EDITOR"))
 
 
 class Unsupported(Exception):
@@ -248,7 +263,7 @@ def _vec(v) -> list[float]:
 
 
 def article_material(path: Path, sliders: dict | None = None, cutout_map: Path | None = None,
-                     base_color_map: Path | None = None) -> dict:
+                     base_color_map: Path | None = None, shine_maps: dict | None = None) -> dict:
     """The article on its master, by the article's names; raises Unsupported if not yet built.
 
     ``cutout_map`` is a binding's cut-out (a character's hair, brows, lashes: JOB_FORMAT.md
@@ -260,6 +275,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     its atlas), multiplied into the base (9.3; it rode ``base_color_tex`` on the v1 masters). On
     Subsurface it scales ``subsurface_color`` too, which is exact where the article connects its
     subsurface colour to an untinted, untextured base (F-P09-5); anything else is refused.
+
+    ``shine_maps`` (Phase22) maps a shine port (``roughness_map``) to the binding's file: the
+    master's ``<port>_tex``, linear, on the mesh's st. A Subsurface article without one gets the
+    port's neutral value as a constant.
     """
     art = article.read(Path(path))
     if art.master not in BUILT_MASTERS:
@@ -267,7 +286,7 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     extra = sorted(set(art.textures) - TEXTURE_ROLES)
     if extra:
         raise Unsupported(f"{art.name}: textures {extra} are not carried by Unreal's masters yet")
-    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT, BASE_MAP_PORT})
+    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT, BASE_MAP_PORT} - set(SHINE_PORTS))
     if unported:
         raise Unsupported(f"{art.name}: sliders {unported} are not carried by Unreal's masters yet")
     if cutout_map is not None and CUTOUT_PORT not in art.ports:
@@ -285,7 +304,17 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
                    "its base has a texture" if "base_color" in art.textures else None)
             if why:
                 raise Unsupported(f"{art.name}: a picture on Unreal's Subsurface master, but {why}")
-    ports = {k: v for k, v in art.ports.items() if k not in (CUTOUT_PORT, BASE_MAP_PORT)}
+    shine_maps = dict(shine_maps or {})
+    for port in shine_maps:
+        if port not in art.ports:
+            raise KeyError(f"{art.name} does not declare the shine input ({port})")
+        if art.master not in SHINE_MASTERS:
+            raise Unsupported(f"{art.name}: the {art.master} master has no {port} input")
+        if not runtime_has_shine():
+            raise Unsupported(f"{art.name}: its {port}, and the pinned runtime's masters predate it "
+                              "(built before Phase22 22.1.3; set MATTER_UNREAL_RUNTIME to a local build)")
+    ports = {k: v for k, v in art.ports.items()
+             if k not in (CUTOUT_PORT, BASE_MAP_PORT) and k not in SHINE_PORTS}
     for k, v in (sliders or {}).items():
         if k not in ports:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
@@ -307,6 +336,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         textures["cutout_tex"] = {"file": str(cutout_map), "srgb": False}
     if base_color_map is not None:
         textures["base_color_map_tex"] = {"file": str(base_color_map), "srgb": True}
+    if art.master in SHINE_MASTERS:
+        for port, neutral in SHINE_PORTS.items():
+            textures[f"{port}_tex"] = ({"file": str(shine_maps[port]), "srgb": False} if port in shine_maps
+                                       else {"constant": [neutral, neutral, neutral, 1.0]})
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -444,7 +477,8 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
             s["materials"][name] = article_material(Path(b["article"]["path"]),
                                                     {**b.get("set", {}), **(s.get("set") or {})},
                                                     Path(cut) if cut else None,
-                                                    Path(pic) if pic else None)
+                                                    Path(pic) if pic else None,
+                                                    {p: Path(b[p]) for p in SHINE_PORTS if b.get(p)})
     # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3
     cams = {}
     for cam, (pos, target) in build_character.cameras(parts).items():

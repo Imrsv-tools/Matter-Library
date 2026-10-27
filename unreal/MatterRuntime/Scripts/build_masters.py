@@ -130,6 +130,8 @@ SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
 #   thin     geometry_thin_walled, a property of the master (its settings row), not a parameter
 #   base_map the mesh's picture, base_color_map_tex (LCDSchema §Base colour map, Phase09 RD-P09-1),
 #            on the masters whose author tier carries it
+#   shine    the mesh's shine maps (LCDSchema §Shine maps, Phase22): roughness_map_tex, an offset
+#            around 0.5 added before the bias; a grey default (128) for a binding that has none
 MASTERS = {
     "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
@@ -140,7 +142,7 @@ MASTERS = {
     "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True, base_map=True),
     "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
     "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE,
-                             base_map=True),
+                             base_map=True, shine=True),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
                              extra=TRANSMISSION, thin=True),
     "TranslucentThick": dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
@@ -367,7 +369,7 @@ def texture(g, name, default, uv, col, colour=None):
     return t
 
 
-def build_master(token, white, no_wear, flat, white_colour=None):
+def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -461,7 +463,8 @@ def build_master(token, white, no_wear, flat, white_colour=None):
     # The mesh's own st, NOT the article's placement: the atlas a mesh-supplied map is drawn on
     # (the cut-out, the picture), so a Creator's UV nudge never moves it.
     own_st = (image_uv(g, mesh_st(g, 16), 15)
-              if spec.get("base_map") or spec.get("opacity") or spec.get("hair") else None)
+              if spec.get("base_map") or spec.get("opacity") or spec.get("hair") or spec.get("shine")
+              else None)
     base_map = None
     if spec.get("base_map"):
         # The mesh's picture (LCDSchema §Base colour map, Phase09 RD-P09-1), supplied per binding:
@@ -518,6 +521,13 @@ def build_master(token, white, no_wear, flat, white_colour=None):
     else:
         feed(metal, "base_metalness")
 
+    if spec.get("shine"):
+        # Phase22 (LCDSchema §Shine maps, RD-P22-4): the mesh's roughness map, linear on its own st,
+        # an offset around 0.5 added before the bias: clamp(r + (map - 0.5) + bias). The slot's
+        # default is 128 (0.502); the library's driver binds an exact 0.5 where an article has none.
+        rmap = texture(g, "roughness_map_tex", grey, own_st, 6)
+        rough = g.op(M.MaterialExpressionAdd, rough,
+                     g.op_k(M.MaterialExpressionSubtract, rmap, 0.5, 5, a_out="R"), 4)
     # roughness_biased_clamped (LCDSchema): the bias is added, then clamped to 0..1
     rough = g.op(M.MaterialExpressionAdd, rough, g.scalar("roughness_bias", 0.0, col=4), 3)
     feed(g.one(M.MaterialExpressionSaturate, rough, 2), "specular_roughness")
@@ -729,9 +739,10 @@ def main():
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
+    grey = default_texture("T_Matter_Grey", (128, 128, 128, 255))     # a shine map's neutral
     white_colour = (default_texture("T_Matter_WhiteColour", (255, 255, 255, 255), srgb=True)
                     if COLOUR_SAMPLER == "srgb" else None)
-    for mat in ([build_master(t, white, no_wear, flat, white_colour) for t in MASTERS]
+    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey) for t in MASTERS]
                 + ([build_sky()] if SKY else [])):
         save(mat)
     log("RESULT ok")

@@ -46,9 +46,12 @@ MAPS = ("roughness",)
 
 # Roughness offsets (roughness units). The Physically Based skin value is 0.5 and the pores spread
 # it 0.46 - 0.56; these move whole zones. Judgement, chosen to be seen in the look view, not fitted.
-T_ZONE = -0.13         # forehead, nose, chin: the sebaceous zones, oilier
-CHEEKS = +0.07         # drier
-FACE_GRAIN = 0.035     # a 1.5 - 3 cm grain over the face, so the highlight breaks up
+# First made at half these (T-zone -0.13, cheeks +0.07): the look view moved by a third of an 8-bit
+# level on average, while a uniform -0.13 moved its highlights by up to 23 % (22.1.3's probe), so
+# the renderer could show it and the map was too timid.
+T_ZONE = -0.25         # forehead, nose, chin: the sebaceous zones, oilier
+CHEEKS = +0.12         # drier
+FACE_GRAIN = 0.06      # a 1.5 - 3 cm grain over the face, so the highlight breaks up
 BODY_GRAIN = 0.025     # a 8 - 16 cm drift over the body
 CHEST_BACK = -0.03     # the upper trunk's sebaceous zone
 
