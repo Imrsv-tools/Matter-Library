@@ -219,9 +219,9 @@ def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None):
     constant is the tone over the STORED map's decoded average over the skin, so the article
     renders the tone on average (RD-P21-3). ``gamma``: ``fit_albedo``'s exponent, given (else solved).
     ``hold`` = (W, the reference's ratio): a structure takes ``Skin``'s ratio where W is 1 (the lips'
-    zone, 23.3) and its own, rescaled so its skin average is unchanged, where W is 0. ``peak``: the
-    map's peak factor, given (``Skin``'s, so a structure clips its brightest texels where ``Skin``
-    does and the lips' zone is the same texel for texel)."""
+    zone, 23.3) and its own, rescaled so its skin average is unchanged, where W is 0. ``peak``: a
+    floor for the map's peak factor (``Skin``'s, whose ratio is held already clipped at it), so the
+    lips' zone renders as ``Skin``'s does, texel for texel, while a wider structure keeps its range."""
     import numpy as np  # noqa: PLC0415
     S = reg["Body"]
     ratio = col / tone
@@ -230,7 +230,9 @@ def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None):
         W, ref = hold[0][..., None], hold[1]
         t = (ref[S].mean(0) - (W * ref)[S].mean(0)) / ((1 - W) * ratio)[S].mean(0)
         ratio = W * ref + (1 - W) * ratio * t
-    k = np.maximum(np.percentile(ratio[cover], PEAK, axis=0), 1e-6) if peak is None else peak
+    k = np.maximum(np.percentile(ratio[cover], PEAK, axis=0), 1e-6)
+    if peak is not None:                       # never below Skin's: the zone (clipped at Skin's) is not clipped again
+        k = np.maximum(k, peak)
     mp = np.clip(ratio / k, 0.0, 1.0)
     clipped = float((ratio[cover] / k > 1.0).any(axis=-1).mean())
     mp = bleed(np.where(cover[..., None], mp, 0.0), cover, BLEED)
@@ -367,16 +369,16 @@ def main(argv=None) -> int:
         tone = tone_of(roman)
         model = lut.check(roman, tone)
         print(f"Fitzpatrick{roman} model check (RD-P23-3): " + json.dumps(model))
-        # Every structure is composed, whichever are written, so the tone's albedo exponent (the
-        # smallest any structure needs) and Skin's lips' zone do not depend on the command line.
-        cols = {s: gss.compose(tone, roman, (), F, lut, gss.SEED, structure=s)[0] for s in gss.STRUCTURES}
-        gamma = min(fit_albedo(c / tone, tone, S, cover)[1] for c in cols.values())
-        ref = fit_albedo(cols["Skin"] / tone, tone, S, cover, gamma)[0]
+        # Skin is composed whichever structures are written: its ratio is every structure's lips' zone.
+        # Each structure solves its own albedo exponent; in the zone it takes Skin's ratio regardless.
+        ref = fit_albedo(gss.compose(tone, roman, (), F, lut, gss.SEED)[0] / tone, tone, S, cover)[0]
         k1 = np.maximum(np.percentile(ref[cover], PEAK, axis=0), 1e-6)    # Skin's peak, as calibrate finds it
+        ref = np.minimum(ref, k1)                                         # ...and Skin's clip, as it renders
         rendered = {}
         for s in a.structures or list(gss.STRUCTURES):
-            srgb8, const, st = (calibrate(cols[s], tone, reg, cover, gamma) if s == "Skin" else
-                                calibrate(cols[s], tone, reg, cover, gamma, (W, ref), k1))
+            col = gss.compose(tone, roman, (), F, lut, gss.SEED, structure=s)[0]
+            srgb8, const, st = (calibrate(col, tone, reg, cover) if s == "Skin" else
+                                calibrate(col, tone, reg, cover, None, (W, ref), k1))
             p = write(roman, srgb8, s)
             name = map_name(roman, s)
             rows[name] = {"made": "pigment", **st, "fit": model["fit"], "melanin0": model["melanin0"]}
@@ -389,9 +391,13 @@ def main(argv=None) -> int:
         if "Skin" in rendered:
             for s, r in rendered.items():
                 if s != "Skin":
-                    d = np.abs(_linear_to_srgb(r[zone]) - _linear_to_srgb(rendered["Skin"][zone])) * 255
+                    # the drawn texels (the bleed past the island's edge is grown from texels outside
+                    # the zone, and is reported, not judged)
+                    dz = np.abs(_linear_to_srgb(r) - _linear_to_srgb(rendered["Skin"])).max(-1) * 255
+                    d, db = dz[zone & cover], dz[zone & ~cover]
                     print(f"  lips' zone, {map_name(roman, s)} vs {map_name(roman)}: max {d.max():.2f}, "
-                          f"mean {d.mean():.3f} sRGB levels over {int(zone.sum())} texels")
+                          f"mean {d.mean():.3f} sRGB levels over {d.size} drawn texels (the bleed beyond: "
+                          f"max {db.max() if db.size else 0:.2f})")
                     if d.max() > 1.5:
                         raise SystemExit(f"{map_name(roman, s)}: the lips' zone differs from Skin's (RD-P23-5)")
     write_provenance(rows)

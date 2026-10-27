@@ -131,12 +131,16 @@ LIPS = {"III": (0.93, 0.68, 0.93), "IV": gsm.LIP_RULE}
 # ``mottle_scale`` the centimetre-scale melanin and blood mottling's strength and size; ``flecks`` the
 # ~1 mm pigment flecks; ``redness`` the cheeks' and nose's flush. The numbers are judgement.
 STRUCTURES = {
-    "Skin": {"seed": 0, "sun": 1.0, "mottle": 1.0, "mottle_scale": 1.0, "flecks": 1.0, "redness": 1.0},
-    # more weathered: a stronger tan on the face and hands, coarser mottling, few flecks, little flush
-    "Skin2": {"seed": 1, "sun": 1.5, "mottle": 1.3, "mottle_scale": 1.5, "flecks": 0.5, "redness": 0.6},
-    # less sun: an even, finer skin, more flecks, a rosier flush
-    "Skin3": {"seed": 2, "sun": 0.55, "mottle": 0.75, "mottle_scale": 0.7, "flecks": 1.7, "redness": 1.5},
+    "Skin": {"seed": 0, "face": 1.0, "sun": 1.0, "mottle": 1.0, "mottle_scale": 1.0, "flecks": 1.0, "redness": 1.0},
+    # weathered: a tanned face and hands over a pale trunk, an evener face (its placed colour at about
+    # half), large blotchy mottling, few flecks, little flush
+    "Skin2": {"seed": 1, "face": 0.55, "sun": 2.6, "mottle": 1.8, "mottle_scale": 2.2, "flecks": 0.4, "redness": 0.5},
+    # sheltered and rosy: little tan, fine even skin, many flecks, a strong flush on the cheeks and nose
+    "Skin3": {"seed": 2, "face": 1.0, "sun": 0.25, "mottle": 0.6, "mottle_scale": 0.6, "flecks": 2.2, "redness": 2.6},
 }
+# ``face`` scales the placed regional colour (``FACE``) as a whole: 1 is the bar's solve.
+# The first gains (23.3.1: sun 1.5 / 0.55, mottle 1.3 / 0.75, redness 0.6 / 1.5, no ``face``) moved the
+# face by a mean dE of 0.6-1.7 at the look view, against 4-12 between tones: not three people.
 
 
 # ------------------------------------------------------------------ the model -------------------
@@ -529,8 +533,9 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     fit = lut.tones[roman]["fit"]
     Fm, Fb = np.ones(P.shape[:2]), np.ones(P.shape[:2])
     for k, (dm, db, ds, dd) in (FACE[fit] if face_tbl is None else face_tbl).items():
-        Fm *= np.exp(dm * fw[k]); Fb *= np.exp(db * fw[k])
-        so2 = so2 + ds * fw[k]; depth = depth + dd * fw[k]
+        w = st["face"] * fw[k]
+        Fm *= np.exp(dm * w); Fb *= np.exp(db * w)
+        so2 = so2 + ds * w; depth = depth + dd * w
     M *= np.maximum(Fm + Md - 1, 0.3 * Fm)                       # the regions, then the detail's amount
     B *= np.maximum(Fb + Bd - 1, 0.3 * Fb)
     dmel = np.zeros(P.shape[:2])
