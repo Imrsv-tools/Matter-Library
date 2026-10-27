@@ -29,6 +29,8 @@
   "coat_ior": 1.336,
   "base_color_map": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickI_basecolor_sUKN.png",
+  "normal_map_tex": "../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png",
+  "cavity_map_tex": "../../../../textures/fit/makehuman/skin/Skin_cavity_sUKN.png",
   "lcd_ports": [
     "base_color_tint",
     "roughness_bias"

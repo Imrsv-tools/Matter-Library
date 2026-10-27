@@ -10,6 +10,10 @@
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
     <input name="overlay2_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 2 Color" />
     <input name="base_color_map" type="filename" value="../../../../textures/fit/makehuman/skin/FitzpatrickVI_basecolor_sUKN.png" uiname="Base Color Map" />
+    <input name="roughness_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png" uiname="Roughness Map" />
+    <input name="normal_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png" uiname="Normal Map" />
+    <input name="cavity_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_cavity_sUKN.png" uiname="Cavity Map" />
+    <input name="scatter_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_scatter_sUKN.png" uiname="Scatter Map" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -100,8 +104,24 @@
       <input name="in1" type="float" nodename="roughness_overlay1" />
       <input name="in2" type="float" nodename="overlay2_roughness_delta" />
     </add>
-    <add name="roughness_biased" type="float">
+    <texcoord name="shine_map_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <image name="roughness_map_tex" type="float">
+      <input name="file" type="filename" interfacename="roughness_map" />
+      <input name="default" type="float" value="0.5" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <subtract name="roughness_map_offset" type="float">
+      <input name="in1" type="float" nodename="roughness_map_tex" />
+      <input name="in2" type="float" value="0.5" />
+    </subtract>
+    <add name="roughness_mapped" type="float">
       <input name="in1" type="float" nodename="roughness_overlay2" />
+      <input name="in2" type="float" nodename="roughness_map_offset" />
+    </add>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_mapped" />
       <input name="in2" type="float" interfacename="roughness_bias" />
     </add>
     <clamp name="roughness_biased_clamped" type="float">
@@ -122,6 +142,27 @@
       <input name="in1" type="vector3" nodename="surface_normal_ts_x2" />
       <input name="in2" type="float" value="1.0" />
     </subtract>
+    <image name="normal_map_tex" type="vector3">
+      <input name="file" type="filename" interfacename="normal_map" />
+      <input name="default" type="vector3" value="0.5, 0.5, 1.0" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <multiply name="normal_map_ts_x2" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_map_tex" />
+      <input name="in2" type="float" value="2.0" />
+    </multiply>
+    <subtract name="normal_map_ts" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_map_ts_x2" />
+      <input name="in2" type="float" value="1.0" />
+    </subtract>
+    <multiply name="normal_map_xy" type="vector3">
+      <input name="in1" type="vector3" nodename="normal_map_ts" />
+      <input name="in2" type="vector3" value="1.0, 1.0, 0.0" />
+    </multiply>
+    <add name="normal_mapped" type="vector3">
+      <input name="in1" type="vector3" nodename="surface_normal_ts" />
+      <input name="in2" type="vector3" nodename="normal_map_xy" />
+    </add>
     <extract name="overlay1_nx_raw" type="float">
       <input name="in" type="color4" nodename="overlay1_tex" />
       <input name="index" type="integer" value="0" />
@@ -156,7 +197,7 @@
       <input name="in2" type="float" nodename="overlay1_effect_raw" />
     </multiply>
     <add name="normal_overlay1" type="vector3">
-      <input name="in1" type="vector3" nodename="surface_normal_ts" />
+      <input name="in1" type="vector3" nodename="normal_mapped" />
       <input name="in2" type="vector3" nodename="overlay1_normal_scaled" />
     </add>
     <extract name="overlay2_nx_raw" type="float">
@@ -211,18 +252,40 @@
       <input name="in" type="vector3" nodename="normal_ts_encoded" />
     </normalmap>
     <output name="normal_out" type="vector3" nodename="surface_normal" />
+    <image name="cavity_map_tex" type="float">
+      <input name="file" type="filename" interfacename="cavity_map" />
+      <input name="default" type="float" value="1.0" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <multiply name="specular_weight_mapped" type="float">
+      <input name="in1" type="float" nodename="cavity_map_tex" />
+      <input name="in2" type="float" value="1.0" />
+    </multiply>
+    <output name="specular_weight_out" type="float" nodename="specular_weight_mapped" />
+    <image name="scatter_map_tex" type="float">
+      <input name="file" type="filename" interfacename="scatter_map" />
+      <input name="default" type="float" value="0.0" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <multiply name="scatter_map_gain" type="float">
+      <input name="in1" type="float" nodename="scatter_map_tex" />
+      <input name="in2" type="float" value="4.0" />
+    </multiply>
+    <add name="scatter_map_factor" type="float">
+      <input name="in1" type="float" nodename="scatter_map_gain" />
+      <input name="in2" type="float" value="1.0" />
+    </add>
+    <multiply name="subsurface_radius_mapped" type="float">
+      <input name="in1" type="float" nodename="scatter_map_factor" />
+      <input name="in2" type="float" value="0.00367" />
+    </multiply>
+    <output name="subsurface_radius_out" type="float" nodename="subsurface_radius_mapped" />
     <mix name="subsurface_weight_deposit2" type="float">
       <input name="bg" type="float" value="1.0" />
       <input name="fg" type="float" value="0.0" />
       <input name="mix" type="float" nodename="overlay2_effect_raw" />
     </mix>
     <output name="subsurface_weight_out" type="float" nodename="subsurface_weight_deposit2" />
-    <mix name="coat_weight_deposit2" type="float">
-      <input name="bg" type="float" value="0.1" />
-      <input name="fg" type="float" value="0.0" />
-      <input name="mix" type="float" nodename="overlay2_effect_raw" />
-    </mix>
-    <output name="coat_weight_out" type="float" nodename="coat_weight_deposit2" />
     <mix name="fuzz_weight_deposit2" type="float">
       <input name="bg" type="float" value="0.1" />
       <input name="fg" type="float" value="0.0" />
@@ -239,15 +302,13 @@
     <input name="geometry_normal" type="vector3" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="normal_out" />
     <input name="subsurface_weight" type="float" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="subsurface_weight_out" />
     <input name="subsurface_color" type="color3" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="base_color_out" />
-    <input name="subsurface_radius" type="float" value="0.00367" />
+    <input name="subsurface_radius" type="float" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="subsurface_radius_out" />
     <input name="subsurface_radius_scale" type="color3" value="1, 0.373, 0.185" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
-    <input name="coat_weight" type="float" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="coat_weight_out" />
-    <input name="coat_roughness" type="float" value="0.3" />
-    <input name="coat_ior" type="float" value="1.5" />
     <input name="fuzz_weight" type="float" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="fuzz_weight_out" />
     <input name="fuzz_color" type="color3" value="0.09, 0.05, 0.02" />
     <input name="fuzz_roughness" type="float" value="0.5" />
+    <input name="specular_weight" type="float" nodegraph="NG_Skin_FitzpatrickVI_Clean_Base_s001_v01" output="specular_weight_out" />
   </open_pbr_surface>
   <surfacematerial name="Skin_FitzpatrickVI_Clean_Base_s001_v01" type="material">
     <input name="surfaceshader" type="surfaceshader" nodename="SR_Skin_FitzpatrickVI_Clean_Base_s001_v01" />
