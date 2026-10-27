@@ -4,9 +4,9 @@
     uv run tools/converters/fit/test_gen_skin_shine.py        exit 0 = PASS
 
 * the roughness map is linear greyscale at hm08's map size;
-* its average over the skin is 0.5 to within 1 %, so every article keeps its measured roughness on
-  average (RD-P22-4);
-* outside every UV island it is exactly neutral (128), so a mip blends no offset in;
+* its average over the skin is the maker's SKIN_ROUGHNESS (0.62 since click 2, RD-P22-17; 0.5 at
+  RD-P22-4) to within 1 %;
+* outside every UV island it is exactly that average, so a mip blends no other offset in;
 * the normal map (22.2) is RGB at the map size, decodes to unit vectors on the skin, and is exactly
   flat (128, 128, 255) beyond every island;
 * the cavity map (22.2) is greyscale at the map size, never brightens (it only multiplies
@@ -34,14 +34,15 @@ def main() -> int:
         m = np.asarray(im).astype(np.float64)
     if not fails:
         avg = float((m / 255.0)[reg["Body"]].mean())
-        if abs(avg - 0.5) > 0.005:
-            fails.append(f"{p.name}: the skin's average is {avg:.4f}, not 0.5 to within 1 %")
+        if abs(avg - shine.SKIN_ROUGHNESS) > 0.005:
+            fails.append(f"{p.name}: the skin's average is {avg:.4f}, not {shine.SKIN_ROUGHNESS} to within 1 %")
         grown = reg["islands"].copy()
         for _ in range(gsm.BLEED + 1):
             grown = grown | np.roll(grown, 1, 0) | np.roll(grown, -1, 0) | np.roll(grown, 1, 1) | np.roll(grown, -1, 1)
         off = m[~grown]
-        if off.size and (off != 128).any():
-            fails.append(f"{p.name}: {(off != 128).sum()} texels beyond every island are not neutral (128)")
+        if off.size and (off != shine.OUTSIDE).any():
+            fails.append(f"{p.name}: {(off != shine.OUTSIDE).sum()} texels beyond every island are not "
+                         f"the skin's average ({shine.OUTSIDE:.0f})")
         print(f"roughness: skin average {avg:.4f}, range {m[reg['Body']].min():.0f}..{m[reg['Body']].max():.0f}")
     grown = reg["islands"].copy()
     for _ in range(gsm.BLEED + 1):

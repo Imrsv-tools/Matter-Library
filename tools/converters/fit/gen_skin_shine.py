@@ -13,7 +13,8 @@ atlas, read on the mesh's own UVs, and its neutral value draws today's skin (RD-
   the Creator's bias and the clamp, ``clamp(pores + (map - 0.5) + bias)`` (RD-P22-4). Oilier, so
   glossier, on the forehead, nose and chin; drier on the cheeks; a few-millimetre grain so the
   highlight breaks up; neutral on the lips (they keep their own finish, RD-P22-8). **Its average
-  over the skin is held at 0.5**, so each article's measured roughness stays its average.
+  over the skin is held at ``SKIN_ROUGHNESS`` (0.62, RD-P22-17; 0.5 until click 2)**, so the skin
+  sits 0.12 rougher than the pores alone, as measured skin does; the image's default stays 0.5.
 * ``Skin_normal_sUKN.png`` (22.2): the skin's RELIEF at the scale the atlas carries (hm08 gives the
   face ~0.47 mm a texel, the back of the hand ~0.75 mm, the body ~0.7-1.1 mm), a tangent-space
   normal (+Y up; the tangent is the mesh's dP/du from texcoord 0, as a bake's is) whose XY is added
@@ -62,6 +63,13 @@ MAPS = ("roughness", "normal", "cavity")
 # Roughness offsets (roughness units). The Physically Based skin value is 0.5 and the pores spread
 # it 0.46 - 0.56; these move whole zones. First made at half these (T-zone -0.13, cheeks +0.07):
 # the look view moved by a third of an 8-bit level on average, so the map was too timid.
+# The map's average over the skin (RD-P22-17). Click 2 (*"the shine is still just really over the
+# top"*): the skin is rougher than Physically Based's single 0.5 and carries no coat; measured skin's
+# specular lobe has a Beckmann slope of ~0.3-0.35 (Weyrich et al. 2006, as used by d'Eon & Luebke,
+# GPU Gems 3 ch. 14), i.e. an OpenPBR roughness of ~0.55-0.6, plus the pores' spread. The image's
+# default stays a neutral 0.5, so a consumer that does not read the map draws the article as before.
+SKIN_ROUGHNESS = 0.62
+OUTSIDE = float(round(SKIN_ROUGHNESS * 255))   # beyond every island
 T_ZONE = -0.25         # forehead, nose, chin: the sebaceous zones, oilier
 CHEEKS = +0.12         # drier
 FACE_GRAIN = 0.06      # a 1.5 - 3 cm grain over the face
@@ -73,8 +81,11 @@ CHEST_BACK = -0.03     # the upper trunk's sebaceous zone
 # The relief (22.2): depths in metres of the HEIGHT field (negative = into the skin). The slope a
 # depth makes depends on its width, and the atlas's texel (~0.5 mm on the face) is the narrowest
 # width any of these can have, so the widths below are never under ~1.3 texels where they act.
-FURROW = {"face": (1.3e-3, 160e-6), "hand": (1.5e-3, 210e-6), "body": (1.9e-3, 160e-6)}  # cell, depth
-FURROW_WIDTH = 0.11    # of a cell: the furrow's half-width; narrow, so the plateaus stay flat (not domes)
+# cell, depth, half-width (of a cell). A furrow narrower than ~1.3 texels cannot be drawn: it
+# averages into a dip at every cell edge and the plateaus read as domes (cobbles). The back of the
+# hand (~0.75 mm a texel) and the body (~0.7-1.1 mm) were first made at 1.5 / 1.9 mm cells, two
+# texels: cobbled. Their cells are now the size the atlas can draw as a network of lines, ~4 texels.
+FURROW = {"face": (1.3e-3, 160e-6, 0.11), "hand": (3.2e-3, 200e-6, 0.16), "body": (3.6e-3, 100e-6, 0.15)}
 PORE = {"cell": 0.95e-3, "radius": 0.30, "depth": 250e-6}   # the face's pores (radius in cells)
 LINE_DEPTH = {"forehead": 500e-6, "glabella": 500e-6, "crows": 420e-6, "undereye": 320e-6,
               "nasolabial": 400e-6, "lips": 260e-6, "neck": 500e-6, "knuckle": 520e-6}
@@ -129,15 +140,15 @@ def roughness_offset(F: dict, R: dict | None = None) -> tuple[np.ndarray, dict]:
 
 
 def store(f: np.ndarray, F: dict) -> tuple[np.ndarray, dict]:
-    """The offset -> an 8-bit linear map around 128, its average over the skin held at 0.5."""
+    """The offset -> an 8-bit linear map, its average over the skin held at SKIN_ROUGHNESS."""
     S, cover = F["reg"]["Body"], F["cover"]
     f = gsm.bleed(np.where(cover, f, 0.0)[..., None], cover, gsm.BLEED)[..., 0]
     grown = _grown(cover)
     shift = -float(f[S].mean())
     for _ in range(4):                    # the clip and the 8 bits move the mean: settle it
-        q = np.round(np.clip(0.5 + f + shift, 0.0, 1.0) * 255.0)
-        q[~grown] = 128.0                  # beyond every island: neutral, so a mip blends nothing
-        shift += 0.5 - float((q / 255.0)[S].mean())
+        q = np.round(np.clip(SKIN_ROUGHNESS + f + shift, 0.0, 1.0) * 255.0)
+        q[~grown] = OUTSIDE                # beyond every island: the skin's average, so a mip blends nothing
+        shift += SKIN_ROUGHNESS - float((q / 255.0)[S].mean())
     m = q.astype(np.uint8)
     dec = m / 255.0
     stats = {"skin_average": round(float(dec[S].mean()), 4),
@@ -258,12 +269,12 @@ def height(Q, Nq, sel: dict, A: Anatomy, rng_seed: int = SEED) -> tuple[np.ndarr
 
     # 1. The furrow network: the skin's plateaus and the furrows between them, everywhere
     for region, w, k in (("face", face, 0), ("hand", hand, 1), ("body", body, 2)):
-        cell, depth = FURROW[region]
+        cell, depth, width = FURROW[region]
         idx = w > 0.01
         if not idx.any():
             continue
         f1, f2 = worley(Q[idx], cell, rng_seed + 11 + k)
-        fur = np.exp(-((f2 - f1) / FURROW_WIDTH) ** 2)
+        fur = np.exp(-((f2 - f1) / width) ** 2)
         vary = np.clip(0.7 + 0.6 * gsm.vnoise(Q[idx], 0.02, rng_seed + 21 + k), 0.3, 1.3)
         H[idx] -= w[idx] * depth * fur * vary
         G[idx] += w[idx] * fur * 0.5
@@ -497,8 +508,8 @@ def main(argv=None) -> int:
     st |= {f"{z}_average": round(float(dec[sel & F['reg']['Body']].mean()), 4) for z, sel in zones.items()}
     if st["uncovered_islands"]:
         raise SystemExit(f"roughness: {st['uncovered_islands']} island texels left unpainted")
-    if abs(st["skin_average"] - 0.5) > 0.005:
-        raise SystemExit(f"roughness: the skin's average is {st['skin_average']}, not 0.5")
+    if abs(st["skin_average"] - SKIN_ROUGHNESS) > 0.005:
+        raise SystemExit(f"roughness: the skin's average is {st['skin_average']}, not {SKIN_ROUGHNESS}")
     Image.fromarray(mr, "L").save(out / name("roughness"), optimize=True)
     rows["roughness"] = {"made": "procedural", "space": "linear", "neutral": 0.5,
                          "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", **st}

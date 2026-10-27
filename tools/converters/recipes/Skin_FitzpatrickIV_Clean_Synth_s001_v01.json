@@ -36,9 +36,6 @@
   "subsurface_radius": 0.00367,
   "subsurface_radius_scale": "1, 0.373, 0.185",
   "subsurface_scatter_anisotropy": 0.8,
-  "coat_weight": 0.1,
-  "coat_roughness": 0.3,
-  "coat_ior": 1.5,
   "fuzz_weight": 0.1,
   "fuzz_color": "0.436, 0.227, 0.131",
   "fuzz_roughness": 0.5,
@@ -98,7 +95,7 @@
     },
     {
       "kind": "judgement",
-      "why": "Phase07 7.3. Coat 0.1 at roughness 0.3 is MPFB2's 'enhanced skin' clearcoat (skin oil; CC0 shader settings, research Pass 3); coat_ior 1.5 is the value MPFB2 inherits from Blender (sebum is ~1.47). subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."
+      "why": "Phase22 (RD-P22-17, after click 2: \"the shine is still just really over the top\"): NO COAT. Phase07 7.3 gave the skin MPFB2's 'enhanced skin' clearcoat (0.1 at roughness 0.3, IOR 1.5) for its oil; on the relief it laid one sharp, wet glint over the whole body, and it double-counted the oil the roughness map's T-zone already carries. The skin's oil and its overall roughness (the map's average, 0.62) are in roughness_map. subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."
     },
     {
       "kind": "procedural",
