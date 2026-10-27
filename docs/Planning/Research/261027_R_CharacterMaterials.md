@@ -218,9 +218,9 @@ Each would be fixed in the Glossary by the phase that first builds it.
 - **Ruled 2026-10-27:** RD-CMT-1 … 4 (ownership; the kit is ours and only shared pieces get in; docs last; verdicts in the look-dev scene). **Recorded:** four rulings made elsewhere (§Resolved).
 - **Open with the lead:** none.
 - **Owed (durable docs these rulings make owed, and the verb that lands each):**
-  - `Roadmap.md`: *Skin Layers*' Outcome widened (whole body, per mark, cosmetics and film effects); *Hair Colour by Region* and the participation page added, last — **a lead-directed `/quick-fix`**;
-  - `PlatformDependencies.md`: a row asking the platform for a way to open a library draft in the look-dev scene (RD-CMT-4) — **the same quick fix**;
+  - ~~`Roadmap.md`: *Skin Layers*' Outcome widened; *Hair Colour by Region* and the participation page added, last~~ **landed 2026-10-27** by a lead-directed `/quick-fix` (*"yes do the quick fix and push"*): the re-sequence note, *Eyes in the Shader* moved above *Skin Layers*, *Skin Layers* widened, *Hair Colour by Region* and the *Character Materials Guide* seeded, last;
+  - ~~`PlatformDependencies.md`: a row asking for a draft in the look-dev scene~~ **landed the same commit as P33** (RD-CMT-4);
   - the inclusion test (RD-CMT-2) in a spec — **the participation page, last** (RD-CMT-3); until then this doc's §Resolved is its authority.
-- **▶ Next:** that quick fix on the lead's word; then `/discovery Skin Maps Beyond Colour`.
+- **▶ Next:** `/discovery Skin Maps Beyond Colour`.
 
   Resume with `/research CharacterMaterials`.
