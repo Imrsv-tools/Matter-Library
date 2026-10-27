@@ -145,6 +145,7 @@ The library's skin colour stops being paint and becomes pigment. `gen_synth_skin
   - **The refit:** per tone, the eumelanin share and the epidermis thickness (and a melanin range below 0.003), from OMF's pinned model. The table is re-made the way `chromophore_lut.json` was, its header naming the model and the commit. CC0 derived numbers, Apache-2.0 code, not copied into the tree.
   - **It passes** when, at all six tones, the model colour at the tone's pigment is within ±15 % of the tone per channel and its red/blue within 15 %. The maker prints this check; it is not a new gate.
   - **If it fails** at a tone: that tone keeps today's procedural colour, and BioSkin goes to the lead as a question against RD-SYN-1. It is a learned model that colours every texel, though it paints no map.
+  - **Amended by the lead, 2026-10-27 (23.2.2):** the refit failed at I, II, V and VI (23.2.1). The lead chose *"Borrow the response"* over this fallback: each failing tone takes the nearer passing tone's fit and operating point, and so its relative response, under one structure. BioSkin was not taken up.
 - **RD-P23-4 — Three structures per tone, named on the Material token: `Skin`, `Skin2`, `Skin3`.**
   - **What a structure is:** a seed plus a small set of named maker parameters (sun-exposure pattern, mottling strength and scale, regional redness), kept in the maker's table as RD-P22-19's scatter table is. It is the same person at every tone, because the fields are computed once and only the tone's pigment is applied to them.
   - **Why the Material token:** `Identity.md` gives the Material token *"optionally … a base-set id, as in `Limestone26b`"*, and a structure is a base set. The Variant stays the tone, so ledger M4's pairing and `rig.py`'s pairing are untouched. Changing tone swaps the Variant only, so a character keeps its face. Detail is *"the other layers"*: the drafts' `Synth…` is a layer set, not a structure.
@@ -273,3 +274,22 @@ Time to the first click is short: 23.1 is one tool option and four renders.
   | VI | **2.0**: red 3× the tone at the ceiling | **1.46** |
 
   The freed fits pass by contradiction (II darker in melanin than IV; both light tones on the blood floor), so a regional change driven from them is arbitrary, and VI fails under every setting. **The model is the limit, not its parameters.** RD-P23-3's fallback (today's colour at the failing tones; BioSkin to the lead) applies, and it breaks the Outcome's *"one set of pigment maps"* at four tones · next: the lead's call.
+- **23.2.2 — the lead's call: "Borrow the response"** (2026-10-27, chosen over the fallback as written and over pausing for research). **Deviation from RD-P23-3, the lead's:** one pigment structure for all six tones; the table holds two fits, III's (eumelanin 0.075, epidermis 0.099 mm) and IV's (1.0, 0.093 mm). I and II use III's fit at III's operating melanin (0.0269), and V and VI use IV's (0.107), so each takes that tone's relative response. The calibration holds every tone's average exactly. **Matching brightness instead was measured and rejected:** it put I and II on the melanin floor and VI's blue at 3 % of the tone. The table is re-made from a scratch folder, its header naming the model, the commit and both fits. The maker prints RD-P23-3's check (III and IV pass; the borrowed tones show their offset).
+- **23.2.3 — the library's maker, all six tones** · the `23.2` commit · `gen_skin_maps.py` stays the one command; its colour comes from `gen_synth_skin.compose`. The procedural recipe and its Blender AO bake are gone; `--picture`, `calibrate` and the provenance stay, and `skin.yaml` gains `made: pigment`, the fit and the operating melanin. **RD-P23-7:** the base path needs no `scipy`; only the marks layers load it. **The lead's texture (click 1)**, measured against the bar (d) in log-luminance band-pass, 1–2.5 / 2–10 / 10–30 mm:
+  - The bar's face: 0.037 / 0.052 / 0.072; its body is near flat (0.002).
+  - Today's maker's face: 0.009 / 0.013 / 0.023.
+  - The first build matched the bar's strength with dense noise and read **blotchy and brown** at the look view (the agent's eye, before any click); it was rebuilt before showing.
+  - Now: III's face 0.032 / 0.021 / 0.030, with fine flecks on a smoother base; the body 0.021–0.023 fine. VI's face fine 0.045, body 0.024–0.027.
+  - The gains are per fit, because IV's operating melanin is 4× III's (`DETAIL`, in `gen_synth_skin.py`).
+  - The six skins and six lips take the new constant (the articles differ only by it). The three plain `…_Clean_Synth` drafts are gone: recipe, `.mtlx`, map and provenance rows (RD-P23-8).
+- **23.2.4 — the regional evidence** · rendered colour over the tone (constant × map), today → new:
+
+  | Region | I – III | IV – VI |
+  |---|---|---|
+  | Cheeks, colour (r, g, b) | 1.00, 0.89, 0.91 → 0.87, 0.78, 0.77 | → 0.88, 0.77, 0.73 |
+  | Cheeks, redness (R/G over the tone's) | 1.13 → **1.11** | 1.13 → **1.13** |
+  | Lips | 0.75, 0.54, 0.58 → 0.74, 0.52, 0.56 | the same |
+  | Trunk and hand | within 0.03 of the tone | blue up to 1.09 |
+
+  **The Brief's *"redness must fall from I to VI"* does not hold.** It is equal within each borrowing group, and the light group's cheek redness is slightly below the dark group's, even with the cheeks' and nose's blood at 1.8× on the light fit. The cheeks sit ~12 % darker than the tone: the face's sun melanin. Every average is the tone exactly.
+- **23.2.5 — click 2** · ▶ SCAFFOLD COMPLETE — sitting owed · `library/parity/P23_Look6/six_tones_look.jpg` (a row per tone: front face, three-quarter face and hand, today at `749fb60` beside new; a last row has the bar (c) beside III). `look.py --today` now draws today's pictures as they stood then, from the local LFS store; before this, a re-made map was drawn under the old constant. **The rig's six-tone sheet (tool agreement) is not run yet** · next: the lead's verdict.

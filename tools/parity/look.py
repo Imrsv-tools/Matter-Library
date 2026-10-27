@@ -15,9 +15,9 @@ shadows and screen-space AO, at a fixed exposure. Four cameras:
 * ``ear``: the left ear, lit from behind by the rim alone (the key and the fill off; the hair hidden).
 
 ``--today <rev>`` also renders the same cast with each article as it stood at ``<rev>`` (from git),
-and the sheet sets today's beside the new. Today's articles name their pictures by absolute path
-into the working tree, so a picture changed since ``<rev>`` is drawn as it is now. Without it, one
-column: the baseline.
+and the sheet sets today's beside the new. Each of today's pictures is drawn as it stood at
+``<rev>`` too: a picture changed since is taken from the local LFS store (Phase23 23.2; before, it
+was drawn as it is now). Without it, one column: the baseline.
 
 ``--reference <picture>`` (Phase23 23.1, RD-P23-1) draws a colour picture from outside the tree
 on a Fitzpatrick skin and its lips, in three more columns: as made (constant 1), held to the
@@ -131,11 +131,43 @@ def _relocated(art: jobmod.Article, text: str, out: Path) -> jobmod.Article:
     return jobmod.Article.read(out)
 
 
+def _picture_at(path: Path, rev: str, folder: Path) -> Path:
+    """The picture at ``path`` as it stood at ``rev``: the working copy when it is unchanged, else
+    the old one from the local LFS store, written under ``folder`` (Phase23 23.2: a re-made map would
+    otherwise be drawn under the old article's constant)."""
+    import hashlib  # noqa: PLC0415
+    try:
+        rel = path.resolve().relative_to(jobmod.REPO).as_posix()
+    except ValueError:
+        return path
+    old = subprocess.run(["git", "-C", str(jobmod.REPO), "show", f"{rev}:{rel}"], capture_output=True)
+    if old.returncode != 0:
+        return path                                    # not in the tree at rev: as it is now
+    blob = old.stdout
+    if blob.startswith(b"version https://git-lfs"):
+        oid = re.search(rb"oid sha256:([0-9a-f]{64})", blob).group(1).decode()
+        if path.is_file() and hashlib.sha256(path.read_bytes()).hexdigest() == oid:
+            return path
+        blob = subprocess.run(["git", "-C", str(jobmod.REPO), "lfs", "smudge"], input=blob,
+                              capture_output=True, check=True).stdout
+    elif path.is_file() and path.read_bytes() == blob:
+        return path
+    out = folder / "_pictures" / rel
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(blob)
+    return out
+
+
 def today_article(art: jobmod.Article, rev: str, folder: Path) -> jobmod.Article:
-    """``art`` as it stood at ``rev``, its pictures named by absolute path into the working tree."""
+    """``art`` as it stood at ``rev``, each picture as it stood then (``_picture_at``)."""
     rel = art.path.resolve().relative_to(jobmod.REPO)
     text = subprocess.run(["git", "-C", str(jobmod.REPO), "show", f"{rev}:{rel.as_posix()}"],
                           capture_output=True, text=True, check=True).stdout
+
+    def at_rev(m: re.Match) -> str:
+        v = m.group(2)
+        return m.group(1) + (str(_picture_at(art.path.parent / v, rev, folder)) if v else v) + m.group(3)
+    text = re.sub(r'(type="filename" value=")([^"]*)(")', at_rev, text)
     return _relocated(art, text, folder / rel)
 
 

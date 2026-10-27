@@ -7,7 +7,7 @@
     <input name="normal_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png" uiname="Normal Map" />
     <input name="cavity_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_cavity_sUKN.png" uiname="Cavity Map" />
     <constant name="base_color_const" type="color3">
-      <input name="value" type="color3" value="0.4546, 0.2406, 0.1389" />
+      <input name="value" type="color3" value="0.5189, 0.3217, 0.2374" />
     </constant>
     <texcoord name="base_color_map_uv" type="vector2">
       <input name="index" type="integer" value="0" />

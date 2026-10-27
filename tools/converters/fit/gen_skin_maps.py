@@ -10,20 +10,15 @@ SkinMaps.md``). The six ``Skin_Fitzpatrick*`` articles carry it as their own ``b
 (RD-P18-9, RD-P21-1) and the six ``Lips_Fitzpatrick*`` carry the same one (RD-P21-2), so the
 colour runs across the lip edge.
 
-**What the picture is made of** (RD-SKM-2, RD-SKM-5: CC0 parts only, never a photograph). The
-recipe is the research probe's v2 (``docs/Planning/Research/261014_R_SkinMaps_probe.py``,
-F-SKM-25), unchanged:
-
-* MPFB2's CC0 region masks (face, lips, ears, eyelids, areolae) and its thickness map
-  (``sss.png``), pinned by sha256 in the rig's source table (``build_character.SOURCES``);
-* an ambient-occlusion bake of the mesh, and each texel's 3D position, baked once in Blender
-  headless (``bake``; cached in the git-ignored ``library/parity/_sources/skinmaps/``);
-* 3D value noise (seamless across UV seams), and two cheek blobs placed from the face's own
-  texel positions (no hand painting).
-
-Blood (haemoglobin absorbs green and blue) reddens the thin and flushed regions; melanin and
-occlusion darken the creases, the eye sockets and the areolae. The groin is plain skin by
-construction (RD-SKM-4). The lips take the lip colour, feathered into the face.
+**What the picture is made of** (Phase23, RD-P23-2: pigment, not paint). The colour comes from
+``gen_synth_skin.compose``: every texel gets a melanin and a blood amount placed on the body in 3D,
+and a tabulated skin model (OMF's two-chromophore model, ``synth/chromophore_lut.json``) turns them
+into colour, relative to the tone. The model holds only at III and IV (23.2.1), so I and II take
+III's fitted response and V and VI take IV's (the lead, 2026-10-27, "Borrow the response"). CC0
+parts only, never a photograph (RD-SKM-2, RD-SKM-5): MPFB2's CC0 region masks, hm08, seeded 3D
+noise. The groin is plain skin by construction (RD-SKM-4). The lips take the lip colour, feathered
+into the face. *(Until Phase23 it was the research probe's v2 recipe, F-SKM-25: an AO bake in
+Blender, value noise and two cheek blobs; retired at 23.2.)*
 
 **The calibration** (RD-P21-3, the spec's steps 2 and 3; ``calibrate``). The measured tone stays
 the average: over the skin (the ``Body`` part, lips excluded) the picture's average is the
@@ -35,7 +30,7 @@ colour picture: they hand in a colour picture, the library stores the multiplier
 
 The tone is the skin recipe's Physically Based value (its ``sources[physicallybased].used``),
 never its ``base_color_const``, which this tool's output raises. The lip colour is Phase08's rule
-(the tone x ``LIP_RULE``; ``Lips_Fitzpatrick*``'s sources).
+(the tone x ``LIP_RULE``; ``Lips_Fitzpatrick*``'s sources), drawn by the maker from the tone alone.
 
 Writes ``MatterLibrary/textures/fit/makehuman/skin/Fitzpatrick<Tone>_basecolor_sUKN.png`` and
 ``library/provenance/sources/fit/makehuman/skin.yaml`` (with each tone's ``base_color_const``,
@@ -46,7 +41,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -62,7 +56,6 @@ TONES = ("I", "II", "III", "IV", "V", "VI")
 RECIPES = REPO / "tools" / "converters" / "recipes"
 OUT = REPO / "MatterLibrary" / "textures" / "fit" / "makehuman" / "skin"
 PROVENANCE = REPO / "library" / "provenance" / "sources" / "fit" / "makehuman" / "skin.yaml"
-BAKE = bc.CACHE / "skinmaps"               # git-ignored: the mesh's AO and texel positions
 TAG = "sUKN"
 BLEED = 16                                 # pixels past each island's edge (the kit's README)
 LIP_RULE = (0.80, 0.55, 0.60)              # Phase08 8.2: lips = the skin's albedo x this
@@ -80,78 +73,6 @@ for _name, _sha in (("mpfb_face.jpg", "6f2d7abee30d63378b7b4214cf43a47d4cae65d96
     bc.SOURCES.setdefault(_name, {"url": _MPFB + _name, "sha256": _sha,
                                   "licence": "CC0 (MPFB2 LICENSE.ASSETS.md: textures on hm08's UVs)"})
 MASKS = ("face", "lips", "ears", "eyelids", "aureolae")
-
-
-# ---------------------------------------------------------------- bake (inside Blender) ----------
-def bake(out: Path) -> None:
-    """AO (4 cm of occlusion) and each texel's object-space position (MakeHuman units), baked on
-    hm08's body at N x N with a 16-pixel margin; saved top row first, as an image file is read."""
-    import bpy
-    import numpy as np
-
-    out.mkdir(parents=True, exist_ok=True)
-    obj = out / "base.obj"
-    obj.write_bytes(bc.source("base.obj"))
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.wm.obj_import(filepath=str(obj), use_split_groups=True)
-    body = next(o for o in bpy.context.scene.objects if o.type == "MESH" and o.name.lower() == "body")
-    for o in list(bpy.context.scene.objects):
-        if o is not body:
-            bpy.data.objects.remove(o)
-    sc = bpy.context.scene
-    sc.render.engine = "CYCLES"
-    sc.cycles.device = "CPU"
-    sc.cycles.seed = 0
-    sc.render.bake.margin = BLEED
-    world = bpy.data.worlds.new("w")
-    sc.world = world
-    world.light_settings.distance = 0.4     # MakeHuman units (dm): 4 cm of occlusion
-
-    def one(kind: str, samples: int, emit_coords: bool = False):
-        img = bpy.data.images.new(kind, N, N, alpha=True, float_buffer=True)
-        img.generated_color = (0, 0, 0, 0)
-        mat = bpy.data.materials.new(kind)
-        mat.use_nodes = True
-        nt = mat.node_tree
-        nt.nodes.clear()
-        out_n = nt.nodes.new("ShaderNodeOutputMaterial")
-        em = nt.nodes.new("ShaderNodeEmission")
-        if emit_coords:
-            tc = nt.nodes.new("ShaderNodeTexCoord")
-            nt.links.new(tc.outputs["Object"], em.inputs["Color"])
-        nt.links.new(em.outputs[0], out_n.inputs[0])
-        tex = nt.nodes.new("ShaderNodeTexImage")
-        tex.image = img
-        nt.nodes.active = tex
-        body.data.materials.clear()
-        body.data.materials.append(mat)
-        bpy.context.view_layer.objects.active = body
-        body.select_set(True)
-        sc.cycles.samples = samples
-        bpy.ops.object.bake(type=kind)
-        a = np.empty(N * N * 4, np.float32)
-        img.pixels.foreach_get(a)
-        return np.flipud(a.reshape(N, N, 4))        # Blender's rows run bottom-up
-
-    np.save(out / "ao.npy", one("AO", 64)[..., 0])
-    np.save(out / "pos.npy", one("EMIT", 1, emit_coords=True)[..., :3])
-    (out / "bake.json").write_text(json.dumps({"N": N, "margin": BLEED, "ao_distance_mh": 0.4,
-                                               "ao_samples": 64, "base_obj_sha256":
-                                               bc.SOURCES["base.obj"]["sha256"]}) + "\n")
-
-
-def ensure_bake():
-    import numpy as np  # noqa: PLC0415
-    meta = BAKE / "bake.json"
-    if not (meta.is_file() and json.loads(meta.read_text()).get("N") == N
-            and json.loads(meta.read_text()).get("base_obj_sha256") == bc.SOURCES["base.obj"]["sha256"]):
-        exe = __import__("os").environ.get("MATTER_BLENDER") or __import__("shutil").which("blender")
-        if not exe:
-            raise SystemExit("Blender not found (set MATTER_BLENDER or put blender on PATH): the AO bake needs it")
-        print(f"baking AO and positions on hm08 in Blender ({exe}) ...")
-        subprocess.run([exe, "-b", "--factory-startup", "--python", str(Path(__file__).resolve()),
-                        "--", "bake", str(BAKE)], check=True)
-    return np.load(BAKE / "ao.npy"), np.load(BAKE / "pos.npy")
 
 
 # ---------------------------------------------------------------- the picture (numpy) ------------
@@ -242,52 +163,6 @@ def tone_of(roman: str):
     return np.array([float(x) for x in used[0].split(",")])
 
 
-def compose(tone, reg: dict, ao, pos):
-    """The absolute skin colour (linear) for one tone: the probe's v2 recipe (F-SKM-25), with the
-    average held to the tone over the skin exactly, the lips' feathered edge included."""
-    import numpy as np  # noqa: PLC0415
-    cover = np.linalg.norm(pos, axis=-1) > 1e-5    # baked texels (the islands plus the margin)
-    m = {k: _grey(f"mpfb_{k}.jpg") for k in MASKS}
-    sss = _grey("sss.png")
-    sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
-
-    # cheeks: two blobs placed from the face texels' own 3D positions (X is lateral)
-    F = pos[(m["face"] > 0.5) & cover]
-    ext = F.max(0) - F.min(0)
-    lat = 0
-    up = int(np.argmax(np.where(np.arange(3) == lat, -1, ext)))
-    front = 3 - lat - up
-    sign = 1.0 if F[:, front].mean() > pos[cover][:, front].mean() else -1.0
-    cx, w, h0, hh = F[:, lat].mean(), ext[lat], F[:, up].min(), ext[up]
-    cheeks = np.zeros((N, N))
-    for side in (-1, 1):
-        c = np.zeros(3)
-        c[lat] = cx + side * 0.27 * w
-        c[up] = h0 + 0.42 * hh
-        near = F[(np.abs(F[:, lat] - c[lat]) < 0.05 * w) & (np.abs(F[:, up] - c[up]) < 0.05 * hh)]
-        c[front] = (near[:, front].max() if sign > 0 else near[:, front].min()) if len(near) else F[:, front].mean()
-        cheeks = np.maximum(cheeks, np.exp(-((np.linalg.norm(pos - c, axis=-1) / (0.2 * w)) ** 2)))
-    cheeks *= blur(m["face"], 12)
-
-    n1, n2 = vnoise(pos, 0.25, 7), vnoise(pos, 1.0, 11)
-    redness = np.clip(0.3 * sss + 0.4 * blur(m["ears"], 6) + 0.35 * cheeks + 0.25 * blur(m["aureolae"], 4)
-                      + 0.05 * n1, 0, 1.2)
-    HB = np.array([0.0, 0.42, 0.34])          # haemoglobin: absorbs green and blue
-    MEL = np.array([0.88, 0.84, 0.80])        # the darker-skin side of the same tone
-    col = tone * np.exp(-redness[..., None] * HB)
-    dark = np.clip(1 - ao, 0, 1) * 0.9 + 0.35 * blur(m["eyelids"], 6) + 0.35 * blur(m["aureolae"], 4)
-    col = col * (1 - np.clip(dark, 0, 1)[..., None] * (1 - MEL) * 2.2)
-    col = col * (1 + 0.035 * n2)[..., None]
-    lip = tone * np.array(LIP_RULE)
-    lm = np.clip(blur(m["lips"], 5) * 1.15, 0, 1)[..., None]       # feathered: no line at the lips
-    lips = lip * (0.92 + 0.08 * n1[..., None])
-    # hold the average: over the skin, (s x col)(1 - lm) + lips lm averages to the tone, per channel
-    S = reg["Body"]
-    s = (tone - (lips * lm)[S].mean(0)) / (col * (1 - lm))[S].mean(0)
-    col = col * s * (1 - lm) + lips * lm
-    return col, cover
-
-
 def bleed(lin, covered, px: int):
     """Grow the covered colour ``px`` pixels outward (gen_fit_makehuman.bleed)."""
     import gen_fit_makehuman as fm  # noqa: PLC0415
@@ -345,7 +220,9 @@ def write_provenance(rows: dict) -> None:
                 shine_rows.append(line)
     for roman, r in rows.items():
         old[f"Fitzpatrick{roman}"] = (
-            f"  Fitzpatrick{roman}: {{made: {r['made']}, tone: {r['tone']}, base_color_const: "
+            f"  Fitzpatrick{roman}: {{made: {r['made']}, "
+            + (f"fit: {r['fit']}, melanin0: {r['melanin0']}, " if "fit" in r else "")
+            + f"tone: {r['tone']}, base_color_const: "
             f"{r['base_color_const']}, peak_factor: {r['peak_factor']}, lips_average: {r['lips_average']}}}")
     names = sorted(old, key=lambda n: TONES.index(n.removeprefix("Fitzpatrick")))
     src = [bc.SOURCES[n] for n in ("base.obj", "mpfb_face.jpg", "mpfb_lips.jpg", "mpfb_ears.jpg",
@@ -365,7 +242,9 @@ def write_provenance(rows: dict) -> None:
         "  upstream:",
         *[f"    - {{url: {s['url']}, sha256: {s['sha256']}}}" for s in src],
         "  upstream_licence: \"CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh and its textures)\"",
-        "  evidence: tools/converters/fit/gen_skin_maps.py"
+        "  model: \"open-morphology-foundation tools/material_generate/biophysical.py 0.1.0 (e079588), "
+        "tabulated per fit in tools/converters/fit/synth/chromophore_lut.json\"",
+        "  evidence: tools/converters/fit/gen_skin_maps.py, tools/converters/fit/gen_synth_skin.py"
         + (", tools/converters/fit/gen_skin_shine.py" if shine_rows else ""),
         "members:",
         *[old[n] for n in names],
@@ -396,7 +275,7 @@ def main(argv=None) -> int:
     if a.picture and len(a.tones) != 1:
         raise SystemExit("--picture is one tone's picture: name exactly one tone")
     reg = regions()
-    ao = pos = None
+    F = lut = None
     rows = {}
     for roman in a.tones:
         tone = tone_of(roman)
@@ -404,13 +283,18 @@ def main(argv=None) -> int:
             col, cover = from_picture(a.picture, reg)
             made = "contributed"
         else:
-            if ao is None:
-                ao, pos = ensure_bake()
-            col, cover = compose(tone, reg, ao, pos)
-            made = "procedural"
+            import gen_synth_skin as gss  # noqa: PLC0415 (it imports this module)
+            if F is None:
+                F, lut = gss.fields(), gss.Lut()
+            col, _info = gss.compose(tone, roman, (), F, lut, gss.SEED)
+            cover = F["cover"]
+            made = "pigment"
+            model = lut.check(roman, tone)
+            print(f"Fitzpatrick{roman} model check (RD-P23-3): " + json.dumps(model))
         srgb8, _const, st = calibrate(col, tone, reg, cover)
         p = write(roman, srgb8)
-        rows[roman] = {"made": made, **st}
+        rows[roman] = {"made": made, **st} | ({"fit": model["fit"], "melanin0": model["melanin0"]}
+                                              if made == "pigment" else {})
         print(f"Fitzpatrick{roman}: {p.relative_to(REPO)}\n  " + json.dumps(st))
         if st["uncovered_islands"]:
             raise SystemExit(f"Fitzpatrick{roman}: {st['uncovered_islands']} island texels left unpainted")
@@ -419,7 +303,4 @@ def main(argv=None) -> int:
 
 
 if __name__ == "__main__":
-    if "--" in sys.argv and sys.argv[sys.argv.index("--") + 1] == "bake":
-        bake(Path(sys.argv[sys.argv.index("--") + 2]))
-    else:
-        raise SystemExit(main())
+    raise SystemExit(main())

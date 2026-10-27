@@ -16,7 +16,7 @@
   "fits": "MakeHuman_Body_v01",
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
-  "base_color_const": "0.0938, 0.053, 0.0212",
+  "base_color_const": "0.1071, 0.0709, 0.0362",
   "roughness_tex": "../../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
   "normal_tex": "../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
   "metalness_const": 0.0,
@@ -60,7 +60,7 @@
       "kind": "procedural",
       "script": "tools/converters/fit/gen_skin_maps.py",
       "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
-      "note": "the skin map (Phase21): CC0 parts only (MPFB2's region masks and thickness map, an AO bake of hm08, 3D noise; RD-SKM-2), its average over the skin held to the Physically Based tone below; base_color_const is that tone x the map's peak factor, fuzz_color stays the tone (the average the skin renders)"
+      "note": "the skin map (Phase23, pigment, RD-P23-2): CC0 parts only (MPFB2's region masks, hm08, seeded 3D melanin and blood fields through OMF's tabulated two-chromophore model; RD-SKM-2), its average over the skin held to the Physically Based tone below; base_color_const is that tone x the map's peak factor, fuzz_color stays the tone (the average the skin renders)"
     },
     {
       "kind": "physicallybased",

@@ -26,14 +26,15 @@ provenance:
     - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_aureolae.jpg, sha256: bc69ca4c397a721c8e47fb854028649dd1c5aeb2d184b60c984f3eb6d53e2de7}
     - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/sss.png, sha256: d433f15c7240c5b0c91c6fafa482d9c380504efd6ad4d1504b4d7da32d1eec42}
   upstream_licence: "CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh and its textures)"
-  evidence: tools/converters/fit/gen_skin_maps.py, tools/converters/fit/gen_skin_shine.py
+  model: "open-morphology-foundation tools/material_generate/biophysical.py 0.1.0 (e079588), tabulated per fit in tools/converters/fit/synth/chromophore_lut.json"
+  evidence: tools/converters/fit/gen_skin_maps.py, tools/converters/fit/gen_synth_skin.py, tools/converters/fit/gen_skin_shine.py
 members:
-  FitzpatrickI: {made: procedural, tone: [0.847, 0.638, 0.552], base_color_const: [0.8832, 0.6762, 0.5854], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6361, 0.3458, 0.3221]}
-  FitzpatrickII: {made: procedural, tone: [0.799, 0.485, 0.347], base_color_const: [0.8331, 0.514, 0.368], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6, 0.2629, 0.2025]}
-  FitzpatrickIII: {made: procedural, tone: [0.623, 0.433, 0.343], base_color_const: [0.6496, 0.4589, 0.3638], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.4679, 0.2347, 0.2001]}
-  FitzpatrickIV: {made: procedural, tone: [0.436, 0.227, 0.131], base_color_const: [0.4546, 0.2406, 0.1389], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.3274, 0.1231, 0.0764]}
-  FitzpatrickV: {made: procedural, tone: [0.283, 0.148, 0.079], base_color_const: [0.2951, 0.1569, 0.0838], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.2125, 0.0802, 0.0461]}
-  FitzpatrickVI: {made: procedural, tone: [0.09, 0.05, 0.02], base_color_const: [0.0938, 0.053, 0.0212], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.0676, 0.0271, 0.0117]}
+  FitzpatrickI: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.847, 0.638, 0.552], base_color_const: [0.8994, 0.7133, 0.6538], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.6295, 0.3318, 0.3116]}
+  FitzpatrickII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.799, 0.485, 0.347], base_color_const: [0.8485, 0.5422, 0.411], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.5939, 0.2522, 0.1959]}
+  FitzpatrickIII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.623, 0.433, 0.343], base_color_const: [0.6616, 0.4841, 0.4063], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.463, 0.2252, 0.1936]}
+  FitzpatrickIV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.436, 0.227, 0.131], base_color_const: [0.5189, 0.3217, 0.2374], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.3237, 0.1177, 0.0735]}
+  FitzpatrickV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.283, 0.148, 0.079], base_color_const: [0.3368, 0.2098, 0.1432], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.2101, 0.0767, 0.0443]}
+  FitzpatrickVI: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.09, 0.05, 0.02], base_color_const: [0.1071, 0.0709, 0.0362], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.0668, 0.0259, 0.0112]}
   Skin_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.62, "skin_range": [0.518, 0.686], "uncovered_islands": 0, "tzone_average": 0.4548, "cheeks_average": 0.7018}
   Skin_normal: {"made": "procedural", "space": "linear", "neutral": [0.5, 0.5, 1.0], "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal", "xy_rms_skin": 0.0451, "xy_rms_face": 0.0706, "xy_p99_skin": 0.14, "unit_error_max": 0.005}
   Skin_cavity: {"made": "procedural", "space": "linear", "neutral": 1.0, "rule": "specular_weight x map", "skin_average": 0.9537, "skin_p1": 0.78}

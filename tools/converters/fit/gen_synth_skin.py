@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
-"""Make SYNTHETIC SKIN test maps for MakeHuman_Body_v01 (hm08): real-looking skin with no person in it.
+"""The library's PIGMENT skin maker for MakeHuman_Body_v01 (hm08), and its marks-layer test drafts.
 
-    uv run --with scipy tools/converters/fit/gen_synth_skin.py                    # every test tone and layer
+    uv run tools/converters/fit/gen_skin_maps.py                                  # the library's six maps (this compose)
+    uv run --with scipy tools/converters/fit/gen_synth_skin.py                    # the layer drafts (II, IV, VI)
     uv run --with scipy tools/converters/fit/gen_synth_skin.py IV --detail SynthVeins
     uv run --with scipy tools/converters/fit/gen_synth_skin.py --out /tmp/synth  # a trial, nothing in the library
 
-(``--with scipy``: the point processes use its k-d tree; the core environment stays as it is.)
+**Phase23 (RD-P23-2): ``compose`` with no layers is the library's skin colour.** ``gen_skin_maps.py``
+calls it for the six ``Skin_Fitzpatrick*`` maps and keeps the calibration, ``--picture`` and the
+provenance. That path needs only the project's environment; ``--with scipy`` is for the marks
+layers alone (their point processes use its k-d tree, RD-P23-7). The base's skin-scale detail is
+raised to the bar's strength on the face and about 60 % of it on the body (``DETAIL``; click 1, the
+lead: *"we need some sort of texture on the hands and rest of the body"*). The model holds only at
+III and IV (23.2.1), so each tone takes the nearer one's response (``Lut``). The plain ``Synth``
+drafts were retired at 23.2 (RD-P23-8); the twelve layer drafts were made before it, on the
+spike's base, and are *Skin Layers*' references. Re-running this command remakes them on today's.
 
 **What this is.** The lead's spike (2026-10-26; OMF research `261026_R_SyntheticSkinAndEyeSets`,
 "1) yes 2) yes 3) yes - run the spike … add these tests directly to the Matter Library"). Each map is
@@ -63,8 +72,9 @@ import make_kits  # noqa: E402
 
 MESH = gsm.MESH
 N = gsm.N
-TONES = ("II", "IV", "VI")              # light, medium, dark: the test's spread
-DETAILS = ("Synth", "SynthFreckles", "SynthVeins", "SynthMarks", "SynthAll")
+TONES = gsm.TONES                       # Phase23: the library's maker, all six tones
+DRAFT_TONES = ("II", "IV", "VI")        # the layer drafts' spread (the 2026-10-26 spike)
+DETAILS = ("SynthFreckles", "SynthVeins", "SynthMarks", "SynthAll")   # the plain "Synth" retired (RD-P23-8)
 LAYERS = {"Synth": (), "SynthFreckles": ("freckles",), "SynthVeins": ("veins",),
           "SynthMarks": ("marks",), "SynthAll": ("freckles", "veins", "marks")}
 OUT = gsm.OUT
@@ -74,17 +84,39 @@ LUT_PATH = HERE / "synth" / "chromophore_lut.json"
 BLOOD0 = 0.02            # the dermal blood prior: each tone's melanin is solved with blood held here
 EPS = 0.01               # softens the ratio where a channel is near 0 (blue on dark skin)
 SEED = 20261026
+# The base detail, per fit (23.2.2; click 1, the bar). Gains over the spike's: ``fine`` on the 1-2.5 mm
+# noise, ``coarse`` on the 7-25 mm noise (kept near the spike's: strong coarse noise reads blotchy),
+# ``dots`` a sparse ~1 mm pigment fleck (the bar's fine detail is discrete flecks on a smooth base),
+# each on the face and the body, and ``flush`` the cheeks' and nose's blood. The IV fit's operating
+# melanin is 4x the III fit's, so a melanin modulation reads ~2.7x stronger there: its melanin gains
+# are cut by that, and its flush is the spike's, so redness falls from the light tones to the dark.
+DETAIL = {"III": {"fine": (3.0, 2.0), "coarse": (1.3, 1.0), "dots": (0.9, 0.5), "flush": 1.8},
+          "IV": {"fine": (1.1, 0.75), "coarse": (0.5, 0.4), "dots": (0.33, 0.18), "flush": 1.0}}
 
 
 # ------------------------------------------------------------------ the model -------------------
 class Lut:
+    """The tabulated model, one table per FIT (Phase23 23.2.1, RD-P23-3 as the lead amended it,
+    "Borrow the response"): OMF's model holds only at III and IV, so each tone uses the fit of the
+    nearest of them (I, II from III; V, VI from IV) at that fit tone's own melanin, and so takes its
+    RELATIVE response; the calibration still holds each tone's own average."""
+
     def __init__(self, path: Path = LUT_PATH):
         d = json.loads(path.read_text())
         self.meta = {k: d[k] for k in ("model", "omf_commit")}
+        self.fits = d["fits"]                      # fit -> {eumelanin_ratio, epidermis_thickness_mm}
+        self.tones = d["tones"]                    # tone -> {fit, melanin, matched_on, ...}
         self.mel = np.log(np.array(d["melanin"]))
         self.bld = np.log(np.array(d["blood"]))
         self.so2 = np.array(d["so2"])
-        self.a = np.array(d["albedo"])             # [so2, mel, blood, rgb]
+        self.tables = {k: np.array(v) for k, v in d["albedo"].items()}   # fit -> [so2, mel, blood, rgb]
+        self.a = None
+
+    def use(self, roman: str) -> float:
+        """Select the tone's fit; return its operating melanin."""
+        t = self.tones[roman]
+        self.a = self.tables[t["fit"]]
+        return float(t["melanin"])
 
     def __call__(self, mel, bld, so2):
         fm = np.interp(np.log(np.maximum(mel, 1e-6)), self.mel, np.arange(len(self.mel)))
@@ -101,12 +133,16 @@ class Lut:
                     out = out + wa * wb * wc * self.a[k0 + a, i0 + b, j0 + c]
         return out
 
-    def melanin_for(self, tone) -> float:
-        """The tone's melanin with blood at BLOOD0: the nearest colour in log space."""
-        m = np.exp(np.linspace(self.mel[0], self.mel[-1], 400))
-        c = self(m, np.full_like(m, BLOOD0), np.full_like(m, 0.8))
-        err = np.linalg.norm(np.log(c + 1e-4) - np.log(np.asarray(tone) + 1e-4), axis=-1)
-        return float(m[int(np.argmin(err))])
+    def check(self, roman: str, tone) -> dict:
+        """RD-P23-3's printed check: the model's colour at the operating point over the tone (the
+        borrowed tones' differ by design; the calibration takes it up)."""
+        m0 = self.use(roman)
+        c = self(np.array(m0), np.array(BLOOD0), np.array(0.8))
+        r = c / np.asarray(tone)
+        rb = (c[0] / c[2]) / (tone[0] / tone[2])
+        return {"fit": self.tones[roman]["fit"], "melanin0": round(m0, 5), "model_over_tone": np.round(r, 3).tolist(),
+                "red_blue_over_tone": round(float(rb), 3),
+                "passes": bool(max(np.abs(r - 1).max(), abs(rb - 1)) <= 0.15)}
 
 
 # ------------------------------------------------------------------ the mesh in 3D --------------
@@ -292,12 +328,18 @@ def grow_veins(rng, P, N3, cover, starts, axis_dirs, lengths, radius, weight, st
 
 
 # ------------------------------------------------------------------ the picture -----------------
-def compose(tone, roman, layers, F, lut, rng_seed):
+def compose(tone, roman, layers, F, lut, rng_seed, detail=None):
     """The absolute skin colour (linear) for one tone and one set of layers."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
-    m0 = lut.melanin_for(tone)
+    m0 = lut.use(roman)
     face = masks["face"]
+    # Phase23 click 1 (the lead: "we need some sort of texture on the hands and rest of the body"):
+    # the skin-scale detail on the face at the bar's measured strength, and on the body (23.2.2).
+    # The face's weight is wide and follows the head, so no seam shows at the hairline.
+    dg = DETAIL[lut.tones[roman]["fit"]] if detail is None else detail
+    wf = np.clip(np.maximum(1.3 * gsm.blur(face, 40), 0.8 * F["parts"]["head"]), 0, 1)
+    gf, gc, gd = ((dg[k][1] + (dg[k][0] - dg[k][1]) * wf) for k in ("fine", "coarse", "dots"))
     down = -Nr[..., 1]                                  # A-pose: the palms and the soles face down
     palm = parts["hand"] * np.clip((down - 0.2) / 0.5, 0, 1)
     sole = parts["foot"] * np.clip((down - 0.4) / 0.4, 0, 1)
@@ -315,9 +357,11 @@ def compose(tone, roman, layers, F, lut, rng_seed):
     M *= 1 - 0.45 * np.maximum(palm, sole)                       # palms and soles: little melanin
     M *= 1 + 0.18 * gsm.blur(masks["eyelids"], 6) + 0.5 * gsm.blur(masks["aureolae"], 4)
     M *= 1 + 0.22 * np.clip(cv, 0, 1.5)                          # creases: a little darker
-    M *= np.exp(fbm(P, (0.025, 0.007, 0.0025, 0.0012), (0.09, 0.07, 0.07, 0.05), 11))
+    M *= np.exp(gc * fbm(P, (0.025, 0.007), (0.09, 0.07), 11))
+    M *= np.exp(gf * fbm(P, (0.0025, 0.0012), (0.07, 0.05), 211))
     speck = np.abs(gsm.vnoise(P, 0.0009, 13)) + 0.5 * np.abs(gsm.vnoise(P, 0.0005, 17))
-    M *= 1 + 0.10 * (0.6 - speck)                                # fine, uneven pigment (1-2 mm)
+    M *= np.exp(0.10 * gf * (0.6 - speck))                       # fine, uneven pigment (1-2 mm)
+    M *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41) - 0.5) / 0.3, 0, 1)   # sparse ~1 mm flecks
 
     # blood: cheeks, the nose, the ears, the fingertips and the palms, knuckles, elbows, knees
     Fp = P[(face > 0.5) & cover]
@@ -336,9 +380,9 @@ def compose(tone, roman, layers, F, lut, rng_seed):
     joints_out = sum(gauss3(P, J[f"{s}-{j}"], 0.035) for s in "lr" for j in ("elbow", "knee"))
     sss = gsm._grey("sss.png")
     sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
-    B = (1 + 0.9 * cheek + 0.8 * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
+    B = (1 + 0.9 * dg["flush"] * cheek + 0.8 * dg["flush"] * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
          + 0.7 * tips + 0.45 * palm + 0.5 * knuckles + 0.35 * joints_out + 0.25 * sss)
-    B *= np.exp(fbm(P, (0.015, 0.004, 0.0015, 0.0008), (0.18, 0.12, 0.08, 0.05), 23))
+    B *= np.exp(gc * fbm(P, (0.015, 0.004), (0.18, 0.12), 23) + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223))
     so2 = np.full(P.shape[:2], 0.8)
     under_eye = gsm.blur(masks["eyelids"], 10)
     so2 = so2 - 0.25 * under_eye                                   # the bluish shadow under the eyes
@@ -514,7 +558,7 @@ def write_provenance(rows: dict, lut: Lut) -> None:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("tones", nargs="*", default=list(TONES))
+    ap.add_argument("tones", nargs="*", default=list(DRAFT_TONES))
     ap.add_argument("--detail", action="append", choices=DETAILS, help="one layer set (repeatable; default all)")
     ap.add_argument("--out", type=Path, help="write the pictures here instead (a trial: no provenance)")
     a = ap.parse_args(argv)
