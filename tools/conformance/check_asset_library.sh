@@ -16,9 +16,11 @@ rc=0
 
 # Blender uses its OWN bundled USD — run with a clean env (see check_exporter.sh).
 CLEAN="env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH"
+# The Blender to run: $MATTER_BLENDER (the rig's and the thumbnails' variable), else `blender` on PATH.
+BLENDER="${MATTER_BLENDER:-blender}"
 
 echo "### 1. Generate the Asset-Browser library (blender --background --factory-startup -> gen_asset_library.py, every Creator-selectable article in the working tree)"
-if $CLEAN blender --background --factory-startup --python "$GEN" -- "$OUT" > "$OUT/gen.log" 2>&1 \
+if $CLEAN "$BLENDER" --background --factory-startup --python "$GEN" -- "$OUT" > "$OUT/gen.log" 2>&1 \
         && grep -q ASSET_LIB_OK "$OUT/gen.log"; then
   echo "  generate: OK"; grep ASSET_LIB_OK "$OUT/gen.log"
 else
@@ -27,7 +29,7 @@ fi
 
 echo ""
 echo "### 2. Structure verify (asset-marked + catalog + identity carrier + proxy)"
-$CLEAN blender --background "$OUT/MatterLibrary.blend" --python "$VERIFY" > "$OUT/verify.log" 2>&1
+$CLEAN "$BLENDER" --background "$OUT/MatterLibrary.blend" --python "$VERIFY" > "$OUT/verify.log" 2>&1
 grep -E '^\s*\[(PASS|FAIL)\]|=> asset-library' "$OUT/verify.log" || { cat "$OUT/verify.log"; rc=1; }
 grep -q 'CONFORMS' "$OUT/verify.log" || rc=1
 

@@ -22,6 +22,8 @@ CONF="$REPO/tools/conformance"
 BLEND="$REPO/blender/MatterMaterials.blend"
 MATROOT="$REPO/MatterLibrary/materials"
 PY="$ENVP/bin/python"
+# The Blender to run: $MATTER_BLENDER (the rig's and the thumbnails' variable), else `blender` on PATH.
+BLENDER="${MATTER_BLENDER:-blender}"
 OUT="${1:-$(mktemp -d)}"
 EXPECT_ID="Copper_Verdigris_Aged_Base_s01_v01"   # every scenario resolves to the ONE Copper identity
 mkdir -p "$OUT"
@@ -43,7 +45,7 @@ run_scenario() {
   # Blender uses its OWN bundled USD/MaterialX — strip the from-source USD-tools env (which the
   # pxr checks below need) or Blender's libusd_ms.so crashes on a MaterialX symbol mismatch.
   if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
-          blender --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode "$MODE" \
+          "$BLENDER" --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode "$MODE" \
           > "$OUT/export_${MODE}.log" 2>&1 && grep -q SLICE_EXPORT_OK "$OUT/export_${MODE}.log"; then
     echo "  export: OK -> $USDA"
   else
@@ -110,7 +112,7 @@ run_portable() {
   USDA="$POUT/creator_copper_portable.usda"
   echo "### 1. Real add-on export (blender --background -> export_lcd_usd portable=True)"
   if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
-          blender --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode distinct --portable \
+          "$BLENDER" --background "$BLEND" --python "$CONF/export_copper_slice.py" -- "$USDA" --mode distinct --portable \
           > "$OUT/export_portable.log" 2>&1 && grep -q SLICE_EXPORT_OK "$OUT/export_portable.log"; then
     echo "  export: OK -> $USDA"
   else
@@ -169,7 +171,7 @@ echo ""
 echo "======== SELECTION-CONTEXT REGRESSION (E9 §15d) ========"
 echo "### §2 split must fire even when context.selected_objects is incomplete (File-browser bug)"
 if env -u LD_LIBRARY_PATH -u PYTHONPATH -u PXR_MTLX_STDLIB_SEARCH_PATHS -u PXR_AR_DEFAULT_SEARCH_PATH \
-        blender --background --factory-startup --python "$CONF/test_export_selection.py" \
+        "$BLENDER" --background --factory-startup --python "$CONF/test_export_selection.py" \
         -- "$OUT/creator_selection_regression.usda" > "$OUT/selection_reg.log" 2>&1; then
   grep -E "^REG:" "$OUT/selection_reg.log"
 else
