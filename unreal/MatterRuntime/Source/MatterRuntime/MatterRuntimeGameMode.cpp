@@ -612,6 +612,16 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 	if (RimComp)
 	{
 		RimComp->SetIntensity(RimIntensity * RimScale);
+		// Phase22 22.3: light through thin parts (an ear, a finger) is drawn from the light's own
+		// shadow depth, so a setting that looks for it asks the rim to cast shadows. Off when absent,
+		// so every other setting lights exactly as before.
+		bool bRimShadows = false;
+		S->TryGetBoolField(TEXT("rim_shadows"), bRimShadows);
+		if (RimComp->CastShadows != bRimShadows)
+		{
+			RimComp->SetCastShadows(bRimShadows);
+			RimComp->MarkRenderStateDirty();
+		}
 	}
 
 	TMap<FString, UMaterialInstanceDynamic*> Built;

@@ -62,7 +62,8 @@ AMBIENT_OCCLUSION = 0.5
 
 VIEWS = {"face": "face, front", "face34": "face, three quarters", "hand": "back of the left hand",
          "ear": "left ear, lit from behind"}
-BACKLIT = {"sun_scale": 0.0, "fill_scale": 0.0, "rim_scale": 1.6}   # the ear's setting
+# the ear's setting; the rim casts shadows so Unreal can draw light through the ear (22.3)
+BACKLIT = {"sun_scale": 0.0, "fill_scale": 0.0, "rim_scale": 1.6, "rim_shadows": True}
 
 
 def _travel(source) -> list[float]:

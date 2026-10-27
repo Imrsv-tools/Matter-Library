@@ -157,6 +157,7 @@ A second project now calls the driver from outside the rig, to picture its own a
 | `…textures` | Parameter name → `{"file": <abs path>, "srgb": true or false}`, or `{"constant": [r, g, b, a]}` for a flat value. Every texture reaches its master as linear float; `srgb` says whether the file's pixels are decoded first. |
 | `look` | Optional, format 4 only: the look view instead of the matched light (§The look view). |
 | `fill_scale`, `rim_scale` | Format 4: a multiplier on that setting's look fill and rim; each follows `sun_scale` when absent. |
+| `rim_shadows` | Format 4 (Phase22 22.3): `true` makes the look rim cast shadows for that setting, which Unreal needs to draw light through thin parts (it reads the thickness from the light's shadow depth). Off when absent. `look.py`'s backlit ear sets it. |
 | `sun_scale`, `sky_scale` | A multiplier on that setting's sun and sky, 1 when absent. 0 turns the light off for that setting (the calibration reads the sun and the dome apart with them; a caller can read emission alone the same way). |
 | `views[]` | `suffix` · `location` · `forward` · `up` · `fov` (degrees) · `near` · `hide` (mesh names left out of that view). `camera_view()` writes one. |
 
