@@ -1,6 +1,6 @@
 # Phase23 — Synthetic Skin Sets
 
-**Status:** IN EXECUTION (2026-10-27): resumed at 23.2; the face's regional colour placed (23.2.7), click 2 again owed (23.2.8). Opened by the lead's *"/execute P23"* at `749fb60`. *Before:* BRIEF READY (discovery Pass 1, 2026-10-27), and before that SEEDED the same day. The lead numbered it Phase23 with *"/discovery P23"*, then *"yes. synth skin"*, which opened Pass 1. It was the head of `## Future` in the lead's order of 2026-10-27 (RD-CMT-3), and F-CMT-9 had laid out *Phase23* for it.
+**Status:** IN EXECUTION — SUSPENDED at 23.2 (2026-10-27): the face's regional colour placed and the under-eye ring sat (23.2.7–23.2.10). **Next session, in the lead's order** (*"do items 1–3 now to settle 23.2, park item 4 with Skin Layers, then 23.3"*): **23.2.11** I, II and VI re-made on the maker (I and II take III's `FACE` and `LIPS`, VI takes IV's; the recipes' constants, `build_proof_subset.py`) · **23.2.12** the rig's six-tone sheet (tool agreement), never run this phase · **23.2.13** click 2's judge line restated (below) · then **23.3** as the step list has it. Opened by the lead's *"/execute P23"* at `749fb60`. *Before:* BRIEF READY (discovery Pass 1, 2026-10-27), and before that SEEDED the same day. The lead numbered it Phase23 with *"/discovery P23"*, then *"yes. synth skin"*, which opened Pass 1. It was the head of `## Future` in the lead's order of 2026-10-27 (RD-CMT-3), and F-CMT-9 had laid out *Phase23* for it.
 **Lane:** `build` (§Risk lane). **Next:** `/execute P23`.
 **Measured at:** `4398f05`, on **the machine with Unreal**. Unreal 5.8 is at the path `unreal/build.sh` takes as `UE`, and the official Blender 5.2.2 is set as `MATTER_BLENDER` (Learnings B22). `unreal-runtime-v7` is pinned.
 **Builds on:** *Skin Maps* ([`Complete/Phase21_SkinMaps.md`](Complete/Phase21_SkinMaps.md)), which shipped the colour map, and *Skin Maps Beyond Colour* ([`Complete/Phase22_SkinMapsBeyondColour.md`](Complete/Phase22_SkinMapsBeyondColour.md)), which shipped the four shine maps. It closed 2026-10-27, the lead: *"they look totally fake but better then the previous totally fake looking ones so we continue building and learning"*. Its deferral table routes *"the skin still reads as fake"* here.
@@ -54,6 +54,7 @@ The library's skin colour stops being paint and becomes pigment. `gen_synth_skin
 2. **Six tones, one pigment structure (23.2).** The look sheet: the six tones' face and hand, today's beside new, with (c) from click 1 beside tone III as the bar. Plus the rig's six-tone sheet.
    - *Judge:*
      - each tone has its own regional colour (cheeks and lips redden on light skin and barely on dark; freckle-scale mottling shows on light skin and fades on dark);
+       **Restated 2026-10-27 (23.2.13; the lead's order, taking the agent's recommendation):** under the borrowed response (RD-P23-3 as amended), redness cannot fall tone by tone: I–III share III's fit and IV–VI share IV's. The line now reads: *each fit group reads right* — I–III with the bar's placed face colour at full strength, IV–VI with the same regions at half their contrast — judged by eye at the look view;
      - each tone's average is unchanged;
      - no seams;
      - the three tools move alike;
@@ -236,6 +237,7 @@ Time to the first click is short: 23.1 is one tool option and four renders.
 | What | To | What it consumes from this phase |
 |---|---|---|
 | The 12 layer drafts as placed layers; tone VI's marks | *Skin Layers* | the pigment maker's freckle, vein and mark generators; the structure's fields, so a layer lands on a skin's own pigment |
+| **The face's remaining gap to the bar:** the under-eye ring's violet (mauve here: III's fit cannot take green down as far) and how far it runs down; the bar's red blotching on the cheeks and nose sides. Parked by the lead, 2026-10-27: *"park item 4 with Skin Layers"* | *Skin Layers* | `FACE`, `face_regions` and the bar's measured profiles (23.2.7, 23.2.9); the placement grid (`look.py --reference`) |
 | The makers' atlas inputs on the body | the first `Body_v02` maps (CTB-7) | the maker as this phase leaves it |
 | The AI detail layer | later, a GPU machine (RD-SKM-5) | the calibrated base it multiplies |
 | Studio keeping a character's structure when its tone changes | the platform, through the row filed at 23.3 | the `Skin` / `Skin2` / `Skin3` Material tokens; the Variant pairing (M4) |
