@@ -156,7 +156,10 @@ RUNTIME_TINTS_SCATTER = True
 # pinned unreal-runtime-v6 does not, and Unreal ignores a parameter a master lacks, so it would draw
 # the skin without its map and say nothing. Until a runtime with it is pinned (v7), a shine map is
 # drawn only by a local build (MATTER_UNREAL_RUNTIME or MATTER_UNREAL_EDITOR); else it is refused.
-PINNED_RUNTIME_HAS_SHINE = False
+# Phase22 22.4 (2026-10-27): unreal-runtime-v7 is pinned, built with all four shine maps
+# (roughness, normal, cavity, scatter), rim shadows and the look view. Set it False only for a
+# runtime older than v7.
+PINNED_RUNTIME_HAS_SHINE = True
 
 
 def runtime_has_shine() -> bool:

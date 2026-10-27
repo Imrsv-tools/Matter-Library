@@ -21,7 +21,8 @@ column: the baseline.
 
 Writes ``<out>/<setting><view>.png`` and ``<out>/look_sheet.png``. Default ``<out>``:
 ``library/parity/Look__<skin>[__vs_<rev>]``. It needs a runtime that reads job format 4 (built at
-Phase22 22.1 or later): ``MATTER_UNREAL_RUNTIME`` (a local package) or ``MATTER_UNREAL_EDITOR``.
+Phase22 22.1 or later): ``MATTER_UNREAL_RUNTIME`` (a local package), ``MATTER_UNREAL_EDITOR``, or
+the pinned build (``unreal/RUNTIME.json``, ``unreal-runtime-v7`` or later).
 """
 
 from __future__ import annotations
@@ -215,10 +216,10 @@ def main(argv=None) -> int:
     upath = work / "look_job.json"
     upath.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
 
-    cmd = drv.find_runtime(fetch=False)
+    cmd = drv.find_runtime()          # the pinned unreal-runtime-v7 or later draws the look view
     if cmd is None:
         raise SystemExit("no Unreal runtime: set MATTER_UNREAL_RUNTIME to a package built at Phase22 22.1 "
-                         "or later (the pinned build cannot draw the look view)")
+                         "or later, or run on Linux, where the pinned build (v7) is downloaded")
     wanted = [(s["id"], v["suffix"]) for s in settings for v in views
               if (v["suffix"] == "__ear") == s["id"].endswith("__backlit")]
     drv.run_runtime(cmd, upath, work / "unreal.log", [work / "raw" / f"{i}{x}.pfm" for i, x in wanted])
