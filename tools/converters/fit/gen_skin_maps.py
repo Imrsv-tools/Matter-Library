@@ -333,11 +333,16 @@ def write(roman: str, srgb8) -> Path:
 
 def write_provenance(rows: dict) -> None:
     """``skin.yaml``: every tone written so far (a run of one tone keeps the others' rows)."""
-    old = {}
+    old, shine_files, shine_rows = {}, [], []
     if PROVENANCE.is_file():
         for line in PROVENANCE.read_text().splitlines():
             if line.startswith("  Fitzpatrick") and ": {" in line:
                 old[line.split(":", 1)[0].strip()] = line
+            # Phase22: the shine maps' rows are gen_skin_shine.py's; carry them over unchanged
+            elif line.startswith("  - MatterLibrary/textures/fit/makehuman/skin/Skin_"):
+                shine_files.append(line)
+            elif line.startswith("  Skin_") and ": {" in line:
+                shine_rows.append(line)
     for roman, r in rows.items():
         old[f"Fitzpatrick{roman}"] = (
             f"  Fitzpatrick{roman}: {{made: {r['made']}, tone: {r['tone']}, base_color_const: "
@@ -353,15 +358,18 @@ def write_provenance(rows: dict) -> None:
         "version: v01",
         "files:",
         *[f"  - MatterLibrary/textures/fit/makehuman/skin/{n}_basecolor_{TAG}.png" for n in names],
+        *shine_files,
         "provenance:",
         "  source: derived",
         "  license: CC0-1.0",
         "  upstream:",
         *[f"    - {{url: {s['url']}, sha256: {s['sha256']}}}" for s in src],
         "  upstream_licence: \"CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh and its textures)\"",
-        "  evidence: tools/converters/fit/gen_skin_maps.py",
+        "  evidence: tools/converters/fit/gen_skin_maps.py"
+        + (", tools/converters/fit/gen_skin_shine.py" if shine_rows else ""),
         "members:",
         *[old[n] for n in names],
+        *shine_rows,
     ]
     PROVENANCE.parent.mkdir(parents=True, exist_ok=True)
     PROVENANCE.write_text("\n".join(lines) + "\n", encoding="utf-8")

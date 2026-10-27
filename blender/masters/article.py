@@ -41,6 +41,11 @@ class ArticleData:
     maps: dict[str, Path] = field(default_factory=dict)
 
 
+# The nodes that sample a MESH's map, whose file is the input's value (the binding's, or a fitted
+# article's own: ArticleData.maps), not one of the article's texture roles. Phase22 adds the shine maps.
+MESH_MAP_NODES = ("cutout_tex", "base_color_map_tex", "roughness_map_tex", "normal_map_tex", "cavity_map_tex")
+
+
 def read(path: Path) -> ArticleData:
     root = ET.parse(path).getroot()
     doc_cs = root.get("colorspace")
@@ -58,7 +63,7 @@ def read(path: Path) -> ArticleData:
             art.ports[i.get("name")] = _floats(i.get("value"))
         for node in ng:
             name = node.get("name", "")
-            if name in ("cutout_tex", "base_color_map_tex"):
+            if name in MESH_MAP_NODES:
                 continue        # its file is the binding's map (build's `cutout_map` / `base_color_map`)
             if name.endswith("_tex") and node.tag in ("image", "tiledimage"):
                 f = node.find("input[@name='file']")

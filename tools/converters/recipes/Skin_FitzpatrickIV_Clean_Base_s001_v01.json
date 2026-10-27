@@ -33,6 +33,7 @@
   "fuzz_roughness": 0.5,
   "base_color_map": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png",
+  "roughness_map_tex": "../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png",
   "overlays": [
     {
       "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png",

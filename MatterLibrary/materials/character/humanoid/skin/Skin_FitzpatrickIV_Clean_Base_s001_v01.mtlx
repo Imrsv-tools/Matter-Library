@@ -10,6 +10,7 @@
     <input name="roughness_bias" type="float" value="0.0" uiname="Roughness Bias" />
     <input name="overlay2_color" type="color3" value="0.413, 0.386, 0.308" uiname="Overlay 2 Color" />
     <input name="base_color_map" type="filename" value="../../../../textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png" uiname="Base Color Map" />
+    <input name="roughness_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png" uiname="Roughness Map" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -100,8 +101,24 @@
       <input name="in1" type="float" nodename="roughness_overlay1" />
       <input name="in2" type="float" nodename="overlay2_roughness_delta" />
     </add>
-    <add name="roughness_biased" type="float">
+    <texcoord name="shine_map_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <image name="roughness_map_tex" type="float">
+      <input name="file" type="filename" interfacename="roughness_map" />
+      <input name="default" type="float" value="0.5" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <subtract name="roughness_map_offset" type="float">
+      <input name="in1" type="float" nodename="roughness_map_tex" />
+      <input name="in2" type="float" value="0.5" />
+    </subtract>
+    <add name="roughness_mapped" type="float">
       <input name="in1" type="float" nodename="roughness_overlay2" />
+      <input name="in2" type="float" nodename="roughness_map_offset" />
+    </add>
+    <add name="roughness_biased" type="float">
+      <input name="in1" type="float" nodename="roughness_mapped" />
       <input name="in2" type="float" interfacename="roughness_bias" />
     </add>
     <clamp name="roughness_biased_clamped" type="float">

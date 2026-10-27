@@ -10,6 +10,7 @@ files:
   - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickIV_basecolor_sUKN.png
   - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickV_basecolor_sUKN.png
   - MatterLibrary/textures/fit/makehuman/skin/FitzpatrickVI_basecolor_sUKN.png
+  - MatterLibrary/textures/fit/makehuman/skin/Skin_roughness_sUKN.png
 provenance:
   source: derived
   license: CC0-1.0
@@ -22,7 +23,7 @@ provenance:
     - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/mpfb_aureolae.jpg, sha256: bc69ca4c397a721c8e47fb854028649dd1c5aeb2d184b60c984f3eb6d53e2de7}
     - {url: https://raw.githubusercontent.com/makehumancommunity/mpfb2/3edf9df0551765be43563d047888cf7877eb89b4/src/mpfb/data/textures/sss.png, sha256: d433f15c7240c5b0c91c6fafa482d9c380504efd6ad4d1504b4d7da32d1eec42}
   upstream_licence: "CC0 (MPFB2 LICENSE.ASSETS.md: the hm08 base mesh and its textures)"
-  evidence: tools/converters/fit/gen_skin_maps.py
+  evidence: tools/converters/fit/gen_skin_maps.py, tools/converters/fit/gen_skin_shine.py
 members:
   FitzpatrickI: {made: procedural, tone: [0.847, 0.638, 0.552], base_color_const: [0.8832, 0.6762, 0.5854], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6361, 0.3458, 0.3221]}
   FitzpatrickII: {made: procedural, tone: [0.799, 0.485, 0.347], base_color_const: [0.8331, 0.514, 0.368], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.6, 0.2629, 0.2025]}
@@ -30,3 +31,4 @@ members:
   FitzpatrickIV: {made: procedural, tone: [0.436, 0.227, 0.131], base_color_const: [0.4546, 0.2406, 0.1389], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.3274, 0.1231, 0.0764]}
   FitzpatrickV: {made: procedural, tone: [0.283, 0.148, 0.079], base_color_const: [0.2951, 0.1569, 0.0838], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.2125, 0.0802, 0.0461]}
   FitzpatrickVI: {made: procedural, tone: [0.09, 0.05, 0.02], base_color_const: [0.0938, 0.053, 0.0212], peak_factor: [1.0427, 1.0599, 1.0606], lips_average: [0.0676, 0.0271, 0.0117]}
+  Skin_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.5, "skin_range": [0.447, 0.518], "uncovered_islands": 0, "tzone_average": 0.4133, "cheeks_average": 0.5461}

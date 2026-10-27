@@ -79,6 +79,10 @@ AUTHOR_TIER_PORTS = {
     # the article is bound (LCDSchema §Base colour map) and MULTIPLIED into the base colour.
     # Empty here: with no map supplied the image's default (1) leaves the article's own colour.
     "base_color_map": ("filename", "", "Base Color Map", {}),
+    # Phase22 22.1 (RD-P22-3, RD-P22-4): the MESH's roughness offset, linear data read on the
+    # mesh's own UVs and added to the roughness before the Creator's bias: clamp(r + (map - 0.5) +
+    # bias). A fitted Character article names its own; empty, the image's default (0.5) adds 0.
+    "roughness_map": ("filename", "", "Roughness Map", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -102,6 +106,10 @@ CUTOUT_MASTERS = {"Masked", "Hair"}
 # tier). The picture shades the article's base colour; the masters whose base is layered
 # (TwoLayer), light (Emissive) or seen through (Translucent*) do not take it.
 BASE_COLOR_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}
+
+# Masters that take the mesh's shine maps (Phase22 RD-P22-3): Subsurface only for now, since the
+# skins and lips are Subsurface. Another master takes one when an article needs it.
+SHINE_MAP_MASTERS = {"Subsurface"}
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
@@ -204,6 +212,9 @@ class MaterialSpec:
     # Phase18 (RD-P18-9): a fitted Character article's OWN picture, drawn for the part mesh it
     # `fits`: the input's value in the article (relative path). A binding may still supply its own.
     base_color_map_tex: Optional[str] = None
+    # Phase22 22.1: a fitted article's own roughness map (relative path), drawn for `fits`; it
+    # declares the roughness_map input with that value (LCDSchema §Shine maps)
+    roughness_map_tex: Optional[str] = None
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -354,6 +365,12 @@ def _check_spec(spec: MaterialSpec) -> None:
     if spec.base_color_map and spec.master not in BASE_COLOR_MAP_MASTERS:
         raise ValueError("base_color_map is an input of the masters "
                          f"{sorted(BASE_COLOR_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
+    if spec.roughness_map_tex:
+        if spec.master not in SHINE_MAP_MASTERS:
+            raise ValueError("roughness_map is an input of the masters "
+                             f"{sorted(SHINE_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
+        if not spec.fits:
+            raise ValueError("a shine map is drawn for a part mesh: declare `fits` (Phase22, RD-P22-3)")
     if spec.master == "Hair":
         # Phase08 8.1 (the lead's interim hair: light through the strands, soft edges)
         if not spec.cutout_map or spec.opacity_cutoff is not None:
@@ -404,6 +421,7 @@ def assemble(spec: MaterialSpec) -> str:
         "opacity_cutoff": spec.opacity_cutoff,
         "cutout_map": None,                  # the binding supplies it; the article's is empty
         "base_color_map": spec.base_color_map_tex,   # empty (the binding's), or a fitted article's own
+        "roughness_map": spec.roughness_map_tex,
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -417,6 +435,8 @@ def assemble(spec: MaterialSpec) -> str:
         author_ports.append("cutout_map")
     if spec.base_color_map:
         author_ports.append("base_color_map")
+    if spec.roughness_map_tex:
+        author_ports.append("roughness_map")
     if has_layer2:
         author_ports += ["layer_blend_balance", "layer_blend_contrast"]
         if not spec.layer2_base_color_tex:
@@ -664,6 +684,20 @@ def assemble(spec: MaterialSpec) -> str:
         rough_src = _node("add", f"roughness_overlay{i}", "float",
                           in1=("float", "nodename", rough_src),
                           in2=("float", "nodename", f"overlay{i}_roughness_delta"))
+
+    # Phase22 (RD-P22-4): the mesh's roughness map, an offset around 0.5 read on texcoord 0 (the
+    # mesh's own UVs, outside the Creator's placement) as linear data, added before the bias.
+    if spec.roughness_map_tex:
+        _node("texcoord", "shine_map_uv", "vector2", index=("integer", "value", 0))
+        img = ng.addNode("image", "roughness_map_tex", "float")
+        _add_input(img, "file", "filename", interfacename="roughness_map")
+        _add_input(img, "default", "float", value=0.5)
+        _add_input(img, "texcoord", "vector2", nodename="shine_map_uv")
+        _node("subtract", "roughness_map_offset", "float",
+              in1=("float", "nodename", "roughness_map_tex"), in2=("float", "value", 0.5))
+        rough_src = _node("add", "roughness_mapped", "float",
+                          in1=("float", "nodename", rough_src),
+                          in2=("float", "nodename", "roughness_map_offset"))
 
     if "roughness_bias" in spec.lcd_ports:
         biased = ng.addNode("add", "roughness_biased", "float")

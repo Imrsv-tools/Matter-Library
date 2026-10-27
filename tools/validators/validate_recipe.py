@@ -207,6 +207,39 @@ def fitted_errors(d: dict) -> list:
     return errs + picture_errors(f, fits)
 
 
+# G8 for the shine maps (Phase22 22.1, RD-P22-3): a fitted article's own data map. LINEAR DATA, so
+# not the picture's rule: greyscale ("L") for an offset map, at the mesh's map size. No coverage
+# test: the map's neutral value (no change) is right on any island and is its background too, so
+# an island left neutral is not an unpainted one (F-P22-6).
+DATA_MAPS = {"roughness_map_tex": "L"}
+
+
+def data_map_errors(d: dict) -> list:
+    """G8 for one recipe's shine maps: each against the part mesh ``fits`` names."""
+    from PIL import Image  # noqa: PLC0415 (only a fitted article needs it)
+    errs = []
+    for key, mode in DATA_MAPS.items():
+        rel = d.get(key)
+        if not rel:
+            continue
+        mesh = G.PART_MESHES.get(d.get("fits"))
+        if mesh is None:
+            errs.append(f"G8 {key} is drawn for a part mesh: declare fits")
+            continue
+        f = ((MATERIALS / d["path"]).parent / rel).resolve()
+        if not f.is_file():
+            errs.append(f"G8 {key} {rel!r} does not exist (resolved from the article's folder)")
+            continue
+        n = mesh["map_size"]
+        with Image.open(f) as im:
+            if im.format != "PNG" or im.mode != mode:
+                errs.append(f"G8 {f.name} is {im.format} {im.mode}: {key} is a greyscale PNG "
+                            "(linear data; no alpha)")
+            elif im.size != (n, n):
+                errs.append(f"G8 {f.name} is {im.size[0]} x {im.size[1]}: {d['fits']}'s maps are {n} x {n}")
+    return errs
+
+
 # --- G3 / G5 / G6 / G7 -------------------------------------------------------------------
 def _colour(s: str) -> list:
     return [float(c) for c in s.split(",")]
@@ -299,6 +332,7 @@ def check_recipe(d: dict, schema: dict, file_stem: str | None = None) -> list:
     if (dom, cls) == ("utility", "virtual") and (overlays or "maskset_tex" in d):
         errs.append("G7 a utility/virtual reference carries no wear layers (it stays pure; C1)")
     errs += fitted_errors(d)
+    errs += data_map_errors(d)
     errs += scale_fit_errors(d)
     return errs
 
