@@ -1,7 +1,7 @@
 # Phase22 — Skin Maps Beyond Colour
 
-**Status:** ACTIVE (IN DISCOVERY) — **the Brief is written, with one lead question open (Q-P22-1).** Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
-**Lane:** `build` (§Risk lane). **Next:** the lead answers Q-P22-1, then `/execute P22`.
+**Status:** ACTIVE (IN DISCOVERY) — **BRIEF READY** (Pass 2, 2026-10-27: the lead answered Q-P22-1 by rejecting Blender as the look surface and proposing the library's Unreal test runtime, RD-P22-11). Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
+**Lane:** `build` (§Risk lane). **Next:** `/execute P22`.
 **Measured at:** `49da20e`, on **the machine with Unreal**: Unreal 5.8 at the path `unreal/build.sh` takes as `UE`, and the official Blender 5.2.2 as `MATTER_BLENDER` (Learnings B22).
 **Builds on:** *Skin Maps* ([`Phase21_SkinMaps.md`](Complete/Phase21_SkinMaps.md)), which shipped the colour map. **Research:** [`261014_R_SkinMaps.md`](../Research/261014_R_SkinMaps.md) (the survey, F-SKM-11 … 18) · [`261026_R_SyntheticSkinAndEyes.md`](../Research/261026_R_SyntheticSkinAndEyes.md) (RD-SYN-3) · [`261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (the order, RD-CMT-1 … 4, F-CMT-9).
 
@@ -29,48 +29,45 @@ Every tool runs on the machine with Unreal:
 - Blender reads the maps through `load_article.py`;
 - Unreal through `build_masters.py`, built and run here as a local package; `unreal-runtime-v7` is published at the lead's word.
 
-The look is judged in a **shadowed close-up**, and tool agreement on the rig.
+The look is judged in **a shadowed look view added to the library's own Unreal test runtime** (RD-P22-11), the same Unreal, Substrate and masters Studio builds from. Tool agreement is judged on the rig. **Studio** sees the maps once the platform carries them (a ledger row filed at 22.1, F-P22-8).
 
 ### First human test
 
 **Where:** the machine with Unreal; every tool the clicks compare runs there (F-P22-3).
-- **The look:** the lead's Blender, on a **shadowed close-up scene** built headless from the factory scene into its own file and opened detached (Blender B10–B11, ClaudeCode CC2). It has a side key light with shadows, a fill, a rim, a neutral grey dome, fixed exposure, and a grey and a chrome ball (the look-dev recipe the platform's character research names). Its cameras are the face (front and three-quarter), the back of the hand, and a backlit ear. Today's skin sits beside the new one, as at Phase21's click 1, the surface on which the lead said *"still reads plastic"*.
-- **Tool agreement:** the rig's sheet (`face`, `hand`) in Storm, Blender and Unreal. Storm runs at 512 px on this machine (Storm S11).
-- **The agent drives every tool; the lead looks and judges.** Each path goes in the handback.
-- **Which surface carries the look verdict** is Q-P22-1. These clicks are its recommended answer (a).
+- **The look: the library's Unreal test runtime, in a new shadowed look view** (RD-P22-11). It adds a side key light with shadows, a fill and a rim, a neutral dome, and fixed exposure, with the renderer set as close to Studio's as the runtime allows (read from the platform at execute). Its cameras are the face (front and three-quarter), the back of the hand, and a backlit ear, on the rig's hm08 character. **Today's skin and the new one are rendered side by side into a look sheet**, which the agent opens with `xdg-open`; the path goes in the handback. It is the same Unreal, Substrate and masters Studio builds from (F-P22-8).
+- **Tool agreement:** the rig's sheet (`face`, `hand`) in Storm, Blender and Unreal, in the rig's matched light. Storm runs at 512 px on this machine (Storm S11).
+- **The agent drives every tool; the lead looks and judges.**
 
-1. **Roughness, one tone (22.1).** Fitzpatrick IV in the shadowed close-up, today's beside it.
+1. **Roughness, one tone (22.1).** Fitzpatrick IV in the look view, today's beside it. *First, before any map: today's skin alone in the look view, as the baseline* (the lead: *"(or show me)"*).
    - *Judge:*
      - the forehead, nose and chin catch a brighter, tighter highlight than the cheeks;
      - the even sheen is broken;
      - the tone is unchanged;
      - **does it still read as plastic?**
    - **Can the surface show it?**
-     - The key light puts a highlight across the forehead and one cheek. The rig's light has no shadows and cannot show it (RD-CMT-4's reason).
-     - The face gets about a 441-pixel square of the atlas (F-SKM-26), and the oily zones span tens of those pixels.
+     - The key light puts a highlight across the forehead and one cheek. The rig's matched light has no shadows and cannot show it (RD-CMT-4's reason).
+     - The face gets about a 441-pixel square of the atlas (F-SKM-26), and the oily zones span tens of those pixels. The look view renders above the rig's 512 px; Storm's 512 px limit (S11) does not apply to Unreal.
      - The fixture is the rig's own hm08 character, the mesh the platform builds from.
      - **The roughness map's average over the skin is neutral** (RD-P22-4), so the tone and the overall shine stay as they are, and only their spread changes.
 2. **Relief (22.2).** The same tone, with the normal and cavity maps added.
    - *Judge:* the creases at the eyes, the fold from nose to mouth, the knuckles and the lip lines catch and lose the light, and the shine dims inside them. Nothing reads as painted-on shading. The relief runs across the lip edge with no seam (RD-P22-8).
-   - **Can the surface show it?** The key light at a grazing angle across the face and the back of the hand. The creases are drawn at the scale of millimetres to centimetres, which the 441-pixel face carries. The pores stay finer than a pixel at this framing, which is correct (F-P21-1).
+   - **Can the surface show it?** The key light grazes the face and the back of the hand. The creases are drawn at the scale of millimetres to centimetres, which the 441-pixel face carries. The pores stay finer than a pixel at this framing, which is correct (F-P21-1).
 3. **Light through ears and fingers (22.3), only if its probe passes** (RD-P22-7).
    - *Judge:* in the backlit-ear camera, the ear and the fingertips glow warm at their thin edges, more than today's.
-   - **Can the surface show it?** Cycles' random walk already carries light through thin geometry, so today's beside the new one is what shows the map's own share. The rig has no backlight, so this click is Blender's. Unreal's response is measured by the agent on the probe.
-4. **Six tones, three tools (22.4).** The rig's sheet: `face` and `hand` for Fitzpatrick I to VI, today's beside the new, in Storm, Blender and Unreal.
+   - **Can the surface show it?** The look view's backlit camera, today's beside the new. The probe also measures Blender's response for agreement.
+4. **Six tones, three tools (22.4).** The rig's sheet: `face` and `hand` for Fitzpatrick I to VI, today's beside the new, in Storm, Blender and Unreal; and the look sheet for the six tones.
    - *Judge:* every tone takes the same shine, and the three tools move alike.
    - **The agent's evidence, in the 22.4 log:** the rig's Moved verdict per tone, the roughness map's average over the skin (neutral to within 1 %), and G8 on every map.
 5. **Pictured (22.4).** The thumbnail sheet: the six skins' `face` and `hand` and the six lips' `lips`, beside today's.
    - *Judge:* skin you would pick from a card.
 
 **Reconciled click by click:**
-- Click 1 needs 22.1 only: the maker's roughness map, the input in the contract, the gates, IV's skin, Blender's loader and the scene builder. Unreal's and Storm's halves of 22.1 are the agent's evidence (the rig on IV), not a click.
+- Click 1 needs 22.1 only: the look view (and its baseline), the maker's roughness map, the input in the contract, the gates, IV's skin and Unreal's builder. Blender's and Storm's halves of 22.1 are the agent's evidence (the rig on IV), not a click.
 - Click 2 needs 22.2.
 - Click 3 needs 22.3, and only if its probe passes.
 - Clicks 4 and 5 need 22.4.
 
-**Not a click: Unreal's look.** The rig's Unreal column has no shadows, so it shows agreement, not the look. Unreal's look is the platform's look-dev scene (P33), through Studio, which cannot draw a new map until the platform does its own work (F-P22-8). → Q-P22-1.
-
-**Not a click: Studio.** The platform's, through a ledger row written at 22.4.
+**Not a click: Studio.** Studio sees the maps once the platform carries them (the ledger row filed at 22.1; F-P22-8) and judges them in its own look-dev scene when that exists (P33). That sitting is the platform's and does not hold this phase's close (RD-P22-12).
 
 ### In now
 
@@ -81,12 +78,12 @@ The look is judged in a **shadowed close-up**, and tool agreement on the rig.
 | **Fitzpatrick IV's skin and lips** wearing the maps (RD-P22-8), re-assembled in place at `v01` | 22.1, 22.2 |
 | **Blender:** `load_article.py` reads each map on the mesh's UVs as non-colour data and combines it as the contract says | 22.1, 22.2 |
 | **Unreal:** `build_masters.py` samples each map on the mesh's own UVs with a neutral default, and `drivers/unreal.py` wires it. Built and packaged here, and run by the rig as a local package | 22.1, 22.2 |
-| **The shadowed close-up's builder**, tracked (RD-P22-9) | 22.1 |
+| **The runtime's shadowed look view** (RD-P22-11): the runtime's game mode lights a job asking for it with a key light that casts shadows, a fill and a rim, and turns on the shadows its matched light turns off. The rig asks for it and writes a look sheet, today's beside the new. Rebuilt and packaged here. **Its first picture is today's skin, the baseline** | 22.1 (first) |
 | **The thickness probe** (RD-P22-7), then the map and its input if it passes | 22.3 |
 | **All six tones and lips** wearing the shared maps; the rig's sheet over six tones | 22.4 |
 | **Thumbnails re-made** (every kept one: the masters' hash moves with `load_article.py`, F-P22-6); the dev install re-served | 22.4 |
 | **Written down:** LCDSchema (the new inputs, a section of their own), `SkinMaps.md` (*colour only, for now* becomes the shine maps, with how to make one), the Glossary (*shine map*), and Learnings where a trap is found | 22.4 |
-| **Ledger:** a row asking Studio to carry the maps (F-P22-8). Its id is claimed when it is written | 22.4 |
+| **Ledger:** a row asking Studio to carry the three maps (F-P22-8), filed as soon as `roughness_map` is in the contract, so a platform session can work alongside. Its id is claimed when it is written | 22.1 |
 | **`unreal-runtime-v7`** and a dev snapshot, each at the lead's word, with `HEAD` pushed | 22.4 |
 
 ### Not now
@@ -112,8 +109,9 @@ The look is judged in a **shadowed close-up**, and tool agreement on the rig.
 - **The fitted article, its part mesh, `fits` and G8:** Phase18 built them; Phase21 used them.
 - **The rig passes an article's own maps on generically** (`job.Article.own_maps`). Storm needs no wiring, and data maps already stay raw, which is right (Storm S10).
 - **Thumbnails** on the atlas, for fitted articles (Phase21 `50ed85b`).
+- **The look view needs no new renderer:** the runtime already spawns a sun and a sky light and turns their shadows off on purpose, to match the rig (F-P22-11). The look view is those lights with shadows on, plus a fill and a rim, chosen by the job.
 - **Contracts touched:** LCDSchema's author tier gains three inputs, added the way `cutout_map` and `base_color_map` were added. Every article that does not declare them assembles byte-identically. **No Creator port, name, type or range moves.**
-- **New code:** the maker; one branch per map in the assembler, Blender's loader and Unreal's builder; the drivers' wiring; G8's rule for data maps; the scene builder. **Nothing replaces a native behaviour.**
+- **New code:** the maker; one branch per map in the assembler, Blender's loader and Unreal's builder; the drivers' wiring; G8's rule for data maps; the runtime's look view and its sheet. **Nothing replaces a native behaviour.**
 
 ### Decisions that bind
 
@@ -130,7 +128,7 @@ The look is judged in a **shadowed close-up**, and tool agreement on the rig.
 - **RD-P21-6** (the lead, *"a,"*, on an option that read *"un-park … next, with its roughness map first"*): roughness comes first.
 - **RD-SYN-3** (*"3) yes"*): un-parked. **RD-CMT-3:** the order of the character phases.
 - **RD-CMT-2** (*"usable on all the chars - not made for ONE character"*): maps on the approved mesh, placed by anatomy, pass the inclusion test by construction.
-- **RD-CMT-4** (*"5) yes"*): the look verdict for a character material is made in the platform's shadowed look-dev scene; the rig stays the tool-agreement check. → Q-P22-1, because the scene cannot show this phase's maps yet (F-P22-8).
+- **RD-CMT-4** (*"5) yes"*): the look verdict for a character material is made in the platform's shadowed look-dev scene; the rig stays the tool-agreement check. That scene does not exist yet and Studio cannot draw these maps yet (F-P22-8), so this phase judges in the library's own Unreal look view (RD-P22-11), and the Studio verdict follows (RD-P22-12).
 - **The LCD principle** (the lead, 2026-09-28: *"we use the master materails to lean in on the egines BEST qaulities"*): a value one viewer ignores is still authored, and agreement is judged on the nod. It is the bar for the thickness probe.
 - **Pre-release, no versioning** (`AI_WorkingAgreement.md` §Settled practices): the twelve articles are rebuilt in place at `v01`. None is in a frozen release (`library/releases/*.lock.yaml`, grepped 2026-10-27).
 
@@ -164,13 +162,19 @@ The look is judged in a **shadowed close-up**, and tool agreement on the rig.
 - **RD-P22-8 — The lips carry the normal and cavity maps and keep their own roughness.**
   - The relief runs across the lip edge, and the lips keep their finish (RD-P21-2).
   - The nails wear no map (their own part).
-- **RD-P22-9 — The shadowed close-up's builder is a tracked script under `tools/parity/scene/`, not `/tmp`.**
-  - Phase21's builder was lost (F-P22-9), and the next four character phases judge in the same light until the platform's look-dev scene can show their pieces (P33).
-  - It builds a scene for a sitting; it is not a gate.
+- ~~**RD-P22-9 — The shadowed close-up's builder is a tracked script under `tools/parity/scene/`.**~~ *Superseded 2026-10-27 by RD-P22-11: the look surface is the Unreal runtime's look view, not a Blender scene.* What survives: the look surface is tracked code, not a `/tmp` script (F-P22-9), because the next four character phases judge in the same light until Studio's look-dev scene can show their pieces (P33).
 - **RD-P22-10 — The maker is the library's, and in 3D.**
   - It reuses `gen_synth_skin.py`'s rasteriser and the makers' pinned MPFB2 masks, and adds no new picture drawn on the atlas.
   - It writes its provenance into `library/provenance/sources/fit/makehuman/skin.yaml`.
   - A contributor's own map painted on the atlas is accepted, bound to its layout, as for colour (`SkinMaps.md`).
+- **RD-P22-11 — The look is judged in a shadowed look view in the library's Unreal test runtime** (Pass 2; answers Q-P22-1).
+  - **The lead, verbatim (2026-10-27):** *"I think trying to judge if it look plastic in studio using Blender is not the way... Also... why not update our UE matter test tool to use the new maps first and shoe screensshots from that? (or show me)"*.
+  - *The reading:* Blender is not the look surface, and option (a) is withdrawn. The look surface is the runtime the rig already drives, given a look view with shadows, which shows today's skin first, then each map.
+  - **Why it stands in for Studio better than Blender:** it is Unreal with Substrate, running the masters Studio builds from the library's own builder (F-P22-8).
+  - The rig's matched, shadowless light is unchanged and stays the tool-agreement check. The look view is a separate view a job asks for.
+- **RD-P22-12 — The close does not wait for Studio** *(unless the lead says otherwise)*.
+  - Studio needs platform work per map (F-P22-8) and a look-dev scene that does not exist yet (P33). The library files the ask at 22.1, so the work can run alongside.
+  - The Studio sitting is the platform's, recorded in the ledger, as Studio's side did not hold Phase21's close.
 
 ### Risk lane — `build`
 
@@ -190,6 +194,7 @@ The controls this phase touches, each read on 2026-10-27:
   - Showing the maps in Unreal outside this machine needs `unreal-runtime-v7`. `publish.sh 7` publishes a public asset: the lead's word, with `HEAD` pushed.
   - Unreal's Subsurface master samples 9 textures today; three or four more stay under 16 (F-P22-5).
   - Before any launch, check `ps -ef | grep "[U]nrealEditor"` (the lead's Studio shares this GPU).
+- **The runtime's C++** (`unreal/MatterRuntime/Source/MatterRuntime/MatterRuntimeGameMode.cpp`): the look view is a lighting choice the job makes. **A job that does not ask for it lights exactly as today**, so the rig's matched light and every past verdict stand. This is a C++ change, so it needs `build.sh editor` (compiled with its capped job count) as well as `masters` and `package`. The defaults check is the rig on a Matter article and on IV before and after, compared to v6.
 - **The tracked Asset-Browser library** (`blender/asset_library/MatterLibrary.blend`): it has only ever been regenerated on the library machine. If 22.4 needs it regenerated, ask first.
 - **Publication:** a dev snapshot and a runtime, each at the lead's word. **Data:** nothing is deleted.
 - **Content:** no map carries anatomy (RD-SKM-4). Thumbnails show only the face, hand and lips (RD-MP-3).
@@ -198,9 +203,10 @@ The controls this phase touches, each read on 2026-10-27:
 ### Step list
 
 - **22.1 — Roughness, one tone, end to end:** Fitzpatrick IV's skin, oily and dry by region.
+  - **First, the runtime's look view, and today's skin in it** (the baseline picture).
   - The maker's roughness map, and `roughness_map` in the contract, the assembler and the gates.
-  - Blender's loader and Unreal's builder, with Unreal built and packaged here.
-  - The shadowed close-up's builder.
+  - Unreal's builder and Blender's loader, with Unreal built and packaged here.
+  - The ledger row asking Studio to carry the three maps.
   - The rig on IV in all three tools, as the agent's evidence.
   - **Click 1.**
 - **22.2 — Relief:** the normal and cavity maps and their inputs, on IV's skin and lips. **Click 2.**
@@ -229,7 +235,13 @@ The controls this phase touches, each read on 2026-10-27:
     - Build with `UE=~/Documents/Unreal/Linux_Unreal_Engine_5.8.0 bash unreal/build.sh masters`, then `package`.
     - Run the rig with `MATTER_UNREAL_RUNTIME=$PWD/unreal/MatterRuntime/Packaged/Linux/MatterRuntime.sh`.
     - Keep a copy of a `MATTER built …` log first, for the defaults check.
-  - **The sitting:** `tools/parity/scene/` gains the shadowed close-up's builder. Its output goes to the git-ignored `library/parity/P22_Sitting/`, with today's articles re-assembled from `HEAD` beside it, as Phase21 did.
+  - **The look view:**
+    - `MatterRuntimeGameMode.cpp` / `.h` read a lighting choice from the job: the look view's key light with shadows, fill and rim, and shadows on. Without the choice, today's matched light.
+    - `tools/parity/JOB_FORMAT.md` (the field), `tools/parity/job.py` (the look cameras: face front and three-quarter, the back of the hand, a backlit ear) and `tools/parity/drivers/unreal.py`.
+    - A look sheet, today's beside the new, from the existing sheet tools (`pair_sheet.py`).
+    - Today's articles re-assembled from `HEAD` into the git-ignored `library/parity/P22_today/`, as Phase21 did.
+    - Build: `UE=… bash unreal/build.sh editor`, then `masters` and `package`.
+  - **The ledger row:** `docs/Planning/PlatformDependencies.md`, written from F-P22-8's list, by content.
   - **Smoke:** `uv run tools/parity/rig.py --character Skin_FitzpatrickIV_Clean_Base_s001_v01`.
 - **22.2:** the same for `normal_map` (added to the tangent-space XY before `normal_out_unit`) and `cavity_map` (× `specular_weight`). The recipes for `Lips_FitzpatrickIV_*.json` too.
 - **22.3:** the probe, run on IV in scratch (never committed), backlit, in Blender and Unreal. Then the same wiring as above, or the deferral written into `SkinMaps.md` and §Deferred.
@@ -239,24 +251,15 @@ The controls this phase touches, each read on 2026-10-27:
   - `tools/thumbnails/` for every kept thumbnail;
   - `serve_to_stage.py` (then close Stage);
   - `LCDSchema.md`, `SkinMaps.md`, `docs/Glossary.md`;
-  - `docs/Planning/PlatformDependencies.md` (the row);
+  - the ledger row brought up to date with what shipped;
   - at the lead's word: `unreal/publish.sh 7`, `unreal/RUNTIME.json`, `build_snapshot.py --publish`.
 - **Test ceiling (build):** existing tests and units for the maker: the roughness map's average over the skin is neutral; the normal map decodes to unit vectors, flat where it should be; every island is covered. One real-path smoke: the rig on the character. G8's data-map rule is a rule in an existing gate. **No new gate or lane.**
 
 ### Open for the lead
 
-1. **Q-P22-1 — Where is this phase's look verdict made?**
-   - **The tension:** RD-CMT-4 (*"5) yes"*) puts a character material's look verdict in the platform's shadowed look-dev scene. **That scene cannot show these maps yet:**
-     - Studio still draws with masters of its own (P20 OPEN), so each new input needs platform work first;
-     - opening a library draft there is P33, also OPEN (F-P22-8).
-   - **(a) The library's shadowed close-up in Blender is this phase's look surface (recommended).**
-     - It is the light Phase21's click 1 used, where you said *"still reads plastic"*, so it can show the fault.
-     - It is built to the look-dev recipe (shadowed key, fill, rim, a neutral dome, fixed exposure, grey and chrome balls).
-     - The rig stays tool agreement.
-     - The verdict in Studio's look-dev scene is then the platform's sitting, once the new ledger row and P33 land. It is recorded there and does not hold this phase's close, as Studio's side did not hold Phase21's.
-   - **(b) The close waits for your verdict in Studio's look-dev scene.**
-     - The phase builds and judges everything else, then parks (`ACTIVE (parked on P33 and the new row)`) until Studio carries the maps and can open a draft there.
-     - That is two pieces of platform work, on masters that are not yet the library's.
+*Nothing open (2026-10-27, Pass 2).*
+
+- ~~**Q-P22-1 — Where is this phase's look verdict made?**~~ → **RD-P22-11.** The lead rejected (a), the shadowed close-up in Blender: *"trying to judge if it look plastic in studio using Blender is not the way"*. They proposed the library's Unreal test tool instead: *"why not update our UE matter test tool to use the new maps first and shoe screensshots from that? (or show me)"*. (b), waiting for Studio, is decided against by RD-P22-12, unless the lead says otherwise.
 
 ---
 
@@ -290,15 +293,22 @@ The controls this phase touches, each read on 2026-10-27:
   - `job.Article.own_maps` returns every `filename` input with a value, and `maps_for` puts them on the binding.
   - Each driver still wires each port.
   - `MAP_COLORSPACE` marks only `base_color_map` as sRGB, so data maps stay raw, which is right (Storm S10).
-- **F-P22-8 — Studio cannot show a new map yet.**
-  - Studio draws with masters of its own (P20 OPEN), so every new input needs platform work.
-  - Opening a library draft in the look-dev scene is P33, OPEN.
-  - **The platform's character research** (2026-10-25 … 26, read at its origin on 2026-10-27; nothing on the character since) lists the shine maps as owed under every route. It describes skin that reads as skin as a roughness map, a specular or cavity map and a face normal, with the tiling pore normal faded at grazing angles. It notes that a baked normal map needs MikkTSpace-compatible tangents on the consumer's side.
-  - Recorded by content (`LOCAL_DELTAS.md` §Separation). The ledger row at 22.4 states the tangent need as this library's requirement.
-- **F-P22-9 — Phase21's sitting scene is not on this machine.** It is in the library machine's git-ignored `library/parity/P21_Sitting/`, and its builder was a `/tmp` script that was not kept. → RD-P22-9.
+- **F-P22-8 — What Studio needs to see a new map** (read at the platform's origin, 2026-10-27, recorded by content; `LOCAL_DELTAS.md` §Separation). *Corrected in Pass 2: Pass 1 read the ledger's P20 `OPEN` as "Studio draws with masters of its own".*
+  - **Studio already draws Matter with the library's masters.** The platform builds them into its own project by running this repo's `build_masters.py` (M7), and binds textures by the library's slot names (`base_color_map_tex`, `roughness_tex`, …). That was seen on Desktop in the platform's Matter-in-Studio work (2026-10-05). P20 stays `OPEN` for its close notes.
+  - **So per new map, the platform:**
+    1. re-runs its masters build from the library's updated builder, which gives Studio's masters the new slots;
+    2. has Stage read the map from the article (the article's own value, or the binding's) and send it to Studio, through the same places `base_color_map` passes through today;
+    3. binds the new slot as **linear data** in the plugin, with the neutral default when an article has none (as it already does for a missing normal);
+    4. **for the normal map:** builds MikkTSpace-compatible tangents, or a baked normal map will not match the other tools.
+  - **To judge the look in Studio:** a look-dev scene for characters (P33). None exists on the platform yet (searched 2026-10-27).
+  - **The platform's character research** (2026-10-25 … 26) lists the shine maps as owed under every route, and describes skin that reads as skin as a roughness map, a specular or cavity map and a face normal, with the tiling pore normal faded at grazing angles.
+- **F-P22-9 — Phase21's sitting scene is not on this machine.** It is in the library machine's git-ignored `library/parity/P21_Sitting/`, and its builder was a `/tmp` script that was not kept. → RD-P22-9, superseded by RD-P22-11.
 - **F-P22-10 — The sweep for consumer rulings found nothing newer than the 2026-10-27 order.**
   - The platform's docs, fetched 2026-10-27, have no character commit after 2026-10-26, and CMT already read the character research through its last pass.
   - In this repo, the only later mention of this phase is the CharSkins retro's numbering question, which this invocation answers.
+- **F-P22-11 — The library's Unreal runtime turns its shadows off on purpose** (read 2026-10-27).
+  - `MatterRuntimeGameMode.cpp` spawns a sun and a sky light with shadows off, turns off dynamic and contact shadows, Lumen's light and its reflections, and casts no shadow from the mesh. `Config/DefaultEngine.ini` says why: matched lighting (`tools/parity/JOB_FORMAT.md`).
+  - So its pictures cannot show plastic today, and a shadowed look view is a lighting choice added beside the matched one, not a new renderer.
 
 ## Deferred
 
@@ -309,12 +319,12 @@ The controls this phase touches, each read on 2026-10-27:
 | Wrinkle maps driven by expressions | a later phase, with the platform pushing face-shape weights | `normal_map` and its combination |
 | The 15 synthetic drafts wearing the maps | *Synthetic Skin Sets* | the shared maps; the three inputs |
 | A mark's own relief and shine | *Skin Layers* | the `normal_map` and `roughness_map` channels, and how they combine |
-| Studio wearing the maps, and the verdict in its look-dev scene | the platform, through the ledger (the new row; P33) | the three inputs as LCDSchema states them; the articles as served; `unreal-runtime-v7`'s Subsurface master |
+| Studio wearing the maps, and the verdict in its look-dev scene | the platform, through the ledger (the row filed at 22.1; P33); does not hold the close (RD-P22-12) | the three inputs as LCDSchema states them; the articles as served; `unreal-runtime-v7`'s Subsurface master |
 | The glow through thin parts, **only if 22.3's probe fails** | a dated `(planned)` mark in `SkinMaps.md` | the probe's record |
 
 ## Depends on
 
-- **Nothing outside this repo, for every click**, under Q-P22-1's answer (a). Under (b), the close depends on the platform's new row and P33.
+- **Nothing outside this repo, for every click** (RD-P22-11, RD-P22-12). Studio's sitting follows the platform's work on the 22.1 row and P33.
 - `unreal-runtime-v7` and the dev snapshot are the lead's word, with `HEAD` pushed.
 
 ## Discovery Log
@@ -342,3 +352,7 @@ The controls this phase touches, each read on 2026-10-27:
   - **Grepped the tree for the phase's name:** no code; only the planning docs above.
   - **Baseline:** `run_all.py` at `49da20e`, on the machine with Unreal: **18 lanes, 18 PASS, 0 SKIP, 0 FAIL** (every lane ran). `check_exporter.sh` is not baselined: no step touches `blender/addons/` or `tools/conformance/`.
   - **Decided by the agent unless the lead says otherwise:** RD-P22-1 to RD-P22-10. **Put to the lead:** Q-P22-1.
+- **2026-10-27 — Pass 2** (the lead on Q-P22-1: *"1) What does it take to get Studio to see the new maps? I think trying to judge if it look plastic in studio using Blender is not the way... Also... why not update our UE matter test tool to use the new maps first and shoe screensshots from that? (or show me)"*).
+  - **Read at the platform's origin:** how Studio builds its Matter masters and binds their textures, how Stage carries `base_color_map`, and whether a look-dev scene exists. → F-P22-8 corrected.
+  - **Read in the tree:** the runtime's lighting (F-P22-11).
+  - **Changed:** the look surface becomes the runtime's shadowed look view (RD-P22-11; RD-P22-9 superseded). The ledger row moves to 22.1. The close does not wait for Studio (RD-P22-12, unless the lead says otherwise). The First human test is rewritten: today's skin in the look view first.
