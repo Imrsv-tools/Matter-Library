@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase23 — Synthetic Skin Sets — ACTIVE (BRIEF READY) *(numbered 2026-10-27 by the lead's "/discovery P23", as the head of `## Future` (RD-CMT-3, F-CMT-9), and opened by "yes. synth skin"; discovery Pass 1 wrote the Brief the same day; seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2)*
-**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
-- `docs/Planning/Phases/Phase23_SyntheticSkinSets.md` · research `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 1) · `docs/Planning/Research/261027_R_CharacterMaterials.md`
+*No active phase (Phase23 closed 2026-10-27).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -230,4 +228,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### Phase22 — Skin Maps Beyond Colour — COMPLETE
 **Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
 - `docs/Planning/Phases/Complete/Phase22_SkinMapsBeyondColour.md`
-*Closed 2026-10-27: four shine maps on all six skins in three tools, `unreal-runtime-v7`, `matterlib-0.2.0-dev.13`; the lead: "totally fake but better", so the building continues.*
+*Closed 2026-10-27: four shine maps on all six skins in three tools, `unreal-runtime-v7`, `matterlib-0.2.0-dev.13` (never left draft; `dev.14` carries it); the lead: "totally fake but better", so the building continues.*
+
+### Phase23 — Synthetic Skin Sets — COMPLETE
+**Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
+- `docs/Planning/Phases/Complete/Phase23_SyntheticSkinSets.md`
+*Closed 2026-10-27: three skins per tone from the pigment maker, the face's colour placed per fit group, `matterlib-0.2.0-dev.14`; the lead: "looks good".*
