@@ -124,10 +124,16 @@ bool AMatterRuntimeGameMode::LoadJob(const FString& Path)
 	OutDir = Job->GetStringField(TEXT("out_dir"));
 	int32 Format = 0;
 	Job->TryGetNumberField(TEXT("format"), Format);
-	if (Format != JobFormat)
+	if (Format < OldestJobFormat || Format > JobFormat)
 	{
 		// a pinned package older or newer than the driver: say so rather than misread the buffers
-		Note(FString::Printf(TEXT("MATTER job format %d, this runtime reads format %d (rebuild or re-pin it)"), Format, JobFormat), true);
+		Note(FString::Printf(TEXT("MATTER job format %d, this runtime reads formats %d to %d (rebuild or re-pin it)"),
+			Format, OldestJobFormat, JobFormat), true);
+		return false;
+	}
+	if (Format < 4 && Job->HasField(TEXT("look")))
+	{
+		Note(TEXT("MATTER a job with a \"look\" must be format 4"), true);
 		return false;
 	}
 	Width = Job->GetIntegerField(TEXT("width"));
@@ -247,7 +253,92 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	SF.SetEyeAdaptation(false);
 	SF.SetTemporalAA(false);
 	SF.SetAntiAliasing(false);    // the driver supersamples instead
+
+	const TSharedPtr<FJsonObject>* Look = nullptr;
+	if (Job->TryGetObjectField(TEXT("look"), Look))
+	{
+		BuildLook(*Look);
+	}
 	return true;
+}
+
+void AMatterRuntimeGameMode::BuildLook(const TSharedPtr<FJsonObject>& Look)
+{
+	// The look view (Phase22 RD-P22-11): a shadowed key, a fill and a rim, a dimmed dome, and the
+	// shadows, contact shadows and screen-space AO the matched view turns off. Studio also runs
+	// Lumen; this runtime cannot (its meshes are built at run time with no distance fields), so
+	// the dome and the fill stand in for bounce light.
+	auto Aim = [](UDirectionalLightComponent* C, const TSharedPtr<FJsonObject>& L, float& Intensity)
+	{
+		const FVector Dir = Vec(L, TEXT("direction"), FVector(0, 0, -1)).GetSafeNormal();
+		C->SetWorldRotation(FRotationMatrix::MakeFromX(Dir).Rotator());
+		Intensity = L->GetNumberField(TEXT("intensity"));
+		C->SetIntensity(Intensity);
+		C->SetLightColor(FLinearColor::White);
+		double Angle = 0.53;
+		L->TryGetNumberField(TEXT("angle"), Angle);
+		C->SetLightSourceAngle(Angle);
+	};
+	auto Spawn = [this, &Aim](const TSharedPtr<FJsonObject>& L, float& Intensity) -> UDirectionalLightComponent*
+	{
+		ADirectionalLight* A = GetWorld()->SpawnActor<ADirectionalLight>(FVector::ZeroVector, FRotator::ZeroRotator);
+		UDirectionalLightComponent* C = Cast<UDirectionalLightComponent>(A->GetLightComponent());
+		C->SetMobility(EComponentMobility::Movable);
+		C->SetCastShadows(false);
+		Aim(C, L, Intensity);
+		return C;
+	};
+
+	// the key is the sun, re-aimed, and the one light that casts shadows
+	const TSharedPtr<FJsonObject> Key = Look->GetObjectField(TEXT("key"));
+	Aim(SunComp, Key, SunIntensity);
+	SunComp->SetCastShadows(true);
+	double Contact = 0.0;
+	Key->TryGetNumberField(TEXT("contact_shadow"), Contact);
+	SunComp->ContactShadowLength = Contact;
+	SunComp->MarkRenderStateDirty();
+	const TSharedPtr<FJsonObject>* L = nullptr;
+	if (Look->TryGetObjectField(TEXT("fill"), L))
+	{
+		FillComp = Spawn(*L, FillIntensity);
+	}
+	if (Look->TryGetObjectField(TEXT("rim"), L))
+	{
+		RimComp = Spawn(*L, RimIntensity);
+	}
+	double Sky = SkyIntensity;
+	if (Look->TryGetNumberField(TEXT("sky_intensity"), Sky))
+	{
+		SkyIntensity = Sky;
+		SkyComp->SetIntensity(SkyIntensity);
+	}
+	for (const auto& Pair : Meshes)
+	{
+		Pair.Value->SetCastShadow(true);
+	}
+	bool bVirtual = false;
+	if (Look->TryGetBoolField(TEXT("virtual_shadows"), bVirtual) && bVirtual)
+	{
+		// Studio's shadow method (virtual shadow maps); the matched view never casts a shadow
+		if (IConsoleVariable* V = IConsoleManager::Get().FindConsoleVariable(TEXT("r.Shadow.Virtual.Enable")))
+		{
+			V->Set(1, ECVF_SetByCode);
+		}
+	}
+	FEngineShowFlags& SF = CaptureComp->ShowFlags;
+	SF.SetDynamicShadows(true);
+	SF.SetContactShadows(true);
+	double AO = 0.0;
+	Look->TryGetNumberField(TEXT("ambient_occlusion"), AO);
+	if (AO > 0.0)
+	{
+		SF.SetAmbientOcclusion(true);
+		SF.SetScreenSpaceAO(true);
+		CaptureComp->PostProcessSettings.AmbientOcclusionIntensity = AO;
+	}
+	Note(FString::Printf(TEXT("MATTER look key=%s %.3f fill=%.3f rim=%.3f sky=%.3f contact=%.3f ao=%.2f virtual=%d"),
+		*SunComp->GetDirection().ToString(), SunIntensity, FillIntensity, RimIntensity, SkyIntensity,
+		Contact, AO, int32(bVirtual)), false);
 }
 
 bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
@@ -510,6 +601,18 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 	S->TryGetNumberField(TEXT("sky_scale"), SkyScale);
 	SunComp->SetIntensity(SunIntensity * SunScale);
 	SkyComp->SetIntensity(SkyIntensity * SkyScale);
+	// the look view's fill and rim follow the key unless a setting scales them itself
+	double FillScale = SunScale, RimScale = SunScale;
+	S->TryGetNumberField(TEXT("fill_scale"), FillScale);
+	S->TryGetNumberField(TEXT("rim_scale"), RimScale);
+	if (FillComp)
+	{
+		FillComp->SetIntensity(FillIntensity * FillScale);
+	}
+	if (RimComp)
+	{
+		RimComp->SetIntensity(RimIntensity * RimScale);
+	}
 
 	TMap<FString, UMaterialInstanceDynamic*> Built;
 	const TSharedPtr<FJsonObject> Mats = S->GetObjectField(TEXT("materials"));

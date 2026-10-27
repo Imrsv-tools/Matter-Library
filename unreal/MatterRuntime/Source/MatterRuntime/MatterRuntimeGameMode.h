@@ -29,6 +29,11 @@ class UTextureRenderTarget2D;
  * Lighting is matched to the rig (JOB_FORMAT.md): a sun with no shadows, and a sky light
  * captured from a large unlit sphere of constant radiance, which is also the visible
  * background. So the dome is never read from a file (Phase06 D10; Storm learning S2).
+ *
+ * A job may instead ask for the LOOK VIEW (job format 4, Phase22 RD-P22-11): the sun becomes a
+ * key light that casts shadows, a fill and a rim join it, the dome is dimmed, and shadows,
+ * contact shadows and screen-space AO are turned on, so a picture can show whether a surface
+ * reads as plastic. A job without "look" lights exactly as the matched view always has.
  */
 UCLASS()
 class AMatterRuntimeGameMode : public AGameModeBase
@@ -45,6 +50,7 @@ private:
 
 	bool LoadJob(const FString& Path);
 	bool BuildWorld();
+	void BuildLook(const TSharedPtr<FJsonObject>& Look);
 	bool LoadMesh(const TSharedPtr<FJsonObject>& Spec);
 	bool ApplySetting(int32 Index);
 	UMaterialInterface* LoadMaster(const FString& Token);
@@ -59,6 +65,8 @@ private:
 	UPROPERTY() TObjectPtr<UTextureRenderTarget2D> Target;
 	UPROPERTY() TObjectPtr<USkyLightComponent> SkyComp;
 	UPROPERTY() TObjectPtr<UDirectionalLightComponent> SunComp;
+	UPROPERTY() TObjectPtr<UDirectionalLightComponent> FillComp;   // the look view's (Phase22)
+	UPROPERTY() TObjectPtr<UDirectionalLightComponent> RimComp;
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> SkySphere;
 	UPROPERTY() TMap<FString, TObjectPtr<UStaticMeshComponent>> Meshes;
 	UPROPERTY() TMap<FString, TObjectPtr<UMaterialInterface>> Masters;
@@ -66,8 +74,11 @@ private:
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mids;
 
 	// 2 (6.3): mesh buffers carry a tangent sign; 3 (Phase09 9.3): the masters' own
-	// base_color_map_tex, which an older master would silently leave white
-	static constexpr int32 JobFormat = 3;
+	// base_color_map_tex, which an older master would silently leave white; 4 (Phase22 22.1):
+	// format 3 plus an optional "look", which an older runtime would silently light as matched.
+	// Both 3 and 4 are read, so the matched jobs every caller writes keep working.
+	static constexpr int32 JobFormat = 4;
+	static constexpr int32 OldestJobFormat = 3;
 
 	TSharedPtr<FJsonObject> Job;
 	TMap<FString, FString> MeshMaterial;     // mesh name -> the material slot id it takes
@@ -78,6 +89,8 @@ private:
 	int32 MaxFrames = 20000;
 	float SunIntensity = 1.f;
 	float SkyIntensity = 1.f;
+	float FillIntensity = 0.f;
+	float RimIntensity = 0.f;
 
 	EPhase Phase = EPhase::Settle;
 	int32 SettingIndex = 0;

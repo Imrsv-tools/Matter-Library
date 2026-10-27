@@ -139,11 +139,11 @@ A second project now calls the driver from outside the rig, to picture its own a
 
 ### The file the app reads
 
-`unreal_job.json`, format 3, handed to the app as `-MatterJob=<path>`. The reader is `unreal/MatterRuntime/Source/MatterRuntime/MatterRuntimeGameMode.cpp`; where this table and it disagree, it is the authority. Lengths are **centimetres**, Z up, left-handed (the driver converts from the rig's metres by `(x, y, z) → 100 (−z, x, y)`).
+`unreal_job.json`, format 3 (or 4, with a `look`: §The look view, below), handed to the app as `-MatterJob=<path>`. The reader is `unreal/MatterRuntime/Source/MatterRuntime/MatterRuntimeGameMode.cpp`; where this table and it disagree, it is the authority. Lengths are **centimetres**, Z up, left-handed (the driver converts from the rig's metres by `(x, y, z) → 100 (−z, x, y)`).
 
 | Field | Meaning |
 |---|---|
-| `format` | Must equal the app's own number (3). Any other is refused by name, never misread. |
+| `format` | 3, or 4 for a job with a `look` *(2026-10-27, Phase22)*. A runtime built at Phase22 22.1 or later reads both; one built before it (`unreal-runtime-v6` and older) reads 3 only. Any other is refused by name, never misread, and a `look` in a format-3 job is refused too. |
 | `width` | Each capture is `width` × `width`. The driver sends the picture's width × `SUPERSAMPLE` and box-filters down, because the app renders with no anti-aliasing. |
 | `out_dir` | Where the app writes `<setting id><view suffix>.pfm`, one per setting per view (linear scene colour, float RGB, before any tone curve), and its own record, `matter_runtime.log`. |
 | `settle_frames` | Optional. Frames drawn before a setting is captured (the driver sends `SETTLE_FRAMES`, 120). |
@@ -155,6 +155,8 @@ A second project now calls the driver from outside the rig, to picture its own a
 | `…master` | A master token: the app loads `/Game/Masters/M_Matter_<token>`. The eight masters, and **`Sky`**: unlit and two-sided, drawing its `radiance` vector as a flat colour. The driver's mask uses it, and a caller may use it to draw a mesh in a flat colour seen from both sides. |
 | `…scalars`, `…vectors` | Parameter name → a number, or `[r, g, b]`. **A name the master has no parameter for is ignored, and nothing says so.** `article_material()` refuses what it knows the masters do not carry; a hand-written name is not checked by anyone. |
 | `…textures` | Parameter name → `{"file": <abs path>, "srgb": true or false}`, or `{"constant": [r, g, b, a]}` for a flat value. Every texture reaches its master as linear float; `srgb` says whether the file's pixels are decoded first. |
+| `look` | Optional, format 4 only: the look view instead of the matched light (§The look view). |
+| `fill_scale`, `rim_scale` | Format 4: a multiplier on that setting's look fill and rim; each follows `sun_scale` when absent. |
 | `sun_scale`, `sky_scale` | A multiplier on that setting's sun and sky, 1 when absent. 0 turns the light off for that setting (the calibration reads the sun and the dome apart with them; a caller can read emission alone the same way). |
 | `views[]` | `suffix` · `location` · `forward` · `up` · `fov` (degrees) · `near` · `hide` (mesh names left out of that view). `camera_view()` writes one. |
 
@@ -173,6 +175,7 @@ A second project now calls the driver from outside the rig, to picture its own a
 | `warmup(settings)` | The throwaway first setting. |
 | `read_pfm(path)` · `linear(path, exposure=0.0)` · `srgb8(lin)` | A capture as an array; as the rig's linear picture, supersampling filtered; and the plain sRGB encode. |
 | `JOB_FORMAT` · `SUPERSAMPLE` · `SETTLE_FRAMES` · `FLAT_NORMAL` · `Unsupported` | The job's format number, the supersampling factor, the settle count, the flat normal's exact texel, and the refusal's type. |
+| `LOOK_JOB_FORMAT` | *(2026-10-27)* The format of a job carrying a `look` (4). `JOB_FORMAT` stays 3, the format of every matched job. |
 
 Everything else in the module is the rig's own and may change with it: `unreal_job()`, `character_scene()`, `calibrate()`, the calibration constants, anything with a leading underscore. **A tool built on these calls is defined and tested by the project that builds it.**
 
@@ -186,6 +189,21 @@ git log <the "source" in unreal/RUNTIME.json>..HEAD -- unreal/MatterRuntime/Scri
 
 - **`unreal-runtime-v4` (source `47954ea`, published and pinned 2026-10-11) carries two changes that alter pictures and that v3 (source `e1fc83e`, 1 October) did not:** the coat darkens the base as OpenPBR does (10 October: every article with a coat), and a light's brightness no longer depends on its colour (11 October: every Emissive article but Neon). A machine holding v3 fetches v4 the next time the driver looks for the pinned build. *(Was, earlier the same day: "A build with both is made on the machine with Unreal and is not yet published".)*
 - **A builder change that alters nothing at its defaults needs no new build** (the lead, 2026-10-05). One that does alter them needs one before the rig's Unreal column, or a second caller's pictures, show it.
+
+## The look view *(2026-10-27, Phase22 RD-P22-11)*
+
+**Matched light cannot show whether a surface reads as plastic**: it has no shadows. The look view is a second lighting a job may ask for, in the same runtime, masters and Substrate; the matched light, the rig and every verdict made on it are unchanged. `tools/parity/look.py <skin> [--today <rev>]` is the caller: it renders the rig's character, cast as `rig.py --character` casts it, from four cameras (the face front and at three quarters, the back of the left hand, the left ear lit from behind), and writes a look sheet, today's articles beside the working tree's.
+
+```json
+"look": {"key":  {"direction": [x, y, z], "intensity": 1.7, "angle": 0.53, "contact_shadow": 0.02},
+         "fill": {"direction": [x, y, z], "intensity": 0.34, "angle": 5.0},
+         "rim":  {"direction": [x, y, z], "intensity": 1.5, "angle": 1.0},
+         "sky_intensity": 0.3, "ambient_occlusion": 0.5, "virtual_shadows": true}
+```
+
+- **`key`** re-aims the sun (directions are the way the light travels, in Unreal's space) and is the **one light that casts shadows**; `contact_shadow` is Unreal's contact-shadow length, a fraction of the screen. **`fill`** and **`rim`** are added directional lights with no shadows. **`sky_intensity`** replaces the dome's (the dome's radiance is unchanged). Every mesh casts shadows; dynamic and contact shadows are on; `ambient_occlusion` > 0 turns on screen-space AO at that intensity; `virtual_shadows` turns on virtual shadow maps.
+- **What it is not:** Studio also runs Lumen and ray tracing. This runtime cannot: its meshes are built at run time with no distance fields, and each capture starts with no view state. The dome and the fill stand in for bounce light. Read a look sheet for the surface (where the shine is and how it breaks), not for an exact match to Studio.
+- **The pictures** are linear captures at 2× the sheet's width, box-filtered and plain-sRGB encoded at the matched view's exposure (`EXPOSURE_K`), so the look's brightness is fixed by its lights, never by auto-exposure.
 
 ## Open questions Unreal's column should settle
 

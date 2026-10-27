@@ -90,6 +90,10 @@ DOME_K = 1.011
 # The runtime refuses any other job format (2, 6.3: mesh buffers carry a tangent sign; 3, Phase09
 # 9.3: the picture is the masters' own base_color_map_tex, which a v1-v2 master would silently drop).
 JOB_FORMAT = 3
+# Phase22 22.1: a job asking for the look view (a shadowed key, a fill, a rim; RD-P22-11) is format
+# 4, so a runtime built before it refuses the job rather than light it as matched. Every other job
+# stays format 3, which runtimes from unreal-runtime-v3 on read.
+LOOK_JOB_FORMAT = 4
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
 BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
@@ -450,8 +454,12 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
 
 
 def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DOME_K,
-               extra_settings: list | None = None, extra_views: list | None = None) -> Path:
-    """Convert a rig job (the test scene or the character) into the runtime's job; returns its path."""
+               extra_settings: list | None = None, extra_views: list | None = None,
+               look: dict | None = None) -> Path:
+    """Convert a rig job (the test scene or the character) into the runtime's job; returns its path.
+
+    ``look`` (Phase22) asks for the look view instead of the matched light: the job's ``look``
+    field (JOB_FORMAT.md), written by ``tools/parity/look.py``; the job becomes format 4."""
     meshes_dir = folder / "meshes"
     meshes_dir.mkdir(parents=True, exist_ok=True)
     if job.get("mode") == "character":
@@ -461,7 +469,7 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
             s.pop("set")
             s["materials"] |= furniture
         return _write_ujob(job, folder, meshes, names, furniture, settings, cameras, sun_k, dome_k,
-                           extra_settings, extra_views)
+                           extra_settings, extra_views, look)
     mpt = float(job["article"]["meters_per_tile"])
     makers = {"Sphere": build_scene.sphere, "Cube": build_scene.rounded_cube, "Floor": build_scene.floor}
     meshes = []
@@ -480,7 +488,7 @@ def unreal_job(job: dict, folder: Path, sun_k: float = SUN_K, dome_k: float = DO
         mat = article_material(Path(job["article"]["path"]), s.get("set"))
         settings.append({"id": s["id"], "materials": {n: mat for n in names} | furniture})
     return _write_ujob(job, folder, meshes, names, furniture, settings, TEST_CAMERAS, sun_k, dome_k,
-                       extra_settings, extra_views)
+                       extra_settings, extra_views, look)
 
 
 WARMUP_ID = "__warmup"
@@ -496,7 +504,8 @@ def warmup(settings: list) -> dict:
 
 
 def _write_ujob(job: dict, folder: Path, meshes: list, names: list, furniture: dict, settings: list,
-                cameras: dict, sun_k: float, dome_k: float, extra_settings, extra_views) -> Path:
+                cameras: dict, sun_k: float, dome_k: float, extra_settings, extra_views,
+                look: dict | None = None) -> Path:
     settings = ([warmup(settings)] + settings + list(extra_settings or [])
                 + [mask_setting(job, names, furniture)])
     views = []
@@ -510,6 +519,8 @@ def _write_ujob(job: dict, folder: Path, meshes: list, names: list, furniture: d
     ujob = {"format": JOB_FORMAT, "width": int(job["width"]) * SUPERSAMPLE, "out_dir": str(folder / "raw"),
             "settle_frames": SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes,
             "settings": settings, "views": views}
+    if look:
+        ujob |= {"format": LOOK_JOB_FORMAT, "look": look}
     p = folder / "unreal_job.json"
     p.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
     return p
