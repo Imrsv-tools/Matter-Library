@@ -196,7 +196,9 @@ CHARACTER_VIEW_EXTRA = {"Tongue": {"hide": ["Teeth"], "raise": 0.05}}
 
 
 def character_family(stem: str) -> tuple[list[str], list[str]]:
-    fam = stem.split("_")[0]
+    # Phase23 23.3 (RD-P23-4): a skin STRUCTURE is a base-set id on the Material token
+    # (``Skin2_FitzpatrickIV_…``), so a trailing number is stripped before the family is looked up
+    fam = stem.split("_")[0].rstrip("0123456789")
     if fam not in CHARACTER_FAMILIES:
         raise SystemExit(f"{stem}: no Character family {fam!r} (have {', '.join(CHARACTER_FAMILIES)})")
     parts, views = CHARACTER_FAMILIES[fam]

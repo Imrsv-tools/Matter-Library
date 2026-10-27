@@ -122,6 +122,21 @@ FACE = {  # fit: {region: (dlog melanin, dlog blood, d so2, depth)}
 # The lips over the tone, per fit: III's the bar's measured lips over its trunk (pink-mauve, where the
 # library's rule, Phase08 8.2, reads brown-red on the new face); IV's keeps the rule.
 LIPS = {"III": (0.93, 0.68, 0.93), "IV": gsm.LIP_RULE}
+# Phase23 23.3 (RD-P23-4): a skin STRUCTURE is a seed plus a few named maker parameters, so two
+# characters of one tone need not share a face. The fields are computed once per structure and only
+# the tone's pigment is applied to them, so a structure is the same person at every tone. The name is
+# the article's Material token (``Skin2_FitzpatrickIV_…``); ``Skin`` is today's maps exactly (seed
+# offset 0 and every gain 1). ``seed`` moves every noise field (not the lips': RD-P23-5); ``sun`` scales
+# how much darker the sun-exposed face, neck, hands and forearms are than the trunk; ``mottle`` and
+# ``mottle_scale`` the centimetre-scale melanin and blood mottling's strength and size; ``flecks`` the
+# ~1 mm pigment flecks; ``redness`` the cheeks' and nose's flush. The numbers are judgement.
+STRUCTURES = {
+    "Skin": {"seed": 0, "sun": 1.0, "mottle": 1.0, "mottle_scale": 1.0, "flecks": 1.0, "redness": 1.0},
+    # more weathered: a stronger tan on the face and hands, coarser mottling, few flecks, little flush
+    "Skin2": {"seed": 1, "sun": 1.5, "mottle": 1.3, "mottle_scale": 1.5, "flecks": 0.5, "redness": 0.6},
+    # less sun: an even, finer skin, more flecks, a rosier flush
+    "Skin3": {"seed": 2, "sun": 0.55, "mottle": 0.75, "mottle_scale": 0.7, "flecks": 1.7, "redness": 1.5},
+}
 
 
 # ------------------------------------------------------------------ the model -------------------
@@ -442,18 +457,22 @@ def grow_veins(rng, P, N3, cover, starts, axis_dirs, lengths, radius, weight, st
 
 
 # ------------------------------------------------------------------ the picture -----------------
-def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None):
-    """The absolute skin colour (linear) for one tone and one set of layers."""
+def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, structure="Skin"):
+    """The absolute skin colour (linear) for one tone, one structure and one set of layers."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
     m0 = lut.use(roman)
     face = masks["face"]
+    st = STRUCTURES[structure]
+    so = 1000 * st["seed"]                                       # 0 for ``Skin``: today's seeds exactly
+    ms = st["mottle_scale"]
     # Phase23 click 1 (the lead: "we need some sort of texture on the hands and rest of the body"):
     # the skin-scale detail on the face at the bar's measured strength, and on the body (23.2.2).
     # The face's weight is wide and follows the head, so no seam shows at the hairline.
     dg = DETAIL[lut.tones[roman]["fit"]] if detail is None else detail
     wf = np.clip(np.maximum(1.3 * gsm.blur(face, 40), 0.8 * F["parts"]["head"]), 0, 1)
     gf, gc, gd = ((dg[k][1] + (dg[k][0] - dg[k][1]) * wf) for k in ("fine", "coarse", "dots"))
+    gc, gd = gc * st["mottle"], gd * st["flecks"]
     down = -Nr[..., 1]                                  # A-pose: the palms and the soles face down
     palm = parts["hand"] * np.clip((down - 0.2) / 0.5, 0, 1)
     sole = parts["foot"] * np.clip((down - 0.4) / 0.4, 0, 1)
@@ -467,18 +486,18 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None):
     upper_back = parts["trunk"] * np.clip((P[..., 1] - (J["pelvis"][1] + 0.6 * (J["neck"][1] - J["pelvis"][1]))) / 0.12, 0, 1)
     sun = sun + 0.15 * upper_back * np.clip(-Nr[..., 2], 0, 1)
 
-    M = (0.82 + 0.36 * sun)
+    M = (0.82 + 0.36 * st["sun"] * sun)
     M *= 1 - 0.45 * np.maximum(palm, sole)                       # palms and soles: little melanin
     M *= 1 + 0.18 * gsm.blur(masks["eyelids"], 6) + 0.5 * gsm.blur(masks["aureolae"], 4)
     M *= 1 + 0.22 * np.clip(cv, 0, 1.5)                          # creases: a little darker
     # The skin-scale detail is kept apart (``Md``) and added as an AMOUNT of pigment after the face's
     # regions (23.2.7): a fleck is the same melanin on a face whose melanin a region took out, so it
     # shows more on pale skin, not less (multiplied in, it vanished on III's pale face).
-    Md = np.exp(gc * fbm(P, (0.025, 0.007), (0.09, 0.07), 11))
-    Md *= np.exp(gf * fbm(P, (0.0025, 0.0012), (0.07, 0.05), 211))
-    speck = np.abs(gsm.vnoise(P, 0.0009, 13)) + 0.5 * np.abs(gsm.vnoise(P, 0.0005, 17))
+    Md = np.exp(gc * fbm(P, (0.025 * ms, 0.007 * ms), (0.09, 0.07), 11 + so))
+    Md *= np.exp(gf * fbm(P, (0.0025, 0.0012), (0.07, 0.05), 211 + so))
+    speck = np.abs(gsm.vnoise(P, 0.0009, 13 + so)) + 0.5 * np.abs(gsm.vnoise(P, 0.0005, 17 + so))
     Md *= np.exp(0.10 * gf * (0.6 - speck))                      # fine, uneven pigment (1-2 mm)
-    Md *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41) - 0.5) / 0.3, 0, 1)  # sparse ~1 mm flecks
+    Md *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41 + so) - 0.5) / 0.3, 0, 1)  # sparse ~1 mm flecks
 
     # blood: cheeks, the nose, the ears, the fingertips and the palms, knuckles, elbows, knees
     Fp = P[(face > 0.5) & cover]
@@ -497,9 +516,11 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None):
     joints_out = sum(gauss3(P, J[f"{s}-{j}"], 0.035) for s in "lr" for j in ("elbow", "knee"))
     sss = gsm._grey("sss.png")
     sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
-    B = (1 + 0.9 * dg["flush"] * cheek + 0.8 * dg["flush"] * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
+    flush = dg["flush"] * st["redness"]
+    B = (1 + 0.9 * flush * cheek + 0.8 * flush * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
          + 0.7 * tips + 0.45 * palm + 0.5 * knuckles + 0.35 * joints_out + 0.25 * sss)
-    Bd = np.exp(gc * fbm(P, (0.015, 0.004), (0.18, 0.12), 23) + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223))
+    Bd = np.exp(gc * fbm(P, (0.015 * ms, 0.004 * ms), (0.18, 0.12), 23 + so)
+                + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223 + so))
     so2 = np.full(P.shape[:2], 0.8)
     under_eye = gsm.blur(masks["eyelids"], 10)
     so2 = so2 - 0.25 * under_eye                                   # the bluish shadow under the eyes
@@ -647,6 +668,19 @@ def fields() -> dict:
         scale[roman] = [float(x) for x in r["subsurface_radius_scale"].split(",")]
     return {"scatter_scale": scale, "P": P, "N": Nr, "cv": cv, "cover": cover, "reg": reg, "masks": masks,
             "parts": body_parts(P, J), "J": J}
+
+
+def lips_hold(F) -> tuple:
+    """The lips' zone every structure shares with ``Skin`` (RD-P23-5; 23.3): the lips' part, the lip
+    colour's feather, and 16 px past both (the bleed). One ``Lips_<Tone>`` article (``Skin``'s map
+    and constant) meets every structure's skin with no step only if each structure's map is ``Skin``'s
+    there. Returns (W: 1 over the zone, fading to 0 within ~1 cm past it; the zone, the lips' check)."""
+    lm = np.clip(gsm.blur(F["masks"]["lips"], 5) * 1.15, 0, 1)
+    zone = F["reg"]["Lips"] | (lm > 0.004)
+    for _ in range(gsm.BLEED):
+        zone = zone | np.roll(zone, 1, 0) | np.roll(zone, -1, 0) | np.roll(zone, 1, 1) | np.roll(zone, -1, 1)
+    W = np.maximum(np.clip(gsm.blur(zone.astype(np.float64), 16) * 2.2, 0, 1), zone)
+    return W, zone
 
 
 def write_provenance(rows: dict, lut: Lut) -> None:

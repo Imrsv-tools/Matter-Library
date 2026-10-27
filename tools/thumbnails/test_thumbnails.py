@@ -118,6 +118,9 @@ check(S.character_views(S.CHARACTER_VIEWS) == list(S.CHARACTER_VIEWS), "every wh
 check(all(set(v) <= set(S.CHARACTER_VIEWS) for _, v in S.CHARACTER_FAMILIES.values()),
       "every family's views are on the whitelist")
 for stem, parts, views in [("Skin_FitzpatrickIII_Clean_Base_s001_v01", ["Body"], ["face", "hand"]),
+                           # Phase23 23.3: a skin structure (RD-P23-4) is drawn as the skin is
+                           ("Skin2_FitzpatrickIV_Clean_Base_s001_v01", ["Body"], ["face", "hand"]),
+                           ("Skin3_FitzpatrickVI_Clean_Base_s001_v01", ["Body"], ["face", "hand"]),
                            ("Lips_Natural_Clean_Base_s001_v01", ["Lips"], ["lips"]),
                            ("Nail_FitzpatrickI_Clean_Base_s001_v01", ["Nails"], ["hand"]),
                            ("Eye_Natural_Clean_Base_s001_v01", ["Pupil", "Iris", "Sclera"], ["eye"]),

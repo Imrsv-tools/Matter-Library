@@ -16,7 +16,7 @@ Glass_Clear_Clean_Base_s01_v01.mtlx
 
 | Token | Axis | Examples | Default |
 |-------|------|----------|---------|
-| **Material** | **the matter**, down to species or alloy (optionally with a base-set id, as in `Limestone26b`) | `Limestone`, `WhiteOak`, `MildSteel`, `StainlessSteel` | required |
+| **Material** | **the matter**, down to species or alloy (optionally with a base-set id, as in `Limestone26b`; a skin's structure, one person, is one: `Skin2_FitzpatrickIV`, where the Variant is the tone, Phase23) | `Limestone`, `WhiteOak`, `MildSteel`, `StainlessSteel`, `Skin2` | required |
 | **Variant** | **the look**: the base-texture choice plus tint and the other [LCD](../Contract/LCDSchema.md) settings | `Natural`, `Veined`, `Polished`, `Brushed`, `Weathered`, `Blue` | **`Natural`** (untinted) |
 | **Condition** | **damage**, driven by overlay 1 (+ the maskset) | `Clean` → `Worn` → `Distressed` → `VeryDistressed12` | **`Clean`** (slider at 0) |
 | **Detail** | **everything else**, driven by overlays 2–3: usually deposits, sometimes a second damage layer | `Base` → `Dusty` → `Smudged` → `ScratchedButNotVeryDusty` | **`Base`** (sliders at 0) |

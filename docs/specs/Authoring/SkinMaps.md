@@ -34,6 +34,20 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 
 **Six maps per mesh version, one for each Fitzpatrick article (I to VI), each carrying its own hue.** One neutral map recoloured by tone cannot make cheeks and lips *redder*, because a brightness-only map carries no hue (F-SKM-14, F-SKM-24).
 
+## Pigment, not paint: the library's maker (Phase23, 2026-10-27)
+
+**The library's maps are made from pigment** (RD-P23-2). Every texel gets a melanin and a blood amount, placed on the body in 3D, and a skin model (OMF's two-chromophore model, tabulated in `tools/converters/fit/synth/chromophore_lut.json`) turns them into colour relative to the tone; the calibration below then holds the average. These amounts are the **pigment maps**: they stay inside the maker, and what ships is their baked colour (RD-SKM-3).
+- **The model holds only at III and IV** (Phase23 23.2.1): refitted per tone, it failed at I, II, V and VI. **So each tone borrows a fit's response** (the lead, 2026-10-27: *"Borrow the response"*): I–III take III's fit, IV–VI take IV's.
+- **The face's regional colour is placed**, not noise: ten regions from the head's own landmarks (the face's level, forehead, cheeks, nose, nostril wings, the ring under the eye, the tear trough, the crease above the lid, the eyelids, the chin), each one pigment change, solved once per fit (`gen_synth_skin.FACE`). The lips take the lip colour over the tone (`LIPS`), feathered into the face.
+
+## Several skins per tone: structures — **Built** (Phase23 23.3, RD-P23-4)
+
+**A skin structure is one person: a seed plus a few named maker parameters** (`gen_synth_skin.STRUCTURES`: how much darker the sun-exposed skin is, the mottling's strength and size, the pigment flecks, the flush). Its fields are computed once and only the tone's pigment is applied to them, so **a structure is the same person at every tone.** Three ship per tone: `Skin` (the original names), `Skin2` and `Skin3`.
+- **Named on the Material token** ([Identity](../Ontology/Identity.md): a base-set id): `Skin2_FitzpatrickIV_Clean_Base_s001_v01`, its map `Skin2FitzpatrickIV_basecolor_sUKN.png`. The Variant stays the tone, so lips and nails pair by it as before (M4).
+- **One `Lips_<Tone>` serves every structure** (RD-P23-5). Each structure's map is `Skin`'s inside the lips' zone (the lips' part, the lip colour's feather, and 16 px past both) and fades to its own within about a centimetre; the rest is rescaled so the average stays the tone. The maker measures it on every run and stops if any structure renders more than 1.5 sRGB levels from `Skin` there (measured 2026-10-27: within 1.04).
+- **One shine set serves every structure** too (RD-P23-6): the shine maps describe anatomy, not pigment.
+- **More structures are a row in the table**, not a phase.
+
 ## Shine maps: the skin's surface, beyond colour (Phase22, 2026-10-27)
 
 **The colour map does not take away skin's plastic look; the even sheen did that** (F-P21-1). Four more pictures on the same atlas describe the skin's **surface**: where it is oilier or drier, its relief, the shine lost in its creases, and where light passes through it. Built by Phase22 *Skin Maps Beyond Colour* ([`Phase22_SkinMapsBeyondColour.md`](../../Planning/Phases/Complete/Phase22_SkinMapsBeyondColour.md)); the lead's verdicts at its sittings are in that doc. The inputs and their formulas are the contract's: [LCDSchema §Shine maps](../Contract/LCDSchema.md#shine-maps-the-meshs-surface-a-fitted-article-carries).
@@ -91,9 +105,11 @@ The probe's main lesson. Its first library-made map turned the whole body red, b
 2. **Hold the average.** Over the skin, lips excluded, the picture's average colour must equal the article's measured tone, per channel. That is the article's `base_color_const` (from Physically Based), e.g. `0.436, 0.227, 0.131` for Fitzpatrick IV.
 3. **Store it as a multiplier.** The stored map is the picture divided by the tone, scaled so its brightest value is 1 (the 99.9th percentile per channel). The article's own colour is raised by the same factor, so the product is unchanged. ~~The library's fit converter (`tools/converters/fit/`) should do this step, so a contributor hands in the colour picture. *(planned)*~~ **The library's maker does this step** (`tools/converters/fit/gen_skin_maps.py`, below), so a contributor hands in the colour picture. It works the factor out from the map as stored (8-bit sRGB, decoded), so the average that renders is the tone to rounding. `fuzz_color` stays the tone, which is that average.
 
+**The brightest texel stays a real albedo** (Phase23 23.2.11; G6: `base_color_const` ≤ 1). A light tone with a contrasty picture would ask for more: on III's fit the face is 1.2–1.5× its trunk, which at I's tone means an albedo of 1.21. The maker then compresses the picture's **light side** (above the skin's mean) by one exponent on every channel until the constant is under 0.99, and keeps its dark side (the lips, the ring under the eye). The exponent is the provenance row's `contrast` (I 0.316, II 0.489, 2026-10-27; 1 elsewhere); a tone's structures share the smallest any of them needs.
+
 **Not a hidden map above 1** (RD-P21-3): a map normalised to its mean would need values above 1, which an 8-bit PNG cannot hold; raising the article's colour keeps the picture format unchanged.
 
-**The library's six maps are one picture** (F-P21-10). Every term of the library's recipe multiplies the tone, so the map divided by the tone is identical for every tone: the six files are byte-identical, and Git LFS stores one. Each still carries hue (redder cheeks and lips), so one map per tone still holds (RD-SKM-3). **They are kept as six files, each named by its article, so a contributor can replace one tone's map on its own.**
+**The library's six maps are one picture** (F-P21-10). Every term of the library's recipe multiplies the tone, so the map divided by the tone is identical for every tone: the six files are byte-identical, and Git LFS stores one. Each still carries hue (redder cheeks and lips), so one map per tone still holds (RD-SKM-3). **They are kept as six files, each named by its article, so a contributor can replace one tone's map on its own.** *(Drift, 2026-10-27: true until Phase23. The pigment maker's maps differ by fit group, I–III and IV–VI, and I and II again by their albedo exponent, so the six files now differ.)*
 
 ## Sources and licence
 
@@ -110,8 +126,11 @@ The probe's main lesson. Its first library-made map turned the whole body red, b
 
 **The library's maps** are made by one command, which writes each map, its provenance (`library/provenance/sources/fit/makehuman/skin.yaml`) and each tone's raised `base_color_const`, and prints the measured averages:
 
-    uv run tools/converters/fit/gen_skin_maps.py          # every tone
+    uv run tools/converters/fit/gen_skin_maps.py          # every tone, every structure (18 maps)
     uv run tools/converters/fit/gen_skin_maps.py IV       # one tone
+    uv run tools/converters/fit/gen_skin_maps.py IV --structure Skin2    # one structure's map
+
+It prints, per tone, the skin model's check (RD-P23-3) and, per structure, how far its lips' zone is from `Skin`'s. **A new structure** is a row in `gen_synth_skin.STRUCTURES`, then its recipes copied from each tone's `Skin_` recipe with the new name, map and printed `base_color_const`.
 
 **Your own picture**, painted (or made) as the absolute skin colour on hm08's atlas, under the rules above. It is bound to `MakeHuman_Body_v01` and is not carried to a later mesh version (§Authored on the body):
 
@@ -155,3 +174,4 @@ The probe's sheet is a diagnostic. Published pictures of skin show the face and 
 - 2026-10-20 — in force (Phase21 21.3): the *Proposed* marks settled as built and seen; the article question answered (RD-P21-1), the lips (RD-P21-2), the calibration (RD-P21-3), the atlas size (RD-P21-5); the CC BY line corrected (F-P21-6); the six-maps-are-one finding (F-P21-10), Storm's colour space (F-P21-9), and how the maker is run.
 - 2026-10-26 — *Authored on the body, baked per layout* (the lead's ruling on OMF's ask): the rule, the makers' six hm08-atlas inputs as a Todo, and a contributor's painted picture accepted as bound to its layout; *Beyond Colour* marked un-parked (lead-directed quick fix).
 - 2026-10-27 — *Shine maps* (Phase22 22.4): the roughness, relief, cavity and scatter maps, one set for every tone, and the skin's coat dropped (RD-P22-17); *colour only, for now* struck.
+- 2026-10-27 — *Pigment, not paint* and *Several skins per tone* (Phase23 23.2–23.3): the pigment maker, the borrowed response, the placed face, the albedo ceiling, three structures per tone; *the six maps are one picture* marked Drift.

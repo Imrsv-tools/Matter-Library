@@ -4,6 +4,12 @@
     uv run tools/converters/fit/gen_skin_maps.py                  # every tone
     uv run tools/converters/fit/gen_skin_maps.py IV               # one tone
     uv run tools/converters/fit/gen_skin_maps.py IV --picture my_skin.png   # a contributor's picture
+    uv run tools/converters/fit/gen_skin_maps.py IV --structure Skin2       # one structure (Phase23 23.3)
+
+Each tone has three STRUCTURES (``gen_synth_skin.STRUCTURES``), three people of that tone: ``Skin``
+writes ``Fitzpatrick<Tone>_basecolor``, ``Skin2`` and ``Skin3`` write ``Skin2Fitzpatrick<Tone>_…`` for
+the ``Skin2_Fitzpatrick<Tone>`` articles. Every structure takes ``Skin``'s colour in the lips' zone
+(``gen_synth_skin.lips_hold``), so one ``Lips_<Tone>`` meets each with no step; the run measures it.
 
 A **skin map** is a colour picture of the body drawn on hm08's atlas (``docs/specs/Authoring/
 SkinMaps.md``). The six ``Skin_Fitzpatrick*`` articles carry it as their own ``base_color_map``
@@ -45,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -174,13 +181,14 @@ def bleed(lin, covered, px: int):
     return fm.bleed(lin, covered, px)
 
 
-def fit_albedo(ratio, tone, S, cover):
+def fit_albedo(ratio, tone, S, cover, gamma=None):
     """Keep the brightest texel a real albedo (G6: base_color_const in [0, 1]). The constant is the
     tone x the picture's peak over its skin mean, so a light tone with a contrasty picture asks for
     more than 1 (23.2.11: tone I on III's fit, its face 1.2-1.5x its trunk, asked for 1.21 in red).
     Then the picture's LIGHT side is compressed: above the skin's mean, ONE exponent on every channel
     (so the hue of each region holds); at or below it (the lips, the ring under the eye) the picture
-    is kept as made. Just enough to fit. Returns (ratio, the exponent; 1 = as made)."""
+    is kept as made. Just enough to fit. ``gamma`` given: that exponent, unsolved (a tone's structures
+    share the smallest, 23.3). Returns (ratio, the exponent; 1 = as made)."""
     import numpy as np  # noqa: PLC0415
     m = ratio[S].mean(0)
     lr = np.log(np.maximum(ratio / m, 1e-6))
@@ -191,6 +199,8 @@ def fit_albedo(ratio, tone, S, cover):
     def peak(r):           # the constant calibrate would write, per channel
         return tone * np.percentile(r[cover], PEAK, axis=0) / r[S].mean(0)
 
+    if gamma is not None:
+        return (ratio, 1.0) if gamma == 1.0 else (knee(gamma), gamma)
     if peak(ratio).max() <= ALBEDO_MAX:
         return ratio, 1.0
     lo, hi = 0.0, 1.0
@@ -203,16 +213,24 @@ def fit_albedo(ratio, tone, S, cover):
     return knee(lo), lo
 
 
-def calibrate(col, tone, reg: dict, cover):
+def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None):
     """The colour picture -> (the stored map as 8-bit sRGB, the article's base_color_const, the
     numbers). The map is col / tone over its own 99.9th percentile per channel (brightest ~1); the
     constant is the tone over the STORED map's decoded average over the skin, so the article
-    renders the tone on average (RD-P21-3)."""
+    renders the tone on average (RD-P21-3). ``gamma``: ``fit_albedo``'s exponent, given (else solved).
+    ``hold`` = (W, the reference's ratio): a structure takes ``Skin``'s ratio where W is 1 (the lips'
+    zone, 23.3) and its own, rescaled so its skin average is unchanged, where W is 0. ``peak``: the
+    map's peak factor, given (``Skin``'s, so a structure clips its brightest texels where ``Skin``
+    does and the lips' zone is the same texel for texel)."""
     import numpy as np  # noqa: PLC0415
     S = reg["Body"]
     ratio = col / tone
-    ratio, gamma = fit_albedo(ratio, tone, S, cover)
-    k = np.maximum(np.percentile(ratio[cover], PEAK, axis=0), 1e-6)
+    ratio, gamma = fit_albedo(ratio, tone, S, cover, gamma)
+    if hold is not None:
+        W, ref = hold[0][..., None], hold[1]
+        t = (ref[S].mean(0) - (W * ref)[S].mean(0)) / ((1 - W) * ratio)[S].mean(0)
+        ratio = W * ref + (1 - W) * ratio * t
+    k = np.maximum(np.percentile(ratio[cover], PEAK, axis=0), 1e-6) if peak is None else peak
     mp = np.clip(ratio / k, 0.0, 1.0)
     clipped = float((ratio[cover] / k > 1.0).any(axis=-1).mean())
     mp = bleed(np.where(cover[..., None], mp, 0.0), cover, BLEED)
@@ -223,6 +241,9 @@ def calibrate(col, tone, reg: dict, cover):
     srgb8 = np.round(_linear_to_srgb(mp) * 255.0).astype(np.uint8)
     dec = _srgb_to_linear(srgb8 / 255.0)
     const = tone / dec[S].mean(0)
+    if const.max() > 1.0:
+        raise SystemExit(f"base_color_const {[round(float(v), 4) for v in const]} passes 1 (G6): the "
+                         "picture's brightest is not a real albedo at this tone")
     stats = {"tone": [round(float(v), 4) for v in tone],
              "base_color_const": [round(float(v), 4) for v in const],
              "peak_factor": [round(float(v), 4) for v in k],
@@ -234,10 +255,21 @@ def calibrate(col, tone, reg: dict, cover):
     return srgb8, const, stats
 
 
-def write(roman: str, srgb8) -> Path:
+def map_name(roman: str, structure: str = "Skin") -> str:
+    """The map's stem: ``FitzpatrickIV`` for ``Skin`` (today's name), ``Skin2FitzpatrickIV`` for a
+    further structure (23.3)."""
+    return ("" if structure == "Skin" else structure) + f"Fitzpatrick{roman}"
+
+
+def _row_key(name: str):
+    s, _, t = name.partition("Fitzpatrick")
+    return (int(s.removeprefix("Skin") or 1), TONES.index(t))
+
+
+def write(roman: str, srgb8, structure: str = "Skin") -> Path:
     from PIL import Image  # noqa: PLC0415
     OUT.mkdir(parents=True, exist_ok=True)
-    p = OUT / f"Fitzpatrick{roman}_basecolor_{TAG}.png"
+    p = OUT / f"{map_name(roman, structure)}_basecolor_{TAG}.png"
     Image.fromarray(srgb8, "RGB").save(p, optimize=True)
     return p
 
@@ -247,21 +279,21 @@ def write_provenance(rows: dict) -> None:
     old, shine_files, shine_rows = {}, [], []
     if PROVENANCE.is_file():
         for line in PROVENANCE.read_text().splitlines():
-            if line.startswith("  Fitzpatrick") and ": {" in line:
+            if re.fullmatch(r"  (Skin\d)?Fitzpatrick[IV]+: \{.*", line):
                 old[line.split(":", 1)[0].strip()] = line
             # Phase22: the shine maps' rows are gen_skin_shine.py's; carry them over unchanged
             elif line.startswith("  - MatterLibrary/textures/fit/makehuman/skin/Skin_"):
                 shine_files.append(line)
             elif line.startswith("  Skin_") and ": {" in line:
                 shine_rows.append(line)
-    for roman, r in rows.items():
-        old[f"Fitzpatrick{roman}"] = (
-            f"  Fitzpatrick{roman}: {{made: {r['made']}, "
+    for name, r in rows.items():
+        old[name] = (
+            f"  {name}: {{made: {r['made']}, "
             + (f"fit: {r['fit']}, melanin0: {r['melanin0']}, " if "fit" in r else "")
             + (f"contrast: {r['contrast']}, " if r.get("contrast", 1.0) != 1.0 else "")
             + f"tone: {r['tone']}, base_color_const: "
             f"{r['base_color_const']}, peak_factor: {r['peak_factor']}, lips_average: {r['lips_average']}}}")
-    names = sorted(old, key=lambda n: TONES.index(n.removeprefix("Fitzpatrick")))
+    names = sorted(old, key=_row_key)
     src = [bc.SOURCES[n] for n in ("base.obj", "mpfb_face.jpg", "mpfb_lips.jpg", "mpfb_ears.jpg",
                                    "mpfb_eyelids.jpg", "mpfb_aureolae.jpg", "sss.png")]
     lines = [
@@ -305,36 +337,63 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("tones", nargs="*", default=list(TONES), help="Roman numerals (default: all six)")
     ap.add_argument("--picture", type=Path, help="a contributor's colour picture for ONE tone")
+    ap.add_argument("--structure", dest="structures", action="append", choices=("Skin", "Skin2", "Skin3"),
+                    help="write this structure's maps (repeatable; default all three, 23.3)")
     a = ap.parse_args(argv)
     bad = [t for t in a.tones if t not in TONES]
     if bad:
         raise SystemExit(f"unknown tone {bad} (have {list(TONES)})")
     if a.picture and len(a.tones) != 1:
         raise SystemExit("--picture is one tone's picture: name exactly one tone")
+    import numpy as np  # noqa: PLC0415
     reg = regions()
-    F = lut = None
     rows = {}
-    for roman in a.tones:
+    if a.picture:
+        roman = a.tones[0]
         tone = tone_of(roman)
-        if a.picture:
-            col, cover = from_picture(a.picture, reg)
-            made = "contributed"
-        else:
-            import gen_synth_skin as gss  # noqa: PLC0415 (it imports this module)
-            if F is None:
-                F, lut = gss.fields(), gss.Lut()
-            col, _info = gss.compose(tone, roman, (), F, lut, gss.SEED)
-            cover = F["cover"]
-            made = "pigment"
-            model = lut.check(roman, tone)
-            print(f"Fitzpatrick{roman} model check (RD-P23-3): " + json.dumps(model))
+        col, cover = from_picture(a.picture, reg)
         srgb8, _const, st = calibrate(col, tone, reg, cover)
         p = write(roman, srgb8)
-        rows[roman] = {"made": made, **st} | ({"fit": model["fit"], "melanin0": model["melanin0"]}
-                                              if made == "pigment" else {})
+        rows[map_name(roman)] = {"made": "contributed", **st}
         print(f"Fitzpatrick{roman}: {p.relative_to(REPO)}\n  " + json.dumps(st))
-        if st["uncovered_islands"]:
-            raise SystemExit(f"Fitzpatrick{roman}: {st['uncovered_islands']} island texels left unpainted")
+        write_provenance(rows)
+        return 0
+
+    import gen_synth_skin as gss  # noqa: PLC0415 (it imports this module)
+    F, lut = gss.fields(), gss.Lut()
+    W, zone = gss.lips_hold(F)
+    cover, S = F["cover"], reg["Body"]
+    for roman in a.tones:
+        tone = tone_of(roman)
+        model = lut.check(roman, tone)
+        print(f"Fitzpatrick{roman} model check (RD-P23-3): " + json.dumps(model))
+        # Every structure is composed, whichever are written, so the tone's albedo exponent (the
+        # smallest any structure needs) and Skin's lips' zone do not depend on the command line.
+        cols = {s: gss.compose(tone, roman, (), F, lut, gss.SEED, structure=s)[0] for s in gss.STRUCTURES}
+        gamma = min(fit_albedo(c / tone, tone, S, cover)[1] for c in cols.values())
+        ref = fit_albedo(cols["Skin"] / tone, tone, S, cover, gamma)[0]
+        k1 = np.maximum(np.percentile(ref[cover], PEAK, axis=0), 1e-6)    # Skin's peak, as calibrate finds it
+        rendered = {}
+        for s in a.structures or list(gss.STRUCTURES):
+            srgb8, const, st = (calibrate(cols[s], tone, reg, cover, gamma) if s == "Skin" else
+                                calibrate(cols[s], tone, reg, cover, gamma, (W, ref), k1))
+            p = write(roman, srgb8, s)
+            name = map_name(roman, s)
+            rows[name] = {"made": "pigment", **st, "fit": model["fit"], "melanin0": model["melanin0"]}
+            print(f"{name}: {p.relative_to(REPO)}\n  " + json.dumps(st))
+            if st["uncovered_islands"]:
+                raise SystemExit(f"{name}: {st['uncovered_islands']} island texels left unpainted")
+            rendered[s] = _srgb_to_linear(srgb8 / 255.0) * const     # what the article renders
+        # RD-P23-5, checked by measurement: every structure renders Skin's colour in the lips' zone
+        # (one Lips_<Tone> article meets each with no step), to 8-bit rounding.
+        if "Skin" in rendered:
+            for s, r in rendered.items():
+                if s != "Skin":
+                    d = np.abs(_linear_to_srgb(r[zone]) - _linear_to_srgb(rendered["Skin"][zone])) * 255
+                    print(f"  lips' zone, {map_name(roman, s)} vs {map_name(roman)}: max {d.max():.2f}, "
+                          f"mean {d.mean():.3f} sRGB levels over {int(zone.sum())} texels")
+                    if d.max() > 1.5:
+                        raise SystemExit(f"{map_name(roman, s)}: the lips' zone differs from Skin's (RD-P23-5)")
     write_provenance(rows)
     return 0
 

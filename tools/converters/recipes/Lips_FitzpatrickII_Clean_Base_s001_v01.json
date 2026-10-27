@@ -17,7 +17,7 @@
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
   "metalness_const": 0.0,
-  "base_color_const": "0.99, 0.5987, 0.4507",
+  "base_color_const": "0.9773, 0.5913, 0.4442",
   "roughness_const": 0.35,
   "specular_ior": 1.4,
   "subsurface_weight": 1.0,
