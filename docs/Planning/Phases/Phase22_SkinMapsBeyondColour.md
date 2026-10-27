@@ -1,7 +1,7 @@
 # Phase22 — Skin Maps Beyond Colour
 
-**Status:** ACTIVE (IN DISCOVERY) — **BRIEF READY** (Pass 2, 2026-10-27: the lead answered Q-P22-1 by rejecting Blender as the look surface and proposing the library's Unreal test runtime, RD-P22-11). Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
-**Lane:** `build` (§Risk lane). **Next:** `/execute P22`.
+**Status:** ACTIVE (IN DISCOVERY) — **BRIEF READY, with one lead question open (Q-P22-2, raised by the lead at the session's `/retro`)** (Pass 2, 2026-10-27: the lead answered Q-P22-1 by rejecting Blender as the look surface and proposing the library's Unreal test runtime, RD-P22-11). Numbered Phase22 on 2026-10-27 as discovery opened (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*). It was the head of `## Future` after the 2026-10-27 re-sequence (RD-CMT-3), and F-CMT-9 laid out the numbering. Seeded 2026-10-14 by `/research` (the lead: *"Seed a phase TBD..."*, then *"Full skin map set"*). Parked the same day (RD-DS-8, *"skin detail stay parked TBD"*) and un-parked 2026-10-26 (RD-SYN-3, *"3) yes"*). Until 2026-10-27 the doc was `Phases/Future/PhaseTBD_SkinMapsBeyondColour.md`.
+**Lane:** `build` (§Risk lane). **Next:** the lead answers Q-P22-2, then `/execute P22`.
 **Measured at:** `49da20e`, on **the machine with Unreal**: Unreal 5.8 at the path `unreal/build.sh` takes as `UE`, and the official Blender 5.2.2 as `MATTER_BLENDER` (Learnings B22).
 **Builds on:** *Skin Maps* ([`Phase21_SkinMaps.md`](Complete/Phase21_SkinMaps.md)), which shipped the colour map. **Research:** [`261014_R_SkinMaps.md`](../Research/261014_R_SkinMaps.md) (the survey, F-SKM-11 … 18) · [`261026_R_SyntheticSkinAndEyes.md`](../Research/261026_R_SyntheticSkinAndEyes.md) (RD-SYN-3) · [`261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (the order, RD-CMT-1 … 4, F-CMT-9).
 
@@ -257,7 +257,13 @@ The controls this phase touches, each read on 2026-10-27:
 
 ### Open for the lead
 
-*Nothing open (2026-10-27, Pass 2).*
+1. **Q-P22-2 — Test the skins in Studio directly?** *(Raised by the lead with `/retro`, 2026-10-27, after Pass 2, verbatim: "And irt sounds like we just test the skins in studio directly?". Recorded at the run's end, not resolved: it may reverse RD-P22-11 and RD-P22-12.)*
+   - **What "Studio directly" takes** (F-P22-8): per map, the platform re-runs its masters build from this repo's builder, has Stage carry the map as it carries `base_color_map`, binds it as linear data with a neutral default, and, for the normal map, builds MikkTSpace-compatible tangents. Then a shadowed look-dev scene to judge in (P33), which does not exist yet. All of it is platform work in its own repo.
+   - **(a) Studio is the look surface, and this phase waits for it.** The library builds the maps and the inputs; each look click is sat in Studio once the platform has carried that map. The runtime's look view (RD-P22-11) is dropped, or kept only as the agent's own early check. The close waits on the platform (RD-P22-12 reversed). The ledger row at 22.1 becomes the critical path.
+   - **(b) The runtime's look view first, Studio as the last click.** As Pass 2 has it, with one added click at the end: the six tones in Studio, once the platform has carried the maps. The close waits for that click.
+   - **(c) As Pass 2 has it.** The runtime's look view is the phase's look surface, and the Studio sitting is the platform's, after the close.
+   - *Not yet recommended by the agent:* the session ended at `/retro`. The next session puts it to the lead, with (b) as the likely middle: no step waits on another repo, and the product surface still has the last word.
+
 
 - ~~**Q-P22-1 — Where is this phase's look verdict made?**~~ → **RD-P22-11.** The lead rejected (a), the shadowed close-up in Blender: *"trying to judge if it look plastic in studio using Blender is not the way"*. They proposed the library's Unreal test tool instead: *"why not update our UE matter test tool to use the new maps first and shoe screensshots from that? (or show me)"*. (b), waiting for Studio, is decided against by RD-P22-12, unless the lead says otherwise.
 
