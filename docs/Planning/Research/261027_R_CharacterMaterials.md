@@ -23,7 +23,8 @@
   5. **A shadowed scene to judge in.** The library's rig has no shadows, so **its sheet cannot show plastic**. Character materials are judged in a shadowed look-dev scene in Studio, and the rig keeps its job: checking that the tools agree.
 - **One shape for every kind** (Pass 3, borrowed from the Workshop): **the spec · what it is made on · the maker · the finish · the guide.** Only the first three change by kind. Skins have all five in a first form; eyes have three; makeup has none.
 - **How others take part** (Pass 5): today, a **skin map** (painted, or made by a maker) and **maker settings**; after the phases, an **iris structure**, a **makeup piece painted on the body in Blender**, and **hair colours**. The rules are the same for every kind: CC0 only, no photograph or scan of a person, no whole AI-made map, provenance for every input, made in 3D.
-- **Suggested order** (Pass 6, for the lead to cut): *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* (makeup and marks, whole body) → *Hair Colour by Region*. Alongside the first: **a short participation page**, a lead-directed `/quick-fix`, not a phase.
+- **The order** (Pass 6, as the lead cut it 2026-10-27): *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* (makeup and marks, whole body) → *Hair Colour by Region* → **the participation page and kit guide last**, once the pipeline has been used (RD-CMT-3).
+- **What gets in** (RD-CMT-2): a piece that ships, loads in Studio and **works on every character** — made with the library's Blender kit or not. A skin or makeup made for one character is not added.
 
 ---
 
@@ -148,16 +149,19 @@
 
 **Research output, for the lead to cut. Unnumbered; each a phase with an Outcome, except the first line.**
 
-- **Character Materials page** — a lead-directed `/quick-fix`, not a phase. *Outcome:* a contributor finds every kind of character material, what each needs, and which can be made today, on one page.
 - **Skin Maps Beyond Colour** (seeded) — *Outcome:* up close, skin catches the light as real skin does (oilier and drier areas, creases, light through ears and fingers). Roughness first, then normal, cavity, thickness. **It also gives the marks their depth.**
 - **Synthetic Skin Sets** (seeded) — *Outcome:* every tone has several real-looking skins with no person in them, from one maker. It carries the six layout pictures onto the body (the `SkinMaps.md` Todo) and judges tone VI's marks.
 - **Eyes in the Shader** (seeded) — *Outcome:* a Creator sets an eye's colours, ring and redness with a few controls over a handful of iris structures.
 - **Skin Layers** (seeded; **proposed widening**) — *Outcome:* a Creator puts makeup and marks, from blush to film scars, tattoos, dirt and blood, **anywhere on the body and per mark**, each a library piece, without a new skin per combination. It pairs with the platform's stack bake; the library's half is the placed-layer contract and the first pieces.
 - **Hair Colour by Region** (new, small) — *Outcome:* brows and lashes take their own colour from the same hair pigment, and stubble and body hair arrive as skin layers.
 
+- **Character Materials page and the kit's guide** — **last** (RD-CMT-3: after the pipeline is built and used). A lead-directed `/quick-fix` when it comes, not a phase. *Outcome:* a contributor finds every kind of character material, the inclusion test (RD-CMT-2), what each needs and how to make it, on one page.
+
 **Waits outside the library:** the shadowed look-dev scene as a durable place to judge (the platform); OMF's render body (a re-bake here); the stack bake and controls (the platform).
 
 ## Open questions (plain)
+
+*All five answered 2026-10-27; see §Resolved (RD-CMT-1 … 4).*
 
 | Id | Question | Recommendation |
 |---|---|---|
@@ -169,7 +173,19 @@
 
 ## Resolved
 
-Rulings made in other projects' sessions that bind this library, **recorded here by date and content** (`LOCAL_DELTAS.md` §Separation), not by those projects' ids:
+**The lead's answers to Q-CMT-1 … 5 (2026-10-27), verbatim:** *"1) yes 2)Ours - we need to keep in mind that this is still about making and using predefined elements taht ship and are loaded in Studio at runtime, Makeup and other effects need to be usable on all the chars - not made for ONE character. It is a line because we want to provide tools creators can use to make NEW skins and makeup etc and submit them to be included for all to use and discourage (or at least not encourage) people making a spcific Skin for a specific mesh, with speicfic makeup that would never work on any other models (e.g. we would simply not add it to the group library and they would not show in Studio so we don't want to encourage taht)... However is someone crafts a bunch of amazing looking scar or damage effects (makeup) and submits it... we would totally add that the library... am I over thinking this question... heheh.. I am open to a kit - but we shoudl both be opebn to things not coming from the kit and a kit does not mean make super bespoke things with it expecting instand inclusion into the library. 3) I would put the docs at the end after we have done it and eaten our own dogfood to ensure the pipeline is as simple as it can be. 4) If you like 5) yes"*
+
+- **RD-CMT-1 — The ownership read is right** (Q-CMT-1: *"yes"*). This library makes the pieces: skins, eyes, makeup and marks (film effects included) and hair colour. The groom is the Asset Library's. How a character wears pieces (the stack, its bake, the Studio controls) is the platform's.
+- **RD-CMT-2 — The Blender kit is ours, and the library takes shared pieces, not bespoke ones** (Q-CMT-2: *"Ours"*).
+  - **A piece ships and is loaded in Studio at runtime, and it must work on every character, not on one** (*"usable on all the chars - not made for ONE character"*).
+  - **The library accepts a piece made anywhere** — with the kit or without it — when it is good and works for everyone (*"amazing looking scar or damage effects … we would totally add that"*).
+  - **A kit is not a promise of inclusion.** A skin made for one mesh, or makeup that works on one model only, is not added to the library and so never shows in Studio. The library's docs and kit do not encourage it.
+  - *What it means for the design (the research's reading):* **the inclusion test is "does it work on every character built from the approved mesh"**, at every tone where tone matters. Made-in-3D pieces placed by anatomy pass it by construction, and carry to a future body by a re-bake. The bench's `rig.py --character --body` (CTB-Q2, offered) is how a reviewer **sees** it pass on bodies of different shapes and sizes.
+- **RD-CMT-3 — The participation docs come last** (Q-CMT-3), *"after we have done it and eaten our own dogfood to ensure the pipeline is as simple as it can be"*. The order otherwise stands as Pass 6 lists it.
+- **Q-CMT-4 — "If you like"**, read with RD-CMT-3: **no page now**; it is written at the end, from the pipeline as built.
+- **RD-CMT-4 — The look verdict for a character material is made in the shadowed look-dev scene** (Q-CMT-5: *"yes"*). The rig stays the tool-agreement check. This makes **an ask of the platform owed**: a way to open a library draft in that scene. It goes in `PlatformDependencies.md`, not in prose.
+
+**Rulings made in other projects' sessions** that bind this library, **recorded here by date and content** (`LOCAL_DELTAS.md` §Separation), not by those projects' ids:
 
 - **2026-10-25 — Character materials are made outside Studio and live in the libraries; Studio refines them.** The lead, verbatim: *"we want Studi to primarly be a consumer of assets, not a craetor of assets … Ideally people would make these things in blender, bring them in to studio and just refine it with simple controls … hair solutions that are crafted and put in the asset library or matter library ( like the skins, and the wardrobe etc) and then in studio, you pull it in a refine it for the situation"*. The platform's research read it as: skin, eyes and makeup in this library; hair's groom in the Asset Library and its colour here.
 - **2026-10-25 — The human's layers are Skins · Eyes · Makeup;** makeup runs *"from … simple face makup to film makup like scars, blumishes"*; *"simple yet powerful"*; *"pipelines to allow others to continutbe"*. **Makeup changes from mark to mark,** and *"makeup should function the same accross the entrie body"*. **The proposed control lists are the starting list.**
@@ -199,10 +215,12 @@ Each would be fixed in the Glossary by the phase that first builds it.
   - The library makes the pieces (skin, eyes, makeup and marks, hair colour); the platform makes how a character wears them.
   - The largest gain left is the shine maps (*Beyond Colour*).
   - Participation needs one entry page now and a spec per kind as each is built.
-- **Recorded:** four rulings made elsewhere (§Resolved).
-- **Open with the lead:** Q-CMT-1 … 5.
-- **▶ Next:** the lead's answers. Then, on the lead's word:
-  - the participation page as a `/quick-fix` (Q-CMT-4);
-  - `/discovery Skin Maps Beyond Colour`.
+- **Ruled 2026-10-27:** RD-CMT-1 … 4 (ownership; the kit is ours and only shared pieces get in; docs last; verdicts in the look-dev scene). **Recorded:** four rulings made elsewhere (§Resolved).
+- **Open with the lead:** none.
+- **Owed (durable docs these rulings make owed, and the verb that lands each):**
+  - `Roadmap.md`: *Skin Layers*' Outcome widened (whole body, per mark, cosmetics and film effects); *Hair Colour by Region* and the participation page added, last — **a lead-directed `/quick-fix`**;
+  - `PlatformDependencies.md`: a row asking the platform for a way to open a library draft in the look-dev scene (RD-CMT-4) — **the same quick fix**;
+  - the inclusion test (RD-CMT-2) in a spec — **the participation page, last** (RD-CMT-3); until then this doc's §Resolved is its authority.
+- **▶ Next:** that quick fix on the lead's word; then `/discovery Skin Maps Beyond Colour`.
 
   Resume with `/research CharacterMaterials`.
