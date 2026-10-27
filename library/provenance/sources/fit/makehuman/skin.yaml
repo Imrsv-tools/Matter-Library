@@ -29,12 +29,12 @@ provenance:
   model: "open-morphology-foundation tools/material_generate/biophysical.py 0.1.0 (e079588), tabulated per fit in tools/converters/fit/synth/chromophore_lut.json"
   evidence: tools/converters/fit/gen_skin_maps.py, tools/converters/fit/gen_synth_skin.py, tools/converters/fit/gen_skin_shine.py
 members:
-  FitzpatrickI: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.847, 0.638, 0.552], base_color_const: [0.8994, 0.7133, 0.6538], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.6295, 0.3318, 0.3116]}
-  FitzpatrickII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.799, 0.485, 0.347], base_color_const: [0.8485, 0.5422, 0.411], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.5939, 0.2522, 0.1959]}
+  FitzpatrickI: {made: pigment, fit: III, melanin0: 0.0269, contrast: 0.343, tone: [0.847, 0.638, 0.552], base_color_const: [0.99, 0.7443, 0.6716], peak_factor: [1.1318, 1.1285, 1.1566], lips_average: [0.753, 0.4216, 0.5008]}
+  FitzpatrickII: {made: pigment, fit: III, melanin0: 0.0269, contrast: 0.53, tone: [0.799, 0.485, 0.347], base_color_const: [0.99, 0.5987, 0.4507], peak_factor: [1.2105, 1.2051, 1.2518], lips_average: [0.704, 0.3176, 0.3105]}
   FitzpatrickIII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.623, 0.433, 0.343], base_color_const: [0.8935, 0.6157, 0.524], peak_factor: [1.4341, 1.4219, 1.5276], lips_average: [0.5363, 0.2768, 0.2958]}
   FitzpatrickIV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.436, 0.227, 0.131], base_color_const: [0.5318, 0.2955, 0.2065], peak_factor: [1.2197, 1.3016, 1.5761], lips_average: [0.3243, 0.1184, 0.0741]}
   FitzpatrickV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.283, 0.148, 0.079], base_color_const: [0.3452, 0.1926, 0.1245], peak_factor: [1.2197, 1.3016, 1.5761], lips_average: [0.2105, 0.0772, 0.0447]}
-  FitzpatrickVI: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.09, 0.05, 0.02], base_color_const: [0.1071, 0.0709, 0.0362], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.0668, 0.0259, 0.0112]}
+  FitzpatrickVI: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.09, 0.05, 0.02], base_color_const: [0.1098, 0.0651, 0.0315], peak_factor: [1.2197, 1.3016, 1.5761], lips_average: [0.0669, 0.0261, 0.0113]}
   Skin_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.62, "skin_range": [0.518, 0.686], "uncovered_islands": 0, "tzone_average": 0.4548, "cheeks_average": 0.7018}
   Skin_normal: {"made": "procedural", "space": "linear", "neutral": [0.5, 0.5, 1.0], "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal", "xy_rms_skin": 0.0451, "xy_rms_face": 0.0706, "xy_p99_skin": 0.14, "unit_error_max": 0.005}
   Skin_cavity: {"made": "procedural", "space": "linear", "neutral": 1.0, "rule": "specular_weight x map", "skin_average": 0.9537, "skin_p1": 0.78}

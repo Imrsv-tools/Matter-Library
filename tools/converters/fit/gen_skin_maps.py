@@ -25,7 +25,11 @@ the average: over the skin (the ``Body`` part, lips excluded) the picture's aver
 article's measured tone. The stored map is the picture divided by the tone and scaled so its
 brightest is 1 (the 99.9th percentile per channel); the article's ``base_color_const`` is raised
 by the same factor. The factor is worked out from the map AS STORED (8-bit sRGB, decoded), so the
-average that renders is the tone to rounding. ``--picture`` runs the same step on a contributor's
+average that renders is the tone to rounding. **The brightest texel stays a real albedo**
+(``fit_albedo``, 23.2.11): where the constant would pass ``ALBEDO_MAX``, as a light tone with a
+contrasty picture asks, the picture's light side (above the skin's mean) is compressed by one
+exponent on every channel (the provenance row's ``contrast``) until it fits; the dark side (the
+lips, the ring under the eye) is kept. ``--picture`` runs the same step on a contributor's
 colour picture: they hand in a colour picture, the library stores the multiplier.
 
 The tone is the skin recipe's Physically Based value (its ``sources[physicallybased].used``),
@@ -60,6 +64,7 @@ TAG = "sUKN"
 BLEED = 16                                 # pixels past each island's edge (the kit's README)
 LIP_RULE = (0.80, 0.55, 0.60)              # Phase08 8.2: lips = the skin's albedo x this
 PEAK = 99.9                                # the stored map's brightest: this percentile -> 1
+ALBEDO_MAX = 0.99                          # the constant's ceiling (G6: <= 1; headroom for 8-bit)
 
 # MPFB2's CC0 region masks and thickness map on hm08's UVs (the probe pinned their git blob
 # sha1s, 2026-10-14; these are the same files' sha256, measured 2026-10-20). The rig's own masks
@@ -169,6 +174,35 @@ def bleed(lin, covered, px: int):
     return fm.bleed(lin, covered, px)
 
 
+def fit_albedo(ratio, tone, S, cover):
+    """Keep the brightest texel a real albedo (G6: base_color_const in [0, 1]). The constant is the
+    tone x the picture's peak over its skin mean, so a light tone with a contrasty picture asks for
+    more than 1 (23.2.11: tone I on III's fit, its face 1.2-1.5x its trunk, asked for 1.21 in red).
+    Then the picture's LIGHT side is compressed: above the skin's mean, ONE exponent on every channel
+    (so the hue of each region holds); at or below it (the lips, the ring under the eye) the picture
+    is kept as made. Just enough to fit. Returns (ratio, the exponent; 1 = as made)."""
+    import numpy as np  # noqa: PLC0415
+    m = ratio[S].mean(0)
+    lr = np.log(np.maximum(ratio / m, 1e-6))
+
+    def knee(g):
+        return m * np.exp(np.where(lr > 0, g * lr, lr))
+
+    def peak(r):           # the constant calibrate would write, per channel
+        return tone * np.percentile(r[cover], PEAK, axis=0) / r[S].mean(0)
+
+    if peak(ratio).max() <= ALBEDO_MAX:
+        return ratio, 1.0
+    lo, hi = 0.0, 1.0
+    for _ in range(30):                        # bisect the exponent: the largest that fits
+        g = (lo + hi) / 2
+        lo, hi = (g, hi) if peak(knee(g)).max() <= ALBEDO_MAX else (lo, g)
+    if peak(knee(lo)).max() > ALBEDO_MAX:
+        raise SystemExit(f"tone {list(tone)}: no compression of the light side brings the constant under "
+                         f"{ALBEDO_MAX} (the dark side alone asks too much)")
+    return knee(lo), lo
+
+
 def calibrate(col, tone, reg: dict, cover):
     """The colour picture -> (the stored map as 8-bit sRGB, the article's base_color_const, the
     numbers). The map is col / tone over its own 99.9th percentile per channel (brightest ~1); the
@@ -177,6 +211,7 @@ def calibrate(col, tone, reg: dict, cover):
     import numpy as np  # noqa: PLC0415
     S = reg["Body"]
     ratio = col / tone
+    ratio, gamma = fit_albedo(ratio, tone, S, cover)
     k = np.maximum(np.percentile(ratio[cover], PEAK, axis=0), 1e-6)
     mp = np.clip(ratio / k, 0.0, 1.0)
     clipped = float((ratio[cover] / k > 1.0).any(axis=-1).mean())
@@ -191,6 +226,7 @@ def calibrate(col, tone, reg: dict, cover):
     stats = {"tone": [round(float(v), 4) for v in tone],
              "base_color_const": [round(float(v), 4) for v in const],
              "peak_factor": [round(float(v), 4) for v in k],
+             "contrast": round(gamma, 3),
              "clipped_share": round(clipped, 5),
              "skin_average": [round(float(v), 4) for v in (const * dec[S].mean(0))],
              "lips_average": [round(float(v), 4) for v in (const * dec[reg["Lips"]].mean(0))],
@@ -222,6 +258,7 @@ def write_provenance(rows: dict) -> None:
         old[f"Fitzpatrick{roman}"] = (
             f"  Fitzpatrick{roman}: {{made: {r['made']}, "
             + (f"fit: {r['fit']}, melanin0: {r['melanin0']}, " if "fit" in r else "")
+            + (f"contrast: {r['contrast']}, " if r.get("contrast", 1.0) != 1.0 else "")
             + f"tone: {r['tone']}, base_color_const: "
             f"{r['base_color_const']}, peak_factor: {r['peak_factor']}, lips_average: {r['lips_average']}}}")
     names = sorted(old, key=lambda n: TONES.index(n.removeprefix("Fitzpatrick")))
