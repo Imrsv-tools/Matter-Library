@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The look view: a character's skin in the library's Unreal runtime, lit to show its surface.
 
-    uv run tools/parity/look.py <skin> [--today <git rev>] [--width 1024] [--out <dir>]
+    uv run tools/parity/look.py <skin> [--today <git rev>] [--also <skin> ...] [--width 1024] [--out <dir>]
 
 Phase22 (RD-P22-11). The rig's matched light has no shadows, so its sheet cannot show whether a
 skin reads as plastic; it stays the tool-agreement check. This renders the rig's character, cast
@@ -168,6 +168,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("skin", nargs="?", default=rig.CHARACTER_SKIN)
     ap.add_argument("--today", metavar="REV", help="also render the cast as it stood at this git revision")
+    ap.add_argument("--also", action="append", default=[], metavar="SKIN",
+                    help="another skin from the working tree, a further column (repeatable)")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
@@ -194,6 +196,13 @@ def main(argv=None) -> int:
                              "the two cannot share one launch")
         settings.insert(0, {"id": "today", "materials": today_mats})
         columns.insert(0, ("today", f"today ({rev})"))
+    for i, other in enumerate(a.also, start=1):
+        oart = jobmod.Article.read(jobmod.find_article(other))
+        omats, omeshes = materials(rig.character_cast(oart), work / f"also{i}")
+        if [Path(m["file"]).read_bytes() for m in omeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
+            raise SystemExit(f"{oart.name}'s cast builds different meshes; it cannot share the launch")
+        settings.append({"id": f"also{i}", "materials": omats})
+        columns.append((f"also{i}", f"working tree: {oart.name}"))
     settings += [s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
 
     parts = bc.load_parts()

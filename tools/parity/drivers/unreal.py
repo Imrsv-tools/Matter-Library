@@ -101,7 +101,8 @@ CUTOUT_PORT = "cutout_map"   # not a slider: the mesh's map, supplied per bindin
 BASE_MAP_PORT = "base_color_map"   # not a slider: the mesh's picture, per binding (Phase09 RD-P09-1)
 # Phase22 (LCDSchema §Shine maps): the mesh's shine maps -> the master's <port>_tex, linear; an
 # article without one gets an exact neutral constant (the slot's own default is 128, 0.502)
-SHINE_PORTS = {"roughness_map": 0.5}
+SHINE_PORTS = {"roughness_map": (0.5, 0.5, 0.5), "normal_map": (0.5, 0.5, 1.0),   # 22.2: flat
+               "cavity_map": (1.0, 1.0, 1.0)}                                        # 22.2: open skin
 SHINE_MASTERS = {"Subsurface"}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)
@@ -339,7 +340,7 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     if art.master in SHINE_MASTERS:
         for port, neutral in SHINE_PORTS.items():
             textures[f"{port}_tex"] = ({"file": str(shine_maps[port]), "srgb": False} if port in shine_maps
-                                       else {"constant": [neutral, neutral, neutral, 1.0]})
+                                       else {"constant": [*neutral, 1.0]})
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -362,6 +363,8 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     if art.master == "Subsurface" and "subsurface_weight" in sh and "subsurface_color" not in sh:
         vectors["subsurface_color"] = list(vectors.get("base_color", [0.8, 0.8, 0.8]))
         scalars["subsurface_follows_base"] = 1.0    # Phase21: the scatter takes the tint too
+    if art.master in SHINE_MASTERS and "normal_map" in art.ports and "coat_weight" in sh:
+        scalars["coat_follows_normal"] = 1.0        # Phase22 22.2: the coat follows the skin's relief
     # the Creator sliders, under the article's names (D5); a vector2 port is a vector's R, G
     for k, v in ports.items():
         if k in COLOUR_SLIDERS:

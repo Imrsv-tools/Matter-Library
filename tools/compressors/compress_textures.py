@@ -70,6 +70,7 @@ ROLE_TOKENS = [
     ("metalness", "BC4"),
     ("metallic", "BC4"),   # legacy alias (Copper source PNG); canonicalized to metalness at freeze
     ("roughness", "BC4"),
+    ("cavity", "BC4"),     # Phase22 22.2: the skin's cavity map (one channel, x specular_weight)
     ("opacity", "BC4"),
     ("normal", "BC5"),
     ("overlay", "BC7"),

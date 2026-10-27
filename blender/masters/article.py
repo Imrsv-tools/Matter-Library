@@ -92,7 +92,12 @@ def read(path: Path) -> ArticleData:
                                 if m.get("name", "").startswith(f"{i.get('name')}_deposit")),
                                key=lambda m: m.get("name"))
                 bg = chain[0].find("input[@name='bg']") if chain else None
-                if bg is not None and bg.get("value") is not None:
+                mapped = ng.find("multiply[@name='specular_weight_mapped']/input[@name='in2']")
+                if i.get("name") == "specular_weight" and mapped is not None:
+                    # Phase22 22.2: the cavity map x the article's own specular_weight (in2); each
+                    # target's master multiplies the mesh's map in itself
+                    art.shader["specular_weight"] = _floats(mapped.get("value"))
+                elif bg is not None and bg.get("value") is not None:
                     art.shader[i.get("name")] = _floats(bg.get("value"))
                 elif not chain and i.get("name") in art.ports:
                     # Phase12: a value the Creator may SET (transmission_color) reaches the shader

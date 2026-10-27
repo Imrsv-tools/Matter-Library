@@ -45,7 +45,8 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
 
 def build(path: Path, sliders: dict | None = None, name: str | None = None,
           cutout_map: Path | None = None, base_color_map: Path | None = None,
-          roughness_map: Path | None = None):
+          roughness_map: Path | None = None, normal_map: Path | None = None,
+          cavity_map: Path | None = None):
     """A new material for ``path`` with ``sliders`` applied; returns the material.
 
     ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
@@ -56,6 +57,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     master, whose own tint (and Hair's light through the card) then acts on the product.
     ``roughness_map`` (Phase22, LCDSchema §Shine maps) is the mesh's roughness offset, linear, on
     the mesh's own UVs: ``roughness + (map - 0.5)``, ahead of the master's bias and clamp.
+    ``normal_map`` (22.2) is the mesh's tangent-space relief, its XY added to the article's normal;
+    ``cavity_map`` multiplies the specular weight.
     """
     build_masters.ensure_all()
     art = read(path)
@@ -65,6 +68,10 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         base_color_map = art.maps.get("base_color_map")
     if roughness_map is None:
         roughness_map = art.maps.get("roughness_map")
+    if normal_map is None:
+        normal_map = art.maps.get("normal_map")
+    if cavity_map is None:
+        cavity_map = art.maps.get("cavity_map")
     if art.master not in build_masters.MASTERS:
         raise NotImplementedError(f"{art.name}: master {art.master!r} has no Blender version yet")
     ports = dict(art.ports)
@@ -210,6 +217,71 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         L(add.outputs["Value"], sock)
         y -= 300
 
+    def _mesh_map(port: str, file: Path):
+        """A shine map's image node, linear, on the mesh's UVs (unplaced)."""
+        if port not in art.ports:
+            raise KeyError(f"{art.name} does not declare the shine input ({port})")
+        img = bpy.data.images.load(str(file), check_existing=True)
+        img.colorspace_settings.name = "Non-Color"
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(uv.outputs["UV"], tex.inputs["Vector"])
+        return tex
+
+    def _vec(op: str, x: int, b=None):
+        n = nt.nodes.new("ShaderNodeVectorMath")
+        n.operation = op
+        n.location = (x, y)
+        if b is not None:
+            n.inputs[1].default_value = b
+        return n
+
+    if normal_map is not None:
+        # Phase22 22.2 (RD-P22-5): the mesh's relief, tangent space. The master decodes its Normal
+        # Map colour (2c - 1), adds the overlays and normalises once; so the body's XY is added to
+        # the article's own here and re-encoded, unclamped (c = n/2 + 1/2), as the graph does.
+        tex = _mesh_map("normal_map", normal_map)
+        sock = master.inputs["Normal Map"]
+        own = _vec("MULTIPLY_ADD", 0)
+        own.inputs[1].default_value = (2.0, 2.0, 2.0)
+        own.inputs[2].default_value = (-1.0, -1.0, -1.0)
+        if sock.is_linked:                             # the pores' normal
+            L(sock.links[0].from_socket, own.inputs[0])
+        else:
+            own.inputs[0].default_value = tuple(sock.default_value)[:3]
+        body = _vec("MULTIPLY_ADD", 0)
+        body.inputs[1].default_value = (2.0, 2.0, 0.0)  # its XY only
+        body.inputs[2].default_value = (-1.0, -1.0, 0.0)
+        L(tex.outputs["Color"], body.inputs[0])
+        add = _vec("ADD", 200)
+        L(own.outputs[0], add.inputs[0])
+        L(body.outputs[0], add.inputs[1])
+        enc = _vec("MULTIPLY_ADD", 400)
+        enc.inputs[1].default_value = (0.5, 0.5, 0.5)
+        enc.inputs[2].default_value = (0.5, 0.5, 0.5)
+        L(add.outputs[0], enc.inputs[0])
+        L(enc.outputs[0], sock)
+        y -= 300
+        if "coat_weight" in art.shader and "Coat Follows Normal" in master.inputs:
+            master.inputs["Coat Follows Normal"].default_value = 1.0   # the sebum follows the relief
+
+    if cavity_map is not None:
+        # RD-P22-6: specular_weight x the cavity map. The article's own specular_weight is set on
+        # the socket below; this multiplies the map into whatever reaches it (1 when unset).
+        tex = _mesh_map("cavity_map", cavity_map)
+        mul = nt.nodes.new("ShaderNodeMath")
+        mul.operation = "MULTIPLY"
+        mul.location = (200, y)
+        L(tex.outputs["Color"], mul.inputs[0])
+        cavity_weight = mul
+        L(mul.outputs["Value"], master.inputs["Specular Weight"])
+        y -= 300
+    else:
+        cavity_weight = None
+
     # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base
     # (no value on the shader: the assembler wires it to base_color_out) scatters the base's own
     # colour, the picture included. ML_Subsurface tints its Base Color inside the master but takes
@@ -276,7 +348,9 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         master.inputs["roughness_bias"].default_value = ports["roughness_bias"][0]
     if "specular_ior" in art.shader:
         master.inputs["IOR"].default_value = art.shader["specular_ior"][0]
-    if "specular_weight" in art.shader:
+    if cavity_weight is not None:
+        cavity_weight.inputs[1].default_value = art.shader.get("specular_weight", [1.0])[0]
+    elif "specular_weight" in art.shader:
         master.inputs["Specular Weight"].default_value = art.shader["specular_weight"][0]
     if "base_weight" in art.shader and art.shader["base_weight"][0] != 1.0:
         raise NotImplementedError(f"{art.name}: base_weight != 1 is not mapped yet")

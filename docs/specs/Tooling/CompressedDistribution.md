@@ -61,7 +61,7 @@ Keyed by role **name**. All roles use full mip chains. `specular` is a scalar (n
 
 > Source-filename note: role detection keys on the OpenPBR-correct suffix — the metallic map ships as
 > `*_metalness_*.png` (canonicalised before the 0.1.0 freeze; `metallic` stays a legacy alias in the compressor's suffix table). The role name stays `metallic_texture`.
-> *(Updated 2026-09-23, measured: the suffix→BC table in `compress_textures.py` — `basecolor`/`diffuse`/`emissive`/`overlay`/`overlays`/`masks` → BC7, `metalness`/`metallic`/`roughness`/`opacity`/`ambient_occlusion`/`ao` → BC4, `normal` → BC5.)*
+> *(Updated 2026-09-23, measured: the suffix→BC table in `compress_textures.py` — `basecolor`/`diffuse`/`emissive`/`overlay`/`overlays`/`masks` → BC7, `metalness`/`metallic`/`roughness`/`opacity`/`ambient_occlusion`/`ao` → BC4, `normal` → BC5. 2026-10-27, Phase22 22.2: `cavity` → BC4, the skin's cavity map.)*
 
 > **Reevaluate (2026-09-23):** role names such as `diffuse_texture` / `metallic_texture` come from a consumer's field naming, not from OpenPBR/LCD vocabulary; whether the published [master contract](../../Glossary.md) *(planned)* carries these names or OpenPBR-named roles is open — owned by the release-bundle / consumer-contract phase (R14).
 

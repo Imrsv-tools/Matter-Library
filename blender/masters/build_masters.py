@@ -278,7 +278,10 @@ def _sockets(parts: set) -> list:
               ("Subsurface Color", "NodeSocketColor", (0.8, 0.8, 0.8, 1.0)),
               ("Subsurface Radius", "NodeSocketFloat", 1.0),
               ("Subsurface Radius Scale", "NodeSocketVector", (1.0, 1.0, 1.0)),
-              ("Subsurface Anisotropy", "NodeSocketFloat", 0.0)]
+              ("Subsurface Anisotropy", "NodeSocketFloat", 0.0),
+              # Phase22 22.2: 1 = the coat takes the article's normal (skin's sebum follows its
+              # relief); 0 = the geometry's, OpenPBR's default and every master's before
+              ("Coat Follows Normal", "NodeSocketFloat", 0.0)]
     return s
 
 
@@ -460,6 +463,14 @@ def _build(name: str, parts: set):
     nmap = _node(ng, "ShaderNodeNormalMap", 300, -700, space="TANGENT", uv_map="")
     L(enc.outputs[0], nmap.inputs["Color"])
     L(nmap.outputs["Normal"], bsdf.inputs["Normal"])
+    if "subsurface" in parts:
+        # Phase22 22.2: the coat's normal = mix(the geometry's, the article's, Coat Follows Normal)
+        geo = _node(ng, "ShaderNodeNewGeometry", 300, -900)
+        cmix = _node(ng, "ShaderNodeMix", 600, -850, data_type="VECTOR")
+        L(gi.outputs["Coat Follows Normal"], cmix.inputs["Factor"])
+        L(geo.outputs["Normal"], cmix.inputs[4])        # A (vector)
+        L(nmap.outputs["Normal"], cmix.inputs[5])       # B (vector)
+        L(cmix.outputs[1], bsdf.inputs["Coat Normal"])  # Result (vector)
 
     # OpenPBR coat -> Principled Coat (coat_color = Coat Tint: both tint what lies under the
     # coat). Coat Normal stays unlinked = the geometry normal, as OpenPBR's

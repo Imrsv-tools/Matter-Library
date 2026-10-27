@@ -83,6 +83,12 @@ AUTHOR_TIER_PORTS = {
     # mesh's own UVs and added to the roughness before the Creator's bias: clamp(r + (map - 0.5) +
     # bias). A fitted Character article names its own; empty, the image's default (0.5) adds 0.
     "roughness_map": ("filename", "", "Roughness Map", {}),
+    # Phase22 22.2 (RD-P22-5, RD-P22-6): the MESH's relief. normal_map is a tangent-space normal
+    # (+Y up), its XY added to the article's own before the overlays and normalised once; empty,
+    # the image's default (0.5, 0.5, 1) adds nothing. cavity_map multiplies specular_weight;
+    # empty, its default (1) leaves it.
+    "normal_map": ("filename", "", "Normal Map", {}),
+    "cavity_map": ("filename", "", "Cavity Map", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -110,6 +116,12 @@ BASE_COLOR_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}
 # Masters that take the mesh's shine maps (Phase22 RD-P22-3): Subsurface only for now, since the
 # skins and lips are Subsurface. Another master takes one when an article needs it.
 SHINE_MAP_MASTERS = {"Subsurface"}
+
+
+def shine_maps(spec) -> dict:
+    """The shine inputs this spec declares -> its own file, in AUTHOR_TIER_PORTS order."""
+    return {p: t for p, t in (("roughness_map", spec.roughness_map_tex), ("normal_map", spec.normal_map_tex),
+                              ("cavity_map", spec.cavity_map_tex)) if t}
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
@@ -215,6 +227,9 @@ class MaterialSpec:
     # Phase22 22.1: a fitted article's own roughness map (relative path), drawn for `fits`; it
     # declares the roughness_map input with that value (LCDSchema §Shine maps)
     roughness_map_tex: Optional[str] = None
+    # Phase22 22.2: its normal and cavity maps, the same way (normal_map, cavity_map)
+    normal_map_tex: Optional[str] = None
+    cavity_map_tex: Optional[str] = None
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -365,9 +380,9 @@ def _check_spec(spec: MaterialSpec) -> None:
     if spec.base_color_map and spec.master not in BASE_COLOR_MAP_MASTERS:
         raise ValueError("base_color_map is an input of the masters "
                          f"{sorted(BASE_COLOR_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
-    if spec.roughness_map_tex:
+    for port, tex in shine_maps(spec).items():
         if spec.master not in SHINE_MAP_MASTERS:
-            raise ValueError("roughness_map is an input of the masters "
+            raise ValueError(f"{port} is an input of the masters "
                              f"{sorted(SHINE_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
         if not spec.fits:
             raise ValueError("a shine map is drawn for a part mesh: declare `fits` (Phase22, RD-P22-3)")
@@ -422,6 +437,8 @@ def assemble(spec: MaterialSpec) -> str:
         "cutout_map": None,                  # the binding supplies it; the article's is empty
         "base_color_map": spec.base_color_map_tex,   # empty (the binding's), or a fitted article's own
         "roughness_map": spec.roughness_map_tex,
+        "normal_map": spec.normal_map_tex,
+        "cavity_map": spec.cavity_map_tex,
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -435,8 +452,7 @@ def assemble(spec: MaterialSpec) -> str:
         author_ports.append("cutout_map")
     if spec.base_color_map:
         author_ports.append("base_color_map")
-    if spec.roughness_map_tex:
-        author_ports.append("roughness_map")
+    author_ports += list(shine_maps(spec))
     if has_layer2:
         author_ports += ["layer_blend_balance", "layer_blend_contrast"]
         if not spec.layer2_base_color_tex:
@@ -687,8 +703,20 @@ def assemble(spec: MaterialSpec) -> str:
 
     # Phase22 (RD-P22-4): the mesh's roughness map, an offset around 0.5 read on texcoord 0 (the
     # mesh's own UVs, outside the Creator's placement) as linear data, added before the bias.
+    shine_uv = []
+
+    def _shine_image(port: str, typ: str, default: str):
+        """A shine map's image: linear, on texcoord 0 (one texcoord node for all of them)."""
+        if not shine_uv:
+            shine_uv.append(_node("texcoord", "shine_map_uv", "vector2", index=("integer", "value", 0)))
+        img = ng.addNode("image", f"{port}_tex", typ)
+        _add_input(img, "file", "filename", interfacename=port)
+        _add_input(img, "default", typ, value=default)
+        _add_input(img, "texcoord", "vector2", nodename="shine_map_uv")
+        return f"{port}_tex"
+
     if spec.roughness_map_tex:
-        _node("texcoord", "shine_map_uv", "vector2", index=("integer", "value", 0))
+        shine_uv.append(_node("texcoord", "shine_map_uv", "vector2", index=("integer", "value", 0)))
         img = ng.addNode("image", "roughness_map_tex", "float")
         _add_input(img, "file", "filename", interfacename="roughness_map")
         _add_input(img, "default", "float", value=0.5)
@@ -751,8 +779,8 @@ def assemble(spec: MaterialSpec) -> str:
     # already-world output of `normalmap`: overlay bumps were added along world X/Y, and the
     # "flat" (0, 0, 1) fallback became a fixed world +Z normal (Execution Log F10).
     # An article with ONLY a normal map needs no combination and keeps the direct graph.
-    has_normal_out = bool(spec.normal_tex or spec.layer2_normal_tex or ov_effect)
-    combine = bool(spec.layer2_normal_tex or ov_effect)
+    has_normal_out = bool(spec.normal_tex or spec.layer2_normal_tex or ov_effect or spec.normal_map_tex)
+    combine = bool(spec.layer2_normal_tex or ov_effect or spec.normal_map_tex)
     if has_normal_out and not combine:
         _image("normal_tex", "vector3", spec.normal_tex)
         nmap = ng.addNode("normalmap", "surface_normal", "vector3")
@@ -785,6 +813,16 @@ def assemble(spec: MaterialSpec) -> str:
             n_src = _node("normalize", "normal_layered_unit", "vector3",
                           **{"in": ("vector3", "nodename", blended)})
 
+        if spec.normal_map_tex:
+            # Phase22 (RD-P22-5): the mesh's relief, tangent space (+Y up) on texcoord 0: its XY is
+            # added to the article's normal, as an overlay's is (M1), and normalised once below.
+            _shine_image("normal_map", "vector3", "0.5, 0.5, 1.0")
+            body = _decode("normal_map_tex", "normal_map_ts")
+            _node("multiply", "normal_map_xy", "vector3",
+                  in1=("vector3", "nodename", body), in2=("vector3", "value", "1.0, 1.0, 0.0"))
+            n_src = _node("add", "normal_mapped", "vector3",
+                          in1=("vector3", "nodename", n_src), in2=("vector3", "nodename", "normal_map_xy"))
+
         for i, eff in enumerate(ov_effect, start=1):
             # R and G are remapped INDIVIDUALLY and only then combined: combining first and
             # remapping the vector would drive z to -1.
@@ -809,7 +847,7 @@ def assemble(spec: MaterialSpec) -> str:
                           in1=("vector3", "nodename", n_src),
                           in2=("vector3", "nodename", f"overlay{i}_normal_scaled"))
 
-        if ov_effect:
+        if ov_effect or spec.normal_map_tex:
             n_src = _node("normalize", "normal_out_unit", "vector3",
                           **{"in": ("vector3", "nodename", n_src)})
         # re-encode (n * 0.5 + 0.5) and convert the tangent-space result to world space ONCE
@@ -822,6 +860,15 @@ def assemble(spec: MaterialSpec) -> str:
 
     if has_normal_out:
         ng.addOutput("normal_out", "vector3").setNodeName(n_src)
+
+    # Phase22 (RD-P22-6): the mesh's cavity map dims the specular in creases and furrows:
+    # specular_weight = the article's (OpenPBR's 1 when unset) x the map. No colour moves.
+    if spec.cavity_map_tex:
+        _shine_image("cavity_map", "float", 1.0)
+        sw = _node("multiply", "specular_weight_mapped", "float",
+                   in1=("float", "nodename", "cavity_map_tex"),
+                   in2=("float", "value", 1.0 if spec.specular_weight is None else spec.specular_weight))
+        ng.addOutput("specular_weight_out", "float").setNodeName(sw)
 
     # --- Opacity: source -> [cutoff threshold] -> out.
     # The Masked cutoff is thresholded IN the graph (both here and in the UE master, P1) —
@@ -903,6 +950,12 @@ def assemble(spec: MaterialSpec) -> str:
     _add_input(shader, "specular_ior", "float", value=spec.specular_ior)
     if has_normal_out:
         _add_input(shader, "geometry_normal", "vector3", nodegraph=ng_name, output="normal_out")
+    if spec.normal_map_tex and spec.coat_weight:
+        # Phase22 22.2: skin's coat is its sebum, a film microns thin that follows the skin's relief,
+        # not a clear layer over it; on the mesh's smooth normal (OpenPBR's default, right for car
+        # paint) it lays one even gloss over the relief, the plastic look. So an article carrying the
+        # mesh's relief puts its coat on the same normal.
+        _add_input(shader, "geometry_coat_normal", "vector3", nodegraph=ng_name, output="normal_out")
     if has_opacity_out:
         _add_input(shader, "geometry_opacity", "float", nodegraph=ng_name, output="opacity_out")
     if spec.thin_walled is not None:
@@ -936,7 +989,9 @@ def assemble(spec: MaterialSpec) -> str:
                      ("fuzz_roughness", "float"),
                      ("specular_roughness_anisotropy", "float"),
                      ("specular_weight", "float")):
-        if getattr(spec, key) is not None:
+        if key == "specular_weight" and spec.cavity_map_tex:
+            _add_input(shader, key, typ, nodegraph=ng_name, output="specular_weight_out")
+        elif getattr(spec, key) is not None:
             if key in covered_out:
                 _weight(key, getattr(spec, key))
             else:

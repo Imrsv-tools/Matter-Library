@@ -211,7 +211,9 @@ def fitted_errors(d: dict) -> list:
 # not the picture's rule: greyscale ("L") for an offset map, at the mesh's map size. No coverage
 # test: the map's neutral value (no change) is right on any island and is its background too, so
 # an island left neutral is not an unpainted one (F-P22-6).
-DATA_MAPS = {"roughness_map_tex": "L"}
+DATA_MAPS = {"roughness_map_tex": "L",
+             "normal_map_tex": "RGB",     # 22.2: a tangent-space normal, +Y up, flat = (128, 128, 255)
+             "cavity_map_tex": "L"}       # 22.2: x specular_weight, open skin = 255
 
 
 def data_map_errors(d: dict) -> list:
@@ -233,7 +235,8 @@ def data_map_errors(d: dict) -> list:
         n = mesh["map_size"]
         with Image.open(f) as im:
             if im.format != "PNG" or im.mode != mode:
-                errs.append(f"G8 {f.name} is {im.format} {im.mode}: {key} is a greyscale PNG "
+                kind = "an RGB PNG" if mode == "RGB" else "a greyscale PNG"
+                errs.append(f"G8 {f.name} is {im.format} {im.mode}: {key} is {kind} "
                             "(linear data; no alpha)")
             elif im.size != (n, n):
                 errs.append(f"G8 {f.name} is {im.size[0]} x {im.size[1]}: {d['fits']}'s maps are {n} x {n}")

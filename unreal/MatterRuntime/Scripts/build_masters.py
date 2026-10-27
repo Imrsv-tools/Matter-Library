@@ -131,7 +131,9 @@ SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
 #   base_map the mesh's picture, base_color_map_tex (LCDSchema §Base colour map, Phase09 RD-P09-1),
 #            on the masters whose author tier carries it
 #   shine    the mesh's shine maps (LCDSchema §Shine maps, Phase22): roughness_map_tex, an offset
-#            around 0.5 added before the bias; a grey default (128) for a binding that has none
+#            around 0.5 added before the bias; a grey default (128) for a binding that has none.
+#            22.2: normal_map_tex (tangent space, its XY added before the overlays; flat default)
+#            and cavity_map_tex (x specular_weight; white default)
 MASTERS = {
     "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
@@ -472,6 +474,20 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
         base_map = texture(g, "base_color_map_tex", white, own_st, 12, colour=white_colour)
         base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
+    cavity = None
+    if spec.get("shine"):
+        # Phase22 22.2 (LCDSchema §Shine maps, RD-P22-5): the mesh's relief, tangent space (+Y up) on
+        # its own st: its XY added to the article's normal before the overlays, normalised once
+        # below. The slot's default is the flat normal; the driver binds an exact flat constant.
+        bn = g.op_k(M.MaterialExpressionSubtract,
+                    g.op_k(M.MaterialExpressionMultiply, texture(g, "normal_map_tex", flat, own_st, 12),
+                           2.0, 11, "RGB"), 1.0, 10)
+        bxy = g.op(M.MaterialExpressionMultiply, bn,
+                   g.node(M.MaterialExpressionConstant3Vector, 10,
+                          constant=unreal.LinearColor(1.0, 1.0, 0.0, 0.0)), 9)
+        n_ts = g.op(M.MaterialExpressionAdd, n_ts, bxy, 8)
+        # RD-P22-6: the cavity map, x specular_weight (white when none is bound)
+        cavity = texture(g, "cavity_map_tex", white, own_st, 7)
 
     keep = None     # Phase10: 1 - each deposit's cover, multiplied: what the deposits leave visible
     for n in OVERLAYS:
@@ -547,6 +563,19 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
                        transform_source_type=M.MaterialVectorCoordTransformSource.TRANSFORMSOURCE_TANGENT,
                        transform_type=M.MaterialVectorCoordTransform.TRANSFORM_WORLD)
     feed(normal, "geometry_normal")
+    if spec.get("shine"):
+        # Phase22 22.2: skin's coat (its sebum) follows the skin's relief: the coat's normal is
+        # mix(the geometry's, the article's, coat_follows_normal). 0 by default, so the master draws as
+        # before; the driver sets 1 on an article that declares normal_map (the assembler's
+        # geometry_coat_normal = normal_out).
+        if "geometry_coat_normal" not in inputs:
+            raise RuntimeError(f"{token}: Epic's function has no input geometry_coat_normal")
+        coat_n = g.node(M.MaterialExpressionLinearInterpolate, 2)
+        g.link(g.node(M.MaterialExpressionConstant3Vector, 3,
+                      constant=unreal.LinearColor(0.0, 0.0, 1.0, 0.0)), coat_n, "A")
+        g.link(normal, coat_n, "B")
+        g.link(g.scalar("coat_follows_normal", 0.0, col=3), coat_n, "Alpha")
+        feed(coat_n, "geometry_coat_normal")
 
     missing = []
     params = {}     # each pass-through parameter as the article sets it, before any scaling
@@ -561,6 +590,8 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
             p = g.op_k(M.MaterialExpressionMultiply, p, SCALED[name], 5)
         if name in COVERED:
             p = hidden(p)
+        if name == "specular_weight" and cavity is not None:
+            p = g.op(M.MaterialExpressionMultiply, p, cavity, 5, b_out="R")
         if name == "subsurface_color" and base_map is not None:
             # Phase09 F-P09-5: an article taking the picture scatters the PICTURE's colour (its
             # subsurface_color is connected to base_color_out), or the picture keeps only
