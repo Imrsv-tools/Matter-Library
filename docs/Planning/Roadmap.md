@@ -11,7 +11,9 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (2026-10-20, Phase21 closed). Which phase runs next is the lead's call.*
+### Phase22 — Skin Maps Beyond Colour — ACTIVE (IN DISCOVERY) *(numbered 2026-10-27 as discovery opened, the lead's "/discovery Phase22 Skin Maps Beyond Colour"; the head of `## Future` since RD-CMT-3; seeded 2026-10-14, un-parked 2026-10-26, RD-SYN-3)*
+**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
+- `docs/Planning/Phases/Phase22_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md` · `docs/Planning/Research/261027_R_CharacterMaterials.md`
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -32,10 +34,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
-
-### Skin Maps Beyond Colour — SEEDED, **un-parked 2026-10-26** *(the lead, "3) yes", RD-SYN-3, `261026_R_SyntheticSkinAndEyes.md`; ~~parked 2026-10-14: "skin detail stay parked TBD", RD-DS-8~~; added 2026-10-14 by `/research` on the lead's "Seed a phase TBD...", "Full skin map set"; builds on Skin Maps, which ships the colour map first; starting discovery stays the lead's call)*
-**Outcome:** up close, a character's skin catches the light as real skin does (fine wrinkles and creases, oilier and drier areas, light glowing through ears and fingers), in Blender, a USD viewer and Unreal.
-- `docs/Planning/Phases/Future/PhaseTBD_SkinMapsBeyondColour.md` · research `docs/Planning/Research/261014_R_SkinMaps.md`
 
 ### Synthetic Skin Sets — RESEARCH *(seeded 2026-10-26 by `/research` on the lead's "inform the matter library how it SHOULD be doing things moving forward"; a draft test set is in the library, RD-SYN-2; kick off `/discovery` when ready)*
 **Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.

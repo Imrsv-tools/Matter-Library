@@ -1,6 +1,6 @@
-# PhaseTBD — Skin Maps Beyond Colour
+# Phase22 — Skin Maps Beyond Colour
 
-**Status:** SEEDED (2026-10-14), not numbered, **un-parked 2026-10-26** (the lead, *"3) yes"*, RD-SYN-3, [`261026_R_SyntheticSkinAndEyes.md`](../../Research/261026_R_SyntheticSkinAndEyes.md); it was parked 2026-10-14, *"skin detail stay parked TBD"*, RD-DS-8). The test set there shows what colour alone can reach; this phase is what answers "still reads plastic". A pointer-shell written by `/research` on the lead's word: *"Seed a phase TBD..."*, then *"Full skin map set"* when asked which. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It builds on *Skin Maps* ([`Phase21_SkinMaps.md`](../Phase21_SkinMaps.md)), which ships the colour map first.
+**Status:** ACTIVE (IN DISCOVERY) — **numbered Phase22 2026-10-27 as discovery opened** (the lead: *"/discovery Phase22 Skin Maps Beyond Colour"*; the head of `## Future` since the 2026-10-27 re-sequence, RD-CMT-3; the numbering F-CMT-9 laid out). Seeded 2026-10-14, **un-parked 2026-10-26** (the lead, *"3) yes"*, RD-SYN-3, [`261026_R_SyntheticSkinAndEyes.md`](../../Research/261026_R_SyntheticSkinAndEyes.md); it was parked 2026-10-14, *"skin detail stay parked TBD"*, RD-DS-8). The test set there shows what colour alone can reach; this phase is what answers "still reads plastic". A pointer-shell written by `/research` on the lead's word: *"Seed a phase TBD..."*, then *"Full skin map set"* when asked which. **Starting discovery is a deliberate gate, the lead's call, never a slide.** It builds on *Skin Maps* ([`Phase21_SkinMaps.md`](../Phase21_SkinMaps.md)), which ships the colour map first.
 
 ## Outcome
 
