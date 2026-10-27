@@ -58,7 +58,7 @@ OUT = gsm.OUT
 TAG = gsm.TAG
 PROVENANCE = gsm.PROVENANCE
 SEED = 20261027
-MAPS = ("roughness", "normal", "cavity")
+MAPS = ("roughness", "normal", "cavity", "scatter")
 
 # Roughness offsets (roughness units). The Physically Based skin value is 0.5 and the pores spread
 # it 0.46 - 0.56; these move whole zones. First made at half these (T-zone -0.13, cheeks +0.07):
@@ -93,6 +93,9 @@ LINE_WIDTH = {"forehead": 0.65e-3, "glabella": 0.6e-3, "crows": 0.55e-3, "undere
               "nasolabial": 2.4e-3, "lips": 0.35e-3, "neck": 0.9e-3, "knuckle": 0.6e-3}
 CAVITY_DEPTH = 450e-6  # a groove this deep dims the specular to CAVITY_FLOOR
 CAVITY_FLOOR = 0.5
+# The scatter map (22.3, RD-P22-18): where the body is thin, so light passes through it. The
+# radius becomes subsurface_radius x (1 + 4 x map) (LCDSchema §Shine maps): 1 = x5.
+SCATTER = {"ears": 1.0, "fingertips": 0.6, "nose_wings": 0.4, "eyelids": 0.5, "toes": 0.4}
 CREASE_CAVITY = 0.25   # the mesh's own creases (its concavity) dim it this much more at the deepest
 
 
@@ -472,6 +475,59 @@ def store_cavity(c: np.ndarray, F: dict, cover) -> tuple[np.ndarray, dict]:
                "skin_p1": round(float(np.percentile(dec[S], 1)), 3)}
 
 
+# ------------------------------------------------------------------ scatter (22.3) --------------
+def _capsule(P, a, b, r_in: float, r_out: float):
+    """1 within r_in of the segment a-b, falling to 0 at r_out; and the position t along it (0..1)."""
+    ab = b - a
+    t = np.clip(((P - a) @ ab) / float(ab @ ab), 0.0, 1.0)
+    d = np.linalg.norm(P - (a + t[..., None] * ab), axis=-1)
+    return smooth(d, r_out, r_in), t
+
+
+def scatter(F: dict) -> np.ndarray:
+    """0 on thick skin; up to 1 where the body is thin: the ears (graded by MPFB2's thickness map,
+    so the rim is thinnest), the last two phalanges of every finger rising to the tip, the nose's
+    wings, the eyelids and the toes' tips. Placed in 3D from hm08's joints and MPFB2's masks."""
+    P, J, masks = F["P"], F["J"], F["masks"]
+    S = F["reg"]["Body"]
+    sss = gsm._grey("sss.png")
+    sss = np.clip(sss / max(float(np.percentile(sss[S], 99)), 1e-6), 0.0, 1.2)
+    ears = np.clip(masks["ears"] * 1.5, 0.0, 1.0)
+    rim = np.clip((sss - 0.9) / 0.25, 0.0, 1.0)               # within the ear: the thinner, the more
+    f = SCATTER["ears"] * ears * (0.55 + 0.45 * rim)
+    tips = np.zeros(P.shape[:2])
+    for side in ("l", "r"):
+        for k in range(1, 6):
+            w, t = _capsule(P, J[f"{side}-finger-{k}-2"], J[f"{side}-finger-{k}-4"], 0.010, 0.014)
+            tips = np.maximum(tips, w * smooth(t, 0.0, 1.0))
+            if k == 1 or f"{side}-toe-{k}-4" not in J:
+                continue
+            w, t = _capsule(P, J[f"{side}-toe-{k}-3"], J[f"{side}-toe-{k}-4"], 0.008, 0.012)
+            tips = np.maximum(tips, w * t * SCATTER["toes"] / SCATTER["fingertips"])
+    f = np.maximum(f, SCATTER["fingertips"] * tips)
+    ye, ex = float(J["l-eye"][1]), float(J["l-eye"][0])
+    front = np.clip((F["N"][..., 2] - 0.1) / 0.4, 0.0, 1.0)
+    face = np.clip(masks["face"] * 1.5, 0.0, 1.0) * front
+    wings = (ellipse(P, 0.016, ye - 0.047, 0.007, 0.007) + ellipse(P, -0.016, ye - 0.047, 0.007, 0.007)) * face
+    f = np.maximum(f, SCATTER["nose_wings"] * np.clip(wings, 0.0, 1.0))
+    f = np.maximum(f, SCATTER["eyelids"] * np.clip(masks["eyelids"] * 1.5, 0.0, 1.0))
+    f = np.where(F["reg"]["Lips"], 0.0, f)
+    return np.clip(f, 0.0, 1.0)
+
+
+def store_scatter(f: np.ndarray, F: dict) -> tuple[np.ndarray, dict]:
+    cover = F["cover"]
+    f = gsm.bleed(np.where(cover, f, 0.0)[..., None], cover, gsm.BLEED)[..., 0]
+    m = np.round(np.clip(f, 0, 1) * 255.0)
+    m[~_grown(cover)] = 0
+    m = m.astype(np.uint8)
+    S = F["reg"]["Body"]
+    ears = (F["masks"]["ears"] > 0.5) & S
+    dec = m / 255.0
+    return m, {"skin_share_raised": round(float((dec[S] > 0.05).mean()), 4),
+               "ears_average": round(float(dec[ears].mean()), 3), "max": round(float(dec.max()), 3)}
+
+
 # ------------------------------------------------------------------ provenance and main ---------
 def write_provenance(rows: dict) -> None:
     """Add this maker's files and member rows to ``skin.yaml``, keeping every other row."""
@@ -524,6 +580,11 @@ def main(argv=None) -> int:
     Image.fromarray(mc, "L").save(out / name("cavity"), optimize=True)
     rows["cavity"] = {"made": "procedural", "space": "linear", "neutral": 1.0,
                       "rule": "specular_weight x map", **sc}
+
+    ms, ss = store_scatter(scatter(F), F)
+    Image.fromarray(ms, "L").save(out / name("scatter"), optimize=True)
+    rows["scatter"] = {"made": "procedural", "space": "linear", "neutral": 0.0,
+                       "rule": "subsurface_radius x (1 + 4 x map)", **ss}
     for k, r in rows.items():
         print(f"{k}: {out / name(k)}\n  " + json.dumps({x: v for x, v in r.items() if x not in ('made', 'rule')}))
     if not a.out:

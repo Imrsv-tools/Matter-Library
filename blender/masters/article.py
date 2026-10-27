@@ -43,7 +43,8 @@ class ArticleData:
 
 # The nodes that sample a MESH's map, whose file is the input's value (the binding's, or a fitted
 # article's own: ArticleData.maps), not one of the article's texture roles. Phase22 adds the shine maps.
-MESH_MAP_NODES = ("cutout_tex", "base_color_map_tex", "roughness_map_tex", "normal_map_tex", "cavity_map_tex")
+MESH_MAP_NODES = ("cutout_tex", "base_color_map_tex", "roughness_map_tex", "normal_map_tex", "cavity_map_tex",
+                  "scatter_map_tex")
 
 
 def read(path: Path) -> ArticleData:
@@ -92,11 +93,12 @@ def read(path: Path) -> ArticleData:
                                 if m.get("name", "").startswith(f"{i.get('name')}_deposit")),
                                key=lambda m: m.get("name"))
                 bg = chain[0].find("input[@name='bg']") if chain else None
-                mapped = ng.find("multiply[@name='specular_weight_mapped']/input[@name='in2']")
-                if i.get("name") == "specular_weight" and mapped is not None:
-                    # Phase22 22.2: the cavity map x the article's own specular_weight (in2); each
-                    # target's master multiplies the mesh's map in itself
-                    art.shader["specular_weight"] = _floats(mapped.get("value"))
+                mapped = ng.find(f"multiply[@name='{i.get('name')}_mapped']/input[@name='in2']")
+                if mapped is not None:
+                    # Phase22: a mesh's map x the article's own value (in2): the cavity map x
+                    # specular_weight (22.2), the scatter map's factor x subsurface_radius (22.3);
+                    # each target's master applies the mesh's map itself
+                    art.shader[i.get("name")] = _floats(mapped.get("value"))
                 elif bg is not None and bg.get("value") is not None:
                     art.shader[i.get("name")] = _floats(bg.get("value"))
                 elif not chain and i.get("name") in art.ports:

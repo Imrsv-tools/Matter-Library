@@ -10,7 +10,9 @@
 * the normal map (22.2) is RGB at the map size, decodes to unit vectors on the skin, and is exactly
   flat (128, 128, 255) beyond every island;
 * the cavity map (22.2) is greyscale at the map size, never brightens (it only multiplies
-  specular_weight down), and is exactly 255 beyond every island.
+  specular_weight down), and is exactly 255 beyond every island;
+* the scatter map (22.3) is greyscale at the map size, exactly 0 (neutral) beyond every island,
+  and raises only a small share of the skin (the thin parts), the ears most.
 """
 import sys
 from pathlib import Path
@@ -73,6 +75,23 @@ def main() -> int:
         if off.size and (off != 255).any():
             fails.append(f"{p.name}: {(off != 255).sum()} texels beyond every island are not 1")
         print(f"cavity: skin average {(c / 255.0)[reg['Body']].mean():.4f}")
+    p = shine.OUT / shine.name("scatter")
+    with Image.open(p) as im:
+        ok = im.mode == "L" and im.size == (gsm.N, gsm.N)
+        sc = np.asarray(im).astype(np.float64)
+    if not ok:
+        fails.append(f"{p.name}: want L {gsm.N} x {gsm.N}")
+    else:
+        off = sc[~grown]
+        if off.size and (off != 0).any():
+            fails.append(f"{p.name}: {(off != 0).sum()} texels beyond every island are not 0")
+        raised = float((sc[reg["Body"]] > 12).mean())
+        if raised > 0.15:
+            fails.append(f"{p.name}: {raised:.0%} of the skin is raised; only the thin parts should be")
+        ears = (gsm._grey("mpfb_ears.jpg") > 0.5) & reg["Body"]
+        if (sc[ears] / 255.0).mean() < 0.4:
+            fails.append(f"{p.name}: the ears average {(sc[ears] / 255.0).mean():.2f}; they are the thinnest part")
+        print(f"scatter: {raised:.1%} of the skin raised, ears average {(sc[ears] / 255.0).mean():.2f}")
     for f in fails:
         print("FAIL", f)
     print("PASS" if not fails else f"{len(fails)} failed")

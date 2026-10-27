@@ -44,6 +44,7 @@
   "roughness_map_tex": "../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png",
   "normal_map_tex": "../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png",
   "cavity_map_tex": "../../../../textures/fit/makehuman/skin/Skin_cavity_sUKN.png",
+  "scatter_map_tex": "../../../../textures/fit/makehuman/skin/Skin_scatter_sUKN.png",
   "overlays": [
     {
       "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png",

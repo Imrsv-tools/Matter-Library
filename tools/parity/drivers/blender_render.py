@@ -302,7 +302,7 @@ def run(job_path: Path) -> None:
             # the setting's
             sliders = {**b.get("set", {}), **s.get("set", {})}
             # Phase22: the mesh's shine maps (LCDSchema §Shine maps)
-            shine = {p: b[p] for p in ("roughness_map", "normal_map", "cavity_map") if b.get(p)}
+            shine = {p: b[p] for p in ("roughness_map", "normal_map", "cavity_map", "scatter_map") if b.get(p)}
             key = (a["name"], cut, pic, repr(sorted(shine.items())), repr(sorted(sliders.items())))
             if key not in built:
                 tag = f"__{Path(cut or pic).stem}" if (cut or pic) else ""

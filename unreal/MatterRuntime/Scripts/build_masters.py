@@ -121,6 +121,7 @@ TRANSMISSION = {"transmission_weight": 0.0, "transmission_color": (1.0, 1.0, 1.0
 #   measured 2026-09-29 (6.4) on Neon's dim view and read as the function's own scale; it is
 #   1 / the length of Neon's magenta, and was wrong for every other colour.
 SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
+SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: radius x (1 + 4 x scatter_map), as the assembler's
 
 # Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
 #   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
@@ -133,7 +134,8 @@ SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
 #   shine    the mesh's shine maps (LCDSchema §Shine maps, Phase22): roughness_map_tex, an offset
 #            around 0.5 added before the bias; a grey default (128) for a binding that has none.
 #            22.2: normal_map_tex (tangent space, its XY added before the overlays; flat default)
-#            and cavity_map_tex (x specular_weight; white default)
+#            and cavity_map_tex (x specular_weight; white default). 22.3: scatter_map_tex
+#            (subsurface_radius x (1 + SCATTER_GAIN x map); black default)
 MASTERS = {
     "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
@@ -371,7 +373,7 @@ def texture(g, name, default, uv, col, colour=None):
     return t
 
 
-def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
+def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -475,6 +477,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
         base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
     cavity = None
+    scatter = None
     if spec.get("shine"):
         # Phase22 22.2 (LCDSchema §Shine maps, RD-P22-5): the mesh's relief, tangent space (+Y up) on
         # its own st: its XY added to the article's normal before the overlays, normalised once
@@ -488,6 +491,11 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
         n_ts = g.op(M.MaterialExpressionAdd, n_ts, bxy, 8)
         # RD-P22-6: the cavity map, x specular_weight (white when none is bound)
         cavity = texture(g, "cavity_map_tex", white, own_st, 7)
+        # 22.3 (RD-P22-18): the scatter map raises the radius at thin parts: 1 + SCATTER_GAIN x map
+        # (black when none is bound, so x 1)
+        scatter = g.op_k(M.MaterialExpressionAdd,
+                         g.op_k(M.MaterialExpressionMultiply, texture(g, "scatter_map_tex", black, own_st, 7),
+                                SCATTER_GAIN, 6, "R"), 1.0, 5)
 
     keep = None     # Phase10: 1 - each deposit's cover, multiplied: what the deposits leave visible
     for n in OVERLAYS:
@@ -592,6 +600,8 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None):
             p = hidden(p)
         if name == "specular_weight" and cavity is not None:
             p = g.op(M.MaterialExpressionMultiply, p, cavity, 5, b_out="R")
+        if name == "subsurface_radius" and scatter is not None:
+            p = g.op(M.MaterialExpressionMultiply, p, scatter, 4)
         if name == "subsurface_color" and base_map is not None:
             # Phase09 F-P09-5: an article taking the picture scatters the PICTURE's colour (its
             # subsurface_color is connected to base_color_out), or the picture keeps only
@@ -771,9 +781,10 @@ def main():
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
     grey = default_texture("T_Matter_Grey", (128, 128, 128, 255))     # a shine map's neutral
+    black = default_texture("T_Matter_Black", (0, 0, 0, 255))         # the scatter map's neutral
     white_colour = (default_texture("T_Matter_WhiteColour", (255, 255, 255, 255), srgb=True)
                     if COLOUR_SAMPLER == "srgb" else None)
-    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey) for t in MASTERS]
+    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black) for t in MASTERS]
                 + ([build_sky()] if SKY else [])):
         save(mat)
     log("RESULT ok")

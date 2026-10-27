@@ -89,6 +89,10 @@ AUTHOR_TIER_PORTS = {
     # empty, its default (1) leaves it.
     "normal_map": ("filename", "", "Normal Map", {}),
     "cavity_map": ("filename", "", "Cavity Map", {}),
+    # Phase22 22.3 (RD-P22-7, RD-P22-18): the MESH's scatter reach. It raises subsurface_radius
+    # where the body is thin (ears, nose wings, fingers), so light passes through them:
+    # radius x (1 + SCATTER_GAIN x map). Empty, the image's default (0) leaves the radius.
+    "scatter_map": ("filename", "", "Scatter Map", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -121,7 +125,10 @@ SHINE_MAP_MASTERS = {"Subsurface"}
 def shine_maps(spec) -> dict:
     """The shine inputs this spec declares -> its own file, in AUTHOR_TIER_PORTS order."""
     return {p: t for p, t in (("roughness_map", spec.roughness_map_tex), ("normal_map", spec.normal_map_tex),
-                              ("cavity_map", spec.cavity_map_tex)) if t}
+                              ("cavity_map", spec.cavity_map_tex), ("scatter_map", spec.scatter_map_tex)) if t}
+
+
+SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: a white scatter map gives the radius x5 (LCDSchema §Shine maps)
 
 MAX_OVERLAYS = 3   # MasterSet.md: <=3 overlay layers, <=1 maskset (raised from 2, 2026-09-25)
 
@@ -230,6 +237,8 @@ class MaterialSpec:
     # Phase22 22.2: its normal and cavity maps, the same way (normal_map, cavity_map)
     normal_map_tex: Optional[str] = None
     cavity_map_tex: Optional[str] = None
+    # Phase22 22.3: its scatter map, the same way (scatter_map)
+    scatter_map_tex: Optional[str] = None
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -439,6 +448,7 @@ def assemble(spec: MaterialSpec) -> str:
         "roughness_map": spec.roughness_map_tex,
         "normal_map": spec.normal_map_tex,
         "cavity_map": spec.cavity_map_tex,
+        "scatter_map": spec.scatter_map_tex,
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -870,6 +880,21 @@ def assemble(spec: MaterialSpec) -> str:
                    in2=("float", "value", 1.0 if spec.specular_weight is None else spec.specular_weight))
         ng.addOutput("specular_weight_out", "float").setNodeName(sw)
 
+    # Phase22 22.3 (RD-P22-18): the mesh's scatter map raises the scatter radius at thin parts:
+    # subsurface_radius = the article's x (1 + SCATTER_GAIN x the map). Its default (0) leaves it.
+    if spec.scatter_map_tex:
+        if spec.subsurface_radius is None:
+            raise ValueError("scatter_map needs the article's own subsurface_radius")
+        _shine_image("scatter_map", "float", 0.0)
+        _node("multiply", "scatter_map_gain", "float",
+              in1=("float", "nodename", "scatter_map_tex"), in2=("float", "value", SCATTER_GAIN))
+        _node("add", "scatter_map_factor", "float",
+              in1=("float", "nodename", "scatter_map_gain"), in2=("float", "value", 1.0))
+        sr = _node("multiply", "subsurface_radius_mapped", "float",
+                   in1=("float", "nodename", "scatter_map_factor"),
+                   in2=("float", "value", spec.subsurface_radius))
+        ng.addOutput("subsurface_radius_out", "float").setNodeName(sr)
+
     # --- Opacity: source -> [cutoff threshold] -> out.
     # The Masked cutoff is thresholded IN the graph (both here and in the UE master, P1) —
     # the alternative, UE's OpacityMaskClipValue, is a static base-property override a MID
@@ -977,7 +1002,9 @@ def assemble(spec: MaterialSpec) -> str:
         # Phase09 (F-P09-5): a Subsurface article taking the mesh's picture scatters the PICTURE's
         # colour, or the picture keeps only (1 - subsurface_weight) of its strength (learning M4).
         _add_input(shader, "subsurface_color", "color3", nodegraph=ng_name, output="base_color_out")
-    if spec.subsurface_radius is not None:
+    if spec.subsurface_radius is not None and spec.scatter_map_tex:
+        _add_input(shader, "subsurface_radius", "float", nodegraph=ng_name, output="subsurface_radius_out")
+    elif spec.subsurface_radius is not None:
         _add_input(shader, "subsurface_radius", "float", value=spec.subsurface_radius)
     if spec.subsurface_radius_scale is not None:
         _add_input(shader, "subsurface_radius_scale", "color3", value=spec.subsurface_radius_scale)

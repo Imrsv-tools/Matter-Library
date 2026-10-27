@@ -18,6 +18,8 @@ import bpy
 import build_masters
 from article import ArticleData, read  # noqa: F401  (ArticleData: kept importable from here)
 
+SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: radius x (1 + 4 x scatter_map), as the assembler's
+
 COLOR_SPACES = {"srgb_texture": "sRGB", "lin_rec709": "Non-Color", None: "Non-Color"}
 # per-article texture roles (the assembler's <role>_tex / <role>_const) -> the master socket;
 # a role is wired only where the article's master has the socket
@@ -46,7 +48,7 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
 def build(path: Path, sliders: dict | None = None, name: str | None = None,
           cutout_map: Path | None = None, base_color_map: Path | None = None,
           roughness_map: Path | None = None, normal_map: Path | None = None,
-          cavity_map: Path | None = None):
+          cavity_map: Path | None = None, scatter_map: Path | None = None):
     """A new material for ``path`` with ``sliders`` applied; returns the material.
 
     ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
@@ -58,7 +60,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     ``roughness_map`` (Phase22, LCDSchema §Shine maps) is the mesh's roughness offset, linear, on
     the mesh's own UVs: ``roughness + (map - 0.5)``, ahead of the master's bias and clamp.
     ``normal_map`` (22.2) is the mesh's tangent-space relief, its XY added to the article's normal;
-    ``cavity_map`` multiplies the specular weight.
+    ``cavity_map`` multiplies the specular weight. ``scatter_map`` (22.3) raises the scatter radius
+    where the body is thin: ``subsurface_radius x (1 + 4 x map)``.
     """
     build_masters.ensure_all()
     art = read(path)
@@ -72,6 +75,8 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         normal_map = art.maps.get("normal_map")
     if cavity_map is None:
         cavity_map = art.maps.get("cavity_map")
+    if scatter_map is None:
+        scatter_map = art.maps.get("scatter_map")
     if art.master not in build_masters.MASTERS:
         raise NotImplementedError(f"{art.name}: master {art.master!r} has no Blender version yet")
     ports = dict(art.ports)
@@ -282,6 +287,25 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     else:
         cavity_weight = None
 
+    if scatter_map is not None:
+        # RD-P22-18: subsurface_radius x (1 + SCATTER_GAIN x the scatter map); the article's own
+        # radius is set on the multiply below (the master's socket is then driven by the link)
+        tex = _mesh_map("scatter_map", scatter_map)
+        gain = nt.nodes.new("ShaderNodeMath")
+        gain.operation = "MULTIPLY_ADD"
+        gain.location = (200, y)
+        gain.inputs[1].default_value = SCATTER_GAIN
+        gain.inputs[2].default_value = 1.0
+        L(tex.outputs["Color"], gain.inputs[0])
+        scatter_radius = nt.nodes.new("ShaderNodeMath")
+        scatter_radius.operation = "MULTIPLY"
+        scatter_radius.location = (400, y)
+        L(gain.outputs["Value"], scatter_radius.inputs[0])
+        L(scatter_radius.outputs["Value"], master.inputs["Subsurface Radius"])
+        y -= 300
+    else:
+        scatter_radius = None
+
     # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base
     # (no value on the shader: the assembler wires it to base_color_out) scatters the base's own
     # colour, the picture included. ML_Subsurface tints its Base Color inside the master but takes
@@ -352,6 +376,10 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         cavity_weight.inputs[1].default_value = art.shader.get("specular_weight", [1.0])[0]
     elif "specular_weight" in art.shader:
         master.inputs["Specular Weight"].default_value = art.shader["specular_weight"][0]
+    if scatter_radius is not None:
+        if "subsurface_radius" not in art.shader:
+            raise ValueError(f"{art.name}: scatter_map needs the article's own subsurface_radius")
+        scatter_radius.inputs[1].default_value = art.shader["subsurface_radius"][0]
     if "base_weight" in art.shader and art.shader["base_weight"][0] != 1.0:
         raise NotImplementedError(f"{art.name}: base_weight != 1 is not mapped yet")
 

@@ -102,7 +102,8 @@ BASE_MAP_PORT = "base_color_map"   # not a slider: the mesh's picture, per bindi
 # Phase22 (LCDSchema §Shine maps): the mesh's shine maps -> the master's <port>_tex, linear; an
 # article without one gets an exact neutral constant (the slot's own default is 128, 0.502)
 SHINE_PORTS = {"roughness_map": (0.5, 0.5, 0.5), "normal_map": (0.5, 0.5, 1.0),   # 22.2: flat
-               "cavity_map": (1.0, 1.0, 1.0)}                                        # 22.2: open skin
+               "cavity_map": (1.0, 1.0, 1.0),                                        # 22.2: open skin
+               "scatter_map": (0.0, 0.0, 0.0)}                                       # 22.3: thick skin
 SHINE_MASTERS = {"Subsurface"}
 # the article's texture roles -> the master's <role>_tex slots (6.3: the Opaque core in full;
 # 6.4: TwoLayer's layer 2, Masked's opacity)

@@ -783,6 +783,27 @@ bool AMatterRuntimeGameMode::CaptureView(const TSharedPtr<FJsonObject>& View, co
 			CaptureComp->HiddenComponents.Add(Mesh->Get());
 		}
 	}
+	// Phase22 22.3: in the look view (the only one whose meshes cast shadows; the key is the tell),
+	// a part hidden from this view casts no shadow either: the backlit ear hides the hair, whose
+	// dithered cards otherwise shadow the head behind the ear once the rim casts shadows.
+	if (SunComp->CastShadows)
+	{
+		bool bChanged = false;
+		for (const auto& Pair : Meshes)
+		{
+			const bool bCast = !CaptureComp->HiddenComponents.Contains(Pair.Value.Get());
+			if (Pair.Value->CastShadow != bCast)
+			{
+				Pair.Value->SetCastShadow(bCast);
+				bChanged = true;
+			}
+		}
+		if (bChanged)
+		{
+			GetWorld()->SendAllEndOfFrameUpdates();
+			FlushRenderingCommands();
+		}
+	}
 	CaptureComp->CaptureScene();
 	FlushRenderingCommands();
 

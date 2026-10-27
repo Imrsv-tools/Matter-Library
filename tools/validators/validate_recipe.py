@@ -213,7 +213,8 @@ def fitted_errors(d: dict) -> list:
 # an island left neutral is not an unpainted one (F-P22-6).
 DATA_MAPS = {"roughness_map_tex": "L",
              "normal_map_tex": "RGB",     # 22.2: a tangent-space normal, +Y up, flat = (128, 128, 255)
-             "cavity_map_tex": "L"}       # 22.2: x specular_weight, open skin = 255
+             "cavity_map_tex": "L",       # 22.2: x specular_weight, open skin = 255
+             "scatter_map_tex": "L"}      # 22.3: radius x (1 + 4 map), thick skin = 0
 
 
 def data_map_errors(d: dict) -> list:

@@ -13,6 +13,7 @@
     <input name="roughness_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png" uiname="Roughness Map" />
     <input name="normal_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png" uiname="Normal Map" />
     <input name="cavity_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_cavity_sUKN.png" uiname="Cavity Map" />
+    <input name="scatter_map" type="filename" value="../../../../textures/fit/makehuman/skin/Skin_scatter_sUKN.png" uiname="Scatter Map" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -261,6 +262,24 @@
       <input name="in2" type="float" value="1.0" />
     </multiply>
     <output name="specular_weight_out" type="float" nodename="specular_weight_mapped" />
+    <image name="scatter_map_tex" type="float">
+      <input name="file" type="filename" interfacename="scatter_map" />
+      <input name="default" type="float" value="0.0" />
+      <input name="texcoord" type="vector2" nodename="shine_map_uv" />
+    </image>
+    <multiply name="scatter_map_gain" type="float">
+      <input name="in1" type="float" nodename="scatter_map_tex" />
+      <input name="in2" type="float" value="4.0" />
+    </multiply>
+    <add name="scatter_map_factor" type="float">
+      <input name="in1" type="float" nodename="scatter_map_gain" />
+      <input name="in2" type="float" value="1.0" />
+    </add>
+    <multiply name="subsurface_radius_mapped" type="float">
+      <input name="in1" type="float" nodename="scatter_map_factor" />
+      <input name="in2" type="float" value="0.00367" />
+    </multiply>
+    <output name="subsurface_radius_out" type="float" nodename="subsurface_radius_mapped" />
     <mix name="subsurface_weight_deposit2" type="float">
       <input name="bg" type="float" value="1.0" />
       <input name="fg" type="float" value="0.0" />
@@ -283,7 +302,7 @@
     <input name="geometry_normal" type="vector3" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="normal_out" />
     <input name="subsurface_weight" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="subsurface_weight_out" />
     <input name="subsurface_color" type="color3" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="base_color_out" />
-    <input name="subsurface_radius" type="float" value="0.00367" />
+    <input name="subsurface_radius" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="subsurface_radius_out" />
     <input name="subsurface_radius_scale" type="color3" value="1, 0.373, 0.185" />
     <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
     <input name="fuzz_weight" type="float" nodegraph="NG_Skin_FitzpatrickIV_Clean_Base_s001_v01" output="fuzz_weight_out" />
