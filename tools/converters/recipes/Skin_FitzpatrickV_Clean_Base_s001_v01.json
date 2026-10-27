@@ -16,7 +16,7 @@
   "fits": "MakeHuman_Body_v01",
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
-  "base_color_const": "0.3368, 0.2098, 0.1432",
+  "base_color_const": "0.3466, 0.1932, 0.1252",
   "roughness_tex": "../../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
   "normal_tex": "../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
   "metalness_const": 0.0,

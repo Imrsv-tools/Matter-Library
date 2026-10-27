@@ -92,6 +92,32 @@ SEED = 20261026
 # are cut by that, and its flush is the spike's, so redness falls from the light tones to the dark.
 DETAIL = {"III": {"fine": (3.0, 2.0), "coarse": (1.3, 1.0), "dots": (0.9, 0.5), "flush": 1.8},
           "IV": {"fine": (1.1, 0.75), "coarse": (0.5, 0.4), "dots": (0.33, 0.18), "flush": 1.0}}
+# The face's PLACED regional colour (23.2.7; click 2, the lead: "We are certainly not at the "bar (c),
+# III" level"). Each region is a smooth shape placed from the head's own landmarks (``face_regions``)
+# and carries one pigment change: log melanin, log blood, oxygen saturation, and depth (blood seen
+# through thin skin, which takes each channel by its own scatter reach: red most, so it reads
+# violet). The numbers were solved once on III's fit so each region's colour over the trunk matches
+# the bar's same region (the bar is a research reference, never shipped: RD-P23-10; a handful of
+# region averages are taken from it, as a tone is, and no picture). The regions and their shapes are
+# one structure for every tone; the numbers are per fit, as ``DETAIL``'s are. III's fit is solved to
+# the bar's region colours over the trunk; IV's to the same colours at half their log contrast (no
+# dark-skin reference exists: the agent's judgement, for the lead's eye at IV and V). Measured on the
+# atlas, 2026-10-27: every region within 0.13 (III) and 0.02 (IV) in log of its target. The bar's face
+# is lighter and cooler than its trunk (pink, where today's face was a darker tan from sun melanin).
+# On III's fit that needs melanin out (its pheomelanin is the yellow); blood out alone reads cream.
+FACE = {  # fit: {region: (dlog melanin, dlog blood, d so2, depth)}
+    "III": {"face": (-1.106, -0.368, 0.150, -0.105), "forehead": (-0.108, -0.372, -0.130, -0.250),
+            "cheek": (-3.000, -1.105, 0.150, -0.250), "nose": (-3.000, -1.200, 0.150, -0.250),
+            "alae": (-1.262, 0.061, 0.150, -0.250), "under_eye": (-3.000, -0.135, 0.150, 0.053),
+            "eyelid": (-0.588, 1.200, 0.150, 0.067), "chin": (-1.676, 0.203, 0.150, -0.025)},
+    "IV": {"face": (-0.360, -0.040, 0.031, -0.055), "forehead": (-0.001, -0.089, -0.062, -0.121),
+           "cheek": (-0.283, -0.185, -0.091, -0.171), "nose": (-0.328, -0.294, -0.148, -0.250),
+           "alae": (-0.013, 0.035, 0.038, -0.091), "under_eye": (-0.182, 0.067, 0.082, 0.022),
+           "eyelid": (-0.151, 0.607, 0.150, 0.036), "chin": (0.010, 0.133, 0.108, -0.001)},
+}
+# The lips over the tone, per fit: III's the bar's measured lips over its trunk (pink-mauve, where the
+# library's rule, Phase08 8.2, reads brown-red on the new face); IV's keeps the rule.
+LIPS = {"III": (0.93, 0.68, 0.93), "IV": gsm.LIP_RULE}
 
 
 # ------------------------------------------------------------------ the model -------------------
@@ -263,6 +289,50 @@ def gauss3(P, c, r):
     return np.exp(-(np.linalg.norm(P - np.asarray(c), axis=-1) / r) ** 2)
 
 
+def ellipse3(P, c, r):
+    """A soft ellipsoid: ``r`` is the (x, y, z) radius in metres."""
+    return np.exp(-(((P - np.asarray(c)) / np.asarray(r)) ** 2).sum(-1))
+
+
+def face_landmarks(P, masks, cover) -> dict:
+    """The head's landmarks, from the mesh and MPFB's masks: the nose tip (the face's most forward
+    texel), the face's midline, each eye (its eyelid mask's centre) and the mouth."""
+    Fp = P[(masks["face"] > 0.5) & cover]
+    nose = Fp[np.argmax(Fp[:, 2])]
+    fx = Fp[:, 0].mean()
+    lid = P[(masks["eyelids"] > 0.5) & cover]
+    eyes = (lid[lid[:, 0] < fx].mean(0), lid[lid[:, 0] >= fx].mean(0))
+    mouth = P[(masks["lips"] > 0.5) & cover].mean(0)
+
+    def on_face(x, y):
+        near = Fp[(np.abs(Fp[:, 0] - x) < 0.005) & (np.abs(Fp[:, 1] - y) < 0.005)]
+        return np.array([x, y, near[:, 2].max() if len(near) else nose[2] - 0.03])
+    return {"Fp": Fp, "nose": nose, "fx": fx, "eyes": eyes, "mouth": mouth, "on_face": on_face}
+
+
+def face_regions(P, masks, cover, head=None) -> dict:
+    """Each FACE region's soft weight (0..1), placed from the landmarks (23.2.7). The face's own level
+    reaches over the whole head (``head``, the body part) and fades into the neck, so it does not stop
+    at MPFB's face mask short of the hairline (a tan strip under the hair, seen at the look view)."""
+    L = face_landmarks(P, masks, cover)
+    n, fx, (el, er), mo, at = L["nose"], L["fx"], L["eyes"], L["mouth"], L["on_face"]
+    face = np.clip(1.3 * gsm.blur(masks["face"], 30), 0, 1)
+    lids = np.clip(gsm.blur(masks["eyelids"], 4) * 1.3, 0, 1)
+    W = {"face": face if head is None else np.maximum(face, np.clip(head, 0, 1))}
+    W["forehead"] = ellipse3(P, at(fx, (el[1] + er[1]) / 2 + 0.045), (0.045, 0.022, 0.03))
+    W["cheek"] = sum(ellipse3(P, at(fx + s * 0.040, n[1] - 0.004), (0.020, 0.017, 0.02)) for s in (-1, 1))
+    W["nose"] = gauss3(P, n, 0.010)
+    W["alae"] = sum(gauss3(P, at(n[0] + s * 0.014, n[1] - 0.006), 0.007) for s in (-1, 1))
+    W["under_eye"] = sum(ellipse3(P, at(e[0] + np.sign(e[0] - fx) * 0.002, e[1] - 0.015), (0.015, 0.007, 0.012))
+                         for e in (el, er)) * (1 - lids)
+    W["eyelid"] = lids
+    W["chin"] = ellipse3(P, at(fx, mo[1] - 0.034), (0.018, 0.013, 0.02))
+    for k in W:
+        if k != "face":
+            W[k] = np.clip(W[k], 0, 1) * face
+    return W
+
+
 # ------------------------------------------------------------------ point processes -------------
 def sample_points(rng, weight, P, cover, n):
     """n texel positions drawn with probability ~ weight (already per unit skin area)."""
@@ -328,7 +398,7 @@ def grow_veins(rng, P, N3, cover, starts, axis_dirs, lengths, radius, weight, st
 
 
 # ------------------------------------------------------------------ the picture -----------------
-def compose(tone, roman, layers, F, lut, rng_seed, detail=None):
+def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None):
     """The absolute skin colour (linear) for one tone and one set of layers."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
@@ -357,11 +427,14 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None):
     M *= 1 - 0.45 * np.maximum(palm, sole)                       # palms and soles: little melanin
     M *= 1 + 0.18 * gsm.blur(masks["eyelids"], 6) + 0.5 * gsm.blur(masks["aureolae"], 4)
     M *= 1 + 0.22 * np.clip(cv, 0, 1.5)                          # creases: a little darker
-    M *= np.exp(gc * fbm(P, (0.025, 0.007), (0.09, 0.07), 11))
-    M *= np.exp(gf * fbm(P, (0.0025, 0.0012), (0.07, 0.05), 211))
+    # The skin-scale detail is kept apart (``Md``) and added as an AMOUNT of pigment after the face's
+    # regions (23.2.7): a fleck is the same melanin on a face whose melanin a region took out, so it
+    # shows more on pale skin, not less (multiplied in, it vanished on III's pale face).
+    Md = np.exp(gc * fbm(P, (0.025, 0.007), (0.09, 0.07), 11))
+    Md *= np.exp(gf * fbm(P, (0.0025, 0.0012), (0.07, 0.05), 211))
     speck = np.abs(gsm.vnoise(P, 0.0009, 13)) + 0.5 * np.abs(gsm.vnoise(P, 0.0005, 17))
-    M *= np.exp(0.10 * gf * (0.6 - speck))                       # fine, uneven pigment (1-2 mm)
-    M *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41) - 0.5) / 0.3, 0, 1)   # sparse ~1 mm flecks
+    Md *= np.exp(0.10 * gf * (0.6 - speck))                      # fine, uneven pigment (1-2 mm)
+    Md *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41) - 0.5) / 0.3, 0, 1)  # sparse ~1 mm flecks
 
     # blood: cheeks, the nose, the ears, the fingertips and the palms, knuckles, elbows, knees
     Fp = P[(face > 0.5) & cover]
@@ -382,10 +455,19 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None):
     sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
     B = (1 + 0.9 * dg["flush"] * cheek + 0.8 * dg["flush"] * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
          + 0.7 * tips + 0.45 * palm + 0.5 * knuckles + 0.35 * joints_out + 0.25 * sss)
-    B *= np.exp(gc * fbm(P, (0.015, 0.004), (0.18, 0.12), 23) + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223))
+    Bd = np.exp(gc * fbm(P, (0.015, 0.004), (0.18, 0.12), 23) + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223))
     so2 = np.full(P.shape[:2], 0.8)
     under_eye = gsm.blur(masks["eyelids"], 10)
     so2 = so2 - 0.25 * under_eye                                   # the bluish shadow under the eyes
+    depth = np.zeros(P.shape[:2])
+    fw = F.get("face_w") or face_regions(P, masks, cover, parts["head"])
+    fit = lut.tones[roman]["fit"]
+    Fm, Fb = np.ones(P.shape[:2]), np.ones(P.shape[:2])
+    for k, (dm, db, ds, dd) in (FACE[fit] if face_tbl is None else face_tbl).items():
+        Fm *= np.exp(dm * fw[k]); Fb *= np.exp(db * fw[k])
+        so2 = so2 + ds * fw[k]; depth = depth + dd * fw[k]
+    M *= np.maximum(Fm + Md - 1, 0.3 * Fm)                       # the regions, then the detail's amount
+    B *= np.maximum(Fb + Bd - 1, 0.3 * Fb)
     dmel = np.zeros(P.shape[:2])
 
     # Each layer draws from its own generator, seeded alike, so SynthAll is exactly the single layers
@@ -481,20 +563,21 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None):
     bld = BLOOD0 * B
     base = lut(np.full_like(mel, m0), np.full_like(bld, BLOOD0), np.full_like(mel, 0.8))
     col = lut(mel, bld, np.clip(so2, 0.45, 0.95))
+    # Blood BELOW the dermis (a vein, the ring under the eye). The tabulated model is one semi-infinite
+    # layer with no depth, where more blood only absorbs more blue (it reads orange, measured
+    # 2026-10-26). What makes it read blue-violet is depth: red light reaches it and is absorbed, blue
+    # scatters back before it gets there. So it darkens each channel by how deep that channel's light
+    # goes, which is the article's own scatter depth per channel (subsurface_radius_scale).
+    reach = np.asarray(F["scatter_scale"][roman])
     if "veins" in layers:
-        # A vein lies BELOW the dermis. The tabulated model is one semi-infinite layer with no depth,
-        # where more blood only absorbs more blue (it reads orange, measured 2026-10-26). What makes a
-        # vein read blue-green is depth: red light reaches it and is absorbed, blue scatters back
-        # before it gets there. So the vein darkens each channel by how deep that channel's light
-        # goes, which is the article's own scatter depth per channel (subsurface_radius_scale).
-        reach = np.asarray(F["scatter_scale"][roman])
-        col = col * (1 - 0.30 * vein[..., None] * reach)
+        depth = depth + 0.30 * vein
+    col = col * np.clip(1 - depth[..., None] * reach, 0.2, 1.5)
     ratio = (col + EPS) / (base + EPS)
     out = tone * ratio
 
     # the lips: the library's rule, feathered (the Lips article carries its own lip colour)
     lm = np.clip(gsm.blur(masks["lips"], 5) * 1.15, 0, 1)[..., None]
-    lips = tone * np.array(gsm.LIP_RULE) * (0.92 + 0.08 * gsm.vnoise(P, 0.0025, 7)[..., None])
+    lips = tone * np.array(LIPS[fit]) * (0.92 + 0.08 * gsm.vnoise(P, 0.0025, 7)[..., None])
     out = out * (1 - lm) + lips * lm
     S = reg["Body"]
     s = (tone - (lips * lm)[S].mean(0)) / (out * (1 - lm))[S].mean(0)

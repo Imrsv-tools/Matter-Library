@@ -31,9 +31,9 @@ provenance:
 members:
   FitzpatrickI: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.847, 0.638, 0.552], base_color_const: [0.8994, 0.7133, 0.6538], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.6295, 0.3318, 0.3116]}
   FitzpatrickII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.799, 0.485, 0.347], base_color_const: [0.8485, 0.5422, 0.411], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.5939, 0.2522, 0.1959]}
-  FitzpatrickIII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.623, 0.433, 0.343], base_color_const: [0.6616, 0.4841, 0.4063], peak_factor: [1.0619, 1.118, 1.1845], lips_average: [0.463, 0.2252, 0.1936]}
-  FitzpatrickIV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.436, 0.227, 0.131], base_color_const: [0.5189, 0.3217, 0.2374], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.3237, 0.1177, 0.0735]}
-  FitzpatrickV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.283, 0.148, 0.079], base_color_const: [0.3368, 0.2098, 0.1432], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.2101, 0.0767, 0.0443]}
+  FitzpatrickIII: {made: pigment, fit: III, melanin0: 0.0269, tone: [0.623, 0.433, 0.343], base_color_const: [0.8897, 0.6114, 0.5224], peak_factor: [1.4281, 1.4118, 1.523], lips_average: [0.5361, 0.2766, 0.2958]}
+  FitzpatrickIV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.436, 0.227, 0.131], base_color_const: [0.534, 0.2964, 0.2075], peak_factor: [1.2248, 1.3056, 1.5843], lips_average: [0.3242, 0.1183, 0.0741]}
+  FitzpatrickV: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.283, 0.148, 0.079], base_color_const: [0.3466, 0.1932, 0.1252], peak_factor: [1.2248, 1.3056, 1.5843], lips_average: [0.2104, 0.0772, 0.0447]}
   FitzpatrickVI: {made: pigment, fit: IV, melanin0: 0.10725, tone: [0.09, 0.05, 0.02], base_color_const: [0.1071, 0.0709, 0.0362], peak_factor: [1.1901, 1.4174, 1.8121], lips_average: [0.0668, 0.0259, 0.0112]}
   Skin_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.62, "skin_range": [0.518, 0.686], "uncovered_islands": 0, "tzone_average": 0.4548, "cheeks_average": 0.7018}
   Skin_normal: {"made": "procedural", "space": "linear", "neutral": [0.5, 0.5, 1.0], "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal", "xy_rms_skin": 0.0451, "xy_rms_face": 0.0706, "xy_p99_skin": 0.14, "unit_error_max": 0.005}

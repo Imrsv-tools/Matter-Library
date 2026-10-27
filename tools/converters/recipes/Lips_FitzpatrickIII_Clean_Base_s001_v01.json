@@ -17,7 +17,7 @@
   "scale_tag": "s001",
   "meters_per_tile": 0.01,
   "metalness_const": 0.0,
-  "base_color_const": "0.6616, 0.4841, 0.4063",
+  "base_color_const": "0.8897, 0.6114, 0.5224",
   "roughness_const": 0.35,
   "specular_ior": 1.4,
   "subsurface_weight": 1.0,
@@ -40,7 +40,7 @@
       "kind": "procedural",
       "script": "tools/converters/fit/gen_skin_maps.py",
       "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
-      "note": "Phase21: the colour is Skin_FitzpatrickIII's map x its base_color_const; the map's lip region carries the derivation rule below (the skin's tone x (0.80, 0.55, 0.60), 0.498, 0.238, 0.206 before Phase21), feathered into the face"
+      "note": "Phase21: the colour is Skin_FitzpatrickIII's map x its base_color_const; the map's lip region is the skin's tone x (0.93, 0.68, 0.93) since Phase23 23.2.7 (the lips of the phase's reference, measured over its trunk, gen_synth_skin.LIPS), feathered into the face; before that the derivation rule below (the skin's tone x (0.80, 0.55, 0.60); 0.498, 0.238, 0.206 before Phase21)"
     },
     {
       "kind": "judgement",
