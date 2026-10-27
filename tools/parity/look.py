@@ -19,6 +19,11 @@ and the sheet sets today's beside the new. Today's articles name their pictures 
 into the working tree, so a picture changed since ``<rev>`` is drawn as it is now. Without it, one
 column: the baseline.
 
+``--reference <picture>`` (Phase23 23.1, RD-P23-1) draws a colour picture from outside the tree
+on a Fitzpatrick skin and its lips, in three more columns: as made (constant 1), held to the
+skin's tone at the picture's own size, and held to it at the library's 2048 atlas (the
+contributor's calibration, ``gen_skin_maps.calibrate``). It writes only under ``<out>``.
+
 Writes ``<out>/<setting><view>.png`` and ``<out>/look_sheet.png``. Default ``<out>``:
 ``library/parity/Look__<skin>[__vs_<rev>]``. It needs a runtime that reads job format 4 (built at
 Phase22 22.1 or later): ``MATTER_UNREAL_RUNTIME`` (a local package), ``MATTER_UNREAL_EDITOR``, or
@@ -115,20 +120,93 @@ def look_views(parts: dict) -> list[dict]:
     return [drv.camera_view(pos, rot, f"__{v}", hide) for v, ((pos, rot), hide) in cams.items()]
 
 
+def _relocated(art: jobmod.Article, text: str, out: Path) -> jobmod.Article:
+    """``text`` (an article's .mtlx) written to ``out``, its pictures named by absolute path."""
+    def absolute(m: re.Match) -> str:
+        v = m.group(2)
+        return m.group(1) + (str((art.path.parent / v).resolve()) if v else v) + m.group(3)
+    text = re.sub(r'(type="filename" value=")([^"]*)(")', absolute, text)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(text, encoding="utf-8")
+    return jobmod.Article.read(out)
+
+
 def today_article(art: jobmod.Article, rev: str, folder: Path) -> jobmod.Article:
     """``art`` as it stood at ``rev``, its pictures named by absolute path into the working tree."""
     rel = art.path.resolve().relative_to(jobmod.REPO)
     text = subprocess.run(["git", "-C", str(jobmod.REPO), "show", f"{rev}:{rel.as_posix()}"],
                           capture_output=True, text=True, check=True).stdout
+    return _relocated(art, text, folder / rel)
 
-    def absolute(m: re.Match) -> str:
-        v = m.group(2)
-        return m.group(1) + (str((art.path.parent / v).resolve()) if v else v) + m.group(3)
-    text = re.sub(r'(type="filename" value=")([^"]*)(")', absolute, text)
-    out = folder / rel
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(text, encoding="utf-8")
-    return jobmod.Article.read(out)
+
+# ---------------------------------------------------------------- the reference column (Phase23) --
+# RD-P23-1, RD-P23-10: a colour picture from OUTSIDE the tree (the platform's research reference)
+# drawn on the skin article, so the bar is seen in this light on this shine. Everything it writes
+# stays under the git-ignored ``library/parity/``; nothing here names the picture's path.
+
+def _with_map(art: jobmod.Article, picture: Path, const, out: Path) -> jobmod.Article:
+    """``art`` with its own ``base_color_map`` set to ``picture`` and ``base_color_const`` to ``const``."""
+    text = art.path.read_text(encoding="utf-8")
+    text, n_map = re.subn(r'(<input name="base_color_map" type="filename" value=")[^"]*(")',
+                          lambda m: m.group(1) + str(picture.resolve()) + m.group(2), text)
+    value = ", ".join(f"{float(v):.4f}" for v in const)
+    text, n_const = re.subn(r'(<constant name="base_color_const" type="color3">\s*<input name="value" '
+                            r'type="color3" value=")[^"]*(")',
+                            lambda m: m.group(1) + value + m.group(2), text)
+    if (n_map, n_const) != (1, 1):
+        raise SystemExit(f"{art.name}: expected one base_color_map and one base_color_const "
+                         f"(found {n_map} and {n_const}); it cannot carry a reference picture")
+    return _relocated(art, text, out / f"{art.name}.mtlx")
+
+
+def reference_casts(cast: dict, picture: Path, folder: Path) -> list[tuple[str, str, dict]]:
+    """The reference columns for a Fitzpatrick skin's cast: (setting id, heading, cast).
+
+    The skin and its lips share one map and one constant (RD-P21-2), so both take the picture.
+    (b) the picture as made, constant 1; (c) held to the skin's tone, at the picture's own size,
+    by ``gen_skin_maps.calibrate`` (the contributor's ``--picture`` step); (d) the picture box-
+    filtered in linear light to the library's 2048 atlas, then the same step."""
+    import numpy as np  # noqa: PLC0415
+    sys.path.insert(0, str(jobmod.REPO / "tools" / "converters" / "fit"))
+    import gen_skin_maps as gsm  # noqa: PLC0415
+
+    skin = cast["Body"]
+    variant = skin.name.split("_")[1]
+    roman = variant.removeprefix("Fitzpatrick")
+    if not variant.startswith("Fitzpatrick") or roman not in gsm.TONES:
+        raise SystemExit(f"--reference needs a Fitzpatrick skin (got {skin.name})")
+    swap = [p for p in ("Body", "Lips") if p in cast and "base_color_map" in cast[p].ports]
+
+    im = Image.open(picture).convert("RGB")
+    size = im.size[0]
+    if im.size[0] != im.size[1] or size % gsm.N:
+        raise SystemExit(f"the reference picture is {im.size[0]} x {im.size[1]}; it must be square, "
+                         f"a multiple of {gsm.N}, on {gsm.MESH}'s atlas")
+    f = size // gsm.N
+    col = gsm._srgb_to_linear(np.asarray(im, dtype=np.float64) / 255.0)
+    reg = gsm.regions()
+    big = {k: np.repeat(np.repeat(v, f, 0), f, 1) for k, v in reg.items()}
+    tone = gsm.tone_of(roman)
+    avg = col[big["Body"]].mean(0)
+    print(f"reference: {size}², skin average (linear) {np.round(avg, 3).tolist()}, "
+          f"red/blue {avg[0] / avg[2]:.2f}; tone {roman} {np.round(tone, 4).tolist()}, "
+          f"red/blue {tone[0] / tone[2]:.2f}")
+
+    def column(sid, heading, pic, const):
+        sub = folder / sid
+        return sid, heading, cast | {p: _with_map(cast[p], pic, const, sub) for p in swap}
+
+    out = [column("ref_asis", "(b) reference, as made", picture, (1.0, 1.0, 1.0))]
+    for sid, heading, c, r in (("ref_held", f"(c) held to {roman}, {size} px", col, big),
+                               ("ref_2048", f"(d) held to {roman}, {gsm.N} px",
+                                col.reshape(gsm.N, f, gsm.N, f, 3).mean(axis=(1, 3)), reg)):
+        srgb8, const, st = gsm.calibrate(c, tone, r, r["islands"])
+        p = folder / sid / "basecolor.png"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        Image.fromarray(srgb8, "RGB").save(p)
+        print(f"{sid}: " + json.dumps(st))
+        out.append(column(sid, heading, p, const))
+    return out
 
 
 def materials(cast: dict, folder: Path) -> tuple[dict, list[dict]]:
@@ -172,6 +250,9 @@ def main(argv=None) -> int:
     ap.add_argument("--today", metavar="REV", help="also render the cast as it stood at this git revision")
     ap.add_argument("--also", action="append", default=[], metavar="SKIN",
                     help="another skin from the working tree, a further column (repeatable)")
+    ap.add_argument("--reference", type=Path, metavar="PICTURE",
+                    help="a colour picture on the skin's atlas, from outside the tree (Phase23 RD-P23-10): "
+                         "three more columns, the picture as made, held to the skin's tone, and that at 2048")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
@@ -179,7 +260,8 @@ def main(argv=None) -> int:
 
     art = jobmod.Article.read(jobmod.find_article(a.skin))
     cast = rig.character_cast(art)
-    out = (a.out or rig.OUT_ROOT / (f"Look__{art.name}" + (f"__vs_{a.today}" if a.today else ""))).resolve()
+    out = (a.out or rig.OUT_ROOT / (f"Look__{art.name}" + (f"__vs_{a.today}" if a.today else "")
+                                    + ("__vs_reference" if a.reference else ""))).resolve()
     shutil.rmtree(out / "work", ignore_errors=True)
     work = out / "work"
 
@@ -205,7 +287,15 @@ def main(argv=None) -> int:
             raise SystemExit(f"{oart.name}'s cast builds different meshes; it cannot share the launch")
         settings.append({"id": f"also{i}", "materials": omats})
         columns.append((f"also{i}", f"working tree: {oart.name}"))
-    settings += [s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
+    if a.reference:
+        columns[columns.index(("new", f"working tree: {art.name}"))] = ("new", f"(a) {art.name}")
+        for sid, heading, rcast in reference_casts(cast, a.reference, work / "reference"):
+            rmats, rmeshes = materials(rcast, work / sid)
+            if [Path(m["file"]).read_bytes() for m in rmeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
+                raise SystemExit(f"{sid}'s cast builds different meshes; it cannot share the launch")
+            settings.append({"id": sid, "materials": rmats})
+            columns.append((sid, heading))
+    settings +=[s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
 
     parts = bc.load_parts()
     views = look_views(parts)
