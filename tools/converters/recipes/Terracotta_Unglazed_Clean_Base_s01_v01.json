@@ -1,8 +1,8 @@
 {
   "summary": "Bare red-orange fired clay, as in flowerpots, roof and floor tiles.",
   "search_words": ["terracotta", "clay", "brick", "pot", "tile", "ceramic"],
-  "origin": ["measured", "agent-drafted"],
-  "_comment": "Unglazed terracotta: a red-orange earthenware clay fired low and left bare (flower pots, roof and floor tiles, architectural cladding), matte and porous. Opaque: a solid, rough dielectric. Param-only (L1): Physically Based 'Terracotta' gives the colour, the roughness and the IOR; a plain fired body reads at this scale without a texture. Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant. Not carried: the efflorescence (a pale salt bloom) the wish list also wants, which needs a colour deposit layer. Built by the Phase11 batch.",
+  "origin": ["procedural", "measured", "agent-drafted"],
+  "_comment": "Unglazed terracotta: a red-orange earthenware clay fired low and left bare (flower pots, roof and floor tiles, architectural cladding), matte and porous. Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_terracotta_unglazed.py; re-made 2026-10-31 for the maintainer's redo, \"could pass for painted clay\"; it was param-only, L1): the kiln flashes the body in soft clouds 2 to 5 cm across (paler and buff where it ran cooler, deeper red-brown where the flame touched), sparse sand and grog show as pale and dark grains, and the face has open pin pores and a dry, sanded tooth. The mean colour is Physically Based 'Terracotta'. It is the coarser, architectural sibling of Earthenware_Natural (the finer pottery body, anchored to the same entry). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask (chips in broken patches, dust in the recesses). No third layer is relevant. Not carried: the efflorescence (a pale salt bloom) the wish list also wants, which needs a colour deposit layer. Built by the Phase11 batch.",
   "name": "Terracotta_Unglazed_Clean_Base_s01_v01",
   "contributor": "MatterBot",
   "status": "draft",
@@ -12,8 +12,9 @@
   "class": "ceramic",
   "scale_tag": "s01",
   "meters_per_tile": 0.1,
-  "base_color_const": "0.555, 0.212, 0.11",
-  "roughness_const": 1.0,
+  "base_color_tex": "../../../textures/base/engineered/ceramic/Terracotta_Unglazed_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/ceramic/Terracotta_Unglazed_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/ceramic/Terracotta_Unglazed_normal_s01.png",
   "metalness_const": 0,
   "specular_ior": 1.5,
   "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
@@ -24,6 +25,8 @@
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
   "sources": [
     {"kind": "physicallybased", "entry": "Terracotta", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
-     "used": {"base_color_const": "0.555, 0.212, 0.11", "metalness_const": 0, "roughness_const": 1.0, "specular_ior": 1.5}}
+     "used": {"base_color_const": "0.555, 0.212, 0.11", "metalness_const": 0, "roughness_const": 1.0, "specular_ior": 1.5},
+     "note": "base_color_const is the MEAN of the generated basecolor texture (linear, re-anchored exactly); roughness 1.0 is its ceiling: the map's mean is 0.95, a sanded face keeping a trace of sheen on its grains (judgement)."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_terracotta_unglazed.py", "provenance": "library/provenance/sources/base/engineered/ceramic/Terracotta_Unglazed.yaml"}
   ]
 }
