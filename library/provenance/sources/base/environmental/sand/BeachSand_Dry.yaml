@@ -8,12 +8,12 @@ provenance:
   evidence:
     url: https://ambientcg.com/view?id=Ground055S
     sha256_scope: shipped_source_set
-    sha256: 4354dfbfa5a6ea62a39cf2c84c557c0f2321f764714d58c3cdc974783be34fa0
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Ground055S_1K-PNG download. sha256 attests the shipped release-source set.
+    sha256: 4913bab5d759d27edf5f76932c95c1aa0dddaa1df37d9b464a62f48ff1b17a6a
+    note: Shipped source textures are processed derivatives of the ambientCG Ground055S_1K-PNG maps, not byte-identical to the download. Re-made at the s1 scale option (2026-10-31, Phase19 D-9) by tools/converters/base/quilt_scan.py (BeachSand_Dry --src-m 1.5 --out-m 1.0 --scale s1 --resample 1536 --size 1024), which quilts the 1.5 m scan into an exact 1 m tile at 1024 px; until then the shipped maps were the download's own (set digest 4354dfbfa5a6ea62a39cf2c84c557c0f2321f764714d58c3cdc974783be34fa0). sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_basecolor_s1.png
-      sha256: 2a167bb04fddedd3daff4bb393f1dfcd4e0db10cd5353faf3e9b14a70bf5f77f
+      sha256: 4f746c0a097261e6b9fa654aba3160a705b4e3c48938b2ccf1b4be35b9e241f7
     - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_normal_s1.png
-      sha256: 38154c8bf84610bc56a694bf60e3f9cd8ecda4e6f0c4deb9a89b49802205d1bf
+      sha256: 09a74201ee606a4c0a184d07dc0b983e6388eeeb769d351458b0694481a60a1f
     - path: MatterLibrary/textures/base/environmental/sand/BeachSand_Dry_roughness_s1.png
-      sha256: 823956f5ba7114c25e6089f67e8feb68682f3b51b475bcc53fd6e7989f3ca1fc
+      sha256: 5ba6e4ab3f2759a4a44230d5bb2f5689a2f3104750f190a95e07b1413ecec349
