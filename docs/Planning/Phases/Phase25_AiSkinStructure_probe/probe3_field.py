@@ -63,10 +63,20 @@ def pushpull(img, kn):
 # a membrane: the face's displacement held in the face, zero held on the ear pads (the picture's own ears,
 # drawn there) and on the island's border; harmonic in between, solved on a coarse grid, then upsampled
 from scipy.ndimage import zoom, binary_dilation
+# ears: pinned at zero move, or (argv[10], a json of per-ear dx, dy, s measured on a first pass in this
+# frame) at the move that puts the model's drawn ear on hm08's pad: out pixel p samples the first pass at
+# e_found + (p - e_hm) * s, i.e. the picture at ident of that point
+EARS = json.load(open(sys.argv[10])) if len(sys.argv) > 10 else {}
 zero = np.zeros((H, W), bool); zero[:4] = zero[-4:] = True; zero[:, :4] = zero[:, -4:] = True
 for e in ("ear_r", "ear_l"):
     f = OF["features"][e]; cx, cy, hw, hh = f["cx"], f["cy"], (f["x1"] - f["x0"]) * 0.75, (f["y1"] - f["y0"]) * 0.75
-    zero[int(cy - hh):int(cy + hh), int(cx - hw):int(cx + hw)] = True
+    sl = (slice(int(cy - hh), int(cy + hh)), slice(int(cx - hw), int(cx + hw)))
+    zero[sl] = True
+    if e in EARS:
+        m = EARS[e]; px, py = gx[sl], gy[sl]
+        qx = (cx - m["dx"]) + (px - cx) * m["s"]; qy = (cy - m["dy"]) + (py - cy) * m["s"]
+        sx_, sy_ = to_frame(PF, *from_frame(OF, qx, qy))
+        D[sl] = np.stack([sx_ - ix[sl], sy_ - iy[sl]], -1)
 zero &= ~binary_dilation(known, iterations=20)
 q = 8; h8, w8 = (H + q - 1) // q, (W + q - 1) // q
 def coarse(a, m):
@@ -74,8 +84,8 @@ def coarse(a, m):
     pa[:H, :W] = a * (m[..., None] if a.ndim == 3 else m); pm[:H, :W] = m
     sa = pa.reshape(h8, q, w8, q, -1).sum((1, 3)); sm = pm.reshape(h8, q, w8, q).sum((1, 3))
     return sa / np.maximum(sm, 1e-9)[..., None], sm > q * q * 0.3
-cD, cK = coarse(D, known); cZ = coarse(zero.astype(float)[..., None], zero)[1]
-fixed = cK | cZ; val = np.where(cK[..., None], cD, 0.0)
+cD, cK = coarse(D, known); cZD, cZ = coarse(D, zero)
+fixed = cK | cZ; val = np.where(cK[..., None], cD, np.where(cZ[..., None], cZD, 0.0))
 Dc = pushpull(val, fixed)
 for _ in range(4000):
     av = (np.roll(Dc, 1, 0) + np.roll(Dc, -1, 0) + np.roll(Dc, 1, 1) + np.roll(Dc, -1, 1)) / 4
