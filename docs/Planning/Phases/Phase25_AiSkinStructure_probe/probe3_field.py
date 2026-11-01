@@ -70,6 +70,14 @@ EARS = json.load(open(sys.argv[10])) if len(sys.argv) > 10 else {}
 zero = np.zeros((H, W), bool); zero[:4] = zero[-4:] = True; zero[:, :4] = zero[:, -4:] = True
 for e in ("ear_r", "ear_l"):
     f = OF["features"][e]; cx, cy, hw, hh = f["cx"], f["cy"], (f["x1"] - f["x0"]) * 0.75, (f["y1"] - f["y0"]) * 0.75
+    if e in EARS and "proj" in EARS[e]:
+        # probe5_earproj.py: the ear's front projected through the profile camera, held like the face;
+        # no rectangle pinned, the ear's back and its surround left to the membrane
+        pj = np.load(EARS[e]["proj"]); qx, qy = pj["ox"], pj["oy"]
+        sx_, sy_ = to_frame(PF, *from_frame(OF, qx, qy))
+        D[pj["py"], pj["px"]] = np.stack([sx_ - ix[pj["py"], pj["px"]], sy_ - iy[pj["py"], pj["px"]]], -1)
+        known[pj["py"], pj["px"]] = True
+        continue
     sl = (slice(int(cy - hh), int(cy + hh)), slice(int(cx - hw), int(cx + hw)))
     zero[sl] = True
     if e in EARS:
