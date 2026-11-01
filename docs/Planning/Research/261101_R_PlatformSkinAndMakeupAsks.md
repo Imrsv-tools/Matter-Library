@@ -24,7 +24,7 @@
 **R-PSM-2 — How big a picture costs in the app today.**
 - The app loads a library picture uncompressed and keeps every mip: colour as 16-bit float, data as 8-bit.
 - **One 8K skin set (a colour map and four shine maps) is about 2 GB of video memory in the app.** The same set at 2048² is about 128 MB.
-- This is worked out from the formats, not yet measured. The platform measures one 8K load before it plans.
+- This is worked out from the formats, not yet measured. ~~The platform measures one 8K load before it plans.~~ *(2026-11-01, later: the app does not load an 8K picture at all today; the platform's skin phase makes it load whole, and its lead judges from that look whether to step down to 4K or 2K.)*
 - It is an input to the library's later size tests (RD-OVS-2), not an ask.
 
 **R-PSM-3 — The base character has five parts, and the lips are part of the body.**
@@ -36,7 +36,7 @@
 **R-PSM-4 — How a Creator picks a skin.**
 - The Creator picks **a person** in the material window, then **changes the tone** from a row of the six tones beside it.
 - **A tone change keeps the person.** It keeps the Material token and changes the Variant: `Skin2_FitzpatrickII` → `Skin2_FitzpatrickV` (P35 (1)).
-- **The nails follow the tone.** One nail article per tone serves every person.
+- **The nails follow the tone.** One nail article per tone serves every person. *(2026-11-01, later: bare nails follow the tone; a polish the Creator picked stays through a tone or skin change. Polish is picked from a Nails row beside Skin and Eyes.)*
 
 **R-PSM-5 — How the app stores and draws makeup.**
 - **Makeup is a list of pieces on a character, merged into one layer on the skin**, so many pieces cost what one does. Each piece is on, off or changed mark by mark.
@@ -95,8 +95,19 @@
 - The app will hide drafts from the skin list.
 - **The need:** the field or rule that says which skins are finished, so the app filters on the library's word, not on names.
 
+**Q-PSM-7 — Makeup slots on the skin's master** *(added 2026-11-01, later the same day; the platform's lead: "Ask library for slots")*.
+- The app merges a character's makeup pieces into one layer (R-PSM-5). **The Subsurface master has nowhere to take it:** its overlays are tiled at their own real-world size, for wear and deposits; the only pictures on the mesh's own layout are the colour map and the four shine maps.
+- The other road, painting the makeup into a per-character copy of the skin's colour and roughness maps, costs a full copy of each per character at the skin's size (about 1 GB at 8K), and more per mark with a different look. OMF's sketch is the opposite: merge once, and let a mark change a few live slots.
+- **The need:** makeup slots on the Subsurface master, sampled on the mesh's own layout, built by this repo's builder:
+  - a **colour + coverage** picture (the merged paint, premultiplied or with its coverage in alpha — the library's choice);
+  - a **finish** picture (how far the makeup moves the skin's roughness, matte to wet), or its packing beside coverage;
+  - **an amount** scalar, so a mark can fade the whole layer without a new merge;
+  - the order against the skin's own maps written down (where the makeup sits relative to the colour map, the roughness map and the relief), so the look is the same in every renderer the library checks.
+- Their neutral (no makeup) must leave every existing skin as it is today.
+- A pigment piece (Q-PSM-3) reaches the colour + coverage picture after the app's merge turns it into colour, so it needs no slot of its own.
+
 ---
 
 ## A suggested ledger row (the library writes its own)
 
-> | P36 | **Makeup, polish and the skin's pigment** (2026-11-01, [`261101_R_PlatformSkinAndMakeupAsks.md`](Research/261101_R_PlatformSkinAndMakeupAsks.md)). The makeup piece format and a first set of pieces (Q-PSM-2); the skin's pigment fields shipped (Q-PSM-3); nail polish articles (Q-PSM-4); the lips' gloss in the finished skins (Q-PSM-1); a finished-or-draft field (Q-PSM-6). | The platform's characters wear makeup, marks and polish, merged into one layer per character. | the library | P34 · P35 · Skin Layers | OPEN |
+> | P36 | **Makeup, polish and the skin's pigment** (2026-11-01, [`261101_R_PlatformSkinAndMakeupAsks.md`](Research/261101_R_PlatformSkinAndMakeupAsks.md)). The makeup piece format and a first set of pieces (Q-PSM-2); the skin's pigment fields shipped (Q-PSM-3); nail polish articles (Q-PSM-4); the lips' gloss in the finished skins (Q-PSM-1); a finished-or-draft field (Q-PSM-6); makeup slots on the skin's master (Q-PSM-7). | The platform's characters wear makeup, marks and polish, merged into one layer per character. | the library | P34 · P35 · Skin Layers | OPEN |
