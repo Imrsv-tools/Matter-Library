@@ -76,6 +76,14 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
   Then re-assemble the skins and lips (`uv run tools/converters/build_proof_subset.py <their recipe paths>`), see them in the look view (`uv run tools/parity/look.py <skin>`, a runtime that reads job format 4) and on the rig, and run the gate.
 - **Not yet** *(planned)*: the pores faded at grazing angles and masked by region (a master change); wrinkles driven by expressions; a mark's own relief (*Skin Layers*). Each would ride these inputs.
 
+## One subject's set at 8K — **Built** (Phase24, 2026-11-01)
+
+One person's complete set stands beside the 18 skins: **`Skin_Tone34_Clean_Base_s001_v01`** (a measured tone between III and IV; the Variant names the tone, never a person, RD-P24-8) and **`Nail_Tone34_…`**, judged against a scanned reference skin on the same body in the library's Unreal look view (the reference is research only and never ships, RD-SKM-2, RD-P23-10; the lead at click 2: *"C is fine"*).
+- **At 8192 × 8192 on the same layout** (RD-OVS-2, RD-P24-2): a mesh version is a UV layout, not a size, so G8 takes a map at a power-of-two multiple of the mesh's `map_size`. The kit, the 18 skins, the six lips and the shared shine maps stay 2048; a contributor still paints at 2048.
+- **All five maps are its own** (`SkinTone34_<channel>_sUKN.png`): colour, and roughness, normal, cavity and scatter (an article's recipe may name its own shine file). Its cavity carries the reference's specular level per face region; its lips' roughness is 0.30.
+- **The lips wear the skin** (RD-P24-3): there is no `Lips_Tone34`. The Lips part is cast with the skin article; the lip colour is the map's, the lip gloss the roughness map's, with no coat (RD-P22-17).
+- **Made by the maker** (`gen_skin_maps.py --subject Tone34`, `gen_skin_shine.py --subject Tone34`; the subject's numbers in `gen_synth_skin.SUBJECTS`): composed in bands of rows, so it runs in about a third of the machine's memory. `--fields DIR` writes its melanin and blood fields (never shipped, RD-P24-6).
+
 ## What the map must and must not show
 
 | Region | Rule | Mark |
@@ -93,7 +101,7 @@ A **skin map** is a painted picture of a body's skin, drawn on the approved huma
 ## The picture's format — **In force** unless marked
 
 - **Layout:** hm08's single 0–1 UV atlas, with at least **16 pixels of bleed** past each UV island's edge, as the probe baked. The recipe gate's G8 refuses a map that leaves any island of `MakeHuman_Body_v01` bare, the nails' and the inner mouth's included.
-- **Size:** **2048 × 2048** (MakeHuman's atlases and the probe; RD-P21-5). At that size the face gets about a 441-pixel square (F-SKM-26). ~~Whether close-ups need a larger atlas, or a face map of its own: **Open**.~~ The atlas stays 2048² (RD-P21-5). A face map of its own, or a larger atlas, is a later question on the same mesh version *(planned)*.
+- **Size:** **2048 × 2048** (MakeHuman's atlases and the probe; RD-P21-5). At that size the face gets about a 441-pixel square (F-SKM-26). ~~Whether close-ups need a larger atlas, or a face map of its own: **Open**.~~ The atlas stays 2048² (RD-P21-5). A face map of its own, or a larger atlas, is a later question on the same mesh version *(planned)*. **Phase24 (2026-11-01, RD-OVS-2): one subject's set is 8192² on the same layout** (§One subject's set at 8K); sizes per layer and their cost are later phases' (RD-OVS-2).
 - **File:** an RGB **PNG**, read as **sRGB** (`srgb_texture`, as every `base_color_map` is: LCDSchema). ⚠ **A USD writer that sets the picture on a bound Material authors `colorSpace = "srgb_texture"` on that asset value**, or Storm reads it raw and draws the skin washed out (F-P21-9; [Learnings Storm](../../Learnings/Storm/Storm.md) S10).
 - **Where it lives:** the fit set, beside the eyes: `MatterLibrary/textures/fit/makehuman/skin/Fitzpatrick<Tone>_basecolor_sUKN.png`, scale tag `sUKN` (the fit set's tag). ~~The exact path waits on the mesh-version naming: **Open** (Q-SKM-4).~~ *(2026-10-15: the naming is answered, and the picture is named by its article as its `base_color_map` value (RD-P18-9); its folder stays `MatterLibrary/textures/fit/makehuman/skin/`, as the fitted teeth's is `…/teeth/`.)*
 - **The pores still tile at 1 cm** on the fitted skin: the map samples the atlas directly, and the pores' layer rides it through `uv_scale = meters_per_tile ÷ the mesh's metres per UV unit` (0.006519 on hm08), which the binding sets (LCDSchema §Base colour map; the rig's `job.binding_set`).
