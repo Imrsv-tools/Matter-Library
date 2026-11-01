@@ -72,6 +72,9 @@ import make_kits  # noqa: E402
 
 MESH = gsm.MESH
 N = gsm.N
+# Phase24 (RD-P24-7): above 2048 the per-texel fields are float32, so an 8K set fits the box's
+# memory; at 2048 they stay float64, so today's maps are made byte for byte as before.
+FT = np.float64 if gsm.F == 1 else np.float32
 TONES = gsm.TONES                       # Phase23: the library's maker, all six tones
 DRAFT_TONES = ("II", "IV", "VI")        # the layer drafts' spread (the 2026-10-26 spike)
 DETAILS = ("SynthFreckles", "SynthVeins", "SynthMarks", "SynthAll")   # the plain "Synth" retired (RD-P23-8)
@@ -230,7 +233,7 @@ def rasterise(m: dict):
     lap = nb_sum / np.maximum(nb_cnt, 1)[:, None] - P
     conc = np.einsum("ij,ij->i", lap, vn)               # > 0: the neighbours stand proud (a crease)
     conc = conc / max(np.percentile(np.abs(conc), 99), 1e-9)
-    pos = np.zeros((N, N, 3)); nor = np.zeros((N, N, 3)); cv = np.zeros((N, N))
+    pos = np.zeros((N, N, 3), FT); nor = np.zeros((N, N, 3), FT); cv = np.zeros((N, N), FT)
     cover = np.zeros((N, N), bool)
     for f in faces:
         for tri in ((0, 1, 2), (0, 2, 3)) if len(f) == 4 else ((0, 1, 2),):

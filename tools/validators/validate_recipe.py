@@ -151,6 +151,15 @@ def schema_drift(schema: dict) -> list:
 
 
 # --- G8: a fitted picture against its part mesh's layout (Phase18, RD-P18-5) --------------
+def size_ok(size: tuple, n: int) -> bool:
+    """A part mesh's picture is square, at its ``map_size`` or a power-of-two multiple of it: the same
+    UV layout at a finer size is the same mesh version (Phase24 RD-P24-2, on the lead's RD-OVS-2,
+    "start with 8k"). A smaller picture is still refused."""
+    w, h = size
+    k = w // n if w % n == 0 else 0
+    return w == h and k >= 1 and k & (k - 1) == 0
+
+
 def picture_errors(picture: Path, mesh_id: str) -> list:
     """What is wrong with a picture drawn for a part mesh ([] when it fits): its format, its size,
     and whether it covers every UV island (``library/meshes/<mesh>_islands.png``)."""
@@ -162,9 +171,11 @@ def picture_errors(picture: Path, mesh_id: str) -> list:
         if im.format != "PNG" or im.mode != "RGB":
             return [f"G8 {picture.name} is {im.format} {im.mode}: a fitted picture is an RGB PNG "
                     "(read as sRGB; no alpha)"]
-        if im.size != (n, n):
-            return [f"G8 {picture.name} is {im.size[0]} x {im.size[1]}: {mesh_id}'s pictures are {n} x {n}"]
-        px = np.asarray(im)
+        if not size_ok(im.size, n):
+            return [f"G8 {picture.name} is {im.size[0]} x {im.size[1]}: {mesh_id}'s pictures are {n} x {n} "
+                    "(or a power-of-two multiple of it)"]
+        f = im.size[0] // n
+        px = np.asarray(im)[::f, ::f]          # the islands are drawn at n: one texel per island texel
     ids = np.asarray(Image.open(ISLANDS / f"{mesh_id}_islands.png")).astype(np.int64)  # 16-bit numbers
     outside = ids == 0
     if not outside.any():
@@ -239,8 +250,9 @@ def data_map_errors(d: dict) -> list:
                 kind = "an RGB PNG" if mode == "RGB" else "a greyscale PNG"
                 errs.append(f"G8 {f.name} is {im.format} {im.mode}: {key} is {kind} "
                             "(linear data; no alpha)")
-            elif im.size != (n, n):
-                errs.append(f"G8 {f.name} is {im.size[0]} x {im.size[1]}: {d['fits']}'s maps are {n} x {n}")
+            elif not size_ok(im.size, n):
+                errs.append(f"G8 {f.name} is {im.size[0]} x {im.size[1]}: {d['fits']}'s maps are {n} x {n} "
+                            "(or a power-of-two multiple of it)")
     return errs
 
 

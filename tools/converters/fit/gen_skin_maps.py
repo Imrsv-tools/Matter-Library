@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -62,13 +63,21 @@ sys.path.insert(0, str(HERE))
 import build_character as bc  # noqa: E402  (the pinned-source fetch: URL + sha256)
 
 MESH = "MakeHuman_Body_v01"
-N = 2048                                   # groups.PART_MESHES[MESH]["map_size"]
+N0 = 2048                                  # groups.PART_MESHES[MESH]["map_size"]: the layout's own size
+# Phase24 (RD-OVS-2, RD-P24-2): the maps may be made at a power-of-two multiple of it, on the same
+# layout (one subject's set at 8192). Set by ``MATTER_SKIN_N`` (``--size`` sets it); every radius
+# written in pixels below means pixels AT 2048 and is scaled by ``F``, so a region keeps its size on
+# the body whatever the picture's size.
+N = int(os.environ.get("MATTER_SKIN_N", N0))
+if N % N0 or (N // N0) & (N // N0 - 1):
+    raise SystemExit(f"MATTER_SKIN_N={N}: a power-of-two multiple of {N0}")
+F = N // N0
 TONES = ("I", "II", "III", "IV", "V", "VI")
 RECIPES = REPO / "tools" / "converters" / "recipes"
 OUT = REPO / "MatterLibrary" / "textures" / "fit" / "makehuman" / "skin"
 PROVENANCE = REPO / "library" / "provenance" / "sources" / "fit" / "makehuman" / "skin.yaml"
 TAG = "sUKN"
-BLEED = 16                                 # pixels past each island's edge (the kit's README)
+BLEED = 16 * F                             # pixels past each island's edge (the kit's README), at 2048
 LIP_RULE = (0.80, 0.55, 0.60)              # Phase08 8.2: lips = the skin's albedo x this
 PEAK = 99.9                                # the stored map's brightest: this percentile -> 1
 ALBEDO_MAX = 0.99                          # the constant's ceiling (G6: <= 1; headroom for 8-bit)
@@ -111,8 +120,10 @@ def _grey(name: str):
 
 
 def blur(a, r: int):
-    """Three box passes: about a Gaussian of sigma ~ r pixels (the probe's)."""
+    """Three box passes: about a Gaussian of sigma ~ r pixels (the probe's). ``r`` is in pixels at
+    2048, scaled to the array's own size (Phase24), so a blur keeps its size on the body."""
     import numpy as np  # noqa: PLC0415
+    r = max(1, round(r * a.shape[0] / N0))
     for _ in range(3):
         for ax in (0, 1):
             c = np.cumsum(np.pad(a, [(r + 1, r) if i == ax else (0, 0) for i in (0, 1)], mode="edge"), axis=ax)
@@ -152,6 +163,8 @@ def regions() -> dict:
     from PIL import Image, ImageDraw  # noqa: PLC0415
     import make_kits  # noqa: PLC0415
     ids = np.asarray(Image.open(REPO / "library" / "meshes" / f"{MESH}_islands.png")).astype(np.int64)
+    if ids.shape[0] != N:                      # the layout's islands at 2048, at the picture's size
+        ids = np.repeat(np.repeat(ids, N // ids.shape[0], 0), N // ids.shape[1], 1)
     m = make_kits.load_mesh(MESH)
     out = {"islands": ids > 0}
     for part, faces in m["split"].items():
