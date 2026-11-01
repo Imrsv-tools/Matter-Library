@@ -25,7 +25,7 @@
 - **Krea 2 can be used,** but its licence has three conditions an Apache-2.0 model does not have: a $1M company revenue limit for commercial use, a required content filter, and a ban on removing watermarks. **FLUX.2 [klein] 4B is Apache-2.0**, ungated, and fits this machine's GPU without tricks (F-AIS-3, F-AIS-4).
 - **A model draws colour only.** The roughness, normal, cavity and scatter maps stay the maker's (Phase22). Nothing here changes them.
 
-**Offered first:** a **disposable probe** on the machine with Unreal. FLUX.2 [klein] 4B draws close-ups of skin with no face, the maker turns them into a melanin and blood detail field, and one tone is rendered three ways side by side: today's skin, the skin with AI detail, and a whole AI face projected as the comparison arm. Cost: a ~16 GB download, minutes of GPU time, nothing in the repo. It waits for your go (Q-AIS-4).
+**The probe ran (2026-11-01, Pass 5; the lead's word, RD-AIS-2):** FLUX.2 [klein] 4B, told what to draw, turned renders of hm08's head into a convincing person whose features land on the mesh, and the result baked into the library's 2048² map in under a minute, untrained. It reads as a real face from angles the model never painted (`261101_R_Spike_SkinMapFromImageModel_sheet.jpg`). Krea 2, the lead's first choice (RD-AIS-1), is scripted and waits on a Hugging Face login.
 
 ---
 
@@ -102,32 +102,47 @@
   - **No ruling's words cover training on photos.** The pictures would not ship, but they would be inputs to what ships, and the spec asks for the provenance of every input (`SkinMaps.md` §Sources). This is new ground for the lead (Q-AIS-2), not a conflict with anything ruled.
 - **F-AIS-10 — "Krea 2 or similar":** both work technically. **For a CC0 library, the Apache-2.0 model is the plainer choice:** no revenue limit, no filter duty, no watermark question, and it fits the GPU. Krea 2 stays open if the lead prefers its look and can answer the revenue limit in one line (Q-AIS-3).
 
+## Pass 5 — The probe: a whole head map from FLUX.2 [klein], on hm08 (2026-11-01)
+
+**Run on the lead's word (RD-AIS-2).** Results, pictures and reproduction: [`261101_R_Spike_SkinMapFromImageModel.md`](261101_R_Spike_SkinMapFromImageModel.md).
+
+- **The concept holds for the head.** An image-edit model repainted hm08's renders as a convincing person with the features in place, in ~3 s per view and under a minute for the head, with no training (F-AIS-11). Baked into the 2048² map, it reads as a real face from angles it never painted.
+- **The views are made progressively:** front first, then each side re-rendered with the map so far (F-AIS-12).
+- **Still to fix:** painted-in eyebrows, a lash line over the eye openings, a slight lip offset at three-quarter angles, the neck seam (F-AIS-13). The layout, not the model, caps the face's sharpness (F-AIS-15).
+- **Not run:** Krea 2, which needs a Hugging Face login (RD-AIS-1); the look in a real renderer on the character.
+
 ## Open questions
 
 | Id | Question (as the lead would see it) | Recommendation |
 |---|---|---|
 | Q-AIS-1 | **Should a whole AI-made skin map ever ship**, if it beats the pigment maker in a judged comparison? Today RD-SKM-5 and RD-SYN-1 say no: only a comparison. | **Keep the rulings for now.** Run the probe first. If the comparison arm is clearly better at what the detail layer cannot reach (the ring under the eye, the regional colour), reopen it with the pictures in front of you. |
 | Q-AIS-2 | **May photos of people (public domain or not) be used to train a model whose output ships**, with no consent recorded? No ruling's words cover training. | **No, by the same reasoning that excluded MakeHuman's photos.** The detail layer needs no training at all, and a layout fine-tune can train on the maker's own maps. |
-| Q-AIS-3 | **Krea 2 or an Apache-2.0 model** (FLUX.2 [klein] 4B) for the library's pictures? Krea 2 needs the generating company under US $1M revenue a year for commercial use (F-AIS-3). | **FLUX.2 [klein] 4B.** It is CC0-clean with no conditions and fits the GPU. Krea 2 only if your one-line answer on the revenue limit allows it and you prefer its look. |
-| Q-AIS-4 | **Run the disposable probe** on the machine with Unreal? | **Yes, on your go.** Cost: ~16 GB download into scratch (95 GB free), minutes on the 24 GB GPU (first check that no Unreal editor holds it), nothing in the repo, torn down after. The result is parked in a `_Spike_` doc beside this one, with its script inline. |
+| ~~Q-AIS-3~~ → **RD-AIS-1** (Krea 2 first) | **Krea 2 or an Apache-2.0 model** (FLUX.2 [klein] 4B) for the library's pictures? Krea 2 needs the generating company under US $1M revenue a year for commercial use (F-AIS-3). | **FLUX.2 [klein] 4B.** It is CC0-clean with no conditions and fits the GPU. Krea 2 only if your one-line answer on the revenue limit allows it and you prefer its look. |
+| ~~Q-AIS-4~~ → **RD-AIS-2** (run; Pass 5) | **Run the disposable probe** on the machine with Unreal? | **Yes, on your go.** Cost: ~16 GB download into scratch (95 GB free), minutes on the 24 GB GPU (first check that no Unreal editor holds it), nothing in the repo, torn down after. The result is parked in a `_Spike_` doc beside this one, with its script inline. |
 
 ## Resolved
 
-*Nothing yet.*
+The lead, 2026-11-01, verbatim: *"We are WELL under 1M... we are pre-rev and likely never 1M... This pipeline we are building is for creators and in fact something THEY could run to make thier characters.... so I am not particualry worried about license right... I want to prove the concept that that these system can generate really good looking skinmaps... I ahve seen the images of the humans they make and they are AMAZING.. I beleive they will mnake very convicing skin maps if we can instruct them correctly. I would lean towards KREA2 (based on images I have seen) but I am open to whatever..."*
+
+- **RD-AIS-1 — Krea 2 is the model to try first; the revenue limit is no obstacle** (*"WELL under 1M"*, *"I would lean towards KREA2 … but I am open to whatever"*). It answers Q-AIS-3. FLUX.2 [klein] 4B stays the fallback.
+- **RD-AIS-2 — Run the probe, aimed at the lead's claim: an image model, instructed well, makes really good-looking WHOLE skin maps** (*"I want to prove the concept"*). It answers Q-AIS-4 and widens it: the whole map is the main arm, not only the detail layer. Under RD-SYN-1 a whole AI map is a judged comparison, so the probe reopens nothing. **Whether one ships stays Q-AIS-1**, decided with the pictures in front of the lead.
+- **The lead's framing for Q-AIS-1, recorded and not yet ruled:** the pipeline is *"something THEY [creators] could run to make their characters"*. A map a creator makes for their own character is **the creator's**, not a library article. RD-RO-2 (CC0) and RD-SYN-1 govern what **the library** ships, so a creator-run generator would sit outside both. Where such a tool would live is open: the platform's 2026-10-25 ruling puts character-making tools outside Studio (F-AIS-2).
 
 ## Status
 
-- **Passes captured:** 4 (2026-11-01):
+- **Passes captured:** 5 (2026-11-01):
   - Pass 1: the platform's pass audited;
   - Pass 2: the licences read;
   - Pass 3: where a picture enters the pigment maker;
-  - Pass 4: the lead's three questions.
-- **Current direction:** an image model supplies **only the skin-scale detail** (`Md`, `Bd`), as melanin and blood, on top of the pigment maker. That is allowed now by RD-SKM-5 and RD-SYN-1, needs no training, and an Apache-2.0 model is enough. A whole AI map stays a comparison arm.
-- **Found:** Krea 2's pictures belong to the user and can be released as CC0, under a $1M revenue limit, a filter duty and a watermark clause (F-AIS-3). FLUX.2 [klein] 4B has none of these (F-AIS-4). The maker already keeps the detail apart as pigment (F-AIS-5). The consent sentence in the spec comes from a finding, not the lead's words (rulings above).
-- **Unverified:** whether Krea 2 embeds a watermark. The platform's pass is an uncommitted edit, at no origin. MV2UV, SMPLitex, TexDreamer, UVMap-ID and UV-IDM were not re-read. The licence reading is not legal advice.
-- **Open with the lead:** Q-AIS-1 to Q-AIS-4.
-- **Owed:** the platform's pass could point back here once the session editing it commits. That is the platform's doc, so it was not touched.
-- **▶ Next:** your word on Q-AIS-4 (*"run the probe"*) and Q-AIS-3. Resume with `/research SkinMapsFromAnImageModel`.
+  - Pass 4: the lead's three questions;
+  - Pass 5: the probe (its own `_Spike_` doc).
+- **Ruled (2026-11-01):** RD-AIS-1 (Krea 2 first; the revenue limit is no obstacle) and RD-AIS-2 (prove that whole maps can look really good; run the probe). The lead's framing for Q-AIS-1, a creator-run generator whose maps are the creator's, is recorded and not ruled.
+- **Current direction:** **a whole AI-made head map works as a concept** (Pass 5): good-looking, in the library's layout, in under a minute, untrained. It is a judged comparison under RD-SYN-1. Whether one ships, or a creator-run tool makes them, is still Q-AIS-1. The detail-layer route (F-AIS-5) stays open beside it.
+- **Found:** Krea 2's pictures are the user's (F-AIS-3); FLUX.2 [klein] 4B has no conditions (F-AIS-4); the maker keeps detail apart as pigment (F-AIS-5); an edit model keeps hm08's features in place, and side views must be made progressively (F-AIS-11, F-AIS-12).
+- **Unverified:** Krea 2's look on this task (not run) and whether it embeds a watermark. The probe's look in a real renderer. One seed only. The platform's pass is an uncommitted edit, at no origin. The licence reading is not legal advice.
+- **Open with the lead:** Q-AIS-1, Q-AIS-2.
+- **Owed:** the Krea 2 run (a Hugging Face login), the lead's look on the character in Blender, and the platform pass's back-link (the platform's doc, not touched).
+- **▶ Next:** a Hugging Face login, then Krea 2 on the same views. Resume with `/research SkinMapsFromAnImageModel`.
 
 ## Sources
 
