@@ -74,7 +74,11 @@ for e in ("ear_r", "ear_l"):
     zero[sl] = True
     if e in EARS:
         m = EARS[e]; px, py = gx[sl], gy[sl]
-        qx = (cx - m["dx"]) + (px - cx) * m["s"]; qy = (cy - m["dy"]) + (py - cy) * m["s"]
+        if "M" in m:   # probe4_earfit.py: a full 2x2 (size, stretch, turn) about the pad's centre
+            (a11, a12), (a21, a22) = m["M"]
+            qx = (cx - m["dx"]) + a11 * (px - cx) + a12 * (py - cy); qy = (cy - m["dy"]) + a21 * (px - cx) + a22 * (py - cy)
+        else:
+            qx = (cx - m["dx"]) + (px - cx) * m["s"]; qy = (cy - m["dy"]) + (py - cy) * m["s"]
         sx_, sy_ = to_frame(PF, *from_frame(OF, qx, qy))
         D[sl] = np.stack([sx_ - ix[sl], sy_ - iy[sl]], -1)
 zero &= ~binary_dilation(known, iterations=20)
