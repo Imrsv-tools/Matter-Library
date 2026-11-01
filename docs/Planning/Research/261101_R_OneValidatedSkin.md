@@ -132,11 +132,23 @@
   - *Variety*: other tones, people and ages, as re-runs of the passed recipe;
   - then the order of 2026-10-27 resumes.
 
+## Resolved
+
+The lead, 2026-11-01, verbatim (to the Phase24 seed's questions): *"Tone, yes ; picture size, I would be very curious on iamgesize / loadablity / performance tests... but I think we shoudl start with 8k and then evalaute all that in later phases... I woudl also assume we will do different resolutiosn for different layers ; Age, keep ; Yes... I will. These shoudl all come together in time... We shoudl proceed with what we can now so we have the tings to test when the studio is ready to accept them. === Relax on the File... I will get us krea and also Flux klein to tryout."* Then, asked whether the phase is more than one: *"Split and seed"*.
+
+- **RD-OVS-1 — The candidate is held to the bar's own measured face average**, not a Fitzpatrick article's tone (*"Tone, yes"*). B stays today's III.
+- **RD-OVS-2 — Start at 8K.** Picture size, loading and performance are tested in later phases, and different layers may get different sizes (*"start with 8k and then evalaute all that in later phases"*). It answers OVS-8's size row: one size, 8K.
+- **RD-OVS-3 — The subject keeps hm08's default age** (*"Age, keep"*). It answers OVS-Q3.
+- **RD-OVS-4 — The lead asks the platform for Studio's side** (the shine-map carry and a draft in the look-dev scene). The library builds what it can now, so the set is ready to test when Studio can take it (*"Yes... I will … proceed with what we can now"*).
+- **RD-OVS-5 — The lead supplies Krea 2 and FLUX.2 [klein]** (*"I will get us krea and also Flux klein to tryout"*).
+- **RD-OVS-6 — Two phases.** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md) builds the judge at 8K, the pigment maker's skin tuned to the bar, and the finished set. [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) brings the image model's skin, as a structure, against the same judge (*"Split and seed"*). It replaces Pass 2's four-step plan.
+
 ## Status
 
 - **Passes:** 2.
   - Pass 1: OMF's input (2026-11-01; OVS-8 added the same day).
   - Pass 2: the library's side, and the plan (2026-11-01).
 - **Ruled 2026-11-01** (recorded above by date and content): OMF keeps the approach; one subject on today's hm08; this library hosts the phase.
-- **Seeded:** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md). OVS-Q1 … Q3 are answered there as recommendations for its discovery.
+- **Ruled by the lead, 2026-11-01:** RD-OVS-1 … 6 (`## Resolved`): the bar's tone, 8K, the default age, Studio's side asked of the platform, the models supplied, two phases.
+- **Seeded:** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md) (the judge, the maker's skin, the finished set), then [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) (the image model's skin against the same judge).
 - **▶ Next:** `/discovery Phase24` when the lead is ready.

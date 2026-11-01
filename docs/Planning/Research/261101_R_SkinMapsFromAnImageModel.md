@@ -113,7 +113,7 @@
 
 ## Pass 6 — Where this goes: Phase24's C2 row (2026-11-01)
 
-OMF's input of the same day ([`261101_R_OneValidatedSkin.md`](261101_R_OneValidatedSkin.md), OVS-3) puts an image model's skin into the library as a **structure**: projected, separated from its light, turned into pigment, and calibrated by the maker. The lead asked for one complete set. **The image-model route is now the C2 row of [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md),** judged beside the bar and the tuned pigment maker. A C2 win goes to the lead as the narrow re-ruling OVS-3 names. Q-AIS-1 (whether a whole AI map ever ships) is folded into it.
+OMF's input of the same day ([`261101_R_OneValidatedSkin.md`](261101_R_OneValidatedSkin.md), OVS-3) puts an image model's skin into the library as a **structure**: projected, separated from its light, turned into pigment, and calibrated by the maker. The lead asked for one complete set. **The image-model route is now [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md)** (split from Phase24 the same day, RD-OVS-6), judged beside the bar and Phase24's tuned pigment-maker skin. A C2 win goes to the lead as the narrow re-ruling OVS-3 names. Q-AIS-1 (whether a whole AI map ever ships) is folded into it.
 
 ## Open questions
 
@@ -146,7 +146,7 @@ The lead, 2026-11-01, verbatim: *"We are WELL under 1M... we are pre-rev and lik
 - **Unverified:** Krea 2's look on this task (not run) and whether it embeds a watermark. The probe's look in a real renderer. One seed only. The platform's pass is an uncommitted edit, at no origin. The licence reading is not legal advice.
 - **Open with the lead:** Q-AIS-1, Q-AIS-2.
 - **Owed:** the Krea 2 run (a Hugging Face login), the lead's look on the character in Blender, and the platform pass's back-link (the platform's doc, not touched).
-- **▶ Next:** the route continues as Phase24's C2 row (Pass 6); a Hugging Face login before its Krea 2 run.
+- **▶ Next:** the route continues as Phase25 (Pass 6). The lead supplies Krea 2 and FLUX.2 [klein] (RD-OVS-5).
 
 ## Sources
 

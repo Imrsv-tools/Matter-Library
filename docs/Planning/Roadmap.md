@@ -34,8 +34,12 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
 
 ### Phase24 — One Validated Skin — SEEDED *(numbered and seeded 2026-11-01 by `/research` on the lead's "one complete set build and tested,,, then we can add variety", after OMF's input of the same day: "today's hm08, Matter Library hosts it"; placed at the head of `## Future`, as the platform's skin phase waits on it)*
-**Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served for testing as one finished set.
+**Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served as one finished set, ready for Studio when Studio can take it. *(Split 2026-11-01, RD-OVS-6: the image model's skin is Phase25.)*
 - `docs/Planning/Phases/Phase24_OneValidatedSkin.md` · research `docs/Planning/Research/261101_R_OneValidatedSkin.md` (OMF's input; Pass 2, the plan) · `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md`
+
+### Phase25 — AI Skin Structure — SEEDED *(split out of Phase24 and seeded 2026-11-01 by `/research` on the lead's "Split and seed", RD-OVS-6; runs after Phase24, against its judge)*
+**Outcome:** an image model's person becomes a skin structure in the library (projected onto the body, its light removed, turned into pigment and calibrated by the maker), judged beside the scanned skin and Phase24's skin on the same body.
+- `docs/Planning/Phases/Phase25_AiSkinStructure.md` · research `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md` · `docs/Planning/Research/261101_R_Spike_SkinMapFromImageModel.md`
 
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
