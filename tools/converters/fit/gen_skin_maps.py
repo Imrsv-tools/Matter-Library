@@ -5,6 +5,7 @@
     uv run tools/converters/fit/gen_skin_maps.py IV               # one tone
     uv run tools/converters/fit/gen_skin_maps.py IV --picture my_skin.png   # a contributor's picture
     uv run tools/converters/fit/gen_skin_maps.py IV --structure Skin2       # one structure (Phase23 23.3)
+    uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 [--fields DIR]   # a subject, 8K (Phase24)
 
 Each tone has three STRUCTURES (``gen_synth_skin.STRUCTURES``), three people of that tone: ``Skin``
 writes ``Fitzpatrick<Tone>_basecolor``, ``Skin2`` and ``Skin3`` write ``Skin2Fitzpatrick<Tone>_…`` for
@@ -65,7 +66,8 @@ import build_character as bc  # noqa: E402  (the pinned-source fetch: URL + sha2
 MESH = "MakeHuman_Body_v01"
 N0 = 2048                                  # groups.PART_MESHES[MESH]["map_size"]: the layout's own size
 # Phase24 (RD-OVS-2, RD-P24-2): the maps may be made at a power-of-two multiple of it, on the same
-# layout (one subject's set at 8192). Set by ``MATTER_SKIN_N`` (``--size`` sets it); every radius
+# layout (one subject's set at 8192). Set by ``MATTER_SKIN_N`` (``--subject`` sets it to the subject's
+# size and re-runs); every radius
 # written in pixels below means pixels AT 2048 and is scaled by ``F``, so a region keeps its size on
 # the body whatever the picture's size.
 N = int(os.environ.get("MATTER_SKIN_N", N0))
@@ -189,9 +191,30 @@ def tone_of(roman: str):
 
 
 def bleed(lin, covered, px: int):
-    """Grow the covered colour ``px`` pixels outward (gen_fit_makehuman.bleed)."""
-    import gen_fit_makehuman as fm  # noqa: PLC0415
-    return fm.bleed(lin, covered, px)
+    """Grow the covered colour ``px`` pixels outward (gen_fit_makehuman.bleed). Above 2048 (Phase24),
+    the same rule, worked only on each pass's new ring of pixels: the whole-picture passes take
+    minutes at 8K with 64 pixels to grow."""
+    if lin.shape[0] <= N0:
+        import gen_fit_makehuman as fm  # noqa: PLC0415
+        return fm.bleed(lin, covered, px)
+    import numpy as np  # noqa: PLC0415
+    lin, covered = lin.copy(), covered.copy()
+    H, W = covered.shape
+    for _ in range(px):
+        grown = covered | np.roll(covered, 1, 0) | np.roll(covered, -1, 0) | np.roll(covered, 1, 1) | np.roll(covered, -1, 1)
+        ys, xs = np.nonzero(grown & ~covered)
+        if not len(ys):
+            break
+        acc = np.zeros((len(ys),) + lin.shape[2:], lin.dtype)
+        n = np.zeros(len(ys))
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):   # np.roll's neighbour: [y - dy, x - dx]
+            yy, xx = (ys - dy) % H, (xs - dx) % W
+            c = covered[yy, xx]
+            acc += lin[yy, xx] * c[:, None]
+            n += c
+        lin[ys, xs] = acc / n[:, None]
+        covered[ys, xs] = True
+    return lin
 
 
 def fit_albedo(ratio, tone, S, cover, gamma=None):
@@ -226,7 +249,7 @@ def fit_albedo(ratio, tone, S, cover, gamma=None):
     return knee(lo), lo
 
 
-def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None):
+def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None, S=None):
     """The colour picture -> (the stored map as 8-bit sRGB, the article's base_color_const, the
     numbers). The map is col / tone over its own 99.9th percentile per channel (brightest ~1); the
     constant is the tone over the STORED map's decoded average over the skin, so the article
@@ -234,9 +257,11 @@ def calibrate(col, tone, reg: dict, cover, gamma=None, hold=None, peak=None):
     ``hold`` = (W, the reference's ratio): a structure takes ``Skin``'s ratio where W is 1 (the lips'
     zone, 23.3) and its own, rescaled so its skin average is unchanged, where W is 0. ``peak``: a
     floor for the map's peak factor (``Skin``'s, whose ratio is held already clipped at it), so the
-    lips' zone renders as ``Skin``'s does, texel for texel, while a wider structure keeps its range."""
+    lips' zone renders as ``Skin``'s does, texel for texel, while a wider structure keeps its range.
+    ``S``: where the tone is the average (default the skin, ``Body``; a Phase24 subject's head, whose
+    tone is its face's)."""
     import numpy as np  # noqa: PLC0415
-    S = reg["Body"]
+    S = reg["Body"] if S is None else S
     ratio = col / tone
     ratio, gamma = fit_albedo(ratio, tone, S, cover, gamma)
     if hold is not None:
@@ -278,7 +303,14 @@ def map_name(roman: str, structure: str = "Skin") -> str:
 
 def _row_key(name: str):
     s, _, t = name.partition("Fitzpatrick")
-    return (int(s.removeprefix("Skin") or 1), TONES.index(t))
+    if not t:                                  # a Phase24 subject (``SkinTone34``): after the tones
+        return (99, 0, name)
+    return (int(s.removeprefix("Skin") or 1), TONES.index(t), "")
+
+
+def _subject_stems() -> list:
+    import gen_synth_skin as gss  # noqa: PLC0415
+    return ["Skin" + k for k in gss.SUBJECTS]
 
 
 def write(roman: str, srgb8, structure: str = "Skin") -> Path:
@@ -294,18 +326,20 @@ def write_provenance(rows: dict) -> None:
     old, shine_files, shine_rows = {}, [], []
     if PROVENANCE.is_file():
         for line in PROVENANCE.read_text().splitlines():
-            if re.fullmatch(r"  (Skin\d)?Fitzpatrick[IV]+: \{.*", line):
+            if re.fullmatch(r"  ((Skin\d)?Fitzpatrick[IV]+|" + "|".join(_subject_stems()) + r"): \{.*", line):
                 old[line.split(":", 1)[0].strip()] = line
             # Phase22: the shine maps' rows are gen_skin_shine.py's; carry them over unchanged
-            elif line.startswith("  - MatterLibrary/textures/fit/makehuman/skin/Skin_"):
+            # (and a Phase24 subject's own: ``SkinTone34_roughness``; a key with "_" is a shine map's)
+            elif line.startswith("  - MatterLibrary/textures/fit/makehuman/skin/Skin") and "_basecolor_" not in line:
                 shine_files.append(line)
-            elif line.startswith("  Skin_") and ": {" in line:
+            elif line.startswith("  Skin") and ": {" in line and "_" in line.split(":", 1)[0]:
                 shine_rows.append(line)
     for name, r in rows.items():
         old[name] = (
             f"  {name}: {{made: {r['made']}, "
             + (f"fit: {r['fit']}, melanin0: {r['melanin0']}, " if "fit" in r else "")
             + (f"contrast: {r['contrast']}, " if r.get("contrast", 1.0) != 1.0 else "")
+            + (f"size: {r['size']}, held_on: {r['held_on']}, " if "size" in r else "")
             + f"tone: {r['tone']}, base_color_const: "
             f"{r['base_color_const']}, peak_factor: {r['peak_factor']}, lips_average: {r['lips_average']}}}")
     names = sorted(old, key=_row_key)
@@ -354,7 +388,11 @@ def main(argv=None) -> int:
     ap.add_argument("--picture", type=Path, help="a contributor's colour picture for ONE tone")
     ap.add_argument("--structure", dest="structures", action="append", choices=("Skin", "Skin2", "Skin3"),
                     help="write this structure's maps (repeatable; default all three, 23.3)")
+    ap.add_argument("--subject", help="a Phase24 subject (gen_synth_skin.SUBJECTS), at its own size")
+    ap.add_argument("--fields", type=Path, help="with --subject: write its melanin and blood fields here (RD-P24-6)")
     a = ap.parse_args(argv)
+    if a.subject:
+        return subject(a.subject, a.fields, argv)
     bad = [t for t in a.tones if t not in TONES]
     if bad:
         raise SystemExit(f"unknown tone {bad} (have {list(TONES)})")
@@ -414,6 +452,63 @@ def main(argv=None) -> int:
                     if d.max() > 1.5:
                         raise SystemExit(f"{map_name(roman, s)}: the lips' zone differs from Skin's (RD-P23-5)")
     write_provenance(rows)
+    return 0
+
+
+def subject(name: str, fields_dir, argv) -> int:
+    """One Phase24 subject's colour map (RD-P24-1, RD-P24-7): at its own size, composed in bands,
+    its face core held at the bar's mean there (``SUBJECTS``' ``held``). Writes ``Skin<Name>_basecolor_sUKN.png`` and its provenance row,
+    and, given ``fields_dir``, its melanin and blood fields as 16-bit linear pictures over a scale
+    (``<dir>/Skin<Name>_fields.json``): never shipped, remade by this command (RD-P24-6)."""
+    import time  # noqa: PLC0415
+    import numpy as np  # noqa: PLC0415
+    from PIL import Image  # noqa: PLC0415
+    import gen_synth_skin as gss  # noqa: PLC0415
+    if name not in gss.SUBJECTS:
+        raise SystemExit(f"unknown subject {name!r} (have {list(gss.SUBJECTS)})")
+    sj = gss.SUBJECTS[name]
+    if N != sj["size"]:                        # the module's size is read at import: re-run at the subject's
+        env = dict(os.environ, MATTER_SKIN_N=str(sj["size"]))
+        os.execvpe(sys.executable, [sys.executable, str(Path(__file__).resolve()), *(argv or sys.argv[1:])], env)
+    t0 = time.time()
+    tone = np.array(sj["tone"])
+    lut = gss.Lut()
+    reg = regions()
+    F = gss.fields(parts=False)
+    rec = RECIPES / f"Skin_{name}_Clean_Base_s001_v01.json"
+    rec = rec if rec.is_file() else RECIPES / f"Skin_Fitzpatrick{sj['recipe']}_Clean_Base_s001_v01.json"
+    F["scatter_scale"][name] = [float(x) for x in json.loads(rec.read_text())["subsurface_radius_scale"].split(",")]
+    if sj["hold"] != "face":
+        raise SystemExit(f"{name}: hold {sj['hold']!r}: only the face core is held")
+    hold = (F["masks"]["face"] > 0.9) & reg["Body"] & F["cover"]   # where the subject's tone is the bar's
+    pg = {} if fields_dir else None
+    col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg)
+    cover = F["cover"]
+    del F
+    t1 = time.time()
+    srgb8, const, st = calibrate(col, np.array(sj["held"]), reg, cover, S=hold)
+    del col
+    stem = "Skin" + name
+    OUT.mkdir(parents=True, exist_ok=True)
+    p = OUT / f"{stem}_basecolor_{TAG}.png"
+    Image.fromarray(srgb8, "RGB").save(p, optimize=True)
+    st["body_average"] = [round(float(v), 4) for v in (const * _srgb_to_linear(srgb8[reg["Body"]] / 255.0)).mean(0)]
+    print(f"{stem}: {p.relative_to(REPO)} ({N}x{N}; compose {t1 - t0:.0f}s, calibrate {time.time() - t1:.0f}s)\n  " + json.dumps(st))
+    if st["uncovered_islands"]:
+        raise SystemExit(f"{stem}: {st['uncovered_islands']} island texels left unpainted")
+    if fields_dir:
+        fields_dir.mkdir(parents=True, exist_ok=True)
+        meta = {"command": f"uv run tools/converters/fit/gen_skin_maps.py --subject {name} --fields <dir>",
+                "space": "linear", "size": N, "encoding": "uint16 = value / scale x 65535"}
+        for k, a in pg.items():
+            sc = float(a[cover].max())
+            Image.fromarray(np.round(np.clip(a / sc, 0, 1) * 65535).astype(np.uint16)).save(fields_dir / f"{stem}_{k}.png")
+            meta[k] = {"scale": sc, "skin_mean": round(float(a[reg["Body"]].mean(dtype=np.float64)), 5)}
+        (fields_dir / f"{stem}_fields.json").write_text(json.dumps(meta, indent=1) + "\n", encoding="utf-8")
+        print(f"  fields: {fields_dir} " + json.dumps(meta))
+    check = lut.check(name, tone)
+    write_provenance({stem: {"made": "pigment", **st, "fit": check["fit"], "melanin0": check["melanin0"],
+                             "size": N, "held_on": sj["hold"]}})
     return 0
 
 

@@ -3,6 +3,12 @@
 
     uv run tools/converters/fit/gen_skin_shine.py                 # every map, into the library
     uv run tools/converters/fit/gen_skin_shine.py --out /tmp/x    # a trial: nothing in the library
+    uv run tools/converters/fit/gen_skin_shine.py --subject Tone34   # a Phase24 subject's own set, at 8K
+
+**Phase24 (a subject's own set, RD-P24-7):** ``--subject`` writes ``Skin<Name>_<kind>_sUKN.png`` at the
+subject's size (``gen_synth_skin.SUBJECTS``), one height sample per texel (an 8K texel is finer than
+2048's 3 x 3), with the subject's ``shine``: the cavity map's level per placed face region and on the
+lips fitted to the scanned bar's specular, and the lips' roughness (the lips wear the skin, RD-P24-3).
 
 Phase22 *Skin Maps Beyond Colour* (RD-P22-1 … 10). Phase21's colour maps did not take away skin's
 plastic look: the cause measured was the EVEN SHEEN (F-P21-1). These maps describe the surface, not
@@ -41,6 +47,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -107,8 +114,12 @@ SCATTER = {"ears": 1.0, "fingertips": 0.3, "nose_wings": 0.0, "eyelids": 0.0, "t
 CREASE_CAVITY = 0.25   # the mesh's own creases (its concavity) dim it this much more at the deepest
 
 
+STEM = "Skin_"          # a subject's set: ``Skin<Name>_`` (``--subject``)
+CHUNK = 4_000_000       # relief points per pass (an 8K atlas has ~40M covered texels)
+
+
 def name(kind: str) -> str:
-    return f"Skin_{kind}_{TAG}.png"
+    return f"{STEM}{kind}_{TAG}.png"
 
 
 def ellipse(P, cx: float, cy: float, rx: float, ry: float):
@@ -150,8 +161,9 @@ def roughness_offset(F: dict, R: dict | None = None) -> tuple[np.ndarray, dict]:
     return f, zones
 
 
-def store(f: np.ndarray, F: dict) -> tuple[np.ndarray, dict]:
-    """The offset -> an 8-bit linear map, its average over the skin held at SKIN_ROUGHNESS."""
+def store(f: np.ndarray, F: dict, lips_to: float | None = None) -> tuple[np.ndarray, dict]:
+    """The offset -> an 8-bit linear map, its average over the skin held at SKIN_ROUGHNESS.
+    ``lips_to``: the lips' own roughness (a subject's lips wear the skin, RD-P24-3)."""
     S, cover = F["reg"]["Body"], F["cover"]
     f = gsm.bleed(np.where(cover, f, 0.0)[..., None], cover, gsm.BLEED)[..., 0]
     grown = _grown(cover)
@@ -160,6 +172,8 @@ def store(f: np.ndarray, F: dict) -> tuple[np.ndarray, dict]:
         q = np.round(np.clip(SKIN_ROUGHNESS + f + shift, 0.0, 1.0) * 255.0)
         q[~grown] = OUTSIDE                # beyond every island: the skin's average, so a mip blends nothing
         shift += SKIN_ROUGHNESS - float((q / 255.0)[S].mean())
+    if lips_to is not None:
+        q[F["reg"]["Lips"]] = round(lips_to * 255.0)
     m = q.astype(np.uint8)
     dec = m / 255.0
     stats = {"skin_average": round(float(dec[S].mean()), 4),
@@ -180,8 +194,9 @@ def jacobian(m: dict, N: int):
     """Each texel's dP per texel step along the atlas's +x (u) and +y (down, -v), from its face."""
     P = np.array(m["points"], dtype=np.float64)
     vt = np.array(m["vt"], dtype=np.float64)
-    Tx = np.zeros((N, N, 3))
-    Ty = np.zeros((N, N, 3))
+    dt = np.float64 if N <= gsm.N0 else np.float32       # Phase24: 8K in float32
+    Tx = np.zeros((N, N, 3), dt)
+    Ty = np.zeros((N, N, 3), dt)
     for f in m["faces"]:
         for tri in ((0, 1, 2), (0, 2, 3)) if len(f) == 4 else ((0, 1, 2),):
             vi = [f[t][0] for t in tri]
@@ -415,9 +430,11 @@ def relief(F: dict, Tx, Ty, supersample: int = 2) -> dict:
     g = np.zeros(len(P))
     for ox in offs:
         for oy in offs:
-            hh, gg = height(P + ox * tx + oy * ty, Nr, sel, A)
-            h += hh
-            g += gg
+            for c in range(0, len(P), CHUNK):         # pointwise: chunks give the same values
+                cs = slice(c, c + CHUNK)
+                hh, gg = height(P[cs] + ox * tx[cs] + oy * ty[cs], Nr[cs], {k: v[cs] for k, v in sel.items()}, A)
+                h[cs] += hh
+                g[cs] += gg
     h /= supersample ** 2
     g /= supersample ** 2
     Hm = np.zeros(cover.shape)
@@ -470,6 +487,20 @@ def cavity(F: dict, R: dict) -> np.ndarray:
     crease = np.clip(F["cv"], 0.0, 1.0)
     c = 1.0 - (1.0 - CAVITY_FLOOR) * depth - CREASE_CAVITY * crease
     return np.clip(np.where(R["cover"], c, 1.0), CAVITY_FLOOR * 0.8, 1.0)
+
+
+def subject_cavity(c: np.ndarray, F: dict, sh: dict) -> np.ndarray:
+    """A subject's cavity: the made map times its level per placed face region (log gains on
+    ``gen_synth_skin.face_regions``' weights, made in bands) and its lips' level."""
+    pre = gss.band_pre(F)
+    n = c.shape[0]
+    for y0 in range(0, n, 512):
+        sl = slice(y0, min(y0 + 512, n))
+        Fb = gss.band_view(F, pre, sl)
+        W = gss.face_regions(Fb["P"], Fb["masks"], Fb["cover"], Fb["parts"]["head"], Fb)
+        c[sl] = c[sl] * np.exp(sum(g * W[k] for k, g in sh["cavity"].items()))
+    c = np.where(F["reg"]["Lips"], c * sh["lips_cavity"], c)
+    return np.clip(c, 0.0, 1.0)
 
 
 def store_cavity(c: np.ndarray, F: dict, cover) -> tuple[np.ndarray, dict]:
@@ -542,8 +573,8 @@ def write_provenance(rows: dict) -> None:
     text = PROVENANCE.read_text(encoding="utf-8")
     lines = text.splitlines()
     files = [f"  - MatterLibrary/textures/fit/makehuman/skin/{name(k)}" for k in rows]
-    members = [f"  Skin_{k}: {json.dumps(r, separators=(', ', ': '))}" for k, r in rows.items()]
-    lines = [ln for ln in lines if ln not in files and not any(ln.startswith(f"  Skin_{k}:") for k in rows)]
+    members = [f"  {STEM}{k}: {json.dumps(r, separators=(', ', ': '))}" for k, r in rows.items()]
+    lines = [ln for ln in lines if ln not in files and not any(ln.startswith(f"  {STEM}{k}:") for k in rows)]
     i = lines.index("provenance:")
     lines[i:i] = files
     lines += members
@@ -556,9 +587,22 @@ def write_provenance(rows: dict) -> None:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--out", type=Path, help="write the maps here instead (a trial: no provenance)")
-    ap.add_argument("--supersample", type=int, default=3, help="height samples per texel, per axis")
+    ap.add_argument("--supersample", type=int, help="height samples per texel, per axis (3; a subject 1)")
+    ap.add_argument("--subject", help="a Phase24 subject's own set (gen_synth_skin.SUBJECTS), at its size")
     a = ap.parse_args(argv)
-    F = gss.fields()
+    global STEM
+    sh = None
+    if a.subject:
+        sj = gss.SUBJECTS[a.subject]
+        if gsm.N != sj["size"]:                # the size is read at import: re-run at the subject's
+            env = dict(os.environ, MATTER_SKIN_N=str(sj["size"]))
+            os.execvpe(sys.executable, [sys.executable, str(Path(__file__).resolve()), *(argv or sys.argv[1:])], env)
+        STEM, sh = f"Skin{a.subject}_", sj["shine"]
+        F = gss.fields(parts=False)
+        F["parts"] = gss.parts_banded(F, ("head", "hand", "neck", "trunk"))
+    else:
+        F = gss.fields()
+    a.supersample = a.supersample or (1 if a.subject else 3)
     m = make_kits.load_mesh(gsm.MESH)
     Tx, Ty = jacobian(m, gsm.N)
     R = relief(F, Tx, Ty, a.supersample)
@@ -567,7 +611,7 @@ def main(argv=None) -> int:
     out.mkdir(parents=True, exist_ok=True)
 
     f, zones = roughness_offset(F, R)
-    mr, st = store(f, F)
+    mr, st = store(f, F, sh["lips_roughness"] if sh else None)
     dec = mr / 255.0
     st |= {f"{z}_average": round(float(dec[sel & F['reg']['Body']].mean()), 4) for z, sel in zones.items()}
     if st["uncovered_islands"]:
@@ -584,7 +628,8 @@ def main(argv=None) -> int:
                       "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal",
                       **sn}
 
-    mc, sc = store_cavity(cavity(F, R), F, R["cover"])
+    cav = cavity(F, R)
+    mc, sc = store_cavity(subject_cavity(cav, F, sh) if sh else cav, F, R["cover"])
     Image.fromarray(mc, "L").save(out / name("cavity"), optimize=True)
     rows["cavity"] = {"made": "procedural", "space": "linear", "neutral": 1.0,
                       "rule": "specular_weight x map", **sc}

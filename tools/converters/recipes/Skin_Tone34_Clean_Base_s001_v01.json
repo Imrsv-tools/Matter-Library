@@ -1,0 +1,115 @@
+{
+  "summary": "Human skin of one measured tone between types III and IV: a complete 8K set with its own shine maps, the lips worn on the skin.",
+  "search_words": [
+    "skin",
+    "character",
+    "human",
+    "skin tone",
+    "8k",
+    "validated"
+  ],
+  "origin": [
+    "procedural",
+    "measured",
+    "agent-drafted"
+  ],
+  "_comment": "SUBJECT Tone34 (Phase24 One Validated Skin, RD-P24-1 ... 8): one person's complete skin set beside the six Fitzpatrick tones, judged against a scanned reference skin on the same body (the reference is research only and never ships, RD-SKM-2, RD-P23-10). The Variant names the measured tone, between III and IV (RD-P24-8), never a person. All five maps are the article's own and 8192 square on hm08's 2048 layout (RD-OVS-2, RD-P24-2). Colour: gen_skin_maps.py --subject Tone34 (the pigment maker on IV's fitted response at the subject's own melanin, its placed face colour and lips solved against the reference's same regions; the face core held at the reference's mean there). Shine: gen_skin_shine.py --subject Tone34 (the shared design at 8K, one height sample a texel; the cavity map's level per face region and on the lips fitted to the reference's specular; the lips' roughness 0.30). THE LIPS WEAR THIS ARTICLE (RD-P24-3): there is no Lips_Tone34; the lip colour is the map's and the lip gloss the roughness map's, with no coat (RD-P22-17). Every other value is Skin_FitzpatrickIII's (Physically Based Skin III: IOR, roughness, the scatter radius); fuzz_color is the subject's tone.",
+  "name": "Skin_Tone34_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
+  "status": "candidate",
+  "path": "character/humanoid/skin/Skin_Tone34_Clean_Base_s001_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "biological",
+  "class": "tissue",
+  "group": "character",
+  "species": "humanoid",
+  "part": "skin",
+  "fits": "MakeHuman_Body_v01",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "base_color_const": "0.7773, 0.4113, 0.3148",
+  "roughness_tex": "../../../../textures/base/biological/tissue/Skin_Pores_roughness_s001.png",
+  "normal_tex": "../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.4,
+  "subsurface_weight": 1.0,
+  "subsurface_radius": 0.00482,
+  "subsurface_radius_scale": "1.0, 0.351, 0.226",
+  "subsurface_scatter_anisotropy": 0.8,
+  "fuzz_weight": 0.1,
+  "fuzz_color": "0.5131, 0.2742, 0.1856",
+  "fuzz_roughness": 0.5,
+  "base_color_map": true,
+  "base_color_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_basecolor_sUKN.png",
+  "roughness_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_roughness_sUKN.png",
+  "normal_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_normal_sUKN.png",
+  "cavity_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_cavity_sUKN.png",
+  "scatter_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_scatter_sUKN.png",
+  "overlays": [
+    {
+      "texture": "../../../../textures/shared/overlays/Scratches01_overlay_s01.png",
+      "density_port": "overlay1_density"
+    },
+    {
+      "texture": "../../../../textures/shared/overlays/Dust01_overlay_s001.png",
+      "density_port": "overlay2_density",
+      "color_port": "overlay2_color"
+    }
+  ],
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "roughness_bias",
+    "overlay2_color"
+  ],
+  "sources": [
+    {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_skin_maps.py",
+      "args": "--subject Tone34",
+      "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
+      "note": "the subject's colour map at 8192 (Phase24): CC0 parts only (MPFB2's region masks, hm08, seeded 3D melanin and blood fields through OMF's tabulated two-chromophore model; RD-SKM-2), no picture of a person; a handful of region averages measured on a research reference set its numbers (gen_synth_skin.SUBJECTS), as a tone is; base_color_const is the face core's measured mean x the map's peak factor"
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/fit/gen_skin_shine.py",
+      "args": "--subject Tone34",
+      "provenance": "library/provenance/sources/fit/makehuman/skin.yaml",
+      "note": "the subject's own roughness, normal, cavity and scatter maps at 8192 (Phase24)"
+    },
+    {
+      "kind": "physicallybased",
+      "entry": "Skin III",
+      "api": "https://api.physicallybased.info/v2/materials",
+      "schema_version": 2.2,
+      "updated": 202609010742,
+      "license": "CC0 1.0 Universal",
+      "used": {
+        "base_color_const": "0.623, 0.433, 0.343",
+        "metalness_const": 0,
+        "roughness_const": 0.5,
+        "specular_ior": 1.4,
+        "subsurface_radius": 0.00482,
+        "subsurface_radius_scale": "1, 0.351, 0.226"
+      },
+      "note": "Skin III's non-colour values (IOR, roughness, the scatter radius and its scale); the colour is the subject's measured tone, not this entry's"
+    },
+    {
+      "kind": "judgement",
+      "why": "subsurface_weight 1.0 and subsurface_color = the albedo: skin scatters throughout, and OpenPBR's default subsurface colour (light grey) would desaturate the tone. Phase21 (RD-P21-1, RD-P21-4): the scatter colour now FOLLOWS the base (subsurface_color connected to base_color_out), so it takes the map and the tint; before, it was pinned to the albedo and the tint was inert on skin in every tool (F-P21-3)."
+    },
+    {
+      "kind": "judgement",
+      "why": "Phase22 (RD-P22-17, after click 2: \"the shine is still just really over the top\"): NO COAT. Phase07 7.3 gave the skin MPFB2's 'enhanced skin' clearcoat (0.1 at roughness 0.3, IOR 1.5) for its oil; on the relief it laid one sharp, wet glint over the whole body, and it double-counted the oil the roughness map's T-zone already carries. The skin's oil and its overall roughness (the map's average, 0.62) are in roughness_map. subsurface_scatter_anisotropy 0.8: tissue scatters strongly forward (a Henyey-Greenstein g of ~0.8 for skin). Fuzz 0.1 in the skin's own albedo, roughness 0.5: fine vellus hair seen at grazing angles, taking roughly the skin's hue (a light grey would put a grey rim on the darker tones); MPFB2 carries no fuzz, so the weight is kept low. Storm ignores the anisotropy (Learnings Storm S8), which adds ~1.2 to the rig's ΔE; Blender is the one honouring it."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_skin_pores.py",
+      "provenance": "library/provenance/sources/base/biological/tissue/Skin_Pores.yaml"
+    }
+  ]
+}

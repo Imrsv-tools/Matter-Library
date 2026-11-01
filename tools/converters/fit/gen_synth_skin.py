@@ -141,6 +141,34 @@ STRUCTURES = {
     # sheltered and rosy: little tan, fine even skin, many flecks, a strong flush on the cheeks and nose
     "Skin3": {"seed": 2, "face": 1.0, "sun": 0.25, "mottle": 0.6, "mottle_scale": 0.6, "flecks": 2.2, "redness": 2.6},
 }
+# Phase24 (RD-P24-1, RD-P24-8): a SUBJECT is one person's skin set beside the six tones, named by a
+# Variant for its measured tone (never a person). Its ``tone`` is measured on the scanned bar's own
+# albedo over the head's skin (the bar never ships, RD-P23-10: a handful of averages are taken from
+# it, as a tone is). It borrows a fit's response at its own operating melanin (the nearer fit that
+# passes RD-P23-3's check: IV, 9 %; III's best is 17 %). Its placed face colour and its lips are
+# solved against the bar's same regions over its trunk, on that fit at the bar's full contrast
+# (24.2, 2026-11-01: each region within 0.08 in log, the nose the worst; the lips exact). Its
+# calibration holds the FACE CORE (MPFB's face mask over 0.9) at the bar's own mean there
+# (``held``): the tone is the face's, and the head beyond the face (scalp, ears) reads darker on the
+# bar than on the maker. ``recipe``: whose scatter radii the depth term reads until the subject's own
+# recipe exists. ``shine`` (gen_skin_shine.py): the cavity map's level per face region, as log gains
+# on the same placed regions, fitted to the bar's specular over the shared map (each within 0.01);
+# the lips' cavity level and roughness (the bar's lip specular over the shared map's; the lips'
+# finish without their coat, RD-P22-17: Lips_*'s 0.35 under a 0.3 coat, so a little lower).
+SUBJECTS = {
+    "Tone34": {"tone": (0.5131, 0.2742, 0.1856), "fit": "IV", "melanin": 0.0805, "size": 8192, "recipe": "III",
+               "hold": "face", "held": (0.6437, 0.3454, 0.2526),
+               "face": {"face": (-0.607, -0.059, 0.068, -0.146), "forehead": (-0.195, -0.270, -0.171, -0.250),
+                        "cheek": (-0.653, -0.128, 0.039, -0.237), "nose": (-0.782, -0.345, -0.083, -0.250),
+                        "alae": (0.070, 0.188, 0.150, -0.187), "under_eye": (0.394, 1.078, 0.150, 0.002),
+                        "tear_trough": (-0.496, 0.590, 0.150, 0.037), "upper_lid": (-0.049, 0.633, 0.150, -0.026),
+                        "eyelid": (-0.132, 1.112, 0.150, 0.122), "chin": (-0.061, 0.291, 0.150, 0.082)},
+               "lips": (1.098, 0.845, 1.163),
+               "shine": {"cavity": {"face": 0.001, "forehead": 0.064, "cheek": 0.044, "nose": -0.053, "alae": -0.292,
+                                    "under_eye": -0.137, "tear_trough": -0.016, "upper_lid": -0.151, "eyelid": -0.288,
+                                    "chin": 0.007},
+                         "lips_cavity": 0.815, "lips_roughness": 0.30}},
+}
 # ``face`` scales the placed regional colour (``FACE``) as a whole: 1 is the bar's solve.
 # The first gains (23.3.1: sun 1.5 / 0.55, mottle 1.3 / 0.75, redness 0.6 / 1.5, no ``face``) moved the
 # face by a mean dE of 0.6-1.7 at the look view, against 4-12 between tones: not three people.
@@ -158,6 +186,8 @@ class Lut:
         self.meta = {k: d[k] for k in ("model", "omf_commit")}
         self.fits = d["fits"]                      # fit -> {eumelanin_ratio, epidermis_thickness_mm}
         self.tones = d["tones"]                    # tone -> {fit, melanin, matched_on, ...}
+        for k, s in SUBJECTS.items():              # Phase24: a subject at its own operating melanin
+            self.tones[k] = {"fit": s["fit"], "melanin": s["melanin"], "matched_on": "the subject's tone"}
         self.mel = np.log(np.array(d["melanin"]))
         self.bld = np.log(np.array(d["blood"]))
         self.so2 = np.array(d["so2"])
@@ -375,14 +405,15 @@ def upper_lid(P, e, fx):
     return np.exp(-((m / 0.016) ** 2 + ((y - 0.010) / 0.005) ** 2 + (z / 0.02) ** 2))
 
 
-def face_regions(P, masks, cover, head=None) -> dict:
+def face_regions(P, masks, cover, head=None, F=None) -> dict:
     """Each FACE region's soft weight (0..1), placed from the landmarks (23.2.7). The face's own level
     reaches over the whole head (``head``, the body part) and fades into the neck, so it does not stop
     at MPFB's face mask short of the hairline (a tan strip under the hair, seen at the look view)."""
-    L = face_landmarks(P, masks, cover)
+    L = F["pre"]["L"] if F is not None and "pre" in F else face_landmarks(P, masks, cover)
     n, fx, (el, er), mo, at = L["nose"], L["fx"], L["eyes"], L["mouth"], L["on_face"]
-    face = np.clip(1.3 * gsm.blur(masks["face"], 30), 0, 1)
-    lids = np.clip(gsm.blur(masks["eyelids"], 4) * 1.3, 0, 1)
+    bl = (lambda k, r: _blur(F, k, r)) if F is not None else (lambda k, r: gsm.blur(masks[k], r))
+    face = np.clip(1.3 * bl("face", 30), 0, 1)
+    lids = np.clip(bl("eyelids", 4) * 1.3, 0, 1)
     W = {"face": face if head is None else np.maximum(face, np.clip(head, 0, 1))}
     W["forehead"] = ellipse3(P, at(fx, (el[1] + er[1]) / 2 + 0.045), (0.045, 0.022, 0.03))
     W["cheek"] = sum(ellipse3(P, at(fx + s * 0.040, n[1] - 0.004), (0.020, 0.017, 0.02)) for s in (-1, 1))
@@ -397,6 +428,13 @@ def face_regions(P, masks, cover, head=None) -> dict:
         if k != "face":  # take the head-wide weight; with the mask, the ring kept 0.04 of its shape
             W[k] = np.clip(W[k], 0, 1) * W["face"]
     return W
+
+
+def _blur(F, name: str, r: int):
+    """A mask blurred: precomputed on the whole atlas for a band (``compose_banded``), else here."""
+    if "pre" in F:
+        return F["pre"]["blur"][(name, r)]
+    return gsm.blur(F["masks"][name], r)
 
 
 # ------------------------------------------------------------------ point processes -------------
@@ -464,8 +502,14 @@ def grow_veins(rng, P, N3, cover, starts, axis_dirs, lengths, radius, weight, st
 
 
 # ------------------------------------------------------------------ the picture -----------------
-def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, structure="Skin"):
-    """The absolute skin colour (linear) for one tone, one structure and one set of layers."""
+def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, structure="Skin", lips=None, pigments=None):
+    """The absolute skin colour (linear) for one tone, one structure and one set of layers.
+
+    ``lips``: the lips over the tone (default the fit's ``LIPS``; a subject's own). ``F`` may be one
+    BAND of rows of an atlas larger than 2048 (``compose_banded``): its ``pre`` holds what needs the
+    whole atlas (the blurred masks, the landmarks, the thickness map), and the run returns the band's
+    two terms before the skin's average is held, which needs the whole atlas too. ``pigments``: a dict
+    that receives the melanin and blood fields (RD-P24-6)."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
     m0 = lut.use(roman)
@@ -477,7 +521,7 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     # the skin-scale detail on the face at the bar's measured strength, and on the body (23.2.2).
     # The face's weight is wide and follows the head, so no seam shows at the hairline.
     dg = DETAIL[lut.tones[roman]["fit"]] if detail is None else detail
-    wf = np.clip(np.maximum(1.3 * gsm.blur(face, 40), 0.8 * F["parts"]["head"]), 0, 1)
+    wf = np.clip(np.maximum(1.3 * _blur(F, "face", 40), 0.8 * F["parts"]["head"]), 0, 1)
     gf, gc, gd = ((dg[k][1] + (dg[k][0] - dg[k][1]) * wf) for k in ("fine", "coarse", "dots"))
     gc, gd = gc * st["mottle"], gd * st["flecks"]
     down = -Nr[..., 1]                                  # A-pose: the palms and the soles face down
@@ -495,7 +539,7 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
 
     M = (0.82 + 0.36 * st["sun"] * sun)
     M *= 1 - 0.45 * np.maximum(palm, sole)                       # palms and soles: little melanin
-    M *= 1 + 0.18 * gsm.blur(masks["eyelids"], 6) + 0.5 * gsm.blur(masks["aureolae"], 4)
+    M *= 1 + 0.18 * _blur(F, "eyelids", 6) + 0.5 * _blur(F, "aureolae", 4)
     M *= 1 + 0.22 * np.clip(cv, 0, 1.5)                          # creases: a little darker
     # The skin-scale detail is kept apart (``Md``) and added as an AMOUNT of pigment after the face's
     # regions (23.2.7): a fleck is the same melanin on a face whose melanin a region took out, so it
@@ -507,7 +551,7 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     Md *= 1 + gd * np.clip((gsm.vnoise(P, 0.0011, 41 + so) - 0.5) / 0.3, 0, 1)  # sparse ~1 mm flecks
 
     # blood: cheeks, the nose, the ears, the fingertips and the palms, knuckles, elbows, knees
-    Fp = P[(face > 0.5) & cover]
+    Fp = F["pre"]["L"]["Fp"] if "pre" in F else P[(face > 0.5) & cover]
     nose = Fp[np.argmax(Fp[:, 2])]
     fx = Fp[:, 0].mean()
     cheek_y = nose[1] + 0.005
@@ -517,22 +561,25 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
         near = Fp[(np.abs(Fp[:, 0] - c[0]) < 0.01) & (np.abs(Fp[:, 1] - c[1]) < 0.01)]
         c[2] = near[:, 2].max() if len(near) else nose[2] - 0.02
         cheek = np.maximum(cheek, gauss3(P, c, 0.022))
-    cheek *= gsm.blur(face, 10)
+    cheek *= _blur(F, "face", 10)
     tips = sum(gauss3(P, J[f"{s}-finger-{k}-4"], 0.012) for s in "lr" for k in range(1, 6))
     knuckles = sum(gauss3(P, J[f"{s}-finger-{k}-2"], 0.009) for s in "lr" for k in range(2, 6)) * np.clip(Nr[..., 1] + 0.3, 0, 1)
     joints_out = sum(gauss3(P, J[f"{s}-{j}"], 0.035) for s in "lr" for j in ("elbow", "knee"))
-    sss = gsm._grey("sss.png")
-    sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
+    if "pre" in F:
+        sss = F["pre"]["sss"]
+    else:
+        sss = gsm._grey("sss.png")
+        sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
     flush = dg["flush"] * st["redness"]
-    B = (1 + 0.9 * flush * cheek + 0.8 * flush * gauss3(P, nose, 0.012) + 0.9 * gsm.blur(masks["ears"], 6)
+    B = (1 + 0.9 * flush * cheek + 0.8 * flush * gauss3(P, nose, 0.012) + 0.9 * _blur(F, "ears", 6)
          + 0.7 * tips + 0.45 * palm + 0.5 * knuckles + 0.35 * joints_out + 0.25 * sss)
     Bd = np.exp(gc * fbm(P, (0.015 * ms, 0.004 * ms), (0.18, 0.12), 23 + so)
                 + gf * fbm(P, (0.0015, 0.0008), (0.08, 0.05), 223 + so))
     so2 = np.full(P.shape[:2], 0.8)
-    under_eye = gsm.blur(masks["eyelids"], 10)
+    under_eye = _blur(F, "eyelids", 10)
     so2 = so2 - 0.25 * under_eye                                   # the bluish shadow under the eyes
     depth = np.zeros(P.shape[:2])
-    fw = F.get("face_w") or face_regions(P, masks, cover, parts["head"])
+    fw = F.get("face_w") or face_regions(P, masks, cover, parts["head"], F)
     fit = lut.tones[roman]["fit"]
     Fm, Fb = np.ones(P.shape[:2]), np.ones(P.shape[:2])
     for k, (dm, db, ds, dd) in (FACE[fit] if face_tbl is None else face_tbl).items():
@@ -634,6 +681,8 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
 
     mel = m0 * M + dmel
     bld = BLOOD0 * B
+    if pigments is not None:
+        pigments["melanin"], pigments["blood"] = mel.astype(np.float32), bld.astype(np.float32)
     base = lut(np.full_like(mel, m0), np.full_like(bld, BLOOD0), np.full_like(mel, 0.8))
     col = lut(mel, bld, np.clip(so2, 0.45, 0.95))
     # Blood BELOW the dermis (a vein, the ring under the eye). The tabulated model is one semi-infinite
@@ -649,16 +698,20 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     out = tone * ratio
 
     # the lips: the library's rule, feathered (the Lips article carries its own lip colour)
-    lm = np.clip(gsm.blur(masks["lips"], 5) * 1.15, 0, 1)[..., None]
-    lips = tone * np.array(LIPS[fit]) * (0.92 + 0.08 * gsm.vnoise(P, 0.0025, 7)[..., None])
+    lm = np.clip(_blur(F, "lips", 5) * 1.15, 0, 1)[..., None]
+    lips = tone * np.array(LIPS[fit] if lips is None else lips) * (0.92 + 0.08 * gsm.vnoise(P, 0.0025, 7)[..., None])
     out = out * (1 - lm) + lips * lm
+    if "pre" in F:                     # a band: the two terms, held by the caller over the whole atlas
+        return (out * (1 - lm), lips * lm), {"melanin0": round(m0, 4), "blood0": BLOOD0}
     S = reg["Body"]
     s = (tone - (lips * lm)[S].mean(0)) / (out * (1 - lm))[S].mean(0)
     out = out * s * (1 - lm) + lips * lm
     return out, {"melanin0": round(m0, 4), "blood0": BLOOD0}
 
 
-def fields() -> dict:
+def fields(parts: bool = True) -> dict:
+    """Every texel's 3D position, normal, concavity and region; ``parts=False`` leaves out the body
+    parts, which ``compose_banded`` makes per band (on the whole 8K atlas they would not fit)."""
     m = make_kits.load_mesh(MESH)
     if m["uv_sha256"] != make_kits.G.PART_MESHES[MESH]["uv_sha256"]:
         raise SystemExit("the mesh's layout is not MakeHuman_Body_v01's")
@@ -674,8 +727,73 @@ def fields() -> dict:
     for roman in ("I", "II", "III", "IV", "V", "VI"):
         r = json.loads((gsm.RECIPES / f"Skin_Fitzpatrick{roman}_Clean_Base_s001_v01.json").read_text())
         scale[roman] = [float(x) for x in r["subsurface_radius_scale"].split(",")]
-    return {"scatter_scale": scale, "P": P, "N": Nr, "cv": cv, "cover": cover, "reg": reg, "masks": masks,
-            "parts": body_parts(P, J), "J": J}
+    out = {"scatter_scale": scale, "P": P, "N": Nr, "cv": cv, "cover": cover, "reg": reg, "masks": masks, "J": J}
+    if parts:
+        out["parts"] = body_parts(P, J)
+    return out
+
+
+# The masks compose blurs, and by how much (pixels at 2048): what a band needs from the whole atlas.
+BLURS = (("face", 40), ("face", 30), ("face", 10), ("eyelids", 4), ("eyelids", 6), ("eyelids", 10),
+         ("aureolae", 4), ("ears", 6), ("lips", 5))
+
+
+def band_pre(F) -> dict:
+    """What a band needs from the whole atlas: the blurred masks, the landmarks, the thickness map."""
+    P, masks, cover = F["P"], F["masks"], F["cover"]
+    sss = gsm._grey("sss.png")
+    sss = np.clip(sss / max(np.percentile(sss[cover], 99), 1e-6), 0, 1)
+    return {"blur": {(k, r): gsm.blur(masks[k], r).astype(np.float32) for k, r in BLURS},
+            "L": face_landmarks(P, masks, cover), "sss": sss}
+
+
+def band_view(F, pre: dict, sl: slice) -> dict:
+    """The fields of one band of rows, with its body parts and the whole atlas's ``pre``."""
+    return {"P": F["P"][sl], "N": F["N"][sl], "cv": F["cv"][sl], "cover": F["cover"][sl], "J": F["J"],
+            "reg": {k: v[sl] for k, v in F["reg"].items()}, "masks": {k: v[sl] for k, v in F["masks"].items()},
+            "scatter_scale": F["scatter_scale"], "parts": body_parts(F["P"][sl], F["J"]),
+            "pre": {"blur": {k: v[sl] for k, v in pre["blur"].items()}, "L": pre["L"], "sss": pre["sss"][sl]}}
+
+
+def parts_banded(F, keys, rows: int = 512) -> dict:
+    """The named body parts over the whole atlas, made in bands, float32 (an 8K atlas's every part,
+    made whole, needs ~15 GB of temporaries)."""
+    n = F["P"].shape[0]
+    out = {k: np.zeros((n, n), np.float32) for k in keys}
+    for y0 in range(0, n, rows):
+        sl = slice(y0, min(y0 + rows, n))
+        b = body_parts(F["P"][sl], F["J"])
+        for k in keys:
+            out[k][sl] = b[k]
+    return out
+
+
+def compose_banded(tone, roman, F, lut, rng_seed, face_tbl=None, lips=None, rows=512, pigments=None):
+    """``compose`` (no marks layers) over the atlas in bands of ``rows`` rows (Phase24, RD-P24-7):
+    an 8K atlas composed whole needs ~45 GB of temporaries; a band of 512 rows of 8192 is the work of
+    one 2048 atlas. Everything compose reads beyond a texel (the blurred masks, the landmarks, the
+    thickness map's level, the skin's average) is taken once on the whole atlas. ``F`` is
+    ``fields(parts=False)``; the body parts are made per band. Returns compose's (colour, info)."""
+    pre = band_pre(F)
+    n = F["P"].shape[0]
+    X = np.zeros((n, n, 3), np.float32)
+    Lp = np.zeros((n, n, 3), np.float32)
+    if pigments is not None:
+        pigments["melanin"], pigments["blood"] = np.zeros((n, n), np.float32), np.zeros((n, n), np.float32)
+    info = {}
+    for y0 in range(0, n, rows):
+        sl = slice(y0, min(y0 + rows, n))
+        pg = {} if pigments is not None else None
+        (xb, lb), info = compose(tone, roman, (), band_view(F, pre, sl), lut, rng_seed, face_tbl=face_tbl,
+                                 lips=lips, pigments=pg)
+        X[sl], Lp[sl] = xb, lb
+        if pg is not None:
+            pigments["melanin"][sl], pigments["blood"][sl] = pg["melanin"], pg["blood"]
+    S = F["reg"]["Body"]
+    s = (np.asarray(tone) - Lp[S].mean(0, dtype=np.float64)) / X[S].mean(0, dtype=np.float64)
+    X *= s.astype(np.float32)
+    X += Lp
+    return X, info
 
 
 def lips_hold(F) -> tuple:
