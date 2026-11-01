@@ -5,7 +5,7 @@
   "_comment": "Natural oak: plain, smooth, unfinished oak boards, flat-sawn: long growth rings that close into the cathedral figure where the cut runs through them, the earlywood's open pores as fine dark streaks, the rays as short flecks. The maps are generated (L2, gen_oak_natural.py), their mean colour and roughness anchored to the scan they replace. Re-made at its tag (2026-10-31, Phase19 D-9): it was ambientCG Wood049 (CC0; photogrammetry, an 80 x 80 cm sample), off its s1 tag, and quilting that scan into an exact 1 m tile broke its long grain into a visible patchwork. The tile is exactly 1 m at about 1 mm a texel. Opaque: a solid, diffuse-dominant dielectric. Named Oak, not WhiteOak: the source says oak and not which species. Carries every relevant wear layer at 0 (C1): scuffs (overlay 1, damage), scratches, dust, gated by the Grime mask (dirt settles in low areas).",
   "name": "Oak_Natural_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "natural/wood/Oak_Natural_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",

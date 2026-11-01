@@ -5,7 +5,7 @@
   "_comment": "Board-formed concrete: cast-in-place concrete poured against rough-sawn timber boards, so the face keeps each board's imprint: vertical strips 8 to 12 cm wide, each a slightly different plane and tone, the sawn grain printed into each, thin paste fins at the joints, the odd knot, bug holes and two form-tie holes. The maps are generated (L2, gen_concrete_boardformed.py); the mean colour and roughness are anchored to Physically Based 'Concrete'. Re-made at its tag (2026-10-31, Phase19 D-9): it was the ambientCG Concrete045 scan at 200 cm, off its s1 tag, and that scan is a 0.67 m sample repeated three times down the tile, so no exact 1 m tile could be cut or quilted from it without breaking its boards. The tile is exactly 1 m at about 1 mm a texel; the boards' widths sum to it, so it wraps on a joint, and the boards run through it with no butt joint. It is one substance carrying an imprint, not an assembly (D1). Opaque: a matte, porous solid. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage; Cracks01 draws a crazing network, the right shape for concrete), scratches, dust as a deposit (Phase10), gated by the Grime mask. Not carried: the wet look and efflorescence the wish list also wants. Built by the Phase11 batch.",
   "name": "Concrete_BoardFormed_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "engineered/cementitious/Concrete_BoardFormed_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

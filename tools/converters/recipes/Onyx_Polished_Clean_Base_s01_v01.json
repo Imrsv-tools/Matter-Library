@@ -5,7 +5,7 @@
   "_comment": "Polished onyx: honey-banded calcite onyx (the stone sold as onyx marble), cut and polished, its wavy amber, orange and cream bands glowing where light gets in. The maps are generated (L2, gen_onyx_polished.py): bands about 3 mm wide, each of fine laminae, with pale and faintly pink seams, undulating gently and irregularly (the scan's 15 cm waves cannot fit a 10 cm tile, and a regular wave repeats as a zigzag); the mean colour and roughness (0.04, polished) are anchored to the scan they replace. Re-made at its tag (2026-10-31, Phase19 D-9): it was ambientCG Onyx007 (CC0, tagged onyx and honey), judged 0.3 m, off its s01 tag, and that scan is one large wave structure no 0.1 m quilt can carry. The tile is exactly 0.1 m. SUBSURFACE: onyx's look is light scattering through it, more than marble's (backlit onyx panels glow through 2 cm). subsurface_color is ONE constant, the texture's mean linear albedo: the library cannot drive a textured article's scatter colour from its texture, so at subsurface_weight 0.5 the bands keep about half their contrast (a judgement between the glow and the banding). subsurface_radius 0.015 m (red), a judgement for a far clearer calcite than marble's 0.0085. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Onyx_Polished_Clean_Base_s01_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "natural/stone/Onyx_Polished_Clean_Base_s01_v01.mtlx",
   "master": "Subsurface",
   "domain": "natural",
