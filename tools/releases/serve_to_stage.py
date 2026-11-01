@@ -38,10 +38,10 @@ keep working. The release lifecycle (``stage/freeze/promote/activate_release.py`
 checkout (through its links), skies by their published names (Phase20). Edits save into the
 composition, so point it at a scene you can dirty.
 
-Phase20 (Q-P20-2 (b)): when ``library/hdris.yaml`` sets ``published_drop_variant``, each name an
-HDRI was published by before is kept for the scenes saved with it: a ``deprecated``,
-non-selectable catalog row and a link in ``hdris/`` to the published copy. HDRI thumbnails no
-entry names are removed.
+HDRIs are served by their published names only (Phase20); a file or thumbnail no entry names is
+removed. The names published before ``published_drop_variant`` was set are not kept: nothing had
+been released, and each was a second copy of its sky in every Build that carried the dev install
+(2026-10-30).
 """
 
 from __future__ import annotations
@@ -130,17 +130,6 @@ def working_tree_hdris() -> tuple[list[dict], str | None]:
         if h["record"].get("tagging"):
             entry["tagging"] = h["record"]["tagging"]
         entries.append(entry)
-    # Phase20 (Q-P20-2 (b)): each name an HDRI was published by before the switch stays
-    # resolvable for the scenes saved with it, hidden and deprecated (Identity.md: "kept for old
-    # scenes"). Its file is a link to the published copy (stamp_hdris) and its picture is that one's.
-    current = {e["id"]: e for e in entries}
-    for h in H.former(listed):
-        old = derive_hdri_entry({"id": h["source_id"], "version": h["version"],
-                                 "status": "deprecated", "creator_selectable": False})
-        now = current[h["id"]]
-        old.update({k: now[k] for k in ("thumbnail_path", "group", "when", "sky", "licence",
-                                        "contributor", "credit", "tagging") if k in now})
-        entries.append(old)
     return entries, H.default(listed)
 
 
@@ -154,23 +143,12 @@ def stamp_hdris(dev: Path) -> int:
     build = dev / "hdris.stamping" if out.is_symlink() else out
     build.mkdir(exist_ok=True)
     want, made = set(), 0
-    listed = H.on_disk()
-    for h in listed:
+    for h in H.on_disk():
         f, dst = H.facts(h), build / f"{h['identity']}.hdr"    # the published name (RD-LBL-5)
         want.add(dst.name)
         if H.stamp_stale(h["path"], dst, f):
             H.stamp(h["path"], dst, f)
             made += 1
-    # Phase20 (Q-P20-2 (b)): the name each was published by before the switch, a relative link to
-    # the published copy, so a scene saved with it still finds its sky (the catalog's hidden row
-    # for Stage; the folder itself for a viewer that searches it, such as USDLiveView).
-    for h in H.former(listed):
-        old = build / f"{h['source_id']}_{h['version']}.hdr"
-        want.add(old.name)
-        if not (old.is_symlink() and os.readlink(old) == f"{h['identity']}.hdr"):
-            if old.is_symlink() or old.exists():
-                old.unlink()          # the stamped copy served under that name before the switch
-            old.symlink_to(f"{h['identity']}.hdr")
     for p in build.iterdir():
         if (p.is_file() or p.is_symlink()) and p.name not in want:
             p.unlink()
@@ -182,11 +160,9 @@ def stamp_hdris(dev: Path) -> int:
 
 def make_thumbnails(dev: Path, entries: list[dict]) -> int:
     """A 2:1 JPEG per HDRI in the runtime (never in git: RD-MP-6), remade when stale. A picture no
-    entry names any more (one under a name the switch retired, Phase20) is removed."""
+    entry names any more is removed."""
     made, want = 0, set()
-    source = {}
-    for h in H.on_disk():   # published id, and the source id a hidden row keeps -> source file
-        source[h["id"]] = source[h["source_id"]] = h["path"]
+    source = {h["id"]: h["path"] for h in H.on_disk()}   # published id -> source file
     for e in entries:
         src, dst = source[e["id"]], dev / e["thumbnail_path"]
         want.add(dst.name)
@@ -268,8 +244,8 @@ def view(composition: Path, lib: Path) -> None:
     if not viewer.is_file():
         raise SystemExit(f"USDLiveView not found at {viewer} (set USDLIVEVIEW)")
     # Phase20: the dev install, not the checkout. Its materials and textures are links into this
-    # checkout, and its HDRIs carry the PUBLISHED names (RD-LBL-5) a scene names, plus the old
-    # ones kept for scenes saved before the switch; the checkout holds only the source names.
+    # checkout, and its HDRIs carry the PUBLISHED names (RD-LBL-5) a scene names; the checkout
+    # holds only the source names.
     env = dict(os.environ, IMRSV_MATTER_LIBRARY=str(lib))
     env.pop("IMRSV_MATTER_SOURCE", None)
     subprocess.Popen([str(viewer), str(composition)], env=env, start_new_session=True,
@@ -320,10 +296,7 @@ def main(argv=None) -> int:
         if catalog.get("hdris"):
             stamped = stamp_hdris(dev)
             made = make_thumbnails(dev, catalog["hdris"])
-            kept = sum(1 for e in catalog["hdris"] if not e["creator_selectable"])
-            print(f"hdris  {len(catalog['hdris']) - kept} served"
-                  + (f" (+{kept} old names kept for old scenes, hidden)" if kept else "")
-                  + f", default {catalog['default_hdri']}; "
+            print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
                   f"{stamped} stamped in {dev / 'hdris'}; "
                   f"{made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
         write_atomic(dev / f"{DEV}.catalog.json",

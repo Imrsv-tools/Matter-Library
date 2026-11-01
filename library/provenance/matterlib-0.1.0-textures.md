@@ -30,11 +30,14 @@ their generator script.
 | `base/utility/virtual/UVGrid` | procedural | CC0-1.0 | `tools/converters/gen_uvgrid.py` |
 | `base/synthetic/textile/Lace_Floral` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
 | `base/natural/stone/Marble_Veined` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
-| `base/engineered/metal/Rust_OnSteel` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
+| `base/engineered/metal/Rust_OnSteel` | procedural | CC0-1.0 | `tools/converters/base/gen_rust_onsteel.py` |
 | `shared/overlays/Dust01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
 | `shared/overlays/Scratches01` | procedural | CC0-1.0 | `tools/converters/layers/gen_scratches01.py` |
+| `shared/overlays/Pitting01` | procedural | CC0-1.0 | `tools/converters/layers/gen_pitting01.py` |
+| `shared/overlays/WaterSpots01` | procedural | CC0-1.0 | `tools/converters/layers/gen_waterspots01.py` |
 | `shared/masks/Verdigris01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
 | `shared/masks/RustBloom01` | procedural | CC0-1.0 | `tools/converters/gen_article_textures.py` |
+| `shared/masks/RustFlake01` | procedural | CC0-1.0 | `tools/converters/layers/gen_rustflake01.py` |
 | `shared/masks/Grime01` | procedural | CC0-1.0 | `tools/converters/gen_shared_textures.py` |
 
 **Immutability:** once a texture ships in an approved release its pixels are frozen; a change is a

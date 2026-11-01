@@ -100,15 +100,6 @@ def on_disk() -> list[dict]:
     return out
 
 
-def former(listed: list[dict]) -> list[dict]:
-    """The HDRIs whose published name is not the one they were published by before
-    ``published_drop_variant`` was set: that one is their source name (Phase20, Q-P20-2 (b)). A
-    scene saved before the switch names it, so the dev install keeps it resolving, hidden and
-    ``deprecated``: Identity.md's lifecycle for a renamed entry, "kept for old scenes". Empty while
-    the setting is unset."""
-    return [h for h in listed if h["id"] != h["source_id"]]
-
-
 def default(listed: list[dict]) -> str | None:
     """The default HDRI's published id. The setting names the source id (RD-LBL-5); one that names
     no listed HDRI is refused."""
@@ -258,7 +249,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Stamp one HDRI's facts into a copy of it (Phase16).")
     sub = ap.add_subparsers(dest="cmd", required=True)
     st = sub.add_parser("stamp", help="write a stamped copy of one HDRI")
-    st.add_argument("id", help="the HDRI's id, e.g. IndustrialSunset02_PureSky")
+    st.add_argument("id", help="the HDRI's published id, e.g. IndustrialSunset02")
     st.add_argument("out", type=Path, help="where to write the stamped .hdr")
     args = ap.parse_args(argv)
     row = next((h for h in on_disk() if h["id"] == args.id), None)

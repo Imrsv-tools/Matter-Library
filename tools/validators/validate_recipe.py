@@ -354,7 +354,6 @@ OFF_SCALE_KNOWN = {
     "Concrete_BoardFormed_Clean_Base_s1_v01": 2.0,
     "Concrete_Polished_Clean_Base_s1_v01": 3.0,
     "Terrazzo_Polished_Clean_Base_s1_v01": 0.8,
-    "Rust_OnSteel_Flaking_Base_s01_v01": 0.5,
     "BeachSand_Dry_Clean_Base_s1_v01": 1.5,
     "OakLeaf_Natural_Clean_Base_s01_v01": 0.12,
     "Marble_Veined_Polished_Base_s01_v01": 0.5,

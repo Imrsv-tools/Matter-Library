@@ -9,7 +9,7 @@
     "manifest": [
       {
         "path": "library/releases/matterlib-0.1.0.lock.yaml",
-        "sha256": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9"
+        "sha256": "778bd1953ec418e79218b8949f5f125b794b150871d0c8019fa0a381b95a6726"
       }
     ],
     "mtlx": [
@@ -27,7 +27,7 @@
       },
       {
         "path": "MatterLibrary/materials/engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
-        "sha256": "780949bd958002ae75cc7e4bab5ed8dc3f159c7fe63cdc0b58cf2536662878d6"
+        "sha256": "1607a5923390b577c81c22721fefb3a7875a8748a4fe0d5c4ffb105acd9fda56"
       },
       {
         "path": "MatterLibrary/materials/natural/mineral/Diamond_Brilliant_Clean_Base_s01_v01.mtlx",
@@ -93,7 +93,7 @@
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.png",
-        "sha256": "5c45d352e9eb435a2f2615d0fd12b54bd3f5b2c15d89f999d7a60eb9a5ffaeae"
+        "sha256": "57d1fc64af1070a8912ada376118186da41f451c3c2866c8460f4df08840fd82"
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.png",
@@ -101,15 +101,15 @@
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png",
-        "sha256": "bca5922a0ddea0745d3c44161763c76fb9c177a5f117b2195b398cdbd951cc60"
+        "sha256": "dd650d6fe40d5941b7f3a40c516572c027165933ca7596108a83f75cbfb253c2"
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.png",
-        "sha256": "4f4d23aec1a88ea25311c9386ad20c373d561d3128dfbdde9ea361702a78248f"
+        "sha256": "5e40700a7175d0e9e4e2ec9bb9aca5540fe5a06c7b917f3dc02420b467b3fec5"
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.png",
-        "sha256": "27a9b267aba93997533e11c724bfde4f8c1ff9b0ce473dc552f9f6f040bd738e"
+        "sha256": "a4d233904430a389480331729d9368892b85c81952814f4c242030d796c46570"
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.png",
@@ -117,11 +117,11 @@
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png",
-        "sha256": "fb2d73a314bf7172d764a19d16430cb66d491bc7ef6b96ee76b6911c456e6baf"
+        "sha256": "a7726f478533ea29dc11a0b5fd109d336304e16962e1d7a9067c24628f660145"
       },
       {
         "path": "MatterLibrary/textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.png",
-        "sha256": "bd52759581ea9ca3cb87c517f2727c566aadab32fb2e2186d4c12c49132a07f2"
+        "sha256": "ba47faf8f7fca2b05d96152bf30c5fbc106d0c7c2fc7fd5b382a9ac3b5cda0c5"
       },
       {
         "path": "MatterLibrary/textures/base/natural/stone/Limestone_Veined_basecolor_s01.png",
@@ -172,6 +172,10 @@
         "sha256": "6f87057227eba2fc1e3c5daa52142280262626d20a74673d6b8f57c4c4bf82d5"
       },
       {
+        "path": "MatterLibrary/textures/shared/masks/RustFlake01_s1.png",
+        "sha256": "87fe2294182dd3b39ee48faf7ef83dc4f07cfabafcfb3a0137505d0bcfca373c"
+      },
+      {
         "path": "MatterLibrary/textures/shared/masks/Verdigris01_s01.png",
         "sha256": "f669f965bf00afc83816ce446aaaf53693537543150d49486471db2610a81d48"
       },
@@ -180,17 +184,25 @@
         "sha256": "a5532824aa6fabdea539035a7989a5b509d2ef585d74f92bcc02e7e5da26d8f0"
       },
       {
+        "path": "MatterLibrary/textures/shared/overlays/Pitting01_overlay_s001.png",
+        "sha256": "cb8c031cc933f3df1eef33f540b5ebaba981e443249b670cbda4b68b624b6342"
+      },
+      {
         "path": "MatterLibrary/textures/shared/overlays/Scratches01_overlay_s01.png",
         "sha256": "561e90fe3c973f6e4d5d62f2df1cf43e058d8022aea3f0c36a572222dd83ce94"
+      },
+      {
+        "path": "MatterLibrary/textures/shared/overlays/WaterSpots01_overlay_s01.png",
+        "sha256": "6914ee75836b3a3477168898464fdcdbe749846d6b2514075d3761bc325fc617"
       }
     ]
   },
-  "payload_digest": "869dd43c7133962aa7b29df81313c19303a7e698bf0b4a4ad06598e6cae3e745",
+  "payload_digest": "0e39e92e18842e34b60004f420e1358c6dd2953e55261624ffe99acdf99957ce",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
-    "manifest": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9",
-    "mtlx_set": "e558eae18a66a536de419c389183729e25e2d9b075ed6f77c840842f5b753a6a",
-    "source_textures_set": "1f845402dedc96c0045cc24b8ffc970f4e7d7a00333ed83baf08f51d9ee9b7cd"
+    "manifest": "778bd1953ec418e79218b8949f5f125b794b150871d0c8019fa0a381b95a6726",
+    "mtlx_set": "2bcd739cce26cf380d3a7b2a7db4ae502d9a8e5262670b3b799d28273353793c",
+    "source_textures_set": "009298712473534a92dee55959f30f2f3afd9d309e9597fdd5cf4c5c99020222"
   },
   "release": "0.1.0"
 }

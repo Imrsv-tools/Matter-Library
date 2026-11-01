@@ -141,7 +141,7 @@ textures:
     provenance:
       source: procedural
       license: CC0-1.0
-      evidence: tools/converters/gen_article_textures.py
+      evidence: tools/converters/base/gen_rust_onsteel.py
   - id: shared/overlays/Dust01                   # PACKED DATA (normal/roughness/density)
     version: v01
     status: approved
@@ -156,6 +156,20 @@ textures:
       source: procedural
       license: CC0-1.0
       evidence: tools/converters/layers/gen_scratches01.py
+  - id: shared/overlays/Pitting01                # PACKED DATA
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/layers/gen_pitting01.py
+  - id: shared/overlays/WaterSpots01             # PACKED DATA
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/layers/gen_waterspots01.py
   - id: shared/masks/Verdigris01
     version: v01
     status: approved
@@ -170,6 +184,13 @@ textures:
       source: procedural
       license: CC0-1.0
       evidence: tools/converters/gen_article_textures.py
+  - id: shared/masks/RustFlake01                 # Rust_OnSteel's layer-2 coverage (since 2026-10-25)
+    version: v01
+    status: approved
+    provenance:
+      source: procedural
+      license: CC0-1.0
+      evidence: tools/converters/layers/gen_rustflake01.py
   - id: shared/masks/Grime01                     # gates Glass's overlays
     version: v01
     status: approved

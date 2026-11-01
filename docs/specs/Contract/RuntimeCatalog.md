@@ -69,15 +69,6 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
       "status": "candidate",
       "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_v01.jpg",
       "version": "v01"
-    },
-    {
-      "creator_selectable": false,
-      "display_name": "IndustrialSunset02_PureSky",
-      "id": "IndustrialSunset02_PureSky",
-      "payload_path": "hdris/IndustrialSunset02_PureSky_v01.hdr",
-      "status": "deprecated",
-      "thumbnail_path": "thumbnails/hdris/IndustrialSunset02_v01.jpg",
-      "version": "v01"
     }
   ],
   "materials": [ … ],
@@ -86,9 +77,9 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
 }
 ```
 
-*(Measured 2026-10-14: the entry above is the dev catalog's, as `tools/releases/serve_to_stage.py` writes it. **Updated 2026-10-16 (Phase20 20.2):** the published name drops* PureSky *([Identity](../Ontology/Identity.md) §HDRI names); the second entry is the name it was published by before, kept for old scenes, below. The credit, licence and taxonomy fields are left out of the example.)*
+*(Measured 2026-10-14: the entry above is the dev catalog's, as `tools/releases/serve_to_stage.py` writes it. **Updated 2026-10-16 (Phase20 20.2):** the published name drops* PureSky *([Identity](../Ontology/Identity.md) §HDRI names). The credit, licence and taxonomy fields are left out of the example.)*
 
-**A name an HDRI was published by before** *(2026-10-16, Phase20, Q-P20-2 (b))*. When the published name changes (`published_drop_variant`), the dev catalog keeps the old one as a row with `status: deprecated` and `creator_selectable: false`. Its `payload_path` is the old file name, served as a link to the published copy, and its `thumbnail_path` and facts are the published HDRI's. **A consumer never offers it** (`creator_selectable`), and **a scene that names it still resolves** (the file is there, under the search path). The site file carries no such row, and a release carries none (planned, *Release Bundle*).
+~~**A name an HDRI was published by before** *(2026-10-16, Phase20, Q-P20-2 (b))*. When the published name changes (`published_drop_variant`), the dev catalog keeps the old one as a row with `status: deprecated` and `creator_selectable: false`. Its `payload_path` is the old file name, served as a link to the published copy, and its `thumbnail_path` and facts are the published HDRI's. **A consumer never offers it** (`creator_selectable`), and **a scene that names it still resolves** (the file is there, under the search path). The site file carries no such row, and a release carries none (planned, *Release Bundle*).~~ **Dropped 2026-10-30 (the platform's ask):** nothing had been released, so no scene needed an old name, and every Build that carried the dev install held each sky twice (the link became a copy). The dev catalog lists published names only. **Reevaluate** if a published name ever changes after a release.
 
 | Field | Type | Meaning | Source |
 |-------|------|---------|--------|

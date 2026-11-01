@@ -1,32 +1,44 @@
 {
-  "summary": "Steel eaten by flaking orange rust, with patches of bare metal showing through.",
-  "search_words": ["rust", "rusty", "corroded", "steel", "metal", "aged metal"],
-  "origin": ["procedural", "agent-drafted"],
-  "_comment": "Phase 71 example article — TWOLAYER, and the article that finally makes the master REACHABLE (the `rust -> TwoLayer` name exception; class metal -> Opaque otherwise, so nothing could ever bind it). The defining observable is TWO LAYERS THAT ARE VISIBLY TWO: bright polished metallic steel under dark orange non-metallic flaking rust, with the maskset saying where the rust sits. Each layer carries its OWN base colour / roughness / metalness / normal. ⚠ `maskset_blend` MUST be nonzero — the blend is t = k * maskset_blend, so at the schema default of 0 layer 2 is invisible however well it is authored (71.7 enforces this).",
+  "summary": "Steel eaten by flaking orange-brown rust in spreading patches, with bare grey metal showing between them.",
+  "search_words": ["rust", "rusty", "corroded", "corrosion", "flaking rust", "steel", "iron", "metal", "aged metal"],
+  "origin": ["procedural", "measured", "agent-drafted"],
+  "_comment": "Flaking rust on steel: bare mild steel on which iron oxide has grown in spreading patches, its crust cracked into flakes and some flakes fallen away. TwoLayer (MasterSet: two real layers, the mask choosing where layer 2 sits; the `rust -> TwoLayer` name exception, Phase71): layer 1 the bare steel (metallic, dulled, finely pitted), layer 2 the rust (a dielectric, rough), each a full generated set at the article's 0.1 m tile (tools/converters/base/gen_rust_onsteel.py), their mean colours Physically Based's Iron and Rust. Where the rust sits is the shared mask RustFlake01, sampled at its own 1 m, so the patches span cm to dm and never repeat at the article's tile; R is graded (0.5 the patch's edge), so layer_blend_balance grows or shrinks the rust, and layer_blend_contrast 0.6 crisps the flaky edge. maskset_blend MUST be non-zero (it defaults to 1 here) or the rust never shows. Carries every relevant wear layer at 0 (C1): pitting (overlay 1, damage, gated in and round the rust), dust as a deposit (overlay 2, caught in the rust) and water spots (overlay 3, on the bare steel). Rebuilt in batch 261016-2 (the maintainer's redo): flaking rust, not the Phase71 test pattern's blocky speckle, seamless maps, its wear layers, and exactly 0.1 m (was 0.5 m under s01; Phase19 D-9).",
   "name": "Rust_OnSteel_Flaking_Base_s01_v01",
   "contributor": "MatterBot",
+  "status": "draft",
   "path": "engineered/metal/Rust_OnSteel_Flaking_Base_s01_v01.mtlx",
   "master": "TwoLayer",
   "domain": "engineered",
   "class": "metal",
   "scale_tag": "s01",
-  "meters_per_tile": 0.5,
-
+  "meters_per_tile": 0.1,
   "base_color_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_basecolor_s01.png",
   "roughness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_roughness_s01.png",
   "metalness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_metalness_s01.png",
   "normal_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer1_normal_s01.png",
-
   "layer2_base_color_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_basecolor_s01.png",
   "layer2_roughness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_roughness_s01.png",
   "layer2_metalness_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_metalness_s01.png",
   "layer2_normal_tex": "../../../textures/base/engineered/metal/Rust_OnSteel_layer2_normal_s01.png",
-
-  "maskset_tex": "../../../textures/shared/masks/RustBloom01_s01.png",
+  "maskset_tex": "../../../textures/shared/masks/RustFlake01_s1.png",
   "layer_blend_balance": 0.5,
-  "layer_blend_contrast": 0.35,
-
+  "layer_blend_contrast": 0.6,
   "specular_ior": 1.5,
-  "lcd_defaults": {"maskset_blend": "0.85"},
-  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "maskset_blend", "roughness_bias"]
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_defaults": {"maskset_blend": "1.0"},
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Iron", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610110901, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.53, 0.513, 0.494", "metalness_const": 1, "roughness_const": 0},
+     "note": "Layer 1, the bare steel: the generated map's mean colour is this, exactly; its roughness is not (a dulled, weathered face, see the judgement)."},
+    {"kind": "physicallybased", "entry": "Rust", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610110901, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.181, 0.057, 0.017", "metalness_const": 0, "roughness_const": 1.0, "specular_ior": 1.5},
+     "note": "Layer 2, the rust: the generated map's mean colour is this, exactly, and the IOR; its roughness varies round 0.9 (see the judgement)."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_rust_onsteel.py", "provenance": "library/provenance/sources/base/engineered/metal/Rust_OnSteel.yaml"},
+    {"kind": "judgement", "why": "Steel roughness about 0.55 for bare, weathered mild steel where the rust has flaked away (not polished); rust roughness about 0.9, a little below Physically Based's 1.0 so a lifted flake's edge keeps a faint sheen. layer_blend_contrast 0.6 so the rust's edge is crisp and flaky at the defaults; maskset_blend 1 so the rust shows fully."}
+  ]
 }

@@ -1,13 +1,13 @@
 {
-  "approved_at": "2026-10-25T07:04:10Z",
+  "approved_at": "2026-10-25T08:58:56Z",
   "approver": "tobias@imrsv.tools",
   "freeze_record": "matterlib-0.1.0.freeze.json",
-  "payload_digest": "869dd43c7133962aa7b29df81313c19303a7e698bf0b4a4ad06598e6cae3e745",
+  "payload_digest": "0e39e92e18842e34b60004f420e1358c6dd2953e55261624ffe99acdf99957ce",
   "payload_sha256": {
     "catalog": "d09acb61303ceace8733fd00e4ed7882cd91119e85782a77033f6e21140bf3f2",
-    "manifest": "e28e2173d97b37d08e97b8e6c0c9f0c3524ff9818701202ccc82ade76bc4e7f9",
-    "mtlx_set": "e558eae18a66a536de419c389183729e25e2d9b075ed6f77c840842f5b753a6a",
-    "source_textures_set": "1f845402dedc96c0045cc24b8ffc970f4e7d7a00333ed83baf08f51d9ee9b7cd"
+    "manifest": "778bd1953ec418e79218b8949f5f125b794b150871d0c8019fa0a381b95a6726",
+    "mtlx_set": "2bcd739cce26cf380d3a7b2a7db4ae502d9a8e5262670b3b799d28273353793c",
+    "source_textures_set": "009298712473534a92dee55959f30f2f3afd9d309e9597fdd5cf4c5c99020222"
   },
   "release": "0.1.0"
 }
