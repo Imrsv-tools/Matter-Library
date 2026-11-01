@@ -346,6 +346,10 @@ def main(argv=None) -> int:
     ap.add_argument("--bar", type=Path, metavar="DIR",
                     help="Phase24 column A: the scanned bar's pictures made by bar_maps.py (git-ignored), "
                          "worn by the skin article on the body AND the lips (RD-P24-3, RD-P24-5)")
+    ap.add_argument("--candidate", action="append", default=[], metavar="LABEL=PICTURE",
+                    help="Phase25 column D: a colour picture from outside the tree (linear albedo, sRGB-encoded, "
+                         "on the skin's atlas) drawn as made, constant 1, on the skin's body and lips, with the "
+                         "skin's own shine maps; one column each (repeatable)")
     ap.add_argument("--judge", action="store_true",
                     help="Phase24's nine fixed views (RD-P24-4) in place of the four look views")
     ap.add_argument("--width", type=int, default=1024)
@@ -390,6 +394,18 @@ def main(argv=None) -> int:
                 raise SystemExit(f"{sid}'s cast builds different meshes; it cannot share the launch")
             settings.append({"id": sid, "materials": rmats})
             columns.append((sid, heading))
+    for spec in a.candidate:
+        label, sep, pic = spec.partition("=")
+        if not sep or not Path(pic).is_file():
+            raise SystemExit(f"--candidate {spec!r}: give LABEL=PICTURE, an existing picture")
+        sid = "cand_" + re.sub(r"[^A-Za-z0-9]+", "_", label)
+        swap = [p for p in ("Body", "Lips") if p in cast and cast[p].name == art.name]
+        ccast = cast | {p: _with_map(cast[p], Path(pic), (1.0, 1.0, 1.0), work / sid) for p in swap}
+        cmats, cmeshes = materials(ccast, work / f"{sid}_cast")
+        if [Path(m["file"]).read_bytes() for m in cmeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
+            raise SystemExit(f"{label}'s cast builds different meshes; it cannot share the launch")
+        settings.append({"id": sid, "materials": cmats})
+        columns.append((sid, f"D: {label}"))
     if a.bar:
         bart = bar_article(art, a.bar.resolve(), work / "bar")
         bmats, bmeshes = materials(cast | {"Body": bart, "Lips": bart}, work / "bar_cast")
@@ -397,7 +413,7 @@ def main(argv=None) -> int:
             raise SystemExit("the bar's cast builds different meshes; it cannot share the launch")
         settings.insert(0, {"id": "bar", "materials": bmats})
         columns.insert(0, ("bar", "A: the scanned bar"))
-        columns[columns.index(("new", f"working tree: {art.name}"))] = ("new", f"B: {art.name}")
+        columns[columns.index(("new", f"working tree: {art.name}"))] = ("new", f"{'C' if a.candidate else 'B'}: {art.name}")
     parts = bc.load_parts()
     views = judge_views(parts) if a.judge else look_views(parts)
     labels = JUDGE_VIEWS if a.judge else VIEWS
