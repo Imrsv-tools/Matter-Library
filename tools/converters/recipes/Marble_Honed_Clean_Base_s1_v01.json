@@ -1,0 +1,38 @@
+{
+  "summary": "White marble with fine grey veins, honed to a soft satin finish rather than a mirror polish, as on floors, stairs and vanity tops.",
+  "search_words": ["marble", "white marble", "honed marble", "carrara", "stone", "floor", "countertop", "rock"],
+  "origin": ["scan", "measured", "agent-drafted"],
+  "_comment": "Honed white marble: a white calcite marble with fine grey veins, ground flat and left at a soft satin (honed) rather than polished to a mirror. Planned on the wish list as CarraraMarble_Honed; renamed Marble_Honed because the scan (ambientCG Marble019, tagged 'bright, light, marble, rough, white') states no quarry, and the library names only what a source states. SUBSURFACE: marble's look is light getting a few millimetres into the calcite, red travelling furthest (Physically Based 'Marble' radius and radius scale). subsurface_color is ONE constant, the scan's mean linear albedo (the library cannot drive a textured article's scatter colour from its texture), so the weight is kept at 0.5 for the veins to keep their contrast. The scan states no size: meters_per_tile 1.0 by judgement from its vein spacing (veins every 5 to 15 cm, as in slab marble), the s1 option's length exactly, nothing stretched. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Marble_Honed_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Marble_Honed_Clean_Base_s1_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Marble_Honed_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Marble_Honed_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Marble_Honed_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "subsurface_weight": 0.5,
+  "subsurface_color": "0.824, 0.824, 0.823",
+  "subsurface_radius": 0.00851,
+  "subsurface_radius_scale": "1, 0.655, 0.464",
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Marble019", "url": "https://ambientcg.com/view?id=Marble019", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/stone/Marble_Honed.yaml", "note": "The colour, roughness (mean 0.365, a honed face) and normal maps. Its mean linear albedo is (0.824, 0.824, 0.823), within 0.01 of the Physically Based entry's lightness."},
+    {"kind": "physicallybased", "entry": "Marble", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610261136, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.83, 0.791, 0.753", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.5, "subsurface_radius": 0.00851, "subsurface_radius_scale": "1, 0.655, 0.464"},
+     "note": "specular_ior, subsurface_radius and subsurface_radius_scale are taken. base_color_const is not: the scan's colour map carries the colour. roughness 0 is a polished face and is not taken: a honed face is the scan's own roughness map."},
+    {"kind": "judgement", "why": "meters_per_tile 1.0 (the scan states no size; veins every 5 to 15 cm, as in slab marble); subsurface_weight 0.5 so the veins keep their contrast; subsurface_color the scan's mean linear albedo."}
+  ]
+}

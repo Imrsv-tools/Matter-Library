@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/stone/Marble_Honed
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Marble019
+    sha256_scope: shipped_source_set
+    sha256: b41ec825fd33649edda7ded33adce8adec3609a4d71795e3d3fefa49cee2374f
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Marble019_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Honed_basecolor_s1.png
+      sha256: 26718d0cc25737a6578efcec2e5f8a6eaabeb9296103c7a2b2e2fa91c9f3124d
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Honed_normal_s1.png
+      sha256: 68aa2d493acb03c3b62a8cf3bb6da70bc75c64482eca960eb090ad44a991a5df
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Honed_roughness_s1.png
+      sha256: 29ef5ea0381f6e2e290c75dffb1fb3f9e36954b1b447ea2726583156818838a5
