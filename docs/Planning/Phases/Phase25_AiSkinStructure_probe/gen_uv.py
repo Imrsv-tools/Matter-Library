@@ -29,6 +29,32 @@ PROMPTS = {
            "the nostrils, the hollows of the ears and the eye sockets show their skin colour, not shadow; the ears are flat, pale skin with faint pink outlines, no depth. "
            "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
            "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
+    # Pass 3 step 2: the target's words kept, the painted depth taken out of the ears and nostrils only
+    "mid": ("A flat unwrapped UV texture map of a real human head's skin, from a photogrammetry scan of "
+           "a real young woman about twenty, light warm skin between Fitzpatrick III and IV, shaved bald head, no eyebrow hair, no makeup. "
+           "The face is laid out flat in the centre with the closed eyes, nose and lips, the scalp and the back of the head unrolled to each side, "
+           "the ears as flat patches. Albedo only: even, shadowless, delit, no lighting, no highlights. "
+           "The nostrils and the hollows of the ears show their pink skin colour, not dark shadow. "
+           "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
+           "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
+    "midglow": ("A flat unwrapped UV texture map of a real human head's skin, from a photogrammetry scan of "
+           "a real young woman about twenty, light warm skin between Fitzpatrick III and IV, shaved bald head, no eyebrow hair, no makeup. "
+           "The face is laid out flat in the centre with the closed eyes, nose and lips, the scalp and the back of the head unrolled to each side, "
+           "the ears as flat patches. Albedo only: even, shadowless, delit, no lighting, no highlights. "
+           "The nostrils and the hollows of the ears show their pink skin colour, not dark shadow. "
+           "Healthy living skin with a soft natural glow: a warm flush on the cheeks, the nose, the ears and the lips. "
+           "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
+           "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
+    # the shadow-free prompt's light-dome words (the only ones that took the depth out, F-P25-19), the face's
+    # flush and glow put back (what it lost)
+    "flatglow": ("A flat unwrapped UV texture map of a real human head's skin, from a photogrammetry scan of "
+           "a real young woman about twenty, light warm skin between Fitzpatrick III and IV, shaved bald head, no eyebrow hair, no makeup. "
+           "The face is laid out flat in the centre with the closed eyes, nose and lips, the scalp and the back of the head unrolled to each side, "
+           "the ears as flat patches. Photographed inside an evenly lit white light dome, so every part is equally bright: "
+           "the nostrils, the hollows of the ears and the eye sockets show their skin colour, not shadow; the ears are flat skin with faint pink outlines, no depth. "
+           "Healthy living skin with a soft natural glow and rich warm colour: a rosy flush on the cheeks, the nose, the ears and the lips. "
+           "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
+           "redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
 }
 graph = json.loads(g.WORKFLOWS["krea"].read_text())
 SRC = __import__("os").environ.get("UV_SRC", "uv_C.png")   # cue.py writes uv_Ccue.png

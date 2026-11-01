@@ -284,7 +284,7 @@ The lead, verbatim: *"Indeed... we need to break this problem down... i look at 
 
 **Next, in order (the lead agreed the order, 2026-11-01):**
 1. **The ears.** `paint_uv.find` finds ears by pinkness and fails on pale ears (F-P25-19) and once took the wrong blob (seed 101, F-P25-17). Make an ear finder that reads the ear's shape (or landmarks), and judge every ear on the render (profile 40 cm), never by the number alone. The painted ear bowl doubles the mesh's own shading (the lead: *"mesh fighting the image"*). **→ Done at `ML_P25_D4` (F-P25-21): a silhouette finder fitted to hm08's ear FRONT; all nine seeds land. Left: a straight seam down the helix's front and a pink patch above the ear (the pinned rectangle's edge), and the turn sits on its 12° cap.** **Then (F-P25-22): the ear projected through the profile camera fits closer, with no seam; the lead took it (RD-P25-17) and all nine seeds land. Left: the serrated helix edge, the lobe step, the patch above the ear. hm08's ear is ~75 triangles, 8 mm edges: it cannot carry the folds.**
-2. **The prompt.** A middle one between the target's (`gen_uv.py … uv`) and the shadow-free one (`… flat`, F-P25-19): shadow-free ears and nostrils, the face's colour and flush kept (the life the lead named). Judge on the mesh beside the target.
+2. **The prompt.** A middle one between the target's (`gen_uv.py … uv`) and the shadow-free one (`… flat`, F-P25-19): shadow-free ears and nostrils, the face's colour and flush kept (the life the lead named). Judge on the mesh beside the target. **→ Tried at `ML_P25_D4` (F-P25-24): four prompts; words alone do not split the face's life from the ear's depth. Next: the lead's pick among F-P25-24's options.**
 3. **Then, if the lead still wants it:** ~40 maps through the chain with the kept prompt, hand-picked on the render, and one layout LoRA as an experiment against the chain's best (F-P25-20: the lead's concern that training on the chain copies its ear flaws stands).
 
 **Everything a run needs (paths from the repo root; all git-ignored under `library/parity/P25_Pass3/`, moved there from this session's scratch, which is deleted with the job):**
@@ -387,6 +387,23 @@ The lead, verbatim: *"Indeed... we need to break this problem down... i look at 
   - **Left:** a fine zig-zag along the helix's inner edge on some seeds (42): about one island pixel per step, where the UV squeezes the ear; the island is at 2K by ruling (RD-P25-13), so it belongs to the detail pass to 8K, not the fit. The other seven seeds are not yet re-run with these settings.
   - **What this pass learned for the pipeline** (the lead: *"start establishing pipeline steps, but also not get TOO locked into a specific image"*), one line each, independent of any one picture or seed: (1) **one camera per region with its own geometry** — the face through the front render, each ear through its profile render — the region matched by shape on the picture (dense landmarks for the face, the silhouette for the ear), then carried by the mesh's own UV: the UV layout is never fitted in 2D; (2) **one coordinate field for the rest of the island**, nothing blended; (3) **judge on the render** (profile 40 cm for the ear), with a flat-colour render to tell the mesh's shading from the map's; (4) **the mesh's detail sets the ceiling**: a region the mesh cannot carry (the ear's folds) is drawn by the map, so a finer mesh (below) changes what the map should hold. Each step takes the mesh's geometry as an input, so a re-meshed hm08 re-runs the same steps.
   - **Reproduce:** `probe5_earproj.py <pass1> <uv_frame.json> library/parity/P25_Views <out> <tag> [pad_rim 12] [min_nz 0.05] [ease 6] [back_out 1.3]`, then as F-P25-22; the flat-colour and tinted atlases are a 64² constant at the held tone (sRGB) and `D_eP_a42.png` with the ear-mask texels tinted, both through `probe1_shine.py`.
+
+- **F-P25-24 — The middle prompt (Pass 3 step 2): words do not split the face's life from the ear's depth; the light-dome wording is the only lever and it takes the flush with it (`ML_P25_D4`, 2026-11-01).**
+  - **Four prompts beside the target** (`gen_uv.py` keys, seeds 7, 42, 2026, Krea at 0.9, each through the whole chain with the projected ears): **`mid`** = the target + *"The nostrils and the hollows of the ears show their pink skin colour, not dark shadow"*; **`midglow`** = `mid` + *"Healthy living skin with a soft natural glow: a warm flush on the cheeks, the nose, the ears and the lips"*; **`flat`** (F-P25-19, the light dome); **`flatglow`** = `flat` + the glow and flush words.
+  - **Measured on the island** (grey levels; darkest 1 % of the projected ear fronts, of a nose window, the face box's median; redness = R − mean(G, B) over the face box):
+
+    | prompt | ear bowl | nostril | face median | face redness |
+    |---|---|---|---|---|
+    | target (`uv`) | 20–52 | 12–37 | 155–159 | 58–60 |
+    | `mid` | 17–41 | 14–29 | 156–160 | — |
+    | `midglow` | 23–37 | 13–55 | 159–163 | — |
+    | `flat` | 52–65 | 36–47 | 172–176 | 52.5–55 |
+    | `flatglow` | 55–61 | 34–75 | 174–177 | 54–55.5 |
+
+    The added sentences barely move the painted depth; only the light-dome wording does, and with it the face goes paler and less red; the glow words do not restore it. The dome prompts also clip 2.8–4.3 % of the island when `put` lifts them to the held tone.
+  - **Seen on the mesh** (`P3_prompt_middle_seed7.png`, seed 7, front 40 cm and the ear in profile 40 cm, shown to the lead): the target keeps the most life (rosy cheeks, flush); `mid` and `midglow` read close to it with as dark an ear; `flat` and `flatglow` give the most natural ear on this coarse mesh but a flatter, greyer face.
+  - **Next, the agent's options, not ruled:** (1) **the ears from their own generation** (the other agent's idea 3 and the region-by-region pipeline of F-P25-23): the face from the target's words, each ear from a light-dome or ear-only prompt, each through its own camera — two pictures, but each region from one picture, nothing blended inside a region; the complexion matched by `put`'s held tone; (2) accept the target's ear depth until the mesh carries folds (Deferred: OMF); (3) more prompt wording (weak lever, measured here).
+  - **Reproduce:** `python3 -I $Q/gen_uv.py $P3/gen <tag> 0.9 <seed> <mid|midglow|flatglow>`; landmarks (`probe2_landmarks.py`), first pass, `probe5_earproj.py`, second pass, `put` as F-P25-22; `probe1_shine.py $E/look10 … target7=… mid7=… glow7=… flat7=… fg7=…`.
 
 ## Routes to compare at the re-discovery (2026-11-01, after 25.1.8)
 
