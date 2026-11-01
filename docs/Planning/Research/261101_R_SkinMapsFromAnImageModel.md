@@ -145,7 +145,7 @@ The lead, 2026-11-01, verbatim: *"We are WELL under 1M... we are pre-rev and lik
 - **Found:** Krea 2's pictures are the user's (F-AIS-3); FLUX.2 [klein] 4B has no conditions (F-AIS-4); the maker keeps detail apart as pigment (F-AIS-5); an edit model keeps hm08's features in place, and side views must be made progressively (F-AIS-11, F-AIS-12).
 - **Unverified:** Krea 2's look on this task (not run) and whether it embeds a watermark. The probe's look in a real renderer. One seed only. The platform's pass is an uncommitted edit, at no origin. The licence reading is not legal advice.
 - **Open with the lead:** Q-AIS-1, Q-AIS-2.
-- **Owed:** the Krea 2 run (a Hugging Face login), the lead's look on the character in Blender, and the platform pass's back-link (the platform's doc, not touched).
+- **Owed:** the Krea 2 run and the look on the character, now Phase25's (the lead supplies Krea 2 and FLUX.2 [klein], RD-OVS-5); the platform pass's back-link (the platform's doc, not touched).
 - **▶ Next:** the route continues as Phase25 (Pass 6). The lead supplies Krea 2 and FLUX.2 [klein] (RD-OVS-5).
 
 ## Sources
