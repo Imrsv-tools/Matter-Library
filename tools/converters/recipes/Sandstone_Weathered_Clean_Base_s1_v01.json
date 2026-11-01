@@ -1,0 +1,33 @@
+{
+  "summary": "Warm buff sandstone with fine bedding lines and soft rust stains, weathered rough, as in cliffs, quarried blocks and old walls.",
+  "search_words": ["sandstone", "stone", "rock", "sedimentary", "weathered stone", "building stone", "cliff"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "Weathered sandstone: sand grains cemented into rock, laid down in beds, cut and left to the weather (cliffs, quarried building stone, old walls). Opaque: a solid, rough dielectric. Base textures are generated (L2, tools/converters/base/gen_sandstone_weathered.py; the wish list planned a scan, L3, but ambientCG's sandstone assets are bricks, tiles and walls, assemblies rather than matter): laminae of random thickness (3 to 40 mm) grouped into beds, gently swaying and dipping, each fading in and out along its length, the harder ones standing slightly proud; soft iron mottling and a few curving iron bands across the beds; a sandy grit and grain, and small rounded weathering pits. The colour is a judgement, a warm buff (Physically Based has no sandstone entry; its Sand read khaki-olive on a stone face). Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask; no third layer is relevant. Not carried: the wet and moss looks the wish list also wants. Built by the Phase11 batch.",
+  "name": "Sandstone_Weathered_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Sandstone_Weathered_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Sandstone_Weathered_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Sandstone_Weathered_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Sandstone_Weathered_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.54,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Sand", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610261136, "license": "CC0 1.0 Universal",
+     "used": {"metalness_const": 0, "roughness_const": 1.0},
+     "note": "Sandstone is cemented sand: the entry's roughness 1.0 is the ceiling (the map's mean is 0.9, a weathered face keeping a trace of sheen on its quartz grains). Its colour (0.44, 0.386, 0.231) is not taken: it read khaki-olive on a stone face; see the judgement."},
+    {"kind": "judgement", "why": "Mean linear albedo (0.43, 0.31, 0.19), about sRGB 174, 151, 121, a warm buff sandstone; specular_ior 1.54, that of quartz (Physically Based 'Quartz'), sandstone's main mineral; the bedding, staining and pits as drawn by the generator. Physically Based has no sandstone entry."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_sandstone_weathered.py", "provenance": "library/provenance/sources/base/natural/stone/Sandstone_Weathered.yaml"}
+  ]
+}
