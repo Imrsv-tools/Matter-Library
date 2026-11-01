@@ -10,6 +10,7 @@ import look  # noqa
 from look import jobmod, rig, bc, drv
 
 out = Path(sys.argv[1]).resolve(); dmap = Path(sys.argv[2]).resolve()
+EXTRA = [a.split("=", 1) for a in sys.argv[3:]]
 maps = out / "maps"; maps.mkdir(parents=True, exist_ok=True)
 FLAT = maps / "flat_normal.png"; Image.fromarray(np.full((8, 8, 3), (128, 128, 255), np.uint8)).save(FLAT)
 ONE = maps / "cavity_one.png"; Image.fromarray(np.full((8, 8), 255, np.uint8)).save(ONE)
@@ -33,7 +34,9 @@ def variant(art, folder, *, picture=None, flat=False, rough_bias=None, cavity_on
 art = jobmod.Article.read(jobmod.find_article("Skin_Tone34_Clean_Base_s001_v01"))
 cast = rig.character_cast(art)
 swap = [p for p in ("Body", "Lips") if p in cast and cast[p].name == art.name]
-COLS = [("C", "C: Tone34 as served", {}),
+COLS = ([("D_neutral", "D-map: flat relief, matte", dict(picture=dmap, flat=True, rough_bias=0.25))]
+        + [(lab, lab, dict(picture=Path(p).resolve(), flat=True, rough_bias=0.25)) for lab, p in EXTRA]) if EXTRA else [
+        ("C", "C: Tone34 as served", {}),
         ("C_neutral", "C: flat relief, matte", dict(flat=True, rough_bias=0.25)),
         ("D", "D-map: Tone34's shine set", dict(picture=dmap)),
         ("D_flat", "D-map: flat relief", dict(picture=dmap, flat=True)),
