@@ -22,6 +22,13 @@ PROMPTS = {
            "the ears as flat patches. Albedo only: even, shadowless, delit, no lighting, no highlights. "
            "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
            "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
+    "flat": ("A flat unwrapped UV texture map of a real human head's skin, from a photogrammetry scan of "
+           "a real young woman about twenty, light warm skin between Fitzpatrick III and IV, shaved bald head, no eyebrow hair, no makeup. "
+           "The face is laid out flat in the centre with the closed eyes, nose and lips, the scalp and the back of the head unrolled to each side, "
+           "the ears as flat patches. Photographed inside an evenly lit white light dome, so every part is equally bright: "
+           "the nostrils, the hollows of the ears and the eye sockets show their skin colour, not shadow; the ears are flat, pale skin with faint pink outlines, no depth. "
+           "Real unretouched skin: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, uneven tone, "
+           "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
 }
 graph = json.loads(g.WORKFLOWS["krea"].read_text())
 SRC = __import__("os").environ.get("UV_SRC", "uv_C.png")   # cue.py writes uv_Ccue.png
