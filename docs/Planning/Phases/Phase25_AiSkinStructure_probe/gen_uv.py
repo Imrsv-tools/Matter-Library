@@ -24,7 +24,8 @@ PROMPTS = {
            "slight redness around the nose and on the cheeks. Not a 3D render, not CGI, not painted."),
 }
 graph = json.loads(g.WORKFLOWS["krea"].read_text())
-img = g.upload("http://127.0.0.1:8188", OUT / "uv_C.png")
+SRC = __import__("os").environ.get("UV_SRC", "uv_C.png")   # cue.py writes uv_Ccue.png
+img = g.upload("http://127.0.0.1:8188", OUT / SRC)
 for s in STRS:
     t = time.time()
     vals = {"IMAGE": img, "PROMPT": PROMPTS[KEY], "SEED": SEED, "STEPS": 8, "STRENGTH": s, "PREFIX": f"matter_p25uv_{TAG}"}
@@ -32,5 +33,5 @@ for s in STRS:
     name = f"uv_{TAG}_s{int(s*100):02d}_seed{SEED}"
     (OUT / f"{name}.png").write_bytes(png)
     (OUT / f"{name}.json").write_text(json.dumps({"model": "krea", "workflow": g.WORKFLOWS["krea"].name, "seed": SEED, "steps": 8,
-                                                  "strength": s, "prompt": PROMPTS[KEY], "source": "uv_C.png"}, indent=1))
+                                                  "strength": s, "prompt": PROMPTS[KEY], "source": SRC}, indent=1))
     print(name, round(time.time() - t, 1), "s", flush=True)
