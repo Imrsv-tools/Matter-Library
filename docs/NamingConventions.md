@@ -65,6 +65,7 @@
 - **A question keeps its id for life.** The ruling that answers it cites it (`RD-P07-9 — answers Q-P07-4`) and the question's line gains `→ RD-P07-9`, in the same edit.
 - **Cite another doc's item by its full id**, never a bare `F12` from a different series.
 - **An unnumbered doc that gets a number keeps its mnemonic ids;** new ones take `P<NN>` (Workflow §Phase Numbering — ids that have left the repository are frozen).
+- **A phase number that moves, or is handed to another phase, takes no ids with it.** They stay where they were minted, and the number's new holder continues each series past the highest ordinal already used, saying so in its header (`F-P15-9` while Scale Grids held `F-P15-1…8`; Thumbnails' `P17` ids from 8).
 - **Landed ids are never renamed.** This project's earlier series (`R<n>`, `BP<n>`, `CM<n>`, bare `F<n>`/`L<n>` in Phase01–07) stay valid as written; this governs what is minted next.
 - **Not these namespaces:** plan step numbers, test / gate ids, Learnings entries and the identifier vocabularies in the table above keep their own forms.
 

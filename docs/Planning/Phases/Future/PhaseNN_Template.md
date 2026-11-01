@@ -20,6 +20,13 @@ Concretely: <the tangible artifacts that exist at close>.
 **Out:**
 -
 
+## Rides on
+
+_(discovery pass 1 — one row per `docs/CoreMechanisms.md` row this phase meets, or `NEW — the lead rules`)_
+
+| Row | What in this phase rides it | The peer we follow (file:line, opened) |
+|---|---|---|
+
 ## Open questions (settle during this phase)
 
 -

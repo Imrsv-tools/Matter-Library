@@ -53,7 +53,7 @@ Matter-Library/
 │   │   ├── Research/                        #   YYMMDD_R_*.md investigations + decisions
 │   │   └── Support/{Troubleshooting,WorkflowFeedback}/
 │   ├── Glossary.md                          # the project vocabulary (one line per term)
-│   └── NamingConventions.md · ToolingConventions.md · CodingStandards.md · Learnings/
+│   └── NamingConventions.md · ToolingConventions.md · CodingStandards.md · CoreMechanisms.md · Learnings/
 ├── MatterLibrary/                          # the CONTENT (CC0): materials/ (.mtlx by Domain/Class) + textures/ (Git LFS)
 ├── library/                                # releases/ (lock.yaml · catalog.json · freeze · approval) + provenance/
 ├── tools/                                  # converters · validators · releases · compressors · conformance · generators · preview_generators · usd-toolchain
@@ -79,6 +79,7 @@ Matter-Library/
 - `docs/CodingStandards.md` — how code is written here. **A stub, deliberately empty.**
 - `docs/ToolingConventions.md` — where scripts, fixtures and CI entry points live.
 - `docs/NamingConventions.md` — the filename grammar, scale tags, casing and id series. **Active.**
+- `docs/CoreMechanisms.md` — problems already solved, each with the code to copy; **read whole by every verb.** **Empty until a close adds its first row** (re-synced 2026-11-01).
 - `docs/Learnings/<Domain>/` — what the technology did that surprised us. One folder per domain that has paid for a lesson here.
 - `Methodology/AgenticEngineering_Workflow.md` — the canonical Workflow Cycle.
 - `Methodology/AgenticEngineering_DocumentationMap.md` — which doc owns what.

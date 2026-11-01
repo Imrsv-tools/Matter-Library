@@ -100,6 +100,7 @@ This is the upstream-doesn't-restate-downstream rule applied to definitions: the
 | `CodingStandards.md` | standard | **enforced C++ style** — casing/formatting/headers/ownership/errors; indexes project deltas | → `NamingConventions` for the words |
 | `ToolingConventions.md` | standard | **tooling + artifact conventions** — the artifact taxonomy (build/script/test-source/fixture/golden/shared-article/output homes + the two-genre test-asset rule + structural guards), script location/naming, build/test/deploy/lint wrapper behavior, test-runner result handling, CI entry-point expectations | → `AI_Orientation` for current commands; → project docs for local tool details; |
 | `architecture/` | product | **what the system IS** — components, boundaries, the invariants it keeps. **Empty until research commits to a stack**; every other stack-shaped doc points back at it | → the research doc's `## Resolved` for the decision behind each |
+| `CoreMechanisms.md` | product | **problems this project has already solved** — one row each: the problem · the owning rule · the code to copy. Read whole by every verb; a phase rides its rows (`## Rides on`); the close adds rows | → the owning doc per row; → the shipped code |
 | product specs (`<Area>/`) | product | system / service / interface behavior, **one folder per product area** — created when the area exists, never in advance | per that area's index |
 
 ---

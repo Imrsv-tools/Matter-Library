@@ -1,6 +1,8 @@
 # Phase24 — One Validated Skin
 
 **Status:** BRIEF READY (discovery Pass 1, 2026-11-01). *Before:* SEEDED the same day. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](Phase25_AiSkinStructure.md), which runs against this phase's judge.
+
+*Migration note (2026-11-01, the method re-sync to upstream `897f5f3`): this Brief was written under the earlier `/discovery`, so it has no `## Rides on` table. `docs/CoreMechanisms.md` holds no rows yet, so the table would be empty and `/execute` owes nothing for it beyond reading that file at its start.*
 **Lane:** `build` (§Risk lane). **Next:** `/execute Phase24`.
 **Measured at:** `08da67b`, on **the machine with Unreal** (Unreal 5.8 at the path `unreal/build.sh` takes as `UE`; the official Blender 5.2.2 as `MATTER_BLENDER`, Learnings B22; `unreal-runtime-v7` pinned).
 **Builds on:** [`Complete/Phase23_SyntheticSkinSets.md`](Complete/Phase23_SyntheticSkinSets.md) (the pigment maker, the look view's reference column, the placed face regions and the scratch solver) · [`Complete/Phase22_SkinMapsBeyondColour.md`](Complete/Phase22_SkinMapsBeyondColour.md) (the four shine maps) · [`../../specs/Authoring/SkinMaps.md`](../../specs/Authoring/SkinMaps.md).

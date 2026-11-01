@@ -30,7 +30,7 @@ Then call `EnterPlanMode` yourself (in some harnesses it and `ExitPlanMode` are 
 
 ### Step 2 — Read, then verify every claim the plan will rest on
 
-**Read:** the phase doc; `.ai/AI_Orientation.md` and `.ai/AI_WorkingAgreement.md`; the standards the plan bakes names and types into — `docs/Glossary.md`, `docs/NamingConventions.md`, `docs/CodingStandards.md`; and the learnings for the domains this phase touches (`ls` the learnings home for the live set — never a filename copied from a doc). If this session already hardened against these at `/discovery`, confirm rather than re-read. **If the phase has a research seed, walk its finding register against your step list** — a finding load-bearing for the Goal that no step addresses is a gap to fold in.
+**Read:** the phase doc and its `## Rides on` table; `.ai/AI_Orientation.md`, `.ai/AI_WorkingAgreement.md` and `docs/CoreMechanisms.md`, whole; the standards the plan bakes names and types into — `docs/Glossary.md`, `docs/NamingConventions.md`, `docs/CodingStandards.md`; and the learnings for the domains this phase touches (`ls` the learnings home for the live set — never a filename copied from a doc). If this session already hardened against these at `/discovery`, confirm rather than re-read. **If the phase has a research seed, walk its finding register against your step list** — a finding load-bearing for the Goal that no step addresses is a gap to fold in.
 
 **⛔ Every claim from the Brief or the seed is a HYPOTHESIS until you have checked it against live source. Trace it; do not transcribe it.** That includes claims that some code path is redundant, cached, dead, or "already handles X" — trace to the actual caller before writing it into a step. **The more a surface says "settled", "FROZEN" or "RESOLVED", the more it earns a live re-grep:** a lead-settled *decision* is not a verified *implementation*, and a decision naming an operation (`X → do Y()`) still owes a trace showing the invoker can actually reach the callee.
 
@@ -138,7 +138,7 @@ Acceptance over two or more instances of one type is not covered by a single-ins
 
 - **Context** — the problem, why now, the intended outcome.
 - **The recommended approach only** — a rejected option becomes a *why-not* note, never a live alternative.
-- **Exact files and functions** — full paths, no ellipsis, existing utilities reused and cited. Trace the real routes and cite lines.
+- **Exact files and functions** — full paths, no ellipsis, existing utilities reused and cited. Trace the real routes and cite lines. **⛔ Every step that meets a `## Rides on` row names that row and its peer; a step that builds its own way where a row applies is a knowing divergence — a numbered `Blockers` item for the lead's ruling, never a plan pick.**
 - **Deliberate behaviour changes.**
 - **`## Acceptance invariants`** — every phrase in the Goal making an **absolute claim** (universal, negative, exclusive or total — `execute_close.md` row `A0`'s arming question owns the class) quoted **verbatim**. This is what makes `execute_close.md` row `A0` mechanical rather than self-scored.
 - **A scope-coverage table** — see [Scope coverage](#scope-coverage).
