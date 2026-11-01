@@ -31,12 +31,17 @@ WORKFLOWS = {"flux": HERE / "comfy" / "flux2klein_edit.json", "krea": HERE / "co
 STEPS = {"flux": 4, "krea": 8}
 
 # The subject (RD-P25-5): hm08's default age (RD-OVS-3), the measured tone between III and IV (RD-P24-1).
-PERSON = ("a young woman about twenty years old with light, warm skin between Fitzpatrick types III and IV, "
+# The lead at click 1: "ths looks like a 3d animation skin ... We want a human skin". The first prompt said
+# "photorealistic", "matte ... no shine" and "a cross-polarised flat scan", which pull toward a render and a
+# retouched face; this one asks for an unretouched photograph of a real person.
+PERSON = ("a real young woman about twenty years old with light, warm skin between Fitzpatrick types III and IV, "
           "a fully shaved bald head, completely shaved-off eyebrows (no eyebrow hair at all), eyes gently closed, "
-          "no makeup, matte skin with no shine and no specular highlights")
-SKIN = ("photorealistic human skin: visible pores, fine texture, subtle natural redness on the cheeks and nose, "
-        "slight darker tone under the eyes, faint freckles, natural uneven skin tone")
-LIGHT = "soft, even, shadowless diffuse lighting from all sides, like a cross-polarised flat scan; plain dark grey background"
+          "no makeup")
+SKIN = ("real human skin, unretouched: visible pores, fine vellus hair, a few small blemishes and tiny moles, "
+        "uneven tone, slight redness around the nose and on the cheeks, faint freckles, faint veins at the temples; "
+        "no retouching, no airbrushing, no beauty filter, not a 3D render, not CGI")
+LIGHT = ("raw documentary photograph on a DSLR with a 100 mm macro lens, soft overcast daylight from the front, "
+         "even and gentle; plain dark grey background")
 KEEP = ("Keep exactly the same head shape, face shape, pose, camera angle, framing and silhouette as the image; "
         "only change the surface so it looks like a real photograph.")
 

@@ -56,11 +56,13 @@ W = 2048                          # FLUX.2 [klein]'s largest square (4 MP), RD-P
 FOV = 24.0
 TARGET = np.array([0.0, 0.715, 0.03])
 HEAD_Y = 0.50                     # the head region: every texel and triangle above this height (m)
-NECK = (0.52, 0.60)               # the model's colour fades in over this height (m): the neck join
-EYE_MM = 7.0                      # kept clear around each eye opening (the model paints eyes larger)
+NECK = (0.50, 0.56)               # the model's colour fades in over this height (m): the neck join
+EYE_MM = 4.0                      # kept clear around each eye opening (the model paints eyes larger)
 EDGE_MM = 2.0                     # kept clear inside the silhouette
 POW = 4.0
 IOU_MIN = 0.95                    # the overlay gate: painted head over the render's silhouette
+NECK_R = 60                       # the neck match's breadth (pixels at 2048)
+NECK_MATCH = (0.53, 0.60)         # D's broad level eases onto C's below the top of this band (m)
 FILL_R = 20                       # the masked brows' and lids' fill reaches this far (pixels at 2048)
 
 # The cameras (RD-P25-4): the spike's five at 0.78 m, then three close ones on the face at 0.45 m.
@@ -227,7 +229,8 @@ def head_fields(d: Path) -> dict:
     cache = d / f"head_fields_{gsm.N}.npz"
     if cache.is_file():
         z = np.load(cache)
-        return {k: z[k] for k in z.files}
+        if "ears" in z.files:
+            return {k: z[k] for k in z.files}
     t = time.time()
     F = gss.fields(parts=False)
     P, cover, masks = F["P"], F["cover"], F["masks"]
@@ -241,7 +244,8 @@ def head_fields(d: Path) -> dict:
         brow = np.maximum(brow, np.exp(-(((m + 0.004) / 0.026) ** 2 + ((y - 0.021) / 0.009) ** 2 + (zz / 0.025) ** 2)))
     out = {"idx": idx, "P": Pf.astype(np.float32), "N": flat(F["N"]).astype(np.float32),
            "face": flat(masks["face"]), "lips": flat(gsm.blur(masks["lips"], 4)),
-           "lids": flat(gsm.blur(masks["eyelids"], 4)), "brow": brow.astype(np.float32)}
+           "lids": flat(gsm.blur(masks["eyelids"], 4)), "brow": brow.astype(np.float32),
+           "ears": flat(gsm.blur(masks["ears"], 6))}
     np.savez(cache, **out)
     print(f"head fields at {gsm.N}: {len(idx)} texels, {time.time() - t:.0f}s")
     return out
@@ -269,7 +273,10 @@ def cmd_bake(d: Path, tag: str, keys: list, picture: bool) -> None:
     H = head_fields(d)
     P, Nr = H["P"].astype(np.float64), H["N"].astype(np.float64)
     n = len(P)
-    keep = (H["brow"] < 0.25) & (H["lips"] < 0.15) & (H["lids"] < 0.2)      # the masks (F-AIS-13)
+    # the masks (F-AIS-13); the ears too: the profile pictures do not sit on hm08's ear (click 1)
+    # The lids are the model's: the lash line sits at the opening, inside the band kept clear around it
+    # (EYE_MM); masking the whole lid left C's smoother lid as a ring (click 1, second showing).
+    keep = (H["brow"] < 0.25) & (H["lips"] < 0.15) & (H["ears"] < 0.2)
     acc, wsum = np.zeros((n, 3)), np.zeros(n)
     skipped, overlaps = [], {}
     for k in keys:
@@ -318,7 +325,9 @@ def cmd_bake(d: Path, tag: str, keys: list, picture: bool) -> None:
     # The masked brows and lids take the subject's colour at D's level there: C times D's ratio to C
     # over the skin around them (a normalised blur in the atlas), so no patch of C shows. The lips
     # stay the subject's as they are (RD-P25-2).
-    fill = (~keep) & (H["lips"] < 0.15)
+    # Every head texel no picture drew (the masks, the band kept clear around the eye openings: the
+    # ring at click 1) takes C at D's level; the lips stay C's.
+    fill = (~have) & (H["lips"] < 0.15)
     logq = np.log(np.maximum(newfull[have], 1e-4) / np.maximum(C[have], 1e-4))
     den = np.zeros(N * N, np.float32)
     den[H["idx"][have]] = 1
@@ -329,6 +338,18 @@ def cmd_bake(d: Path, tag: str, keys: list, picture: bool) -> None:
         num[H["idx"][have]] = logq[:, ch]
         lq[:, ch] = gsm.blur(num.reshape(N, N), FILL_R).ravel()[H["idx"]] / np.maximum(den, 1e-6)
     newfull[fill] = C[fill] * np.exp(lq[fill])
+    # The neck (click 1: "a neck line skin color change"): toward the bottom of the head region D's broad
+    # level is eased onto C's (D's ratio to C, blurred wide, divided out), so the join changes gradually.
+    den_w = np.zeros(N * N, np.float32)
+    den_w[H["idx"][have]] = 1
+    den_w = gsm.blur(den_w.reshape(N, N), NECK_R).ravel()[H["idx"]]
+    lw = np.zeros((n, 3))
+    for ch in range(3):
+        num = np.zeros(N * N, np.float32)
+        num[H["idx"][have]] = logq[:, ch]
+        lw[:, ch] = gsm.blur(num.reshape(N, N), NECK_R).ravel()[H["idx"]] / np.maximum(den_w, 1e-6)
+    s = np.clip((H["P"][:, 1] - NECK_MATCH[0]) / (NECK_MATCH[1] - NECK_MATCH[0]), 0, 1)[:, None]
+    newfull *= np.exp(-(1 - s) * lw)
     drawn = have | fill
     # The blend: where the pictures saw (their weight, feathered in the atlas), faded in over the neck.
     wfull = np.zeros(N * N, np.float32)
