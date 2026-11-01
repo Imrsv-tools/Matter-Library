@@ -1,0 +1,110 @@
+# Research input — one validated skin: one subject, judged against the scanned bar, shown in Studio
+
+**Opened:** 2026-11-01 · **Mnemonic:** `OVS` (ids `OVS-n`, `OVS-Qn`) · **Mode:** research input from the Open Morphology Foundation (OMF). It commits the library to nothing; this library's own `/discovery` seeds and rules the phase.
+**Origin:** OMF research `261026_R_SyntheticSkinAndEyeSets.md` (OMF `.ai/planning/research/`), Passes 9–13 (2026-11-01). That doc reviewed the skin-and-makeup approach across OMF, this library and the platform, and it holds the sources.
+**The lead's direction, 2026-11-01, verbatim** (in OMF's session):
+- *"OMF is the keeper of taxonomy, ontology and the overall apprach to make things as realistic as possible … if you do the NEXT step is figure out how to vlisdate it... We need to STOP DOING 10 , 8, 26 versions of things... we need one 20 year old white female form and test with with (beause we have a real skin "Emily" test asset). Then we build all the tooling needed to make our own, and show it in studio...."*
+- Asked whether that form is today's hm08 body or a new body, and where the phase lives: *"today's hm08, Matter Library hosts it - Share yousr insights with it and push.. it will seed the phase"*.
+
+**Public-repo note.** Only what the library needs is here: no platform paths, no ruling ids from other projects, no private facts.
+**Measured at:** this repo's `4f17d4d` (origin, 2026-10-30).
+
+---
+
+## The direction, as rulings (recorded by date and content)
+
+- **2026-11-01 — OMF keeps the approach to realism.** OMF defines three things; this library builds its pieces to them, and the platform wears them:
+  - the taxonomy of a character's look: its layers, the kinds of change, and what each mark is in measured terms;
+  - the body's regions and landmarks;
+  - how realism is judged.
+
+  This sits beside RD-CMT-1 without conflict: that ruling is about who **makes** a piece, and this one is about who **defines** the approach.
+- **2026-11-01 — Validate on one subject, not many versions.** The subject is a 20-year-old woman on **today's hm08** body, judged against the scanned skin the platform already fitted onto hm08 on 2026-10-25 (the bar this library's Phase23 measured against). Then build the tooling to make our own, and show it in Studio.
+- **2026-11-01 — This library hosts the phase.**
+
+## The proposed phase — *One Validated Skin*
+
+**Outcome (proposed):** *in Studio, our own skin on one young woman's face stands beside the scanned skin in the look-dev scene, and the lead cannot tell them apart at set distances, or names, part by part, what still differs.*
+
+**Why one subject is the right test** (OVS-1):
+- **The mesh is held fixed and only the skin varies,** so a verdict is about the skin.
+  - hm08's coarse ears and hands look the same in every column, so they do not bias the comparison.
+  - The scanned skin already sits on hm08's own UVs, so no new mesh is needed.
+- **It is the instinct of Phase23's click 2, made the rule:** *"this is taking too long, stop doing shades I. II. VI"*.
+- **The later test comes free.** Re-baking the passed skin onto the next body tests *"made in 3D, baked per layout"* on a real change of body.
+
+## The validation protocol (OMF's: the standard the phase opens with)
+
+1. **The subject:**
+   - **The body:** the female hm08 as the character builds it today, unchanged for the whole phase. Card hair, today's eyes, and one lighting rig.
+   - **The tone:** the bar's tone. This library judged against the bar at III (Phase23).
+2. **Three columns on the same body, in the same sitting and the same scene** (the platform's shadowed look-dev scene):
+   - **A, known-good:** the scanned bar.
+   - **B, known-bad:** today's shipped skin at that tone. The lead on Phase22's close: *"they look totally fake"*.
+   - **C, the candidate:** our own skin for this subject. Several C rows are allowed (OVS-Q1).
+3. **The ruler is checked first, in that sitting.** A must read as real and B as fake, in the lead's words. If not, the scene or the views are wrong and no verdict counts.
+4. **Fixed views at set distances,** on the Desktop and in the headset:
+   - the face from the front, three-quarter and profile;
+   - close-ups of an eye, the lips, and the cheek with the nose;
+   - the distances are fixed once (OVS-Q2) and never changed mid-phase.
+5. **Two measures:**
+   - **The screen:** the region-by-region profiles against the bar, built in Phase23 23.2.7–23.2.9. A screen can rule a failure out; it never accepts.
+   - **The gate:** the lead's verdict per column and view, verbatim. It passes when C cannot be told from A, or the remaining gap is named by part.
+6. **The claim is the face, this subject, this tone, nothing more.**
+   - The bar is a head scan; its body was colour-matched at the neck (OVS-7). So the body has no measured bar here and makes no claim.
+   - Other tones, ages, structures and makeup are later re-runs.
+7. **After a pass, in order:**
+   - re-bake onto the next body;
+   - makeup and marks on this same subject (*Skin Layers*);
+   - then other tones and ages.
+
+## What OMF's review found that this phase needs
+
+- **OVS-2 — The judge comes first, and it is the platform's.** RD-CMT-4 puts the verdict in the platform's look-dev scene. The asks are already filed: P33 (open a draft there), P34 (draw the shine maps) and P35 (keep a structure).
+  - **None is answered:** as of 2026-11-01 the platform's docs mention no shine maps and no way to open a draft there.
+  - Phase22 and Phase23 were judged in this library's look view, which is not what a Creator sees in Studio.
+  - **The phase's first steps are therefore the judge** (with the platform), before any skin is tuned.
+- **OVS-3 — AI enters as a C row, as a structure, never as a map.**
+  - RD-SKM-5 stands as written: *"A fully AI-made map is not accepted"*. Its reasons are not licences, so a later "set licences aside" does not lift it:
+    - baked light;
+    - one picture is one tone;
+    - likeness;
+    - a map painted in one UV layout does not carry to the next.
+  - **An AI-made structure fits the rules:** projected onto the body and stored in 3D, separated from its light, decomposed into pigment (melanin, blood), and calibrated like any structure, with a likeness check.
+  - If an AI row beats the procedural one at the gate, the re-ruling is narrow: an AI-made **structure** is accepted under those conditions.
+- **OVS-4 — The skin-colour model is not on this phase's path.** Phase23 23.2.1 found OMF's model holds at III and IV and fails at I, II, V and VI. The subject is at III, so the borrowed response is not used. Fixing the model is OMF's, before the other tones.
+- **OVS-5 — Placement:** on hm08, the maker's own face regions (`gen_synth_skin.FACE`) are enough. The body's regions and landmarks OMF will define matter at the re-bake step, not before.
+- **OVS-6 — For *Skin Layers*, not this phase: marks need pigment.**
+  - A mark written as a pigment change (a bruise, a flush) can only become colour where the skin's pigment fields are.
+  - But `SkinMaps.md` keeps them inside the maker and ships only the baked colour.
+  - OMF's recommendation for that phase: a skin ships its pigment fields and the model's table, and the platform's bake turns pigment into colour. Cosmetics (foundation, lipstick, tattoo ink, dirt) stay paint over the skin.
+- **OVS-7 — The bar is the face only.** The platform's fit of the scan to hm08 baked the head's maps into the face layout and the atlas, and colour-matched the body to the head's medians at the neck seam (2026-10-25).
+
+## Held fixed, and what varies
+
+| Held fixed for the whole phase | Varies |
+|---|---|
+| the hm08 female body · its eyes · card hair · the look-dev scene and its light · the views and distances · the tone | **only the skin:** its colour map and its shine set (roughness, relief, cavity, scatter) |
+
+## Out of scope, each with its home
+
+- other tones: re-runs after a pass (OMF fixes the model for I, II, V and VI first);
+- ages and the next body: the re-bake step, then OMF's body work;
+- makeup and marks: *Skin Layers*, on the same subject;
+- a body bar: none exists yet (OVS-7);
+- eyes: *Eyes in the Shader*. The eyes are held fixed here.
+
+## Questions for the library's discovery (plain)
+
+| Id | Question | OMF's recommendation |
+|---|---|---|
+| **OVS-Q1** | **Which C rows?** | The best procedural structure today, one structure made for this subject (a seed tuned to the bar), and the AI structure row if the library's AI research has one ready. Three at most. |
+| **OVS-Q2** | **The set distances and views.** | Conversational (about 1 m) and close (about 40 cm), in the views of protocol step 4. Fix them at the first sitting. |
+| **OVS-Q3** | **Is the subject's age set on hm08 once, at the start?** The character's body is MakeHuman's default proportions today. | Only if the lead wants it. Set once and never moved: a change of shape keeps hm08's UVs, so the bar's maps still fit. |
+
+## Status
+
+- **Passes:** 1, OMF's input (2026-11-01).
+- **Ruled 2026-11-01** (recorded above by date and content): OMF keeps the approach; one subject on today's hm08; this library hosts the phase.
+- **Open:** OVS-Q1 … Q3, for the library's discovery.
+- **▶ Next:** this library seeds *One Validated Skin* from this doc. Its first steps are the judge, the platform's P33, P34 and P35.
