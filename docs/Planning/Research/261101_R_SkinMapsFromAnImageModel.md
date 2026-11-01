@@ -111,6 +111,10 @@
 - **Still to fix:** painted-in eyebrows, a lash line over the eye openings, a slight lip offset at three-quarter angles, the neck seam (F-AIS-13). The layout, not the model, caps the face's sharpness (F-AIS-15).
 - **Not run:** Krea 2, which needs a Hugging Face login (RD-AIS-1); the look in a real renderer on the character.
 
+## Pass 6 — Where this goes: Phase24's C2 row (2026-11-01)
+
+OMF's input of the same day ([`261101_R_OneValidatedSkin.md`](261101_R_OneValidatedSkin.md), OVS-3) puts an image model's skin into the library as a **structure**: projected, separated from its light, turned into pigment, and calibrated by the maker. The lead asked for one complete set. **The image-model route is now the C2 row of [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md),** judged beside the bar and the tuned pigment maker. A C2 win goes to the lead as the narrow re-ruling OVS-3 names. Q-AIS-1 (whether a whole AI map ever ships) is folded into it.
+
 ## Open questions
 
 | Id | Question (as the lead would see it) | Recommendation |
@@ -142,7 +146,7 @@ The lead, 2026-11-01, verbatim: *"We are WELL under 1M... we are pre-rev and lik
 - **Unverified:** Krea 2's look on this task (not run) and whether it embeds a watermark. The probe's look in a real renderer. One seed only. The platform's pass is an uncommitted edit, at no origin. The licence reading is not legal advice.
 - **Open with the lead:** Q-AIS-1, Q-AIS-2.
 - **Owed:** the Krea 2 run (a Hugging Face login), the lead's look on the character in Blender, and the platform pass's back-link (the platform's doc, not touched).
-- **▶ Next:** a Hugging Face login, then Krea 2 on the same views. Resume with `/research SkinMapsFromAnImageModel`.
+- **▶ Next:** the route continues as Phase24's C2 row (Pass 6); a Hugging Face login before its Krea 2 run.
 
 ## Sources
 

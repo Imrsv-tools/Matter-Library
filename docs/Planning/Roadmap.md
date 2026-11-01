@@ -33,6 +33,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
 
+### Phase24 — One Validated Skin — SEEDED *(numbered and seeded 2026-11-01 by `/research` on the lead's "one complete set build and tested,,, then we can add variety", after OMF's input of the same day: "today's hm08, Matter Library hosts it"; placed at the head of `## Future`, as the platform's skin phase waits on it)*
+**Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served for testing as one finished set.
+- `docs/Planning/Phases/Phase24_OneValidatedSkin.md` · research `docs/Planning/Research/261101_R_OneValidatedSkin.md` (OMF's input; Pass 2, the plan) · `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md`
+
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)

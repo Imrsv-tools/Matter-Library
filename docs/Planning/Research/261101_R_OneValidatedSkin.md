@@ -108,9 +108,35 @@
 | **OVS-Q2** | **The set distances and views.** | Conversational (about 1 m) and close (about 40 cm), in the views of protocol step 4. Fix them at the first sitting. |
 | **OVS-Q3** | **Is the subject's age set on hm08 once, at the start?** The character's body is MakeHuman's default proportions today. | Only if the lead wants it. Set once and never moved: a change of shape keeps hm08's UVs, so the bar's maps still fit. |
 
+## Pass 2 — The library's side: one complete set, and the plan (2026-11-01)
+
+*Written by this library's `/research` session, after reading this doc, the platform's same-day character model and its skin phase's seed (read in the platform's clone; recorded here by content only).*
+
+**The lead, here, verbatim:** *"Studio provided insight and so did OMF... please read their updates adn lets come up with a plan for getting a full set of skins completed and testable for the full concept... Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."*
+
+- **F-OVS-L1 — The protocol fits the library's tools as they stand.**
+  - The look view already draws a reference column from a picture outside the tree (Phase23 23.1, RD-P23-10).
+  - The bar's fit to hm08 exists on the machine with Unreal at 8K, with colour, specular and scatter. So column A can wear the bar's own shine, not only its colour.
+  - No platform work is needed to run the verdict in the library's look view. Studio's look waits on the platform's shine-map carry (P34) and a draft in its look-dev scene (P33). The platform's skin phase runs after its links work (its plan, 2026-11-01).
+- **F-OVS-L2 — The platform's character model of 2026-11-01** (the lips part of the body, nails their own part, makeup one merged layer of pieces) **agrees with the protocol's lips row (OVS-8).** The one set wears its lips on the body's skin. The library's existing `Lips_*` articles stay as they are until a ruling retires them.
+- **F-OVS-L3 — The AI row has a working start.** The library's spike of the same day (`261101_R_Spike_SkinMapFromImageModel.md`) projected an image model's person onto hm08's head and baked it into the map in under a minute, untrained. OVS-3's *structure* needs three steps the spike did not take:
+  - masks at the brows, lids and lips;
+  - inversion to melanin and blood through the maker's skin model;
+  - the maker taking that field in place of its own.
+- **The plan is seeded as [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md):**
+  - **one set** = body skin (lips in) + its own shine set + nails, one tone, one person;
+  - **four steps:** the judge and the ruler click → C1, the pigment maker tuned to the bar → C2, the image model's skin as a structure → the winner finished, served and seen on the character.
+  - It answers OVS-Q1 (two C rows: C1, C2), OVS-Q2 (the views and distances as recommended) and OVS-Q3 (the default age, unless the lead sets it) **as recommendations for discovery.**
+- **After it, as phases (unnumbered, the lead's to cut):**
+  - *Skin Layers* on this same subject, from its pigment fields;
+  - *Variety*: other tones, people and ages, as re-runs of the passed recipe;
+  - then the order of 2026-10-27 resumes.
+
 ## Status
 
-- **Passes:** 1, OMF's input (2026-11-01; OVS-8 added the same day).
+- **Passes:** 2.
+  - Pass 1: OMF's input (2026-11-01; OVS-8 added the same day).
+  - Pass 2: the library's side, and the plan (2026-11-01).
 - **Ruled 2026-11-01** (recorded above by date and content): OMF keeps the approach; one subject on today's hm08; this library hosts the phase.
-- **Open:** OVS-Q1 … Q3, for the library's discovery.
-- **▶ Next:** this library seeds *One Validated Skin* from this doc. Its first steps are the judge, the platform's P33, P34 and P35.
+- **Seeded:** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md). OVS-Q1 … Q3 are answered there as recommendations for its discovery.
+- **▶ Next:** `/discovery Phase24` when the lead is ready.
