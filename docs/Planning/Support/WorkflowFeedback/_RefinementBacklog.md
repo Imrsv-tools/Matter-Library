@@ -42,6 +42,8 @@ both passages quoted. Everything else is one tally line.
 | A ledger status word taken as the consumer's state | `LOCAL_DELTAS` §Separation |
 | A zsh variable breaking the push refspec | `.claude/CLAUDE.md` §Git, the push row |
 | `/retro` not starting the next session | already upstream (IMRSV's step 0), arrived with batch A's re-sync |
+| *Late, the P24 discovery+execute retro (2026-11-01, upstream `b8562ba`):* discovery chained into execute ran out before click 2 (with batch A's P18 tally: 2 runs) · the pixel arithmetic done on the wanted framing, not the fixed lens · a multiplier picture's mean read as the bar's colour | `discovery.md` §Hand-off (a fresh session past ~250k) · First human test (the fixed camera; how a picture was made) |
+| Hardware nearly written into a public phase doc | `.claude/CLAUDE.md`, the PUBLIC line: size by proportion |
 
 **Notes:** two more `cd` slips (CharSkins, P23), both before the scratch form landed in batch A · `RD-OVS-n` beside a doc's `OVS-n` findings is right: the declaring doc owns the mnemonic, the kind segment says what it is (AiSkin) · a handback's push state going stale through a sibling's push is accepted; the push row already says a foreign commit under yours rides.
 
@@ -182,7 +184,6 @@ One run each unless a count is given. The fix is ready to apply when the frictio
 | A push before the promote, safe because the re-freeze was already on origin | P16 | `LOCAL_DELTAS` publishing-producer row |
 | The gate's failing reason far above its summary; the gate re-run to read it | P17 Thumbnails | `LOCAL_DELTAS` RUN row: capture the first run to a scratch log |
 | A USDLiveView view the agent cannot see: `usdrecord` the same file, read `stage.log`; a sitting composition missing a Studio file's top-level scopes (2 runs) | P14, P15 | `LOCAL_DELTAS` artifact row, or a USDLiveView learning |
-| Discovery chained into execute in one session without a context reading at the hand-off | P18 | `discovery.md` §Hand-off |
 | One phase held a full GPU run, a publish, a format redo and a second publish | P17 Thumbnails | `discovery.md` split signal: make vs publish |
 | A map combined with an existing one made an order of magnitude weaker than it, twice | P22 | `execute.md` §Verify ad-hoc row: measure it against the layer it joins first |
 | The plastic look came from a master default no input reached (the coat on the geometric normal) | P22 | `discovery.md` reuse check: list every lobe the master draws and what it reads |
@@ -192,7 +193,7 @@ One run each unless a count is given. The fix is ready to apply when the frictio
 | Click 1 arrived after about 400k of supporting work with the lead away | P22 | the scope alarm: the first click before the supporting build |
 | A maker's self-check repeating the constant it guards | P22 | a stack fact, below |
 
-**Stack facts from single runs, not yet in `docs/Learnings/`** (check the domain file first; add on a second sighting): Unreal's transmission needs a shadow-casting light, and parts hidden from a capture still cast shadows (P22) · a coat on the geometric normal glazes any relief beneath it (P22) · the look view at `--width 2048` asks Vulkan for one 4 GiB block and dies (P23) · a before/after view must take its LFS pictures as they stood at *before* (P23, fixed in `look.py`) · check placement by rendering a debug grid through `look.py --reference`, never in the atlas (P23) · a tree-wide `git grep -o '.{0,40}X'` runs for minutes over LFS and `.blend` files · a staleness key on a hand-bumped version reads stale pictures as fresh (key on a hash of the inputs) · a headless scene for a lead in Material Preview is lit with its studio HDRI, or the look-first render misleads the agent · the rig's seam line flags any periodic texture whose boundary lands on the tile edge · fit a light factor on a probe with no material model in it (a white mirror), not on a material · `rig.py <path.mtlx> --out <scratch>` is the cross-tool one-variable probe · Storm barely renders `transmission_color` · after a `VK_ERROR_DEVICE_LOST`, read `journalctl -k` for a new Xid before relaunching · a `Monitor` on a build's progress counter floods the conversation.
+**Stack facts from single runs, not yet in `docs/Learnings/`** (check the domain file first; add on a second sighting): a float32 mean along axis 0 of a large (M, k) array drifts by percent at 8K — take `dtype=np.float64` (P24) · Unreal's transmission needs a shadow-casting light, and parts hidden from a capture still cast shadows (P22) · a coat on the geometric normal glazes any relief beneath it (P22) · the look view at `--width 2048` asks Vulkan for one 4 GiB block and dies (P23) · a before/after view must take its LFS pictures as they stood at *before* (P23, fixed in `look.py`) · check placement by rendering a debug grid through `look.py --reference`, never in the atlas (P23) · a tree-wide `git grep -o '.{0,40}X'` runs for minutes over LFS and `.blend` files · a staleness key on a hand-bumped version reads stale pictures as fresh (key on a hash of the inputs) · a headless scene for a lead in Material Preview is lit with its studio HDRI, or the look-first render misleads the agent · the rig's seam line flags any periodic texture whose boundary lands on the tile edge · fit a light factor on a probe with no material model in it (a white mirror), not on a material · `rig.py <path.mtlx> --out <scratch>` is the cross-tool one-variable probe · Storm barely renders `transmission_color` · after a `VK_ERROR_DEVICE_LOST`, read `journalctl -k` for a new Xid before relaunching · a `Monitor` on a build's progress counter floods the conversation.
 
 ---
 
@@ -230,7 +231,7 @@ A rule is cut when the flags say it is dead weight *across runs* — not on one 
 
 ## Open — needs a lead ruling, not a refiner tweak
 
-1. **Push upstream `b59f2d9`** (batch B). Batch A's `d12f999` → `897f5f3` were pushed 2026-11-01. This repo's §Heritage names `b59f2d9`, which is not landed until it is on upstream's `origin/main`.
+1. *(Closed 2026-11-01: drain 4 pushed on the lead's word, upstream to `b8562ba`.)*
 2. **A streamlining pass is overdue** on `execute.md` (48.7 KB), `discovery.md` (32.9 KB) and `.claude/CLAUDE.md` (18.8 KB, loaded into every session). It needs the lead in the room (`workflow-refiner.md` §3). With it, the web-service framing: **recommendation** — upstream moves the stack-shaped paragraphs into a sibling that `execute.md` sends only a project with a web surface to, so a project with none never reads them.
 3. **Should the refiner run the way the IMRSV refiner reports it does?** Its note upstream (`NOTE_FROM_IMRSV.md`, A and B): triage in batches of about twenty, default to decline, three bars, every wave ending at or below the bytes it started with, the lead picking from one screen. Drain 2 used the three bars and still grew every doc. *(Drain 4 ran in two batches of 18 and 10 and took IMRSV's question form; the byte rule was not adopted, and the drain grew.)* **Recommendation:** adopt it into `workflow-refiner.md` upstream, with the byte rule as written — it is the only counter-force on record that held. Its C to F and H were not taken.
 4. *(Closed 2026-10-27: the stale staging folder was deleted on the lead's word; 18 lanes PASS on the machine with Unreal.)* ~~**This machine's gate is permanently red on two lanes** (`approval_binds_freeze`, `release_verify`; measured 2026-10-11). The cause is a git-ignored `library/staging/` from 2026-09-24. Three runs asked whether to rebuild or delete it; nobody has said. **Recommendation:** rebuild it (`stage_release.py build`) or delete it, so that a FAIL on this machine means something.~~
@@ -245,6 +246,7 @@ A rule is cut when the flags say it is dead weight *across runs* — not on one 
 13. *(Closed: both closed into `Phases/Complete/`.)* ~~**Phase13 and Phase14 are numbered and still in `Phases/Future/`** (Phase13 being edited by a live session at drain time). Under the rule drain 3 sharpened, each moves to `Phases/` with its Roadmap pointer, by whichever session holds it. **Recommendation:** the next `/discovery` on each does it in its first commit.~~
 14. **Where does a private measurement the library needs live** (the LFS spend, P14)? It cannot enter this public repo. **Recommendation:** the handback only; if it must persist, the platform's private docs, cited here by content.
 15. **Are `.claude/skills/*` the refiner's lane?** `.claude/CLAUDE.md` §Lanes does not list them, and a run deferred a product edit to `/matter-batch` because a refiner's held edit sat in it (P17 Thumbnails). **Recommendation:** a skill is product tooling, which any verb edits for its own unit; only its hard rules and hand-back lines are method. One line in §Lanes.
+16. **After Phase24, *Eyes in the Shader* or *Skin Layers* first?** The Roadmap runs Eyes first; OMF's input proposed Skin Layers on this subject first (P24 retro; raised in chat, unruled). The lead's.
 
 ## Upstream queue
 
@@ -254,7 +256,7 @@ the recorded SHA in `AGENTS.md` §Heritage — **and treat an unpushed upstream 
 landed: check `git merge-base --is-ancestor <sha> origin/main` in the upstream clone at the
 start of each drain.**
 
-- **Awaiting a push (2026-11-01):** `b59f2d9`, a fast-forward from `origin/main` (`897f5f3`). Built in a private clone. Open 1.
+- Nothing awaits a push (2026-11-01: drain 4 pushed, `d12f999` → `b8562ba`; built in a private clone, the shared clone fast-forwarded).
 - *(IMRSV's three-line question form landed upstream in drain 4, replacing drain 3's plain-words sentence — five items here across three units were the proof.)*
 - **A cross-repo session's retro** (MatterSitePipeline's question): friction with this repo's machinery is filed here; friction met in a sibling repo goes to that repo's inbox.
 - **The upstream clone is a shared tree too.** Another project's refiner committed into it mid-drain on 2026-10-11, and files prepared from the earlier tip were written over three of its changes and pushed; `d271d0c` restored them. **`git rev-parse HEAD` in the clone immediately before writing any file prepared from an earlier read of it** — `git status` cannot show a commit that has already landed.

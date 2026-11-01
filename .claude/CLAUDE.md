@@ -10,7 +10,7 @@ See `../AGENTS.md` — canonical agent entry point. The Matter Library is **a co
 - **Bias to the smallest unit** — most work is a `/quick-fix` or a `/research`, not a full phase.
 - **Pre-release: no release ceremony** (lead, 2026-09-25; re-affirmed 2026-09-27). Until the first versionable library, releases, freezes and approvals never gate building, testing or serving a draft — `.ai/AI_WorkingAgreement.md` §Settled practices owns it.
 - **No `cd` in ANY command, not only a search** (§Codebase search owns the ban). The `cd`-free forms on this stack: `git -C <repo> …` · `uv run --directory <repo> …` · absolute paths inside a loop, or a script that takes the list · a scratch script run by its absolute path (`python3 /tmp/x.py`, or a heredoc into the interpreter).
-- **The repo is PUBLIC.** Anything committed and pushed is published. Never carry private platform detail into a tracked file: private issue numbers, internal paths, people's names, private-code citations, **or a fact read from a private doc** (hardware, cost, schedules). An id grep cannot see a fact — re-read every sentence you wrote from a private source.
+- **The repo is PUBLIC.** Anything committed and pushed is published. Never carry private platform detail into a tracked file: private issue numbers, internal paths, people's names, private-code citations, **or a fact read from a private doc** (hardware, cost, schedules) — size by proportion (*"a third of the box's memory"*), never by a part or a GB figure. An id grep cannot see a fact — re-read every sentence you wrote from a private source.
 
 ## Don't Delete Spec Functionality — HARD RULE (this project)
 
