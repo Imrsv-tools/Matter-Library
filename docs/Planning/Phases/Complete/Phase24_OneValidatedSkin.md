@@ -1,12 +1,12 @@
 # Phase24 — One Validated Skin
 
-**Status:** IN EXECUTION (opened 2026-11-01 by the lead's *"/execute Phase24"* at `91f5eb9`). *Before:* BRIEF READY (discovery Pass 1, the same day), and SEEDED before that. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](Phase25_AiSkinStructure.md), which runs against this phase's judge.
+**Status:** 🎉 COMPLETE (closed 2026-11-01, the lead's *"close Phase24"*). *Before:* IN EXECUTION (opened 2026-11-01 by the lead's *"/execute Phase24"* at `91f5eb9`). *Before:* BRIEF READY (discovery Pass 1, the same day), and SEEDED before that. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](../Phase25_AiSkinStructure.md), which runs against this phase's judge.
 
 *Migration note (2026-11-01, the method re-sync to upstream `897f5f3`): this Brief was written under the earlier `/discovery`, so it has no `## Rides on` table. `docs/CoreMechanisms.md` holds no rows yet, so the table would be empty and `/execute` owes nothing for it beyond reading that file at its start.*
-**Lane:** `build` (§Risk lane). **Next:** the close (click 1: *"A reads real, B reads fake"*; click 2: *"C is fine."*; click 3: *"seem to be the same person"*).
+**Lane:** `build` (§Risk lane). **Next:** none, closed (click 1: *"A reads real, B reads fake"*; click 2: *"C is fine."*; click 3: *"seem to be the same person"*).
 **Measured at:** `08da67b`, on **the machine with Unreal** (Unreal 5.8 at the path `unreal/build.sh` takes as `UE`; the official Blender 5.2.2 as `MATTER_BLENDER`, Learnings B22; `unreal-runtime-v7` pinned).
-**Builds on:** [`Complete/Phase23_SyntheticSkinSets.md`](Complete/Phase23_SyntheticSkinSets.md) (the pigment maker, the look view's reference column, the placed face regions and the scratch solver) · [`Complete/Phase22_SkinMapsBeyondColour.md`](Complete/Phase22_SkinMapsBeyondColour.md) (the four shine maps) · [`../../specs/Authoring/SkinMaps.md`](../../specs/Authoring/SkinMaps.md).
-**Research:** [`../Research/261101_R_OneValidatedSkin.md`](../Research/261101_R_OneValidatedSkin.md) (OMF's protocol, OVS-1 … 8; the library's Pass 2; RD-OVS-1 … 6).
+**Builds on:** [`Complete/Phase23_SyntheticSkinSets.md`](Phase23_SyntheticSkinSets.md) (the pigment maker, the look view's reference column, the placed face regions and the scratch solver) · [`Complete/Phase22_SkinMapsBeyondColour.md`](Phase22_SkinMapsBeyondColour.md) (the four shine maps) · [`../../specs/Authoring/SkinMaps.md`](../../../specs/Authoring/SkinMaps.md).
+**Research:** [`../Research/261101_R_OneValidatedSkin.md`](../../Research/261101_R_OneValidatedSkin.md) (OMF's protocol, OVS-1 … 8; the library's Pass 2; RD-OVS-1 … 6).
 
 ## Outcome
 
@@ -76,7 +76,7 @@
 ### Not now
 
 Each has a home:
-- **the image model's skin:** [Phase25](Phase25_AiSkinStructure.md), against this judge (as column D);
+- **the image model's skin:** [Phase25](../Phase25_AiSkinStructure.md), against this judge (as column D);
 - **picture size, loading and performance tests, and a size per layer:** later phases (RD-OVS-2). Here, one size: 8K;
 - **other tones, people and ages:** re-runs of the passed recipe (*Variety*, after);
 - **marks and makeup on this subject; shipping the pigment fields:** *Skin Layers*, from this set's fields (OVS-6);
@@ -200,7 +200,7 @@ Time to the first click: 24.1 is views in one tool, three local pictures and a c
 
 | What | To | What it consumes from this phase |
 |---|---|---|
-| The image model's skin, as column D | [Phase25](Phase25_AiSkinStructure.md) | the judge (views, distances, A at 8K, the lips-on-skin cast); the subject's tone and fit; the maker at 8K taking an outside pigment field; the pigment-field output (RD-P24-6) |
+| The image model's skin, as column D | [Phase25](../Phase25_AiSkinStructure.md) | the judge (views, distances, A at 8K, the lips-on-skin cast); the subject's tone and fit; the maker at 8K taking an outside pigment field; the pigment-field output (RD-P24-6) |
 | Marks and makeup on this subject; shipping the pigment fields | *Skin Layers* | the subject's pigment fields and maker row; the shine set's zones |
 | Other tones, people, ages | *Variety* | the passed recipe: the subject row, the fitted `FACE`, the shine strengths |
 | Picture size, loading and performance; a size per layer | later phases (RD-OVS-2) | the set at 8K; G8's size rule |
@@ -241,4 +241,5 @@ Time to the first click: 24.1 is views in one tool, three local pictures and a c
 - **24.3.3 — written down** · the `24.3` docs commit · `SkinMaps.md` §One subject's set at 8K and its Size line; the Glossary's *Skin subject*; `PlatformDependencies.md` P33 (the set to judge in Studio) and P34 (its own 8K shine maps; its lips wear the skin). `run_all.py` 18/18 PASS.
 - **24.3.4 — click 3 moves to the Unreal look view (deviation)** · **The Brief put click 3 in the lead's Blender; the lead's ruling RD-CMT-4 (2026-10-27, `LOCAL_DELTAS.md`'s *artifact a person reaches* row) says a character material's look is judged in Studio's look-dev scene and, until Studio draws it, in the library's Unreal look view: *"trying to judge if it look plastic in studio using Blender is not the way"*.** Same class as a ruling made: applied. Sheet `library/parity/P24_Click3/look_sheet.png` (Tone34 beside III: face, three quarters, the back of the hand with its nail, the ear lit from behind). **Seen before the showing:** the back of C's hand shows a plain furrow network, stronger than III's (the 8K relief, 24.2.6). **SAT 2026-11-01. The lead, verbatim: *"I only see head, hand and ear... but seem to be the same person"*.** *(Read as click 3 passing: the set reads as one person. The views are the look view's four (head, hand, ear); it has no full-body view, and the widest of this skin are click 2's 1 m views, the upper body.)*
 
-**Resume here (2026-11-01):** every click has sat. Next is the close (`execute_close.md`, the lead's word; the push, and a dev snapshot at the lead's word, RD-OVS-4).
+*Historical (the close ran):* **Resume here (2026-11-01):** every click has sat. Next is the close (`execute_close.md`, the lead's word; the push, and a dev snapshot at the lead's word, RD-OVS-4).
+- **CLOSE — DONE (2026-11-01)** · the `🎉` commit · the Outcome holds: three clicks sat (*"A reads real, B reads fake"*, *"C is fine."*, *"seem to be the same person"*); the set served. **Deferral ledger:** the back of the hand's furrows, stronger than III's at 8K (24.3.4) — `already routed` (stated in the handback the lead answered with *"close Phase24"*); 24.2.7's measured differences (flecks, nose glint, lips' level, the ring) — ruled by *"C is fine."*; the dev snapshot (In now, *"at the lead's word"*) — not given at the close, offered in the handback. CoreMechanisms row 1 (the 8K maker in bands). `run_all.py` 18/18 PASS (no CI, `LOCAL_DELTAS.md`).

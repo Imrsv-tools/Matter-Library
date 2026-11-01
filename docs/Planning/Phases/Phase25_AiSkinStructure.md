@@ -2,7 +2,7 @@
 
 **Status:** SEEDED (2026-11-01). Split out of Phase24 on the lead's *"Split and seed"* (RD-OVS-6). It runs **after Phase24**, against Phase24's judge. **`/discovery Phase25` opens Pass 1** and confirms or rewrites this doc.
 **Written on:** the machine with Unreal, at `de4f5d9`.
-**Seeded from:** [`../Research/261101_R_SkinMapsFromAnImageModel.md`](../Research/261101_R_SkinMapsFromAnImageModel.md) (RD-AIS-1, RD-AIS-2; Passes 3 and 6) · [`../Research/261101_R_Spike_SkinMapFromImageModel.md`](../Research/261101_R_Spike_SkinMapFromImageModel.md) (the route proven on hm08's head; scripts beside it) · [`../Research/261101_R_OneValidatedSkin.md`](../Research/261101_R_OneValidatedSkin.md) (OVS-3: AI enters as a structure) · [`Phase24_OneValidatedSkin.md`](Phase24_OneValidatedSkin.md).
+**Seeded from:** [`../Research/261101_R_SkinMapsFromAnImageModel.md`](../Research/261101_R_SkinMapsFromAnImageModel.md) (RD-AIS-1, RD-AIS-2; Passes 3 and 6) · [`../Research/261101_R_Spike_SkinMapFromImageModel.md`](../Research/261101_R_Spike_SkinMapFromImageModel.md) (the route proven on hm08's head; scripts beside it) · [`../Research/261101_R_OneValidatedSkin.md`](../Research/261101_R_OneValidatedSkin.md) (OVS-3: AI enters as a structure) · [`Phase24_OneValidatedSkin.md`](Complete/Phase24_OneValidatedSkin.md).
 
 ## Outcome
 

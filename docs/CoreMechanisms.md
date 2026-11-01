@@ -16,5 +16,6 @@ every run, up front. **Every row is a problem this project has already solved.**
 
 | # | The problem | Owning rule | Copy this |
 |---|---|---|---|
+| 1 | **Making a body map larger than 2048 inside the machine's memory** (an 8K map's per-texel fields and temporaries need ~45 GB made whole) | `docs/specs/Authoring/SkinMaps.md` §One subject's set at 8K (RD-P24-7) | `gen_synth_skin.compose_banded` / `band_pre` / `band_view` / `parts_banded` (bands of rows; what needs the whole atlas taken once); `gen_skin_shine.relief`'s `CHUNK`; `gen_skin_maps.bleed`'s ring-only path above 2048 |
 
-*No rows yet (2026-11-01, carried from upstream at the fourth drain). The first close that solves a problem a later phase will meet adds one.*
+*Row 1 added at Phase24's close (2026-11-01).*

@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase (Phase23 closed 2026-10-27).*
+*No active phase (Phase24 closed 2026-11-01).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -32,10 +32,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
-
-### Phase24 — One Validated Skin — SEEDED *(numbered and seeded 2026-11-01 by `/research` on the lead's "one complete set build and tested,,, then we can add variety", after OMF's input of the same day: "today's hm08, Matter Library hosts it"; placed at the head of `## Future`, as the platform's skin phase waits on it)*
-**Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served as one finished set, ready for Studio when Studio can take it. *(Split 2026-11-01, RD-OVS-6: the image model's skin is Phase25.)*
-- `docs/Planning/Phases/Phase24_OneValidatedSkin.md` · research `docs/Planning/Research/261101_R_OneValidatedSkin.md` (OMF's input; Pass 2, the plan) · `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md`
 
 ### Phase25 — AI Skin Structure — SEEDED *(split out of Phase24 and seeded 2026-11-01 by `/research` on the lead's "Split and seed", RD-OVS-6; runs after Phase24, against its judge)*
 **Outcome:** an image model's person becomes a skin structure in the library (projected onto the body, its light removed, turned into pigment and calibrated by the maker), judged beside the scanned skin and Phase24's skin on the same body.
@@ -242,3 +238,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** every skin tone has several real-looking skins with no person in them, each tone with its own regional colour, made from one set of pigment maps.
 - `docs/Planning/Phases/Complete/Phase23_SyntheticSkinSets.md`
 *Closed 2026-10-27: three skins per tone from the pigment maker, the face's colour placed per fit group, `matterlib-0.2.0-dev.14`; the lead: "looks good".*
+
+### Phase24 — One Validated Skin — COMPLETE
+**Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served as one finished set, ready for Studio when Studio can take it.
+- `docs/Planning/Phases/Complete/Phase24_OneValidatedSkin.md`
+*Closed 2026-11-01: `Skin_Tone34` and `Nail_Tone34`, one subject's set at 8K, served to the dev install; the lead: "C is fine", "seem to be the same person".*

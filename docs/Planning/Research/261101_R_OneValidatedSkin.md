@@ -123,7 +123,7 @@
   - masks at the brows, lids and lips;
   - inversion to melanin and blood through the maker's skin model;
   - the maker taking that field in place of its own.
-- **The plan is seeded as [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md):**
+- **The plan is seeded as [`Phase24_OneValidatedSkin.md`](../Phases/Complete/Phase24_OneValidatedSkin.md):**
   - **one set** = body skin (lips in) + its own shine set + nails, one tone, one person;
   - **four steps:** the judge and the ruler click → C1, the pigment maker tuned to the bar → C2, the image model's skin as a structure → the winner finished, served and seen on the character.
   - It answers OVS-Q1 (two C rows: C1, C2), OVS-Q2 (the views and distances as recommended) and OVS-Q3 (the default age, unless the lead sets it) **as recommendations for discovery.**
@@ -141,7 +141,7 @@ The lead, 2026-11-01, verbatim (to the Phase24 seed's questions): *"Tone, yes ; 
 - **RD-OVS-3 — The subject keeps hm08's default age** (*"Age, keep"*). It answers OVS-Q3.
 - **RD-OVS-4 — The lead asks the platform for Studio's side** (the shine-map carry and a draft in the look-dev scene). The library builds what it can now, so the set is ready to test when Studio can take it (*"Yes... I will … proceed with what we can now"*).
 - **RD-OVS-5 — The lead supplies Krea 2 and FLUX.2 [klein]** (*"I will get us krea and also Flux klein to tryout"*).
-- **RD-OVS-6 — Two phases.** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md) builds the judge at 8K, the pigment maker's skin tuned to the bar, and the finished set. [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) brings the image model's skin, as a structure, against the same judge (*"Split and seed"*). It replaces Pass 2's four-step plan.
+- **RD-OVS-6 — Two phases.** [`Phase24_OneValidatedSkin.md`](../Phases/Complete/Phase24_OneValidatedSkin.md) builds the judge at 8K, the pigment maker's skin tuned to the bar, and the finished set. [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) brings the image model's skin, as a structure, against the same judge (*"Split and seed"*). It replaces Pass 2's four-step plan.
 
 ## Status
 
@@ -150,5 +150,5 @@ The lead, 2026-11-01, verbatim (to the Phase24 seed's questions): *"Tone, yes ; 
   - Pass 2: the library's side, and the plan (2026-11-01).
 - **Ruled 2026-11-01** (recorded above by date and content): OMF keeps the approach; one subject on today's hm08; this library hosts the phase.
 - **Ruled by the lead, 2026-11-01:** RD-OVS-1 … 6 (`## Resolved`): the bar's tone, 8K, the default age, Studio's side asked of the platform, the models supplied, two phases.
-- **Seeded:** [`Phase24_OneValidatedSkin.md`](../Phases/Phase24_OneValidatedSkin.md) (the judge, the maker's skin, the finished set), then [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) (the image model's skin against the same judge).
+- **Seeded:** [`Phase24_OneValidatedSkin.md`](../Phases/Complete/Phase24_OneValidatedSkin.md) (the judge, the maker's skin, the finished set), then [`Phase25_AiSkinStructure.md`](../Phases/Phase25_AiSkinStructure.md) (the image model's skin against the same judge).
 - **▶ Next:** `/discovery Phase24` when the lead is ready.
