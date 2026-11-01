@@ -13,10 +13,12 @@ Based `Terracotta`, (0.555, 0.212, 0.11), and its mean roughness to 0.95 under t
 (the entry's 1.0 is a ceiling; a sanded face keeps a trace of sheen on its grains). Everything
 here only varies around them.
 
-Writes MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_<channel>_s01.png:
-basecolor (sRGB-encoded), roughness and normal (linear data, NormalGL). Scale `s01`: a 0.1 m
-tile at 1024 px (about 0.1 mm a texel): flash clouds 2 to 5 cm, sand and grog 0.3 to 1.5 mm,
-pin pores 0.2 to 0.6 mm. Seamless (tileable.py), fixed seed, no network.
+Writes MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_<channel>_s1.png:
+basecolor (sRGB-encoded), roughness and normal (linear data, NormalGL). Scale `s1`: a 1 m tile
+at 1024 px (about 1 mm a texel): flash clouds 20 to 50 cm, the body's own unevenness 5 to 10 cm,
+grog 2 to 3 mm, sand and pin pores single texels. Seamless (tileable.py), fixed seed, no network.
+*(Was `s01`, flash clouds 2 to 5 cm in a 0.1 m tile: three or four per tile, so the tile showed
+as a grid on a floor; the maintainer's redo, batch 261101-1, "the pattern is too repetitive".)*
 
     gen_terracotta_unglazed.py [--out DIR]
 
@@ -37,7 +39,7 @@ import tileable as tl  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
 OUT = ROOT / "MatterLibrary" / "textures" / "base" / "engineered" / "ceramic"
 SET = "Terracotta_Unglazed"
-SCALE = "s01"
+SCALE = "s1"
 SEED = 4207
 PB_TERRACOTTA = np.array([0.555, 0.212, 0.11])   # Physically Based `Terracotta`, linear sRGB
 ROUGH_MEAN = 0.95                                # under the entry's 1.0: see the docstring
@@ -53,13 +55,28 @@ def spots(n: int, seed: int, radius: float, share: float) -> np.ndarray:
     return np.clip((r - d1) / (0.3 * r), 0, 1) * keep
 
 
+def soften(a: np.ndarray, sigma: float) -> np.ndarray:
+    """A wrap-around Gaussian blur (sigma in texels), done in the frequency domain so it tiles."""
+    f = np.fft.fftfreq(a.shape[0])
+    g = np.exp(-2 * (np.pi * sigma) ** 2 * (f[:, None] ** 2 + f[None, :] ** 2))
+    return np.real(np.fft.ifft2(np.fft.fft2(a) * g))
+
+
 def maps() -> dict:
-    flash = tl.fbm((2, 4, 8), SEED)                              # kiln flashing, 2 to 5 cm clouds
-    body = tl.fbm((16, 32), SEED + 1)                            # the body's own unevenness
-    fine = tl.fbm((128, 256), SEED + 2)                          # the clay's grain
-    sand_pale = spots(110, SEED + 10, 0.26, 0.07)                # quartz sand, pale
-    grog_dark = spots(70, SEED + 20, 0.26, 0.05)                 # grog, darker red-brown
-    pores = spots(160, SEED + 30, 0.22, 0.12)                    # open pin pores
+    # Kiln flashing, 20 to 50 cm clouds: warped cell blobs over odd-scaled noise, so no octave's
+    # square grid shows (low-scale value noise alone reads as soft horizontal and vertical bands).
+    warp = (0.6 * (tl.fbm((3, 7), SEED + 40) - 0.5), 0.6 * (tl.fbm((3, 7), SEED + 41) - 0.5))
+    d1, _, cid = tl.cells(4, SEED + 42, warp=warp)
+    lift = np.random.RandomState(SEED + 43).rand(16)[cid]
+    blobs = soften(np.clip(1 - d1 / 0.75, 0, 1) ** 1.5 * (0.4 + 0.6 * lift), 40)
+    flash = 0.55 * blobs + 0.45 * tl.fbm((3, 5, 7, 11), SEED)
+    flash = (flash - flash.min()) / (flash.max() - flash.min())
+    body = tl.fbm((10, 20, 40), SEED + 1)                        # the body's own unevenness, 2.5 to 10 cm
+    fine = tl.fbm((256, 512), SEED + 2)                          # the clay's grain
+    rng = np.random.RandomState(SEED + 5)                        # one value per texel tiles by itself
+    sand_pale = (rng.rand(tl.SIZE, tl.SIZE) > 0.97).astype(float)  # quartz sand, pale, ~1 mm
+    pores = (rng.rand(tl.SIZE, tl.SIZE) > 0.975).astype(float)     # open pin pores, ~1 mm
+    grog_dark = spots(400, SEED + 20, 0.4, 0.10)                 # grog, darker red-brown, 2 to 3 mm
 
     # Flash: cooler-fired areas go paler and buff (less red), flame-touched ones deeper and browner.
     f = flash - 0.5
@@ -74,10 +91,11 @@ def maps() -> dict:
 
     rough = 0.05 * (fine - 0.5) + 0.03 * pores - 0.06 * sand_pale
     rough = np.clip(rough - rough.mean() + ROUGH_MEAN, 0, 1)
-    height = (0.6 * fine + 0.25 * body + 0.5 * sand_pale + 0.3 * grog_dark - 1.2 * pores)
+    # At 1 mm a texel a single-texel grain is already steep: a light hand, or it reads as stucco.
+    height = (0.6 * fine + 4.0 * body + 0.25 * sand_pale + 0.3 * grog_dark - 0.5 * pores)
     return {"basecolor": tl.rgb(tl.linear_to_srgb(albedo)),
             "roughness": tl.gray(rough),
-            "normal": tl.normal_map(height, strength=5.0)}
+            "normal": tl.normal_map(height, strength=1.5)}
 
 
 def main(argv=None) -> int:

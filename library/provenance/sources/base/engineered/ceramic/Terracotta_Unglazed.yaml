@@ -4,9 +4,9 @@
 id: base/engineered/ceramic/Terracotta_Unglazed    # mean albedo anchored to Physically Based `Terracotta`
 version: v01
 files:
-  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_basecolor_s01.png
-  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_normal_s01.png
-  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_roughness_s01.png
+  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_basecolor_s1.png
+  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_normal_s1.png
+  - MatterLibrary/textures/base/engineered/ceramic/Terracotta_Unglazed_roughness_s1.png
 provenance:
   source: procedural
   license: CC0-1.0
