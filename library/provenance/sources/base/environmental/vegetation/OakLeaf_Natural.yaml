@@ -1,13 +1,13 @@
 # Draft provenance for one texture set (Phase11 batch 261002-7; lead ruling Q2 = A, 2026-09-25).
 # Holds exactly the `provenance:` block a release lock will carry for this texture when a
 # maintainer promotes it, so nothing is re-derived at promotion time.
-id: base/environmental/vegetation/OakLeaf_Natural    # oak outline and mean albedo by judgement (re-made 2026-10-31: two leaves, livelier green, 0.1 m)
+id: base/environmental/vegetation/OakLeaf_Natural    # oak outline and mean albedo by judgement (re-made 2026-10-31: two leaves, livelier green, 0.1 m; 2026-11-01: about 180 leaves on a 1 m tile)
 version: v01
 files:
-  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_basecolor_s01.png
-  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_normal_s01.png
-  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_opacity_s01.png
-  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_roughness_s01.png
+  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_basecolor_s1.png
+  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_normal_s1.png
+  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_opacity_s1.png
+  - MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_roughness_s1.png
 provenance:
   source: procedural
   license: CC0-1.0
