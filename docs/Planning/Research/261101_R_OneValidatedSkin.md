@@ -80,11 +80,17 @@
   - OMF's recommendation for that phase: a skin ships its pigment fields and the model's table, and the platform's bake turns pigment into colour. Cosmetics (foundation, lipstick, tattoo ink, dirt) stay paint over the skin.
 - **OVS-7 — The bar is the face only.** The platform's fit of the scan to hm08 baked the head's maps into the face layout and the atlas, and colour-matched the body to the head's medians at the neck seam (2026-10-25).
 
+- **OVS-8 — Hold the lips and the picture size fixed too** (added 2026-11-01, after OMF read the platform's own character model of the same day).
+  - The bar wears its lips on the skin, so every column does.
+  - The bar was baked at 8K on hm08's atlas, while today's skins are 2048². The columns are compared at one layout and one size: the bar resampled to the candidate's size, or the candidate made at the bar's. Otherwise resolution, not skin, decides the verdict.
+  - The platform now draws one UV set on a skinned mesh, so the atlas is the layout.
+  - The platform's model also puts the lips in the body, which touches P15 and RD-P21-2. It reaches this library as the platform's own map asks, not through this phase.
+
 ## Held fixed, and what varies
 
 | Held fixed for the whole phase | Varies |
 |---|---|
-| the hm08 female body · its eyes · card hair · the look-dev scene and its light · the views and distances · the tone | **only the skin:** its colour map and its shine set (roughness, relief, cavity, scatter) |
+| the hm08 female body · its eyes · card hair · the look-dev scene and its light · the views and distances · the tone · **the lips worn on the skin**, as the bar's already are · **one layout (hm08's atlas) and one picture size for A, B and C** (OVS-8) | **only the skin:** its colour map and its shine set (roughness, relief, cavity, scatter) |
 
 ## Out of scope, each with its home
 
@@ -104,7 +110,7 @@
 
 ## Status
 
-- **Passes:** 1, OMF's input (2026-11-01).
+- **Passes:** 1, OMF's input (2026-11-01; OVS-8 added the same day).
 - **Ruled 2026-11-01** (recorded above by date and content): OMF keeps the approach; one subject on today's hm08; this library hosts the phase.
 - **Open:** OVS-Q1 … Q3, for the library's discovery.
 - **▶ Next:** this library seeds *One Validated Skin* from this doc. Its first steps are the judge, the platform's P33, P34 and P35.
