@@ -14,6 +14,8 @@
 
 ## Items, ranked
 
+*(Item 5 added after the deposit, on the lead's "Add that to your retro".)*
+
 ### 1 — "Read the seed at origin" cannot be followed when the seed is in a sibling's clone that is ahead, behind, and dirty at once `[doc-gap]`
 
 **Grounding.** `research.md` §The research discipline says a seed read from a clone is *"read at origin (`git show origin/<branch>:<path>`)"*. This run's seeds were in the platform's documentation clone, in three states at once:
@@ -61,6 +63,20 @@ None of them is the literal phrase. I seeded and said so in the Status line. The
 **Proposed fix.** *"A load you priced in the question, answered with the lead's intent to proceed, is consented. A bigger load found after (a second model, a larger download) is priced again before it runs."*
 
 **Where it'd live.** `research.md` §Disposable probes (*Price a heavy step*).
+
+---
+
+### 5 — `retro.md` does not say to start the next verb's session, so the retro handed back a ▶ line and stopped `[doc-gap]`
+
+**Grounding.** This run's `/retro` ended on *"▶ … run `/discovery Phase24` in a fresh session"* and the terminator. The lead: *"You did not offer to kick off discovery in the retro.. is taht not part of the process here?"*
+
+The practice lives only in the agent's memory for this project, from the lead's 2026-10-27 *"I thought you would kick off ML_P22_E1 on the retro... please do that now"*. That memory says: `python3 ~/.claude/hooks/session_name.py --next "<verb> <unit>"` gives the name (exit 3 = already running), then `claude --bg --name <name> "<verb> <unit>"` from the repo root, and the handback reports the id and `claude attach <id>`.
+
+Neither `.ai/commands/retro.md` nor `LOCAL_DELTAS.md` mentions it. The station's change log says IMRSV's `/retro` already does it. So the same miss repeats in any session that reads the command and not the memory. Fixed late, after the terminator, on the lead's prompt: `ML_P24_D1` (`5bf826a5`).
+
+**Proposed fix.** In `retro.md` §Do this, between the deposit and the hand-back: *"When the run's ▶ is a next verb that needs nothing from the lead first, start it: `session_name.py --next "<verb> <unit>"` for the name (exit 3: already running, say so), then `claude --bg --name <name> "<verb> <unit>"` from the repo root. Report the id and `claude attach <id>` before the terminator. An open lead question rides into the launched session through the phase doc."* This is upstream's question first: IMRSV has it, so it is likely portable.
+
+**Where it'd live.** `retro.md` (upstream; IMRSV's version is the reference). Failing that, `LOCAL_DELTAS.md`.
 
 ---
 
