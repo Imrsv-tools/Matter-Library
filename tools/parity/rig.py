@@ -464,6 +464,10 @@ def cast_for(skin: str) -> dict:
     Phase08 8.2 (RD-P08-3): a skin, its lips and its nails pair by the shared Variant token
     (``Skin_FitzpatrickIV`` <-> ``Lips_FitzpatrickIV`` <-> ``Nail_FitzpatrickIV``). A skin with
     no such pair keeps the Natural articles.
+
+    Phase24 (RD-P24-3): a FITTED skin with no ``Lips_<Variant>`` wears its lips itself, as the
+    scanned bar does and as the platform's character puts the lips in the body: the lip colour is
+    the skin's map and the lip gloss its roughness map. (Every skin before Phase24 has its lips.)
     """
     cast = dict(CHARACTER_CAST)
     variant = skin.split("_")[1] if skin.count("_") >= 5 else None
@@ -471,6 +475,10 @@ def cast_for(skin: str) -> dict:
         stem = f"{family}_{variant}_Clean_Base_s001_v01"
         if variant and any(jobmod.MATERIALS.rglob(f"{stem}.mtlx")):
             cast[part] = stem
+        elif part == "Lips" and variant:
+            found = next(jobmod.MATERIALS.rglob(f"{skin}.mtlx"), None)
+            if found is not None and jobmod.Article.read(found).fits:
+                cast[part] = skin
     return cast
 
 

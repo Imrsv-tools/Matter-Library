@@ -1,9 +1,9 @@
 # Phase24 — One Validated Skin
 
-**Status:** BRIEF READY (discovery Pass 1, 2026-11-01). *Before:* SEEDED the same day. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](Phase25_AiSkinStructure.md), which runs against this phase's judge.
+**Status:** IN EXECUTION (opened 2026-11-01 by the lead's *"/execute Phase24"* at `91f5eb9`). *Before:* BRIEF READY (discovery Pass 1, the same day), and SEEDED before that. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](Phase25_AiSkinStructure.md), which runs against this phase's judge.
 
 *Migration note (2026-11-01, the method re-sync to upstream `897f5f3`): this Brief was written under the earlier `/discovery`, so it has no `## Rides on` table. `docs/CoreMechanisms.md` holds no rows yet, so the table would be empty and `/execute` owes nothing for it beyond reading that file at its start.*
-**Lane:** `build` (§Risk lane). **Next:** `/execute Phase24`.
+**Lane:** `build` (§Risk lane). **Next:** 24.1, click 1 (the ruler).
 **Measured at:** `08da67b`, on **the machine with Unreal** (Unreal 5.8 at the path `unreal/build.sh` takes as `UE`; the official Blender 5.2.2 as `MATTER_BLENDER`, Learnings B22; `unreal-runtime-v7` pinned).
 **Builds on:** [`Complete/Phase23_SyntheticSkinSets.md`](Complete/Phase23_SyntheticSkinSets.md) (the pigment maker, the look view's reference column, the placed face regions and the scratch solver) · [`Complete/Phase22_SkinMapsBeyondColour.md`](Complete/Phase22_SkinMapsBeyondColour.md) (the four shine maps) · [`../../specs/Authoring/SkinMaps.md`](../../specs/Authoring/SkinMaps.md).
 **Research:** [`../Research/261101_R_OneValidatedSkin.md`](../Research/261101_R_OneValidatedSkin.md) (OMF's protocol, OVS-1 … 8; the library's Pass 2; RD-OVS-1 … 6).
@@ -222,3 +222,9 @@ Time to the first click: 24.1 is views in one tool, three local pictures and a c
   - **Baseline:** `run_all.py` at `08da67b`: **18 lanes, 18 PASS, none skipped.**
   - **The seed's questions, closed:** the 8K maker's cost → F-P24-2, RD-P24-7 · the look view's columns at 8K → F-P24-4, RD-P24-5 · where the pigment fields are kept → RD-P24-6. OVS-Q1 → one C row here (Phase25 adds D) · OVS-Q2 → RD-P24-4 · OVS-Q3 → RD-OVS-3.
   - **Tree:** ahead of origin by three unpushed commits at kickoff (two retro and research commits, and a sibling session's retro item landing during the pass); nothing to pull.
+
+## Execution ledger
+
+*`step · commit · result · next`. Opened 2026-11-01 at `91f5eb9`, on the machine with Unreal; no Unreal Editor running; the tree clean but four commits ahead of origin (unpushed).*
+
+- **24.1.1 — the judge** · the `24.1.1` commit · `look.py --judge` (the nine views of RD-P24-4; close-ups are the 40 cm view magnified, 7–9 cm across) and `--bar <dir>` (column A, worn on the body and the lips); `rig.cast_for` puts a fitted skin with no `Lips_<Variant>` on the lips (no skin had none, so no cast changed); `tools/parity/bar_maps.py` makes A's pictures under the git-ignored `library/parity/` (`uv run --with OpenEXR`). **The bar's tone, measured (RD-P24-1):** the head's skin, lips excluded, from its albedo: **0.5131, 0.2742, 0.1856** (red/blue 2.76); A renders it to 0.0003. The albedo is stored sRGB-encoded in float (decoded). **A's shine:** the specular values as stored, over their 99.5th percentile on the face, as the cavity map (face mean 0.894; the body keeps the shared map, 0.959). The scan's scatter map (face 0.16–0.26, grey) is measured, not drawn. **Caught on the way:** a float32 mean over 16M texels drifted the colour scale ~7 %; means are float64. GPU: one launch held A and B at 8K. `run_all.py` 18/18 PASS · next: click 1.

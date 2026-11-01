@@ -120,6 +120,64 @@ def look_views(parts: dict) -> list[dict]:
     return [drv.camera_view(pos, rot, f"__{v}", hide) for v, ((pos, rot), hide) in cams.items()]
 
 
+# ------------------------------------------------------------------ the judge's views (Phase24) --
+# RD-P24-4 (OVS-Q2): the face at a viewer's ~1 m and ~40 cm through the rig's one lens (50 mm on a
+# 36 mm aperture), from the front, at three quarters and in profile (from the key's side); and the
+# eye, the lips and the cheek with the nose, each the 40 cm view MAGNIFIED (the same camera
+# position, a narrower view: what a crop of that view would show, at full resolution). Fixed at
+# click 1 and never changed after.
+JUDGE_VIEWS = {"front1m": "face, front, 1 m", "q1m": "face, three quarters, 1 m", "side1m": "face, profile, 1 m",
+               "front40": "face, front, 40 cm", "q40": "face, three quarters, 40 cm",
+               "side40": "face, profile, 40 cm", "eye": "left eye, 40 cm, magnified",
+               "lips": "lips, 40 cm, magnified", "cheek": "left cheek and nose, 40 cm, magnified"}
+CLOSE_FRAME = {"eye": 0.07, "lips": 0.07, "cheek": 0.09}       # metres across a magnified view
+
+
+def judge_views(parts: dict) -> list[dict]:
+    """The judge's nine cameras (``JUDGE_VIEWS``), placed from the rig's own parts."""
+    pts = parts["Body"]["points"]
+    top = max(p[1] for p in pts)
+    head = [p for p in pts if p[1] > top * 0.88]
+    face = (0.0, float(np.median([p[1] for p in head])) - 0.02, max(p[2] for p in head) - 0.08)
+    mouth = tuple(np.mean(parts["Lips"]["points"], axis=0))
+    iris = np.asarray(parts["Iris"]["points"])
+    eye = tuple(iris[iris[:, 0] > 0].mean(0))                    # the character's left: +X, the key's side
+    near = [p for p in head if abs(p[1] - (eye[1] + mouth[1]) / 2) < 0.01 and 0.015 < p[0] < 0.05]
+    cheek = (0.03, (eye[1] + mouth[1]) / 2, max(p[2] for p in near) - 0.005)
+    always = [p.rsplit("/", 1)[1] for p in jobmod.CHARACTER_HIDE_ALWAYS]
+    fov = math.degrees(2 * math.atan(bc.CAM_APERTURE / 2 / bc.CAM_FOCAL))
+    q, s = math.radians(35), math.radians(90)
+    dirs = {"front": (0.0, 0.04, 1.0), "q": (math.sin(q), 0.04, math.cos(q)), "side": (math.sin(s), 0.04, math.cos(s))}
+    cams = []
+    for name, metres in (("1m", 1.0), ("40", 0.4)):
+        for d, v in dirs.items():
+            cams.append((f"{d}{name}", face, v, metres, fov))
+    for v, target, d in (("eye", eye, (0.25, 0.05, 1.0)), ("lips", mouth, (0.0, 0.0, 1.0)),
+                         ("cheek", cheek, (0.6, 0.05, 0.8))):
+        cams.append((v, target, d, 0.4, math.degrees(2 * math.atan(CLOSE_FRAME[v] / 2 / 0.4))))
+    out = []
+    for v, target, d, metres, f in cams:
+        d = np.asarray(d, float)
+        pos = tuple(np.asarray(target) + d / np.linalg.norm(d) * metres)
+        view = drv.camera_view(pos, bc._look_at(pos, target), f"__{v}", always)
+        view["fov"] = f
+        out.append(view)
+    return out
+
+
+def bar_article(art: jobmod.Article, bar: Path, out: Path) -> jobmod.Article:
+    """``art`` wearing the bar's pictures (``bar_maps.py``): its colour and constant, its specular
+    as the cavity map; the article's other shine maps as they are (RD-P24-5)."""
+    rec = json.loads((bar / "bar.json").read_text(encoding="utf-8"))
+    a = _with_map(art, bar / "basecolor.png", rec["base_color_const"], out / "_colour")
+    text, n = re.subn(r'(<input name="cavity_map" type="filename" value=")[^"]*(")',
+                      lambda m: m.group(1) + str((bar / "cavity.png").resolve()) + m.group(2),
+                      a.path.read_text(encoding="utf-8"))
+    if n != 1:
+        raise SystemExit(f"{art.name}: no cavity_map to carry the bar's specular")
+    return _relocated(a, text, out / f"{art.name}.mtlx")
+
+
 def _relocated(art: jobmod.Article, text: str, out: Path) -> jobmod.Article:
     """``text`` (an article's .mtlx) written to ``out``, its pictures named by absolute path."""
     def absolute(m: re.Match) -> str:
@@ -255,16 +313,16 @@ def linear(pfm: Path) -> np.ndarray:
     return img.reshape(h // SUPERSAMPLE, SUPERSAMPLE, w // SUPERSAMPLE, SUPERSAMPLE, c).mean(axis=(1, 3))
 
 
-def sheet(out: Path, columns: list[tuple[str, str]], cell: int) -> Path:
+def sheet(out: Path, columns: list[tuple[str, str]], cell: int, views: dict = VIEWS) -> Path:
     """Rows: the views; columns: (setting prefix, heading). The ear row uses the backlit settings."""
     font, pad, head = rig._font(22), 8, 40
     w = len(columns) * (cell + pad) + pad + 220
-    h = head + len(VIEWS) * (cell + pad) + pad
+    h = head + len(views) * (cell + pad) + pad
     img = Image.new("RGB", (w, h), (24, 24, 24))
     d = ImageDraw.Draw(img)
     for c, (_, title) in enumerate(columns):
         d.text((220 + pad + c * (cell + pad), 10), title, fill=(235, 235, 235), font=font)
-    for r, (view, label) in enumerate(VIEWS.items()):
+    for r, (view, label) in enumerate(views.items()):
         y = head + pad + r * (cell + pad)
         d.text((pad, y + cell // 2 - 12), label, fill=(200, 200, 200), font=rig._font(18))
         for c, (prefix, _) in enumerate(columns):
@@ -285,6 +343,11 @@ def main(argv=None) -> int:
     ap.add_argument("--reference", type=Path, metavar="PICTURE",
                     help="a colour picture on the skin's atlas, from outside the tree (Phase23 RD-P23-10): "
                          "three more columns, the picture as made, held to the skin's tone, and that at 2048")
+    ap.add_argument("--bar", type=Path, metavar="DIR",
+                    help="Phase24 column A: the scanned bar's pictures made by bar_maps.py (git-ignored), "
+                         "worn by the skin article on the body AND the lips (RD-P24-3, RD-P24-5)")
+    ap.add_argument("--judge", action="store_true",
+                    help="Phase24's nine fixed views (RD-P24-4) in place of the four look views")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
@@ -327,10 +390,19 @@ def main(argv=None) -> int:
                 raise SystemExit(f"{sid}'s cast builds different meshes; it cannot share the launch")
             settings.append({"id": sid, "materials": rmats})
             columns.append((sid, heading))
-    settings +=[s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
-
+    if a.bar:
+        bart = bar_article(art, a.bar.resolve(), work / "bar")
+        bmats, bmeshes = materials(cast | {"Body": bart, "Lips": bart}, work / "bar_cast")
+        if [Path(m["file"]).read_bytes() for m in bmeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
+            raise SystemExit("the bar's cast builds different meshes; it cannot share the launch")
+        settings.insert(0, {"id": "bar", "materials": bmats})
+        columns.insert(0, ("bar", "A: the scanned bar"))
+        columns[columns.index(("new", f"working tree: {art.name}"))] = ("new", f"B: {art.name}")
     parts = bc.load_parts()
-    views = look_views(parts)
+    views = judge_views(parts) if a.judge else look_views(parts)
+    labels = JUDGE_VIEWS if a.judge else VIEWS
+    if not a.judge:
+        settings += [s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
     sun, sky = drv.lights()
     ujob = {"format": drv.LOOK_JOB_FORMAT, "width": a.width * SUPERSAMPLE, "out_dir": str(work / "raw"),
             "settle_frames": drv.SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes,
@@ -349,7 +421,7 @@ def main(argv=None) -> int:
         Image.fromarray(drv.srgb8(linear(work / "raw" / f"{i}{x}.pfm"))).save(out / f"{i}{x}.png")
     for pfm in (work / "raw").glob("*.pfm"):
         pfm.unlink()                                  # ~50 MB each; the PNGs are the record
-    p = sheet(out, columns, a.cell)
+    p = sheet(out, columns, a.cell, labels)
     print(f"look sheet {p}")
     return 0
 
