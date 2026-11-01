@@ -6,7 +6,7 @@ then carries "where in the picture" to its own texel through its UV — the ear'
 construction, however the UV squeezes it; its back (unseen) is left to the coordinate field.
 Writes <out_dir>/proj_<ear>.npz (frame pixel -> island point) + ears json {ear: {proj: path}} for
 probe3_field.py, and a check picture (hm08's rendered ear outline on the drawn ear).
-usage: python probe5_earproj.py <first_pass_island.png> <uv_frame.json> <P25_Views dir> <out_dir> <tag> [pad_rim_px 12] [min_nz 0.05]"""
+usage: python probe5_earproj.py <first_pass_island.png> <uv_frame.json> <P25_Views dir> <out_dir> <tag> [pad_rim_px 12] [min_nz 0.05] [ease_px 6] [back_out 1.3]"""
 import json, sys
 import numpy as np
 from PIL import Image, ImageDraw
@@ -49,6 +49,12 @@ def pushpull(img, kn):
 
 PAD_RIM = int(sys.argv[6]) if len(sys.argv) > 6 else 12
 MIN_NZ = float(sys.argv[7]) if len(sys.argv) > 7 else 0.05
+EASE = float(sys.argv[8]) if len(sys.argv) > 8 else 6.0
+BACK_OUT = float(sys.argv[9]) if len(sys.argv) > 9 else 1.3
+SMOOTH = 3.0
+EARM = Hd["ears"] > 0.5
+_rr, _cc = np.divmod(Hd["idx"], 8192)
+EX = (y1 - _rr - 0.5) * W / (y1 - y0) - 0.5; EY = (_cc - x0 + 0.5) * H / (x1 - x0) - 0.5
 _r, _c = np.divmod(Hd["idx"][Hd["ears"] > 0.5], 8192)
 PJX = np.clip(np.round((y1 - _r - 0.5) * W / (y1 - y0) - 0.5).astype(int), 0, W - 1)
 PJY = np.clip(np.round((_c - x0 + 0.5) * H / (x1 - x0) - 0.5).astype(int), 0, H - 1)
@@ -88,14 +94,22 @@ for side, view in (("ear_r", "f-80"), ("ear_l", "f+80")):
     w = np.clip((np.abs(n[ey, ex, 2]) - MIN_NZ) / 0.1, 0, 1)   # the bowl's walls are grazing from the side: keep them
     o = centre + (np.stack([ey, ex], 1) - c_r) @ Mf.T          # (row, col) in the island frame
     X = (y1 - rr[ey, ex] - 0.5) * W / (y1 - y0) - 0.5; Y = (cc[ey, ex] - x0 + 0.5) * H / (x1 - x0) - 0.5
-    jx, jy = np.round(X).astype(int), np.round(Y).astype(int)
-    k = (w > 0) & (jx >= 0) & (jx < W) & (jy >= 0) & (jy < H)
+    # each pixel spread over its four neighbouring texels (bilinear), not the nearest one: at grazing angles
+    # a pixel spans a run of texels and nearest-rounding leaves stair-steps along the rim
     acc = np.zeros((H, W, 2)); wt = np.zeros((H, W))
-    np.add.at(acc, (jy[k], jx[k]), o[k][:, ::-1] * w[k, None]); np.add.at(wt, (jy[k], jx[k]), w[k])
+    bx0, by0 = np.floor(X).astype(int), np.floor(Y).astype(int); fx_, fy_ = X - bx0, Y - by0
+    for ddx, ddy, ww in ((0, 0, (1 - fx_) * (1 - fy_)), (1, 0, fx_ * (1 - fy_)), (0, 1, (1 - fx_) * fy_), (1, 1, fx_ * fy_)):
+        jx, jy = bx0 + ddx, by0 + ddy; wv = w * ww
+        k = (wv > 0) & (jx >= 0) & (jx < W) & (jy >= 0) & (jy < H)
+        np.add.at(acc, (jy[k], jx[k]), o[k][:, ::-1] * wv[k, None]); np.add.at(wt, (jy[k], jx[k]), wv[k])
     good = wt > 0.05
     O = np.where(good[..., None], acc / np.maximum(wt, 1e-9)[..., None], 0)
     # holes inside the ear's front (folds the camera grazes): filled finely from their projected neighbours
+    # the ear's front = what the profile camera sees (facing out from the head is NOT it: the ear's back
+    # faces out too, the ear standing off the skull); its ragged grazing edge smoothed (blur, re-threshold)
     front = binary_fill_holes(binary_closing(good, iterations=3))
+    front = gaussian_filter(front.astype(float), SMOOTH) > 0.5
+    good &= front
     O = pushpull(O, good)
     for _ in range(300):   # then smooth the holes at full resolution (pull-push alone fills in squares)
         av = (np.roll(O, 1, 0) + np.roll(O, -1, 0) + np.roll(O, 1, 1) + np.roll(O, -1, 1)) / 4
@@ -110,6 +124,18 @@ for side, view in (("ear_r", "f-80"), ("ear_l", "f+80")):
     padm = binary_dilation(binary_closing(padm, iterations=2), iterations=PAD_RIM) & (np.abs(np.arange(W)[None, :] - (F["features"][side]["cx"])) < 200)
     ay, ax = np.nonzero(padm & ~front)
     aff = np.c_[ax, ay, np.ones(len(ax))] @ coef
+    # the ear's back and surround: the fitted move pushed out from the drawn ear's centre by BACK_OUT, so it
+    # samples plain skin beyond the dark halo the model paints round an ear (still one coordinate, no blend)
+    ec = centre[::-1]
+    aff = ec + BACK_OUT * (aff - ec)
+    # the front's edge: the projection eased into the fitted move over EASE px (a coordinate ramp, not a
+    # colour blend), so the visible rim does not step against the ear's back (serrated helix, lobe step)
+    if EASE > 0:
+        from scipy.ndimage import distance_transform_edt
+        dist = distance_transform_edt(front)
+        wv = np.clip(dist[py, px] / EASE, 0, 1)[:, None]
+        affF = ec + BACK_OUT * (np.c_[px, py, np.ones(len(px))] @ coef - ec)
+        O[py, px] = wv * O[py, px] + (1 - wv) * affF
     np.savez_compressed(f"{out}/proj_{tag}_{side}.npz", px=np.r_[px, ax], py=np.r_[py, ay], ox=np.r_[O[py, px, 0], aff[:, 0]], oy=np.r_[O[py, px, 1], aff[:, 1]])
     res[side] = {"proj": f"{out}/proj_{tag}_{side}.npz", "iou": round(iou, 3), "s": round(float(s), 3), "rot": float(deg), "aspect": round(float(asp), 3)}
     print(f"{side}: overlap (IoU) {iou:.3f}; render->island x{s:.3f}, wider x{asp:.2f}, turn {deg:+.1f} deg; {good.sum()} texels of the island get the projection")
