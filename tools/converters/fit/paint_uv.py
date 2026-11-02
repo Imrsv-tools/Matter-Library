@@ -5,7 +5,7 @@
     python3 -I tools/converters/fit/paint_uv.py paint <dir> <tag> --model krea|flux [--strength 0.9] [--seeds 7,11]
     uv run tools/converters/fit/paint_uv.py gate  <dir> <picture>[,<picture>…]
     uv run tools/converters/fit/paint_uv.py warp  <dir> <picture> <tag>
-    uv run tools/converters/fit/paint_uv.py put   <dir> <picture> <tag>
+    uv run --with scipy tools/converters/fit/paint_uv.py put <dir> <picture> <tag> [--no-ear]
 
 hm08's head is one island of the atlas: the face unwrapped, the scalp rolled out to each side, the ears
 as pads. ``cut`` takes that island from the subject's colour (``Tone34`` as served, held at its face-core
@@ -210,7 +210,8 @@ def cmd_paint(d: Path, tag: str, model: str, strength: float, seeds: list, serve
     graph = json.loads(g.WORKFLOWS[model].read_text(encoding="utf-8"))
     version = json.loads(g._call(server, "/system_stats"))["system"]["comfyui_version"]
     import hashlib  # noqa: PLC0415
-    # uploaded under a name carrying its hash: ComfyUI serves a cached result for a re-used name (25.1.11)
+    # uploaded under a name carrying its hash, so each source is its own file on the server. (This was once
+    # read as ComfyUI caching by name; the identical pictures were Krea at 0.9 ignoring its input, 25.1.10.)
     raw = (d / "uv_C.png").read_bytes()
     named = d / f"uv_C_{hashlib.sha256(raw).hexdigest()[:12]}.png"
     named.write_bytes(raw)
@@ -442,10 +443,14 @@ def _warp_once(d: Path, picture: Path, tag: str) -> None:
 
 
 # ------------------------------------------------------------------ put ------------------------
-def cmd_put(d: Path, picture: Path, tag: str) -> None:
+def cmd_put(d: Path, picture: Path, tag: str, ear: bool = True) -> None:
     """The picture back on the island of the subject's 8K atlas, held to the face core; C elsewhere,
     exactly as served. Written as ``D_<tag>.png`` (linear albedo, sRGB-encoded, for ``look.py --candidate``
-    at constant 1) and ``albedo_<tag>.npy`` (for ``project_views.py render``)."""
+    at constant 1) and ``albedo_<tag>.npy`` (for ``project_views.py render``).
+
+    For a subject with ear regions (``gen_synth_skin.SUBJECTS[s]["ear"]``) the ear and its join come from
+    the maker, never the picture (RD-P25-18, -19): ``gen_synth_skin.ear_paint``, which needs SciPy
+    (``uv run --with scipy``). ``ear=False`` (``--no-ear``) keeps the picture's ear, as before 25.1."""
     np, Image = _np(), _img()
     import project_views as pv  # noqa: PLC0415
     F = frame_of(d)
@@ -459,6 +464,12 @@ def cmd_put(d: Path, picture: Path, tag: str) -> None:
     alb = pv.subject_albedo()
     flat = alb.reshape(-1, 3)
     flat[idx] = p.astype(flat.dtype)
+    import gen_synth_skin as gss  # noqa: PLC0415
+    if ear and gss.SUBJECTS[SUBJECT].get("ear"):
+        rep = gss.ear_paint(flat, SUBJECT, pv.head_fields(Path(os.environ.get("P25_FIELDS", pv_default_dir()))))
+        for side, r_ in rep.items():
+            print(f"  ear {side}: {r_['texels']} texels from the maker, level {r_['base']}, x {r_['ratio_full_ear']} on the ear; "
+                  f"{r_['kept_as_picture']} kept as the picture in front; join {r_['join']} texels, face weight at most {r_['join_face_max']}")
     np.save(d / f"albedo_{tag}.npy", alb)
     Image.fromarray((srgb(alb) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     print(f"D_{tag}.png: face core {p[face > 0.9].mean(0).round(4).tolist()}; clipped {(p > 1).any(-1).mean() * 100:.3f} % of the island")
@@ -478,6 +489,7 @@ def main(argv=None) -> int:
     s = sub.add_parser("warp"); s.add_argument("dir", type=Path); s.add_argument("picture"); s.add_argument("tag")
     s.add_argument("--passes", type=int, default=2)
     s = sub.add_parser("put"); s.add_argument("dir", type=Path); s.add_argument("picture"); s.add_argument("tag")
+    s.add_argument("--no-ear", action="store_true", help="keep the picture's ear (before RD-P25-18)")
     a = ap.parse_args(argv)
     if a.cmd == "cut":
         cmd_cut(a.dir, a.width)
@@ -488,7 +500,7 @@ def main(argv=None) -> int:
     elif a.cmd == "warp":
         cmd_warp(a.dir, a.dir / a.picture, a.tag, a.passes)
     else:
-        cmd_put(a.dir, a.dir / a.picture, a.tag)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, ear=not a.no_ear)
     return 0
 
 

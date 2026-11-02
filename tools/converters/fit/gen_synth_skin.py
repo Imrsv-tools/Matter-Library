@@ -167,7 +167,11 @@ SUBJECTS = {
                "shine": {"cavity": {"face": 0.001, "forehead": 0.064, "cheek": 0.044, "nose": -0.053, "alae": -0.292,
                                     "under_eye": -0.137, "tear_trough": -0.016, "upper_lid": -0.151, "eyelid": -0.288,
                                     "chin": 0.007},
-                         "lips_cavity": 0.815, "lips_roughness": 0.30}},
+                         "lips_cavity": 0.815, "lips_roughness": 0.30},
+               # Phase25 (RD-P25-18, -19; F-P25-26): the ear as a gradient, each part borrowing the measured
+               # face region of the same skin build. Read only by ``ear_paint`` (25.1's put); ``compose``
+               # keeps its own ear term, so the served set remakes as it was.
+               "ear": {"front": ["alae"], "rim": ["upper_lid"], "lobe": ["cheek"], "back": []}},
 }
 # ``face`` scales the placed regional colour (``FACE``) as a whole: 1 is the bar's solve.
 # The first gains (23.3.1: sun 1.5 / 0.55, mottle 1.3 / 0.75, redness 0.6 / 1.5, no ``face``) moved the
@@ -435,6 +439,111 @@ def _blur(F, name: str, r: int):
     if "pre" in F:
         return F["pre"]["blur"][(name, r)]
     return gsm.blur(F["masks"][name], r)
+
+
+# ------------------------------------------------------------------ the ear (Phase25) -----------
+# RD-P25-18 (the lead: "yes, gradient route"): the ear's colour is a gradient through the skin model,
+# not a picture. No ear colour is measured anywhere (F-P25-26), so each part borrows the subject's own
+# face region whose skin build matches (``SUBJECTS[s]["ear"]``): the front (thin skin on cartilage) the
+# nose's wings, the thinnest rim the upper lid's step, the lobe (fat, no cartilage) the cheek, the back
+# nothing. The weights are measured on hm08 per texel: stand-off from the skull, front or back by the
+# normal, thinness as the distance to the other side, the lobe as the lowest part of the ear.
+# RD-P25-19 (the lead: "don't touch the face ... from the jaw back is fine ... do it - don't rim the ear
+# with the image"): the gradient owns the whole ear at full strength; the skin round it and the join to
+# the head lie on head skin, never where the face weight is 0.15 or more.
+EAR = {"stand_mm": (1.0, 4.0),      # the ear proper: off the skull (the mask reaches ~1 mm onto it)
+       "own_mm": (0.5, 1.5),        # full strength from here off the skull: the gradient owns rim and root
+       "rim_mm": (2.0, 6.0),        # the rim: within this of the ear's other side
+       "lobe_frac": (0.15, 0.35),   # the lobe: the lowest part of the ear's height
+       "ring_mm": 1.0,              # the ear's root ring: its level is the skin the ear joins
+       "join_mm": 10.0,             # the join onto the head skin round the ear
+       "face_max": 0.15,            # no ear colour where the face weight reaches this
+       "skull_m": 0.06, "near_m": 0.08}
+
+
+def _ramp(x, a, b):
+    t = np.clip((x - a) / (b - a), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def ear_weights(H: dict) -> dict:
+    """Per side (``r``: x < 0, ``l``), the ear texels (indices into ``H``) and their measures. ``H`` is
+    ``project_views.head_fields``: every head texel's position ``P``, normal ``N``, ``ears`` and ``face``.
+    Needs SciPy (``uv run --with scipy``), which the project does not carry."""
+    try:
+        from scipy.spatial import cKDTree  # noqa: PLC0415
+    except ImportError as e:
+        raise SystemExit("the ear gradient needs SciPy: run under `uv run --with scipy`") from e
+    P = H["P"].astype(np.float64)
+    Nn = H["N"].astype(np.float64)
+    ears = H["ears"] > 0.5
+    out = {}
+    for side, sg in (("r", -1), ("l", 1)):
+        ei = np.flatnonzero(ears & (np.sign(P[:, 0]) == sg))
+        Pe = P[ei]
+        c = Pe.mean(0)
+        near = np.flatnonzero(~ears & (np.linalg.norm(P - c, axis=1) < EAR["skull_m"]))
+        stand = cKDTree(P[near]).query(Pe)[0]
+        front = (sg * Nn[ei, 0]) > 0                     # faces away from the skull
+        thick = np.empty(len(ei))
+        for a in (True, False):
+            thick[front == a] = cKDTree(Pe[front != a]).query(Pe[front == a])[0]
+        w_ear = _ramp(stand * 1000, *EAR["stand_mm"])
+        y = Pe[:, 1]
+        lo, hi = y[w_ear > 0.5].min(), y[w_ear > 0.5].max()
+        w = {"front": w_ear * front, "rim": w_ear * front * (1 - _ramp(thick * 1000, *EAR["rim_mm"])),
+             "lobe": w_ear * (1 - _ramp((y - lo) / (hi - lo), *EAR["lobe_frac"])), "back": w_ear * ~front}
+        out_i = np.flatnonzero(~ears & (np.linalg.norm(P - c, axis=1) < EAR["near_m"]))
+        d = cKDTree(Pe).query(P[out_i])[0]
+        keep = d < EAR["join_mm"] / 1000
+        out[side] = {"ei": ei, "stand": stand, "w": w, "join": out_i[keep], "join_d": d[keep]}
+    return out
+
+
+def _face_allowed(fw):
+    """1 where the ear's colour may go, 0 on the face (``face_max`` and up), smooth over 0.10 below it."""
+    return _ramp(EAR["face_max"] - fw, 0.0, 0.10)
+
+
+def ear_paint(flat, subject: str, H: dict, W: dict | None = None) -> dict:
+    """The subject's ear gradient written into ``flat`` (the atlas's linear albedo, texels × 3) in place:
+    the ear's level is its root ring's (the head skin it joins) times the skin model's colour of each
+    texel's borrowed regions over the plain face's. Returns a report; a subject without ``ear`` is an error."""
+    import gen_skin_maps as gm  # noqa: PLC0415
+    parts = SUBJECTS[subject].get("ear")
+    if parts is None:
+        raise SystemExit(f"{subject} has no ear regions")
+    W = ear_weights(H) if W is None else W
+    L = Lut()
+    m0 = L.use(subject)
+    rec = json.loads((gm.RECIPES / f"Skin_{subject}_Clean_Base_s001_v01.json").read_text())
+    reach = np.array([float(x) for x in rec["subsurface_radius_scale"].split(",")])
+    T = SUBJECTS[subject]["face"]
+
+    def col(v):
+        return L(m0 * np.exp(v[..., 0]), BLOOD0 * np.exp(v[..., 1]), 0.8 + v[..., 2]) * np.clip(1 - v[..., 3:4] * reach, 0.2, 1.5)
+    face = np.array(T["face"])
+    c0 = col(face[None])[0]
+    idx, fw = H["idx"], H["face"]
+    rep = {}
+    for side, m in W.items():
+        ei, stand, w = m["ei"], m["stand"], m["w"]
+        v = np.tile(face, (len(ei), 1))
+        for k, regs in parts.items():
+            for reg in regs:
+                v = v + w[k][:, None] * np.array(T[reg])
+        ratio = col(v) / c0
+        base = np.median(flat[idx[ei][stand * 1000 < EAR["ring_mm"]]].astype(np.float64), 0)
+        a = np.maximum(_ramp(stand * 1000, *EAR["own_mm"]), _face_allowed(fw[ei]))[:, None]
+        flat[idx[ei]] = (flat[idx[ei]] * (1 - a) + base * ratio * a).astype(flat.dtype)
+        oi = m["join"]
+        wo = (_face_allowed(fw[oi]) * (1 - _ramp(m["join_d"], 0, EAR["join_mm"] / 1000)))[:, None]
+        flat[idx[oi]] = (flat[idx[oi]] * (1 - wo) + base * wo).astype(flat.dtype)
+        rep[side] = {"texels": int(len(ei)), "base": base.round(4).tolist(),
+                     "ratio_full_ear": np.median(ratio[w["front"] + w["back"] > 0.95], 0).round(3).tolist(),
+                     "kept_as_picture": int((a[:, 0] < 0.5).sum()), "join": int((wo[:, 0] > 0.01).sum()),
+                     "join_face_max": round(float(fw[oi][wo[:, 0] > 0].max()) if (wo > 0).any() else 0.0, 3)}
+    return rep
 
 
 # ------------------------------------------------------------------ point processes -------------

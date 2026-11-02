@@ -334,6 +334,31 @@ def sheet(out: Path, columns: list[tuple[str, str]], cell: int, views: dict = VI
     return p
 
 
+# ---------------------------------------------------------------- the working shine (Phase25) --
+# F-P25-13 (the lead: "The skin looks better for this step (we can add texture and stuff later)"):
+# flat relief (the article's normal map and its tiled pore normal both a flat normal) and matte
+# (``roughness_bias`` 0.25); the cavity map kept. Applied alike to C and every candidate, so the
+# click compares colour only; the bar keeps its own shine.
+SHINES = ("served", "neutral")
+
+
+def neutral_article(art: jobmod.Article, folder: Path) -> jobmod.Article:
+    """``art`` with the working shine: flat relief and ``roughness_bias`` 0.25 (probe 1's settings)."""
+    flat = folder / "flat_normal.png"
+    if not flat.is_file():
+        folder.mkdir(parents=True, exist_ok=True)
+        Image.fromarray(np.full((8, 8, 3), (128, 128, 255), np.uint8)).save(flat)
+    text = art.path.read_text(encoding="utf-8")
+    for pat, val in ((r'(<input name="normal_map" type="filename" value=")[^"]*(")', str(flat)),
+                     (r'(<image name="normal_tex" type="vector3">\s*<input name="file" type="filename" value=")[^"]*(")',
+                      str(flat)),
+                     (r'(<input name="roughness_bias" type="float" value=")[^"]*(")', "0.25")):
+        text, n = re.subn(pat, lambda m: m.group(1) + val + m.group(2), text)
+        if n != 1:
+            raise SystemExit(f"{art.name}: --shine neutral expected one match of {pat!r}, found {n}")
+    return _relocated(art, text, folder / art.name / f"{art.name}.mtlx")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("skin", nargs="?", default=rig.CHARACTER_SKIN)
@@ -352,6 +377,9 @@ def main(argv=None) -> int:
                          "skin's own shine maps; one column each (repeatable)")
     ap.add_argument("--judge", action="store_true",
                     help="Phase24's nine fixed views (RD-P24-4) in place of the four look views")
+    ap.add_argument("--shine", choices=SHINES, default="served",
+                    help="Phase25's working shine on the skin (C) and every candidate (D): 'neutral' is flat "
+                         "relief and matte (F-P25-13); the bar keeps its own. Default: as served")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
@@ -364,7 +392,9 @@ def main(argv=None) -> int:
     shutil.rmtree(out / "work", ignore_errors=True)
     work = out / "work"
 
-    new_mats, meshes = materials(cast, work / "new")
+    swap = [p for p in ("Body", "Lips") if p in cast and cast[p].name == art.name]
+    shine = (lambda x, f: neutral_article(x, f / "_neutral")) if a.shine == "neutral" else (lambda x, f: x)
+    new_mats, meshes = materials(cast | {p: shine(cast[p], work / "new_shine") for p in swap}, work / "new")
     settings = [{"id": "new", "materials": new_mats}]
     columns = [("new", f"working tree: {art.name}")]
     if a.today:
@@ -399,8 +429,7 @@ def main(argv=None) -> int:
         if not sep or not Path(pic).is_file():
             raise SystemExit(f"--candidate {spec!r}: give LABEL=PICTURE, an existing picture")
         sid = "cand_" + re.sub(r"[^A-Za-z0-9]+", "_", label)
-        swap = [p for p in ("Body", "Lips") if p in cast and cast[p].name == art.name]
-        ccast = cast | {p: _with_map(cast[p], Path(pic), (1.0, 1.0, 1.0), work / sid) for p in swap}
+        ccast = cast | {p: shine(_with_map(cast[p], Path(pic), (1.0, 1.0, 1.0), work / sid), work / sid) for p in swap}
         cmats, cmeshes = materials(ccast, work / f"{sid}_cast")
         if [Path(m["file"]).read_bytes() for m in cmeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
             raise SystemExit(f"{label}'s cast builds different meshes; it cannot share the launch")
