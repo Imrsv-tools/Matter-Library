@@ -55,6 +55,9 @@ GROIN_R = (0.075, 0.075, 0.09)   # the groin's soft ellipsoid round the crotch (
 MIN_FACE = 0.3               # a texel no view faces better than this is a hole, not a grazing sample: the model
                              # paints a surface turning away darker, and dividing its light out there brightens it 2-3x
 LIGHT_FLOOR = 0.3            # the least light divided out (``--delight``)
+LIGHT_TERMS = {0: 1, 1: 4, 2: 9}   # the normal's terms up to each order (``--light-order``): order 2 also takes
+                             # out shading that follows the spine's and the blades' curvature (27.2.5)
+LUM = (0.2126, 0.7152, 0.0722)
 LEVEL_CAP = 0.5              # the most a seam levelling moves a view, in log colour (x1.65)
 NECK_R = 0.06                # the neck join's ramp on each side of the seam (m)
 NAPE_R = 0.05                # how far up the head island the four views paint the back of the neck (m)
@@ -605,7 +608,7 @@ def neck_join(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 
 
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
-            levelled: bool = False) -> None:
+            levelled: bool = False, keep_colour: bool = False, light_order: int = 2) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -669,10 +672,17 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
         vis &= chroma > MIN_CHROMA
         if delight:
             # the light the model painted into THIS view, as a smooth function of the surface's direction:
-            # the picture over C, fitted with the nine second-order terms of the normal, then divided out
+            # the picture over C, fitted with the terms of the normal up to ``light_order``, then divided out
             fitk = vis & (nz > 0.25)
-            B = sh9(Nu)
-            coef = np.linalg.lstsq(B[fitk], col[fitk] / np.maximum(C[rr[fitk], cc[fitk]], 1e-4), rcond=None)[0]
+            B = sh9(Nu)[:, :LIGHT_TERMS[light_order]]
+            ratio_k = col[fitk] / np.maximum(C[rr[fitk], cc[fitk]], 1e-4)
+            if keep_colour:
+                # a grey light, from luminance alone: a light fitted per channel also divides out the picture's
+                # own colour against C's (Tone34's orange, R/G 1.87 where the picture is 1.70; 27.2.5)
+                Lk = col[fitk] @ np.asarray(LUM) / np.maximum(C[rr[fitk], cc[fitk]] @ np.asarray(LUM), 1e-4)
+                coef = np.repeat(np.linalg.lstsq(B[fitk], Lk, rcond=None)[0][:, None], 3, 1)
+            else:
+                coef = np.linalg.lstsq(B[fitk], ratio_k, rcond=None)[0]
             L = np.maximum(B @ coef, LIGHT_FLOOR)   # at grazing normals the fit falls toward 0; never divide by it
             col[vis] = col[vis] / L[vis]
             light[str(yaw)] = {"min": [round(float(v), 3) for v in L[fitk].min(0)],
@@ -700,6 +710,8 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     ratio = level_holes(C, sh, kn, body, Pa.astype(np.float64))
     D[body] = np.where(kn[body][:, None], sh[body], C[body] * ratio[body])
     gain = C[body].mean(0) / D[body].mean(0)                          # the body held to C's mean
+    if keep_colour:                                                   # ... in brightness only: the hue the picture's
+        gain = np.full(3, (C[body].mean(0) @ np.asarray(LUM)) / (D[body].mean(0) @ np.asarray(LUM)))
     D[body] *= gain
     ring = binary_dilation(groin, iterations=6) & ~groin & body
     level = D[ring].mean(0) / C[ring].mean(0)
@@ -740,6 +752,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
+           "keep_colour": keep_colour, "light_order": light_order,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
            "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
@@ -1113,6 +1126,11 @@ def main(argv=None) -> int:
                    help="divide out the light the model painted into each view (a smooth function of the normal)")
     s.add_argument("--level", action="store_true",
                    help="seam levelling: a smooth tone correction per view so the views agree where they meet")
+    s.add_argument("--keep-colour", action="store_true",
+                   help="keep the picture's own colour: a grey light (from luminance) and the body held to C's "
+                        "brightness only, not its hue (27.2.5)")
+    s.add_argument("--light-order", type=int, choices=(0, 1, 2), default=2,
+                   help="the light's terms of the normal (``--delight``): 2 also takes out curvature shading")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1137,7 +1155,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order)
     return 0
 
 
