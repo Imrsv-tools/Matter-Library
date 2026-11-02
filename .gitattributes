@@ -3,3 +3,6 @@
 MatterLibrary/textures/** filter=lfs diff=lfs merge=lfs -text
 # HDRIs (Phase14, 2026-10-14): Radiance .hdr files, about 16 MB each.
 MatterLibrary/hdris/** filter=lfs diff=lfs merge=lfs -text
+# A map's source picture, kept beside its provenance record (Phase25 25.3: an image model's picture).
+# Not under textures/: every picture there is a shipped texture to the compressor and the release.
+library/provenance/sources/**/*.png filter=lfs diff=lfs merge=lfs -text

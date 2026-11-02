@@ -169,9 +169,12 @@ SUBJECTS = {
                                     "chin": 0.007},
                          "lips_cavity": 0.815, "lips_roughness": 0.30},
                # Phase25 (RD-P25-18, -19; F-P25-26): the ear as a gradient, each part borrowing the measured
-               # face region of the same skin build. Read only by ``ear_paint`` (25.1's put); ``compose``
-               # keeps its own ear term, so the served set remakes as it was.
-               "ear": {"front": ["alae"], "rim": ["upper_lid"], "lobe": ["cheek"], "back": []}},
+               # face region of the same skin build. Read only by ``ear_paint`` (25.1's put; and
+               # ``gen_skin_maps --pigments``, 25.3); ``compose`` keeps its own ear term, so C remakes as it was.
+               "ear": {"front": ["alae"], "rim": ["upper_lid"], "lobe": ["cheek"], "back": []},
+               # Phase25 25.3: the served map is D, the image model's face as a structure, made only from
+               # this record's picture (``gen_skin_maps --subject Tone34 --pigments <field>``; SkinMaps.md).
+               "source": "library/provenance/sources/fit/makehuman/SkinTone34_face.json"},
 }
 # ``face`` scales the placed regional colour (``FACE``) as a whole: 1 is the bar's solve.
 # The first gains (23.3.1: sun 1.5 / 0.55, mottle 1.3 / 0.75, redness 0.6 / 1.5, no ``face``) moved the

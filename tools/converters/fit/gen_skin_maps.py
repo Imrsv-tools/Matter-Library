@@ -340,6 +340,7 @@ def write_provenance(rows: dict) -> None:
             + (f"fit: {r['fit']}, melanin0: {r['melanin0']}, " if "fit" in r else "")
             + (f"contrast: {r['contrast']}, " if r.get("contrast", 1.0) != 1.0 else "")
             + (f"size: {r['size']}, held_on: {r['held_on']}, " if "size" in r else "")
+            + (f"source: {r['source']}, " if "source" in r else "")
             + f"tone: {r['tone']}, base_color_const: "
             f"{r['base_color_const']}, peak_factor: {r['peak_factor']}, lips_average: {r['lips_average']}}}")
     names = sorted(old, key=_row_key)
@@ -349,6 +350,8 @@ def write_provenance(rows: dict) -> None:
         "# Provenance for the skin maps (Phase21): one colour map per Fitzpatrick tone, drawn on",
         "# MakeHuman_Body_v01 (hm08), each a fitted Character article's own picture (RD-P18-9,",
         "# RD-P21-1). Made from CC0 parts only, no photograph (RD-SKM-2). Written by `evidence`.",
+        "# A row `made: ai-assisted` (Phase25): its face is an image model's picture turned into melanin and",
+        "# blood on the skin model; `source` is the picture's generation record (model, seed, licence).",
         "id: fit/makehuman/skin",
         "version: v01",
         "files:",
@@ -390,13 +393,12 @@ def main(argv=None) -> int:
                     help="write this structure's maps (repeatable; default all three, 23.3)")
     ap.add_argument("--subject", help="a Phase24 subject (gen_synth_skin.SUBJECTS), at its own size")
     ap.add_argument("--fields", type=Path, help="with --subject: write its melanin and blood fields here (RD-P24-6)")
-    ap.add_argument("--pigments", type=Path, help="with --subject: compose from this outside field (Phase25 25.2: "
-                    "project_face.py pigments); needs --out")
-    ap.add_argument("--out", type=Path, help="with --pigments: write the map here, not into the library, no provenance row")
+    ap.add_argument("--pigments", type=Path, help="with --subject: compose from this outside field (Phase25: "
+                    "project_face.py pigments); a subject with a ``source`` is served only this way (25.3)")
+    ap.add_argument("--out", type=Path, help="with --subject: write the map and its stats here, not into the library, "
+                    "no provenance row (without --pigments: the maker's own map, C, which the Phase25 chain reads)")
     a = ap.parse_args(argv)
     if a.subject:
-        if bool(a.pigments) != bool(a.out):
-            raise SystemExit("--pigments and --out go together: a map from an outside field is not the served one")
         return subject(a.subject, a.fields, argv, a.pigments, a.out)
     bad = [t for t in a.tones if t not in TONES]
     if bad:
@@ -466,7 +468,8 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
     and, given ``fields_dir``, its melanin and blood fields as 16-bit linear pictures over a scale
     (``<dir>/Skin<Name>_fields.json``): never shipped, remade by this command (RD-P24-6). ``pigments_dir``
     (Phase25 25.2): an outside melanin and blood with its ``weight`` (``project_face.py pigments``), composed in
-    place of the maker's where the weight is 1; the map goes to ``out_dir`` and no provenance row is written."""
+    place of the maker's where the weight is 1, the ear the maker's gradient; served with a ``made: ai-assisted``
+    row naming the subject's ``source`` (25.3). ``out_dir``: the map and its stats there, no provenance row."""
     import time  # noqa: PLC0415
     import numpy as np  # noqa: PLC0415
     from PIL import Image  # noqa: PLC0415
@@ -474,6 +477,11 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
     if name not in gss.SUBJECTS:
         raise SystemExit(f"unknown subject {name!r} (have {list(gss.SUBJECTS)})")
     sj = gss.SUBJECTS[name]
+    if sj.get("source") and not pigments_dir and not out_dir:
+        raise SystemExit(f"{name}'s served map is made from its source picture's field (Phase25 25.3; {sj['source']}): "
+                         "pass --pigments <field>. The maker's own map (C) goes to --out.")
+    if pigments_dir and not out_dir and not sj.get("source"):
+        raise SystemExit(f"{name} has no recorded source (SUBJECTS[...]['source']): a field without one is not served")
     if N != sj["size"]:                        # the module's size is read at import: re-run at the subject's
         env = dict(os.environ, MATTER_SKIN_N=str(sj["size"]))
         os.execvpe(sys.executable, [sys.executable, str(Path(__file__).resolve()), *(argv or sys.argv[1:])], env)
@@ -504,6 +512,19 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
     col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg,
                                    field=field)
     del field
+    if pigments_dir and sj.get("ear"):
+        # The ear and its join are the maker's gradient (RD-P25-18, -19): its red gain is no pigment, so it
+        # cannot come through the field (25.2.1). Painted on the linear colour, before calibration, which is
+        # one scale per channel at contrast 1 (the gradient scales with it), so the map carries it unclipped.
+        import project_views as pv  # noqa: PLC0415
+        flat = col.reshape(-1, 3)
+        if not np.shares_memory(flat, col):
+            raise SystemExit("the colour is not contiguous: the ear would be painted on a copy")
+        hd = REPO / "library" / "parity" / "P25_Views"           # head_fields' cache (made from the mesh if absent)
+        hd.mkdir(parents=True, exist_ok=True)
+        for side, r_ in gss.ear_paint(flat, name, pv.head_fields(hd)).items():
+            print(f"  ear {side}: {r_['texels']} texels the maker's gradient; join {r_['join']}, "
+                  f"face weight at most {r_['join_face_max']}")
     cover = F["cover"]
     del F
     t1 = time.time()
@@ -532,8 +553,10 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
     if out_dir:
         (out_dir / f"{stem}_basecolor_stats.json").write_text(json.dumps({**st, "pigments": str(pigments_dir)}, indent=1) + "\n")
         return 0
-    write_provenance({stem: {"made": "pigment", **st, "fit": check["fit"], "melanin0": check["melanin0"],
-                             "size": N, "held_on": sj["hold"]}})
+    row = {"made": "pigment", **st, "fit": check["fit"], "melanin0": check["melanin0"], "size": N, "held_on": sj["hold"]}
+    if pigments_dir:                           # Phase25 25.3: the face from an image model's picture, as a structure
+        row.update(made="ai-assisted", source=sj["source"])
+    write_provenance({stem: row})
     return 0
 
 

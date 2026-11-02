@@ -10,10 +10,14 @@
     uv run --with scipy tools/converters/fit/project_face.py ears  <dir> first_<stem>.png
     uv run --with scipy tools/converters/fit/project_face.py field <dir> <picture> --ears ears_<stem>.json
     uv run --with scipy tools/converters/fit/paint_uv.py put <dir> face_<stem>.png <tag>
-    uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --fields <cfields>            # C's fields (25.2)
+    uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --fields <cfields> --out library/parity/P25_C   # C (25.3)
     uv run --with scipy tools/converters/fit/project_face.py pigments <dir> <tag> --c-fields <cfields> --out <field>
     uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field> --out <outdir>
     uv run --with scipy tools/converters/fit/project_face.py structure <dir> <outdir> <tag>          # + the maker's ear
+    uv run --with scipy tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field>   # served (25.3)
+
+C, which every step reads, is the maker's own map in git-ignored ``library/parity/P25_C`` (the first line):
+since 25.3 the served ``SkinTone34`` map is D, made by the last line.
 
 Krea 2, asked for an unwrapped head, draws a FRONT PORTRAIT with only the scalp unrolled round it
 (F-P25-14), so its face is never warped in UV space. ``source`` stands the subject's head island up at
@@ -52,7 +56,6 @@ LANDMARKER = REPO / "library" / "parity" / "P25_Face" / "face_landmarker.task"
 LANDMARKER_URL = ("https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/"
                   "face_landmarker.task")
 LANDMARKER_SHA256 = "64184e229b263107bc2b804c6625db1341ff2bb731874b0bcc2fe6544e0bc9ff"
-SUBJECT_MAP = REPO / "MatterLibrary/textures/fit/makehuman/skin/SkinTone34_basecolor_sUKN.png"
 HELD = (0.6437, 0.3454, 0.2526)                             # gen_synth_skin.SUBJECTS["Tone34"]["held"]
 SOURCE_ROWS, SOURCE_COL0 = 7150, 5100                       # the head island's part of the head region
 # The target's words (F-P25-7; the lead on its picture: "so much LIFE, a glow, amazing detail, a softness").
@@ -114,7 +117,8 @@ def cmd_source(d: Path, width: int) -> None:
     r, c = np.divmod(idx, N)
     keep = (c >= SOURCE_COL0) & (r < SOURCE_ROWS)
     idx, face = idx[keep], face[keep]
-    C = np.asarray(Image.open(SUBJECT_MAP)).reshape(-1, 3) / 255.0
+    import project_views as pv  # noqa: PLC0415
+    C = np.asarray(Image.open(pv.subject_map()).convert("RGB")).reshape(-1, 3) / 255.0   # C, the maker's own (25.3)
     Cl = lin(C[idx])
     k = np.array(HELD) / Cl[face > 0.9].mean(0)
     ys, xs = np.divmod(idx, N)

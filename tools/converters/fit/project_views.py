@@ -92,11 +92,23 @@ def lin_to_srgb(x):
     return np.where(x <= 0.0031308, x * 12.92, 1.055 * x ** (1 / 2.4) - 0.055)
 
 
+C_DIR = gsm.REPO / "library" / "parity" / "P25_C"
+
+
+def subject_map() -> Path:
+    """C's map: the maker's own, with no outside field. Since Phase25 25.3 the served map is D (the image
+    model's face as a structure), so C is remade beside it, never read from the library (git-ignored)."""
+    p = C_DIR / f"Skin{SUBJECT}_basecolor_{gsm.TAG}.png"
+    if not p.is_file():
+        raise SystemExit(f"{p} missing: make C with `uv run tools/converters/fit/gen_skin_maps.py "
+                         f"--subject {SUBJECT} --out {C_DIR.relative_to(gsm.REPO)}`")
+    return p
+
+
 def subject_albedo() -> np.ndarray:
-    """The subject's rendered albedo (linear): its map decoded times its ``base_color_const``."""
-    rec = json.loads((gsm.RECIPES / f"Skin_{SUBJECT}_Clean_Base_s001_v01.json").read_text())
-    c = np.array([float(v) for v in rec["base_color_const"].split(",")], np.float32)
-    m = np.asarray(Image.open(gsm.OUT / f"Skin{SUBJECT}_basecolor_{gsm.TAG}.png").convert("RGB"))
+    """C's rendered albedo (linear): the maker's own map decoded times its ``base_color_const``."""
+    c = np.array(json.loads((C_DIR / f"Skin{SUBJECT}_basecolor_stats.json").read_text())["base_color_const"], np.float32)
+    m = np.asarray(Image.open(subject_map()).convert("RGB"))
     lut = srgb_to_lin(np.arange(256) / 255.0).astype(np.float32)
     return lut[m] * c
 

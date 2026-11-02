@@ -1,0 +1,44 @@
+{
+ "what": "The source of SkinTone34's face (Phase25 25.3): an image model's picture of the subject's head island, turned into melanin and blood on the skin maker's model (tools/converters/fit/project_face.py, then gen_skin_maps.py --subject Tone34 --pigments). The ear is the maker's gradient, not the picture's.",
+ "picture": "library/provenance/sources/fit/makehuman/SkinTone34_face_krea2_seed7.png",
+ "picture_size": [2048, 1040],
+ "picture_pixels_sha256": "aefadf75f9028e9d6e6f41029b9e69a7848da6c96f1a305fa5d2df560b0ab1dc",
+ "picture_pixels_sha256_is": "sha256 of the RGB array's bytes (rows top to bottom, 8 bits a channel): a regeneration is checked by pixels, since a PNG encoder may write the same pixels as different bytes",
+ "made": "ai-assisted",
+ "licence": "CC0-1.0",
+ "model": {
+  "name": "Krea 2 Turbo (krea/Krea-2), the Comfy-Org ComfyUI repack in FP8",
+  "files": {"diffusion_model": "krea2_turbo_fp8_scaled.safetensors", "text_encoder": "qwen3vl_4b_fp8_scaled.safetensors", "vae": "qwen_image_vae.safetensors"},
+  "licence": "Krea 2 Community License",
+  "outputs": "owned by whoever generates them; Krea claims no ownership (the licence's section 5.3), so the picture is dedicated CC0 here",
+  "conditions_met_when_made": "commercial use under the licence's revenue limit (the maintainer's ruling RD-AIS-1, 2026-11-01); AI origin disclosed by this record and the provenance row's made: ai-assisted; no content filter needed for a face; whether the model writes a watermark is unverified (F-AIS-3)"
+ },
+ "generation": {
+  "runner": "ComfyUI 0.43.2, over its API (project_face.py paint; standard library only)",
+  "workflow": "tools/converters/fit/comfy/krea2turbo_img2img.json",
+  "workflow_sha256": "210e36da4e3072e02f113f68b074ef0ef9f3b2340017354e4bffaee7041a6bab",
+  "seed": 7,
+  "steps": 8,
+  "cfg": 1.0,
+  "sampler": "euler / simple",
+  "strength": 0.9,
+  "prompt": "project_face.PROMPT",
+  "source_island": "project_face.py source, from C (the maker's own Tone34 map, no outside field)",
+  "source_island_sha256": "8b24a06e64acbe8e743c856ed880726950a0d349eb933a852daefe381b491c32",
+  "regenerated": "2026-11-02: pixel-identical to the picture first made on 2026-11-01 (Phase25 25.3.1)"
+ },
+ "chain": [
+  "uv run tools/converters/fit/paint_uv.py cut <dir>",
+  "uv run tools/converters/fit/project_face.py source <dir>",
+  "python3 -I tools/converters/fit/project_face.py paint <dir> --seeds 7 --strength 0.9",
+  "uv run --with mediapipe==1.2.0 tools/converters/fit/project_face.py landmarks <dir> --render",
+  "uv run --with mediapipe==1.2.0 tools/converters/fit/project_face.py landmarks <dir> <picture>",
+  "uv run --with scipy tools/converters/fit/project_face.py field <dir> <picture>",
+  "uv run --with scipy tools/converters/fit/project_face.py ears <dir> first_<stem>.png",
+  "uv run --with scipy tools/converters/fit/project_face.py field <dir> <picture> --ears ears_<stem>.json",
+  "uv run --with scipy tools/converters/fit/paint_uv.py put <dir> face_<stem>.png <tag>",
+  "uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --fields <cfields> --out library/parity/P25_C",
+  "uv run --with scipy tools/converters/fit/project_face.py pigments <dir> <tag> --c-fields <cfields> --out <field>",
+  "uv run --with scipy tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field>"
+ ]
+}
