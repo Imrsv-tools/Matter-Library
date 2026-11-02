@@ -231,15 +231,84 @@ def snap_eyes(L):
     return L, moves
 
 
+AXIS = 1023.5      # hm08's front render is a mirror about this column (its eye openings sum to 2047, F-P25-25)
+
+
+def mirror_pairs():
+    """Each of MediaPipe's 478 landmarks paired with its mirror image, from the canonical face mesh inside the
+    landmarker bundle (468 vertices, x y z u v each; symmetric by construction); the irises (468-472 and
+    473-477) by their order. A midline point pairs with itself."""
+    np = _np()
+    import struct  # noqa: PLC0415
+    import zipfile  # noqa: PLC0415
+    b = zipfile.ZipFile(landmarker()).read("geometry_pipeline_metadata_landmarks.binarypb")
+
+    def varint(i):
+        v = s = 0
+        while True:
+            c = b[i]; i += 1; v |= (c & 127) << s; s += 7
+            if c < 128:
+                return v, i
+    _, i = varint(0)                      # the canonical mesh: the first field
+    n, i = varint(i)
+    end, fl = i + n, []
+    while i < end:
+        k, i = varint(i)
+        f, t = k >> 3, k & 7
+        if t == 5:
+            if f == 3:                    # the vertex buffer, one float a field
+                fl.append(struct.unpack("<f", b[i:i + 4])[0])
+            i += 4
+        elif t == 0:
+            _, i = varint(i)
+        elif t == 2:
+            ln, i = varint(i); i += ln
+        else:
+            i += 8
+    V = np.array(fl).reshape(468, 5)[:, :3]
+    if len(fl) != 2340:
+        raise SystemExit("the canonical face mesh is not the expected 468 vertices")
+    M = V * [-1, 1, 1]
+    pair = np.argmin(((V[:, None] - M[None]) ** 2).sum(-1), axis=1)
+    if not (pair[pair] == np.arange(468)).all():
+        raise SystemExit("the canonical mesh's mirror pairing is not one-to-one")
+    return np.r_[pair, [473, 474, 475, 476, 477, 468, 469, 470, 471, 472]]
+
+
+def symmetric(L):
+    """hm08's landmarks made mirror-symmetric about ``AXIS``. MediaPipe's fit on the render sits 10-17 px low
+    on the image-right around the brow, above and below the eye and on the cheek (25.1.17; the lead at
+    click 1: "left eyebrow (the one on the right) not in the correct position (map is too low) and that is
+    the same for the eye area"). The fit is also shifted and rolled sideways (its midline at 1030-1036 in the upper face, 1022 at the
+    chin; the render's silhouette is centred on ``AXIS`` on every row), so across, each pair is averaged about
+    ``AXIS`` and the midline put on it; in height the image-left side is kept, the side the lead read right."""
+    np = _np()
+    pair = mirror_pairs()
+    S = L.copy()
+    iris = np.arange(len(L)) >= 468             # inside the empty eye opening, under closed lids: left as found
+    mid = (pair == np.arange(len(L))) & ~iris
+    S[mid, 0] = AXIS
+    left = np.flatnonzero(~mid & ~iris & (L[:, 0] < L[pair, 0]))
+    r = pair[left]
+    x = (L[left, 0] + 2 * AXIS - L[r, 0]) / 2
+    S[left, 0], S[r, 0], S[r, 1] = x, 2 * AXIS - x, L[left, 1]
+    return S
+
+
 def cmd_landmarks(d: Path, picture: Path | None) -> None:
     np = _np()
     if picture is None:                                            # hm08's front render, the eyes snapped
         raw, im = detect(RENDER)
-        L, moves = snap_eyes(raw)
+        E, moves = snap_eyes(raw)
+        L = symmetric(E)
         np.save(d / "lm_hm08_raw.npy", raw)
+        np.save(d / "lm_hm08_eyes.npy", E)
         np.save(d / "lm_hm08.npy", L)
         _overlay(im, L, d / "lm_hm08_overlay.jpg")
-        print(f"lm_hm08.npy: 478 points on hm08's front render; eye points snapped to the openings, moved up to {moves} px")
+        mv = np.abs(L - E)
+        print(f"lm_hm08.npy: 478 points on hm08's front render; eye points snapped to the openings, moved up to {moves} px; "
+              f"the image-right side mirrored from the left: moved up to {mv.max(0).round(1).tolist()} px, the snapped eye "
+              f"contour by at most {mv[sum((e['up'] + e['lo'] + e['c'] for e in EYES.values()), [])].max():.1f} px")
         return
     L, im = detect(picture)
     np.save(d / f"lm_{picture.stem}.npy", L)
