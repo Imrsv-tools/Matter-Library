@@ -68,7 +68,7 @@ HANDS_FROM_PICTURE = False   # the four views' fingers do not land at 1.7 mm a p
                              # toned to the forearm, until the hands have their own cameras (the Brief's route)
 MIN_CHROMA = 0.15            # the least (max - min) / max a sample of skin has; the background is ~0
 GUTTER = 6                   # texels of the 8K atlas's gutter the painted colour fills
-NAPE_X = 0.055               # ... and how far to each side of the middle (m): the ears start beyond it
+NAPE_X = 0.055              # ... and how far to each side of the middle (m): the ears start beyond it
 PROMPT = ("A full-length photograph of the same real young woman about twenty shown four times side by side: seen "
           "from the front, in profile from her side, from the back, and in profile from her other side. She stands "
           "in an A-pose with her arms held out from her sides, nude, with a completely hairless body and a shaved "
@@ -609,6 +609,68 @@ def neck_join(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
     return out, rec
 
 
+def smooth_fill(D, C, known, hole, P, cell: int = 4, reach: float = 0.008, near: float = 0.03, grain_px: float = 3.0):
+    """Skin no view sees (under the jaw, between the legs, the armpits), filled from the seen skin round it (27.2.8).
+    ``level_holes`` gives a hole the maker's colour times D / C from its nearest seen cells, so the maker's own slow
+    tone shows through and a hole whose neighbours differ (the two sides of the throat) splits: under the jaw it
+    read as a hard-edged patch, grey-beige on one side and orange on the other. Here the hole's slow tone is a
+    membrane on the body (``cell``-pixel cells linked by their distance in 3D, ``reach``) held to the seen skin's
+    log colour at its edge, and only the maker's grain (finer than ``grain_px``) is laid on it."""
+    np = _np()
+    from scipy.ndimage import gaussian_filter  # noqa: PLC0415
+    from scipy.sparse import coo_matrix  # noqa: PLC0415
+    from scipy.sparse.linalg import spsolve  # noqa: PLC0415
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    n = D.shape[0]
+    hc = n // cell
+    lg = np.log(np.maximum(D, 1e-4))
+
+    def cells(m):
+        cnt = m.reshape(hc, cell, hc, cell).sum((1, 3))
+        ok = cnt > 0
+        v = (lg * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))[ok] / cnt[ok][:, None]
+        p = (P * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))[ok] / cnt[ok][:, None]
+        return v, p
+
+    hv, hp = cells(hole)
+    kv, kp = cells(known)
+    kd = cKDTree(hp).query(kp, distance_upper_bound=near)[0]
+    kv, kp = kv[np.isfinite(kd)], kp[np.isfinite(kd)]               # the seen skin within ``near`` of a hole
+    K, H = len(kv), len(hv)
+    allp = np.concatenate([hp, kp])
+    pairs = cKDTree(allp).query_pairs(reach, output_type="ndarray")
+    a, b = pairs[:, 0], pairs[:, 1]
+    deg = np.bincount(np.concatenate([a, b]), minlength=H + K).astype(float)
+    Lm = coo_matrix((np.concatenate([-np.ones(len(a)), -np.ones(len(a)), deg]),
+                     (np.concatenate([a, b, np.arange(H + K)]), np.concatenate([b, a, np.arange(H + K)]))),
+                    shape=(H + K, H + K)).tocsr()
+    free = np.arange(H)[deg[:H] > 0]
+    fixed = np.arange(H, H + K)
+    level = hv.copy()                                               # an isolated cell keeps its own value
+    from scipy.sparse import identity  # noqa: PLC0415
+    eps = 1e-4                                                      # a weak pull to the cell's own value: a group of
+    Lff = (Lm[free][:, free] + eps * identity(len(free))).tocsc()  # holes with no seen skin near stays solvable
+    Lfx = Lm[free][:, fixed]
+    for c in range(3):
+        level[free, c] = spsolve(Lff, -(Lfx @ kv[:, c]) + eps * hv[free, c])
+    rr, cc = np.nonzero(hole)
+    dist, idx = cKDTree(hp).query(P[rr, cc], k=6)
+    w = np.exp(-(dist ** 2 - dist[:, :1] ** 2) / (2 * (cell * 0.0008) ** 2))
+    lev = (level[idx] * w[..., None]).sum(1) / w.sum(1, keepdims=True)
+    lc = np.log(np.maximum(C, 1e-4))
+    cov = (known | hole).astype(float)
+    blur = np.stack([gaussian_filter(lc[..., k] * cov, grain_px) for k in range(3)], -1) / np.maximum(
+        gaussian_filter(cov, grain_px), 1e-6)[..., None]
+    grain = lc[rr, cc] - blur[rr, cc]
+    out = D.copy()
+    out[rr, cc] = np.exp(lev + grain)
+    moved = np.abs(np.log(out[rr, cc] @ np.asarray(LUM)) - np.log(D[rr, cc] @ np.asarray(LUM)))
+    rec = {"hole_texels": int(len(rr)), "cells": int(H), "edge_cells": int(K),
+           "moved_log_median": round(float(np.median(moved)), 3), "moved_log_p90": round(float(np.percentile(moved, 90)), 3)}
+    print(f"smooth holes: {json.dumps(rec)}", flush=True)
+    return out, rec
+
+
 def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: float = 0.04, cell: int = 4,
               sigma: float = 0.015, reach: float = 0.008):
     """The picture's slow tone near the head, replaced by a smooth field from Phase25's head to the body (27.2.6).
@@ -684,7 +746,7 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
-            outline_clear: float = 0.0) -> None:
+            outline_clear: float = 0.0, smooth_holes: bool = False) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -790,6 +852,9 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     C = np.where((A["cover"] & ~inner)[..., None], pushpull(np.where(inner[..., None], C, 0.0), inner), C)
     ratio = level_holes(C, sh, kn, body, Pa.astype(np.float64))
     D[body] = np.where(kn[body][:, None], sh[body], C[body] * ratio[body])
+    holes_rec = None
+    if smooth_holes:
+        D, holes_rec = smooth_fill(D, C, body & kn, body & ~kn, Pa.astype(np.float64))
     gain = C[body].mean(0) / D[body].mean(0)                          # the body held to C's mean
     if keep_colour:                                                   # ... in brightness only: the hue the picture's
         gain = np.full(3, (C[body].mean(0) @ np.asarray(LUM)) / (D[body].mean(0) @ np.asarray(LUM)))
@@ -837,6 +902,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
            "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
+           "smooth_holes": holes_rec,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
            "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
@@ -1221,6 +1287,9 @@ def main(argv=None) -> int:
     s.add_argument("--outline-clear", type=float, default=0.0, metavar="PX",
                    help="never sample within PX pixels of the model's outline in a view (its painted dark edge: the "
                         "shoulder dots, 27.2.7)")
+    s.add_argument("--smooth-holes", action="store_true",
+                   help="fill skin no view sees with a smooth tone from the seen skin round it, on the body, and the "
+                        "maker's grain only (the patch under the jaw; 27.2.8)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1245,7 +1314,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes)
     return 0
 
 
