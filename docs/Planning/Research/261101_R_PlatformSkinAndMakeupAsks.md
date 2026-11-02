@@ -258,9 +258,17 @@
 | **Q-PSM-8** | **Confirm the two answers to the platform.** Q-PSM-5: *a skin's own marks stay the skin's; marks a Creator adds are pieces.* Q-PSM-6: *list a skin whose `status` is not `draft`; the library keeps a skin not meant for Creators at `draft`.* | Both rest on what ships today (F-PSM-2, F-PSM-3). Neither changes a file. |
 | **Q-PSM-9** | **Is *Skin Layers* numbered now, to run alongside Phase25 and ahead of *Eyes in the Shader*?** The 2026-10-27 order (RD-CMT-3) puts it after Eyes. The platform's makeup is held on it (F-PSM-1). **(a)** Number *Skin Layers* now: its discovery starts while Phase25 runs, and its first part is the slots, the format and a few pieces. Eyes follows it. **(b)** Number only that first part now, as its own phase. The rest of *Skin Layers* (more pieces, the Blender kit, pigment pieces) keeps its place after Eyes. **(c)** Keep the order. The platform can close its skin phase with the skin and polish and carry makeup to a later phase. | Not decided here. Whichever is chosen, the cost is **shared means**: one heavy GPU job at a time on the machine with Unreal, and the lead's sittings, beside Phase25. **(b)** asks least of those and unblocks the platform's held step. It needs a name; *Skin Layers* keeps its Outcome. |
 
+*Both answered 2026-11-02; see §Resolved (RD-PSM-1, RD-PSM-2).*
+
 ## Resolved
 
-*(None yet.)*
+**The lead's answers to Q-PSM-8 and Q-PSM-9 (2026-11-02), verbatim:** *"1) yes 2) b - and do the quick fix"*
+
+- **RD-PSM-1 — The two answers go to the platform as drafted** (Q-PSM-8: *"yes"*).
+  - **Q-PSM-5:** a skin's own marks stay the skin's; marks a Creator adds are pieces (F-PSM-3).
+  - **Q-PSM-6:** list a skin whose `status` is not `draft`; the library keeps a skin not meant for Creators at `draft` (F-PSM-2).
+- **RD-PSM-2 — The first part of *Skin Layers* is numbered now, as its own phase** (Q-PSM-9: *"b"*): **Phase26 — Makeup on the Skin** (the slots, the format, a first handful of pieces), running alongside Phase25 and ahead of *Eyes in the Shader*. The rest of *Skin Layers* keeps its place after Eyes. The name and its Outcome were drafted at seeding; discovery confirms them. Seeded as `Phases/Phase26_MakeupOnTheSkin.md` and on the Roadmap.
+- **The quick fix** (*"do the quick fix"*): the M14 row and the P32 / P34 / P35 notes in `PlatformDependencies.md` (F-PSM-8), carrying RD-PSM-1's answers.
 
 ## Status
 
@@ -272,15 +280,11 @@
   - The platform's makeup is held on **Q-PSM-7 and Q-PSM-2 together**: a contract change in three tools plus a format and first pieces. That is a phase (F-PSM-4).
   - **Q-PSM-6 is answered** by the `status` field that ships today (F-PSM-2).
   - **Q-PSM-5 is answered as drafted** (F-PSM-3).
-  - Both await the lead's confirmation before they go to the platform.
-  - Q-PSM-1 and Q-PSM-4 are each a one-sitting build (F-PSM-5, F-PSM-7).
+  - **Both confirmed by the lead (RD-PSM-1, 2026-11-02)** and carried to the platform on M14.
+  - **Q-PSM-7 + Q-PSM-2 are Phase26 — Makeup on the Skin** (RD-PSM-2), seeded 2026-11-02.
+  - Q-PSM-1 and Q-PSM-4 are each a one-sitting build (F-PSM-5, F-PSM-7), not yet asked for.
   - Q-PSM-3 is a ruling for *Skin Layers* (F-PSM-6).
   - ⚠ The platform should hear about the relief gap between Q-PSM-2 and Q-PSM-7 before the format is written (F-PSM-4).
-- **Open questions:**
-  - Q-PSM-8 (confirm the two answers);
-  - Q-PSM-9 (when *Skin Layers*, or its first part, runs: alongside Phase25 and ahead of Eyes, or as ordered).
-- **Ledger:** M14 not yet filed. It is offered as a `/quick-fix` (`PlatformDependencies.md`), with P34 and P35 moving to `IN PROGRESS` and a note on P32 (F-PSM-8).
-- **Next step:**
-  - The lead answers Q-PSM-8 and Q-PSM-9.
-  - Then the M14 quick fix carries the confirmed answers to the platform.
-  - If a phase is numbered, its seed and stub go on the Roadmap on the lead's word (`research.md` §Landing).
+- **Open questions:** none. Q-PSM-8 and Q-PSM-9 ruled 2026-11-02 (RD-PSM-1, RD-PSM-2).
+- **Ledger:** M14 filed by the `✅ Quick Fix` commit after the one recording these rulings, with P34 and P35 moved to `IN PROGRESS` and a note on P32 (F-PSM-8).
+- **Next step:** `/discovery Phase26`. Still on offer, each a sitting: the lips' gloss in the shared roughness map (Q-PSM-1, F-PSM-5) and a few polish articles (Q-PSM-4, F-PSM-7). Q-PSM-3 waits for the rest of *Skin Layers*.

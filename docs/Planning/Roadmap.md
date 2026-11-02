@@ -37,11 +37,15 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase25_AiSkinStructure.md` · research `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md` · `docs/Planning/Research/261101_R_Spike_SkinMapFromImageModel.md`
 
+### Phase26 — Makeup on the Skin — SEEDED *(2026-11-02, the first part of *Skin Layers*, numbered by the lead, RD-PSM-2: runs alongside Phase25 and ahead of *Eyes in the Shader*; the platform's skin phase waits on it)*
+**Outcome:** a character wears the library's first makeup: face makeup picked by area and a mark placed on the body, merged into one layer on its skin, and it looks the same in Storm, Blender and Unreal.
+- `docs/Planning/Phases/Phase26_MakeupOnTheSkin.md` · research `docs/Planning/Research/261101_R_PlatformSkinAndMakeupAsks.md`
+
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
 
-### Skin Layers — RESEARCH *(seeded 2026-10-26, the same word; **widened 2026-10-27**: makeup and marks on the whole body and per mark, cosmetics and film effects, each piece working on every character, RD-CMT-1/-2, `261027_R_CharacterMaterials.md`; pairs with the platform's stack bake)*
+### Skin Layers — RESEARCH *(seeded 2026-10-26, the same word; **widened 2026-10-27**: makeup and marks on the whole body and per mark, cosmetics and film effects, each piece working on every character, RD-CMT-1/-2, `261027_R_CharacterMaterials.md`; pairs with the platform's stack bake; **its first part split out 2026-11-02 as Phase26** (the slots, the format, a first handful of pieces), RD-PSM-2; the rest stays here)*
 **Outcome:** a Creator adds makeup and marks (freckles, veins, moles, blemishes, scars, wounds, bruises, tattoos, dirt, blood, or makeup from blush to film effects) to any character's skin, anywhere on the body and per mark, each a library article placed on the body that works on every character, without a new skin per combination.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 3) · `docs/Planning/Research/261027_R_CharacterMaterials.md` (Pass 4, Makeup and marks; RD-CMT-2 the inclusion test)
 
