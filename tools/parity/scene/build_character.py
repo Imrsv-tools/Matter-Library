@@ -375,17 +375,22 @@ def subset(pts, normals, faces):
     return p_pts, p_nrm, [[(remap[vi], ti) for vi, ti in f] for f in faces]
 
 
-def load_parts() -> dict:
-    """Every part: points, normals, faces, faceVarying st in metres, and its UV density."""
+def load_parts(bare: bool = False) -> dict:
+    """Every part: points, normals, faces, faceVarying st in metres, and its UV density.
+
+    ``bare`` (Phase27, RD-P27-4): the character unclothed, for judging the body's skin: the
+    garments that delete body faces (the suit and the shoes) are left out, and so are their deletes.
+    Off by default; every published thumbnail is built from the default cast."""
     base_text = source("base.obj").decode("utf-8", "replace")
     base = base_vertices(base_text)
+    meshes = {k: s for k, s in MESHES.items() if not (bare and s.get("delete"))}
     # the body faces the garments cover, as MakeHuman removes them (any deleted vertex)
     covered = set()
-    for spec in MESHES.values():
+    for spec in meshes.values():
         if spec.get("delete"):
             covered |= deleted_verts(source(PACK, spec["proxy"] + ".mhclo").decode("utf-8", "replace"))
     parts = {}
-    for key, spec in MESHES.items():
+    for key, spec in meshes.items():
         if "group" in spec:
             pts, faces, vt, src = read_obj(base_text, spec["group"])
             if covered:

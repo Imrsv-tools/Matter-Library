@@ -486,7 +486,8 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
     the atlas its map is drawn on (``job.write_character_scene`` does the same).
     Returns the meshes, the bound part names, the unbound parts' materials and the cameras."""
     import build_character  # noqa: PLC0415  (heavy: parses the pinned sources)
-    parts = build_character.load_parts()
+    bare = bool(job.get("bare"))               # Phase27: the unclothed cast (look.py --bare)
+    parts = build_character.load_parts(bare=bare)
     atlas = build_character.atlas_parts()      # the one copy of the rule (Phase09 F-P09-15)
     bound = {b["subject"].removeprefix(CHARACTER): b for b in job["bindings"]}
     unknown = sorted(set(bound) - set(parts))
@@ -515,7 +516,8 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
                                                     {p: Path(b[p]) for p in MAKEUP_PORTS if b.get(p)})
     # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3
     cams = {}
-    for cam, (pos, target) in build_character.cameras(parts).items():
+    # the rig's own cameras frame the garments; a bare cast's views are the caller's (look.py)
+    for cam, (pos, target) in ({} if bare else build_character.cameras(parts)).items():
         pitch, yaw = build_character._look_at(pos, target)
         cams[f"/World/{cam}"] = (tuple(round(v, 4) for v in pos), (round(pitch, 3), round(yaw, 3)))
     return meshes, list(bound), unbound, cams

@@ -165,6 +165,56 @@ def judge_views(parts: dict) -> list[dict]:
     return out
 
 
+# ------------------------------------------------------------------ the body's views (Phase27) ---
+# F-P27-5: the judge for the body's skin, on the bare cast (``--bare``). The whole body from the front,
+# the back and in profile (from the key's side) at ~2.5 m; the trunk front and back at ~1 m; and at
+# 40 cm the neck and shoulder (the head's seam), the left wrist, the left ankle and the back of the
+# left hand. Through the rig's one lens; placed from the rig's own parts, as ``judge_views`` is.
+BODY_VIEWS = {"bfront": "whole body, front, 2.5 m", "bback": "whole body, back, 2.5 m",
+              "bside": "whole body, profile, 2.5 m", "tfront": "trunk, front, 1 m", "tback": "trunk, back, 1 m",
+              "neck": "neck and left shoulder, 40 cm", "wrist": "left wrist, 40 cm",
+              "ankle": "left ankle, 40 cm", "bhand": "back of the left hand, 40 cm"}
+GARMENT_PARTS = {n for m in bc.MESHES.values() if m.get("delete")
+                 for n in [s for s, _ in m.get("split", [])] + [m["rest"]]}
+
+
+def body_views(parts: dict) -> list[dict]:
+    """The body's nine cameras (``BODY_VIEWS``), placed from the bare cast's parts."""
+    pts = np.asarray(parts["Body"]["points"], float)
+    top = pts[:, 1].max()
+    zc = float(np.median(pts[:, 2]))
+    xmax = pts[:, 0].max()
+    hand = pts[pts[:, 0] > xmax - 0.12]
+    hc = (hand.min(0) + hand.max(0)) / 2
+    arm = pts[(pts[:, 0] > xmax - 0.16) & (pts[:, 0] < xmax - 0.12)]          # just inside the hand
+    wrist = arm.mean(0)
+    ank = pts[(pts[:, 1] > 0.07) & (pts[:, 1] < 0.11) & (pts[:, 0] > 0)]       # the left leg above the foot
+    ankle = ank.mean(0)
+    neck_y = top * 0.81
+    sh = pts[(np.abs(pts[:, 1] - neck_y) < 0.02) & (pts[:, 0] > 0)]
+    neck = (float(np.median(sh[:, 0])) * 0.6, neck_y - 0.02, zc)
+    always = [p.rsplit("/", 1)[1] for p in jobmod.CHARACTER_HIDE_ALWAYS]
+    fov = math.degrees(2 * math.atan(bc.CAM_APERTURE / 2 / bc.CAM_FOCAL))
+    q = math.radians(35)
+    cams = [("bfront", (0.0, top / 2, zc), (0.0, 0.0, 1.0), 2.5),
+            ("bback", (0.0, top / 2, zc), (0.0, 0.0, -1.0), 2.5),
+            ("bside", (0.0, top / 2, zc), (1.0, 0.0, 0.0), 2.5),
+            ("tfront", (0.0, top * 0.64, zc), (0.0, 0.05, 1.0), 1.0),
+            ("tback", (0.0, top * 0.64, zc), (0.0, 0.05, -1.0), 1.0),
+            ("neck", neck, (math.sin(q), 0.15, math.cos(q)), 0.4),
+            ("wrist", tuple(wrist), (0.3, 0.3, 1.0), 0.4),
+            ("ankle", tuple(ankle), (0.5, 0.25, 1.0), 0.4),
+            ("bhand", tuple(hc), (0.15, 0.30, 1.0), 0.4)]
+    out = []
+    for v, target, d, metres in cams:
+        d = np.asarray(d, float)
+        pos = tuple(np.asarray(target, float) + d / np.linalg.norm(d) * metres)
+        view = drv.camera_view(pos, bc._look_at(pos, target), f"__{v}", always)
+        view["fov"] = fov
+        out.append(view)
+    return out
+
+
 def bar_article(art: jobmod.Article, bar: Path, out: Path) -> jobmod.Article:
     """``art`` wearing the bar's pictures (``bar_maps.py``): its colour and constant, its specular
     as the cavity map; the article's other shine maps as they are (RD-P24-5)."""
@@ -299,10 +349,16 @@ def reference_casts(cast: dict, picture: Path, folder: Path) -> list[tuple[str, 
     return out
 
 
+BARE = False     # Phase27 ``--bare``: every cast in this launch is built unclothed (set by main)
+
+
 def materials(cast: dict, folder: Path) -> tuple[dict, list[dict]]:
     """The cast's materials in the Unreal job, and its meshes (from a rig job with no views)."""
+    if BARE:
+        cast = {p: x for p, x in cast.items() if p not in GARMENT_PARTS}
     job = json.loads(jobmod.write_character_job(cast, folder, 512, 1).read_text(encoding="utf-8"))
     job["views"] = {}
+    job["bare"] = BARE
     ujob = json.loads(drv.unreal_job(job, folder / "unreal").read_text(encoding="utf-8"))
     return next(s for s in ujob["settings"] if s["id"] == "defaults")["materials"], ujob["meshes"]
 
@@ -385,10 +441,19 @@ def main(argv=None) -> int:
                          "worn on the skin (and its lips with --lips-skin); needs a runtime reading job format 5")
     ap.add_argument("--lips-skin", action="store_true",
                     help="Phase26: the lips wear the skin, as the platform's base character's do")
+    ap.add_argument("--bare", action="store_true",
+                    help="Phase27: the character unclothed (the suit and shoes and the body faces they delete "
+                         "left out), for judging the body's skin; never the default (RD-P27-4)")
+    ap.add_argument("--body", action="store_true",
+                    help="Phase27: the body's nine views (BODY_VIEWS) in place of the four look views; with --bare")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
     a = ap.parse_args(argv)
+    if a.body and (a.judge or not a.bare):
+        raise SystemExit("--body is the bare cast's views: give --bare, and not --judge")
+    global BARE
+    BARE = a.bare
 
     art = jobmod.Article.read(jobmod.find_article(a.skin))
     cast = rig.character_cast(art)
@@ -451,10 +516,10 @@ def main(argv=None) -> int:
         settings.insert(0, {"id": "bar", "materials": bmats})
         columns.insert(0, ("bar", "A: the scanned bar"))
         columns[columns.index(("new", f"working tree: {art.name}"))] = ("new", f"{'C' if a.candidate else 'B'}: {art.name}")
-    parts = bc.load_parts()
-    views = judge_views(parts) if a.judge else look_views(parts)
-    labels = JUDGE_VIEWS if a.judge else VIEWS
-    if not a.judge:
+    parts = bc.load_parts(bare=a.bare)
+    views = judge_views(parts) if a.judge else body_views(parts) if a.body else look_views(parts)
+    labels = JUDGE_VIEWS if a.judge else BODY_VIEWS if a.body else VIEWS
+    if not (a.judge or a.body):
         settings += [s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
     sun, sky = drv.lights()
     fmt = drv.MAKEUP_JOB_FORMAT if a.makeup else drv.LOOK_JOB_FORMAT   # Phase26: an older runtime refuses it
