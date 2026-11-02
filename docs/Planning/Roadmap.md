@@ -37,10 +37,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase25_AiSkinStructure.md` · research `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md` · `docs/Planning/Research/261101_R_Spike_SkinMapFromImageModel.md`
 
-### Phase26 — Makeup on the Skin — BRIEF READY *(2026-11-02, Pass 1: lane `build`, `/execute` starts at 26.1 — red lips and a hand tattoo in three tools; relief stays out, agreed with the platform, RD-P26-1. Seeded 2026-11-02, the first part of *Skin Layers*, numbered by the lead, RD-PSM-2: runs alongside Phase25 and ahead of *Eyes in the Shader*; the platform's skin phase waits on it)*
-**Outcome:** a character wears the library's first makeup: face makeup picked by area and a mark placed on the body, merged into one layer on its skin, and it looks the same in Storm, Blender and Unreal.
-- `docs/Planning/Phases/Phase26_MakeupOnTheSkin.md` · research `docs/Planning/Research/261101_R_PlatformSkinAndMakeupAsks.md`
-
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
@@ -247,3 +243,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** one young woman's skin, complete (colour, shine, lips and nails), stands beside the scanned skin on the same body, and the lead cannot tell them apart at set distances, or names what still differs; it is served as one finished set, ready for Studio when Studio can take it.
 - `docs/Planning/Phases/Complete/Phase24_OneValidatedSkin.md`
 *Closed 2026-11-01: `Skin_Tone34` and `Nail_Tone34`, one subject's set at 8K, served to the dev install; the lead: "C is fine", "seem to be the same person".*
+
+### Phase26 — Makeup on the Skin — COMPLETE
+**Outcome:** a character wears the library's first makeup: face makeup picked by area and a mark placed on the body, merged into one layer on its skin, and it looks the same in Storm, Blender and Unreal.
+- `docs/Planning/Phases/Complete/Phase26_MakeupOnTheSkin.md`
+*Closed 2026-11-02: makeup slots on the skin in three tools, the reference merge, four pieces served to Stage; the lead: "The lips are red", then "yes" at the other four clicks.*

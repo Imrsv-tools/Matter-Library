@@ -1,9 +1,9 @@
 # Phase26 — Makeup on the Skin
 
-**Status:** IN EXECUTION (2026-11-02, `/execute Phase26`, at 26.2). *Before:* BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
+**Status:** 🎉 COMPLETE (closed 2026-11-02). *Before:* IN EXECUTION (2026-11-02, `/execute Phase26`). *Before:* BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
 **Lane:** `build` (§Risk lane).
 **Measured at:** `5c4bfde`, on **the machine with Unreal**. Unreal 5.8 is at the path `unreal/build.sh` takes as `UE`, `MATTER_BLENDER` is the official 5.2.2, and `unreal-runtime-v7` is pinned.
-**Seeded from:** [`../Research/261101_R_PlatformSkinAndMakeupAsks.md`](../Research/261101_R_PlatformSkinAndMakeupAsks.md) (Q-PSM-2, Q-PSM-7; F-PSM-1, F-PSM-4; RD-PSM-2) · [`../Research/261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (Pass 4, Makeup and marks; RD-CMT-1, RD-CMT-2, RD-CMT-4) · the platform's ask row `PlatformDependencies.md` **M14** (1) and (2).
+**Seeded from:** [`../Research/261101_R_PlatformSkinAndMakeupAsks.md`](../../Research/261101_R_PlatformSkinAndMakeupAsks.md) (Q-PSM-2, Q-PSM-7; F-PSM-1, F-PSM-4; RD-PSM-2) · [`../Research/261027_R_CharacterMaterials.md`](../../Research/261027_R_CharacterMaterials.md) (Pass 4, Makeup and marks; RD-CMT-1, RD-CMT-2, RD-CMT-4) · the platform's ask row `PlatformDependencies.md` **M14** (1) and (2).
 
 ## Outcome
 
@@ -271,3 +271,20 @@ The controls, each read:
 - **F-P26-8 — the site file does not carry the pieces.** `groups.GROUPS` is shared by the site file and the dev catalog, so the `makeup` group sits in `groups.DEV_GROUPS`, the dev catalog's only. The site file listing pieces is *(planned, 2026-11-02)*.
 - The eyeshadow's coverage falls on two atlas islands: the eyelids' own and the face's beside them. Both are the lids in 3D, as the render shows.
 - The 26.2 sitting pictures, labelled: `library/parity/Look__Skin_FitzpatrickII_Clean_Base_s001_v01__makeup__lipsskin/CLICK{4_gloss,5_eyeshadow}.png`; the comparison without gloss in `library/parity/P26_2_without_gloss/` (git-ignored). Pictures: `library/parity/Look__Skin_FitzpatrickII_Clean_Base_s001_v01__makeup__lipsskin/CLICK{1,2,3}_*.png` (git-ignored).
+
+## CLOSE — DONE (2026-11-02, on the lead's "Close Phase26")
+
+- **The Outcome, re-read against the tree:** holds. Face makeup picked by area (the lip colour, the gloss, the eyeshadow, fitted) and a mark placed on the body (the tattoo) are merged by the reference merge into one layer on the skin, and the three tools agree at the pieces' pixels (26.1 click 3). Not an absolute claim, so the acceptance block does not arm.
+- **Contract text:** LCDSchema §Makeup layer · `docs/specs/Authoring/MakeupPieces.md` (new) · JOB_FORMAT (format 5, the bindings, `MAKEUP_JOB_FORMAT`) · RuntimeCatalog §Groups (the `makeup` group, `pieces[]`) · SiteFile §Groups (not carried yet) · Identity §Makeup pieces · Glossary (*makeup layer*, *piece*, *fitted piece*, *placed piece*) · `_Architecture.md`'s Authoring row · CoreMechanisms row 2.
+- **The ledger:** `PlatformDependencies.md` M14 (1) and (2) delivered, with the platform's next act (re-run its masters build from `build_masters.py`). That row is how the platform is told.
+- **Loose ends:**
+
+| Item | Disposition |
+|---|---|
+| F-P26-8 — the site file listing the pieces | deferred as an ADDITION: the Brief put the pieces in the dev catalog only; marked *(planned, 2026-11-02)* in SiteFile §Groups and MakeupPieces §Not yet |
+| The tattoo's stepped edge at the hand view's ~5 px/mm | ruled out: 2048² first (RD-P26-9); 4K/8K are later steps |
+| Thumbnails stale since the masters changed | ruled out (RD-P26-10, the lead) |
+| F-P26-7 — `unreal/build.sh package` and a stray `~/.local/bin/env` | not the library's code; a `/retro` item |
+| A published Unreal runtime with the slots | the lead's word: offered at the close; `unreal-runtime-v7` refuses a makeup job (format 5), so nothing draws wrong meanwhile |
+
+- **Evidence:** `run_all.py` 18 lanes, 18 PASS (at 26.2, before the close's doc-only changes); `test_merge_makeup.py` PASS; `test_build_snapshot.py` PASS. No CI runs here (`LOCAL_DELTAS.md`, the CI row).

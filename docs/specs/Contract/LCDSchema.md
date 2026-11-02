@@ -204,6 +204,28 @@ A hairstyle's strands, and an eye's iris and veins, are a **picture drawn on the
 - **The library's maps:** `MatterLibrary/textures/fit/makehuman/skin/Skin_{roughness,normal,cavity,scatter}_sUKN.png`, one set for every tone (RD-P22-2), made in 3D on `MakeHuman_Body_v01` by `tools/converters/fit/gen_skin_shine.py`, worn by the six `Skin_Fitzpatrick*` (all four) and the six `Lips_Fitzpatrick*` (normal and cavity; RD-P22-8). **G8** checks a shine map as data: a greyscale PNG (roughness, cavity, scatter) or an RGB PNG (normal) at the mesh's map size, with no coverage test (its neutral value is right on any island).
 - **Consumers:** `PlatformDependencies.md` P34.
 
+## Makeup layer (the character's, supplied at binding)
+
+*(2026-11-02, Phase26 *Makeup on the Skin* 26.1; RD-P26-2, RD-P26-3, agreed with the platform the same day. Additive: every article that does not declare it assembles byte-identically. The pieces that make the layer: [MakeupPieces.md](../Authoring/MakeupPieces.md).)*
+
+A character's makeup and the marks a Creator adds are **merged into one layer per character**, two pictures on the mesh's own layout. Like `base_color_map`, they belong to the character, never to the article: the article declares the inputs empty and the binding supplies them.
+
+- **The inputs** (author tier, lane B, `AUTHOR_TIER_PORTS`; **not** Creator ports; **Subsurface only**):
+  - **`makeup_color_map`** (`filename`, a `color4` image). RGB the makeup's colour, read `srgb_texture`; A the colour's **coverage**, straight (not premultiplied), read linear.
+  - **`makeup_finish_map`** (`filename`, linear data). R a **target roughness**; G the finish's **coverage**; B unused (0).
+  - **`makeup_amount`** (`float`, default 1). Multiplies both coverages, so a character can fade its whole layer without a new merge.
+- **Declared by** a recipe's `makeup: true`: the 18 `Skin_Fitzpatrick*` and `Skin_Tone34` (19 articles). The assembler refuses it on another master, or on a skin whose scatter does not follow its base. In Blender and Unreal the Subsurface master carries the slots for every Subsurface article, at neutral.
+- **Carried and sampled as `base_color_map` is:** the [Carrier rule](#carrier-rule-no-imrsv-attrs), one Material instance per binding; texcoord 0 directly, **not through `place2d`**. A USD writer authors `colorSpace = "srgb_texture"` on the colour picture's asset value (Storm S10), and leaves the finish picture raw.
+- **Neutral = no picture = coverage 0**, so every skin draws as today. (The colour image's default is clear, (0, 0, 0, 0); the finish image's is black.)
+- **The order:**
+  - `base = mix(base_color_const × base_color_map × base_color_tint, makeup colour, colour coverage × makeup_amount)`: after the tint (the tint is the skin's, never the makeup's) and before any deposit. The scatter colour follows this mixed base.
+  - `roughness = mix(clamp(pores + (roughness_map − 0.5) + roughness_bias, 0, 1), target roughness, finish coverage × makeup_amount)`: after the shine map, the bias and the clamp, so matte powder over a wet skin reads matte.
+  - The normal, the cavity's shine and the scatter radius are untouched. There is **no relief** in the layer *(planned: a third picture with the first piece that needs it, a raised scar; RD-P26-1)*.
+  - **Why finish has its own coverage:** a clear gloss changes finish with no colour.
+- **Render-role nodes:** `makeup_color_map_tex` (`color4`) and `makeup_finish_map_tex` (`vector3`), each file through `interfacename`, on texcoord node `makeup_map_uv`; the mixes are `base_color_makeup` and `roughness_makeup`. Like `base_color_map_tex`, neither has a `file` value in the article. The Unreal master's slots carry the same names.
+- **The known answer:** the library's reference merge, `tools/converters/fit/merge_makeup.py`, writes both pictures at the mesh's map size (2048²) from a piece list; a consumer's own merge must produce the same pictures for the same list (RD-P26-4).
+- **Shipped (Phase26):** the assembled articles, the Blender masters (Subsurface group v13), the library's Unreal Subsurface master (a runtime reading job format 5, [JOB_FORMAT](../../../tools/parity/JOB_FORMAT.md)), and the rig and look view (`--makeup`). **Consumers:** `PlatformDependencies.md` M14 (1).
+
 ## Render-role texture nodes — assembler-owned node-name contract
 
 The overlay/mask **textures** (distinct from their Creator-adjustable `overlay1_density`/`overlay2_density`/`overlay3_density`/`maskset_blend` *scalars* above) are **fixed per article** — only the blend amount is Creator-adjustable, the bitmap is not. They therefore are **NOT** material-level `inputs:` and are **NOT** in the Creator subset. MaterialX rejects extra inputs on the fixed `<surfacematerial>` nodedef (`sdk-validate` "Node interface error"), so a fixed texture path can only live **inside the nodegraph**, on an `<image>` node's `file` input. So that a consumer can find those paths, the producer (the [assembler](../Tooling/AuthoringHarness.md)) and every consumer agree on a **fixed render-role node name** per role:

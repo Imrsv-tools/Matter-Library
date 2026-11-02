@@ -59,7 +59,7 @@ The Matter Library is a **gathering of components, organised by concern**. Each 
 | **Contract** | OpenPBR template · manifest schema · runtime-catalog schema · LCD schema · Creator asset profile | [MaterialXTemplate](Contract/MaterialXTemplate.md) · [Manifest](Contract/Manifest.md) · [RuntimeCatalog](Contract/RuntimeCatalog.md) · [LCDSchema](Contract/LCDSchema.md) · [CreatorAssetProfile](Contract/CreatorAssetProfile.md) · [examples](Contract/examples/) | `MatterLibrary/materials/`, `library/releases/` |
 | **HDRIs** *(Phase14, 2026-10-14)* | a second kind beside materials: a scene's lighting picture, named bare on a `DomeLight`; credited in full to its source | [Identity](Ontology/Identity.md) §HDRI names · [RuntimeCatalog](Contract/RuntimeCatalog.md) §HDRIs · [SiteFile](Contract/SiteFile.md) §Per HDRI | `MatterLibrary/hdris/`, `library/provenance/sources/hdris/`, `tools/converters/import_polyhaven_hdri.py`, `tools/releases/hdris.py` |
 | **Catalog** | the curated set, human-readable | [Catalog](Catalog/Catalog.md) | `library/releases/*.catalog.json` |
-| **Authoring** | the Authoring Golden Path (generate → decompose → assemble), provenance, future tooling | [AuthoringGoldenPath](Authoring/AuthoringGoldenPath.md) · [SkinMaps](Authoring/SkinMaps.md) *(draft, planned)* | `tools/converters/`, `library/provenance/` |
+| **Authoring** | the Authoring Golden Path (generate → decompose → assemble), provenance, future tooling | [AuthoringGoldenPath](Authoring/AuthoringGoldenPath.md) · [SkinMaps](Authoring/SkinMaps.md) *(draft, planned)* · [MakeupPieces](Authoring/MakeupPieces.md) | `tools/converters/`, `library/provenance/` |
 | **Distribution** | stage · freeze · approve · activate · rollback; the install layout and selector | [ReleaseModel](Distribution/ReleaseModel.md) | `tools/releases/`, `library/releases/` |
 | **Tooling** | the authoring harness and validators · the USD validation toolchain · compression and parity | [AuthoringHarness](Tooling/AuthoringHarness.md) · [USDValidationToolchain](Tooling/USDValidationToolchain.md) · [CompressedDistribution](Tooling/CompressedDistribution.md) | `tools/` |
 | **Blender bridge** | the Asset-Browser library and the Matter exporter | [Experience §Shipped](Experience/Experience_MatterLibrary.md) · [CreatorAssetProfile](Contract/CreatorAssetProfile.md) | `blender/`, `tools/generators/`, `tools/conformance/` |
@@ -168,7 +168,7 @@ docs/specs/
 ├── Contract/             MaterialXTemplate.md · Manifest.md · RuntimeCatalog.md · LCDSchema.md · CreatorAssetProfile.md
 │   └── examples/         a verbatim live article kept as the reference
 ├── Catalog/              Catalog.md (the pilot release, human-readable)
-├── Authoring/            AuthoringGoldenPath.md · SkinMaps.md (draft)
+├── Authoring/            AuthoringGoldenPath.md · SkinMaps.md (draft) · MakeupPieces.md
 ├── Distribution/         ReleaseModel.md
 └── Tooling/              AuthoringHarness.md · USDValidationToolchain.md · CompressedDistribution.md
 ```

@@ -90,6 +90,8 @@ The **site file** is the presentation layer of a release (`261014_R_MaterialPipe
 | `character` | Character | `materials` | `character` | `human`: in a human context (skin on a side face and hands, an eye on an eye), **never on the cubes** (RD-P13-2). Its pictures are its thumbnails, on the clothed character *(since Phase17 17.5)*; until then none was published. |
 | `hdris` | HDRIs | `hdris` | — | `thumbnail`: the HDRI's own 2:1 picture |
 
+*(2026-11-02, Phase26.)* The dev catalog has a fourth group, `makeup` (its list `pieces`; [RuntimeCatalog](RuntimeCatalog.md) §Groups). **This file does not carry it yet** *(planned, 2026-11-02)*: the site listing the makeup pieces arrives with a site-file change of its own.
+
 **Since Phase15 (2026-10-14), each group also names its `taxonomy`**, the fields it is browsed by, in order (Matter `domain`, `material_class` · Character `species`, `part` · HDRIs `when`, `sky`), **and Character carries its `rows`**: per species, its parts' `id`s and `label`s in order (`humanoid`: Eyes, Hair, Skin, Nails, Teeth, Mouth; the website's ask M11 (1)). Additive: `schema_version` stays 2. The dev catalog carries the same list.
 
 A group reads the list it names, filtered by `section` where it gives one. **A group is a place to browse, not a [Domain](../Ontology/Taxonomy.md):** Matter and Character are sections of `materials`; an HDRI is a kind beside the taxonomy ([Identity](../Ontology/Identity.md) §HDRI names).

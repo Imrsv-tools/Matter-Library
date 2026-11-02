@@ -18,4 +18,6 @@ every run, up front. **Every row is a problem this project has already solved.**
 |---|---|---|---|
 | 1 | **Making a body map larger than 2048 inside the machine's memory** (an 8K map's per-texel fields and temporaries need ~45 GB made whole) | `docs/specs/Authoring/SkinMaps.md` §One subject's set at 8K (RD-P24-7) | `gen_synth_skin.compose_banded` / `band_pre` / `band_view` / `parts_banded` (bands of rows; what needs the whole atlas taken once); `gen_skin_shine.relief`'s `CHUNK`; `gen_skin_maps.bleed`'s ring-only path above 2048 |
 
-*Row 1 added at Phase24's close (2026-11-01).*
+| 2 | **Laying a mark or a bit of makeup on the body's atlas** (a shape made in 3D, or a stamp placed by a point, a size and a turn), merged with others into one picture a master reads | `docs/specs/Authoring/MakeupPieces.md` §The merge (RD-P26-5, RD-P26-6) | `merge_makeup.merge` / `stamp_coverage` / `tangent_frame` (placement); `gen_makeup_pieces.eyeshadow` (a fitted shape from landmarks); `_fill` (values pushed past an edge) |
+
+*Row 1 added at Phase24's close (2026-11-01); row 2 at Phase26's (2026-11-02).*

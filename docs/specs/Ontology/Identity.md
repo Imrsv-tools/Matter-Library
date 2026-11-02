@@ -110,6 +110,15 @@ The `vNN` in the filename pins the material; the **library release** (a [manifes
   
   A fact the record does not hold has no line. Values are UTF-8 and never hold a line break. Left out: the source's description, its raw tags and the Markdown `edited_from` line (they are in the record and the site file). Readers skip header lines they do not know: Storm and Blender read a stamped copy pixel for pixel (Phase16 F-P16-1, and the 16.2 check on the default sky); Unreal's importer is checked on the machine with Unreal. Written by `tools/releases/hdris.py` (`stamp`, read back by `read_stamp`; `hdris.py stamp <id> <out>` writes one).
 
+## Makeup pieces
+
+*(2026-11-02, Phase26 RD-P26-8.)* A [piece](../../Glossary.md) is a kind beside the taxonomy, as an HDRI is: it has no tile, so no scale tag in its name.
+
+- **Name:** `Makeup_<Kind>_<Variant>_vNN`, PascalCase tokens: `Makeup_LipColour_Full_v01`, `Makeup_Tattoo_Arrow_v01`. `<Kind>` is what it is (`LipColour`, `LipGloss`, `Eyeshadow`, `Tattoo`); `<Variant>` tells one of a kind from another.
+- **Id and version:** the id is the whole name; `vNN` follows §Two version axes (a changed picture is a new `vNN`).
+- **Budget:** the same ≤63 characters of `[A-Za-z0-9_]`, unique within `MatterLibrary/makeup/`.
+- **Files:** the record `MatterLibrary/makeup/<Name>.json`; its picture `MatterLibrary/textures/fit/makehuman/makeup/<Name>_coverage_sUKN.png` (fitted) or `<Name>_stamp_sUKN.png` (placed). The picture's scale tag is the fit set's `sUKN`. What a piece is: [MakeupPieces](../Authoring/MakeupPieces.md).
+
 ## Status
 
 **Solid grammar, corrected for the name budget.** The grammar, defaults, and scale tags are carried unchanged from the library's original design; the ≤63-char / identifier-charset budget is the one hard correction (the original's own 70-char example is over).
