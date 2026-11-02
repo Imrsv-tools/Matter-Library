@@ -52,8 +52,12 @@ VIEWS = ((0, 624), (90, 360), (180, 624), (270, 360))   # (yaw, width): front, p
 CY = 0.015                   # the body's middle height in the mesh's frame (m)
 NAVEL_WIN = (0.03, 0.05, 0.30)       # ``fit --front-pins``: the navel's window on hm08 (|x| <, y from, y to; m): its deepest
                                      # dip below the median of its 2.5 cm neighbours (hm08's: y 0.184, 4.4 mm deep)
-NIP_WIN = (0.04, 0.15, 0.28, 0.52)   # ``fit --front-pins``: each breast's window on hm08 (|x| and y, m); its apex is the mean
-                             # of the points within 1 mm of its most forward one (27.2.12)
+NIP_WIN = (0.03, 0.17, 0.28, 0.48)   # ``fit --front-pins``: each breast's window on hm08 (|x| and y, m). hm08 has no nipple
+                             # (vertices ~12 mm apart): the target is the breast mound's centre, the height-weighted
+                             # centre of its top 40 % above the plane fitted within NIP_R (±0.090, 0.388 m, stable for
+                             # 4-6 cm). The most forward point (±0.075, 0.377) sat too far in and down: the chest's
+                             # own curve pulls it to the middle (the lead, at 27.2.12, circled it)
+NIP_R = 0.05
 NIP_SEARCH = 45              # ... and how far (px) from where the outline-only fit samples it the picture's areola is looked for
 NIP_SIGMA = 25               # the pin's reach (px, ~4 cm): a broad shift of the breast, faded to nothing at the outline
                              # (a point held in the harmonic fit pinched the areola: folds 0.04 -> 0.10 %)
@@ -378,8 +382,8 @@ def relax(m, ys, xs, mv, eps=1e-4):
 
 
 def front_pins(m, f, pic, D0, w):
-    """The front view's pins (27.2.12): hm08's breast apexes (``NIP_WIN``) and navel (``NAVEL_WIN``) against the
-    picture's areolae and navel, each the darkest spot of the picture's blurred luminance inside its body within ``NIP_SEARCH``
+    """The front view's pins (27.2.12): hm08's breast mounds' centres (``NIP_WIN``) and navel (``NAVEL_WIN``) against the
+    picture's areolae and navel, each the darkest small spot of the picture (its log luminance at 2 px against 8 px) inside its body within ``NIP_SEARCH``
     of where the outline-only
     fit ``D0`` samples the apex. The fit holds only the outline, and the model drew the breasts higher and wider than
     hm08's: its areolae landed ~5 cm up and out, as small marks, and hm08's own nipples took plain skin. The navel
@@ -389,24 +393,32 @@ def front_pins(m, f, pic, D0, w):
     from scipy.spatial import cKDTree  # noqa: PLC0415
     P = mesh()[0]
     targets = []
+    C = P[(P[:, 2] > 0.05) & (P[:, 1] > 0.25) & (P[:, 1] < 0.55) & (np.abs(P[:, 0]) < 0.17)]   # the chest's front
+    h = np.zeros(len(C))
+    for i, nb in enumerate(cKDTree(C).query_ball_point(C, NIP_R)):
+        X = C[nb]; c = X.mean(0); n = np.linalg.svd(X - c)[2][2]
+        h[i] = (C[i] - c) @ (n * np.sign(n[2] or 1.0))
     for side in (1, -1):
         a, b, y0, y1 = NIP_WIN
-        sel = (side * P[:, 0] > a) & (side * P[:, 0] < b) & (P[:, 1] > y0) & (P[:, 1] < y1)
-        Q = P[sel]
-        targets.append(("nipple_l" if side > 0 else "nipple_r", Q[Q[:, 2] > Q[:, 2].max() - 0.001].mean(0)))
+        hm = np.where((side * C[:, 0] > a) & (side * C[:, 0] < b) & (C[:, 1] > y0) & (C[:, 1] < y1), h, -1.0)
+        top = hm > 0.6 * hm.max()
+        targets.append(("nipple_l" if side > 0 else "nipple_r", (C[top] * h[top, None]).sum(0) / h[top].sum()))
     xw, y0, y1 = NAVEL_WIN
     Q = P[(np.abs(P[:, 0]) < xw) & (P[:, 1] > y0) & (P[:, 1] < y1) & (P[:, 2] > 0)]
     t = cKDTree(Q[:, :2])
     dip = np.array([np.median(Q[t.query_ball_point(q[:2], 0.025), 2]) - q[2] for q in Q])
     targets.append(("navel", Q[int(np.argmax(dip))]))
-    L = gaussian_filter(pic @ np.asarray(LUM), 2.0)
-    yy, xx = np.mgrid[0:VH, 0:w]
+    lum = np.log(np.maximum(pic @ np.asarray(LUM), 1e-4))
+    L = gaussian_filter(lum, 2.0) - gaussian_filter(lum, 8.0)      # a small dark spot against its surroundings, not
+    yy, xx = np.mgrid[0:VH, 0:w]                                     # the darkest pixel (the armpit's shading won once)
+    from scipy.ndimage import distance_transform_edt  # noqa: PLC0415
+    inner = distance_transform_edt(f) > 6                            # ... and clear of the outline (the armpit's fold)
     pys, pxs, pmv, rec = [], [], [], []
     for name, apex in targets:
         hx, hy, _ = proj(apex[None], 0, w)
         hx, hy = float(hx[0]) - 0.5, float(hy[0]) - 0.5                 # index coordinates
         fx, fy = hx + D0[int(round(hy)), int(round(hx)), 0], hy + D0[int(round(hy)), int(round(hx)), 1]
-        win = f & (np.hypot(xx - fx, yy - fy) < NIP_SEARCH)
+        win = inner & (np.hypot(xx - fx, yy - fy) < NIP_SEARCH)
         if not win.any():
             raise SystemExit(f"no picture under the {name}'s search window")
         ay, ax = divmod(int(np.argmin(np.where(win, L, np.inf))), w)
