@@ -1,6 +1,6 @@
 # Phase26 — Makeup on the Skin
 
-**Status:** IN EXECUTION (2026-11-02, `/execute Phase26`, at 26.1). *Before:* BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
+**Status:** IN EXECUTION (2026-11-02, `/execute Phase26`, at 26.2). *Before:* BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
 **Lane:** `build` (§Risk lane).
 **Measured at:** `5c4bfde`, on **the machine with Unreal**. Unreal 5.8 is at the path `unreal/build.sh` takes as `UE`, `MATTER_BLENDER` is the official 5.2.2, and `unreal-runtime-v7` is pinned.
 **Seeded from:** [`../Research/261101_R_PlatformSkinAndMakeupAsks.md`](../Research/261101_R_PlatformSkinAndMakeupAsks.md) (Q-PSM-2, Q-PSM-7; F-PSM-1, F-PSM-4; RD-PSM-2) · [`../Research/261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (Pass 4, Makeup and marks; RD-CMT-1, RD-CMT-2, RD-CMT-4) · the platform's ask row `PlatformDependencies.md` **M14** (1) and (2).
@@ -246,6 +246,7 @@ The controls, each read:
 
 | Step | Result | Next |
 |---|---|---|
+| 26.2 | **▶ SCAFFOLD COMPLETE — sitting owed** (clicks 4–5). The pieces `Makeup_LipGloss_Clear_v01` (fitted, finish only, roughness 0.08) and `Makeup_Eyeshadow_Lids_v01` (fitted, plum, satin; both upper lids, placed in 3D from each eye) in `gen_makeup_pieces.py`; the look `tools/parity/makeup/first_handful.json` (the 26.1 look plus both). The dev catalog's `pieces` list and `makeup` group (`serve_to_stage.py`, `groups.DEV_GROUPS`), read from a projection: four pieces, `schema_version` unchanged. Measured in the face view (look view, 1024 px), the gloss against the same lips without it: the lips' median colour moves ≤ 2/255; the highlight's peak 170 → 255 (II) and 131 → 255 (VI). **Not yet served to Stage:** the platform's sessions are open on this machine, so the serve waits for the lead's word (`LOCAL_DELTAS.md` §Two machines). | the sitting; the serve; the close |
 | 26.1 | **✅** (clicks 1–3 sat 2026-11-02, below). The slots in the MaterialX graph (the 19 finished skins declare `makeup`; every other article re-assembles byte-identically), the Blender Subsurface group (v13) and loader, and the Unreal Subsurface master (local masters build and package; job format 5). The reference merge (`tools/converters/fit/merge_makeup.py`, units `test_merge_makeup.py`), the pieces `Makeup_LipColour_Full_v01` and `Makeup_Tattoo_Arrow_v01` (`gen_makeup_pieces.py`), the first look `tools/parity/makeup/red_lips_hand_tattoo.json`, and `--makeup` / `--lips-skin` on `rig.py` and `look.py`. Measured at the pieces' pixels (rig, 512 px, Fitzpatrick II): lip colour within 6/255 per channel across the three tools; the tattoo's centre within 1 px, the same extent. | 26.2 |
 
 - **Premise probe (alpha stays linear in a `color4` read as `srgb_texture`):** holds. Unreal by construction: the runtime decodes sRGB on RGB only (`MatterRuntimeGameMode.cpp` `LoadTexture`). Storm and Blender: the lips' covered-pixel counts and centres agree with Unreal's within 4 % and 1 px, which a gamma-curved coverage edge would not give.
@@ -258,4 +259,9 @@ The controls, each read:
 - **Click 1 (the red lipstick, Fitzpatrick II and VI):** the lead, verbatim: *"The lips are red"*. *Reading (the agent's): a pass, the dark skin's "lipstick, not a tint" included, since no fault was named; strike it in one line if not.*
 - **Click 2 (the hand tattoo, both skins):** the lead, verbatim: *"yes"*.
 - **Click 3 (the three tools agree, both skins, the rig's labelled grid):** the lead, verbatim: *"yes"*.
-- **26.1 discharged:** the artifact was observed working in all three clicks. Pictures: `library/parity/Look__Skin_FitzpatrickII_Clean_Base_s001_v01__makeup__lipsskin/CLICK{1,2,3}_*.png` (git-ignored).
+- **26.1 discharged:** the artifact was observed working in all three clicks.
+
+**26.2 notes:**
+- **F-P26-8 — the site file does not carry the pieces.** `groups.GROUPS` is shared by the site file and the dev catalog, so the `makeup` group sits in `groups.DEV_GROUPS`, the dev catalog's only. The site file listing pieces is *(planned, 2026-11-02)*.
+- The eyeshadow's coverage falls on two atlas islands: the eyelids' own and the face's beside them. Both are the lids in 3D, as the render shows.
+- The 26.2 sitting pictures, labelled: `library/parity/Look__Skin_FitzpatrickII_Clean_Base_s001_v01__makeup__lipsskin/CLICK{4_gloss,5_eyeshadow}.png`; the comparison without gloss in `library/parity/P26_2_without_gloss/` (git-ignored). Pictures: `library/parity/Look__Skin_FitzpatrickII_Clean_Base_s001_v01__makeup__lipsskin/CLICK{1,2,3}_*.png` (git-ignored).

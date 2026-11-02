@@ -25,6 +25,8 @@ What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
     when the checkout holds HDRIs, their ``hdris`` list and ``default_hdri`` at schema 3 (Phase14:
     each file passes the HDRI check or the serve is refused; status from its record, else draft;
     the default from ``library/hdris.yaml``);
+  * ``releases/matterlib-dev/makeup`` -> a symlink to this checkout's makeup piece records, and the
+    catalog's ``pieces`` list and ``makeup`` group (Phase26, RD-P26-8; additive);
   * ``active-release.json`` -> ``matterlib-dev`` (the previous value is kept in
     ``active-release.before-dev.json``; ``--off`` puts it back);
   * then (re)starts the Stage daemon from that runtime, unless ``--no-restart``.
@@ -109,7 +111,40 @@ def working_tree_catalog() -> dict:
     hdris, default = working_tree_hdris()
     if hdris:  # Q-P14-2: schema 3 only when HDRIs are listed
         catalog.update(schema_version=SCHEMA_VERSION_HDRIS, hdris=hdris, default_hdri=default)
+    pieces = working_tree_pieces()
+    if pieces:  # Phase26 (RD-P26-8): additive, schema_version unchanged
+        catalog.update(pieces=pieces, groups=G.DEV_GROUPS)
     return catalog
+
+
+PIECES = SOURCE / "makeup"
+
+
+def working_tree_pieces() -> list[dict]:
+    """Every makeup piece on disk (``MatterLibrary/makeup/<Name>.json``, written by
+    ``gen_makeup_pieces.py``) as a catalog entry: its record's facts, and its record and picture as
+    catalog-relative paths (served through the ``makeup`` and ``textures`` links). A picture the
+    record names and the disk does not hold refuses the serve, as a missing payload does."""
+    entries = []
+    for p in sorted(PIECES.glob("*.json")) if PIECES.is_dir() else []:
+        rec = json.loads(p.read_text(encoding="utf-8"))
+        name = rec["name"]
+        parts = name.split("_")                     # Makeup_<Kind>_<Variant>_vNN (RD-P26-8)
+        if len(parts) != 4 or parts[0] != "Makeup" or p.stem != name:
+            raise SystemExit(f"cannot serve {p}: a piece is named Makeup_<Kind>_<Variant>_vNN, as its file")
+        entry = {"id": name, "display_name": f"{parts[1]} ({parts[2]})", "version": parts[3],
+                 "group": G.MAKEUP, "kind": rec["kind"], "piece_kind": parts[1],
+                 "status": rec.get("status") or "draft", "record_path": f"makeup/{p.name}"}
+        entry.update({k: rec[k] for k in ("carries", "defaults", "fits", "size", "summary",
+                                          "licence", "contributor", "channels_planned") if k in rec})
+        for k in ("coverage", "stamp"):
+            if k in rec:
+                pic = (p.parent / rec[k]).resolve()
+                if not pic.is_file():
+                    raise SystemExit(f"cannot serve {name}: its {k} {pic} is not on disk")
+                entry[f"{k}_path"] = pic.relative_to(SOURCE).as_posix()
+        entries.append(entry)
+    return entries
 
 
 def working_tree_hdris() -> tuple[list[dict], str | None]:
@@ -289,6 +324,8 @@ def main(argv=None) -> int:
         link(dev / "materials", SOURCE / "materials")
         link(dev / "textures", SOURCE / "textures")
         catalog = working_tree_catalog()
+        if catalog.get("pieces"):
+            link(dev / "makeup", PIECES)      # Phase26: the piece records, live like the materials
         mt = MT.serve(dev, catalog["materials"], SOURCE)
         print(f"thumbnails  {mt['local'] + mt['published']} materials pictured ({mt['local']} from this "
               f"machine's masters, {mt['published']} from {mt['tag'] or 'no published snapshot'}), "
@@ -307,6 +344,9 @@ def main(argv=None) -> int:
                               else json.dumps({"active_release": ""}) + "\n", encoding="utf-8")
             write_atomic(selector, json.dumps({"active_release": DEV}, indent=2) + "\n")
         print(f"served {len(catalog['materials'])} articles from {SOURCE} -> {dev}")
+        if catalog.get("pieces"):
+            print(f"pieces {len(catalog['pieces'])} makeup pieces: "
+                  + ", ".join(e["id"] for e in catalog["pieces"]))
 
     rc = 0 if args.no_restart else restart_stage(runtime)
     if rc == 0 and args.view:

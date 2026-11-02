@@ -84,6 +84,14 @@ GROUPS = [
      "taxonomy": ["when", "sky"]},
 ]
 
+# Phase26 (RD-P26-8): the makeup PIECES, browsed by kind (fitted, placed) and what they are
+# (LipColour, Tattoo, ...), shown on the character. In the dev catalog only: the site file does not
+# carry the pieces yet (planned, 2026-11-02), so its list stays GROUPS.
+MAKEUP = "makeup"
+MAKEUP_GROUP = {"id": MAKEUP, "label": "Makeup", "list": "pieces", "shown": "human",
+                "taxonomy": ["kind", "piece_kind"]}
+DEV_GROUPS = GROUPS + [MAKEUP_GROUP]
+
 
 # HDRIs: *when* is Poly Haven's time category (exactly one per HDRI, measured on all 59,
 # 2026-10-14); *sky* is its `weather` attribute. The words stay Poly Haven's; merging them into

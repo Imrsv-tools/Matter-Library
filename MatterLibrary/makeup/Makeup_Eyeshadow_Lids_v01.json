@@ -1,0 +1,31 @@
+{
+  "name": "Makeup_Eyeshadow_Lids_v01",
+  "kind": "fitted",
+  "fits": "MakeHuman_Body_v01",
+  "carries": [
+    "colour",
+    "finish"
+  ],
+  "defaults": {
+    "colour": [
+      0.11,
+      0.025,
+      0.085
+    ],
+    "strength": 0.85,
+    "finish": 0.3
+  },
+  "channels_planned": {
+    "relief": "planned (RD-P26-1, Skin Layers)",
+    "pigment": "planned (Skin Layers)"
+  },
+  "summary": "Eyeshadow on both upper lids, from the lashes to the crease: a plum by default, satin.",
+  "contributor": "MatterBot",
+  "licence": "CC0-1.0",
+  "origin": [
+    "procedural",
+    "agent-drafted"
+  ],
+  "script": "tools/converters/fit/gen_makeup_pieces.py",
+  "coverage": "../textures/fit/makehuman/makeup/Makeup_Eyeshadow_Lids_v01_coverage_sUKN.png"
+}

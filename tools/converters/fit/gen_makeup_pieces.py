@@ -78,6 +78,42 @@ def lip_colour(F: dict) -> dict:
                   "Lip colour over the whole lips: a red lipstick by default, satin.", coverage=rel(p))
 
 
+def lip_gloss(F: dict) -> dict:
+    """A clear gloss over the lips: finish only, so the lips' colour (bare or a lip colour's) stays
+    and only their highlight sharpens. The lips' shape, its edge softer than a lip colour's (~2 mm,
+    4 texels): a gloss thins toward the lip line."""
+    m = gsm.blur(F["masks"]["lips"], 4)
+    cov = np.clip((m - 0.15) / 0.6, 0, 1) * F["cover"]
+    p = save_grey(cov, "Makeup_LipGloss_Clear_v01")
+    return record("Makeup_LipGloss_Clear_v01", "fitted", ["finish"], {"strength": 1.0, "finish": 0.08},
+                  "A clear lip gloss: no colour, a wet finish over the lips or a lip colour.", coverage=rel(p))
+
+
+def _smooth(x: np.ndarray, a: float, b: float) -> np.ndarray:
+    t = np.clip((x - a) / (b - a), 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def eyeshadow(F: dict) -> dict:
+    """Shadow on both upper lids, placed in 3D from each eye (``gen_synth_skin.face_landmarks``):
+    from the lash line up to just past the crease (~12 mm), reaching a little further toward the
+    outer corner, fading over ~3 mm; none below the eye's centre line, none off the face's front."""
+    P, cover = F["P"], F["cover"]
+    L = gss.face_landmarks(P, F["masks"], cover)
+    cov = np.zeros(P.shape[:2])
+    for e in L["eyes"]:
+        m, y, z = gss._eye_frame(P, e, L["fx"])                  # toward the nose, up, out of the face
+        r = np.sqrt(((m + 0.003) / 0.019) ** 2 + ((y - 0.0065) / 0.0075) ** 2)
+        c = (1 - _smooth(r, 0.65, 1.0)) * _smooth(y, -0.0015, 0.0015) * np.exp(-(z / 0.015) ** 2)
+        cov = np.maximum(cov, c)
+    cov = cov * cover
+    p = save_grey(cov, "Makeup_Eyeshadow_Lids_v01")
+    return record("Makeup_Eyeshadow_Lids_v01", "fitted", ["colour", "finish"],
+                  {"colour": [0.11, 0.025, 0.085], "strength": 0.85, "finish": 0.3},
+                  "Eyeshadow on both upper lids, from the lashes to the crease: a plum by default, satin.",
+                  coverage=rel(p))
+
+
 def arrow_stamp() -> Image.Image:
     """An asymmetric arrow, white on clear, pointing up the stamp: its head has one barb, on the
     stamp's right, so a mirrored or turned stamp is seen at once. Drawn at 4x and box-filtered."""
@@ -127,15 +163,22 @@ def main() -> int:
     PICTURES.mkdir(parents=True, exist_ok=True)
     LOOKS.mkdir(parents=True, exist_ok=True)
     F = gss.fields(parts=False)
-    for rec in (lip_colour(F), tattoo()):
+    for rec in (lip_colour(F), tattoo(), lip_gloss(F), eyeshadow(F)):
         print(f"{rec['name']}: {save_record(rec)}")
     point = back_of_left_hand(F)
-    look = {"mesh": "MakeHuman_Body_v01", "label": "Red lips and a hand tattoo (Phase26 26.1)",
-            "pieces": [{"piece": "Makeup_LipColour_Full_v01"},
-                       {"piece": "Makeup_Tattoo_Arrow_v01", "point": point, "size": 0.042, "turn": 0}]}
-    p = LOOKS / "red_lips_hand_tattoo.json"
-    p.write_text(json.dumps(look, indent=2) + "\n", encoding="utf-8")
-    print(f"look {p}: the tattoo at {point}")
+    arrow = {"piece": "Makeup_Tattoo_Arrow_v01", "point": point, "size": 0.042, "turn": 0}
+    looks = {"red_lips_hand_tattoo.json": ("Red lips and a hand tattoo (Phase26 26.1)",
+                                           [{"piece": "Makeup_LipColour_Full_v01"}, arrow]),
+             # 26.2: the first handful; the 26.1 look plus the gloss over the lips and the lids
+             "first_handful.json": ("The first handful: red lips, gloss, eyeshadow, a hand tattoo (Phase26 26.2)",
+                                    [{"piece": "Makeup_LipColour_Full_v01"}, {"piece": "Makeup_LipGloss_Clear_v01"},
+                                     {"piece": "Makeup_Eyeshadow_Lids_v01"}, arrow])}
+    for fname, (label, pieces) in looks.items():
+        p = LOOKS / fname
+        p.write_text(json.dumps({"mesh": "MakeHuman_Body_v01", "label": label, "pieces": pieces},
+                                indent=2) + "\n", encoding="utf-8")
+        print(f"look {p}")
+    print(f"the tattoo at {point}")
     return 0
 
 
