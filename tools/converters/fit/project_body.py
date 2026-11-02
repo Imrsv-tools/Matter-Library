@@ -64,6 +64,7 @@ NECK_FILL_R = 0.10           # ``--neck-fill``: how far down the body the head's
                              # picture's chin shadow lies 3-8 cm below the neck seam (27.2.6)
 JAW_DOWN = -0.5              # ``--jaw-free``: a neck-seam point whose normal's up component is below this is under the
                              # jaw (all at the front, |x| < 5 cm; the sides and the nape are above -0.3)
+MOTTLE_SIG = (1.0, 16.0)     # ``--mottle-gain``: the band's two blurs, in 2K texels (~0.8 mm and ~1.3 cm)
 JAW_CLEAR = 0.006            # ... and the picture's samples within this of that seam are holes (its bright chin edge)
 NAPE_R = 0.05                # how far up the head island the four views paint the back of the neck (m)
 RIM = 2                      # texels of the maker's 2K rim taken from the island's inside
@@ -757,7 +758,8 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
-            outline_clear: float = 0.0, smooth_holes: bool = False, jaw_free: bool = False) -> None:
+            outline_clear: float = 0.0, smooth_holes: bool = False, jaw_free: bool = False,
+            delight_keep: float = 0.0, mottle_gain: float = 1.0) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -838,7 +840,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
             else:
                 coef = np.linalg.lstsq(B[fitk], ratio_k, rcond=None)[0]
             L = np.maximum(B @ coef, LIGHT_FLOOR)   # at grazing normals the fit falls toward 0; never divide by it
-            col[vis] = col[vis] / L[vis]
+            col[vis] = col[vis] / L[vis] ** (1.0 - delight_keep)   # ``--delight-keep``: part of the painted light kept
             light[str(yaw)] = {"min": [round(float(v), 3) for v in L[fitk].min(0)],
                                "max": [round(float(v), 3) for v in L[fitk].max(0)]}
         take = vis & (nz > face) & (nz > MIN_FACE)
@@ -879,6 +881,16 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     holes_rec = None
     if smooth_holes:
         D, holes_rec = smooth_fill(D, C, body & kn, body & ~kn, Pa.astype(np.float64))
+    if mottle_gain != 1.0:
+        # ``--mottle-gain``: the skin's own variation between ~1 mm and ~1.3 cm scaled in log colour (27.2.11):
+        # rendered, the back kept ~70 % of the original's mottling, and keeping the painted light recovered a third
+        lg = np.log(np.maximum(D, 1e-4))
+        det = _gblur(lg, body, MOTTLE_SIG[0]) - _gblur(lg, body, MOTTLE_SIG[1])
+        # faded to nothing toward the island's edges over the wide blur: at a cut (down the spine) the small step
+        # left there is otherwise boosted as detail, a thin pale line (seen at 1.8)
+        from scipy.ndimage import distance_transform_edt  # noqa: PLC0415
+        fade = np.clip(distance_transform_edt(body) / MOTTLE_SIG[1], 0.0, 1.0)[..., None]
+        D[body] = np.exp(lg + (mottle_gain - 1.0) * fade * det)[body]
     gain = C[body].mean(0) / D[body].mean(0)                          # the body held to C's mean
     if keep_colour:                                                   # ... in brightness only: the hue the picture's
         gain = np.full(3, (C[body].mean(0) @ np.asarray(LUM)) / (D[body].mean(0) @ np.asarray(LUM)))
@@ -925,7 +937,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
-           "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
+           "keep_colour": keep_colour, "light_order": light_order, "delight_keep": delight_keep, "mottle_gain": mottle_gain, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
            "smooth_holes": holes_rec, "jaw_free_dropped": jaw_dropped if jaw_free else None,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
@@ -1318,6 +1330,11 @@ def main(argv=None) -> int:
                    help="with --neck-fill: do not hold the body to the head where the seam runs under the jaw (its "
                         "red edge ring, a thin line at the jaw's silhouette), and take no picture sample within "
                         "JAW_CLEAR of that seam (27.2.10)")
+    s.add_argument("--delight-keep", type=float, default=0.0, metavar="F",
+                   help="with --delight: keep this share of the light the model painted (divide by light**(1-F)); "
+                        "a probe of how much of the picture's mottling is its light (27.2.11); 0 = none kept")
+    s.add_argument("--mottle-gain", type=float, default=1.0, metavar="G",
+                   help="scale the skin's own variation between ~1 mm and ~1.3 cm (MOTTLE_SIG) by G (27.2.11)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1342,7 +1359,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free, a.delight_keep, a.mottle_gain)
     return 0
 
 
