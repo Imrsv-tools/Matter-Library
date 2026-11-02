@@ -172,8 +172,12 @@ def judge_views(parts: dict) -> list[dict]:
 # left hand. Through the rig's one lens; placed from the rig's own parts, as ``judge_views`` is.
 BODY_VIEWS = {"bfront": "whole body, front, 2.5 m", "bback": "whole body, back, 2.5 m",
               "bside": "whole body, profile, 2.5 m", "tfront": "trunk, front, 1 m", "tback": "trunk, back, 1 m",
-              "neck": "neck and left shoulder, 40 cm", "wrist": "left wrist, 40 cm",
+              "neck": "back and left side of the neck, 40 cm", "wrist": "left wrist, 40 cm",
               "ankle": "left ankle, 40 cm", "bhand": "back of the left hand, 40 cm"}
+# The seams' centres in the rig's frame (hm08's mesh lifted to stand on 0): the mean of each seam's edge
+# midpoints, read from the mesh by ``project_body.py seams``' edges (F-P27-2) and lifted by the mesh's
+# lowest point (-0.817 m). 27.1's guesses framed the chin and the forearm.
+SEAM_AT = {"neck": (0.0, 1.458, 0.052), "wrist": (0.429, 1.057, 0.177), "ankle": (0.224, 0.096, 0.011)}
 GARMENT_PARTS = {n for m in bc.MESHES.values() if m.get("delete")
                  for n in [s for s, _ in m.get("split", [])] + [m["rest"]]}
 
@@ -186,13 +190,8 @@ def body_views(parts: dict) -> list[dict]:
     xmax = pts[:, 0].max()
     hand = pts[pts[:, 0] > xmax - 0.12]
     hc = (hand.min(0) + hand.max(0)) / 2
-    arm = pts[(pts[:, 0] > xmax - 0.16) & (pts[:, 0] < xmax - 0.12)]          # just inside the hand
-    wrist = arm.mean(0)
-    ank = pts[(pts[:, 1] > 0.07) & (pts[:, 1] < 0.11) & (pts[:, 0] > 0)]       # the left leg above the foot
-    ankle = ank.mean(0)
-    neck_y = top * 0.81
-    sh = pts[(np.abs(pts[:, 1] - neck_y) < 0.02) & (pts[:, 0] > 0)]
-    neck = (float(np.median(sh[:, 0])) * 0.6, neck_y - 0.02, zc)
+    lift = float(pts[:, 1].min())                                             # 0 for the rig as built
+    neck, wrist, ankle = ((x, y + lift, z) for x, y, z in (SEAM_AT[k] for k in ("neck", "wrist", "ankle")))
     always = [p.rsplit("/", 1)[1] for p in jobmod.CHARACTER_HIDE_ALWAYS]
     fov = math.degrees(2 * math.atan(bc.CAM_APERTURE / 2 / bc.CAM_FOCAL))
     q = math.radians(35)
@@ -201,7 +200,7 @@ def body_views(parts: dict) -> list[dict]:
             ("bside", (0.0, top / 2, zc), (1.0, 0.0, 0.0), 2.5),
             ("tfront", (0.0, top * 0.64, zc), (0.0, 0.05, 1.0), 1.0),
             ("tback", (0.0, top * 0.64, zc), (0.0, 0.05, -1.0), 1.0),
-            ("neck", neck, (math.sin(q), 0.15, math.cos(q)), 0.4),
+            ("neck", (0.03, neck[1], neck[2] - 0.03), (math.sin(q), 0.1, -math.cos(q)), 0.4),   # nape and side
             ("wrist", tuple(wrist), (0.3, 0.3, 1.0), 0.4),
             ("ankle", tuple(ankle), (0.5, 0.25, 1.0), 0.4),
             ("bhand", tuple(hc), (0.15, 0.30, 1.0), 0.4)]

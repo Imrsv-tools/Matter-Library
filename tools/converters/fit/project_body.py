@@ -5,6 +5,7 @@
     python3 -I tools/converters/fit/project_body.py paint <dir> [--seeds 7] [--strength 0.5]
     uv run --with scipy tools/converters/fit/project_body.py fit   <dir> <picture>
     uv run --with scipy tools/converters/fit/project_body.py put   <dir> <picture> <tag> [--head <atlas.png>] [--no-fit]
+    uv run --with scipy tools/converters/fit/project_body.py seams <atlas.png>
 
 hm08's body island is a person seen from the front with the back split down the spine (F-P27-3), so no
 one camera sees it. ``prep`` renders hm08 four times in ONE picture, front, profile, back, profile
@@ -16,9 +17,14 @@ hm08's render before anything is projected: every pixel of hm08's outline is mat
 outline along hm08's normal (the nearest crossing from inside to outside within ``DMAX`` pixels,
 outliers against the contour's own median dropped), and that displacement, held on the outline, is
 relaxed harmonically over hm08's silhouette: one coordinate field per view, nothing blended (the face's
-field, F-P25-16). ``put`` then gives each body texel the colour of the view that faces it most squarely
-and shows the body there (a hard cut), through the fit; holes by pull-push; the body held to C's mean;
-the groin the maker's colour at the surrounding level (RD-P27-2, RD-SKM-4). The result is written on
+field, F-P25-16). ``put`` then gives each texel of the body, the feet and (with ``--head``) the back of the
+neck the colour of the view that faces it most squarely and shows the body there (a hard cut), through
+the fit; holes take the maker's skin at the level of their neighbours on the body; the body held to C's
+mean; the groin the maker's colour at the surrounding level (RD-P27-2, RD-SKM-4). The hands are the
+maker's until they have their own cameras (``HANDS_FROM_PICTURE``). Where the picture's skin meets
+another source (Phase25's head, the maker's hands) the step is split between the two sides as a smooth
+tone ramp (``neck_join``). ``seams`` measures the level step across each of hm08's seams on an atlas,
+beside the skin's own variation (27.2). The result is written on
 Tone34's 8K atlas (C elsewhere, or ``--head``'s atlas, Phase25's D) as linear albedo, sRGB-encoded, for
 ``look.py --candidate``. Everything is written under ``<dir>`` (git-ignored ``library/parity/P27_*``:
 no picture of an unclothed person is committed, RD-P27-3). SciPy rides ``--with``; the project gains no
@@ -49,6 +55,14 @@ MIN_FACE = 0.3               # a texel no view faces better than this is a hole,
                              # paints a surface turning away darker, and dividing its light out there brightens it 2-3x
 LIGHT_FLOOR = 0.3            # the least light divided out (``--delight``)
 LEVEL_CAP = 0.5              # the most a seam levelling moves a view, in log colour (x1.65)
+NECK_R = 0.06                # the neck join's ramp on each side of the seam (m)
+NAPE_R = 0.05                # how far up the head island the four views paint the back of the neck (m)
+RIM = 2                      # texels of the maker's 2K rim taken from the island's inside
+HANDS_FROM_PICTURE = False   # the four views' fingers do not land at 1.7 mm a pixel (27.2): the maker's hands,
+                             # toned to the forearm, until the hands have their own cameras (the Brief's route)
+MIN_CHROMA = 0.15            # the least (max - min) / max a sample of skin has; the background is ~0
+GUTTER = 6                   # texels of the 8K atlas's gutter the painted colour fills
+NAPE_X = 0.055               # ... and how far to each side of the middle (m): the ears start beyond it
 PROMPT = ("A full-length photograph of the same real young woman about twenty shown four times side by side: seen "
           "from the front, in profile from her side, from the back, and in profile from her other side. She stands "
           "in an A-pose with her arms held out from her sides, nude, with a completely hairless body and a shaved "
@@ -384,21 +398,33 @@ def cmd_fit(d: Path, pic_path: Path) -> None:
 INNER_JUMP = 0.03            # a depth step (m) between neighbouring pixels inside the silhouette: an occluding edge
 INNER_PAD = 20               # pixels kept clear of it (~3.3 cm): where the model's limb edge sits, unfitted
                              # (10 left the profile's elbow edge as a crease on each side of the waist: 27.1 click 1)
+CHIN_PAD = 6                 # ... and where the head is in front (the chin over the throat, the skull over the nape):
+                             # the model's head is fitted by its outline and the head is Phase25's anyway; 20 px
+                             # handed the throat to the profiles at a grazing angle (grey edge leaks: 27.2)
 
 
-def inner_edges(g):
+def inner_edges(g, head=None):
     """Pixels near a depth jump INSIDE hm08's silhouette in one view (an arm across the trunk, a leg behind
     the other). The fit moves only the outline, so the model's own limb edge there can sit a centimetre
-    or two off hm08's and would paint a line onto the surface behind."""
+    or two off hm08's and would paint a line onto the surface behind. ``head`` (the pixels showing the head
+    island): a jump with the head in front keeps only ``CHIN_PAD`` clear."""
     np = _np()
     from scipy.ndimage import binary_dilation  # noqa: PLC0415
     z, m = g["z"], g["mask"]
-    e = np.zeros_like(m)
+    e, eh = np.zeros_like(m), np.zeros_like(m)
+    zz = np.where(m, z, np.inf)
     for ax in (0, 1):
-        z2 = np.roll(z, 1, ax); m2 = np.roll(m, 1, ax)
-        jump = m & m2 & (np.abs(np.where(m & m2, z - z2, 0)) > INNER_JUMP)
-        e |= jump | np.roll(jump, -1, ax)
-    return binary_dilation(e, iterations=INNER_PAD)
+        z2 = np.roll(zz, 1, ax); m2 = np.roll(m, 1, ax)
+        with np.errstate(invalid="ignore"):
+            jump = m & m2 & (np.abs(np.where(m & m2, zz - z2, 0)) > INNER_JUMP)
+        both = jump | np.roll(jump, -1, ax)
+        if head is not None:                                      # the nearer of the two pixels is the head's
+            near_is_head = np.where(zz <= z2, head, np.roll(head, 1, ax))
+            hj = jump & near_is_head
+            eh |= hj | np.roll(hj, -1, ax)
+            both &= ~(hj | np.roll(hj, -1, ax))
+        e |= both
+    return binary_dilation(e, iterations=INNER_PAD) | (binary_dilation(eh, iterations=CHIN_PAD) if eh.any() else eh)
 
 
 def sh9(n):
@@ -490,6 +516,93 @@ def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float 
     return out, raw_max
 
 
+
+def hand_ids():
+    """The two hands' island ids."""
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import make_kits  # noqa: PLC0415
+    _, names = named_islands(make_kits.load_mesh(gss.MESH))
+    return [k for k, v in names.items() if v.startswith("hand_")]
+
+
+def skin_islands(size: int):
+    """The atlas of island ids at ``size``, the ids the four views paint (the body, both hands, both feet:
+    the same picture on both sides of every wrist and ankle, so those seams cannot show, F-P27-2) and the
+    head's id (Phase25's)."""
+    np = _np()
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import make_kits  # noqa: PLC0415
+    m = make_kits.load_mesh(gss.MESH)
+    ids = np.asarray(make_kits.island_ids_png(m, size), np.int32)
+    _, names = named_islands(m)
+    paint = [k for k, v in names.items() if v != "head"]
+    return ids, paint, next(k for k, v in names.items() if v == "head")
+
+
+def level_holes(C, sh, kn, skin, P, cell: int = 8, k: int = 8, sigma: float = 0.01):
+    """A hole's level (D / C, in log colour) from its neighbours ON THE BODY: cell means of the known
+    texels' log ratio, interpolated to each hole texel from its ``k`` nearest cells in 3D (a Gaussian of
+    ``sigma`` metres past the nearest). An atlas-space fill steps wherever a hole runs along an island cut
+    (the inner leg: both sides holes, far apart in the atlas; 27.2's seam instrument read 11 %)."""
+    np = _np()
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    n = C.shape[0]
+    hc = n // cell
+    cl, cp = [], []
+    for img, m in ((sh, skin & kn),):
+        lr = np.log(np.maximum(img, 1e-4) / np.maximum(C, 1e-4))
+        cnt = m.reshape(hc, cell, hc, cell).sum((1, 3))
+        sl = (lr * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))
+        sp = (P * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))
+        ok = cnt >= cell
+        cl.append(sl[ok] / cnt[ok][:, None]); cp.append(sp[ok] / cnt[ok][:, None])
+    cl, cp = np.concatenate(cl), np.concatenate(cp)
+    hole = skin & ~kn
+    hr, hcc = np.nonzero(hole)
+    dist, idx = cKDTree(cp).query(P[hr, hcc].astype(np.float64), k=k)
+    w = np.exp(-(dist ** 2 - dist[:, :1] ** 2) / (2 * sigma ** 2))
+    val = (cl[idx] * w[..., None]).sum(1) / w.sum(1, keepdims=True)
+    out = np.zeros_like(C)
+    out[hr, hcc] = np.exp(val)
+    return out
+
+
+def neck_join(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: float = 0.04, label: str = "neck"):
+    """The step where the picture's skin (``body``: the body and the nape it took) meets Phase25's head
+    (``hm``), split between the two sides. The boundary is found ON THE BODY, not from UV seams: the head's
+    texels within ``near`` metres of a painted texel. At each (every third), the head's mean log colour
+    within ``r`` against the painted side's gives the step, smoothed along the boundary (the median within
+    ``along``). Each side then takes half of it as a smooth tone ramp, full at the boundary and nothing
+    ``NECK_R`` away (by the distance on the body). No pixel is mixed with another; the face is untouched.
+    Returns the two log corrections (painted side, head) at the atlas's size, and a record."""
+    np = _np()
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    br, bc = np.nonzero(body); hr, hc = np.nonzero(hm)
+    Pb, Ph = P[br, bc], P[hr, hc]
+    lb, lh = np.log(np.maximum(D[br, bc], 1e-4)), np.log(np.maximum(H[hr, hc], 1e-4))
+    tb, th = cKDTree(Pb), cKDTree(Ph)
+    dh = tb.query(Ph, distance_upper_bound=near)[0]
+    pts = Ph[np.isfinite(dh)][::3]
+    if not len(pts):
+        raise SystemExit("the head and the painted skin do not meet")
+    nb_b, nb_h = tb.query_ball_point(pts, r), th.query_ball_point(pts, r)
+    delta = np.array([lh[h].mean(0) - lb[b].mean(0) for b, h in zip(nb_b, nb_h)])
+    tree = cKDTree(pts)
+    sm = np.array([np.median(delta[nb], 0) for nb in tree.query_ball_point(pts, along)])
+    out = []
+    for (rr, cc, Q), sign in (((br, bc, Pb), 0.5), ((hr, hc, Ph), -0.5)):
+        g = np.zeros_like(D)
+        dist, i = tree.query(Q)
+        f = np.where(dist < NECK_R, 0.5 * (1 + np.cos(np.pi * np.minimum(dist / NECK_R, 1))), 0.0)
+        g[rr, cc] = sign * sm[i] * f[:, None]
+        out.append(g)
+    rec = {"points": len(pts), "step_log_median": [round(float(v), 3) for v in np.median(sm, 0)],
+           "step_log_p10": [round(float(v), 3) for v in np.percentile(sm, 10, 0)],
+           "step_log_p90": [round(float(v), 3) for v in np.percentile(sm, 90, 0)], "ramp_m": NECK_R}
+    print(f"{label} join: {json.dumps(rec)}", flush=True)
+    return out, rec
+
+
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False) -> None:
     np = _np()
@@ -499,7 +612,31 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.MAX_IMAGE_PIXELS = None
     t = time.time()
     A = np.load(d / "atlas.npz")
-    C, Pa, Na, body, groin = A["C"].astype(np.float64), A["P"], A["N"], A["body"], A["groin"]
+    C, Pa, Na, groin = A["C"].astype(np.float64), A["P"], A["N"], A["groin"]
+    ids2, paint_ids, head_id = skin_islands(2048)
+    body = np.isin(ids2, paint_ids) & A["cover"]                     # the body, the hands and the feet
+    hands = np.isin(ids2, hand_ids()) & A["cover"]
+    if not HANDS_FROM_PICTURE:
+        body &= ~hands
+    base = (lin(np.asarray(Image.open(head).convert("RGB"), np.float64) / 255) if head else pv.subject_albedo())
+    if base.shape[0] != 8192:
+        raise SystemExit(f"the base atlas is {base.shape[0]}, not 8192")
+    hm = (ids2 == head_id) & A["cover"]
+    h8 = skin_islands(8192)[0] == head_id                         # the head's own texels only: the 8K
+    cnt = h8.reshape(2048, 4, 2048, 4).sum((1, 3))                      # atlas beyond its edge is not the head
+    H = (base * h8[..., None]).reshape(2048, 4, 2048, 4, 3).sum((1, 3)) / np.maximum(cnt, 1)[..., None]
+    del h8
+    hm &= cnt >= 8
+    # the nape: the back half of the head island's neck ring is painted by the four views too. Phase25's field
+    # stretches its picture there (a pale, streaked band below the skull, 27.2); RD-P25-16 left the neck to
+    # the body. The join moves up onto the back of the skull, where Phase25's scalp is plain.
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    tb = cKDTree(Pa[body & (Pa[..., 1] > 0.5)][::4].astype(np.float64))
+    dist = np.full(hm.shape, np.inf); dist[hm] = tb.query(Pa[hm].astype(np.float64), distance_upper_bound=NAPE_R)[0]
+    zc = float(np.median(Pa[body & (Pa[..., 1] > 0.6)][:, 2]))        # the neck's middle, front to back
+    nape = (hm & (dist < NAPE_R) & (Pa[..., 2] < zc + 0.01) & (np.abs(Pa[..., 0]) < NAPE_X) if head
+            else np.zeros_like(hm))                                 # within the neck's width: never the ears
+    body |= nape; hm &= ~nape
     pic, fg = picture(pic_path)
     F = np.load(d / f"fit_{pic_path.stem}.npz") if use_fit else None
     rr, cc = np.nonzero(body)
@@ -515,13 +652,20 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
         ix, iy = px - 0.5, py - 0.5                                   # index coordinates
         xi, yi = np.clip(np.round(ix).astype(int), 0, w - 1), np.clip(np.round(iy).astype(int), 0, VH - 1)
         vis = (z <= g["z"][yi, xi] + 0.004) & (nz > 0)
-        vis &= ~inner_edges(g)[yi, xi]          # one limb in front of another: the fit has no outline there
+        uv = g["uv"]
+        hpix = g["mask"] & (ids2[np.clip((uv[..., 1] * 2048).astype(int), 0, 2047),
+                                 np.clip((uv[..., 0] * 2048).astype(int), 0, 2047)] == head_id)
+        vis &= ~inner_edges(g, hpix)[yi, xi]    # one limb in front of another: the fit has no outline there
         if F is not None:
             Dv = F[f"D_{yaw}"]
             ix, iy = ix + sample(Dv[..., 0], ix, iy), iy + sample(Dv[..., 1], ix, iy)
         vis &= sample(fg[:, x0:x0 + w].astype(float), ix, iy) > 0.5
         col = np.zeros((len(rr), 3))
         col[vis] = sample(pic[:, x0:x0 + w], ix[vis], iy[vis])
+        # the model's grey background, or an outline pixel half of it, is never skin (grey dots along the
+        # shoulder in the judge, 27.2): a sample whose colour is nearly neutral is not seen
+        chroma = (col.max(1) - col.min(1)) / np.maximum(col.max(1), 1e-6)
+        vis &= chroma > MIN_CHROMA
         if delight:
             # the light the model painted into THIS view, as a smooth function of the surface's direction:
             # the picture over C, fitted with the nine second-order terms of the normal, then divided out
@@ -545,40 +689,192 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
         sh, lev_max = seam_level(sh, vmap, Pa.astype(np.float64))
         step_before_gain = cut_step(sh, vmap)
     D = C.copy()
-    # a hole (no view faces it squarely enough: between the legs, under the arms) is the maker's skin at
-    # D's level round it: C's own detail times D / C carried smoothly in by pull-push (as the groin is)
-    from scipy.ndimage import gaussian_filter  # noqa: PLC0415
-    ratio = pushpull(np.where(kn[..., None], sh / np.maximum(C, 1e-4), 0.0), kn)
-    ratio = np.stack([gaussian_filter(ratio[..., c], 6.0) for c in range(3)], -1)   # pull-push is blocky; ~5 mm
+    # a hole (no view faces it squarely enough: between the legs, under the arms, the soles) is the maker's
+    # skin at D's level round it ON THE BODY: C's own detail times D / C from the nearest known cells in 3D
+    # C at 2K is the 8K map averaged without its island mask, so its outermost texels mix in the gutter (a thin
+    # pale line along every cut where a hole sits on the rim, 27.2): its rim is taken from the island's inside
+    from scipy.ndimage import binary_erosion  # noqa: PLC0415
+    inner = binary_erosion(A["cover"], iterations=RIM)
+    C = np.where((A["cover"] & ~inner)[..., None], pushpull(np.where(inner[..., None], C, 0.0), inner), C)
+    ratio = level_holes(C, sh, kn, body, Pa.astype(np.float64))
     D[body] = np.where(kn[body][:, None], sh[body], C[body] * ratio[body])
     gain = C[body].mean(0) / D[body].mean(0)                          # the body held to C's mean
     D[body] *= gain
     ring = binary_dilation(groin, iterations=6) & ~groin & body
     level = D[ring].mean(0) / C[ring].mean(0)
     D[groin] = C[groin] * level                                       # RD-P27-2: the maker's, at the level round it
+    neck, neck_rec = None, None
+    if head:                                                          # RD-P25-16: the neck was left to the body
+        neck, neck_rec = neck_join(D, body, H, hm, Pa.astype(np.float64))
+        D[body] *= np.exp(neck[0][body])
+    hand_rec = None
+    if not HANDS_FROM_PICTURE:                                        # the maker's hands, toned to the forearm
+        g, hand_rec = neck_join(D, body, C, hands, Pa.astype(np.float64), label="wrist")
+        D[body] *= np.exp(g[0][body])
+        D[hands] = C[hands] * np.exp(g[1][hands])
+        body = body | hands
     full = pushpull(np.where(body[..., None], D, 0.0), body)          # the island carried past its edge for 8K
-    bid, ids8 = body_island(8192)
-    base = (lin(np.asarray(Image.open(head).convert("RGB"), np.float64) / 255) if head else pv.subject_albedo())
-    if base.shape[0] != 8192:
-        raise SystemExit(f"the base atlas is {base.shape[0]}, not 8192")
+    ids8, _, _ = skin_islands(8192)
     up = np.stack([np.asarray(Image.fromarray(full[..., c].astype(np.float32), "F").resize((8192, 8192), Image.BILINEAR))
                    for c in range(3)], -1)
-    sel = ids8 == bid
+    from scipy.ndimage import binary_dilation as dil  # noqa: PLC0415
+    sel = np.isin(ids8, paint_ids)
+    if nape.any():
+        n8 = np.asarray(Image.fromarray(nape.astype(np.uint8) * 255).resize((8192, 8192), Image.NEAREST)) > 0
+        n8 = dil(n8, iterations=GUTTER) & (ids8 == head_id)          # to the island's own edge (the 2K mask stops short)
+        sel |= n8
+        del n8
     out = base.astype(np.float32)
+    # the painted colour also fills the atlas's gutter round it (texels in no island): a renderer filtering
+    # across an island's edge otherwise reads the old colour there, a thin line on every seam (27.2)
+    sel |= dil(sel, iterations=GUTTER) & (ids8 == 0)
     out[sel] = up[sel]
+    if neck is not None:                                              # the head's share of the neck's step
+        hsel = (ids8 == head_id) & ~sel                                # Phase25's own texels, not the nape painted here
+        gh = pushpull(np.where(hm[..., None], neck[1], 0.0), hm)
+        gh = np.stack([np.asarray(Image.fromarray(gh[..., c].astype(np.float32), "F").resize((8192, 8192),
+                       Image.BILINEAR))[hsel] for c in range(3)], -1)
+        out[hsel] *= np.exp(gh)
     del up, base
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
-           "head": head.name if head else None,
+           "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
            "seen_pct": round(float(have.mean() * 100), 1),
            "grazing_under_0.3_pct": round(float((have & (face < 0.3)).mean() * 100), 1),
            "gain": [round(float(v), 3) for v in gain], "groin_level": [round(float(v), 3) for v in level],
            "seconds": round(time.time() - t)}
     (d / f"D_{tag}.json").write_text(json.dumps(rec, indent=1) + "\n")
     print(f"D_{tag}.png: {json.dumps(rec)}")
+
+
+# ------------------------------------------------------------------ seams --------------------------
+def named_islands(m):
+    """Each face's island and the names of the islands a body seam joins: body, head, hand_l/r, foot_l/r
+    (hm08's own faces, F-P27-1; left is +x)."""
+    np = _np()
+    import make_kits  # noqa: PLC0415
+    isl = np.array(make_kits.islands(m))
+    pts = np.asarray(m["points"], float)
+    cen = {}
+    for k in np.unique(isl):
+        fi = np.nonzero(isl == k)[0]
+        v = np.array([pts[a] for f in fi for a, _ in m["faces"][f]])
+        cen[int(k)] = (len(fi), v.mean(0))
+    body = max(cen, key=lambda k: cen[k][0])
+    big = sorted((k for k in cen if k != body), key=lambda k: -cen[k][0])[:5]
+    names = {body: "body"}
+    head = max(big, key=lambda k: cen[k][1][1])
+    names[head] = "head"
+    rest = [k for k in big if k != head]
+    feet = sorted(rest, key=lambda k: cen[k][1][1])[:2]
+    for k in rest:
+        side = "l" if cen[k][1][0] > 0 else "r"
+        names[k] = ("foot_" if k in feet else "hand_") + side
+    return isl, names
+
+
+def seam_edges(m, isl):
+    """Every mesh edge whose two faces carry different UVs: (island a, island b, face a, face b, the
+    edge's uv indices on each side, its length in metres, its midpoint)."""
+    np = _np()
+    from collections import defaultdict  # noqa: PLC0415
+    pts = np.asarray(m["points"], float)
+    edge = defaultdict(list)
+    for fi, f in enumerate(m["faces"]):
+        n = len(f)
+        for k in range(n):
+            (a, ua), (b, ub) = f[k], f[(k + 1) % n]
+            key, uvs = ((a, b), (ua, ub)) if a < b else ((b, a), (ub, ua))
+            edge[key].append((fi, uvs))
+    out = []
+    for (a, b), lst in edge.items():
+        if len(lst) == 2 and lst[0][1] != lst[1][1]:
+            (f0, u0), (f1, u1) = lst
+            out.append((int(isl[f0]), int(isl[f1]), f0, f1, u0, u1, float(np.linalg.norm(pts[a] - pts[b])),
+                        (pts[a] + pts[b]) / 2))
+    return out
+
+
+def body_part(p) -> str:
+    """Where on the body a point of the body island's own cut lies (the probe's ``seams.py`` buckets)."""
+    x, y, z = p
+    if y > 0.35 and abs(x) > 0.17:
+        return "arm"
+    if y < -0.05 and abs(x) > 0.02:
+        return "leg"
+    return "back" if z < 0 else "front"
+
+
+def cmd_seams(atlas: Path, off_mm: float = 3.0, r_mm: float = 2.0) -> dict:
+    """The level step across each of hm08's seams on an atlas: at three points along every seam edge, the
+    mean luminance ``off_mm`` inside each side (a disc of ``r_mm``, that side's island only), as
+    |ratio - 1| in per cent, length-weighted, per seam, beside its control: the same spacing on ONE side
+    (``same_side``), the skin's own variation. A seam shows where the step beats its control. ``cut:*`` is the body island's own cut (down
+    the spine and the back of the neck, along the arms and legs, on the front of the trunk). A step
+    the eye finds is a level step; a seam with the same picture on both sides reads ~0 (F-P27-2)."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    from scipy.ndimage import map_coordinates, uniform_filter  # noqa: PLC0415
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import make_kits  # noqa: PLC0415
+    Image.MAX_IMAGE_PIXELS = None
+    m = make_kits.load_mesh(gss.MESH)
+    isl, names = named_islands(m)
+    img = lin(np.asarray(Image.open(atlas).convert("RGB"), np.float32) / 255)
+    n = img.shape[0]
+    lum = (img @ np.array([0.2126, 0.7152, 0.0722], np.float32)).astype(np.float32)
+    del img
+    ids = np.asarray(make_kits.island_ids_png(m, n), np.int32)
+    tpm = n / 1.69                     # texels a metre at the atlas's median (F-P27-4)
+    off, r = off_mm / 1000 * tpm, max(1, int(r_mm / 1000 * tpm))
+    means = {}
+    for k in names:
+        msk = (ids == k).astype(np.float32)
+        means[k] = (uniform_filter(lum * msk, 2 * r + 1), uniform_filter(msk, 2 * r + 1))
+    vt = np.asarray(m["vt"], float)
+    cent = {}
+    rows = {}
+    for ia, ib, fa, fb, ua, ub, L, mid in seam_edges(m, isl):
+        if ia not in names or ib not in names or "body" not in (names[ia], names[ib]):
+            continue
+        key = ("cut:" + body_part(mid)) if ia == ib else "-".join(sorted((names[ia], names[ib])))
+        vals, ctrl = [], []
+        for t in (0.25, 0.5, 0.75):
+            side, far = [], []
+            for k, f, (u0, u1) in ((ia, fa, ua), (ib, fb, ub)):
+                if f not in cent:
+                    cent[f] = vt[[t_ for _, t_ in m["faces"][f]]].mean(0)
+                p = vt[u0] + t * (vt[u1] - vt[u0])
+                e = vt[u1] - vt[u0]
+                d = cent[f] - p
+                d -= e * (d @ e) / max(e @ e, 1e-12)
+                for o, dst in ((off, side), (3 * off, far)):   # far: the control, 2 x off from ``side``
+                    q = p + d / max(np.linalg.norm(d), 1e-12) * o / n
+                    y, x = (1 - q[1]) * n - 0.5, q[0] * n - 0.5
+                    s, c = (map_coordinates(a, [[y], [x]], order=1)[0] for a in means[k])
+                    dst.append(s / c if c > 0.3 else np.nan)
+            vals.append(abs(side[0] / side[1] - 1) if np.all(np.isfinite(side)) else np.nan)
+            cc = [abs(a / b - 1) for a, b in zip(side, far) if np.isfinite(a) and np.isfinite(b)]
+            ctrl.append(np.mean(cc) if cc else np.nan)
+        v, cv = np.array(vals), np.array(ctrl)
+        v, cv = v[np.isfinite(v)], cv[np.isfinite(cv)]
+        if len(v) and len(cv):
+            rows.setdefault(key, []).append((float(v.mean()), L, float(cv.mean())))
+    out = {}
+    for key, lst in sorted(rows.items()):
+        w = np.array([b for _, b, _ in lst])
+
+        def wq(q, f):
+            o = np.argsort(q); cw = np.cumsum(w[o]) / w.sum()
+            return round(float(q[o][min(np.searchsorted(cw, f), len(q) - 1)] * 100), 1)
+        q, qc = np.array([a for a, _, _ in lst]), np.array([c for _, _, c in lst])
+        out[key] = {"m": round(float(w.sum()), 2), "median_pct": wq(q, 0.5), "p90_pct": wq(q, 0.9),
+                    "same_side_median_pct": wq(qc, 0.5), "same_side_p90_pct": wq(qc, 0.9)}
+        print(f"{key:14s} {json.dumps(out[key])}", flush=True)
+    return out
 
 
 def main(argv=None) -> int:
@@ -595,8 +891,12 @@ def main(argv=None) -> int:
                    help="divide out the light the model painted into each view (a smooth function of the normal)")
     s.add_argument("--level", action="store_true",
                    help="seam levelling: a smooth tone correction per view so the views agree where they meet")
+    s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
+    s.add_argument("atlas", type=Path)
     a = ap.parse_args(argv)
-    if a.cmd == "prep":
+    if a.cmd == "seams":
+        cmd_seams(a.atlas)
+    elif a.cmd == "prep":
         cmd_prep(a.dir)
     elif a.cmd == "paint":
         cmd_paint(a.dir, [int(x) for x in a.seeds.split(",")], a.strength, a.server)
