@@ -6,6 +6,7 @@
     uv run --with scipy tools/converters/fit/project_body.py fit   <dir> <picture>
     uv run --with scipy tools/converters/fit/project_body.py put   <dir> <picture> <tag> [--head <atlas.png>] [--no-fit]
     uv run --with scipy tools/converters/fit/project_body.py seams <atlas.png>
+    uv run --with scipy tools/converters/fit/project_body.py close prep|paint|put <dir> [--atlas D.png] [--tag t]
 
 hm08's body island is a person seen from the front with the back split down the spine (F-P27-3), so no
 one camera sees it. ``prep`` renders hm08 four times in ONE picture, front, profile, back, profile
@@ -750,6 +751,227 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     print(f"D_{tag}.png: {json.dumps(rec)}")
 
 
+# ------------------------------------------------------------------ the fine skin ------------------
+# RD-P27-6 (the lead, Pass 3: "3 looks more real, marks are right"): the four views are 1.67 mm a pixel, too
+# coarse for the skin itself, and a close camera repainting a region redraws the body's marks (F-P27-18). So
+# the skin is split by size: coarser than CLOSE_SPLIT_M it is D's (the four views), finer it comes from one
+# close camera per region, as a ratio on D. Every region's level is D's, so regions cannot step.
+CLOSE_SIZE = 1536             # each close picture's side, in pixels
+CLOSE_M = 0.6                 # ... and in metres (0.39 mm a pixel)
+CLOSE_STEP = 0.5              # tile spacing (m): 0.1 m of overlap
+CLOSE_MIN_SHARE = 0.08        # a tile showing less of the body than this is dropped
+CLOSE_STRENGTH = 0.65         # RD-P27-6: the lead's "3"
+CLOSE_SPLIT_M = 0.002         # the split (F-P27-18: at 5 mm the marks begin to move; 3 mm still printed a
+                             # breast fold the model drew lower, 27.2.3)
+CLOSE_ERODE = 6               # pixels kept clear of a close picture's outline
+CLOSE_SOFT = 0.08             # the fine skin's log ratio, soft-capped (tanh): the grain varies by a few per cent;
+                             # an edge of a feature the model drew elsewhere (a breast fold, a nipple, a blade's
+                             # crease) is a 20-50 % jump, and uncapped it printed as a second contour (27.2.3)
+CLOSE_PROMPT = ("A close-up photograph of the bare {part} of a real young woman about twenty, seen {side}, with a "
+                "completely hairless body, light warm skin between Fitzpatrick III and IV. Real unretouched skin "
+                "filling the frame: visible pores, fine vellus hair, small blemishes, tiny moles, faint freckles, "
+                "uneven tone. Even, soft, shadowless studio light on a plain grey background. Not a 3D render, not "
+                "CGI, not painted.")
+
+
+def close_part(yaw: int, cx: float, cy: float) -> tuple[str, str]:
+    side = {0: "from the front", 180: "from directly behind"}.get(yaw, "from her side")
+    if abs(cx) > 0.3 and cy > -0.1:
+        part = "arm"
+    elif cy > 0.3:
+        part = "shoulders and upper torso"
+    elif cy > 0.0:
+        part = "waist and lower torso"
+    elif cy > -0.4:
+        part = "hips and thighs"
+    else:
+        part = "lower legs and feet"
+    return part, side
+
+
+def close_raster(P, vt, T, vn, c: dict):
+    """hm08 through one close camera ``c`` (yaw, cx: across the view, cy: height, both metres)."""
+    np = _np()
+    s = CLOSE_SIZE / CLOSE_M
+    R = rot(c["yaw"])
+    keep = proj.__defaults__
+    proj.__defaults__ = (CLOSE_SIZE, s, c["cy"])
+    try:
+        return raster(P - c["cx"] * R[0], vt, T, vn, c["yaw"], CLOSE_SIZE, CLOSE_SIZE)
+    finally:
+        proj.__defaults__ = keep
+
+
+def close_render(g, A):
+    """An 8K atlas (linear) worn through camera geometry ``g``, under the soft key, the raster's one-pixel
+    cracks filled (Krea keeps them as a thin line, F-P27-17)."""
+    np = _np()
+    from scipy.ndimage import binary_closing  # noqa: PLC0415
+    m = g["mask"]; n = A.shape[0]
+    col = sample(A, g["uv"][..., 0] * n - 0.5, g["uv"][..., 1] * n - 0.5) * shade(g["n"])[..., None]
+    col = pushpull(np.where(m[..., None], col, 0.0), m)
+    return np.where(binary_closing(m, iterations=2)[..., None], col, 0.18)
+
+
+def cmd_close_prep(d: Path, atlas: Path) -> None:
+    """Lay the close cameras over the body and the feet, and render each wearing ``atlas`` (D)."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    Image.MAX_IMAGE_PIXELS = None
+    t = time.time()
+    out = d / "close"; out.mkdir(parents=True, exist_ok=True)
+    A = lin(np.asarray(Image.open(atlas).convert("RGB"), np.float32) / 255)
+    P, vt, T, vn = mesh()
+    ids, paint_ids, _ = skin_islands(2048)
+    hand = set(hand_ids())
+    want = [k for k in paint_ids if HANDS_FROM_PICTURE or k not in hand]
+    tri_uv = vt[T[:, :, 1]].mean(1)
+    tid = ids[np.clip(((1 - tri_uv[:, 1]) * 2048).astype(int), 0, 2047), np.clip((tri_uv[:, 0] * 2048).astype(int), 0, 2047)]
+    Tb = T[np.isin(tid, want)]
+    cams = []
+    for yaw in (0, 90, 180, 270):
+        V = P[np.unique(Tb[:, :, 0])] @ rot(yaw).T
+        x0, x1, y0, y1 = V[:, 0].min(), V[:, 0].max(), V[:, 1].min(), V[:, 1].max()
+        nx = max(1, int(np.ceil((x1 - x0 - CLOSE_M) / CLOSE_STEP)) + 1)
+        ny = max(1, int(np.ceil((y1 - y0 - CLOSE_M) / CLOSE_STEP)) + 1)
+        for i in range(nx):
+            for j in range(ny):
+                cx = (x0 + x1) / 2 + (i - (nx - 1) / 2) * CLOSE_STEP
+                cy = (y0 + y1) / 2 + (j - (ny - 1) / 2) * CLOSE_STEP
+                c = {"yaw": yaw, "cx": round(float(cx), 3), "cy": round(float(cy), 3)}
+                g = close_raster(P, vt, T, vn, c)                  # the whole mesh: what is in front, occludes
+                uv = g["uv"]
+                pid = ids[np.clip((uv[..., 1] * 2048).astype(int), 0, 2047), np.clip((uv[..., 0] * 2048).astype(int), 0, 2047)]
+                share = float((g["mask"] & np.isin(pid, want)).mean())
+                if share < CLOSE_MIN_SHARE:
+                    continue
+                c["name"] = f"c{yaw:03d}_{len([k for k in cams if k['yaw'] == yaw]):02d}"
+                c["part"], c["side"] = close_part(yaw, c["cx"], c["cy"])
+                c["share"] = round(share, 3)
+                np.savez(out / f"geom_{c['name']}.npz", **g)
+                save(out / f"in_{c['name']}.png", close_render(g, A))
+                cams.append(c)
+                print(f"{c['name']}: {c['part']}, {c['side']}, body {share * 100:.0f} %", flush=True)
+    (out / "cams.json").write_text(json.dumps({"atlas": atlas.name, "metres": CLOSE_M, "size": CLOSE_SIZE,
+                                               "cams": cams}, indent=1) + "\n")
+    print(f"{len(cams)} close cameras; {time.time() - t:.0f} s")
+
+
+def cmd_close_paint(d: Path, seed: int, strength: float, server: str) -> None:
+    import gen_views_model as g  # noqa: PLC0415
+    out = d / "close"
+    cams = json.loads((out / "cams.json").read_text())["cams"]
+    graph = json.loads(g.WORKFLOWS["krea"].read_text(encoding="utf-8"))
+    version = json.loads(g._call(server, "/system_stats"))["system"]["comfyui_version"]
+    for c in cams:
+        name = f"{c['name']}_s{round(strength * 100):02d}_seed{seed}"
+        if (out / f"{name}.png").exists():
+            continue
+        t = time.time()
+        src = out / f"in_{c['name']}.png"
+        prompt = CLOSE_PROMPT.format(part=c["part"], side=c["side"])
+        vals = {"IMAGE": g.upload(server, src), "PROMPT": prompt, "SEED": seed, "STEPS": 8, "STRENGTH": strength,
+                "PREFIX": "matter_p27close"}
+        png, pid = g.run(server, g.fill(graph, vals))
+        (out / f"{name}.png").write_bytes(png)
+        rec = {"model": "krea", "workflow": g.WORKFLOWS["krea"].name, "comfyui": version, "seed": seed, "steps": 8,
+               "strength": strength, "source": src.name, "source_sha256": hashlib.sha256(src.read_bytes()).hexdigest(),
+               "prompt": prompt, "prompt_id": pid, "seconds": round(time.time() - t, 1)}
+        (out / f"{name}.json").write_text(json.dumps(rec, indent=1) + "\n")
+        print(f"{name}: {rec['seconds']} s", flush=True)
+
+
+def _gblur(img, m, sig):
+    np = _np()
+    from scipy.ndimage import gaussian_filter  # noqa: PLC0415
+    w = gaussian_filter(m.astype(np.float64), sig)
+    return np.stack([gaussian_filter(img[..., k] * m, sig) for k in range(3)], -1) / np.maximum(w, 1e-6)[..., None]
+
+
+def cmd_close_put(d: Path, atlas: Path, tag: str, seed: int, strength: float) -> None:
+    """The fine skin onto ``atlas`` (D at 8K): each body and foot texel takes the ratio of the close picture
+    facing it most squarely to its own blur at ``CLOSE_SPLIT_M`` (above it the colour stays D's), at 2K,
+    carried to the 8K atlas's texels and gutter. The groin keeps the maker's skin (RD-P27-2)."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    from scipy.ndimage import binary_erosion, binary_dilation, gaussian_filter  # noqa: PLC0415
+    Image.MAX_IMAGE_PIXELS = None
+    t = time.time()
+    out = d / "close"
+    cams = json.loads((out / "cams.json").read_text())["cams"]
+    A = np.load(d / "atlas.npz")
+    Pa, Na, groin = A["P"].astype(np.float64), A["N"].astype(np.float64), A["groin"]
+    ids2, paint_ids, head_id = skin_islands(2048)
+    hand = set(hand_ids())
+    want = [k for k in paint_ids if HANDS_FROM_PICTURE or k not in hand]
+    skin = np.isin(ids2, want) & A["cover"] & ~binary_dilation(groin, iterations=4)
+    rr, cc = np.nonzero(skin)
+    X, Nn = Pa[rr, cc], Na[rr, cc]
+    best = np.zeros(len(rr)); lr = np.zeros((len(rr), 3)); src = np.full(len(rr), -1)
+    s = CLOSE_SIZE / CLOSE_M
+    for k, c in enumerate(cams):
+        g = dict(np.load(out / f"geom_{c['name']}.npz"))
+        pic = picture_close(out / f"{c['name']}_s{round(strength * 100):02d}_seed{seed}.png")
+        uv = g["uv"]
+        hpix = g["mask"] & (ids2[np.clip((uv[..., 1] * 2048).astype(int), 0, 2047),
+                                 np.clip((uv[..., 0] * 2048).astype(int), 0, 2047)] == head_id)
+        m = binary_erosion(g["mask"], iterations=CLOSE_ERODE) & ~inner_edges(g, hpix)
+        e = 4 * CLOSE_ERODE                                              # the frame's edge too
+        m[:e] = m[-e:] = False; m[:, :e] = m[:, -e:] = False
+        chroma = (pic.max(-1) - pic.min(-1)) / np.maximum(pic.max(-1), 1e-6)
+        m &= chroma > MIN_CHROMA                                         # never the model's grey background
+        raw = srgb(pic) * 255                                            # nor near the model's own outline, where
+        bg = np.median(np.concatenate([raw[:40].reshape(-1, 3), raw[-40:].reshape(-1, 3)]), 0)   # it moved a limb:
+        fg = np.abs(raw - bg).max(-1) > 18                               # its edge is a fine line (27.2)
+        m &= binary_erosion(fg, iterations=2 * CLOSE_ERODE)
+        lrat = np.log(np.maximum(pic, 1e-4)) - np.log(np.maximum(_gblur(pic, m, CLOSE_SPLIT_M * s), 1e-4))
+        lrat = CLOSE_SOFT * np.tanh(lrat / CLOSE_SOFT)
+        lrat = np.stack([gaussian_filter(lrat[..., j] * m, 0.8) for j in range(3)], -1) / np.maximum(
+            gaussian_filter(m.astype(float), 0.8), 1e-6)[..., None]          # to the 2K texel, not aliased
+        keep = proj.__defaults__
+        proj.__defaults__ = (CLOSE_SIZE, s, c["cy"])
+        try:
+            px, py, z = proj(X - c["cx"] * rot(c["yaw"])[0], c["yaw"], CLOSE_SIZE, CLOSE_SIZE)
+        finally:
+            proj.__defaults__ = keep
+        nz = (Nn @ rot(c["yaw"]).T)[:, 2] / np.maximum(np.linalg.norm(Nn, axis=1), 1e-9)
+        xi, yi = np.floor(px).astype(int), np.floor(py).astype(int)
+        inb = (xi >= 0) & (yi >= 0) & (xi < CLOSE_SIZE) & (yi < CLOSE_SIZE)
+        ok = np.zeros(len(rr), bool)
+        ok[inb] = m[yi[inb], xi[inb]] & (np.abs(z[inb] - g["z"][yi[inb], xi[inb]]) < 0.004)
+        take = ok & (nz > MIN_FACE) & (nz > best)
+        lr[take] = sample(lrat, px[take] - 0.5, py[take] - 0.5)
+        best[take] = nz[take]; src[take] = k
+    got = src >= 0
+    L = np.zeros((2048, 2048, 3)); known = A["cover"].copy()
+    L[rr[got], cc[got]] = lr[got]                                    # 0 (D's own) on every other texel
+    L = pushpull(np.where(known[..., None], L, 0.0), known)         # into the gutter
+    base = lin(np.asarray(Image.open(atlas).convert("RGB"), np.float32) / 255).astype(np.float32)
+    ids8, _, _ = skin_islands(8192)
+    sel = np.isin(ids8, want)
+    sel |= binary_dilation(sel, iterations=GUTTER) & (ids8 == 0)
+    up = np.stack([np.asarray(Image.fromarray(L[..., j].astype(np.float32), "F").resize((8192, 8192), Image.BILINEAR))
+                   for j in range(3)], -1)
+    base[sel] *= np.exp(up[sel])
+    del up
+    Image.fromarray((srgb(base) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
+    srcmap = np.full((2048, 2048), -1, np.int16); srcmap[rr, cc] = src
+    np.savez_compressed(d / f"D_{tag}_close.npz", cam=srcmap)
+    rec = {"atlas": atlas.name, "cams": len(cams), "strength": strength, "seed": seed, "split_m": CLOSE_SPLIT_M,
+           "skin_texels": int(len(rr)), "fine_pct": round(float(got.mean() * 100), 1),
+           "ratio_std": [round(float(v), 4) for v in lr[got].std(0)], "seconds": round(time.time() - t)}
+    (d / f"D_{tag}.json").write_text(json.dumps(rec, indent=1) + "\n")
+    print(f"D_{tag}.png: {json.dumps(rec)}")
+
+
+def picture_close(path: Path):
+    """A close picture at the camera's size, linear."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    raw = np.asarray(Image.open(path).convert("RGB").resize((CLOSE_SIZE, CLOSE_SIZE), Image.LANCZOS), np.float64)
+    return lin(raw / 255)
+
+
 # ------------------------------------------------------------------ seams --------------------------
 def named_islands(m):
     """Each face's island and the names of the islands a body seam joins: body, head, hand_l/r, foot_l/r
@@ -893,8 +1115,20 @@ def main(argv=None) -> int:
                    help="seam levelling: a smooth tone correction per view so the views agree where they meet")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
+    s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
+    s.add_argument("stage", choices=("prep", "paint", "put")); s.add_argument("dir", type=Path)
+    s.add_argument("--atlas", type=Path, help="D at 8K (prep: what the cameras render; put: what the skin goes on)")
+    s.add_argument("--tag", default="close"); s.add_argument("--seed", type=int, default=7)
+    s.add_argument("--strength", type=float, default=CLOSE_STRENGTH); s.add_argument("--server", default="http://127.0.0.1:8188")
     a = ap.parse_args(argv)
-    if a.cmd == "seams":
+    if a.cmd == "close":
+        if a.stage == "prep":
+            cmd_close_prep(a.dir, a.atlas)
+        elif a.stage == "paint":
+            cmd_close_paint(a.dir, a.seed, a.strength, a.server)
+        else:
+            cmd_close_put(a.dir, a.atlas, a.tag, a.seed, a.strength)
+    elif a.cmd == "seams":
         cmd_seams(a.atlas)
     elif a.cmd == "prep":
         cmd_prep(a.dir)

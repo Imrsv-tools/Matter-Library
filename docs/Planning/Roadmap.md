@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*Phase27 (AI Body Skin): BRIEF READY again (Pass 3, 2026-11-02), execute resumes at 27.2; its entry is under `## Future`. Phase25 closed 2026-11-02.*
+*Phase27 (AI Body Skin) is in execution again (from 27.2, 2026-11-02); its entry is under `## Future`. Phase25 closed 2026-11-02.*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -33,7 +33,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
 
-### Phase27 — AI Body Skin — BRIEF READY *(2026-11-02, Pass 3: the skin split by size, the four-view picture above ~3 mm, a close camera per region below, RD-P27-6; execute resumes at 27.2)* *(was BRIEF READY, 2026-11-02: hm08 shown four times in one picture, repainted by Krea, each view fitted to hm08 before it is projected, RD-P27-5; 27.1 is the fit)* *(seeded 2026-11-02, on the lead's "Seed phase 27 as the body.."; the lead ruled the body its own phase, after Phase25, and approved asking the model for unclothed bodies: "1) yes"; discovery may run beside Phase25's execute, its execute after 25.2)*
+### Phase27 — AI Body Skin — IN EXECUTION *(2026-11-02, from 27.2, the fine skin)* *(BRIEF READY 2026-11-02, Pass 3: the skin split by size, the four-view picture above ~3 mm, a close camera per region below, RD-P27-6; execute resumes at 27.2)* *(was BRIEF READY, 2026-11-02: hm08 shown four times in one picture, repainted by Krea, each view fitted to hm08 before it is projected, RD-P27-5; 27.1 is the fit)* *(seeded 2026-11-02, on the lead's "Seed phase 27 as the body.."; the lead ruled the body its own phase, after Phase25, and approved asking the model for unclothed bodies: "1) yes"; discovery may run beside Phase25's execute, its execute after 25.2)*
 **Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, the wrists, the ankles, or down the back and the limbs, judged beside the maker's body on the same unclothed character; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase27_AiBodySkin.md`
 
