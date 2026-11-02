@@ -125,7 +125,7 @@ Nothing here is authorization, secrets, a destructive migration or the public ed
 
 ### Open for the lead
 
-~~*None blocking.*~~ **Q-P27-1** (§Pass 3), asked 2026-11-02. The decisions above stand unless the lead says otherwise.
+~~*None blocking.*~~ ~~**Q-P27-1**~~ answered; **Q-P27-2** (§Pass 3), asked 2026-11-02. The decisions above stand unless the lead says otherwise.
 
 ---
 
@@ -162,6 +162,16 @@ Nothing here is authorization, secrets, a destructive migration or the public ed
 
 - **If 3 or 4:** the route becomes the four views for the person and its colour above ~1 cm, plus **one close camera per region** for the skin below it (Phase25's learned step, *one camera per region with its own geometry*, F-P25-23). The levels come from the four views, so regions cannot step against each other by construction; ~12–20 regions at ~15 s each; 27.2's seams reused (`neck_join` takes any source pair). The Brief is rewritten on it, and 27.1–27.2's tooling stays.
 - **If neither:** the model is not a source of body skin at this distance — what it adds is colour pattern above ~1 cm — and the fine skin must come from elsewhere: the maker's grain under D's colour (F-P27-15's lever), or the maker's own body skin, which the lead also judged wrong at 27.2.2. Which of those is this phase's and which another's is then the fork, put with its options.
+
+**Answered** (2026-11-02). The lead asked to see the original (`P27_Body/f4_s50_seed7.png`, opened), then, verbatim: *"2 is the closest to image. the others start to move the shoulder blade mark lower and lower"*. *(Read as: the four-view picture stays the reference; a close camera that redraws the body's marks is out — fidelity to the picture comes before added detail.)*
+
+- **F-P27-18 — The close camera redraws the marks; keeping only its skin finer than ~3 mm holds them.** Seen at native pixels: already at 0.35 the model draws the left shoulder blade's crease ~4 cm lower than the four-view picture has it, lower and longer at 0.5 and 0.65 — its own anatomy, not a shift (a rigid-shift match finds no consistent offset, r ~0.4 at the blades). **Split by scale instead** ([`region.py split`](Phase27_AiBodySkin_probe/region.py)): D through the camera above the split, the close picture below it. Measured in the picture's frame (fine detail ×1000 at 2 / 6 px; the marks = the 2–16 mm band's correlation with D): D 5.4 / 11.9; **split at 3 mm: 0.35 → 8.3 / 17.6, r 0.98; 0.5 → 7.9 / 13.9, r 0.99; 0.65 → 9.7 / 16.4, r 0.98**; at 2 mm r 0.99–1.00, at 5 mm r 0.92–0.95. **Seen:** the creases where D has them in every split; at 0.35 the added skin is a blotchy mottle (the kind the lead called *"a pattern"* on the calf at 27.2.2); at 0.65 a subtle, even grain. Reproduce: `… region.py split <o> back 3 back_s35_seed7.png` (and `back_s65_seed7.png`) · `… region.py sheet <o> back <o>/show/P3_back_split3mm.png D split_3mm_back_s35_seed7.png split_3mm_back_s65_seed7.png` (labels then retyped plainly on the picture).
+
+### Q-P27-2 — asked 2026-11-02
+
+**Shown:** `library/parity/P27_Region/show/P3_back_split3mm.png` — **1** D as before (column 2) · **2** D + the close camera's skin finer than 3 mm, 0.35 · **3** the same, 0.65. **Asked:** *Does 2 or 3 look more like real skin than 1 — with the marks where they were?*
+- **If 2 or 3:** the route is the four views for everything above ~3 mm and one close camera per region for the skin below it (that strength); the Brief is rewritten on it, then judged in the look view at the click.
+- **If 1:** the close camera adds nothing worth keeping; the fine skin is the maker's question (F-P27-15), put as a fork.
 
 ## Findings (discovery Pass 1, 2026-11-02)
 

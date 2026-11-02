@@ -8,8 +8,10 @@
        (MATTER_SKIN_N = 2048 or 4096: the texel density the region is written at; the 8K atlas is the result)
     region.py calbedo <out>                                      C's rendered albedo (project_views.subject_albedo) as
                                                                  an sRGB 8K atlas, C_albedo.png
-    region.py sheet <out> <name> <out.png> <picture>...          C and D_seam9 through the region camera, then the
-                                                                 pictures; one 768-px crop each, side by side
+    region.py sheet <out> <name> <out.png> <column>...           one 768-px crop per column, side by side: C and D
+                                                                 (D_seam9) through the region camera, or a picture
+    region.py split <out> <name> <mm> <picture>                  D through the camera above <mm>, the picture below
+                                                                 it (split_<mm>mm_<picture>): the marks stay D's
     region_detail.py <out> <name> <atlas>...                     the fine detail of each atlas through that camera
 
 Throwaway, outside the repo; reuses tools/converters/fit/project_body.py and gen_views_model.py unchanged.
@@ -152,19 +154,34 @@ def calbedo(out):
     Image.fromarray((pb.srgb(a) * 255 + 0.5).astype(np.uint8)).save(out / "C_albedo.png")
 
 
-def sheet(out, name, path, pics, box=(384, 200, 1152, 968)):
-    from PIL import ImageDraw
+def ren(out, name, p):
+    """An 8K atlas on hm08 through the region camera, the render's light, the raster's pixel cracks filled (linear)."""
     from scipy.ndimage import binary_closing
     g = np.load(out / f"geom_{name}.npz"); m = g["mask"]; mc = binary_closing(m, iterations=2)
+    A = pb.lin(np.asarray(Image.open(p).convert("RGB"), np.float32) / 255); n = A.shape[0]
+    col = pb.sample(A, g["uv"][..., 0] * n - 0.5, g["uv"][..., 1] * n - 0.5) * pb.shade(g["n"])[..., None]
+    col = pb.pushpull(np.where(m[..., None], col, 0.0), m)
+    return np.where(mc[..., None], col, 0.18)
 
-    def ren(p):                                                      # the raster's pixel cracks filled
-        A = pb.lin(np.asarray(Image.open(p).convert("RGB"), np.float32) / 255); n = A.shape[0]
-        col = pb.sample(A, g["uv"][..., 0] * n - 0.5, g["uv"][..., 1] * n - 0.5) * pb.shade(g["n"])[..., None]
-        col = pb.pushpull(np.where(m[..., None], col, 0.0), m)
-        return Image.fromarray((pb.srgb(np.where(mc[..., None], col, 0.18)) * 255 + 0.5).astype(np.uint8))
-    cols = [("C - the maker's skin on hm08 (probe renderer)", ren(out / "C_albedo.png")),
-            ("D as at click 2 - from the four-view picture (probe renderer)", ren(D8K))]
-    cols += [(f"the model, its own close camera: {p}", Image.open(out / p).convert("RGB")) for p in pics]
+
+def split(out, name, mm, picture):
+    from scipy.ndimage import binary_erosion
+    c = cam(out, name); s = view(c) * mm / 1000
+    g = np.load(out / f"geom_{name}.npz"); m = binary_erosion(g["mask"], iterations=6)
+    D = ren(out, name, D8K)
+    P = pb.lin(np.asarray(Image.open(out / picture).convert("RGB").resize((SIZE, SIZE), Image.LANCZOS), np.float64) / 255)
+    o = np.where(m[..., None], gblur(D, m, s) * P / np.maximum(gblur(P, m, s), 1e-4), D)
+    pb.save(out / f"split_{mm:g}mm_{picture}", o)
+
+
+def sheet(out, name, path, pics, box=(384, 200, 1152, 968)):
+    from PIL import ImageDraw
+
+    def im8(x):
+        return Image.fromarray((pb.srgb(x) * 255 + 0.5).astype(np.uint8))
+    named = {"C": ("C - the maker's skin on hm08 (probe renderer)", lambda: im8(ren(out, name, out / "C_albedo.png"))),
+             "D": ("D as at click 2 - from the four-view picture (probe renderer)", lambda: im8(ren(out, name, D8K)))}
+    cols = [(named[p][0], named[p][1]()) if p in named else (p, Image.open(out / p).convert("RGB")) for p in pics]
     W = box[2] - box[0]
     im = Image.new("RGB", (W * len(cols), W + 40), (30, 30, 30)); d = ImageDraw.Draw(im)
     for i, (t, c) in enumerate(cols):
@@ -185,3 +202,5 @@ if __name__ == "__main__":
         calbedo(out)
     elif a[0] == "sheet":
         sheet(out, a[2], Path(a[3]), a[4:])
+    elif a[0] == "split":
+        split(out, a[2], float(a[3]), a[4])
