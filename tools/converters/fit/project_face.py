@@ -231,6 +231,25 @@ def snap_eyes(L):
     return L, moves
 
 
+def carry_eyes(raw, E, sigma: float = 80.0, power: int = 6):
+    """The eye snap's moves carried onto the landmarks round each eye, fading with distance (a Gaussian of
+    ``sigma`` px on the distance to the nearest contour point; each point takes its near contour points' moves,
+    weighted by distance to the ``-power``, so in effect the nearest one's: the corner moves unlike the lids,
+    and one affine per eye fitted worse). ``snap_eyes`` moves the inner corner up to 25 px up onto the opening and leaves its
+    neighbours (463, 464, 414, 341 …) where MediaPipe put them, so the picture's crease, level from the corner
+    in the picture and in the raw fit, ran DOWN from the corner on the mesh (25.1.19; the lead: a line down
+    from the inner corner where it should run level)."""
+    np = _np()
+    ids = np.array(sum((e["up"] + e["lo"] + e["c"] for e in EYES.values()), []))
+    other = np.setdiff1d(np.arange(468), ids)                    # the irises stay as found (``symmetric``)
+    m = E[ids] - raw[ids]
+    d = np.linalg.norm(raw[other, None] - raw[None, ids], axis=-1)
+    w = 1 / np.maximum(d, 1.0) ** power
+    C = E.copy()
+    C[other] += (w @ m) / w.sum(1)[:, None] * np.exp(-(d.min(1) / sigma) ** 2)[:, None]
+    return C
+
+
 AXIS = 1023.5      # hm08's front render is a mirror about this column (its eye openings sum to 2047, F-P25-25)
 
 
@@ -377,6 +396,7 @@ def cmd_landmarks(d: Path, picture: Path | None) -> None:
     if picture is None:                                            # hm08's front render, the eyes snapped
         raw, im = detect(RENDER)
         E, moves = snap_eyes(raw)
+        E = carry_eyes(raw, E)
         L = snap_brows(d, symmetric(E))
         np.save(d / "lm_hm08_raw.npy", raw)
         np.save(d / "lm_hm08_eyes.npy", E)
