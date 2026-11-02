@@ -891,6 +891,10 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     col = col * np.clip(1 - depth[..., None] * reach, 0.2, 1.5)
     ratio = (col + EPS) / (base + EPS)
     out = tone * ratio
+    if field is not None and "skin" in field:
+        # the outside skin's colour that no melanin and blood make (Phase27 27.3: the picture's body is a
+        # little yellower than the table makes at C's oxygenation), a factor on it, as the lips' (25.2.3)
+        out = out * field["skin"]
 
     # the lips: the library's rule, feathered (the Lips article carries its own lip colour)
     lm = np.clip(_blur(F, "lips", 5) * 1.15, 0, 1)[..., None]

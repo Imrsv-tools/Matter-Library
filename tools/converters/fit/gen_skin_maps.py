@@ -509,6 +509,11 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
             z = np.load(lp)
             field["lips"] = np.ones((N, N, 3), np.float32)
             field["lips"].reshape(-1, 3)[z["idx"]] = z["factor"].astype(np.float32)
+        sp = pigments_dir / f"{stem0}_skin.npz"
+        if sp.is_file():                       # the outside skin's leftover colour, a factor (Phase27 27.3)
+            z = np.load(sp)
+            field["skin"] = np.ones((N, N, 3), np.float32)
+            field["skin"].reshape(-1, 3)[z["idx"]] = z["factor"].astype(np.float32)
     col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg,
                                    field=field)
     del field

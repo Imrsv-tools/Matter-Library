@@ -6,6 +6,7 @@
     uv run --with scipy tools/converters/fit/project_body.py fit   <dir> <picture>
     uv run --with scipy tools/converters/fit/project_body.py put   <dir> <picture> <tag> [--head <atlas.png>] [--no-fit]
     uv run --with scipy tools/converters/fit/project_body.py seams <atlas.png>
+    uv run --with scipy tools/converters/fit/project_body.py pigments <D.png> --base <head.png> --head-field <f> --c-fields <cf> --out <dir>
     uv run --with scipy tools/converters/fit/project_body.py close prep|paint|put <dir> [--atlas D.png] [--tag t]
 
 hm08's body island is a person seen from the front with the back split down the spine (F-P27-3), so no
@@ -1336,6 +1337,81 @@ def body_part(p) -> str:
     return "back" if z < 0 else "front"
 
 
+def cmd_pigments(atlas: Path, base: Path, head_field: Path, cfields: Path, out: Path) -> None:
+    """The body as a structure (27.3, as Phase25's 25.2 for the face): every texel ``put`` wrote (where
+    ``atlas`` differs from ``base``, the head atlas it was written on) turned back into melanin and blood on
+    the maker's own skin model, and merged into Phase25's field (``head_field``: the face, its weight and its
+    lips, untouched). As ``project_face.py pigments``: the target is C's table colour times D / C at C's
+    oxygenation (``cfields``: ``gen_skin_maps.py --subject Tone34 --fields``), so no constant is needed.
+    What the pigments cannot make travels as ``skin`` (a factor on the skin's colour, as the lips' is on
+    theirs). At the head field's size (4K: Tone34 since 0e24d0c), D, C and C's fields averaged to it.
+    Writes ``out`` for ``gen_skin_maps.py --subject Tone34 --pigments``."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import project_face as pf  # noqa: PLC0415
+    import project_views as pv  # noqa: PLC0415
+    import shutil  # noqa: PLC0415
+    Image.MAX_IMAGE_PIXELS = None
+    t0 = time.time()
+    a8 = np.asarray(Image.open(atlas).convert("RGB"))
+    b8 = np.asarray(Image.open(base).convert("RGB"))
+    n = a8.shape[0]
+    if b8.shape != a8.shape or n != 8192:
+        raise SystemExit(f"{atlas.name} and {base.name} must both be 8192 (are {a8.shape[0]}, {b8.shape[0]})")
+    Fh = pf.read_fields(head_field, names=("melanin", "blood"))
+    nh = Fh["melanin"].shape[0]                    # the served size: Tone34 is 4K since 0e24d0c (27.3)
+    k = n // nh
+
+    def down(x):                                    # 2x2 (k x k) mean, as Phase25 made its 4K field
+        return x.reshape(nh, k, nh, k, *x.shape[2:]).mean((1, 3)) if k > 1 else x
+    dec = lin(np.arange(256) / 255.0).astype(np.float32)
+    w = np.flatnonzero((a8 != b8).any(-1).reshape(nh, k, nh, k).any((1, 3)).ravel())
+    del b8
+    D = down(dec[a8]).reshape(-1, 3)[w].astype(np.float64)
+    del a8
+    C = down(pv.subject_albedo()).reshape(-1, 3)[w].astype(np.float64)
+    Fc = {key: down(v) for key, v in pf.read_fields(cfields).items()}
+    so2 = Fc["so2"].reshape(-1)
+    mel, bld = Fh["melanin"].reshape(-1).copy(), Fh["blood"].reshape(-1).copy()
+    n = nh
+    lut = gss.Lut()
+    lut.use("Tone34")
+    target = lut(Fc["melanin"].reshape(-1)[w].astype(np.float64), Fc["blood"].reshape(-1)[w].astype(np.float64),
+                 so2[w].astype(np.float64)) * (D / np.maximum(C, 1e-6))
+    del D, C
+    inv = lut.inverse(target, so2[w])
+    mel[w], bld[w] = inv["melanin"], inv["blood"]
+    # what the pigments cannot make (the picture is yellower than the table at C's oxygenation; without it the
+    # structure's body drew R/G 1.81 against D's 1.73, 27.3) travels as a factor on the skin's colour
+    made = lut(inv["melanin"], inv["blood"], so2[w].astype(np.float64))
+    factor = target / np.maximum(made, 1e-6)
+    out.mkdir(parents=True, exist_ok=True)
+    stem = "SkinTone34"
+    meta = {"command": f"project_body.py pigments {atlas.name} --base {base.name} --head-field {head_field.name}",
+            "space": "linear", "size": n, "encoding": "uint16 = value / scale x 65535",
+            "source": atlas.name, "head_field": str(head_field)}
+    for k, v in (("melanin", mel), ("blood", bld)):
+        sc = float(v.max())
+        Image.fromarray(np.round(np.clip(v / sc, 0, 1) * 65535).astype(np.uint16).reshape(n, n)).save(out / f"{stem}_{k}.png")
+        meta[k] = {"scale": sc}
+    wt = np.asarray(Image.open(head_field / f"{stem}_weight.png")).reshape(-1).copy()
+    wt[w] = 255
+    Image.fromarray(wt.reshape(n, n)).save(out / f"{stem}_weight.png")
+    np.savez_compressed(out / f"{stem}_skin.npz", idx=w.astype(np.int64), factor=factor.astype(np.float16))
+    if (head_field / f"{stem}_lips.npz").is_file():                 # the face's lips, as Phase25 made them
+        shutil.copyfile(head_field / f"{stem}_lips.npz", out / f"{stem}_lips.npz")
+    r = inv["resid"]
+    meta["inverse"] = {"texels": int(len(w)), "clamped": inv["clamped"],
+                       "resid_log_p50": round(float(np.median(r)), 5), "resid_log_p99": round(float(np.percentile(r, 99)), 4),
+                       "share_resid_over_0.02": round(float((r > 0.02).mean()), 5),
+                       "skin_factor_median": [round(float(v), 4) for v in np.median(factor, 0)],
+                       "skin_factor_p1_p99": [[round(float(v), 3) for v in np.percentile(factor, q, 0)] for q in (1, 99)],
+                       "seconds": round(time.time() - t0)}
+    (out / f"{stem}_fields.json").write_text(json.dumps(meta, indent=1) + "\n")
+    print(f"{out}: " + json.dumps(meta["inverse"]))
+
+
 def cmd_seams(atlas: Path, off_mm: float = 3.0, r_mm: float = 2.0) -> dict:
     """The level step across each of hm08's seams on an atlas: at three points along every seam edge, the
     mean luminance ``off_mm`` inside each side (a disc of ``r_mm``, that side's island only), as
@@ -1452,6 +1528,12 @@ def main(argv=None) -> int:
     s.add_argument("--fit-suffix", default="", help="read fit_<picture><SUFFIX>.npz (e.g. _pins, from fit --front-pins)")
     s.add_argument("--mottle-gain", type=float, default=1.0, metavar="G",
                    help="scale the skin's own variation between ~1 mm and ~1.3 cm (MOTTLE_SIG) by G (27.2.11)")
+    s = sub.add_parser("pigments", help="the body as melanin and blood, merged into Phase25's head field (27.3)")
+    s.add_argument("atlas", type=Path, help="D at 8K (put, then close put)")
+    s.add_argument("--base", type=Path, required=True, help="the head atlas put wrote onto (--head)")
+    s.add_argument("--head-field", type=Path, required=True, help="Phase25's field (project_face.py pigments)")
+    s.add_argument("--c-fields", type=Path, required=True, help="C's fields with so2 (gen_skin_maps --fields)")
+    s.add_argument("--out", type=Path, required=True)
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1467,6 +1549,8 @@ def main(argv=None) -> int:
             cmd_close_paint(a.dir, a.seed, a.strength, a.server)
         else:
             cmd_close_put(a.dir, a.atlas, a.tag, a.seed, a.strength)
+    elif a.cmd == "pigments":
+        cmd_pigments(a.atlas, a.base, a.head_field, a.c_fields, a.out)
     elif a.cmd == "seams":
         cmd_seams(a.atlas)
     elif a.cmd == "prep":
