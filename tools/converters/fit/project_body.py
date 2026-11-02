@@ -60,6 +60,8 @@ LIGHT_TERMS = {0: 1, 1: 4, 2: 9}   # the normal's terms up to each order (``--li
 LUM = (0.2126, 0.7152, 0.0722)
 LEVEL_CAP = 0.5              # the most a seam levelling moves a view, in log colour (x1.65)
 NECK_R = 0.06                # the neck join's ramp on each side of the seam (m)
+NECK_FILL_R = 0.10           # ``--neck-fill``: how far down the body the head's level is carried (m); the
+                             # picture's chin shadow lies 3-8 cm below the neck seam (27.2.6)
 NAPE_R = 0.05                # how far up the head island the four views paint the back of the neck (m)
 RIM = 2                      # texels of the maker's 2K rim taken from the island's inside
 HANDS_FROM_PICTURE = False   # the four views' fingers do not land at 1.7 mm a pixel (27.2): the maker's hands,
@@ -607,8 +609,81 @@ def neck_join(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
     return out, rec
 
 
+def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: float = 0.04, cell: int = 4,
+              sigma: float = 0.015, reach: float = 0.008):
+    """The picture's slow tone near the head, replaced by a smooth field from Phase25's head to the body (27.2.6).
+    The four-view picture paints the chin's shadow round the neck, which no light taken out by the surface's
+    direction removes: the body's neck sat at luminance 0.26 against the chest's 0.32 and the head's 0.43, and
+    ``neck_join``'s split step left a dark, red collar on both sides. Here the head is untouched. On the painted
+    side, within ``NECK_FILL_R`` of where it meets the head (found on the body, as ``neck_join`` does), the slow
+    level (the log colour's mean over ``sigma`` metres, on ``cell``-pixel cells) is swapped for a membrane:
+    the head's own level at the join, the body's own slow level from ``NECK_FILL_R`` out, harmonic between
+    (cells linked by their distance on the body, ``reach``). Everything finer than ``sigma`` stays the picture's.
+    Returns the painted side's log correction at the atlas's size, and a record."""
+    np = _np()
+    from scipy.sparse import coo_matrix  # noqa: PLC0415
+    from scipy.sparse.linalg import spsolve  # noqa: PLC0415
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    br, bc = np.nonzero(body); hr, hc = np.nonzero(hm)
+    Pb, Ph = P[br, bc], P[hr, hc]
+    lh = np.log(np.maximum(H[hr, hc], 1e-4))
+    tb, th = cKDTree(Pb), cKDTree(Ph)
+    dh = tb.query(Ph, distance_upper_bound=near)[0]
+    pts = Ph[np.isfinite(dh)][::3]
+    if not len(pts):
+        raise SystemExit("the head and the painted skin do not meet")
+    hlev = np.array([lh[h].mean(0) for h in th.query_ball_point(pts, r)])
+    tree = cKDTree(pts)
+    hlev = np.array([np.median(hlev[nb], 0) for nb in tree.query_ball_point(pts, along)])
+    n = D.shape[0]
+    dj = np.full(D.shape[:2], np.inf)
+    dj[br, bc] = tree.query(Pb, distance_upper_bound=NECK_FILL_R + 3 * sigma)[0]
+    zone = body & np.isfinite(dj)
+    hc_ = n // cell
+    lg = np.log(np.maximum(D, 1e-4))
+    cnt = zone.reshape(hc_, cell, hc_, cell).sum((1, 3))
+    ok = cnt >= cell * cell // 4
+    cm = ((lg * zone[..., None]).reshape(hc_, cell, hc_, cell, 3).sum((1, 3)))[ok] / cnt[ok][:, None]
+    cp = ((P * zone[..., None]).reshape(hc_, cell, hc_, cell, 3).sum((1, 3)))[ok] / cnt[ok][:, None]
+    ct = cKDTree(cp)
+    slow = np.empty_like(cm)                                          # the slow level of each cell
+    for i, nb in enumerate(ct.query_ball_point(cp, 2 * sigma)):
+        w = np.exp(-((cp[nb] - cp[i]) ** 2).sum(1) / (2 * sigma ** 2))
+        slow[i] = (cm[nb] * w[:, None]).sum(0) / w.sum()
+    cd, ci = tree.query(cp)
+    fixed_head = cd < 1.5 * near
+    fixed_body = cd >= NECK_FILL_R
+    fixed = fixed_head | fixed_body
+    val = np.where(fixed_head[:, None], hlev[ci], slow)
+    pairs = ct.query_pairs(reach, output_type="ndarray")
+    K = len(cm)
+    a, b = pairs[:, 0], pairs[:, 1]
+    deg = np.bincount(np.concatenate([a, b]), minlength=K).astype(float)
+    Lm = coo_matrix((np.concatenate([-np.ones(len(a)), -np.ones(len(a)), deg]),
+                     (np.concatenate([a, b, np.arange(K)]), np.concatenate([b, a, np.arange(K)]))), shape=(K, K)).tocsr()
+    free = ~fixed & (deg > 0)
+    fi = np.nonzero(free)[0]
+    Lff = Lm[fi][:, fi].tocsc()
+    Lfx = Lm[fi][:, np.nonzero(~free)[0]]
+    target = val.copy()
+    for c in range(3):
+        target[fi, c] = spsolve(Lff, -(Lfx @ val[~free, c]))
+    corr = np.where((cd < NECK_FILL_R)[:, None], target - slow, 0.0)
+    g = np.zeros_like(D)
+    zr, zc = np.nonzero(zone & (dj < NECK_FILL_R))
+    dist, idx = ct.query(P[zr, zc], k=6)
+    w = np.exp(-(dist ** 2 - dist[:, :1] ** 2) / (2 * (cell * 0.0008) ** 2))
+    g[zr, zc] = (corr[idx] * w[..., None]).sum(1) / w.sum(1, keepdims=True)
+    step = hlev.mean(0) - slow[(cd >= 1.5 * near) & (cd < 0.01)].mean(0)
+    rec = {"points": len(pts), "cells": int(K), "radius_m": NECK_FILL_R, "sigma_m": sigma,
+           "step_log_at_join": [round(float(v), 3) for v in step],
+           "corr_log_p90_abs": [round(float(v), 3) for v in np.percentile(np.abs(corr[cd < NECK_FILL_R]), 90, 0)]}
+    print(f"neck fill: {json.dumps(rec)}", flush=True)
+    return g, rec
+
+
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
-            levelled: bool = False, keep_colour: bool = False, light_order: int = 2) -> None:
+            levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -717,7 +792,10 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     level = D[ring].mean(0) / C[ring].mean(0)
     D[groin] = C[groin] * level                                       # RD-P27-2: the maker's, at the level round it
     neck, neck_rec = None, None
-    if head:                                                          # RD-P25-16: the neck was left to the body
+    if head and fill_neck:                                            # the head untouched; the body's neck filled
+        g, neck_rec = neck_fill(D, body, H, hm, Pa.astype(np.float64))
+        D[body] *= np.exp(g[body])
+    elif head:                                                        # RD-P25-16: the neck was left to the body
         neck, neck_rec = neck_join(D, body, H, hm, Pa.astype(np.float64))
         D[body] *= np.exp(neck[0][body])
     hand_rec = None
@@ -752,7 +830,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
-           "keep_colour": keep_colour, "light_order": light_order,
+           "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
            "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
@@ -1131,6 +1209,9 @@ def main(argv=None) -> int:
                         "brightness only, not its hue (27.2.5)")
     s.add_argument("--light-order", type=int, choices=(0, 1, 2), default=2,
                    help="the light's terms of the normal (``--delight``): 2 also takes out curvature shading")
+    s.add_argument("--neck-fill", action="store_true",
+                   help="with --head: leave the head untouched and carry its level smoothly down the body's neck, "
+                        "replacing the picture's slow tone there (its chin shadow), not split the step (27.2.6)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1155,7 +1236,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill)
     return 0
 
 
