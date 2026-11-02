@@ -699,7 +699,8 @@ def cmd_pigments(d: Path, tag: str, cfields: Path, out: Path) -> None:
     the maker's colour times one constant per channel, and D shares C's oxygenation and depth there, so D's
     colour on the table is C's times D / C, texel by texel, with no constant to know: ``Lut.inverse`` at C's
     oxygenation. ``cfields``: C's fields with ``so2`` (``gen_skin_maps.py --subject Tone34 --fields``).
-    Writes ``out``: the field in ``--fields``' format plus ``weight`` (1 where D's), for
+    Writes ``out``: the field in ``--fields``' format plus ``weight`` (1 where D's) and ``lips`` (D / C, a
+    factor on the maker's lip colour), for
     ``gen_skin_maps.py --subject Tone34 --pigments``; C's own fields elsewhere."""
     np, Image = _np(), _img()
     import gen_synth_skin as gss  # noqa: PLC0415
@@ -725,6 +726,11 @@ def cmd_pigments(d: Path, tag: str, cfields: Path, out: Path) -> None:
         sc = float(a.max())
         Image.fromarray(np.round(np.clip(a / sc, 0, 1) * 65535).astype(np.uint16).reshape(N, N)).save(out / f"{stem}_{k}.png")
         meta[k] = {"scale": sc}
+    # The lips: no melanin and blood make them (25.2.2: the model misses D's by 27 % at the median), and the
+    # maker lays them over the skin as a colour, so they travel as a factor on that colour: D / C, the same
+    # ratio, exact where the lips' feather is full.
+    np.savez_compressed(out / f"{stem}_lips.npz", idx=w.astype(np.int64),
+                        factor=(np.asarray(D[w], np.float64) / np.maximum(C[w], 1e-6)).astype(np.float16))
     wt = np.zeros(N * N, np.uint8)
     wt[w] = 255
     Image.fromarray(wt.reshape(N, N)).save(out / f"{stem}_weight.png")

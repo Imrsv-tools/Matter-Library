@@ -665,7 +665,9 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     that receives the melanin, blood and oxygenation fields (RD-P24-6). ``field``: an outside melanin and
     blood (Phase25 25.2: an image model's, through ``Lut.inverse``), a dict of ``melanin``, ``blood`` and
     ``weight`` arrays at ``F``'s size: where the weight is 1 they replace the maker's own, joined in
-    log-pigment where it is between; the oxygenation, depth and lips stay the maker's."""
+    log-pigment where it is between; the oxygenation and depth stay the maker's. An optional ``lips`` (RGB,
+    a factor on the maker's lip colour, 1 where none) carries the outside lips: lips are not pigmented skin,
+    so they come through the lip layer, never the field (25.2.2, the lead: "Original D lips are way better")."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
     m0 = lut.use(roman)
@@ -862,6 +864,8 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
     # the lips: the library's rule, feathered (the Lips article carries its own lip colour)
     lm = np.clip(_blur(F, "lips", 5) * 1.15, 0, 1)[..., None]
     lips = tone * np.array(LIPS[fit] if lips is None else lips) * (0.92 + 0.08 * gsm.vnoise(P, 0.0025, 7)[..., None])
+    if field is not None and "lips" in field:
+        lips = lips * field["lips"]
     out = out * (1 - lm) + lips * lm
     if "pre" in F:                     # a band: the two terms, held by the caller over the whole atlas
         return (out * (1 - lm), lips * lm), {"melanin0": round(m0, 4), "blood0": BLOOD0}

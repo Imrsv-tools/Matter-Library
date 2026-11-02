@@ -496,6 +496,11 @@ def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int
         field = {k: np.asarray(Image.open(pigments_dir / f"{stem0}_{k}.png"), np.float32) / 65535 * meta0[k]["scale"]
                  for k in ("melanin", "blood")}
         field["weight"] = np.asarray(Image.open(pigments_dir / f"{stem0}_weight.png"), np.float32) / 255
+        lp = pigments_dir / f"{stem0}_lips.npz"
+        if lp.is_file():                       # the outside lips: a factor on the maker's lip colour (25.2.2)
+            z = np.load(lp)
+            field["lips"] = np.ones((N, N, 3), np.float32)
+            field["lips"].reshape(-1, 3)[z["idx"]] = z["factor"].astype(np.float32)
     col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg,
                                    field=field)
     del field
