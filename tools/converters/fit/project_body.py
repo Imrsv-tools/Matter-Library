@@ -382,7 +382,8 @@ def cmd_fit(d: Path, pic_path: Path) -> None:
 
 # ------------------------------------------------------------------ put ----------------------------
 INNER_JUMP = 0.03            # a depth step (m) between neighbouring pixels inside the silhouette: an occluding edge
-INNER_PAD = 10               # pixels kept clear of it (~1.7 cm): where the model's limb edge sits, unfitted
+INNER_PAD = 20               # pixels kept clear of it (~3.3 cm): where the model's limb edge sits, unfitted
+                             # (10 left the profile's elbow edge as a crease on each side of the waist: 27.1 click 1)
 
 
 def inner_edges(g):
