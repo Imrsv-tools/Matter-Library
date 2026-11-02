@@ -37,6 +37,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase25_AiSkinStructure.md` · research `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md` · `docs/Planning/Research/261101_R_Spike_SkinMapFromImageModel.md`
 
+### Phase27 — AI Body Skin — SEEDED *(2026-11-02, on the lead's "Seed phase 27 as the body.."; the lead ruled the body its own phase, after Phase25, and approved asking the model for unclothed bodies: "1) yes"; discovery may run beside Phase25's execute, its execute after 25.2)*
+**Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, shoulders or arms, judged beside the maker's body on the same character; if it wins, the maker turns it into a calibrated skin structure.
+- `docs/Planning/Phases/Phase27_AiBodySkin.md`
+
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
