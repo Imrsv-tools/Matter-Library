@@ -62,6 +62,9 @@ LEVEL_CAP = 0.5              # the most a seam levelling moves a view, in log co
 NECK_R = 0.06                # the neck join's ramp on each side of the seam (m)
 NECK_FILL_R = 0.10           # ``--neck-fill``: how far down the body the head's level is carried (m); the
                              # picture's chin shadow lies 3-8 cm below the neck seam (27.2.6)
+JAW_DOWN = -0.5              # ``--jaw-free``: a neck-seam point whose normal's up component is below this is under the
+                             # jaw (all at the front, |x| < 5 cm; the sides and the nape are above -0.3)
+JAW_CLEAR = 0.006            # ... and the picture's samples within this of that seam are holes (its bright chin edge)
 NAPE_R = 0.05                # how far up the head island the four views paint the back of the neck (m)
 RIM = 2                      # texels of the maker's 2K rim taken from the island's inside
 HANDS_FROM_PICTURE = False   # the four views' fingers do not land at 1.7 mm a pixel (27.2): the maker's hands,
@@ -672,7 +675,7 @@ def smooth_fill(D, C, known, hole, P, cell: int = 4, reach: float = 0.008, near:
 
 
 def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: float = 0.04, cell: int = 4,
-              sigma: float = 0.015, reach: float = 0.008):
+              sigma: float = 0.015, reach: float = 0.008, N=None):
     """The picture's slow tone near the head, replaced by a smooth field from Phase25's head to the body (27.2.6).
     The four-view picture paints the chin's shadow round the neck, which no light taken out by the surface's
     direction removes: the body's neck sat at luminance 0.26 against the chest's 0.32 and the head's 0.43, and
@@ -681,6 +684,10 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
     level (the log colour's mean over ``sigma`` metres, on ``cell``-pixel cells) is swapped for a membrane:
     the head's own level at the join, the body's own slow level from ``NECK_FILL_R`` out, harmonic between
     (cells linked by their distance on the body, ``reach``). Everything finer than ``sigma`` stays the picture's.
+    ``N`` (the atlas's normals; ``--jaw-free``, 27.2.10): the body is not held to the head where the seam runs under
+    the jaw (``JAW_DOWN``). Phase25's head is darker and redder along its edge there (the chin's underside), and
+    held to it the throat's first ~2 cm took that ring; seen edge-on at the jaw's silhouette it read as a thin red
+    line. There the membrane runs free between the sides' join and the body's own level.
     Returns the painted side's log correction at the atlas's size, and a record."""
     np = _np()
     from scipy.sparse import coo_matrix  # noqa: PLC0415
@@ -691,7 +698,11 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
     lh = np.log(np.maximum(H[hr, hc], 1e-4))
     tb, th = cKDTree(Pb), cKDTree(Ph)
     dh = tb.query(Ph, distance_upper_bound=near)[0]
-    pts = Ph[np.isfinite(dh)][::3]
+    ok_pt = np.isfinite(dh)
+    if N is not None:
+        Nh = N[hr, hc]
+        ok_pt &= Nh[:, 1] / np.maximum(np.linalg.norm(Nh, axis=1), 1e-9) >= JAW_DOWN
+    pts = Ph[ok_pt][::3]
     if not len(pts):
         raise SystemExit("the head and the painted skin do not meet")
     hlev = np.array([lh[h].mean(0) for h in th.query_ball_point(pts, r)])
@@ -737,7 +748,7 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
     w = np.exp(-(dist ** 2 - dist[:, :1] ** 2) / (2 * (cell * 0.0008) ** 2))
     g[zr, zc] = (corr[idx] * w[..., None]).sum(1) / w.sum(1, keepdims=True)
     step = hlev.mean(0) - slow[(cd >= 1.5 * near) & (cd < 0.01)].mean(0)
-    rec = {"points": len(pts), "cells": int(K), "radius_m": NECK_FILL_R, "sigma_m": sigma,
+    rec = {"points": len(pts), "jaw_free": N is not None, "cells": int(K), "radius_m": NECK_FILL_R, "sigma_m": sigma,
            "step_log_at_join": [round(float(v), 3) for v in step],
            "corr_log_p90_abs": [round(float(v), 3) for v in np.percentile(np.abs(corr[cd < NECK_FILL_R]), 90, 0)]}
     print(f"neck fill: {json.dumps(rec)}", flush=True)
@@ -746,7 +757,7 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
-            outline_clear: float = 0.0, smooth_holes: bool = False) -> None:
+            outline_clear: float = 0.0, smooth_holes: bool = False, jaw_free: bool = False) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -832,6 +843,19 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
                                "max": [round(float(v), 3) for v in L[fitk].max(0)]}
         take = vis & (nz > face) & (nz > MIN_FACE)
         got[take] = col[take]; face[take] = nz[take]; have |= take; src[take] = k
+    jaw_dropped = 0
+    if jaw_free and head:
+        # the picture paints the chin's lower edge brighter over the throat just below it (+33 % at the seam
+        # against 6-10 mm down): those samples are left as holes for the fill (27.2.10)
+        hr_, hc_ = np.nonzero(hm)
+        Nh = Na[hr_, hc_].astype(np.float64)
+        down = Nh[:, 1] / np.maximum(np.linalg.norm(Nh, axis=1), 1e-9) < JAW_DOWN
+        Ph = Pa[hr_, hc_][down].astype(np.float64)
+        Ph = Ph[np.isfinite(cKDTree(X).query(Ph, distance_upper_bound=0.004)[0])]
+        if len(Ph):
+            near_jaw = cKDTree(Ph).query(X, distance_upper_bound=JAW_CLEAR)[0] < JAW_CLEAR
+            jaw_dropped = int((have & near_jaw).sum())
+            have &= ~near_jaw
     sh = np.zeros_like(C); kn = np.zeros(C.shape[:2], bool)
     sh[rr[have], cc[have]] = got[have]; kn[rr[have], cc[have]] = True
     vmap = np.full(C.shape[:2], -1); vmap[rr, cc] = src
@@ -864,7 +888,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     D[groin] = C[groin] * level                                       # RD-P27-2: the maker's, at the level round it
     neck, neck_rec = None, None
     if head and fill_neck:                                            # the head untouched; the body's neck filled
-        g, neck_rec = neck_fill(D, body, H, hm, Pa.astype(np.float64))
+        g, neck_rec = neck_fill(D, body, H, hm, Pa.astype(np.float64), N=Na.astype(np.float64) if jaw_free else None)
         D[body] *= np.exp(g[body])
     elif head:                                                        # RD-P25-16: the neck was left to the body
         neck, neck_rec = neck_join(D, body, H, hm, Pa.astype(np.float64))
@@ -902,7 +926,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
            "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
-           "smooth_holes": holes_rec,
+           "smooth_holes": holes_rec, "jaw_free_dropped": jaw_dropped if jaw_free else None,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
            "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
@@ -1290,6 +1314,10 @@ def main(argv=None) -> int:
     s.add_argument("--smooth-holes", action="store_true",
                    help="fill skin no view sees with a smooth tone from the seen skin round it, on the body, and the "
                         "maker's grain only (the patch under the jaw; 27.2.8)")
+    s.add_argument("--jaw-free", action="store_true",
+                   help="with --neck-fill: do not hold the body to the head where the seam runs under the jaw (its "
+                        "red edge ring, a thin line at the jaw's silhouette), and take no picture sample within "
+                        "JAW_CLEAR of that seam (27.2.10)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1314,7 +1342,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free)
     return 0
 
 
