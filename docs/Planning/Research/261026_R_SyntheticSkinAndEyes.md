@@ -226,7 +226,7 @@ Each item is a candidate phase, unnumbered (seeded in `Roadmap.md`, Future).
 
 ## Resolved
 
-- **RD-SYN-1 (the lead, 2026-10-26, "1) yes"):** AI makes **no whole skin map**. It may make the **tone-free detail layer** RD-SKM-5 describes, and content such as tattoo designs. A whole-face AI map is only ever a **judged comparison, never shipped**. *(The lead answered "yes" to the recommendation "not yet: AI for the detail layer and content, a whole-face AI map only as a comparison arm"; recorded as that reading.)*
+- **RD-SYN-1 (the lead, 2026-10-26, "1) yes"):** AI makes **no whole skin map**. It may make the **tone-free detail layer** RD-SKM-5 describes, and content such as tattoo designs. A whole-face AI map is only ever a **judged comparison, never shipped**. *(The lead answered "yes" to the recommendation "not yet: AI for the detail layer and content, a whole-face AI map only as a comparison arm"; recorded as that reading.)* *(**Superseded 2026-11-02** by the lead in Phase25: *"What is this ridiculous RULE?! we are literally building complete AIGenerated skins right now... that is what we are doing."* AI-generated skins are accepted; see `docs/specs/Authoring/SkinMaps.md` §Sources and licence.)*
 - **RD-SYN-2 (2026-10-26, "2) yes … run the spike … add these tests directly to the Matter Library"):** the synthetic test set is built **into the library as drafts**, to be judged in Studio.
 - **RD-SYN-3 (2026-10-26, "3) yes"):** ***Skin Maps Beyond Colour* is un-parked** (it was parked by RD-DS-8). Starting its discovery stays the lead's call.
 
