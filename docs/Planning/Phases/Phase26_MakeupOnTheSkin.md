@@ -156,7 +156,8 @@ The controls, each read:
 - **The thumbnail fingerprint** (`tools/thumbnails/showcase.py` `masters_hash` hashes `blender/masters/*.py`; `build_snapshot.py` refuses a thumbnail whose `masters_sha256` differs).
   - **Any edit to the Blender masters stales all ~140 thumbnails.** That is about 40 minutes of GPU (~17 s an article) at the next snapshot, and the pictures come out unchanged at neutral.
   - The 19 declaring skins also change their `article_sha256`.
-  - **Owed at the next snapshot, not at the gate.** It is a heavy GPU job, so it waits for Phase25's generation to be idle.
+  - ~~Owed at the next snapshot, not at the gate.~~ *(Superseded 2026-11-02.)*
+  - **RD-P26-10 — No thumbnail re-render in this phase.** The lead, at the Brief's handback, verbatim: *"Do NOT redo thumbnails until we get everything resolves, things in place, reduce the skin sets etc... total waiste of time"*. Read as: the stale thumbnails stay stale, through this phase and its close. A snapshot that refuses a stale thumbnail is not built for this phase's sake. The re-render waits until the skin work settles and the skin sets are reduced, on the lead's word.
 - **`run_all.py`** (18 lanes): the recipe and material lanes see the new recipe flag, and `validate_recipe.py` learns it.
   - The piece pictures land under `MatterLibrary/textures/fit/makehuman/makeup/`. No gate walks that tree except the release-time compressor (`compress_textures.py`) and the freeze, and neither runs pre-release (§Settled practices).
 - **`check_exporter.sh`:** only if the add-on is touched. The masters are not the add-on. If 26.1 finds it must touch `blender/addons/`, baseline it first.
@@ -182,7 +183,7 @@ The controls, each read:
   - The contract text: LCDSchema §Makeup layer, the piece spec beside `SkinMaps.md`, JOB_FORMAT, RuntimeCatalog §Groups, Identity's piece names, and the Glossary's *piece*, *fitted piece*, *placed piece* and *makeup layer*.
   - The ledger: M14 (1)–(2) answered.
   - The platform told of the commit that holds the builder change, so it can rebuild its masters.
-  - The thumbnail re-render scheduled; a runtime publish offered.
+  - A runtime publish offered. **No thumbnail re-render** (RD-P26-10).
 
 ### Compact build map
 
@@ -213,7 +214,7 @@ The controls, each read:
 |---|---|---|
 | `tools/parity/look.py` | Phase25 (its 25.1 option, committed `9c11f4b` 2026-11-02) | adds its own off-by-default option at 26.1; re-read the file first, and check `git status` for a newer Phase25 edit |
 | `tools/converters/fit/` | Phase25 (`gen_synth_skin.py`, `paint_uv.py`, `project_face.py`) | new files only; reads `gen_skin_shine.py`, edits none of Phase25's |
-| the GPU | one heavy job at a time | a look-view launch, a local Unreal build and package, the later thumbnail re-render: before each, `ps -ef \| grep "[U]nrealEditor"`, and the lead asked once if Phase25's generation is running |
+| the GPU | one heavy job at a time | a look-view launch, and a local Unreal build and package (no thumbnail re-render, RD-P26-10): before each, `ps -ef \| grep "[U]nrealEditor"`, and the lead asked once if Phase25's generation is running |
 
 *Told to Phase25's session by message, 2026-11-02.*
 
@@ -236,5 +237,5 @@ The controls, each read:
   - **F-P26-1:** the slots are binding-supplied like `base_color_map`, not article-carried like the shine maps.
   - **F-P26-2:** finish needs its own coverage (RD-P26-2).
   - **F-P26-3:** a bruise is a pigment piece by the platform's own ask (RD-P26-7).
-  - **F-P26-4:** editing the Blender masters stales every thumbnail (§Risk lane).
+  - **F-P26-4:** editing the Blender masters stales every thumbnail (§Risk lane). The stale thumbnails stay stale (RD-P26-10).
   - **F-P26-5:** a tattoo on the back of the hand is judgeable in the existing hand view; no new camera is needed.
