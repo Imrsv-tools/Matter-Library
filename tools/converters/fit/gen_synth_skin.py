@@ -510,6 +510,9 @@ EAR = {"stand_mm": (1.0, 4.0),      # the ear proper: off the skull (the mask re
        # the borrowed regions only VARY the ear, graded in off the skull; its level and hue are the root's.
        "vary_mm": (1.5, 8.0),
        "scatter_mm": (1.0, 8.0),    # the scatter map's ear term rises from 0 at the root (the head's) to full
+       # ... times this. 0 since 2026-11-02: at up to 4.3x the skin's radius the ear drew flat and evenly lit
+       # in Studio, apart from the head (the lead's screenshot after the graded ear); the ear scatters as the skin.
+       "scatter_gain": 0.0,
        "skull_m": 0.06, "near_m": 0.08}
 
 
@@ -610,7 +613,7 @@ def ear_scatter(f, subject: str, H: dict, W: dict | None = None) -> dict:
     W = ear_weights(H) if W is None else W
     rep = {}
     for side, m in W.items():
-        g = _ramp(m["stand"] * 1000, *EAR["scatter_mm"])
+        g = _ramp(m["stand"] * 1000, *EAR["scatter_mm"]) * EAR["scatter_gain"]
         t = H["idx"][m["ei"]]
         f[t] = f[t] * g
         rep[side] = {"texels": int(len(t)), "graded": int((g < 0.99).sum())}

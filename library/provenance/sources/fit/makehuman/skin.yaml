@@ -74,4 +74,4 @@ members:
   SkinTone34_roughness: {"made": "procedural", "space": "linear", "neutral": 0.5, "rule": "roughness = clamp(pores + (map - 0.5) + roughness_bias)", "skin_average": 0.62, "skin_range": [0.518, 0.686], "uncovered_islands": 0, "tzone_average": 0.4548, "cheeks_average": 0.7018}
   SkinTone34_normal: {"made": "procedural", "space": "linear", "neutral": [0.5, 0.5, 1.0], "rule": "tangent space, +Y up (dP/du, dP/dv of texcoord 0); XY added to the article's normal", "xy_rms_skin": 0.0807, "xy_rms_face": 0.1687, "xy_p99_skin": 0.282, "unit_error_max": 0.006}
   SkinTone34_cavity: {"made": "procedural", "space": "linear", "neutral": 1.0, "rule": "specular_weight x map", "skin_average": 0.953, "skin_p1": 0.769}
-  SkinTone34_scatter: {"made": "procedural", "space": "linear", "neutral": 0.0, "rule": "subsurface_radius x (1 + 4 x map)", "skin_share_raised": 0.0135, "ears_average": 0.447, "max": 1.0}
+  SkinTone34_scatter: {"made": "procedural", "space": "linear", "neutral": 0.0, "rule": "subsurface_radius x (1 + 4 x map)", "skin_share_raised": 0.0088, "ears_average": 0.01, "max": 0.757}
