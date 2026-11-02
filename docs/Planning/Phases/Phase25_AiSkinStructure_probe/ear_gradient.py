@@ -15,7 +15,10 @@ Image.MAX_IMAGE_PIXELS = None
 src, meas, prm, out = sys.argv[1:5]
 Pm = json.load(open(prm)); z = np.load(meas)
 hf = np.load(REPO / "library" / "parity" / "P25_Views" / "head_fields_8192.npz")
-idx, P = hf["idx"], hf["P"]
+idx, P, FACEW, EARS = hf["idx"], hf["P"], hf["face"], hf["ears"] > 0.5
+from scipy.spatial import cKDTree
+FEATHER = Pm.get("join_mm", 10.0) / 1000            # the join to the picture, on head skin outside the ear
+def allowed(fw): t = np.clip((Pm.get("face_max", 0.15) - fw) / 0.10, 0, 1); return t * t * (3 - 2 * t)   # 0 on the face
 L = g.Lut(); m0 = L.use("Tone34"); B0 = g.BLOOD0
 import gen_skin_maps as gm
 reach = np.array([float(x) for x in json.loads((gm.RECIPES / "Skin_Tone34_Clean_Base_s001_v01.json").read_text())["subsurface_radius_scale"].split(",")])
@@ -45,7 +48,16 @@ for s in ("r", "l"):
     base = np.median(lin(flat[idx[ei][ring]].astype(float)), 0)
     cur = lin(flat[idx[ei]].astype(float))
     new = base * ratio
-    a = Pm.get("replace", 1.0) * w_ear[:, None]          # the ear proper takes the gradient; the skull ring keeps the map
+    # RD-P25-19 (the lead): the gradient owns the whole ear, rim and root, at full strength; the skin
+    # round it and the join to the picture lie on head skin behind the jaw, never on the face
+    a = np.maximum(ramp(stand * 1000, 0.5, 1.5), allowed(FACEW[ei]))[:, None]
     flat[idx[ei]] = enc(cur * (1 - a) + new * a).astype(np.uint8)
+    c = P[ei].mean(0)
+    out_i = np.flatnonzero(~EARS & (np.linalg.norm(P - c, axis=1) < 0.08))
+    d = cKDTree(P[ei]).query(P[out_i])[0]
+    keep = d < FEATHER; oi = out_i[keep]
+    wo = (allowed(FACEW[oi]) * (1 - ramp(d[keep], 0, FEATHER)))[:, None]
+    flat[idx[oi]] = enc(lin(flat[idx[oi]].astype(float)) * (1 - wo) + base * wo).astype(np.uint8)
+    print(f"   join: {(wo[:, 0] > 0.01).sum()} head texels outside the ear; front ring kept as the picture: {(a[:, 0] < 0.5).sum()} ear-mask texels")
     print(f"ear {s}: base {base.round(3)}, ratio at full ear p50 {np.median(ratio[w_ear>0.95],0).round(3)}, rim texels {(w['rim']>0.5).sum()}, lobe {(w['lobe']>0.5).sum()}, back {(w['back']>0.5).sum()}")
 Image.fromarray(A).save(out)
