@@ -261,6 +261,10 @@ The controls, each read:
 - **Click 3 (the three tools agree, both skins, the rig's labelled grid):** the lead, verbatim: *"yes"*.
 - **26.1 discharged:** the artifact was observed working in all three clicks.
 
+**26.2 sitting (2026-11-02):**
+- **Click 4 (the clear gloss, with and without, both skins):** the lead, verbatim: *"yes, serve"*. *Reading (the agent's): "yes" answers click 4; "serve" is the word to serve the pieces to Stage.*
+- **Served** (`serve_to_stage.py --no-restart`, Stage not running): the served catalog lists the four pieces under the `makeup` group, each one's record and picture resolving in the dev install.
+
 **26.2 notes:**
 - **F-P26-8 — the site file does not carry the pieces.** `groups.GROUPS` is shared by the site file and the dev catalog, so the `makeup` group sits in `groups.DEV_GROUPS`, the dev catalog's only. The site file listing pieces is *(planned, 2026-11-02)*.
 - The eyeshadow's coverage falls on two atlas islands: the eyelids' own and the face's beside them. Both are the lids in 3D, as the render shows.
