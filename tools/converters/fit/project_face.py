@@ -10,6 +10,10 @@
     uv run --with scipy tools/converters/fit/project_face.py ears  <dir> first_<stem>.png
     uv run --with scipy tools/converters/fit/project_face.py field <dir> <picture> --ears ears_<stem>.json
     uv run --with scipy tools/converters/fit/paint_uv.py put <dir> face_<stem>.png <tag>
+    uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --fields <cfields>            # C's fields (25.2)
+    uv run --with scipy tools/converters/fit/project_face.py pigments <dir> <tag> --c-fields <cfields> --out <field>
+    uv run tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field> --out <outdir>
+    uv run --with scipy tools/converters/fit/project_face.py structure <dir> <outdir> <tag>          # + the maker's ear
 
 Krea 2, asked for an unwrapped head, draws a FRONT PORTRAIT with only the scalp unrolled round it
 (F-P25-14), so its face is never warped in UV space. ``source`` stands the subject's head island up at
@@ -678,6 +682,88 @@ def cmd_ears(d: Path, first: Path, pad_rim: int = 12, min_nz: float = 0.05, ease
     chk.save(d / f"ears_{stem}_check.png")
 
 
+# ------------------------------------------------------------------ pigments (25.2) --------------
+FIELD_NAMES = ("melanin", "blood", "so2")
+
+
+def read_fields(fdir: Path, stem: str = "SkinTone34", names=FIELD_NAMES) -> dict:
+    """``gen_skin_maps.py --fields``' pictures back as float32 arrays (16-bit over each field's scale)."""
+    np, Image = _np(), _img()
+    meta = json.loads((fdir / f"{stem}_fields.json").read_text())
+    return {k: np.asarray(Image.open(fdir / f"{stem}_{k}.png"), np.float32) / 65535 * meta[k]["scale"] for k in names}
+
+
+def cmd_pigments(d: Path, tag: str, cfields: Path, out: Path) -> None:
+    """D as a structure (25.2, F-P25-1): D's colour turned back into melanin and blood on the maker's own
+    skin model, wherever D differs from the served C (the head island and the ear's join). The served map is
+    the maker's colour times one constant per channel, and D shares C's oxygenation and depth there, so D's
+    colour on the table is C's times D / C, texel by texel, with no constant to know: ``Lut.inverse`` at C's
+    oxygenation. ``cfields``: C's fields with ``so2`` (``gen_skin_maps.py --subject Tone34 --fields``).
+    Writes ``out``: the field in ``--fields``' format plus ``weight`` (1 where D's), for
+    ``gen_skin_maps.py --subject Tone34 --pigments``; C's own fields elsewhere."""
+    np, Image = _np(), _img()
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import project_views as pv  # noqa: PLC0415
+    t0 = time.time()
+    D = np.load(d / f"albedo_{tag}.npy", mmap_mode="r").reshape(-1, 3)
+    C = pv.subject_albedo().reshape(-1, 3)
+    w = np.flatnonzero((np.asarray(D) != C).any(-1))
+    Fc = read_fields(cfields)
+    mel, bld, so2 = (Fc[k].reshape(-1) for k in FIELD_NAMES)
+    lut = gss.Lut()
+    lut.use("Tone34")
+    ratio = np.asarray(D[w], np.float64) / np.maximum(C[w], 1e-6)
+    target = lut(mel[w].astype(np.float64), bld[w].astype(np.float64), so2[w].astype(np.float64)) * ratio
+    inv = lut.inverse(target, so2[w])
+    fm, fb = mel.copy(), bld.copy()
+    fm[w], fb[w] = inv["melanin"], inv["blood"]
+    out.mkdir(parents=True, exist_ok=True)
+    stem = "SkinTone34"
+    meta = {"command": f"project_face.py pigments {d.name} {tag}", "space": "linear", "size": N,
+            "encoding": "uint16 = value / scale x 65535", "source": f"albedo_{tag}.npy"}
+    for k, a in (("melanin", fm), ("blood", fb)):
+        sc = float(a.max())
+        Image.fromarray(np.round(np.clip(a / sc, 0, 1) * 65535).astype(np.uint16).reshape(N, N)).save(out / f"{stem}_{k}.png")
+        meta[k] = {"scale": sc}
+    wt = np.zeros(N * N, np.uint8)
+    wt[w] = 255
+    Image.fromarray(wt.reshape(N, N)).save(out / f"{stem}_weight.png")
+    r = inv["resid"]
+    meta["inverse"] = {"texels": int(len(w)), "clamped": inv["clamped"],
+                       "resid_log_p50": round(float(np.median(r)), 5), "resid_log_p99": round(float(np.percentile(r, 99)), 4),
+                       "share_resid_over_0.02": round(float((r > 0.02).mean()), 5),
+                       "melanin_over_C_median": round(float(np.median(inv["melanin"] / np.maximum(mel[w], 1e-6))), 4),
+                       "blood_over_C_median": round(float(np.median(inv["blood"] / np.maximum(bld[w], 1e-6))), 4),
+                       "seconds": round(time.time() - t0)}
+    (out / f"{stem}_fields.json").write_text(json.dumps(meta, indent=1) + "\n")
+    print(f"{out}: " + json.dumps(meta["inverse"]))
+
+
+def cmd_structure(d: Path, made: Path, tag: str) -> None:
+    """The structure ``gen_skin_maps.py --subject Tone34 --pigments … --out <made>`` composed, as the article
+    would render it (the map decoded times its constant), with the ear and its join the maker's gradient
+    (``gen_synth_skin.ear_paint``, as ``paint_uv.py put`` does: RD-P25-18, -19). The gradient lifts red by a
+    gain no melanin and blood make, so the ear cannot come through the field (25.2). Writes
+    ``albedo_<tag>.npy`` and ``D_<tag>.png`` (for ``look.py --candidate``) like ``put``."""
+    np, Image = _np(), _img()
+    import os  # noqa: PLC0415
+    os.environ.setdefault("MATTER_SKIN_N", str(N))              # the maker's size is read at import
+    import gen_skin_maps as gsm  # noqa: PLC0415
+    import gen_synth_skin as gss  # noqa: PLC0415
+    import project_views as pv  # noqa: PLC0415
+    from paint_uv import pv_default_dir  # noqa: PLC0415
+    st = json.loads((made / "SkinTone34_basecolor_stats.json").read_text())
+    m = np.asarray(Image.open(made / "SkinTone34_basecolor_sUKN.png").convert("RGB"))
+    dec = gsm._srgb_to_linear(np.arange(256) / 255.0).astype(np.float32)
+    alb = dec[m] * np.array(st["base_color_const"], np.float32)
+    rep = gss.ear_paint(alb.reshape(-1, 3), "Tone34", pv.head_fields(Path(os.environ.get("P25_FIELDS", pv_default_dir()))))
+    for side, r_ in rep.items():
+        print(f"  ear {side}: {r_['texels']} texels from the maker; join {r_['join']} texels, face weight at most {r_['join_face_max']}")
+    np.save(d / f"albedo_{tag}.npy", alb)
+    Image.fromarray((srgb(alb) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
+    print(f"D_{tag}.png: the structure from {made.name}, base_color_const {st['base_color_const']}")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -691,7 +777,18 @@ def main(argv=None) -> int:
                    help="the projection down to this normal z (0.3 for a seed whose cheek streaks, F-P25-17)")
     s.add_argument("--ears", help="ears_<stem>.json from `ears`: the second pass")
     s = sub.add_parser("ears"); s.add_argument("dir", type=Path); s.add_argument("first", help="first_<stem>.png")
+    s = sub.add_parser("pigments"); s.add_argument("dir", type=Path); s.add_argument("tag", help="albedo_<tag>.npy from `put`")
+    s.add_argument("--c-fields", type=Path, required=True, help="C's fields, with so2 (gen_skin_maps.py --subject Tone34 --fields)")
+    s.add_argument("--out", type=Path, required=True)
+    s = sub.add_parser("structure"); s.add_argument("dir", type=Path); s.add_argument("made", type=Path, help="gen_skin_maps --out")
+    s.add_argument("tag")
     a = ap.parse_args(argv)
+    if a.cmd == "pigments":
+        cmd_pigments(a.dir, a.tag, a.c_fields, a.out)
+        return 0
+    if a.cmd == "structure":
+        cmd_structure(a.dir, a.made, a.tag)
+        return 0
     if a.cmd == "source":
         cmd_source(a.dir, a.width)
     elif a.cmd == "paint":

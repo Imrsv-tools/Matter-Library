@@ -219,6 +219,49 @@ class Lut:
                     out = out + wa * wb * wc * self.a[k0 + a, i0 + b, j0 + c]
         return out
 
+    def inverse(self, target, so2, chunk: int = 1 << 21) -> dict:
+        """Phase25 25.2 (F-P25-1): per texel, the melanin and blood whose colour on this table, at that
+        texel's ``so2``, is ``target`` (linear RGB, the model's own colour, before depth and the tone).
+        The nearest point of a fine grid (log melanin x4, log blood x4, oxygenation in steps of 0.025),
+        found in log colour with the oxygenation held, then two Gauss-Newton steps in log pigment at the
+        exact ``so2``; the result held inside the table. Three colours, two pigments: the leftover
+        (``resid``, log colour, the largest channel) says where the target is a colour the model cannot
+        make; it is reported, never hidden. ``use`` first. Returns melanin, blood, resid, clamped."""
+        from scipy.spatial import cKDTree  # noqa: PLC0415  (25.2 runs with ``--with scipy``)
+
+        def _lg(c):                                     # the table's darkest corners hold exact zeros
+            return np.log(np.maximum(c, 1e-6))
+        lm = np.linspace(self.mel[0], self.mel[-1], 4 * len(self.mel))
+        lb = np.linspace(self.bld[0], self.bld[-1], 4 * len(self.bld))
+        ls = np.arange(self.so2[0], self.so2[-1] + 1e-9, 0.025)
+        gm, gb, gs = np.meshgrid(lm, lb, ls, indexing="ij")
+        gm, gb, gs = gm.ravel(), gb.ravel(), gs.ravel()
+        WS = 40.0                                       # an oxygenation step outweighs any colour step
+        tree = cKDTree(np.c_[_lg(self(np.exp(gm), np.exp(gb), gs)), WS * gs])
+        tgt = np.log(np.maximum(np.asarray(target, np.float64).reshape(-1, 3), 1e-6))
+        so2 = np.asarray(so2, np.float64).ravel()
+        n = len(so2)
+        mel, bld, res = np.empty(n), np.empty(n), np.empty(n)
+        clamped = 0
+        lo, hi = np.array([self.mel[0], self.bld[0]]), np.array([self.mel[-1], self.bld[-1]])
+        for a in range(0, n, chunk):
+            s = slice(a, min(a + chunk, n))
+            t, o = tgt[s], so2[s]
+            _, i = tree.query(np.c_[t, WS * o])
+            x = np.c_[gm[i], gb[i]]
+            for _ in range(2):
+                f0 = _lg(self(np.exp(x[:, 0]), np.exp(x[:, 1]), o))
+                h = 1e-3
+                J = np.stack([(_lg(self(np.exp(x[:, 0] + h), np.exp(x[:, 1]), o)) - f0) / h,
+                              (_lg(self(np.exp(x[:, 0]), np.exp(x[:, 1] + h), o)) - f0) / h], -1)
+                JT = np.swapaxes(J, 1, 2)
+                A = JT @ J + 1e-9 * np.eye(2)
+                x = np.clip(x + np.linalg.solve(A, (JT @ (t - f0)[..., None]))[..., 0], lo, hi)
+            clamped += int(((x <= lo + 1e-9) | (x >= hi - 1e-9)).any(1).sum())
+            f = _lg(self(np.exp(x[:, 0]), np.exp(x[:, 1]), o))
+            mel[s], bld[s], res[s] = np.exp(x[:, 0]), np.exp(x[:, 1]), np.abs(f - t).max(1)
+        return {"melanin": mel, "blood": bld, "resid": res, "clamped": clamped}
+
     def check(self, roman: str, tone) -> dict:
         """RD-P23-3's printed check: the model's colour at the operating point over the tone (the
         borrowed tones' differ by design; the calibration takes it up)."""
@@ -611,14 +654,18 @@ def grow_veins(rng, P, N3, cover, starts, axis_dirs, lengths, radius, weight, st
 
 
 # ------------------------------------------------------------------ the picture -----------------
-def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, structure="Skin", lips=None, pigments=None):
+def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, structure="Skin", lips=None, pigments=None,
+            field=None):
     """The absolute skin colour (linear) for one tone, one structure and one set of layers.
 
     ``lips``: the lips over the tone (default the fit's ``LIPS``; a subject's own). ``F`` may be one
     BAND of rows of an atlas larger than 2048 (``compose_banded``): its ``pre`` holds what needs the
     whole atlas (the blurred masks, the landmarks, the thickness map), and the run returns the band's
     two terms before the skin's average is held, which needs the whole atlas too. ``pigments``: a dict
-    that receives the melanin and blood fields (RD-P24-6)."""
+    that receives the melanin, blood and oxygenation fields (RD-P24-6). ``field``: an outside melanin and
+    blood (Phase25 25.2: an image model's, through ``Lut.inverse``), a dict of ``melanin``, ``blood`` and
+    ``weight`` arrays at ``F``'s size: where the weight is 1 they replace the maker's own, joined in
+    log-pigment where it is between; the oxygenation, depth and lips stay the maker's."""
     P, Nr, cv, cover, reg, masks, parts, J = (F[k] for k in ("P", "N", "cv", "cover", "reg", "masks", "parts", "J"))
     rng = np.random.default_rng(rng_seed)
     m0 = lut.use(roman)
@@ -790,10 +837,16 @@ def compose(tone, roman, layers, F, lut, rng_seed, detail=None, face_tbl=None, s
 
     mel = m0 * M + dmel
     bld = BLOOD0 * B
+    if field is not None:
+        w = np.clip(field["weight"], 0, 1)
+        mel = np.exp(w * np.log(np.maximum(field["melanin"], 1e-6)) + (1 - w) * np.log(np.maximum(mel, 1e-6)))
+        bld = np.exp(w * np.log(np.maximum(field["blood"], 1e-6)) + (1 - w) * np.log(np.maximum(bld, 1e-6)))
+    so2 = np.clip(so2, 0.45, 0.95)
     if pigments is not None:
         pigments["melanin"], pigments["blood"] = mel.astype(np.float32), bld.astype(np.float32)
+        pigments["so2"] = so2.astype(np.float32)
     base = lut(np.full_like(mel, m0), np.full_like(bld, BLOOD0), np.full_like(mel, 0.8))
-    col = lut(mel, bld, np.clip(so2, 0.45, 0.95))
+    col = lut(mel, bld, so2)
     # Blood BELOW the dermis (a vein, the ring under the eye). The tabulated model is one semi-infinite
     # layer with no depth, where more blood only absorbs more blue (it reads orange, measured
     # 2026-10-26). What makes it read blue-violet is depth: red light reaches it and is absorbed, blue
@@ -877,27 +930,31 @@ def parts_banded(F, keys, rows: int = 512) -> dict:
     return out
 
 
-def compose_banded(tone, roman, F, lut, rng_seed, face_tbl=None, lips=None, rows=512, pigments=None):
+def compose_banded(tone, roman, F, lut, rng_seed, face_tbl=None, lips=None, rows=512, pigments=None, field=None):
     """``compose`` (no marks layers) over the atlas in bands of ``rows`` rows (Phase24, RD-P24-7):
     an 8K atlas composed whole needs ~45 GB of temporaries; a band of 512 rows of 8192 is the work of
     one 2048 atlas. Everything compose reads beyond a texel (the blurred masks, the landmarks, the
     thickness map's level, the skin's average) is taken once on the whole atlas. ``F`` is
-    ``fields(parts=False)``; the body parts are made per band. Returns compose's (colour, info)."""
+    ``fields(parts=False)``; the body parts are made per band. ``field``: compose's, whole-atlas arrays,
+    sliced per band. Returns compose's (colour, info)."""
     pre = band_pre(F)
     n = F["P"].shape[0]
     X = np.zeros((n, n, 3), np.float32)
     Lp = np.zeros((n, n, 3), np.float32)
     if pigments is not None:
-        pigments["melanin"], pigments["blood"] = np.zeros((n, n), np.float32), np.zeros((n, n), np.float32)
+        for k in ("melanin", "blood", "so2"):
+            pigments[k] = np.zeros((n, n), np.float32)
     info = {}
     for y0 in range(0, n, rows):
         sl = slice(y0, min(y0 + rows, n))
         pg = {} if pigments is not None else None
+        fb = None if field is None else {k: v[sl] for k, v in field.items()}
         (xb, lb), info = compose(tone, roman, (), band_view(F, pre, sl), lut, rng_seed, face_tbl=face_tbl,
-                                 lips=lips, pigments=pg)
+                                 lips=lips, pigments=pg, field=fb)
         X[sl], Lp[sl] = xb, lb
         if pg is not None:
-            pigments["melanin"][sl], pigments["blood"][sl] = pg["melanin"], pg["blood"]
+            for k in pg:
+                pigments[k][sl] = pg[k]
     S = F["reg"]["Body"]
     s = (np.asarray(tone) - Lp[S].mean(0, dtype=np.float64)) / X[S].mean(0, dtype=np.float64)
     X *= s.astype(np.float32)

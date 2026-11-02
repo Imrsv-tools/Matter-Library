@@ -390,9 +390,14 @@ def main(argv=None) -> int:
                     help="write this structure's maps (repeatable; default all three, 23.3)")
     ap.add_argument("--subject", help="a Phase24 subject (gen_synth_skin.SUBJECTS), at its own size")
     ap.add_argument("--fields", type=Path, help="with --subject: write its melanin and blood fields here (RD-P24-6)")
+    ap.add_argument("--pigments", type=Path, help="with --subject: compose from this outside field (Phase25 25.2: "
+                    "project_face.py pigments); needs --out")
+    ap.add_argument("--out", type=Path, help="with --pigments: write the map here, not into the library, no provenance row")
     a = ap.parse_args(argv)
     if a.subject:
-        return subject(a.subject, a.fields, argv)
+        if bool(a.pigments) != bool(a.out):
+            raise SystemExit("--pigments and --out go together: a map from an outside field is not the served one")
+        return subject(a.subject, a.fields, argv, a.pigments, a.out)
     bad = [t for t in a.tones if t not in TONES]
     if bad:
         raise SystemExit(f"unknown tone {bad} (have {list(TONES)})")
@@ -455,11 +460,13 @@ def main(argv=None) -> int:
     return 0
 
 
-def subject(name: str, fields_dir, argv) -> int:
+def subject(name: str, fields_dir, argv, pigments_dir=None, out_dir=None) -> int:
     """One Phase24 subject's colour map (RD-P24-1, RD-P24-7): at its own size, composed in bands,
     its face core held at the bar's mean there (``SUBJECTS``' ``held``). Writes ``Skin<Name>_basecolor_sUKN.png`` and its provenance row,
     and, given ``fields_dir``, its melanin and blood fields as 16-bit linear pictures over a scale
-    (``<dir>/Skin<Name>_fields.json``): never shipped, remade by this command (RD-P24-6)."""
+    (``<dir>/Skin<Name>_fields.json``): never shipped, remade by this command (RD-P24-6). ``pigments_dir``
+    (Phase25 25.2): an outside melanin and blood with its ``weight`` (``project_face.py pigments``), composed in
+    place of the maker's where the weight is 1; the map goes to ``out_dir`` and no provenance row is written."""
     import time  # noqa: PLC0415
     import numpy as np  # noqa: PLC0415
     from PIL import Image  # noqa: PLC0415
@@ -482,18 +489,28 @@ def subject(name: str, fields_dir, argv) -> int:
         raise SystemExit(f"{name}: hold {sj['hold']!r}: only the face core is held")
     hold = (F["masks"]["face"] > 0.9) & reg["Body"] & F["cover"]   # where the subject's tone is the bar's
     pg = {} if fields_dir else None
-    col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg)
+    field = None
+    if pigments_dir:
+        stem0 = "Skin" + name
+        meta0 = json.loads((pigments_dir / f"{stem0}_fields.json").read_text())
+        field = {k: np.asarray(Image.open(pigments_dir / f"{stem0}_{k}.png"), np.float32) / 65535 * meta0[k]["scale"]
+                 for k in ("melanin", "blood")}
+        field["weight"] = np.asarray(Image.open(pigments_dir / f"{stem0}_weight.png"), np.float32) / 255
+    col, info = gss.compose_banded(tone, name, F, lut, gss.SEED, face_tbl=sj["face"], lips=sj["lips"], pigments=pg,
+                                   field=field)
+    del field
     cover = F["cover"]
     del F
     t1 = time.time()
     srgb8, const, st = calibrate(col, np.array(sj["held"]), reg, cover, S=hold)
     del col
     stem = "Skin" + name
-    OUT.mkdir(parents=True, exist_ok=True)
-    p = OUT / f"{stem}_basecolor_{TAG}.png"
+    dest = out_dir or OUT
+    dest.mkdir(parents=True, exist_ok=True)
+    p = dest / f"{stem}_basecolor_{TAG}.png"
     Image.fromarray(srgb8, "RGB").save(p, optimize=True)
     st["body_average"] = [round(float(v), 4) for v in (const * _srgb_to_linear(srgb8[reg["Body"]] / 255.0)).mean(0)]
-    print(f"{stem}: {p.relative_to(REPO)} ({N}x{N}; compose {t1 - t0:.0f}s, calibrate {time.time() - t1:.0f}s)\n  " + json.dumps(st))
+    print(f"{stem}: {p} ({N}x{N}; compose {t1 - t0:.0f}s, calibrate {time.time() - t1:.0f}s)\n  " + json.dumps(st))
     if st["uncovered_islands"]:
         raise SystemExit(f"{stem}: {st['uncovered_islands']} island texels left unpainted")
     if fields_dir:
@@ -507,6 +524,9 @@ def subject(name: str, fields_dir, argv) -> int:
         (fields_dir / f"{stem}_fields.json").write_text(json.dumps(meta, indent=1) + "\n", encoding="utf-8")
         print(f"  fields: {fields_dir} " + json.dumps(meta))
     check = lut.check(name, tone)
+    if out_dir:
+        (out_dir / f"{stem}_basecolor_stats.json").write_text(json.dumps({**st, "pigments": str(pigments_dir)}, indent=1) + "\n")
+        return 0
     write_provenance({stem: {"made": "pigment", **st, "fit": check["fit"], "melanin0": check["melanin0"],
                              "size": N, "held_on": sj["hold"]}})
     return 0
