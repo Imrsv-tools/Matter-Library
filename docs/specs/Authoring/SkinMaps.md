@@ -142,6 +142,12 @@ The probe's main lesson. Its first library-made map turned the whole body red, b
 
 It prints, per tone, the skin model's check (RD-P23-3) and, per structure, how far its lips' zone is from `Skin`'s. **A new structure** is a row in `gen_synth_skin.STRUCTURES`, then its recipes copied from each tone's `Skin_` recipe with the new name, map and printed `base_color_const`.
 
+**An AI-assisted map** (Phase25; the first is `Tone34`'s): an image model paints the subject's head island, the face is carried onto hm08 through one front camera, and the maker turns the colour into melanin and blood on its own skin model; the lips travel as a factor on the maker's lip colour, and **the ear is the maker's gradient**, each part borrowing a measured face region of the same skin (*"looks better"*, the lead), never the picture's ear. The chain is `tools/converters/fit/project_face.py` (its docstring lists every step), and the served map is made with:
+
+    uv run --with scipy tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field>
+
+The picture and its generation record (model, files, seed, settings, licence) are kept beside the provenance, in `library/provenance/sources/fit/makehuman/`; the map's provenance row says `made: ai-assisted` and names that record. A subject with a recorded source is never remade without its field (the maker refuses: it would silently restore the maker's own map). The maker's own map for that subject, which the chain reads as its starting point, is made to a scratch folder with `--out`.
+
 **Your own picture**, painted (or made) as the absolute skin colour on hm08's atlas, under the rules above. It is bound to `MakeHuman_Body_v01` and is not carried to a later mesh version (§Authored on the body):
 
     uv run tools/converters/fit/gen_skin_maps.py IV --picture my_skin.png

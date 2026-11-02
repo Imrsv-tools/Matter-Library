@@ -20,4 +20,6 @@ every run, up front. **Every row is a problem this project has already solved.**
 
 | 2 | **Laying a mark or a bit of makeup on the body's atlas** (a shape made in 3D, or a stamp placed by a point, a size and a turn), merged with others into one picture a master reads | `docs/specs/Authoring/MakeupPieces.md` §The merge (RD-P26-5, RD-P26-6) | `merge_makeup.merge` / `stamp_coverage` / `tangent_frame` (placement); `gen_makeup_pieces.eyeshadow` (a fitted shape from landmarks); `_fill` (values pushed past an edge) |
 
-*Row 1 added at Phase24's close (2026-11-01); row 2 at Phase26's (2026-11-02).*
+| 3 | **Making a skin from an image model's picture** (the picture carried onto hm08 through a camera, then turned into the maker's melanin and blood so tone and marks stay changeable), served with its source | `docs/specs/Authoring/SkinMaps.md` §How to make one, *An AI-assisted map* (Phase25) | `project_face.cmd_field` (the front projection and coordinate field) · `gen_synth_skin.Lut.inverse` + `project_face.cmd_pigments` (colour → pigment) · `gen_skin_maps.subject(pigments_dir=…)` (served, the ear by `gen_synth_skin.ear_paint`) |
+
+*Row 1 added at Phase24's close (2026-11-01); row 2 at Phase26's (2026-11-02); row 3 at Phase25's (2026-11-02).*

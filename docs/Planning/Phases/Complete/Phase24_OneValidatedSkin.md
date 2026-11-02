@@ -1,6 +1,6 @@
 # Phase24 — One Validated Skin
 
-**Status:** 🎉 COMPLETE (closed 2026-11-01, the lead's *"close Phase24"*). *Before:* IN EXECUTION (opened 2026-11-01 by the lead's *"/execute Phase24"* at `91f5eb9`). *Before:* BRIEF READY (discovery Pass 1, the same day), and SEEDED before that. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](../Phase25_AiSkinStructure.md), which runs against this phase's judge.
+**Status:** 🎉 COMPLETE (closed 2026-11-01, the lead's *"close Phase24"*). *Before:* IN EXECUTION (opened 2026-11-01 by the lead's *"/execute Phase24"* at `91f5eb9`). *Before:* BRIEF READY (discovery Pass 1, the same day), and SEEDED before that. The lead numbered it on OMF's input (*"today's hm08, Matter Library hosts it … it will seed the phase"*) and here: *"Just ONE set please we need to stop genearting 5 shades... let's get one complete set build and tested,,, then we can add variety."* Split the same day (*"Split and seed"*, RD-OVS-6). The image model's skin is [`Phase25_AiSkinStructure.md`](Phase25_AiSkinStructure.md), which runs against this phase's judge.
 
 *Migration note (2026-11-01, the method re-sync to upstream `897f5f3`): this Brief was written under the earlier `/discovery`, so it has no `## Rides on` table. `docs/CoreMechanisms.md` holds no rows yet, so the table would be empty and `/execute` owes nothing for it beyond reading that file at its start.*
 **Lane:** `build` (§Risk lane). **Next:** none, closed (click 1: *"A reads real, B reads fake"*; click 2: *"C is fine."*; click 3: *"seem to be the same person"*).
@@ -76,7 +76,7 @@
 ### Not now
 
 Each has a home:
-- **the image model's skin:** [Phase25](../Phase25_AiSkinStructure.md), against this judge (as column D);
+- **the image model's skin:** [Phase25](Phase25_AiSkinStructure.md), against this judge (as column D);
 - **picture size, loading and performance tests, and a size per layer:** later phases (RD-OVS-2). Here, one size: 8K;
 - **other tones, people and ages:** re-runs of the passed recipe (*Variety*, after);
 - **marks and makeup on this subject; shipping the pigment fields:** *Skin Layers*, from this set's fields (OVS-6);
@@ -200,7 +200,7 @@ Time to the first click: 24.1 is views in one tool, three local pictures and a c
 
 | What | To | What it consumes from this phase |
 |---|---|---|
-| The image model's skin, as column D | [Phase25](../Phase25_AiSkinStructure.md) | the judge (views, distances, A at 8K, the lips-on-skin cast); the subject's tone and fit; the maker at 8K taking an outside pigment field; the pigment-field output (RD-P24-6) |
+| The image model's skin, as column D | [Phase25](Phase25_AiSkinStructure.md) | the judge (views, distances, A at 8K, the lips-on-skin cast); the subject's tone and fit; the maker at 8K taking an outside pigment field; the pigment-field output (RD-P24-6) |
 | Marks and makeup on this subject; shipping the pigment fields | *Skin Layers* | the subject's pigment fields and maker row; the shine set's zones |
 | Other tones, people, ages | *Variety* | the passed recipe: the subject row, the fitted `FACE`, the shine strengths |
 | Picture size, loading and performance; a size per layer | later phases (RD-OVS-2) | the set at 8K; G8's size rule |
