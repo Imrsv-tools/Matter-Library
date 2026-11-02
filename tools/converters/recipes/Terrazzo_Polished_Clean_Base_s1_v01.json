@@ -2,7 +2,7 @@
   "summary": "Stone chips set in cement, ground flat and polished, as on floors.",
   "search_words": ["terrazzo", "floor", "chips", "stone", "cement", "polished"],
   "origin": ["scan", "measured", "agent-drafted"],
-  "_comment": "Polished terrazzo: chips of stone set in a cement binder, then ground flat and polished, so the floor shows each chip cut through (ambientCG Terrazzo019L, CC0; tagged beige, floor, stone, terrazzo; 80 x 80 cm, so meters_per_tile 0.8 from the source and tag s1, not the wish list's s01; the L variant is the largest of the asset's three sizes). A warm beige: tan and cream chips from under 1 cm to about 6 cm in a beige matrix, polished (roughness map mean 0.28). It is one substance, a composite stone, not an assembly (D1): the chips are part of the matter; divider strips and floor tiles are geometry. Opaque: a solid dielectric. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), scuffs, dust as a deposit (Phase10), gated by the Grime mask. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A5).",
+  "_comment": "Polished terrazzo: chips of stone set in a cement binder, then ground flat and polished, so the floor shows each chip cut through (ambientCG Terrazzo019L, CC0; tagged beige, floor, stone, terrazzo; 80 x 80 cm from the source, tag s1, not the wish list's s01; the L variant is the largest of the asset's three sizes). Re-made at its tag (2026-10-31, Phase19 D-9): the maps are quilted from the 0.8 m scan into an exact 1 m tile (tools/converters/base/quilt_scan.py), every patch at the scan's own size; written at 1024 px. Nothing stretched. A warm beige: tan and cream chips from under 1 cm to about 6 cm in a beige matrix, polished (roughness map mean 0.28). It is one substance, a composite stone, not an assembly (D1): the chips are part of the matter; divider strips and floor tiles are geometry. Opaque: a solid dielectric. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), scuffs, dust as a deposit (Phase10), gated by the Grime mask. Built for the platform's generated architectural Set (261004_R_PlatformSetMaterialAsks.md, A5).",
   "name": "Terrazzo_Polished_Clean_Base_s1_v01",
   "contributor": "MatterBot",
   "status": "approved",
@@ -11,7 +11,7 @@
   "domain": "engineered",
   "class": "cementitious",
   "scale_tag": "s1",
-  "meters_per_tile": 0.8,
+  "meters_per_tile": 1.0,
   "base_color_tex": "../../../textures/base/engineered/cementitious/Terrazzo_Polished_basecolor_s1.png",
   "roughness_tex": "../../../textures/base/engineered/cementitious/Terrazzo_Polished_roughness_s1.png",
   "normal_tex": "../../../textures/base/engineered/cementitious/Terrazzo_Polished_normal_s1.png",
@@ -26,6 +26,7 @@
   "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
   "sources": [
     {"kind": "ambientcg", "asset": "Terrazzo019L", "url": "https://ambientcg.com/view?id=Terrazzo019L", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/engineered/cementitious/Terrazzo_Polished.yaml"},
+    {"kind": "procedural", "script": "tools/converters/base/quilt_scan.py", "args": "Terrazzo_Polished --src-m 0.8 --out-m 1.0 --scale s1 --size 1024", "why": "re-makes the scan at its scale option: quilted at the scan's own size, never stretched"},
     {"kind": "physicallybased", "entry": "Concrete", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202609010742, "license": "CC0 1.0 Universal",
      "used": {"specular_ior": 1.5, "metalness_const": 0},
      "note": "only the IOR and metalness are taken, for the cement binder; colour and roughness are the scan's. Physically Based has no terrazzo entry. The scan's mean linear albedo is about 0.35, 0.27, 0.18, a warm beige, left as scanned."}

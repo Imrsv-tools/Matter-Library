@@ -1,23 +1,33 @@
 #!/usr/bin/env python3
-"""Generate the base texture set `OakLeaf_Natural` (Phase11 batch 261002-7; lane L2).
+"""Generate the base texture set `OakLeaf_Natural` (Phase11 batch 261002-7; re-made 261031-1, 261101-1; lane L2).
 
-One fresh, green oak leaf's upper surface, on a card: the Masked master cuts it out by the
+Fresh, green oak leaves' upper surfaces, on a card: the Masked master cuts them out by the
 `opacity` map. The OUTLINE is a pedunculate-oak leaf drawn by JUDGEMENT: obovate (widest past
 the middle), five rounded lobes a side with rounded sinuses about halfway to the midrib, lobes
 alternating a little left to right, a rounded terminal lobe, small ear-like auricles at the
 base and a short stalk. Pinnate veins: a pale midrib and one secondary vein to each lobe, with
 a fine net between. No scan fits: ambientCG's single-leaf sets (Leaf001-003) are tagged only
 "green, leaf, single, tree", and the library names only what a source states, so the set is
-generated. The colour is anchored, not invented per pixel: the MEAN linear albedo over the
-leaf is Physically Based `Grass` (0.105, 0.133, 0.041), the nearest measured green foliage
-(it has no leaf entry). Everything here only varies around it.
+generated.
 
-Writes MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_<channel>_s01.png:
+MANY LEAVES a tile, scattered (the maintainer's redo, 261101-1: "we should redo the oak leaf";
+laid as a surface, the 261031-1 tile's two leaves repeated in a grid every 10 cm). About 180
+leaves on a 1 m tile, each with its own place, tilt, size, mirroring, lobing, midrib bow and
+tone, overlapping where they fall, so no leaf or layout repeats inside a metre. A leaf may cross
+the tile's border: every leaf is drawn on wrapped coordinates, in a window round itself.
+
+The colour is a JUDGEMENT (the same redo: "a livelier leaf green"): the MEAN linear albedo over
+the leaves is (0.075, 0.185, 0.028), sRGB about 77, 119, 47, a fresh mid green. It was anchored
+to Physically Based `Grass` (0.105, 0.133, 0.041), whose olive read dull on a leaf; Physically
+Based has no leaf entry. The roughness keeps that entry's 0.5 (a waxy cuticle).
+
+Writes MatterLibrary/textures/base/environmental/vegetation/OakLeaf_Natural_<channel>_s1.png:
 basecolor (sRGB-encoded), roughness, normal (linear data, NormalGL) and opacity (linear, the
-cut-out). Scale `s01`: one leaf per tile, about 0.12 m tile, so the blade is ~10 cm long and
-~5 cm wide. Outside the leaf the colour and roughness are padded with the leaf's own mean, so
-filtering at the cut edge draws no fringe. The leaf never touches the tile's border and every
-noise wraps, so the tile is seamless. Fixed seed, no network.
+cut-out). Scale `s1`: an exact 1 m tile at 2048 px (about 0.5 mm a texel), blades 4.5 to 7.5 cm
+long. *(Was `s01`, two leaves in 0.1 m.)* Outside the leaves
+the colour and roughness are padded with the leaves' own mean, so filtering at the cut edge
+draws no fringe. Every noise wraps and every leaf is drawn wrapped, so the tile is seamless.
+Fixed seed, no network.
 
     gen_oakleaf_natural.py [--out DIR]
 
@@ -39,24 +49,61 @@ import tileable as tl  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent.parent.parent
 OUT = ROOT / "MatterLibrary" / "textures" / "base" / "environmental" / "vegetation"
 SET = "OakLeaf_Natural"
-SCALE = "s01"
+SCALE = "s1"
+SIZE = 2048
 SEED = 707
-GRASS = np.array([0.105, 0.133, 0.041])   # Physically Based `Grass`, linear sRGB: the leaf's mean
-VEIN = np.array([1.55, 1.45, 1.35])       # relative tint of a vein (paler, a little yellower)
-STALK = np.array([1.5, 1.2, 1.6])         # relative tint of the stalk
+LEAF = np.array([0.075, 0.185, 0.028])    # judgement: a fresh mid green, linear sRGB: the leaves' mean
+VEIN = np.array([1.55, 1.40, 1.60])       # relative tint of a vein (paler, a little yellower)
+STALK = np.array([1.5, 1.0, 2.2])         # relative tint of the stalk
 ROUGH = 0.5                               # Physically Based `Grass` roughness: a waxy cuticle
 
-BASE, TIP = 0.90, 0.08                    # blade from base to tip, image rows as tile fractions
+# A leaf is drawn in its own frame: the blade from row BASE to row TIP of a unit square.
+BASE, TIP = 0.90, 0.08
 LENGTH = BASE - TIP
 STALK_END = 0.975
-HALF_W = 0.235                            # the envelope's peak half-width, tile units
+HALF_W = 0.235                            # the envelope's peak half-width, leaf units
 LOBES = 5
 SINUS = 0.50                              # how far a sinus cuts toward the midrib (fraction of width)
 SUPER = 4                                 # supersampling for the anti-aliased outline
+LEAN = 0.45                               # a lobe's crest moves this far tipward per unit of width
+
+GRID = 14                                 # leaves are scattered one to a cell of a GRID x GRID jitter
+KEEP = 0.92                               # the share of cells that hold a leaf: a few gaps
 
 
-def midrib_x(t):
-    return 0.5 + 0.018 * np.sin(np.pi * t)
+def leaves() -> list:
+    """The leaves on the tile: centre (x, y), tilt in degrees, size (a leaf unit in tiles: a blade
+    is LENGTH of it), mirrored, lobe phases (right, left), midrib bow, tone (relative to LEAF,
+    before re-anchoring). One per jittered cell, in a random order, so overlaps fall anyhow."""
+    rng = np.random.RandomState(SEED + 50)
+    out = []
+    for gy in range(GRID):
+        for gx in range(GRID):
+            if rng.rand() > KEEP:
+                continue
+            out.append(dict(c=((gx + rng.rand()) / GRID, (gy + rng.rand()) / GRID),
+                            tilt=rng.uniform(0, 360), size=rng.uniform(0.045, 0.075) / LENGTH,
+                            mirror=bool(rng.rand() < 0.5),
+                            phases=(rng.uniform(0, 0.6), rng.uniform(0, 0.6)),
+                            bow=rng.uniform(-0.02, 0.02),
+                            tone=tuple(1 + rng.uniform(-0.12, 0.12, 3))))
+    return [out[i] for i in rng.permutation(len(out))]
+
+
+def frame(X, Y, leaf):
+    """Tile coordinates to the leaf's own frame (its blade upright in the unit square), wrapped."""
+    dx = (X - leaf["c"][0] + 0.5) % 1.0 - 0.5
+    dy = (Y - leaf["c"][1] + 0.5) % 1.0 - 0.5
+    a = np.radians(leaf["tilt"])
+    u = (np.cos(a) * dx + np.sin(a) * dy) / leaf["size"]
+    v = (-np.sin(a) * dx + np.cos(a) * dy) / leaf["size"]
+    if leaf["mirror"]:
+        u = -u
+    return 0.5 + u, 0.53 + v                                          # the blade's middle at the centre
+
+
+def midrib_x(t, bow):
+    return 0.5 + bow * np.sin(np.pi * t)
 
 
 def envelope(t):
@@ -76,10 +123,6 @@ def lobing(t, phase):
     return 1 - fade * (1 - m)
 
 
-PHASES = (0.0, 0.32)                      # right, left: lobes alternate a little
-LEAN = 0.45                               # a lobe's crest moves this far tipward per unit of width
-
-
 def lobe_crests(phase):
     """t of each lobe crest on one side (where lobing() == 1)."""
     crest_s = 0.5 ** (1 / 1.35)
@@ -91,18 +134,17 @@ def lobe_crests(phase):
     return ts
 
 
-def outline(n: int) -> np.ndarray:
-    """Coverage of the blade plus stalk on an n x n grid (1 inside), not yet filtered."""
-    y = (np.arange(n) + 0.5) / n
-    x = (np.arange(n) + 0.5) / n
-    X, Y = np.meshgrid(x, y)
+def outline(X, Y, leaf) -> np.ndarray:
+    """Coverage of one leaf's blade plus stalk (1 inside), at tile coordinates X, Y."""
+    X, Y = frame(X, Y, leaf)
     t = (BASE - Y) / LENGTH
-    dx = X - midrib_x(t)
+    dx = X - midrib_x(t, leaf["bow"])
     env = envelope(t)
     ts = t - LEAN * np.abs(dx) / LENGTH                                # lobes lean toward the tip
-    half = np.where(dx >= 0, env * lobing(ts, PHASES[0]), env * lobing(ts, PHASES[1]))
+    ph = leaf["phases"]
+    half = np.where(dx >= 0, env * lobing(ts, ph[0]), env * lobing(ts, ph[1]))
     blade = (t >= 0) & (t <= 1) & (np.abs(dx) < half)
-    stalk = (Y > BASE - 0.01) & (Y < STALK_END) & (np.abs(X - midrib_x(0.0) + 0.02 * (Y - BASE)) < 0.0055)
+    stalk = (Y > BASE - 0.01) & (Y < STALK_END) & (np.abs(X - midrib_x(0.0, leaf["bow"]) + 0.02 * (Y - BASE)) < 0.0055)
     return (blade | stalk).astype(float)
 
 
@@ -112,64 +154,86 @@ def seg_dist(X, Y, a, b):
     return np.hypot(X - (a[0] + t * ab[0]), Y - (a[1] + t * ab[1])), t
 
 
-def veins(size: int):
-    """(midrib, secondary) vein strengths in [0, 1], each a soft line."""
-    c = (np.arange(size) + 0.5) / size
-    X, Y = np.meshgrid(c, c)
-    # midrib + stalk: a line down the curved midrib, tapering toward the tip
+def veins(X, Y, leaf):
+    """One leaf's (midrib, secondary, stalk) strengths in [0, 1] at tile coordinates X, Y."""
+    X, Y = frame(X, Y, leaf)
+    bow = leaf["bow"]
     t = (BASE - Y) / LENGTH
     w_mid = np.interp(t, [-0.1, 0.0, 1.0], [0.0050, 0.0050, 0.0012])
-    d_mid = np.abs(X - midrib_x(np.clip(t, 0, 1)))
+    d_mid = np.abs(X - midrib_x(np.clip(t, 0, 1), bow))
     midrib = np.clip(1 - d_mid / w_mid, 0, 1) * ((t > -0.10) & (t < 0.99))
-    # secondary veins: from the midrib, a little below each lobe's crest, out to the crest
-    sec = np.zeros((size, size))
-    for side, phase in zip((1, -1), PHASES):
+    sec = np.zeros_like(X)
+    for side, phase in zip((1, -1), leaf["phases"]):
         for tc in lobe_crests(phase):
             half = float(envelope(np.array([tc]))[0])
             tip_t = tc + LEAN * 0.93 * half / LENGTH                  # the leaning crest
             half = float(envelope(np.array([tip_t]))[0])
-            tip = (midrib_x(tip_t) + side * 0.90 * half, BASE - tip_t * LENGTH)
+            tip = (midrib_x(tip_t, bow) + side * 0.90 * half, BASE - tip_t * LENGTH)
             t0 = tc - 0.07
-            root = (midrib_x(t0), BASE - t0 * LENGTH)
+            root = (midrib_x(t0, bow), BASE - t0 * LENGTH)
             mid = (root[0] + side * 0.5 * half, BASE - (0.5 * (t0 + tip_t) - 0.02) * LENGTH)  # a gentle bow
             for a, b, w0, w1 in ((root, mid, 0.0026, 0.0018), (mid, tip, 0.0018, 0.0007)):
                 d, f = seg_dist(X, Y, np.array(a), np.array(b))
                 w = w0 + (w1 - w0) * f
                 sec = np.maximum(sec, np.clip(1 - d / w, 0, 1))
-    return midrib, sec
+    stalk = (Y > BASE + 0.004).astype(float)
+    return midrib, sec, stalk
+
+
+def window(leaf, n):
+    """The pixel rows and columns (wrapped) round one leaf, and their tile coordinates, plus the
+    same at SUPER x SUPER sub-pixels for the outline."""
+    h = int(np.ceil(0.62 * leaf["size"] * n)) + 2                      # the leaf frame's reach, rotated
+    cx, cy = int(leaf["c"][0] * n), int(leaf["c"][1] * n)
+    k = np.arange(-h, h)
+    cols, rows = (cx + k) % n, (cy + k) % n
+    x = (cx + k + 0.5) / n
+    y = (cy + k + 0.5) / n
+    X, Y = np.meshgrid(x, y)
+    kb = (np.arange(2 * h * SUPER) + 0.5) / SUPER
+    XB, YB = np.meshgrid((cx - h + kb) / n, (cy - h + kb) / n)
+    return np.ix_(rows, cols), X, Y, XB, YB, 2 * h
 
 
 def maps() -> dict:
-    n = tl.SIZE
-    big = outline(n * SUPER)
-    cover = big.reshape(n, SUPER, n, SUPER).mean(axis=(1, 3))         # anti-aliased opacity
-    inside = cover > 0.5
-    midrib, sec = veins(n)
-    netw = 1 - np.abs(2 * tl.fbm((96, 192), SEED + 5) - 1)              # ridged: a reticulate net
+    n = SIZE
+    netw = 1 - np.abs(2 * tl.fbm((640, 1280), SEED + 5, n) - 1)       # ridged: a reticulate net
     net = np.clip((netw - 0.82) / 0.18, 0, 1)
-    mottle = tl.fbm((6, 12, 24), SEED)
-    fine = tl.fbm((128, 256), SEED + 10)
-    c = (np.arange(n) + 0.5) / n
-    X, Y = np.meshgrid(c, c)
-    stalk = ((Y > BASE + 0.004) & inside).astype(float)
+    mottle = tl.fbm((60, 120, 240), SEED, n)                           # 4 to 16 mm: within a leaf
+    fine = tl.fbm((512, 1024), SEED + 10, n)
+    shade = 1.0 + 0.18 * (mottle - 0.5) + 0.05 * (fine - 0.5) + 0.05 * net
 
-    vein = np.maximum(midrib, 0.8 * sec)
-    shade = 1.0 + 0.14 * (mottle - 0.5) + 0.05 * (fine - 0.5) + 0.05 * net
-    tint = 1 + vein[..., None] * (VEIN - 1)[None, None, :]
-    tint = tint * (1 - stalk[..., None]) + STALK[None, None, :] * stalk[..., None]
-    albedo = GRASS[None, None, :] * shade[..., None] * tint
-    albedo *= GRASS / albedo[inside].mean(0)                            # re-anchor the leaf's MEAN
-    albedo[~inside] = GRASS                                             # pad: no fringe at the cut
+    cover = np.zeros((n, n))
+    albedo = np.zeros((n, n, 3))
+    vein_all = np.zeros((n, n))
+    mid_all = np.zeros((n, n))
+    sec_all = np.zeros((n, n))
+    for leaf in leaves():                                             # later leaves lie on top
+        ix, X, Y, XB, YB, m = window(leaf, n)
+        cov = outline(XB, YB, leaf).reshape(m, SUPER, m, SUPER).mean(axis=(1, 3))
+        midrib, sec, stalk = veins(X, Y, leaf)
+        vein = np.maximum(midrib, 0.8 * sec)
+        tint = 1 + vein[..., None] * (VEIN - 1)[None, None, :]
+        tint = tint * (1 - stalk[..., None]) + STALK[None, None, :] * stalk[..., None]
+        col = LEAF[None, None, :] * np.array(leaf["tone"])[None, None, :] * shade[ix][..., None] * tint
+        albedo[ix] = albedo[ix] * (1 - cov[..., None]) + col * cov[..., None]
+        vein_all[ix] = vein_all[ix] * (1 - cov) + vein * cov
+        mid_all[ix] = mid_all[ix] * (1 - cov) + midrib * cov
+        sec_all[ix] = sec_all[ix] * (1 - cov) + sec * cov
+        cover[ix] = np.maximum(cover[ix], cov)
+    inside = cover > 0.5
+    albedo *= LEAF / albedo[inside].mean(0)                            # re-anchor the leaves' MEAN
+    albedo[~inside] = LEAF                                              # pad: no fringe at the cut
 
-    rough = np.clip(ROUGH + 0.05 * (fine - 0.5) + 0.04 * (mottle - 0.5) + 0.10 * vein, 0, 1)
+    rough = np.clip(ROUGH + 0.05 * (fine - 0.5) + 0.04 * (mottle - 0.5) + 0.10 * vein_all, 0, 1)
     rough += ROUGH - rough[inside].mean()
     rough[~inside] = ROUGH
 
     # upper surface: the veins sit in shallow channels, the tissue between them bulges a little
-    height = -1.0 * midrib - 0.6 * sec - 0.15 * net + 0.35 * mottle + 0.15 * fine
+    height = -1.0 * mid_all - 0.6 * sec_all - 0.15 * net + 0.35 * mottle + 0.15 * fine
     return {"basecolor": tl.rgb(tl.linear_to_srgb(albedo)),
             "roughness": tl.gray(rough),
-            "normal": tl.normal_map(height, strength=3.0),
+            "normal": tl.normal_map(height, strength=1.0),
             "opacity": Image.fromarray((cover * 255).round().astype(np.uint8), "L")}
 
 

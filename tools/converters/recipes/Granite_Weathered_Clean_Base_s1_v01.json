@@ -1,0 +1,31 @@
+{
+  "summary": "Rough, unpolished granite speckled grey, buff and white, as on weathered boulders, kerbs and old building stone.",
+  "search_words": ["granite", "stone", "rock", "weathered stone", "rough stone", "boulder", "kerb", "curb"],
+  "origin": ["scan", "agent-drafted"],
+  "_comment": "Weathered granite: a coarse-grained igneous stone with a rough, unpolished face, its grey, buff and white crystals dulled by the weather (ambientCG Granite003B, CC0, an unpolished 'B' variant; roughness map mean 0.49). The rough sibling of Granite_Polished (Granite001A). Opaque: a solid dielectric; granite does not scatter light through like marble. The source states no physical size: the scan is 0.4 m by a judgement from its grain (crystals of about 3-5 mm), as for Granite_Polished. Made at its tag (Phase19 D-9): the maps are quilted from the scan into an exact 1 m tile at 2048 px (tools/converters/base/quilt_scan.py), every patch at the scan's own size; nothing is stretched. The quilting flattens the scan's broad tone before it quilts (else a broad stain shows as blocks on the patch grid), so the scan's large rust and buff stains are not carried: the weathering reads in the rough, dull face and in the dust and crevice layers. Carries every relevant wear layer at 0 (C1): chipped edge wear (overlay 1, damage) and dust as a deposit (Phase10), gated by the Crevice mask; no third layer is relevant. Not carried: the wet and moss looks the wish list also wants. Built by the Phase11 batch.",
+  "name": "Granite_Weathered_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Granite_Weathered_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Granite_Weathered_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Granite_Weathered_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Granite_Weathered_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.54,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Granite003B", "url": "https://ambientcg.com/view?id=Granite003B", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/stone/Granite_Weathered.yaml"},
+    {"kind": "procedural", "script": "tools/converters/base/quilt_scan.py", "args": "Granite_Weathered --src-m 0.4 --out-m 1.0 --scale s1 --size 2048", "why": "makes the scan at its scale option: quilted at the scan's own size, never stretched"},
+    {"kind": "judgement", "why": "specular_ior 1.54, that of quartz (Physically Based 'Quartz'), granite's main mineral with feldspar, as on Granite_Polished; Physically Based has no granite entry. The scan's 0.4 m from the grain size, since the source states no physical size; the article tiles at exactly 1 m (quilted)."}
+  ]
+}

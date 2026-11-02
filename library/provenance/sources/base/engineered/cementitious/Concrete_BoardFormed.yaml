@@ -1,19 +1,15 @@
-# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
-# Holds the `provenance:` block a release lock will carry when this texture is promoted.
-id: base/engineered/cementitious/Concrete_BoardFormed
+# Draft provenance for one texture set (lead ruling Q2 = A, 2026-09-25).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+# Was the ambientCG Concrete045 scan (2 m, off its s1 tag) until 2026-10-31; re-made by the
+# generator at an exact 1 m tile (Phase19 D-9).
+id: base/engineered/cementitious/Concrete_BoardFormed    # mean albedo anchored to Physically Based 'Concrete'
 version: v01
+files:
+  - MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_basecolor_s1.png
+  - MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_normal_s1.png
+  - MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_roughness_s1.png
 provenance:
-  source: ambientCG
+  source: procedural
   license: CC0-1.0
-  evidence:
-    url: https://ambientcg.com/view?id=Concrete045
-    sha256_scope: shipped_source_set
-    sha256: ef4ae3db907e082febdf6d673139d2680acd826117db59bd3ab6ca2679265eb3
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Concrete045_1K-PNG download. sha256 attests the shipped release-source set.
-    files:
-    - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_basecolor_s1.png
-      sha256: 99ed6b2fff6062327a7d47581955e4621192d01b27e2dfec13c8da9ae8ca23ba
-    - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_normal_s1.png
-      sha256: a9426dbf790e81b25a4f87afa4fefadfcacbcfa8f9b9f833b9cc4f1392ae6eb6
-    - path: MatterLibrary/textures/base/engineered/cementitious/Concrete_BoardFormed_roughness_s1.png
-      sha256: 276fc6a01fc96c785feb2c9b2d3718aa34d7fd4a19650adfe497e440f1fa93ac
+  evidence: tools/converters/base/gen_concrete_boardformed.py

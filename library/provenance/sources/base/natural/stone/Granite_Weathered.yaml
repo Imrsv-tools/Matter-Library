@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/stone/Granite_Weathered
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Granite003B
+    sha256_scope: shipped_source_set
+    sha256: caed16c6998794823d40c47bf102d04a67b7388c124a9acbd514fdd9d2f8f94d
+    note: "Shipped source textures are processed derivatives of the ambientCG Granite003B_1K-PNG maps, not byte-identical to the download: made at the s1 scale option (2026-11-01, Phase19 D-9) by tools/converters/base/quilt_scan.py (Granite_Weathered --src-m 0.4 --out-m 1.0 --scale s1 --size 2048), which quilts the 0.4 m scan (judged from its 3-5 mm crystals; the source states no size) into an exact 1 m tile at 2048 px. Until then the shipped set digest was ee4aec09b41b6916f6c32406bc5ee3c5d4442c5172249e39c7ce3ac04e3bdb64. sha256 attests the shipped release-source set."
+    files:
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Weathered_basecolor_s1.png
+      sha256: 7e9e0d7bb5092b427c5d98275e283d6415ad7232049c01f14138f2ed73309fb1
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Weathered_normal_s1.png
+      sha256: 3c9c30ab08d9deeec02bdba7733fa8185873eedeeff5449481a7a775de737f24
+    - path: MatterLibrary/textures/base/natural/stone/Granite_Weathered_roughness_s1.png
+      sha256: 14daa9748982ed54c24cd0d5e40c1d8b2fe2ffac47e67b59f40fe39fe139e4a0

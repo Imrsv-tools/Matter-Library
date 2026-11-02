@@ -8,12 +8,12 @@ provenance:
   evidence:
     url: https://ambientcg.com/view?id=Terrazzo019L
     sha256_scope: shipped_source_set
-    sha256: a92674e62c2bc5a15ed7e0dc9311c4020b21c2a453ddf6bab6f30d2045d84d91
-    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Terrazzo019L_1K-PNG download. sha256 attests the shipped release-source set.
+    sha256: debae51134c299f26b00b39576612d6bb148e3a3d3b78b86e8a534abed4011fa
+    note: Shipped source textures are processed derivatives of the ambientCG Terrazzo019L_1K-PNG maps, not byte-identical to the download. Re-made at the s1 scale option (2026-10-31, Phase19 D-9) by tools/converters/base/quilt_scan.py (Terrazzo_Polished --src-m 0.8 --out-m 1.0 --scale s1 --size 1024), which quilts the 0.8 m scan into an exact 1 m tile at 1024 px. Until then the shipped set digest was a92674e62c2bc5a15ed7e0dc9311c4020b21c2a453ddf6bab6f30d2045d84d91. sha256 attests the shipped release-source set.
     files:
     - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_basecolor_s1.png
-      sha256: f6246ffb159478149cae5c39938a72f384e21e32792107176e0db0bec757f68d
+      sha256: e7ba58f800314e7de2742da5f88d8beb1b7d0b13489353cd41eb3c22d0bf243b
     - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_normal_s1.png
-      sha256: 2393af98b76948cb0371e6c5907d2b398f66176a14519d57ee439c045b290a1d
+      sha256: 990314317d672fd35a69c9528eaa2c670e37aa6fe911db9cfd6441d97212d2e9
     - path: MatterLibrary/textures/base/engineered/cementitious/Terrazzo_Polished_roughness_s1.png
-      sha256: 3f6ce6803e84de15d85fc3fa3390a7bd9e7741ef718e23c093015ae9c788fd1f
+      sha256: 954574dd78b2fea34ba2642b651f1d4ba1b68021d74ef56ecaf265ab7b350463

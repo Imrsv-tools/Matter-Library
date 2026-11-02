@@ -101,7 +101,7 @@ for rel, master, want_subject in [
         ("synthetic/textile/Lace_Floral_Clean_Base_s01_v01.mtlx", "Masked", "lace"),
         ("synthetic/textile/Canvas_Natural_Clean_Base_s001_v01.mtlx", "Opaque", "drape"),
         ("utility/virtual/GreyCard_Neutral18_Clean_Base_s01_v01.mtlx", "Opaque", "card"),
-        ("environmental/vegetation/OakLeaf_Natural_Clean_Base_s01_v01.mtlx", "Masked", "leaf")]:
+        ("environmental/vegetation/OakLeaf_Natural_Clean_Base_s1_v01.mtlx", "Masked", "leaf")]:
     got = S.subject_for(master, M / rel)
     check(got == want_subject, f"{Path(rel).stem.split('_Clean')[0]}: {got}")
 check(S.subject_for("Subsurface", M / "character/humanoid/Skin_FitzpatrickIII_Clean_Base_s001_v01.mtlx")

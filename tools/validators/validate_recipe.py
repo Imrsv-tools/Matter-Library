@@ -363,15 +363,7 @@ TAG_METRES = SCALE_TAG_METRES          # the assembler's table (Identity.md §Sc
 # with its recorded size. Each is a redo row in library/wishlist.yaml; a redo that lands on its
 # tag must leave this list, and nothing joins it.
 OFF_SCALE_KNOWN = {
-    "Concrete_BoardFormed_Clean_Base_s1_v01": 2.0,
-    "Concrete_Polished_Clean_Base_s1_v01": 3.0,
-    "Terrazzo_Polished_Clean_Base_s1_v01": 0.8,
-    "BeachSand_Dry_Clean_Base_s1_v01": 1.5,
-    "OakLeaf_Natural_Clean_Base_s01_v01": 0.12,
     "Marble_Veined_Polished_Base_s01_v01": 0.5,
-    "Onyx_Polished_Clean_Base_s01_v01": 0.3,
-    "Oak_Natural_Clean_Base_s1_v01": 0.8,
-    "Paint_OnMetal_Chipped_Base_s01_v01": 0.3,
     "Lace_Floral_Clean_Base_s01_v01": 0.25,
 }
 
