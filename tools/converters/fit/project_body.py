@@ -50,6 +50,13 @@ S = 600.0                    # pixels per metre in the four views (1.67 mm a pix
 VH = 1152                    # the picture's height
 VIEWS = ((0, 624), (90, 360), (180, 624), (270, 360))   # (yaw, width): front, profile, back, profile
 CY = 0.015                   # the body's middle height in the mesh's frame (m)
+NAVEL_WIN = (0.03, 0.05, 0.30)       # ``fit --front-pins``: the navel's window on hm08 (|x| <, y from, y to; m): its deepest
+                                     # dip below the median of its 2.5 cm neighbours (hm08's: y 0.184, 4.4 mm deep)
+NIP_WIN = (0.04, 0.15, 0.28, 0.52)   # ``fit --front-pins``: each breast's window on hm08 (|x| and y, m); its apex is the mean
+                             # of the points within 1 mm of its most forward one (27.2.12)
+NIP_SEARCH = 45              # ... and how far (px) from where the outline-only fit samples it the picture's areola is looked for
+NIP_SIGMA = 25               # the pin's reach (px, ~4 cm): a broad shift of the breast, faded to nothing at the outline
+                             # (a point held in the harmonic fit pinched the areola: folds 0.04 -> 0.10 %)
 DMAX = 24                    # the furthest the model's outline is looked for, in pixels (4 cm)
 GROIN_R = (0.075, 0.075, 0.09)   # the groin's soft ellipsoid round the crotch (m): x, y, z radii
 MIN_FACE = 0.3               # a texel no view faces better than this is a hole, not a grazing sample: the model
@@ -370,11 +377,50 @@ def relax(m, ys, xs, mv, eps=1e-4):
     return out
 
 
-def cmd_fit(d: Path, pic_path: Path) -> None:
+def front_pins(m, f, pic, D0, w):
+    """The front view's pins (27.2.12): hm08's breast apexes (``NIP_WIN``) and navel (``NAVEL_WIN``) against the
+    picture's areolae and navel, each the darkest spot of the picture's blurred luminance inside its body within ``NIP_SEARCH``
+    of where the outline-only
+    fit ``D0`` samples the apex. The fit holds only the outline, and the model drew the breasts higher and wider than
+    hm08's: its areolae landed ~5 cm up and out, as small marks, and hm08's own nipples took plain skin. The navel
+    needed 4 mm (the outline already holds it); its pin keeps the belly anchored while the breasts move."""
+    np = _np()
+    from scipy.ndimage import gaussian_filter  # noqa: PLC0415
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    P = mesh()[0]
+    targets = []
+    for side in (1, -1):
+        a, b, y0, y1 = NIP_WIN
+        sel = (side * P[:, 0] > a) & (side * P[:, 0] < b) & (P[:, 1] > y0) & (P[:, 1] < y1)
+        Q = P[sel]
+        targets.append(("nipple_l" if side > 0 else "nipple_r", Q[Q[:, 2] > Q[:, 2].max() - 0.001].mean(0)))
+    xw, y0, y1 = NAVEL_WIN
+    Q = P[(np.abs(P[:, 0]) < xw) & (P[:, 1] > y0) & (P[:, 1] < y1) & (P[:, 2] > 0)]
+    t = cKDTree(Q[:, :2])
+    dip = np.array([np.median(Q[t.query_ball_point(q[:2], 0.025), 2]) - q[2] for q in Q])
+    targets.append(("navel", Q[int(np.argmax(dip))]))
+    L = gaussian_filter(pic @ np.asarray(LUM), 2.0)
+    yy, xx = np.mgrid[0:VH, 0:w]
+    pys, pxs, pmv, rec = [], [], [], []
+    for name, apex in targets:
+        hx, hy, _ = proj(apex[None], 0, w)
+        hx, hy = float(hx[0]) - 0.5, float(hy[0]) - 0.5                 # index coordinates
+        fx, fy = hx + D0[int(round(hy)), int(round(hx)), 0], hy + D0[int(round(hy)), int(round(hx)), 1]
+        win = f & (np.hypot(xx - fx, yy - fy) < NIP_SEARCH)
+        if not win.any():
+            raise SystemExit(f"no picture under the {name}'s search window")
+        ay, ax = divmod(int(np.argmin(np.where(win, L, np.inf))), w)
+        pys.append(hy); pxs.append(hx); pmv.append((ax - fx, ay - fy))                 # the residual past D0
+        rec.append({"pin": name, "apex_m": [round(float(v), 3) for v in apex], "hm08_px": [round(hx, 1), round(hy, 1)],
+                    "picture_px": [ax, ay], "move_mm": round(float(np.hypot(ax - fx, ay - fy)) * 1000 / S, 1)})
+    return np.asarray(pys), np.asarray(pxs), np.asarray(pmv, float), rec
+
+
+def cmd_fit(d: Path, pic_path: Path, pins: bool = False) -> None:
     np = _np()
     pic, fg = picture(pic_path)
     stem = pic_path.stem
-    rec, warped = {"picture": pic_path.name, "dmax_px": DMAX, "views": {}}, np.full_like(pic, 0.18)
+    rec, warped = {"picture": pic_path.name, "dmax_px": DMAX, "front_pins": pins, "views": {}}, np.full_like(pic, 0.18)
     fields = {}
     for yaw, x0, w in frames():
         g = np.load(d / f"geom_{yaw}.npz")
@@ -382,6 +428,13 @@ def cmd_fit(d: Path, pic_path: Path) -> None:
         f = fg[:, x0:x0 + w]
         ys, xs, mv, n_out = outline_moves(m, f)
         D = relax(m, ys, xs, mv)
+        if pins and yaw == 0:
+            from scipy.ndimage import distance_transform_edt  # noqa: PLC0415
+            py, px, pm, rec["pins_front"] = front_pins(m, f, pic[:, x0:x0 + w], pushpull(D, m), w)
+            gy, gx = np.mgrid[0:VH, 0:w].astype(np.float64)
+            bump = sum(r[None, None, :] * np.exp(-((gx - cx) ** 2 + (gy - cy) ** 2) / (2 * NIP_SIGMA ** 2))[..., None]
+                       for cy, cx, r in zip(py, px, pm))
+            D = D + bump * np.clip(distance_transform_edt(m) / NIP_SIGMA, 0.0, 1.0)[..., None]
         D = pushpull(D, m)                                            # carried past the outline for sampling
         fields[f"D_{yaw}"] = D.astype(np.float32)
         gy, gx = np.mgrid[0:VH, 0:w].astype(np.float64)
@@ -399,6 +452,7 @@ def cmd_fit(d: Path, pic_path: Path) -> None:
             "move_mm_p99": round(float(np.percentile(np.hypot(*D[m].T), 99) * mm), 1),
             "folded_pct": round(float((det <= 0).mean() * 100), 3)}
         print(f"view {yaw:3d}: {json.dumps(rec['views'][str(yaw)])}", flush=True)
+    stem += "_pins" if pins else ""                                     # its own file: earlier atlases reproduce
     np.savez(d / f"fit_{stem}.npz", **fields)
     save(d / f"fit_{stem}.png", warped)
     (d / f"fit_{stem}.json").write_text(json.dumps(rec, indent=1) + "\n")
@@ -759,7 +813,7 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
             outline_clear: float = 0.0, smooth_holes: bool = False, jaw_free: bool = False,
-            delight_keep: float = 0.0, mottle_gain: float = 1.0) -> None:
+            delight_keep: float = 0.0, mottle_gain: float = 1.0, fit_suffix: str = "") -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -793,7 +847,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
             else np.zeros_like(hm))                                 # within the neck's width: never the ears
     body |= nape; hm &= ~nape
     pic, fg = picture(pic_path)
-    F = np.load(d / f"fit_{pic_path.stem}.npz") if use_fit else None
+    F = np.load(d / f"fit_{pic_path.stem}{fit_suffix}.npz") if use_fit else None
     rr, cc = np.nonzero(body)
     X, Nn = Pa[rr, cc].astype(np.float64), Na[rr, cc].astype(np.float64)
     Nu = Nn / np.maximum(np.linalg.norm(Nn, axis=1, keepdims=True), 1e-9)
@@ -936,7 +990,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     del up, base
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
-    rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
+    rec = {"picture": pic_path.name, "fit": use_fit and f"fit_{pic_path.stem}{fit_suffix}", "delight": delight, "light": light, "levelled": levelled,
            "keep_colour": keep_colour, "light_order": light_order, "delight_keep": delight_keep, "mottle_gain": mottle_gain, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
            "smooth_holes": holes_rec, "jaw_free_dropped": jaw_dropped if jaw_free else None,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
@@ -1305,6 +1359,9 @@ def main(argv=None) -> int:
     s = sub.add_parser("paint"); s.add_argument("dir", type=Path); s.add_argument("--seeds", default="7")
     s.add_argument("--strength", type=float, default=0.5); s.add_argument("--server", default="http://127.0.0.1:8188")
     s = sub.add_parser("fit"); s.add_argument("dir", type=Path); s.add_argument("picture")
+    s.add_argument("--front-pins", action="store_true",
+                   help="also pin the picture's areolae and navel onto hm08's in the front view (27.2.12); "
+                        "written as fit_<picture>_pins")
     s = sub.add_parser("put"); s.add_argument("dir", type=Path); s.add_argument("picture"); s.add_argument("tag")
     s.add_argument("--head", type=Path, help="an 8K atlas (Phase25's D) the body is written onto; default C")
     s.add_argument("--no-fit", action="store_true", help="project the picture as painted (Pass 2's f4_50)")
@@ -1333,6 +1390,7 @@ def main(argv=None) -> int:
     s.add_argument("--delight-keep", type=float, default=0.0, metavar="F",
                    help="with --delight: keep this share of the light the model painted (divide by light**(1-F)); "
                         "a probe of how much of the picture's mottling is its light (27.2.11); 0 = none kept")
+    s.add_argument("--fit-suffix", default="", help="read fit_<picture><SUFFIX>.npz (e.g. _pins, from fit --front-pins)")
     s.add_argument("--mottle-gain", type=float, default=1.0, metavar="G",
                    help="scale the skin's own variation between ~1 mm and ~1.3 cm (MOTTLE_SIG) by G (27.2.11)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
@@ -1357,9 +1415,9 @@ def main(argv=None) -> int:
     elif a.cmd == "paint":
         cmd_paint(a.dir, [int(x) for x in a.seeds.split(",")], a.strength, a.server)
     elif a.cmd == "fit":
-        cmd_fit(a.dir, a.dir / a.picture)
+        cmd_fit(a.dir, a.dir / a.picture, a.front_pins)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free, a.delight_keep, a.mottle_gain)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free, a.delight_keep, a.mottle_gain, a.fit_suffix)
     return 0
 
 
