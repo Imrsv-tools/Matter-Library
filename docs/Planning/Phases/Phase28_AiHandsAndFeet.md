@@ -42,6 +42,8 @@ Each part gets **its own close camera on hm08 itself**, the face's method (Phase
 3. **Q-P28-3** — A sole from below: does Krea accept that view, or draw a different pose? (The soles are rarely seen; the maker's sole is the fallback.)
 4. **Q-P28-4** — The lead's end goal (a skin map from a brief: age, ethnicity, sex): its own phase after this one? It needs at least a prompt built from a brief, a body render of that build (a male hm08 shape is not the rig's), and the maker taking a new subject — none of which this phase does.
 
+5. **Q-P28-5** — Does an AI-made skin still fit every character, or does its painted shading tie it to one build? Parked in [`261102_R_SkinPortability.md`](../Research/261102_R_SkinPortability.md); decide before this phase starts (a sole or palm with painted shading has the same problem).
+
 ## Depends on
 
 - **Phase27 closed** (the body's finished colour is this phase's source tone, and its seams and close cameras are reused).
