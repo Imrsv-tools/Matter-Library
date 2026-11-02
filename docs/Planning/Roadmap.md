@@ -37,6 +37,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, the wrists, the ankles, or down the back and the limbs, judged beside the maker's body on the same unclothed character; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase27_AiBodySkin.md`
 
+### Phase28 — AI Hands and Feet — SEEDED *(2026-11-02, on the lead's "add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after")*
+**Outcome:** the character's hands and feet, palms and soles included, wear the same image-model person's skin as the body, so the whole skin map reads as one complete person from every side.
+- `docs/Planning/Phases/Phase28_AiHandsAndFeet.md`
+
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
 **Outcome:** a Creator sets an eye's iris colours, ring and redness with a few controls, over a handful of real-looking iris patterns.
 - `docs/Planning/Research/261026_R_SyntheticSkinAndEyes.md` (Pass 3, item 4)
