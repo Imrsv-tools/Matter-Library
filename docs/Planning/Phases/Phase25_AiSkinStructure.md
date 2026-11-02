@@ -317,7 +317,17 @@ The lead, verbatim: *"Indeed... we need to break this problem down... i look at 
   This orders RD-P25-13. RD-OVS-2's 8K stays the shipping target. *(Read as: the working size stays the model's own, ~2 MP for the head island. The detail pass's first target is 4K, tested as its own step once the map is figured out. 8K follows only after the 4K test. "Figured out" includes the full map, the body as well as the head, by the lead's first message.)*
   - **The steps in numbers:** the head island covers 5,658 × 2,888 texels at 8K, and 2,829 × 1,444 at 4K. The model paints it at 2,048 × 1,072, so the 4K test is a ~1.4× lift and 8K a ~2.8× lift.
   - **No tool changes now:** `paint_uv.py put` writes the 8K atlas, which holds a 2K island as made.
-- **The lead's question, open: "what about the rest of the body?"** It is answered in the handback of `ML_P25_D5`: the body is the next unit (§Deferred), and its discovery opens with a cheap probe per region. The lead has not ruled.
+- **The lead's question, open: "what about the rest of the body?"** `ML_P25_D5`'s answer (the agent's, not ruled):
+  - **The layout:** hm08's body is mostly one large unrolled island (the trunk, arms and legs, front and back together), with the hands and feet as their own islands. It has few features to line up (nipples, navel, knuckles, nails).
+  - **A route per region, probed cheaply first:**
+    - trunk, arms and legs: (a) the model repaints the island in UV space at a low strength, over the maker's body; or (b) a front and a back picture projected through hm08's front and back renders, matched by body landmarks (the face's method). Pass 2 measured that at full strength the model ignores the layout;
+    - hands and feet: the face's method, since knuckles and nails must land;
+    - every seam (neck, shoulders, arms): solved there, with the model on both sides (RD-P25-16);
+    - what the mesh cannot carry: the maker's gradient, as the ear.
+  - **Three things for the lead before it starts:**
+    - its own phase (recommended), after this one, at 2K; the 4K test then runs on the whole map (RD-P25-20);
+    - **asking the model for unclothed bodies, in a public CC0 library:** a deliberate yes first;
+    - **no bar for the body** (OVS-7): it is judged by eye against the maker's body.
 
 **Everything a run needs (paths from the repo root; all git-ignored under `library/parity/P25_Pass3/`, moved there from this session's scratch, which is deleted with the job):**
 - `uv_a_s90_seed7.png` + `.json` (the target; `gen_uv.py <dir> a 0.9 7` regenerates it byte-identical from `gen/uv_C.png`) · `target_frame.json` (its frame: bbox rows 1492–7150, cols 5252–8140, 2048 × 1040) · `map/uv_frame.json` (`paint_uv`'s frame, for `put` and `find`).
