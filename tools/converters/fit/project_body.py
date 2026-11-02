@@ -534,14 +534,16 @@ def cut_step(img, vmap, r: int = 6):
     return {"median": round(float(np.median(q) * 100), 1), "p90": round(float(np.percentile(q, 90) * 100), 1)}
 
 
-def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float = 10.0, anchor: float = 1e-3):
+def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float = 10.0, anchor: float = 1e-3,
+               lum: bool = False):
     """Seam levelling (Lempitsky & Ivanov's seamless mosaicing): one smooth correction per view, in log
     colour, solved on ``cell``-pixel cells, so that where two views meet their levels agree, and the
     correction changes as little as possible elsewhere. Cells are neighbours by their distance ON THE
     BODY (``reach``, metres), not in the atlas: the body island's own cuts (down the spine, along the
     limbs) join pieces the atlas holds apart, and a field smooth only in the atlas steps across them.
     No pixel is mixed with another view's: each texel keeps its own view's detail; only a slow tone
-    field moves it."""
+    field moves it. ``lum``: the levels agree in brightness only, one factor for all three channels, so each
+    view keeps the picture's hue (levelled per channel, a leg's front took its profile view's hue, 27.2.15)."""
     np = _np()
     from scipy.sparse import coo_matrix  # noqa: PLC0415
     from scipy.sparse.linalg import spsolve  # noqa: PLC0415
@@ -549,6 +551,8 @@ def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float 
     n = img.shape[0]
     hc = n // cell
     lg = np.log(np.maximum(img, 1e-4))
+    if lum:
+        lg = np.repeat(np.log(np.maximum(img @ np.asarray(LUM), 1e-4))[..., None], 3, -1)
     keys, mean, cen, view = [], [], [], []
     for v in range(len(VIEWS)):
         m = (vmap == v)
@@ -572,7 +576,9 @@ def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float 
     bvec = np.concatenate([rhs_seam, np.zeros((K, 3))])
     nodes = {k: i for i, k in enumerate(keys)}
     AtA = (A.T @ A).tocsc()
-    g = np.stack([spsolve(AtA, A.T @ bvec[:, c]) for c in range(3)], 1)
+    g = np.stack([spsolve(AtA, A.T @ bvec[:, c]) for c in range(1 if lum else 3)], 1)
+    if lum:
+        g = np.repeat(g, 3, 1)
     raw_max = float(np.abs(g).max())
     g = np.clip(g, -LEVEL_CAP, LEVEL_CAP)
     from PIL import Image  # noqa: PLC0415
@@ -591,6 +597,31 @@ def seam_level(img, vmap, P, cell: int = 8, reach: float = 0.012, seam_w: float 
         out[m] = img[m] * np.exp(up[m])
     return out, raw_max
 
+
+
+def smooth_normals(P, N, m, sigma: float, cell: int = 8):
+    """The surface normal over ``m`` averaged on the body with a Gaussian of ``sigma`` metres, on ``cell``-texel
+    cells, only between cells facing the same way (never the inside of an arm with the side of the trunk); the
+    cells' result carried back to every texel."""
+    np = _np()
+    from PIL import Image  # noqa: PLC0415
+    from scipy.spatial import cKDTree  # noqa: PLC0415
+    n = m.shape[0]; hc = n // cell
+    cnt = m.reshape(hc, cell, hc, cell).sum((1, 3))
+    kn = cnt > 0
+    p = (P * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))[kn] / cnt[kn][:, None]
+    q = (N * m[..., None]).reshape(hc, cell, hc, cell, 3).sum((1, 3))[kn]
+    q /= np.maximum(np.linalg.norm(q, axis=1, keepdims=True), 1e-9)
+    wc = cnt[kn].astype(np.float64)
+    a, b = cKDTree(p).query_pairs(3 * sigma, output_type="ndarray").T
+    w = np.exp(-((p[a] - p[b]) ** 2).sum(1) / (2 * sigma ** 2)) * ((q[a] * q[b]).sum(1) > 0)
+    acc = q * wc[:, None]
+    for k in range(3):
+        acc[:, k] += np.bincount(a, w * wc[b] * q[b, k], len(p)) + np.bincount(b, w * wc[a] * q[a, k], len(p))
+    G = np.zeros((hc, hc, 3)); G[kn] = acc / np.maximum(np.linalg.norm(acc, axis=1, keepdims=True), 1e-9)
+    G = pushpull(G, kn)
+    return np.stack([np.asarray(Image.fromarray(G[..., c].astype(np.float32), "F").resize((n, n), Image.BILINEAR))
+                     for c in range(3)], -1)
 
 
 def hand_ids():
@@ -825,7 +856,8 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
             levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
             outline_clear: float = 0.0, smooth_holes: bool = False, jaw_free: bool = False,
-            delight_keep: float = 0.0, mottle_gain: float = 1.0, fit_suffix: str = "") -> None:
+            delight_keep: float = 0.0, mottle_gain: float = 1.0, fit_suffix: str = "",
+            light_blur: float = 0.0, level_lum: bool = False) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -862,7 +894,16 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     F = np.load(d / f"fit_{pic_path.stem}{fit_suffix}.npz") if use_fit else None
     rr, cc = np.nonzero(body)
     X, Nn = Pa[rr, cc].astype(np.float64), Na[rr, cc].astype(np.float64)
-    Nu = Nn / np.maximum(np.linalg.norm(Nn, axis=1, keepdims=True), 1e-9)
+    if light_blur > 0:
+        # ``--light-blur``: the light is fitted and divided out on hm08's normal smoothed over this many metres.
+        # Where the model drew a feature in another place or shape (the breast's underside, 27.2.14), the picture
+        # has no shading at hm08's; divided by hm08's own small-scale shape it brightened there by half. Smoothed
+        # ON THE BODY, not in the atlas: blurred in the atlas, each side of the island's own cuts (the arm, the
+        # back) averaged only itself, and the light divided out stepped across them (the arm's cut 91 %)
+        Nn_l = smooth_normals(Pa.astype(np.float64), Na.astype(np.float64), body, light_blur)[rr, cc]
+    else:
+        Nn_l = Nn
+    Nu = Nn_l / np.maximum(np.linalg.norm(Nn_l, axis=1, keepdims=True), 1e-9)
     got = np.zeros((len(rr), 3)); face = np.zeros(len(rr)); have = np.zeros(len(rr), bool)
     src = np.full(len(rr), -1)
     light = {}
@@ -932,7 +973,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     step_before_gain = cut_step(sh, vmap)
     lev_max = None
     if levelled:
-        sh, lev_max = seam_level(sh, vmap, Pa.astype(np.float64))
+        sh, lev_max = seam_level(sh, vmap, Pa.astype(np.float64), lum=level_lum)
         step_before_gain = cut_step(sh, vmap)
     D = C.copy()
     # a hole (no view faces it squarely enough: between the legs, under the arms, the soles) is the maker's
@@ -1003,7 +1044,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit and f"fit_{pic_path.stem}{fit_suffix}", "delight": delight, "light": light, "levelled": levelled,
-           "keep_colour": keep_colour, "light_order": light_order, "delight_keep": delight_keep, "mottle_gain": mottle_gain, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
+           "keep_colour": keep_colour, "light_order": light_order, "delight_keep": delight_keep, "light_blur_m": light_blur, "level_lum": level_lum, "mottle_gain": mottle_gain, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
            "smooth_holes": holes_rec, "jaw_free_dropped": jaw_dropped if jaw_free else None,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
@@ -1402,6 +1443,12 @@ def main(argv=None) -> int:
     s.add_argument("--delight-keep", type=float, default=0.0, metavar="F",
                    help="with --delight: keep this share of the light the model painted (divide by light**(1-F)); "
                         "a probe of how much of the picture's mottling is its light (27.2.11); 0 = none kept")
+    s.add_argument("--level-lum", action="store_true",
+                   help="with --level: the views' levels agree in brightness only, each keeping the picture's hue "
+                        "(per channel, a leg's front took its profile view's hue and lost the knee's red; 27.2.15)")
+    s.add_argument("--light-blur", type=float, default=0.0, metavar="M",
+                   help="with --delight: fit and divide out the light on hm08's normal smoothed over M metres, so a "
+                        "feature the model drew elsewhere is not un-shaded (the breast's underside; 27.2.14); 0 = none")
     s.add_argument("--fit-suffix", default="", help="read fit_<picture><SUFFIX>.npz (e.g. _pins, from fit --front-pins)")
     s.add_argument("--mottle-gain", type=float, default=1.0, metavar="G",
                    help="scale the skin's own variation between ~1 mm and ~1.3 cm (MOTTLE_SIG) by G (27.2.11)")
@@ -1429,7 +1476,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture, a.front_pins)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free, a.delight_keep, a.mottle_gain, a.fit_suffix)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear, a.smooth_holes, a.jaw_free, a.delight_keep, a.mottle_gain, a.fit_suffix, a.light_blur, a.level_lum)
     return 0
 
 
