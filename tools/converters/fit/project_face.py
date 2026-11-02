@@ -295,12 +295,89 @@ def symmetric(L):
     return S
 
 
+# hm08's brows in MediaPipe's numbering, each row from the outer end to the inner
+BROWS = {"R": dict(up=[70, 63, 105, 66, 107], lo=[46, 53, 52, 65, 55]),
+         "L": dict(up=[300, 293, 334, 296, 336], lo=[276, 283, 282, 295, 285])}
+
+
+def brow_cards(d: Path):
+    """The brow cards' visible strands (their opacity map) seen through the front camera, a mask at the
+    render's size, cached as ``brow_cards.npz``. The cards are where hm08's brows are; MediaPipe only
+    guesses them on a render with no brows drawn."""
+    np, Image = _np(), _img()
+    cache = d / "brow_cards.npz"
+    if cache.is_file():
+        return np.load(cache)["mask"]
+    import os  # noqa: PLC0415
+    os.environ.setdefault("MATTER_SKIN_N", str(N))
+    sys.path.insert(0, str(REPO / "tools" / "parity" / "scene"))
+    import build_character as bc  # noqa: PLC0415
+    import project_views as pv  # noqa: PLC0415
+    parts = bc.load_parts()
+    P = pv.head_mesh()[0]
+    dy = P[:, 1].max() - np.array(parts["Body"]["points"])[:, 1].max()   # undo load_parts' feet-on-the-ground shift
+    Bp = parts["Brows"]
+    pts, st = np.array(Bp["points"]) + [0, dy, 0], np.array(Bp["atlas_st"])
+    alpha = np.asarray(Image.open(bc.FIT / f"{bc.MESHES['brows']['fit']}_opacity_sUKN.png").convert("L"), np.float64) / 255
+    ah, aw = alpha.shape
+    cam, Wd = pv.camera(pv.VIEWS["f000"]), pv.W
+    mask = np.zeros((Wd, Wd))
+    g = np.linspace(0, 1, 40)
+    bu, bv = np.meshgrid(g, g)
+    keep = bu + bv <= 1
+    bu, bv = bu[keep], bv[keep]
+    bw = 1 - bu - bv
+    k = 0
+    for f in Bp["faces"]:
+        vi = [v for v, _ in f]
+        for tri in ((0, 1, 2), (0, 2, 3)) if len(f) == 4 else ((0, 1, 2),):
+            a, b, c = (pts[vi[t]] for t in tri)
+            ta, tb, tc = (st[k + t] for t in tri)
+            X = bw[:, None] * a + bu[:, None] * b + bv[:, None] * c
+            U = bw[:, None] * ta + bu[:, None] * tb + bv[:, None] * tc
+            al = alpha[np.clip(((1 - U[:, 1]) * ah).astype(int), 0, ah - 1), np.clip((U[:, 0] * aw).astype(int), 0, aw - 1)]
+            x, y, _ = pv.project(cam, X)
+            ok = (x >= 0) & (x < Wd) & (y >= 0) & (y < Wd)
+            np.maximum.at(mask, (y[ok].astype(int), x[ok].astype(int)), al[ok])
+        k += len(f)
+    m = mask > 0.5
+    np.savez_compressed(cache, mask=m)
+    return m
+
+
+def snap_brows(d: Path, L):
+    """hm08's brow points onto the brow cards: each row's span stretched to the cards' (a row's outer
+    point to their outer end, its inner to their inner end), the upper row on their top edge, the lower on
+    their bottom edge (25.1.18; the lead at the brow fix: the painted tail ran below the cards' tail)."""
+    np = _np()
+    from scipy.ndimage import binary_closing  # noqa: PLC0415
+    m = binary_closing(brow_cards(d), iterations=4)
+    S = L.copy()
+    for side, E in BROWS.items():
+        sel = np.zeros_like(m)
+        half = slice(0, int(AXIS)) if L[E["up"][0], 0] < AXIS else slice(int(AXIS) + 1, m.shape[1])
+        sel[:, half] = m[:, half]
+        ys, xs = np.nonzero(sel)
+        top = {x: np.percentile(ys[xs == x], 5) for x in np.unique(xs)}
+        bot = {x: np.percentile(ys[xs == x], 95) for x in np.unique(xs)}
+        cols = np.array(sorted(top))
+        for row, edge in ((E["up"], top), (E["lo"], bot)):
+            x0, x1 = L[row[0], 0], L[row[-1], 0]               # this row's outer and inner ends
+            c0, c1 = (cols.min(), cols.max()) if x0 < x1 else (cols.max(), cols.min())
+            for i in row:
+                t = 0.03 + 0.94 * (L[i, 0] - x0) / (x1 - x0)   # held 3 % in from the tips: the rows never meet
+                x = c0 + t * (c1 - c0)
+                xi = cols[np.argmin(np.abs(cols - x))]
+                S[i] = [x, edge[xi]]
+    return S
+
+
 def cmd_landmarks(d: Path, picture: Path | None) -> None:
     np = _np()
     if picture is None:                                            # hm08's front render, the eyes snapped
         raw, im = detect(RENDER)
         E, moves = snap_eyes(raw)
-        L = symmetric(E)
+        L = snap_brows(d, symmetric(E))
         np.save(d / "lm_hm08_raw.npy", raw)
         np.save(d / "lm_hm08_eyes.npy", E)
         np.save(d / "lm_hm08.npy", L)
