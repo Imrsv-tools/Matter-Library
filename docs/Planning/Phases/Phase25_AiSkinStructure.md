@@ -1,13 +1,15 @@
 # Phase25 — AI Skin Structure
 
-**Status:** IN DISCOVERY (Pass 3, research and testing until the result is great; opened by the lead's *"/discovery Phase25"*, 2026-11-01). The face's route is settled (RD-P25-15); the next session starts at §Pass 3 hand-off (the ears, then the prompt). *Before:* IN EXECUTION — click 1 sat and rejected at 25.1.13 (*"we have to figure out how we get MUCH closer to the last image"*). *(Opened 2026-11-01 by the lead's "/execute Phase25" at `c6b890d`.)* *Before:* BRIEF READY (re-discovery, Pass 2, 2026-11-01, opened by the lead's *"/discovery Phase25"* after 25.1.8). *Before:* IN EXECUTION from `3df2ce1` (25.1, the project-and-bake route, sat twice and rejected at 25.1.8); BRIEF READY (Pass 1); SEEDED (2026-11-01), split out of Phase24 on the lead's *"Split and seed"* (RD-OVS-6). It runs against Phase24's judge.
+**Status:** BRIEF READY (2026-11-02, at the close of Pass 3, `ML_P25_D5`): the face's route (RD-P25-15) and the ear's (RD-P25-18, -19) are settled and the Brief is rewritten for the head build at 2K; `/execute` starts at 25.1. *Before:* IN DISCOVERY (Pass 3, research and testing until the result is great; opened by the lead's *"/discovery Phase25"*, 2026-11-01). *Before:* IN EXECUTION — click 1 sat and rejected at 25.1.13 (*"we have to figure out how we get MUCH closer to the last image"*). *(Opened 2026-11-01 by the lead's "/execute Phase25" at `c6b890d`.)* *Before:* BRIEF READY (re-discovery, Pass 2, 2026-11-01, opened by the lead's *"/discovery Phase25"* after 25.1.8). *Before:* IN EXECUTION from `3df2ce1` (25.1, the project-and-bake route, sat twice and rejected at 25.1.8); BRIEF READY (Pass 1); SEEDED (2026-11-01), split out of Phase24 on the lead's *"Split and seed"* (RD-OVS-6). It runs against Phase24's judge.
 **Lane:** `build` (§Risk lane).
 **Measured at:** `28b3c02` (Pass 2), on **the machine with Unreal** (Unreal 5.8 at the path `unreal/build.sh` takes as `UE`; the official Blender 5.2.2 as `MATTER_BLENDER`; `unreal-runtime-v7` pinned).
 **Seeded from:** [`../Research/261101_R_SkinMapsFromAnImageModel.md`](../Research/261101_R_SkinMapsFromAnImageModel.md) (RD-AIS-1, RD-AIS-2) · [`../Research/261101_R_Spike_SkinMapFromImageModel.md`](../Research/261101_R_Spike_SkinMapFromImageModel.md) (the views route, now superseded) · [`../Research/261101_R_OneValidatedSkin.md`](../Research/261101_R_OneValidatedSkin.md) (OVS-3; RD-OVS-1 … 6) · [`Complete/Phase24_OneValidatedSkin.md`](Complete/Phase24_OneValidatedSkin.md) (the judge, `Tone34`, its pigment fields) · Pass 2's probe, [`Phase25_AiSkinStructure_probe/`](Phase25_AiSkinStructure_probe/) (F-P25-7).
 
 ## Outcome
 
-**An image model paints the head's whole skin map in the body's own layout, as one picture with no views stitched together, and it is judged beside the scanned skin and Phase24's skin on the same body. If it wins, the maker turns it into a calibrated skin structure.**
+**An image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, and it is judged beside the scanned skin and Phase24's skin on the same body. If it wins, the maker turns it into a calibrated skin structure.**
+
+*(Rewritten 2026-11-02 at Pass 3's close: the model draws a front portrait, not an unwrap (F-P25-14), so the face is projected through one camera (RD-P25-15, the lead: *"MUCH BETTER! YES"*) and the ear is a gradient (RD-P25-18). Pass 2's Outcome read: "paints the head's whole skin map in the body's own layout, as one picture with no views stitched together". The lead's objection to many views cut and blended still holds: one camera, one field, nothing blended.)*
 
 *(Rewritten at Pass 2. Pass 1's Outcome said the model's person was "projected onto the body"; the lead rejected that route at 25.1.8: *"you are cuting pasting, patching, matching, blending, when I think we should be trying to figure out how it can generate a full map"*. The claim is still the face, this subject, this tone (OVS-7).)*
 
@@ -15,11 +17,11 @@
 
 ## The Brief
 
-> **⚠ Superseded for the face at Pass 3 — start at [§Pass 3 hand-off](#pass-3-hand-off--start-here-2026-11-01-ml_p25_d3--the-next-session).** This Brief is Pass 2's: its fit is route 5 with a UV-space warp (RD-P25-10's (d)). Pass 3 replaced that for the face with **RD-P25-15** (the model's front-view face matched to hm08's front render by dense landmarks and projected through that camera; one coordinate field carries the rest of the island; the ears pinned to their fitted move, now fitted by silhouette, F-P25-21) and **RD-P25-16** (the neck waits for the body islands). The phase is research and testing until the result is great (the lead, §Pass 3 opening); the Brief is rewritten when a route is built. *(Marked 2026-11-01, `ML_P25_D4`, on `ML_P25_D3`'s note.)*
+*Rewritten 2026-11-02 at the close of Pass 3 (`ML_P25_D5`). Pass 2's Brief (route 5 with a UV-space warp) is in git at `4b16404`; what replaced it is RD-P25-15 … 20. The routes table, Rides on and the carried decisions are kept below.*
 
 ### What this phase builds, in one paragraph
 
-**The model paints the map itself.** hm08's head is one island in the atlas: an unwrapped face with the scalp rolled out to each side and the ears as pads. Krea 2 already knows that picture: given the island at the subject's tone, it repaints it as one coherent unwrapped photograph of a real person, with the features where hm08's layout has them and no seams between views, because there are no views (F-P25-7, measured this pass). 25.1 makes that a library tool: cut the island, have the model repaint it fully while a constraint holds the fit: a geometry control (the lead's Krea edit LoRA route, F-P25-8), or one warp of the model's free face onto hm08's features (F-P25-11), because strength cannot hold it; put it back at the model's size (2K; 8K waits for the fit, RD-P25-13). Click 1 shows it beside A, C and 25.1's views-route D. The winner then goes through the maker as a structure (25.2) and, if it wins, into the set (25.3), as Pass 1 planned. **Only the colour varies:** D wears `Tone34`'s shine set, nails, body and every held-fixed piece.
+**The face comes from the model's picture; the ear from the maker.** Krea 2 paints the head island at the subject's tone with the target's prompt. Its face is a front portrait (F-P25-14), so dense landmarks (MediaPipe, 478 points) match it to hm08's front render, with hm08's eye points snapped to the eye openings (F-P25-25). Each visible face texel takes its colour through that one camera, and one coordinate field carries the rest of the island from the picture's own layout, nothing blended (RD-P25-15, F-P25-16). The ear is not the picture's: it is a gradient through the maker's skin model, each part borrowing a measured face region of the same skin build, owning the whole ear and never touching the face (RD-P25-18, RD-P25-19, F-P25-26). The neck join waits for the body (RD-P25-16). Everything is at the model's size, ~2K; the 4K test comes when things are figured out, 8K after (RD-P25-20). The working shine is flat relief + matte (F-P25-13). 25.1 makes the chain a library tool and shows click 1; 25.2 makes D a structure; 25.3, if D won, puts it in the set.
 
 ### The routes, compared (Pass 2)
 
@@ -44,58 +46,53 @@ The island cut and the UV-space generation are new; the inversion is new (F-P25-
 ### First human test
 
 **Where:** the machine with Unreal, where every tool the clicks compare has run (`LOCAL_DELTAS.md` §Two machines).
-- **The surface:** the library's look view (`tools/parity/look.py --judge`, the pinned runtime), Phase24's nine fixed views at ~1 m and ~40 cm (RD-P24-4), `--width 1536`. A is the scanned bar (`--bar`, made locally, never committed: RD-P23-10). C is `Skin_Tone34_Clean_Base_s001_v01` as served. D is an outside colour picture worn by `Tone34`'s article with its shine set (`look.py --candidate`, built at 25.1). The agent renders, measures, opens the sheet with `xdg-open` and puts its path in the handback. **Every picture shown to the lead is at its native resolution, one file per view, never a shrunk contact sheet** (the lead: *"the images you show me are too low res for the quaklity we are starting to look into"*). Never Blender (RD-CMT-4).
-- **The ruler:** sat at Phase24's click 1 (*"A reads real, B reads fake"*); not re-sat.
-- **The reference the lead has already judged:** 25.1's views-route D (`kr50`, second showing): *"It is better"* than C, rejected for its route and its seams. Click 1 is meant to close the gap from it to A **without** its seams.
-- **Can the surface show it?** The close-ups are 0.04 mm a pixel; an 8K texel on the face is ~0.1 mm. The model paints the island at its largest size, about 2 MP (Krea's range is 1–2K, F-P25-10): **0.36 picture pixels per 8K texel, ~0.28 mm a pixel**, so the plain picture is ~3× softer than C's texels and ~7× the close-up's pixel. **Click 1 is judged at that size anyway** (RD-P25-13, the lead: work at 2K or 4K until the fit is solved): it answers the fit and the skin, and softness in the close-ups is expected, named in the handback, and not the question. The fixture is the subject itself (one tone, one person, RD-OVS-1).
+- **The surface:** the library's look view (`tools/parity/look.py --judge`, the pinned runtime), Phase24's nine fixed views at ~1 m and ~40 cm (RD-P24-4), `--width 1536`. Never Blender (RD-CMT-4). The agent renders, measures and opens the pictures with `xdg-open`, putting their paths in the handback. **Every picture shown to the lead is at native resolution, one labelled picture at a time** (the lead).
+- **The columns:** A is the scanned bar as is (`--bar`, local, never committed: RD-P23-10). C is `Skin_Tone34_Clean_Base_s001_v01` with the working shine. D is the chain's map, the subject's target seed (`uv_a_s90_seed7`, regenerated byte-identical by its record), with the working shine. **C and D wear the same shine**, so the click compares colour only; A keeps its own.
+- **The reference the lead has already judged:** the target on hm08 (`P3_probe3_target_on_mesh.png`, *"MUCH BETTER! YES"*), the eye fix (*"looks right"*) and the gradient ear (*"looks better"*). Click 1 is meant to show that same result **made by the tool, not the probes**, beside A, so the lead can say whether D beats C as a skin.
+- **Can the surface show it?** At 2K the face is ~0.32 mm a picture pixel, against ~0.04 mm a pixel in the close-ups. So the close-ups read soft; that is expected, named in the handback, and not the question (RD-P25-20). The ¾ and front at 40 cm (~0.25 mm a pixel) carry the fit and the skin. **The fixture** is the subject itself (one tone, one person, RD-OVS-1).
 
-1. **Click 1 — the model's whole map beside the bar (25.1).** A · C · **D-views** (25.1's `kr50`, already judged) · **D-map** (route 5, at the model's size, RD-P25-13).
-   - *Judge:* does D-map read as real as A, and does it lose the seams D-views had (the neck and forehead gradient lines, the ears)? Part by part: the eyes, cheeks, nose, lips, hairline, ears, neck.
-   - *What the lead can say after:* *"D-map reads real and has no lines; it beats D-views"*, or *"it is softer / it moved the lips / it painted shadows"*.
-   - **If D-map loses to D-views or C in every view,** 25.2 does not start on the agent's word (RD-P25-6).
-2. **Click 2 — the structure (25.2).** As Pass 1 wrote it: shown only if the inversion changes the look by more than 1 ΔE in a face region.
-3. **Click 3 — the set with D, served (25.3, only if D won).** As Pass 1 wrote it.
+1. **Click 1 — the chain's head beside the bar (25.1).** A · C · D, the nine views.
+   - *Judge:* does D read as a real person's skin, as close to A as the probes were? Check each part: the eyes (level, no painted line under them), lips, nose, brows, the ear (plain, one gradient, the face untouched) and the hairline.
+   - *What the lead can say after:* *"D is the probes' result, and it beats C"*, or which part regressed.
+   - **If D does not beat C,** 25.2 does not start on the agent's word (RD-P25-6).
+2. **Click 2 — the structure (25.2):** as Pass 1 wrote it, shown only if the inversion changes the look by more than 1 ΔE in a face region.
+3. **Click 3 — the set with D, served (25.3, only if D won):** as Pass 1 wrote it.
 
-**Reconciled click by click:**
-- Click 1 needs only 25.1: the island cut and put back, the fit candidate chosen, `look.py --candidate` (already built). D-views is on disk (`library/parity/P25_Views/albedo_kr50.npy`, git-ignored); its picture is remade with `project_views.py bake … --picture` if `D_kr50.png` is stale.
-- Clicks 2 and 3 are unchanged from Pass 1.
-- **§In now, walked:** every row names its step.
+**Reconciled click by click:** click 1 needs only 25.1, and every column is on disk or regenerated by the tool. The ear gradient is in the maker before click 1 (25.1), so D's ear is the maker's at click 1 as at 25.2. **§In now, walked:** every row names its step.
 
-**Not a click: Studio and the headset** (RD-OVS-4, F-P25-6).
+**Not a click:** Studio and the headset (RD-OVS-4, F-P25-6). The 4K test (RD-P25-20).
 
 ### In now
 
 | Item | Step |
 |---|---|
-| **The island tool** under `tools/converters/fit/`: cut `Tone34`'s head island from the 8K atlas at the subject's tone, upright, at the model's size, with its mask; put a picture back on the island, held to the subject's face core (`SUBJECTS["Tone34"]["held"]`), C elsewhere (the probe's `prep.py` / `back.py`, F-P25-7) | 25.1 |
-| **The fit, held by a constraint chosen by measurement** (RD-P25-10): a geometry control (a Krea edit or control LoRA under Krea's licence, fed hm08's feature lines); FLUX.2 [klein]'s own edit; or the model's free face warped once onto hm08's in UV space *(superseded for the face by RD-P25-15, Pass 3)*. The gate: lips and lids land on hm08's, no brows painted, the skin fully repainted | 25.1 |
-| **The detail pass in UV space: to 4K first, 8K only after** (RD-P25-13, RD-P25-20) | after the fit passes and click 1 is sat |
-| **The prompt** that reads as a real person's unwrapped skin, with no shadows painted in (F-P25-7: the sockets came out dark) | 25.1 |
-| **The record** of every picture: model files, LoRA, seed, prompt, steps, strength (RD-P25-7) | 25.1 |
-| **The inverse of the skin model** and **the maker taking an outside field**, the remake-identical proof (unchanged from Pass 1; F-P25-1) | 25.2 |
-| **If D won:** the lead's re-ruling; `Tone34`'s colour made from D; provenance (*AI-assisted*, the model and LoRA named); the picture kept as its source (RD-P25-8); thumbnails; the dev install re-served | 25.3 |
-| **Written down:** `SkinMaps.md` (an AI-painted map: how it is made, and whether one is accepted, in the lead's words); the AIS research's Q-AIS-1 row and a pointer to Pass 2's routes | at the close |
+| **The face chain as a library tool** under `tools/converters/fit/`, from the probes: the landmarks on the picture and on hm08's front render, hm08's eye points snapped to the openings (`snap_eyes.py`); the front projection and the coordinate field (`probe3_field.py`); `paint_uv.py put` | 25.1 |
+| **The generation** through the lead's ComfyUI: Krea 2 at 0.9 with the target's prompt (`gen_uv.py`'s `a` key), the record per picture (RD-P25-7) | 25.1 |
+| **The ear region in the maker** (RD-P25-18, RD-P25-19): the four weights from the mesh, the borrowed regions per subject, the join on head skin behind the jaw, the face untouched (F-P25-26); and `put` taking the ear and its join from the maker's map, never the picture | 25.1 |
+| **The working shine in the look view:** flat relief + matte as an option, so D and C are drawn alike (probe 1's settings, `probe1_shine.py`) | 25.1 |
+| **The inverse of the skin model** and **the maker taking an outside field** (on the face; the ear the maker's own), the remake-identical proof | 25.2 |
+| **If D won:** the lead's re-ruling; `Tone34`'s colour made from D; provenance (*AI-assisted*, the model named); the picture kept as its source (RD-P25-8); thumbnails; the dev install re-served | 25.3 |
+| **Written down:** `SkinMaps.md` (how an AI-assisted map is made, and the ear gradient, in the lead's words); the AIS research's Q-AIS-1 row and a pointer to the routes | at the close |
 
 ### Not now
 
-- **The body from the model:** the head island only (RD-P25-1). The body has no bar (OVS-7). The body islands painted the same way are the natural next unit.
-- **Other tones, people and ages:** *Variety*, after.
-- **A raw AI map shipped as is:** never (RD-SYN-1); D-map is a comparison until 25.2 makes it a structure.
-- **Routes 2 and 3** (RD-P25-11); **training a layout LoRA** unless no conditioner passes (RD-P25-12).
-- **The non-commercial identity-edit LoRA** (F-P25-8).
-- **The shine set and nails from the model:** a model draws colour only (RD-P25-3).
-- **The views route's bake** (25.1.1–25.1.8): kept in the tree, not the route (RD-P25-14).
-- **A creator-run generator** (Q-AIS-1's framing); **training on photos of people** (Q-AIS-2).
+- **The 4K test and 8K** (RD-P25-20): after things are figured out, each its own step.
+- **The body and the neck seam** (RD-P25-16, §Deferred): the next unit. The lead asked *"what about the rest of the body?"* (2026-11-02), and the handback answered it; nothing is ruled.
+- **The ear from a picture** (the projection and silhouette fits, F-P25-21, F-P25-22): kept as probes, not built.
+- **The relief map's return** (RD-P25-3 is in question since F-P25-13): after the colour is settled; the lead: *"we can add texture and stuff later"*.
+- **A layout LoRA** (RD-P25-12, F-P25-20): only if the chain fails, on the lead's word.
+- **Other seeds, tones, people and ages:** *Variety*. **A creator-run generator** (Q-AIS-1); **training on photos of people** (Q-AIS-2).
+- **The shine set and nails from the model** (RD-P25-3). **A raw AI map shipped as is:** never (RD-SYN-1).
 
 ### The reuse check
 
 *What does the stack already provide, and which contracts are touched?*
-- **The judge exists:** `look.py --judge`, `--bar`, and `--candidate` (25.1's commit `12343f5`).
-- **The generation client exists:** `gen_views_model.py`'s ComfyUI client (`upload`, `fill`, `run`, standard library only) and its tracked Krea workflow; the probe drove it unchanged. Its view table and prompt are the views route's.
-- **The head's texels and masks exist:** `project_views.head_fields` (the head's texel indices, positions, and the face, lips, lids, brow and ear masks at 8K), cached; the probe cut the island from them. Its renderer is the agent's quick check on the mesh (the probe's sheet).
-- **ComfyUI's model folder** has Krea 2 Turbo and FLUX.2 [klein] 4B (F-P25-5). **A Krea edit LoRA needs its node pack** installed into the lead's ComfyUI (custom nodes) and the LoRA file in the shared model folder: a system change, logged in the workstation's change log.
-- **The maker** (`gen_synth_skin`, `gen_skin_maps --fields`) and its 8K bands: as Pass 1 (25.2).
-- **No input added, no master changed, no new Unreal runtime owed** (`base_color_map` carries D).
+- **The judge exists:** `look.py --judge`, `--bar` and `--candidate`. Only the working-shine option is new, and its settings are probe 1's, already run through `look`'s own functions.
+- **The generation client and the island tool exist:** `paint_uv.py` (`cut`, `paint`, `put`, `find`) and `gen_views_model.py`'s client. The probes drove them unchanged.
+- **The head's geometry exists:** `head_fields_8192.npz` (every head texel's position, normal and masks) and the front render's geometry (`geom_f000.npz`). The probes read nothing else.
+- **The maker has regions and a skin model:** `face_regions`, `SUBJECTS[…]["face"]`, `Lut`, the depth term. The ear region is one more region of the same kind, and its values are borrowed regions (F-P25-26), not new numbers. **It replaces `compose`'s `0.9 * _blur(F, "ears", 6)` only for a subject that opts in**, so the tones and other skins remake identical.
+- **New outside packages, kept out of the project's dependencies:** MediaPipe (Apache-2.0) and its face-landmarker model (sha256 `64184e22…bc9ff`), and SciPy (Delaunay, `map_coordinates`, the distance transform). They ride `uv run --with`, as `bar_maps.py` does with OpenEXR. Making either a project dependency is a lead question, not taken here.
+- **No input added, no master changed, no new Unreal runtime owed** (`base_color_map` carries D; the working shine sets existing inputs).
 - **Contracts touched:** none of the article's. `SkinMaps.md` §Sources (*"A fully AI-made map is not accepted"*) only by the lead's re-ruling at 25.3.
 
 ### Decisions that bind
@@ -116,7 +113,7 @@ The island cut and the UV-space generation are new; the inversion is new (F-P25-
 **Decided at Pass 1 and still standing:** RD-P25-1 (the head; the body is C's, joined in pigment at the neck) · RD-P25-3 (only the colour varies) · RD-P25-6 (click 1 can stop the phase) · RD-P25-7 (generation drives the lead's ComfyUI over its API; the project gains no dependency; ComfyUI started by the agent only if not running, stopped by PID if started) · RD-P25-8 (if D wins, its picture is its source, in LFS with its record; now one picture, not views).
 **Superseded at Pass 2:** RD-P25-4 (views at the model's size, close cameras) and RD-P25-5 (two D rows from the same views; Krea by img2img with the overlay gate): there are no views. **RD-P25-2 (the lips are the maker's)** now holds for 25.2's structure only: at click 1 D-map is shown as the model painted it, lips included, because masking them in is the patching the lead rejected; whether its lips stand is judged.
 
-**Decided here, unless the lead says otherwise:**
+**Decided at Pass 2, unless the lead says otherwise** (RD-P25-9, -10 and -13 as later passes amended them, in place):
 - **RD-P25-9 — The route is the head island painted in UV space.** The model repaints C's head island, cut upright at the subject's tone, as one picture; the picture goes back on the island, held to the subject's face core. Why: it is the only route found that gives a whole map in hm08's own layout from the model with no views, no projection and no training, and the probe showed it works untrained (F-P25-7).
 - **RD-P25-10 — The fit is held by a constraint, not by strength, and the constraint is chosen by measurement.** Plain img2img with cues is out (F-P25-11). Three candidates, the same island, prompt and seed: **(b)** a geometry control: a Krea 2 edit, control or inpaint LoRA under the Krea 2 Community License, given the island with hm08's feature lines (lips, lid slits, nostrils, ear rims, drawn from `head_fields`' masks) as an aligned source or edge map (NK2E and its canny LoRA, `krea2-inpaint-edit`, `krea2-anypaint`; licences read again at install); **(c)** FLUX.2 [klein] 4B's own edit (Apache-2.0); **(d)** the model paints freely at the strength where its skin is best (0.9 in the probe), then **one smooth 2D warp of that picture in UV space** *(superseded for the face by RD-P25-15 at Pass 3: a 2D warp bends a front view into an unwrap and cannot fit, F-P25-14)* moves its eyes, brows' line, nose, lips and ears onto hm08's (landmarks found on the picture, hm08's from its masks; a thin-plate warp, NumPy) and nothing is blended. **The gate:** in UV space, the painted lips' and lid lines' centroids within **1 mm** of hm08's masks, no brows painted, the skin repainted fully (strength ≥ 0.75, or (d)). (d) also needs: no feature stretched visibly by the warp (the agent's look at the warped picture, measured as the warp's largest local scale). The agent runs it; the winner goes to click 1. If none passes at a strength that repaints the skin, RD-P25-12 applies and the lead is asked.
 - **RD-P25-11 — Routes 2 and 3 are not taken.** Route 2's tools are the rejected route done jointly, or re-unwrap hm08 (whose layout is fixed), and its best-known tool's licence does not apply in the EU, the UK or South Korea, which a public CC0 library's tool cannot have. Route 3 is projection again.
@@ -124,45 +121,57 @@ The island cut and the UV-space generation are new; the inversion is new (F-P25-
 - **RD-P25-13 — 2K, at most 4K, until the fit is solved; the detail pass to 8K waits.** *Ordered by RD-P25-20 (2026-11-02): 2K until things are figured out, then a 4K test, only then 8K.* The lead, 2026-11-01: *"Until we solve this sizing stuff we can work in 4 or even 2k"*. *(Read as: the fit is the question; resolution comes after it.)* The island is painted at the model's size (~2 MP; 4K only where a candidate needs it) and put back as made; 25.1 does not build the detail pass. **Once the fit passes and the lead has looked at click 1,** the pass runs as follows, as its own step or the start of 25.2. The model's picture of the island is ~2 MP; 8K needs ~11× the pixels on the face. The pass is the model's own: the island upsampled to 8K and repainted in overlapping tiles at a low strength, the same prompt, the tiles joined by the sampler (a ComfyUI tiled upscale), not by our blend. Execute measures how far the tiles drift from the whole picture's colour (per face region, against the 2 MP picture upsampled) and shows the lead the plain picture too if the pass changes the look.
 - **RD-P25-14 — 25.1's views-route code stays in the tree, unused by this route.** `look.py --candidate` and `gen_views_model.py`'s client are reused; `project_views.py`'s renderer and `head_fields` are reused; its bake is not the route. Whether the bake is retired is decided at the close, by whether anything still calls it.
 
+**Decided at Pass 3** (each with its finding): **RD-P25-15** the face is the front projection · **RD-P25-16** the neck waits for the body · **RD-P25-17** the ear projected *(superseded for colour by RD-P25-18)* · **RD-P25-18** the ear is a gradient · **RD-P25-19** the gradient owns the whole ear and never touches the face · **RD-P25-20** 2K, then a 4K test, then 8K. **And unless the lead says otherwise:** hm08's eye points are the snapped ones (F-P25-25, *"looks right"*); the ear borrows `alae` / `upper_lid` / `cheek` (F-P25-26, *"looks better"*); the working shine is flat relief + matte for click 1 (F-P25-13); D is the target seed (`uv_a_s90_seed7`).
+
 ### Risk lane — `build`
 
-The controls this phase touches, each read on 2026-11-01:
-- **The maker** (25.2): as Pass 1 — a new optional input; every committed skin map is its fingerprint; `Tone34` and the 18 skins must remake pixel-identical without the field.
-- **`look.py`:** `--candidate` exists (`12343f5`); no change expected. Writes only under its output folder (RD-P23-10).
-- **What enumerates the trees this phase adds to:** new tools under `tools/converters/fit/` are enumerated by no gate. **The probe folder** `docs/Planning/Phases/Phase25_AiSkinStructure_probe/` is read by nothing (only a docstring names `docs/Planning/Phases`; grepped `tools/` this pass), as Phase10's probe files are. A D win changes `SkinTone34_basecolor_sUKN.png` (the recipe gate G8, thumbnails, `serve_to_stage.py`; Learnings G2).
-- **The lead's ComfyUI** is shared by the lead's other projects: a node pack is installed through its manager or its `custom_nodes` folder, the change logged in the workstation's change log with its revert, and the LoRA's licence quoted in the ledger before its first run. **Before each model run:** `ps -ef | grep "[U]nrealEditor"`; ComfyUI's queue empty (`/queue`); free memory read. **Before a look-view launch:** ComfyUI's cached models released with `POST /free` (`unload_models`), which does not stop the server (P25 retro item 4).
+The controls this phase touches, each read on 2026-11-01/02:
+- **The maker** (25.1's ear region, 25.2's field): every committed skin map is its fingerprint. The ear region is opt-in per subject, so **`Tone34` and the 18 skins must remake pixel-identical without it** (the 25.2 proof, run from 25.1). The served `Tone34` changes only at 25.3.
+- **`look.py`:** a new option, off by default. It writes only under its output folder (RD-P23-10).
+- **What enumerates the trees this phase adds to:** new tools under `tools/converters/fit/` are enumerated by no gate. The probe folder `docs/Planning/Phases/Phase25_AiSkinStructure_probe/` is read by nothing. A D win changes `SkinTone34_basecolor_sUKN.png` (the recipe gate G8, thumbnails, `serve_to_stage.py`; Learnings G2).
+- **The lead's ComfyUI** is the lead's, shared with other projects. If it is not running, the agent starts it with `comfyui` and stops it by PID when done (RD-P25-7). It was found stopped on 2026-11-02. **Before each model run:** `ps -ef | grep "[U]nrealEditor"`, the queue empty, free memory read. **Before a look-view launch:** no Unreal process for ~3 minutes (§Two machines), and ComfyUI's models freed (`POST /free`).
 - **The masters and the runtime:** untouched.
-- **The one irreversible risk is publication:** the repo is public. The bar is never committed nor its path written. D's picture is committed only on a D win and the lead's re-ruling.
-- **Baseline:** `run_all.py` at `180e00b` (Pass 1: 18/18 PASS); 25.1.7 recorded 18/18 PASS after its tools. No change under `blender/addons/` or `tools/conformance/`.
+- **The one irreversible risk is publication:** the repo is public. The bar is never committed nor its path written. A model's picture of a person is committed only on a D win and the lead's re-ruling (RD-P25-8).
+- **Baseline:** `run_all.py` 18/18 PASS at 25.1.12; execute re-runs it at kickoff. No change under `blender/addons/` or `tools/conformance/`.
 
 Nothing here is authorization, secrets, a destructive migration or the public edge.
 
 ### Step list
 
-- **25.1 — The model paints the map.** *(Pass 3: the fit is RD-P25-15's front projection, not the three candidates; the step list is rewritten when that route is built.)* The island tool; the three fit candidates through RD-P25-10's gate; the prompt; D-map on the atlas at the model's size. **Click 1** (A · C · D-views · D-map).
-- **25.2 — D as a structure.** As Pass 1: the skin model's inverse; the maker composing `Tone34` from D's field on the head and C's on the body at 8K, the lips the maker's (RD-P25-2); the remake-identical proof; the round trip. **Click 2**, only if the structure changes the look.
+- **25.1 — The chain makes the head.** The face chain as a tool; the generation; the ear region in the maker, `put` taking the ear from it; the working shine in the look view. **Click 1** (A · C · D).
+- **25.2 — D as a structure.** As Pass 1: the skin model's inverse; the maker composing `Tone34` from D's field on the face (the ear and the lips the maker's, RD-P25-2) and C's on the body; the remake-identical proof; the round trip. **Click 2**, only if the structure changes the look.
 - **25.3 — If D won: the set with D, served.** As Pass 1. **Click 3.**
 
-Time to the first click: the probe's four scripts become one tool, plus the warp (a few hours); a node pack and a LoRA installed (minutes); three candidates × a few strengths at ~13 s a picture; one look-view launch. The detail pass is not before click 1 (RD-P25-13).
+Time to the first click: the probes are written and reproduce byte-identical, so 25.1 is porting them into tools (a few hours), one picture (~15 s) and one look-view launch (~1 min).
 
 ### Compact build map
 
 - **25.1:**
-  - `tools/converters/fit/paint_uv.py` (new, NumPy): `cut` (the island from the subject's atlas at its held tone, upright, at a given size, plus its mask and C's lip/lid masks in the same frame; the probe's `prep.py`, with the island chosen from `head_fields` by its atlas columns, `_c >= 5100 & _r < 7150` in the probe: replace that literal with the island's own connected component) · `put` (a picture back on the island, held to the face core; the probe's `back.py`) · `lines` (hm08's feature lines in the island's frame, for a geometry control) · `warp` (conditioner (d): landmarks on the picture onto hm08's, one thin-plate warp, NumPy) · `gate` (the lip and lid centroids in mm, RD-P25-10). Writes under git-ignored `library/parity/P25_*`.
-  - The generation: `gen_views_model.py`'s client, called on the island (a `--picture` mode, or a small sibling script); a tracked workflow per conditioner under `tools/converters/fit/comfy/` (the LoRA's file named, never the model folder's path).
-  - *After the fit passes (RD-P25-13), not before click 1:* the detail pass: a tracked tiled-upscale workflow (ComfyUI's own tiled sampling, or a node pack's, licence read), on the cut island at 4K first, 8K only after (RD-P25-20).
-  - Evidence before click 1: the gate per conditioner and strength; the probe's mesh check (`project_views.py render … --albedo`) for the winner; D-map per face region against A and C (Phase23's profiles, as Phase24 measured); the detail pass's drift.
+  - `tools/converters/fit/project_face.py` (new; NumPy, plus MediaPipe and SciPy through `--with`):
+    - `landmarks <picture>` and `landmarks --render`, the second with the eye snap (`snap_eyes.py`'s method);
+    - `field <picture> <frame>`: the front projection to normal z 0.08 (0.3 for a seed whose cheek streaks, F-P25-17), the coordinate field, the ear pads held at zero move (the ear is the maker's);
+    - the face-landmarker model fetched once into the git-ignored `library/parity/`, its sha256 checked.
+    - Writes under git-ignored `library/parity/P25_*`.
+  - `paint_uv.py`: the `put` ear rule (RD-P25-19); `cmd_paint`'s wrong caching comment corrected (25.1.9).
+  - The prompt: `gen_uv.py`'s `a` key moved into the tool, with the record per picture.
+  - `gen_synth_skin.py`: an `ear` part in `face_regions` (the stand-off, front/back, thinness and lobe weights; F-P25-26's numbers), `SUBJECTS["Tone34"]["ear"]`, and the join limited by the face mask; a call `put` uses to get the subject's ear colour at 8K.
+  - `look.py --shine neutral` (flat relief + matte, `probe1_shine.py`'s `variant`), applied to C and every candidate.
+  - Evidence before click 1:
+    - the tool's D against the probes' (`D_grad_p2.png`) per face region;
+    - the eye check (`find`'s lash lines);
+    - texels on the face with weight ≥ 0.15 unchanged by the ear (F-P25-26's check);
+    - the 18 skins and `Tone34` remake identical without the ear key.
 - **25.2** (unchanged from Pass 1):
-  - `gen_synth_skin.Lut.inverse(ratio, so2, depth)`: per texel, the (melanin, blood) whose colour over the base matches, by the table's own grid (a nearest lookup refined by one interpolation step); out-of-gamut texels reported, not clipped silently.
-  - `compose` / `compose_banded`: an optional outside field (`field=`) replacing `mel` and `bld` where its weight is 1, C's own elsewhere, joined in log-pigment; the lips term unchanged.
-  - `gen_skin_maps.py --subject Tone34 --pigments DIR`: D's field in; the map and its stats out to a scratch folder unless D won.
-  - Proof: without `--pigments`, `Tone34` and the 18 skins pixel-identical (in-process). The round trip, D against click 1's picture per region (ΔE).
-- **25.3 (only on a D win):** `SkinTone34_basecolor_sUKN.png` from D; the provenance row (`made: ai-assisted`, model, LoRA, revision, seed, the picture's hash); the picture tracked (RD-P25-8); `make_thumbnails.py`; `serve_to_stage.py --no-restart` (check for a running Stage daemon first; close what you start); `SkinMaps.md` §Sources in the lead's words.
+  - `gen_synth_skin.Lut.inverse(ratio, so2, depth)`;
+  - `compose` / `compose_banded` taking an outside field on the face;
+  - `gen_skin_maps.py --subject Tone34 --pigments DIR`;
+  - the proof and the round trip.
+- **25.3 (only on a D win):** as Pass 1.
 - **Tests:** `run_all.py` per step; the remake-identical proof; one real-path smoke per click, which is the look view. No new gate.
 
 ### Open for the lead
 
-*None.* RD-P25-9 … 14 are decided unless the lead says otherwise.
+*None blocking.* Asked and not ruled: the body (Not now). The decisions above stand unless the lead says otherwise.
 
 ---
 
@@ -218,7 +227,8 @@ Time to the first click: the probe's four scripts become one tool, plus the warp
 ## Depends on
 
 - **The models (RD-OVS-5)** in the shared model folder, and the lead's ComfyUI, before 25.1's generation step: both supplied during this pass (F-P25-5). Execute checks each file is whole (no `.part` left) before the first run.
-- **A Krea edit LoRA and its node pack** in the lead's ComfyUI, installed by 25.1 (RD-P25-10); the change logged in the workstation's change log.
+- ~~**A Krea edit LoRA and its node pack** in the lead's ComfyUI, installed by 25.1 (RD-P25-10)~~ *not needed: the face is the front projection (RD-P25-15), 2026-11-02.*
+- **MediaPipe's face-landmarker model and SciPy, run through `uv run --with`** (§The reuse check); no project dependency.
 - **Nothing outside this repo for any click.** The bar is read locally (RD-P23-10).
 
 ## Discovery Log
@@ -245,7 +255,8 @@ Time to the first click: the probe's four scripts become one tool, plus the warp
   - **Corrected on a sibling's message** (the P25 retro `f481c23`): the "ComfyUI caches by upload name" claim, at 25.1.9, 25.1.13 and the Pass 3 opening. The Roadmap entry's `BRIEF READY` updated.
   - **Learnings:** none new read; the look view as Phase24 ran it.
 - **Pass 3 continued — 2026-11-01** (session `ML_P25_D5`, the hand-off's three items). Search mode: Bash reads on absolute paths (auto mode; no Grep/Glob tools).
-  - **Done:** the low eye (F-P25-25, the lead: *"looks right"*); the ear gradient probed (F-P25-26); OMF's ear ask drafted (F-P25-27).
+  - **Done:** the low eye (F-P25-25, the lead: *"looks right"*); the ear gradient (F-P25-26, RD-P25-19, the lead: *"looks better"*); OMF's ear ask drafted (F-P25-27); the resolution steps (RD-P25-20).
+  - **BRIEF READY 2026-11-02:** the Brief, Outcome and Roadmap entry rewritten for the head build. Not done this pass: a `run_all.py` baseline (the last was 18/18 PASS at 25.1.12; execute runs it at kickoff). A sibling session, `ML_R_PlatformMakeupAsks`, was started on the lead's word for the platform's makeup asks; it shares no file with this phase.
   - **Web:** one web-only agent (ear colour and anatomy sources, F-P25-26); two papers fetched to scratch and read as text.
   - **House rules:** ComfyUI (the lead's, left running) freed before each launch. One launch (`eargrad/look1`) started while a short Unreal run from another session was up: it showed in the check chained before the launch and had gone a minute later. Later launches waited for 3 quiet minutes.
 
@@ -282,7 +293,7 @@ The lead, verbatim: *"Indeed... we need to break this problem down... i look at 
 
 **Kept from Pass 2:** `paint_uv.py`; the gate and its positive control; Krea at 0.9 draws from the words alone; FLUX's edit paints a second face; 2K until the fit is solved (RD-P25-13; then 4K, then 8K: RD-P25-20); one labelled picture at a time for the lead. *(A "ComfyUI caches by upload name" item stood here; wrong, struck at Pass 3: see 25.1.9. It also means F-P25-11's "cues do not help" at 0.75–0.9 says less than it seems: at 0.9 no input can help.)*
 
-### Pass 3 hand-off — start here (2026-11-01, `ML_P25_D3` → the next session)
+### Pass 3 hand-off (2026-11-01, `ML_P25_D3` → the next session) — *done at `ML_P25_D5`; start at §The Brief*
 
 **Where it stands.** The phase is research and testing until the result is great (the lead). The route for the face is settled: **the model paints a front-view face; dense landmarks (MediaPipe, 478) match it to hm08's front render; it is projected through that camera; one coordinate field carries the rest of the island from the picture's own unrolled sides, the ears pinned to their fitted move** (RD-P25-15, F-P25-15 … 17). The lead's best so far: **the target `uv_a_s90_seed7` through that chain, projection to normal z 0.08, ears fitted** (`P3_probe3_ears.png`, right). Working shine: flat relief + matte (F-P25-13, the lead: *"The skin looks better for this step"*). The neck waits for the body islands (RD-P25-16).
 
@@ -471,6 +482,7 @@ The lead, verbatim: *"Indeed... we need to break this problem down... i look at 
     - in front of the ear (4.3–4.5 k ear-mask texels a side) the strip stays the picture.
     - **Checked on the atlas:** no texel outside the ear with a face weight ≥ 0.15 changed (0 of 3.8 M); the largest face weight in the join is 0.14.
     - **Seen** (`P3_ear_gradient_whole.png`, before · after, profile and ¾ at 40 cm, shown to the lead): the dark picture streak down the ear's front edge is gone, so the ear is one gradient from root to rim, and the cheek and jaw are unchanged. Still there and not this chain's: the pale strip above the ear's top (the article's other maps, F-P25-23) and the neck step (RD-P25-16).
+    - **The lead's verdict** (2026-11-02), verbatim: *"the new earmap looks better"*. **The mapping (front = `alae`, rim + `upper_lid`, lobe = `cheek`, back unchanged) stands as decided**, unless the lead says otherwise: it was put to the lead twice and not changed.
     - **Reproduce:** as above with `p2.json` (= `p1.json`; `join_mm` 10 and `face_max` 0.15 are the script's defaults) → `$E/D_grad_p2.png`, run as `uv run --with scipy python $Q/ear_gradient.py …`. SciPy rides `--with` because the project has none. Then `probe1_shine.py $E/look3 library/parity/P25_Map/D_s7.png before=$E/D_grad_p1.png after=$E/D_grad_p2.png`.
   - **For the build (25.2's maker, not this pass):** an `ear` part in `face_regions`, with the four weights from the mesh as above and `SUBJECTS[…]["ear"] = {"front": ["alae"], "rim": ["upper_lid"], "lobe": ["cheek"], "back": []}`. It replaces `compose`'s `0.9 * _blur(F, "ears", 6)` blood term on the ear, and the remake-identical proof covers the tones that keep the old term. **The mapping is the agent's, from the anatomy sources: the lead's to confirm.** The weights re-run unchanged on a re-meshed ear.
   - **Reproduce** (`E=library/parity/P25_Pass3/eargrad`, scripts kept as `Phase25_AiSkinStructure_probe/ear_measures.py`, `ear_gradient.py`):

@@ -33,8 +33,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
 
-### Phase25 — AI Skin Structure — IN DISCOVERY (Pass 3: research and testing until the result is great, the lead, 2026-11-01) *(split out of Phase24 and seeded 2026-11-01 by `/research` on the lead's "Split and seed", RD-OVS-6; runs after Phase24, against its judge; re-discovered 2026-11-01 after the lead rejected the views route at 25.1.8: the model now paints the map in the body's own layout)*
-**Outcome:** an image model paints the head's whole skin map in the body's own layout, as one picture with no views stitched together, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
+### Phase25 — AI Skin Structure — BRIEF READY (2026-11-02, Pass 3's close: the face projected through one front camera, the ear a gradient in the maker, at 2K) *(split out of Phase24 and seeded 2026-11-01 by `/research` on the lead's "Split and seed", RD-OVS-6; runs after Phase24, against its judge; re-discovered 2026-11-01 after the lead rejected the views route at 25.1.8: the model now paints the map in the body's own layout)*
+**Outcome:** an image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Phase25_AiSkinStructure.md` · research `docs/Planning/Research/261101_R_SkinMapsFromAnImageModel.md` · `docs/Planning/Research/261101_R_Spike_SkinMapFromImageModel.md`
 
 ### Eyes in the Shader — RESEARCH *(seeded 2026-10-26, the same word)*
