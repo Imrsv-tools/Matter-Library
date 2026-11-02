@@ -55,7 +55,7 @@
       <input name="in2" type="float" nodename="overlay2_density_mask" />
     </multiply>
     <constant name="base_color_const" type="color3">
-      <input name="value" type="color3" value="0.8812, 0.5341, 0.4292" />
+      <input name="value" type="color3" value="0.8757, 0.5339, 0.4289" />
     </constant>
     <texcoord name="base_color_map_uv" type="vector2">
       <input name="index" type="integer" value="0" />
@@ -326,7 +326,7 @@
     </add>
     <multiply name="subsurface_radius_mapped" type="float">
       <input name="in1" type="float" nodename="scatter_map_factor" />
-      <input name="in2" type="float" value="0.00482" />
+      <input name="in2" type="float" value="0.00241" />
     </multiply>
     <output name="subsurface_radius_out" type="float" nodename="subsurface_radius_mapped" />
     <mix name="subsurface_weight_deposit2" type="float">
@@ -353,7 +353,7 @@
     <input name="subsurface_color" type="color3" nodegraph="NG_Skin_Tone34_Clean_Base_s001_v01" output="base_color_out" />
     <input name="subsurface_radius" type="float" nodegraph="NG_Skin_Tone34_Clean_Base_s001_v01" output="subsurface_radius_out" />
     <input name="subsurface_radius_scale" type="color3" value="1.0, 0.351, 0.226" />
-    <input name="subsurface_scatter_anisotropy" type="float" value="0.8" />
+    <input name="subsurface_scatter_anisotropy" type="float" value="0.0" />
     <input name="fuzz_weight" type="float" nodegraph="NG_Skin_Tone34_Clean_Base_s001_v01" output="fuzz_weight_out" />
     <input name="fuzz_color" type="color3" value="0.5131, 0.2742, 0.1856" />
     <input name="fuzz_roughness" type="float" value="0.5" />

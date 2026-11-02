@@ -156,7 +156,9 @@ STRUCTURES = {
 # the lips' cavity level and roughness (the bar's lip specular over the shared map's; the lips'
 # finish without their coat, RD-P22-17: Lips_*'s 0.35 under a 0.3 coat, so a little lower).
 SUBJECTS = {
-    "Tone34": {"tone": (0.5131, 0.2742, 0.1856), "fit": "IV", "melanin": 0.0805, "size": 8192, "recipe": "III",
+    # size: 4096 since 2026-11-02 (the lead: "4k or even 2k is fine right now as we try to figure out
+    # poistioning and layers"; RD-P25-20). Was 8192 (RD-OVS-2); 8K returns after the 4K test.
+    "Tone34": {"tone": (0.5131, 0.2742, 0.1856), "fit": "IV", "melanin": 0.0805, "size": 4096, "recipe": "III",
                "hold": "face", "held": (0.6437, 0.3454, 0.2526),
                "face": {"face": (-0.607, -0.059, 0.068, -0.146), "forehead": (-0.195, -0.270, -0.171, -0.250),
                         "cheek": (-0.653, -0.128, 0.039, -0.237), "nose": (-0.782, -0.345, -0.083, -0.250),
@@ -504,6 +506,10 @@ EAR = {"stand_mm": (1.0, 4.0),      # the ear proper: off the skull (the mask re
        "ring_mm": 1.0,              # the ear's root ring: its level is the skin the ear joins
        "join_mm": 10.0,             # the join onto the head skin round the ear
        "face_max": 0.15,            # no ear colour where the face weight reaches this
+       # Phase25 after the close (the lead in Studio: the ears "in their own universe ... no blend with SSS"):
+       # the borrowed regions only VARY the ear, graded in off the skull; its level and hue are the root's.
+       "vary_mm": (1.5, 8.0),
+       "scatter_mm": (1.0, 8.0),    # the scatter map's ear term rises from 0 at the root (the head's) to full
        "skull_m": 0.06, "near_m": 0.08}
 
 
@@ -579,6 +585,9 @@ def ear_paint(flat, subject: str, H: dict, W: dict | None = None) -> dict:
             for reg in regs:
                 v = v + w[k][:, None] * np.array(T[reg])
         ratio = col(v) / c0
+        full = (w["front"] + w["back"]) > 0.95
+        ratio = ratio / np.median(ratio[full], 0)              # the ear's level and hue: its root's (the join's)
+        ratio = 1 + (ratio - 1) * _ramp(stand * 1000, *EAR["vary_mm"])[:, None]
         base = np.median(flat[idx[ei][stand * 1000 < EAR["ring_mm"]]].astype(np.float64), 0)
         a = np.maximum(_ramp(stand * 1000, *EAR["own_mm"]), _face_allowed(fw[ei]))[:, None]
         flat[idx[ei]] = (flat[idx[ei]] * (1 - a) + base * ratio * a).astype(flat.dtype)
@@ -589,6 +598,22 @@ def ear_paint(flat, subject: str, H: dict, W: dict | None = None) -> dict:
                      "ratio_full_ear": np.median(ratio[w["front"] + w["back"] > 0.95], 0).round(3).tolist(),
                      "kept_as_picture": int((a[:, 0] < 0.5).sum()), "join": int((wo[:, 0] > 0.01).sum()),
                      "join_face_max": round(float(fw[oi][wo[:, 0] > 0].max()) if (wo > 0).any() else 0.0, 3)}
+    return rep
+
+
+def ear_scatter(f, subject: str, H: dict, W: dict | None = None) -> dict:
+    """The scatter map's ear term (``gen_skin_shine.scatter``, flat, texels) graded in from the ear's root:
+    0 where the ear meets the head, as the head is, rising to the ear's own off the skull (``scatter_mm``).
+    The ear is its own UV island, so no blur in the atlas can reach across the join; this is measured in 3D."""
+    if SUBJECTS[subject].get("ear") is None:
+        raise SystemExit(f"{subject} has no ear regions")
+    W = ear_weights(H) if W is None else W
+    rep = {}
+    for side, m in W.items():
+        g = _ramp(m["stand"] * 1000, *EAR["scatter_mm"])
+        t = H["idx"][m["ei"]]
+        f[t] = f[t] * g
+        rep[side] = {"texels": int(len(t)), "graded": int((g < 0.99).sum())}
     return rep
 
 

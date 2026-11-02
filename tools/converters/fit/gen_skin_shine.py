@@ -589,6 +589,7 @@ def main(argv=None) -> int:
     ap.add_argument("--out", type=Path, help="write the maps here instead (a trial: no provenance)")
     ap.add_argument("--supersample", type=int, help="height samples per texel, per axis (3; a subject 1)")
     ap.add_argument("--subject", help="a Phase24 subject's own set (gen_synth_skin.SUBJECTS), at its size")
+    ap.add_argument("--only", choices=("scatter",), help="make only this map (the others need the relief, minutes at 8K)")
     a = ap.parse_args(argv)
     global STEM
     sh = None
@@ -602,13 +603,36 @@ def main(argv=None) -> int:
         F["parts"] = gss.parts_banded(F, ("head", "hand", "neck", "trunk"))
     else:
         F = gss.fields()
+    rows = {}
+    out = a.out or OUT
+    out.mkdir(parents=True, exist_ok=True)
+    if a.only != "scatter":
+        rows = shine_maps(F, a, sh, out)
+
+    fs = scatter(F)
+    if a.subject and gss.SUBJECTS[a.subject].get("ear"):     # Phase25: the ear's term graded from its root, in 3D
+        import project_views as pv  # noqa: PLC0415
+        hd = gsm.REPO / "library" / "parity" / "P25_Views"
+        hd.mkdir(parents=True, exist_ok=True)
+        print("  ear scatter: " + json.dumps(gss.ear_scatter(fs.reshape(-1), a.subject, pv.head_fields(hd))))
+    ms, ss = store_scatter(fs, F)
+    Image.fromarray(ms, "L").save(out / name("scatter"), optimize=True)
+    rows["scatter"] = {"made": "procedural", "space": "linear", "neutral": 0.0,
+                       "rule": "subsurface_radius x (1 + 4 x map)", **ss}
+    for k, r in rows.items():
+        print(f"{k}: {out / name(k)}\n  " + json.dumps({x: v for x, v in r.items() if x not in ('made', 'rule')}))
+    if not a.out:
+        write_provenance(rows)
+    return 0
+
+
+def shine_maps(F: dict, a, sh, out: Path) -> dict:
+    """Roughness, normal and cavity (they share the relief)."""
+    rows = {}
     a.supersample = a.supersample or (1 if a.subject else 3)
     m = make_kits.load_mesh(gsm.MESH)
     Tx, Ty = jacobian(m, gsm.N)
     R = relief(F, Tx, Ty, a.supersample)
-    rows = {}
-    out = a.out or OUT
-    out.mkdir(parents=True, exist_ok=True)
 
     f, zones = roughness_offset(F, R)
     mr, st = store(f, F, sh["lips_roughness"] if sh else None)
@@ -633,16 +657,7 @@ def main(argv=None) -> int:
     Image.fromarray(mc, "L").save(out / name("cavity"), optimize=True)
     rows["cavity"] = {"made": "procedural", "space": "linear", "neutral": 1.0,
                       "rule": "specular_weight x map", **sc}
-
-    ms, ss = store_scatter(scatter(F), F)
-    Image.fromarray(ms, "L").save(out / name("scatter"), optimize=True)
-    rows["scatter"] = {"made": "procedural", "space": "linear", "neutral": 0.0,
-                       "rule": "subsurface_radius x (1 + 4 x map)", **ss}
-    for k, r in rows.items():
-        print(f"{k}: {out / name(k)}\n  " + json.dumps({x: v for x, v in r.items() if x not in ('made', 'rule')}))
-    if not a.out:
-        write_provenance(rows)
-    return 0
+    return rows
 
 
 if __name__ == "__main__":
