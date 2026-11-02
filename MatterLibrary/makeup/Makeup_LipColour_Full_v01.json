@@ -1,0 +1,31 @@
+{
+  "name": "Makeup_LipColour_Full_v01",
+  "kind": "fitted",
+  "fits": "MakeHuman_Body_v01",
+  "carries": [
+    "colour",
+    "finish"
+  ],
+  "defaults": {
+    "colour": [
+      0.477,
+      0.007,
+      0.013
+    ],
+    "strength": 1.0,
+    "finish": 0.35
+  },
+  "channels_planned": {
+    "relief": "planned (RD-P26-1, Skin Layers)",
+    "pigment": "planned (Skin Layers)"
+  },
+  "summary": "Lip colour over the whole lips: a red lipstick by default, satin.",
+  "contributor": "MatterBot",
+  "licence": "CC0-1.0",
+  "origin": [
+    "procedural",
+    "agent-drafted"
+  ],
+  "script": "tools/converters/fit/gen_makeup_pieces.py",
+  "coverage": "../textures/fit/makehuman/makeup/Makeup_LipColour_Full_v01_coverage_sUKN.png"
+}

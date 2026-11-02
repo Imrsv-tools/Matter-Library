@@ -1,6 +1,6 @@
 # Phase26 — Makeup on the Skin
 
-**Status:** BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). `/execute Phase26` starts at 26.1. *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
+**Status:** IN EXECUTION (2026-11-02, `/execute Phase26`, at 26.1). *Before:* BRIEF READY (2026-11-02, the close of Pass 1, `ML_P26_D1`). *Before:* SEEDED (2026-11-02), the first part of *Skin Layers*, numbered on the lead's *"b"* (RD-PSM-2). It runs **alongside Phase25** and **ahead of *Eyes in the Shader***. The rest of *Skin Layers* keeps its place after Eyes.
 **Lane:** `build` (§Risk lane).
 **Measured at:** `5c4bfde`, on **the machine with Unreal**. Unreal 5.8 is at the path `unreal/build.sh` takes as `UE`, `MATTER_BLENDER` is the official 5.2.2, and `unreal-runtime-v7` is pinned.
 **Seeded from:** [`../Research/261101_R_PlatformSkinAndMakeupAsks.md`](../Research/261101_R_PlatformSkinAndMakeupAsks.md) (Q-PSM-2, Q-PSM-7; F-PSM-1, F-PSM-4; RD-PSM-2) · [`../Research/261027_R_CharacterMaterials.md`](../Research/261027_R_CharacterMaterials.md) (Pass 4, Makeup and marks; RD-CMT-1, RD-CMT-2, RD-CMT-4) · the platform's ask row `PlatformDependencies.md` **M14** (1) and (2).
@@ -239,3 +239,17 @@ The controls, each read:
   - **F-P26-3:** a bruise is a pigment piece by the platform's own ask (RD-P26-7).
   - **F-P26-4:** editing the Blender masters stales every thumbnail (§Risk lane). The stale thumbnails stay stale (RD-P26-10).
   - **F-P26-5:** a tattoo on the back of the hand is judgeable in the existing hand view; no new camera is needed.
+
+---
+
+## Execution ledger (`/execute Phase26`, 2026-11-02)
+
+| Step | Result | Next |
+|---|---|---|
+| 26.1 | **▶ SCAFFOLD COMPLETE — sitting owed** (clicks 1–3). The slots in the MaterialX graph (the 19 finished skins declare `makeup`; every other article re-assembles byte-identically), the Blender Subsurface group (v13) and loader, and the Unreal Subsurface master (local masters build and package; job format 5). The reference merge (`tools/converters/fit/merge_makeup.py`, units `test_merge_makeup.py`), the pieces `Makeup_LipColour_Full_v01` and `Makeup_Tattoo_Arrow_v01` (`gen_makeup_pieces.py`), the first look `tools/parity/makeup/red_lips_hand_tattoo.json`, and `--makeup` / `--lips-skin` on `rig.py` and `look.py`. Measured at the pieces' pixels (rig, 512 px, Fitzpatrick II): lip colour within 6/255 per channel across the three tools; the tattoo's centre within 1 px, the same extent. | the lead's sitting |
+
+- **Premise probe (alpha stays linear in a `color4` read as `srgb_texture`):** holds. Unreal by construction: the runtime decodes sRGB on RGB only (`MatterRuntimeGameMode.cpp` `LoadTexture`). Storm and Blender: the lips' covered-pixel counts and centres agree with Unreal's within 4 % and 1 px, which a gamma-curved coverage edge would not give.
+- **F-P26-6 — a fact the Brief rested on was false:** *"no gate walks that tree except the release-time compressor … neither runs pre-release"*. The `compression` lane of `run_all.py` walks every texture and refused the piece pictures' unknown roles. `compress_textures.py` learns `coverage` (BC4) and `stamp` (BC7).
+- **F-P26-7 — the build's environment:** `unreal/build.sh package` failed with *Permission denied* starting `~/.local/bin/env` (a non-executable file shadowing `/usr/bin/env` on the session's PATH). Run with a PATH without `~/.local/bin`, it packaged. A `/retro` item, not a code change.
+- **The tattoo's point** was first taken 1.5 cm up the hand; the look view showed it on the wrist's edge, seen edge-on. Moved 2 cm toward the knuckles (`gen_makeup_pieces.back_of_left_hand`).
+- At the hand view's ~5 px/mm the tattoo's edges step visibly: the 2048 atlas gives the back of the hand ~0.75 mm a texel (RD-P26-9; the 4K and 8K steps).

@@ -14,6 +14,9 @@
     <input name="normal_map" type="filename" value="../../../../textures/fit/makehuman/skin/SkinTone34_normal_sUKN.png" uiname="Normal Map" />
     <input name="cavity_map" type="filename" value="../../../../textures/fit/makehuman/skin/SkinTone34_cavity_sUKN.png" uiname="Cavity Map" />
     <input name="scatter_map" type="filename" value="../../../../textures/fit/makehuman/skin/SkinTone34_scatter_sUKN.png" uiname="Scatter Map" />
+    <input name="makeup_color_map" type="filename" value="" uiname="Makeup Color Map" />
+    <input name="makeup_finish_map" type="filename" value="" uiname="Makeup Finish Map" />
+    <input name="makeup_amount" type="float" value="1.0" uiname="Makeup Amount" />
     <texcoord name="geom_uv" type="vector2">
       <input name="index" type="integer" value="0" />
     </texcoord>
@@ -70,8 +73,32 @@
       <input name="in1" type="color3" nodename="base_color_mapped" />
       <input name="in2" type="color3" interfacename="base_color_tint" />
     </multiply>
-    <mix name="base_color_deposit2" type="color3">
+    <texcoord name="makeup_map_uv" type="vector2">
+      <input name="index" type="integer" value="0" />
+    </texcoord>
+    <image name="makeup_color_map_tex" type="color4" colorspace="srgb_texture">
+      <input name="file" type="filename" interfacename="makeup_color_map" />
+      <input name="default" type="color4" value="0.0, 0.0, 0.0, 0.0" />
+      <input name="texcoord" type="vector2" nodename="makeup_map_uv" />
+    </image>
+    <convert name="makeup_color" type="color3">
+      <input name="in" type="color4" nodename="makeup_color_map_tex" />
+    </convert>
+    <extract name="makeup_color_coverage_map" type="float">
+      <input name="in" type="color4" nodename="makeup_color_map_tex" />
+      <input name="index" type="integer" value="3" />
+    </extract>
+    <multiply name="makeup_color_coverage" type="float">
+      <input name="in1" type="float" nodename="makeup_color_coverage_map" />
+      <input name="in2" type="float" interfacename="makeup_amount" />
+    </multiply>
+    <mix name="base_color_makeup" type="color3">
       <input name="bg" type="color3" nodename="base_color_tinted" />
+      <input name="fg" type="color3" nodename="makeup_color" />
+      <input name="mix" type="float" nodename="makeup_color_coverage" />
+    </mix>
+    <mix name="base_color_deposit2" type="color3">
+      <input name="bg" type="color3" nodename="base_color_makeup" />
       <input name="fg" type="color3" interfacename="overlay2_color" />
       <input name="mix" type="float" nodename="overlay2_effect_raw" />
     </mix>
@@ -129,7 +156,29 @@
       <input name="low" type="float" value="0.0" />
       <input name="high" type="float" value="1.0" />
     </clamp>
-    <output name="roughness_out" type="float" nodename="roughness_biased_clamped" />
+    <image name="makeup_finish_map_tex" type="vector3">
+      <input name="file" type="filename" interfacename="makeup_finish_map" />
+      <input name="default" type="vector3" value="0.0, 0.0, 0.0" />
+      <input name="texcoord" type="vector2" nodename="makeup_map_uv" />
+    </image>
+    <extract name="makeup_roughness" type="float">
+      <input name="in" type="vector3" nodename="makeup_finish_map_tex" />
+      <input name="index" type="integer" value="0" />
+    </extract>
+    <extract name="makeup_finish_coverage_map" type="float">
+      <input name="in" type="vector3" nodename="makeup_finish_map_tex" />
+      <input name="index" type="integer" value="1" />
+    </extract>
+    <multiply name="makeup_finish_coverage" type="float">
+      <input name="in1" type="float" nodename="makeup_finish_coverage_map" />
+      <input name="in2" type="float" interfacename="makeup_amount" />
+    </multiply>
+    <mix name="roughness_makeup" type="float">
+      <input name="bg" type="float" nodename="roughness_biased_clamped" />
+      <input name="fg" type="float" nodename="makeup_roughness" />
+      <input name="mix" type="float" nodename="makeup_finish_coverage" />
+    </mix>
+    <output name="roughness_out" type="float" nodename="roughness_makeup" />
     <image name="normal_tex" type="vector3">
       <input name="file" type="filename" value="../../../../textures/base/biological/tissue/Skin_Pores_normal_s001.png" />
       <input name="texcoord" type="vector2" nodename="uv_place" />

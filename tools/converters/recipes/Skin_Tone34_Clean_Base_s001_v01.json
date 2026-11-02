@@ -40,6 +40,7 @@
   "fuzz_color": "0.5131, 0.2742, 0.1856",
   "fuzz_roughness": 0.5,
   "base_color_map": true,
+  "makeup": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_basecolor_sUKN.png",
   "roughness_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_roughness_sUKN.png",
   "normal_map_tex": "../../../../textures/fit/makehuman/skin/SkinTone34_normal_sUKN.png",

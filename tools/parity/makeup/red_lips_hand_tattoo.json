@@ -1,0 +1,19 @@
+{
+  "mesh": "MakeHuman_Body_v01",
+  "label": "Red lips and a hand tattoo (Phase26 26.1)",
+  "pieces": [
+    {
+      "piece": "Makeup_LipColour_Full_v01"
+    },
+    {
+      "piece": "Makeup_Tattoo_Arrow_v01",
+      "point": [
+        0.4455,
+        0.2258,
+        0.2456
+      ],
+      "size": 0.042,
+      "turn": 0
+    }
+  ]
+}

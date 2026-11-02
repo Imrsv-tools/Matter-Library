@@ -76,8 +76,9 @@ private:
 	// 2 (6.3): mesh buffers carry a tangent sign; 3 (Phase09 9.3): the masters' own
 	// base_color_map_tex, which an older master would silently leave white; 4 (Phase22 22.1):
 	// format 3 plus an optional "look", which an older runtime would silently light as matched.
-	// Both 3 and 4 are read, so the matched jobs every caller writes keep working.
-	static constexpr int32 JobFormat = 4;
+	// Both 3 and 4 are read, so the matched jobs every caller writes keep working. 5 (Phase26 26.1):
+	// a binding carries the makeup layer, which an older Subsurface master would silently leave bare.
+	static constexpr int32 JobFormat = 5;
 	static constexpr int32 OldestJobFormat = 3;
 
 	TSharedPtr<FJsonObject> Job;

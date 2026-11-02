@@ -29,6 +29,7 @@
   "fuzz_color": "0.623, 0.433, 0.343",
   "fuzz_roughness": 0.5,
   "base_color_map": true,
+  "makeup": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIII_basecolor_sUKN.png",
   "roughness_map_tex": "../../../../textures/fit/makehuman/skin/Skin_roughness_sUKN.png",
   "normal_map_tex": "../../../../textures/fit/makehuman/skin/Skin_normal_sUKN.png",

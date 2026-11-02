@@ -136,6 +136,11 @@ SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: radius x (1 + 4 x scatter_map), as the
 #            22.2: normal_map_tex (tangent space, its XY added before the overlays; flat default)
 #            and cavity_map_tex (x specular_weight; white default). 22.3: scatter_map_tex
 #            (subsurface_radius x (1 + SCATTER_GAIN x map); black default)
+#   makeup   the mesh's makeup (LCDSchema §Makeup layer, Phase26 RD-P26-2): makeup_color_map_tex
+#            (RGB the colour, A its coverage; clear default) mixed over the tinted base, and the
+#            scatter colour with it; makeup_finish_map_tex (R a target roughness, G its coverage;
+#            black default) mixed in after the roughness clamp; both coverages x makeup_amount.
+#            Coverage 0 at the defaults, so the master draws as before (no runtime owed)
 MASTERS = {
     "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
     "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
@@ -146,7 +151,7 @@ MASTERS = {
     "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True, base_map=True),
     "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
     "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE,
-                             base_map=True, shine=True),
+                             base_map=True, shine=True, makeup=True),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
                              extra=TRANSMISSION, thin=True),
     "TranslucentThick": dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
@@ -373,7 +378,16 @@ def texture(g, name, default, uv, col, colour=None):
     return t
 
 
-def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None):
+def lerp(g, a, b, alpha, col, a_out="", b_out=""):
+    """mix(bg=a, fg=b, mix=alpha): MaterialX's mix, Unreal's Lerp."""
+    n = g.node(unreal.MaterialExpressionLinearInterpolate, col)
+    g.link(a, n, "A", a_out)
+    g.link(b, n, "B", b_out)
+    g.link(alpha, n, "Alpha")
+    return n
+
+
+def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -476,6 +490,16 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         base_map = texture(g, "base_color_map_tex", white, own_st, 12, colour=white_colour)
         base = g.op(M.MaterialExpressionMultiply, base, base_map, 10, b_out="RGB")
     base = g.op(M.MaterialExpressionMultiply, base, g.vector("base_color_tint", (1.0, 1.0, 1.0)), 10)
+    makeup = None
+    if spec.get("makeup"):
+        # Phase26 (RD-P26-2, LCDSchema §Makeup layer): the merge's colour picture on the mesh's own
+        # st, mixed over the tinted base by its A x makeup_amount, before any deposit (the assembler's
+        # base_color_makeup). The clear default (0, 0, 0, 0) covers nothing.
+        mk = texture(g, "makeup_color_map_tex", clear, own_st, 12)
+        amount = g.scalar("makeup_amount", 1.0, col=11)
+        mcov = g.op(M.MaterialExpressionMultiply, mk, amount, 10, a_out="A")
+        base = lerp(g, base, mk, mcov, 9, b_out="RGB")
+        makeup = (mk, mcov, amount)
     cavity = None
     scatter = None
     if spec.get("shine"):
@@ -554,7 +578,14 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                      g.op_k(M.MaterialExpressionSubtract, rmap, 0.5, 5, a_out="R"), 4)
     # roughness_biased_clamped (LCDSchema): the bias is added, then clamped to 0..1
     rough = g.op(M.MaterialExpressionAdd, rough, g.scalar("roughness_bias", 0.0, col=4), 3)
-    feed(g.one(M.MaterialExpressionSaturate, rough, 2), "specular_roughness")
+    rough = g.one(M.MaterialExpressionSaturate, rough, 2)
+    if makeup is not None:
+        # Phase26 (RD-P26-2): the finish after the bias and clamp (roughness_makeup): mix(that, R,
+        # G x makeup_amount); the black default covers nothing
+        fin = texture(g, "makeup_finish_map_tex", black, own_st, 4)
+        fcov = g.op(M.MaterialExpressionMultiply, fin, makeup[2], 3, a_out="G")
+        rough = lerp(g, rough, fin, fcov, 2, b_out="R")
+    feed(rough, "specular_roughness")
     if MESH_BINORMAL == "unreal":
         # The library's normal maps are +Y up (MaterialX): green follows dP/dt, which is where the
         # runtime's meshes point their binormal (drivers/unreal.py tangent_signs). A mesh whose
@@ -616,6 +647,9 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
             follow = g.scalar("subsurface_follows_base", 0.0, col=6)
             p = g.op(M.MaterialExpressionMultiply, p,
                      g.lerp_from_one(g.vector("base_color_tint", (1.0, 1.0, 1.0)), follow, 5), 5)
+            if makeup is not None:
+                # Phase26: the scatter follows the made-up base (the makeup over it, as over the base)
+                p = lerp(g, p, makeup[0], makeup[1], 4, b_out="RGB")
             # A black texel (the eye picture's pupil) would scatter a colour of exactly 0, which
             # HANGS THE GPU (learning U11: Xid 109 in SubsurfaceScattering, 9.3; the floor alone
             # cleared it, the job otherwise identical)
@@ -782,9 +816,10 @@ def main():
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
     grey = default_texture("T_Matter_Grey", (128, 128, 128, 255))     # a shine map's neutral
     black = default_texture("T_Matter_Black", (0, 0, 0, 255))         # the scatter map's neutral
+    clear = default_texture("T_Matter_Clear", (0, 0, 0, 0))           # Phase26: makeup, coverage 0
     white_colour = (default_texture("T_Matter_WhiteColour", (255, 255, 255, 255), srgb=True)
                     if COLOUR_SAMPLER == "srgb" else None)
-    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black) for t in MASTERS]
+    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black, clear) for t in MASTERS]
                 + ([build_sky()] if SKY else [])):
         save(mat)
     log("RESULT ok")

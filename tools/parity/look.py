@@ -380,6 +380,11 @@ def main(argv=None) -> int:
     ap.add_argument("--shine", choices=SHINES, default="served",
                     help="Phase25's working shine on the skin (C) and every candidate (D): 'neutral' is flat "
                          "relief and matte (F-P25-13); the bar keeps its own. Default: as served")
+    ap.add_argument("--makeup", metavar="COMPOSITION",
+                    help="Phase26: a makeup composition (a piece list, JSON) merged by the reference merge and "
+                         "worn on the skin (and its lips with --lips-skin); needs a runtime reading job format 5")
+    ap.add_argument("--lips-skin", action="store_true",
+                    help="Phase26: the lips wear the skin, as the platform's base character's do")
     ap.add_argument("--width", type=int, default=1024)
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
@@ -388,7 +393,9 @@ def main(argv=None) -> int:
     art = jobmod.Article.read(jobmod.find_article(a.skin))
     cast = rig.character_cast(art)
     out = (a.out or rig.OUT_ROOT / (f"Look__{art.name}" + (f"__vs_{a.today}" if a.today else "")
-                                    + ("__vs_reference" if a.reference else ""))).resolve()
+                                    + ("__vs_reference" if a.reference else "")
+                                    + ("__makeup" if a.makeup else "") + ("__lipsskin" if a.lips_skin else ""))).resolve()
+    cast = rig.makeup_cast(cast, a.makeup, a.lips_skin, out)
     shutil.rmtree(out / "work", ignore_errors=True)
     work = out / "work"
 
@@ -411,7 +418,8 @@ def main(argv=None) -> int:
         columns.insert(0, ("today", f"today ({rev})"))
     for i, other in enumerate(a.also, start=1):
         oart = jobmod.Article.read(jobmod.find_article(other))
-        omats, omeshes = materials(rig.character_cast(oart), work / f"also{i}")
+        omats, omeshes = materials(rig.makeup_cast(rig.character_cast(oart), None, a.lips_skin, out),
+                                   work / f"also{i}")      # the same makeup (job.MAKEUP) and lips
         if [Path(m["file"]).read_bytes() for m in omeshes] != [Path(m["file"]).read_bytes() for m in meshes]:
             raise SystemExit(f"{oart.name}'s cast builds different meshes; it cannot share the launch")
         settings.append({"id": f"also{i}", "materials": omats})
@@ -449,7 +457,8 @@ def main(argv=None) -> int:
     if not a.judge:
         settings += [s | {"id": f"{s['id']}__backlit"} | BACKLIT for s in list(settings)]
     sun, sky = drv.lights()
-    ujob = {"format": drv.LOOK_JOB_FORMAT, "width": a.width * SUPERSAMPLE, "out_dir": str(work / "raw"),
+    fmt = drv.MAKEUP_JOB_FORMAT if a.makeup else drv.LOOK_JOB_FORMAT   # Phase26: an older runtime refuses it
+    ujob = {"format": fmt, "width": a.width * SUPERSAMPLE, "out_dir": str(work / "raw"),
             "settle_frames": drv.SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes,
             "settings": [drv.warmup(settings)] + settings, "views": views, "look": look_lights()}
     upath = work / "look_job.json"

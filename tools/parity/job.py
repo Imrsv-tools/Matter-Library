@@ -166,7 +166,13 @@ CHARACTER_HIDE_ALWAYS = ["/World/Character/Cornea"]
 # the nodegraph's interface input, and UsdMtlx authors no colorSpace (measured 2026-10-20: a uniform
 # sRGB 128 map rendered at 0.52-0.60 of a 255 one in Storm, against 0.28-0.41 in Blender; with this
 # metadata Storm read 0.275, Blender's). A cut-out is data and stays raw.
-MAP_COLORSPACE = {"base_color_map": ' (\n                    colorSpace = "srgb_texture"\n                )'}
+MAP_COLORSPACE = {port: ' (\n                    colorSpace = "srgb_texture"\n                )'
+                  for port in ("base_color_map", "makeup_color_map")}   # Phase26: the makeup's colour too
+
+# Phase26 26.1 (LCDSchema §Makeup layer): the reference merge's two pictures for this run, set by
+# ``rig.py --makeup`` / ``look.py --makeup``: port -> file. Every binding whose article declares the
+# makeup inputs (the finished skins, RD-P26-3) takes them, by the Carrier rule, like a mesh's map.
+MAKEUP: dict[str, Path] = {}
 
 
 def write_character_scene(bindings: dict[str, "Article"], out: Path) -> Path:
@@ -257,7 +263,7 @@ def maps_for(part: str, art: "Article", meshmaps: dict[str, dict[str, Path]]) ->
     picture would cover the contribution, so the rig never supplies it over the article's)."""
     supplied = {port: path for port, path in meshmaps.get(f"/World/Character/{part}", {}).items()
                 if port in art.ports}
-    return supplied | art.own_maps()
+    return supplied | art.own_maps() | {p: f for p, f in MAKEUP.items() if p in art.ports}
 
 
 def write_character_job(bindings: dict[str, "Article"], out_dir: Path, width: int, samples: int,

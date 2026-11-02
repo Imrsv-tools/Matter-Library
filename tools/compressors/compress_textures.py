@@ -73,6 +73,10 @@ ROLE_TOKENS = [
     ("cavity", "BC4"),     # Phase22 22.2: the skin's cavity map (one channel, x specular_weight)
     ("scatter", "BC4"),    # Phase22 22.3: the skin's scatter map (one channel, x subsurface_radius)
     ("opacity", "BC4"),
+    # Phase26 (RD-P26-5): a makeup piece's pictures. A fitted piece's coverage is one channel on the
+    # atlas; a placed piece's stamp is RGBA (a colour multiplier and its coverage), so BC7
+    ("coverage", "BC4"),
+    ("stamp", "BC7"),
     ("normal", "BC5"),
     ("overlay", "BC7"),
     ("ao", "BC4"),

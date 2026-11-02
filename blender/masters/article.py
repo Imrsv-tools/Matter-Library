@@ -44,7 +44,9 @@ class ArticleData:
 # The nodes that sample a MESH's map, whose file is the input's value (the binding's, or a fitted
 # article's own: ArticleData.maps), not one of the article's texture roles. Phase22 adds the shine maps.
 MESH_MAP_NODES = ("cutout_tex", "base_color_map_tex", "roughness_map_tex", "normal_map_tex", "cavity_map_tex",
-                  "scatter_map_tex")
+                  "scatter_map_tex",
+                  # Phase26: the makeup's two pictures (LCDSchema §Makeup layer), the binding's
+                  "makeup_color_map_tex", "makeup_finish_map_tex")
 
 
 def read(path: Path) -> ArticleData:

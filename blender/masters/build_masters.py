@@ -75,7 +75,8 @@ import math
 
 import bpy
 
-VERSION = 12    # bump when a group's contents change; ensure_*() rebuilds an older one
+VERSION = 13    # bump when a group's contents change; ensure_*() rebuilds an older one
+#               (13: Phase26, the Subsurface master's makeup layer)
 #               (12: the coat darkens the base, OpenPBR's coat_darkening)
 #               (11: Phase12 12.4, the emission sockets take their ports' names)
 #               (8: Phase10, a deposit overlay covers the surface in its colour)
@@ -281,7 +282,13 @@ def _sockets(parts: set) -> list:
               ("Subsurface Anisotropy", "NodeSocketFloat", 0.0),
               # Phase22 22.2: 1 = the coat takes the article's normal (skin's sebum follows its
               # relief); 0 = the geometry's, OpenPBR's default and every master's before
-              ("Coat Follows Normal", "NodeSocketFloat", 0.0)]
+              ("Coat Follows Normal", "NodeSocketFloat", 0.0),
+              # Phase26 26.1 (RD-P26-2, LCDSchema §Makeup layer): the merge's pictures, sampled by the
+              # loader; each coverage already x makeup_amount. Coverage 0 by default: the skin as before
+              ("Makeup Color", "NodeSocketColor", (0.0, 0.0, 0.0, 1.0)),
+              ("Makeup Color Coverage", "NodeSocketFloat", 0.0),
+              ("Makeup Roughness", "NodeSocketFloat", 0.5),
+              ("Makeup Finish Coverage", "NodeSocketFloat", 0.0)]
     return s
 
 
@@ -345,6 +352,10 @@ def _build(name: str, parts: set):
     L(base, tint.inputs[0])
     L(gi.outputs["base_color_tint"], tint.inputs[1])
     base = tint.outputs[0]
+    if "subsurface" in parts:
+        # Phase26 (RD-P26-2): the makeup over the tinted base, before any deposit (the assembler's
+        # base_color_makeup)
+        base = _lerp_color(ng, base, gi.outputs["Makeup Color"], gi.outputs["Makeup Color Coverage"], -200, 750)
 
     keep = None    # Phase10: 1 - each deposit's cover, multiplied: what a deposit leaves visible
     for n in OVERLAYS:
@@ -411,9 +422,14 @@ def _build(name: str, parts: set):
     metal = hidden(metal, 0, 300)
     L(metal, bsdf.inputs["Metallic"])
 
-    rc = _math(ng, "ADD", 200, 200, clamp=True)                # roughness_biased_clamped
-    L(rough, rc.inputs[0])
-    L(gi.outputs["roughness_bias"], rc.inputs[1])
+    rcn = _math(ng, "ADD", 200, 200, clamp=True)               # roughness_biased_clamped
+    L(rough, rcn.inputs[0])
+    L(gi.outputs["roughness_bias"], rcn.inputs[1])
+    rough_out = rcn.outputs[0]
+    if "subsurface" in parts:
+        # Phase26 (RD-P26-2): the makeup's finish after the bias and clamp (roughness_makeup)
+        rough_out = _lerp_float(ng, rough_out, gi.outputs["Makeup Roughness"],
+                                gi.outputs["Makeup Finish Coverage"], 330, 250)
 
     # OpenPBR anisotropy -> Principled (Phase07 7.6). OpenPBR: at = r^2 sqrt(2 / (1 + (1-a)^2)),
     # ab = (1-a) at. Principled (Disney 2012): aspect = sqrt(1 - 0.9 a'), ax = r'^2 / aspect,
@@ -442,7 +458,7 @@ def _build(name: str, parts: set):
     L(q.outputs[0], f.inputs[0])
     f.inputs[1].default_value = 0.25
     rr = _math(ng, "MULTIPLY", 720, 200)
-    L(rc.outputs[0], rr.inputs[0])
+    L(rough_out, rr.inputs[0])
     L(f.outputs[0], rr.inputs[1])
     L(rr.outputs[0], bsdf.inputs["Roughness"])
     ap = _math(ng, "DIVIDE", 590, -60, clamp=True)
@@ -487,6 +503,13 @@ def _build(name: str, parts: set):
             coat_w = src
         L(src, bsdf.inputs[pin])
     base_under = base      # OpenPBR's base_color, before Principled's one-colour mappings below
+    ss_color = None
+    if "subsurface" in parts:
+        # Phase26 (RD-P26-2): the scatter colour follows the made-up base. The loader hands the
+        # skin's scatter colour (its base x tint, F-P09-5) in; the makeup mixes over it here as it
+        # does over the base. Coverage 0 (the default) leaves it.
+        ss_color = _lerp_color(ng, gi.outputs["Subsurface Color"], gi.outputs["Makeup Color"],
+                               gi.outputs["Makeup Color Coverage"], -150, 1100)
 
     if "opacity" in parts:
         # the article's ifgreatereq: opacity >= cutoff -> 1, else 0  (== 1 - (opacity < cutoff))
@@ -554,7 +577,7 @@ def _build(name: str, parts: set):
         L(gi.outputs["Subsurface Radius"], bsdf.inputs["Subsurface Scale"])
         L(gi.outputs["Subsurface Anisotropy"], bsdf.inputs["Subsurface Anisotropy"])
         bsdf.subsurface_method = SUBSURFACE_METHOD
-        base = _lerp_color(ng, base, gi.outputs["Subsurface Color"], sw, 0, 800)
+        base = _lerp_color(ng, base, ss_color, sw, 0, 800)
     if "hair" in parts:
         # OpenPBR thin-walled subsurface (MaterialX open_pbr_surface.mtlx, "Subsurface
         # (thin-walled)"): mix(reflection, transmission, 0.5), each lobe coloured c and
@@ -625,7 +648,7 @@ def _build(name: str, parts: set):
     L(omk.outputs[0], kc.inputs[1])
     e_diel = base_under
     if "subsurface" in parts:
-        e_diel = _lerp_color(ng, base_under, gi.outputs["Subsurface Color"], sw, 0, 1850)
+        e_diel = _lerp_color(ng, base_under, ss_color, sw, 0, 1850)
     e_metal = _vmath(ng, "SCALE", 300, 1950)
     L(base_under, e_metal.inputs[0])
     L(gi.outputs["Specular Weight"], e_metal.inputs["Scale"])

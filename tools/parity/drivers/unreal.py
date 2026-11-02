@@ -94,6 +94,13 @@ JOB_FORMAT = 3
 # 4, so a runtime built before it refuses the job rather than light it as matched. Every other job
 # stays format 3, which runtimes from unreal-runtime-v3 on read.
 LOOK_JOB_FORMAT = 4
+# Phase26 26.1: a job whose bindings carry the makeup layer (LCDSchema §Makeup layer) is format 5, so
+# a runtime whose Subsurface master predates the makeup slots (unreal-runtime-v7 and before) refuses
+# it rather than draw a bare skin as matched. A format-5 job may also carry a look.
+MAKEUP_JOB_FORMAT = 5
+MAKEUP_PORTS = {"makeup_color_map": [0.0, 0.0, 0.0, 0.0],     # -> the master's <port>_tex; an article
+                "makeup_finish_map": [0.0, 0.0, 0.0, 1.0]}    # without one gets coverage 0 exactly
+MAKEUP_MASTERS = {"Subsurface"}
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
 BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
@@ -128,6 +135,8 @@ SLIDERS = {"base_color_tint", "roughness_bias", "uv_scale", "uv_offset", "uv_rot
            # Phase12: a value the Creator may SET, under the article's (and OpenPBR's) own name.
            # Every runtime's see-through masters already carry it as a parameter (F-GLC-4).
            "transmission_color",
+           # Phase26: the makeup layer's strength (author tier), 1 = the whole layer
+           "makeup_amount",
            # Phase12 12.4: a light's colour and brightness, the Emissive master's own parameters.
            # The master corrects the brightness itself (x the colour's length, Learnings Unreal
            # U4; x 1/0.798 through unreal-runtime-v3), so a Creator's value gets the same
@@ -268,7 +277,8 @@ def _vec(v) -> list[float]:
 
 
 def article_material(path: Path, sliders: dict | None = None, cutout_map: Path | None = None,
-                     base_color_map: Path | None = None, shine_maps: dict | None = None) -> dict:
+                     base_color_map: Path | None = None, shine_maps: dict | None = None,
+                     makeup_maps: dict | None = None) -> dict:
     """The article on its master, by the article's names; raises Unsupported if not yet built.
 
     ``cutout_map`` is a binding's cut-out (a character's hair, brows, lashes: JOB_FORMAT.md
@@ -284,6 +294,11 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     ``shine_maps`` (Phase22) maps a shine port (``roughness_map``) to the binding's file: the
     master's ``<port>_tex``, linear, on the mesh's st. A Subsurface article without one gets the
     port's neutral value as a constant.
+
+    ``makeup_maps`` (Phase26) maps a makeup port (``makeup_color_map``, ``makeup_finish_map``) to the
+    binding's file, the reference merge's pictures: the master's ``<port>_tex``, the colour sRGB (its
+    A, coverage, stays linear: the runtime decodes RGB only), the finish linear. A declaring article
+    without them gets coverage 0 exactly.
     """
     art = article.read(Path(path))
     if art.master not in BUILT_MASTERS:
@@ -291,7 +306,8 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
     extra = sorted(set(art.textures) - TEXTURE_ROLES)
     if extra:
         raise Unsupported(f"{art.name}: textures {extra} are not carried by Unreal's masters yet")
-    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT, BASE_MAP_PORT} - set(SHINE_PORTS))
+    unported = sorted(set(art.ports) - SLIDERS - {CUTOUT_PORT, BASE_MAP_PORT} - set(SHINE_PORTS)
+                      - set(MAKEUP_PORTS))
     if unported:
         raise Unsupported(f"{art.name}: sliders {unported} are not carried by Unreal's masters yet")
     if cutout_map is not None and CUTOUT_PORT not in art.ports:
@@ -318,8 +334,14 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         if not runtime_has_shine():
             raise Unsupported(f"{art.name}: its {port}, and the pinned runtime's masters predate it "
                               "(built before Phase22 22.1.3; set MATTER_UNREAL_RUNTIME to a local build)")
+    makeup_maps = dict(makeup_maps or {})
+    for port in makeup_maps:
+        if port not in art.ports:
+            raise KeyError(f"{art.name} does not declare the makeup input ({port})")
+        if art.master not in MAKEUP_MASTERS:
+            raise Unsupported(f"{art.name}: the {art.master} master has no {port} input")
     ports = {k: v for k, v in art.ports.items()
-             if k not in (CUTOUT_PORT, BASE_MAP_PORT) and k not in SHINE_PORTS}
+             if k not in (CUTOUT_PORT, BASE_MAP_PORT) and k not in SHINE_PORTS and k not in MAKEUP_PORTS}
     for k, v in (sliders or {}).items():
         if k not in ports:
             raise KeyError(f"{art.name} does not declare the slider {k!r}")
@@ -345,6 +367,10 @@ def article_material(path: Path, sliders: dict | None = None, cutout_map: Path |
         for port, neutral in SHINE_PORTS.items():
             textures[f"{port}_tex"] = ({"file": str(shine_maps[port]), "srgb": False} if port in shine_maps
                                        else {"constant": [*neutral, 1.0]})
+    if art.master in MAKEUP_MASTERS and "makeup_color_map" in art.ports:
+        for port, neutral in MAKEUP_PORTS.items():
+            textures[f"{port}_tex"] = ({"file": str(makeup_maps[port]), "srgb": port == "makeup_color_map"}
+                                       if port in makeup_maps else {"constant": list(neutral)})
     for role, param in LAYER_CONSTANTS:
         if role in art.textures:
             value = [1.0]                 # the texture carries it; the constant stays neutral
@@ -485,7 +511,8 @@ def character_scene(job: dict, meshes_dir: Path, settings: list) -> tuple[list, 
                                                     {**b.get("set", {}), **(s.get("set") or {})},
                                                     Path(cut) if cut else None,
                                                     Path(pic) if pic else None,
-                                                    {p: Path(b[p]) for p in SHINE_PORTS if b.get(p)})
+                                                    {p: Path(b[p]) for p in SHINE_PORTS if b.get(p)},
+                                                    {p: Path(b[p]) for p in MAKEUP_PORTS if b.get(p)})
     # the cameras as build_character writes them: translate to 4 places, rotateXYZ to 3
     cams = {}
     for cam, (pos, target) in build_character.cameras(parts).items():
@@ -562,6 +589,8 @@ def _write_ujob(job: dict, folder: Path, meshes: list, names: list, furniture: d
             "settings": settings, "views": views}
     if look:
         ujob |= {"format": LOOK_JOB_FORMAT, "look": look}
+    if any(b.get(p) for b in job.get("bindings", []) for p in MAKEUP_PORTS):
+        ujob["format"] = MAKEUP_JOB_FORMAT          # Phase26: a runtime without the makeup slots refuses it
     p = folder / "unreal_job.json"
     p.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
     return p

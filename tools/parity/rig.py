@@ -574,6 +574,24 @@ def write_character_scorecard(job: dict, scores: dict, ref: str = "blender") -> 
     return card
 
 
+def makeup_cast(cast: dict, composition: str | None, lips_skin: bool, out: Path) -> dict:
+    """Phase26 26.1: ``--lips-skin`` casts the skin on the lips (the platform's new base character
+    has its lips in the body, R-PSM-3; F-PSM-5); ``--makeup`` merges a composition with the reference
+    merge (``tools/converters/fit/merge_makeup.py``) into ``<out>/makeup/`` and binds its two pictures
+    on every part whose article declares the makeup inputs (``job.MAKEUP``)."""
+    if lips_skin:
+        cast = cast | {"Lips": cast["Body"]}
+    if composition:
+        if not any("makeup_color_map" in a.ports for a in cast.values()):
+            raise SystemExit("--makeup: no article in the cast declares the makeup inputs (a finished skin does)")
+        sys.path.insert(0, str(jobmod.REPO / "tools" / "converters" / "fit"))
+        import merge_makeup  # noqa: PLC0415 (heavy: rasterises the body)
+        pc, pf = merge_makeup.run(Path(composition), out / "makeup")
+        jobmod.MAKEUP.update({"makeup_color_map": pc, "makeup_finish_map": pf})
+        print(f"makeup    {composition} -> {pc.parent}")
+    return cast
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Render one material side by side in Storm and Blender.")
     ap.add_argument("article", nargs="?",
@@ -583,6 +601,11 @@ def main(argv=None) -> int:
     ap.add_argument("--scale-view", action="store_true",
                     help="with --character: each part wears the scale grid nearest its article's "
                          "size (Phase19 D-7), into <out>__scale_view")
+    ap.add_argument("--makeup", metavar="COMPOSITION",
+                    help="with --character (Phase26): a makeup composition (a piece list, JSON), merged by the "
+                         "reference merge and worn on the skin, e.g. tools/parity/makeup/red_lips_hand_tattoo.json")
+    ap.add_argument("--lips-skin", action="store_true",
+                    help="with --character (Phase26): the lips wear the skin, as the platform's base character's do")
     ap.add_argument("--sweep", action="store_true", help="every declared slider through its range")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--samples", type=int, default=128)
@@ -609,6 +632,10 @@ def main(argv=None) -> int:
         art = jobmod.Article.read(jobmod.find_article(args.article or CHARACTER_SKIN))
         out = Path(args.out) if args.out else OUT_ROOT / f"Character__{art.name}"
         cast = character_cast(art)
+        if args.makeup or args.lips_skin:
+            if not args.out:
+                out = out.with_name(out.name + "__makeup" * bool(args.makeup) + "__lipsskin" * args.lips_skin)
+            cast = makeup_cast(cast, args.makeup, args.lips_skin, out.resolve())
         scale_view = None
         if args.scale_view:
             cast, stands_for, off = scale_view_cast(cast)

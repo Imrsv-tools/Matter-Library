@@ -48,7 +48,8 @@ def _rgba(v: list[float]) -> tuple[float, float, float, float]:
 def build(path: Path, sliders: dict | None = None, name: str | None = None,
           cutout_map: Path | None = None, base_color_map: Path | None = None,
           roughness_map: Path | None = None, normal_map: Path | None = None,
-          cavity_map: Path | None = None, scatter_map: Path | None = None):
+          cavity_map: Path | None = None, scatter_map: Path | None = None,
+          makeup_color_map: Path | None = None, makeup_finish_map: Path | None = None):
     """A new material for ``path`` with ``sliders`` applied; returns the material.
 
     ``cutout_map`` is the mesh's cut-out (LCDSchema §Cut-out map), supplied per binding the way
@@ -62,6 +63,10 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
     ``normal_map`` (22.2) is the mesh's tangent-space relief, its XY added to the article's normal;
     ``cavity_map`` multiplies the specular weight. ``scatter_map`` (22.3) raises the scatter radius
     where the body is thin: ``subsurface_radius x (1 + 4 x map)``.
+    ``makeup_color_map`` / ``makeup_finish_map`` (Phase26, LCDSchema §Makeup layer) are the reference
+    merge's two pictures, on the mesh's own UVs: the colour's RGB (sRGB) mixed over the tinted base by
+    its A x ``makeup_amount``; the finish's R a target roughness, mixed in after the clamp by its G x
+    ``makeup_amount``. The master's Subsurface group does both mixes; without them it is the skin.
     """
     build_masters.ensure_all()
     art = read(path)
@@ -305,6 +310,39 @@ def build(path: Path, sliders: dict | None = None, name: str | None = None,
         y -= 300
     else:
         scatter_radius = None
+
+    # Phase26 26.1 (RD-P26-2): the makeup layer, the merge's two pictures on the mesh's UVs. Both
+    # coverages x makeup_amount (the port's value, or a slider's); the master mixes them.
+    for port, file in (("makeup_color_map", makeup_color_map), ("makeup_finish_map", makeup_finish_map)):
+        if file is None:
+            continue
+        if port not in art.ports or "Makeup Color" not in master.inputs:
+            raise KeyError(f"{art.name} does not declare the makeup input ({port})")
+        img = bpy.data.images.load(str(file), check_existing=True)
+        img.colorspace_settings.name = "sRGB" if port == "makeup_color_map" else "Non-Color"
+        img.alpha_mode = "CHANNEL_PACKED"     # straight coverage: the colour is never premultiplied
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        tex.interpolation = "Linear"
+        tex.extension = "REPEAT"
+        tex.location = (-300, y)
+        L(uv.outputs["UV"], tex.inputs["Vector"])     # the mesh's UVs, unplaced
+        amount = nt.nodes.new("ShaderNodeMath")
+        amount.operation = "MULTIPLY"
+        amount.location = (200, y)
+        amount.inputs[1].default_value = ports.get("makeup_amount", [1.0])[0]
+        if port == "makeup_color_map":
+            L(tex.outputs["Alpha"], amount.inputs[0])
+            L(tex.outputs["Color"], master.inputs["Makeup Color"])
+            L(amount.outputs["Value"], master.inputs["Makeup Color Coverage"])
+        else:
+            sep = nt.nodes.new("ShaderNodeSeparateColor")
+            sep.location = (0, y)
+            L(tex.outputs["Color"], sep.inputs["Color"])
+            L(sep.outputs["Red"], master.inputs["Makeup Roughness"])
+            L(sep.outputs["Green"], amount.inputs[0])
+            L(amount.outputs["Value"], master.inputs["Makeup Finish Coverage"])
+        y -= 300
 
     # Phase09 (F-P09-5): a Subsurface article whose subsurface_color is CONNECTED to its base
     # (no value on the shader: the assembler wires it to base_color_out) scatters the base's own

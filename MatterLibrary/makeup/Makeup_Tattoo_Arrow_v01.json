@@ -1,0 +1,29 @@
+{
+  "name": "Makeup_Tattoo_Arrow_v01",
+  "kind": "placed",
+  "carries": [
+    "colour"
+  ],
+  "defaults": {
+    "colour": [
+      0.02,
+      0.02,
+      0.022
+    ],
+    "strength": 1.0
+  },
+  "channels_planned": {
+    "relief": "planned (RD-P26-1, Skin Layers)",
+    "pigment": "planned (Skin Layers)"
+  },
+  "summary": "A small black-ink arrow tattoo, placed anywhere on the body; its head has one barb, so its turn reads.",
+  "contributor": "MatterBot",
+  "licence": "CC0-1.0",
+  "origin": [
+    "procedural",
+    "agent-drafted"
+  ],
+  "script": "tools/converters/fit/gen_makeup_pieces.py",
+  "stamp": "../textures/fit/makehuman/makeup/Makeup_Tattoo_Arrow_v01_stamp_sUKN.png",
+  "size": 0.042
+}

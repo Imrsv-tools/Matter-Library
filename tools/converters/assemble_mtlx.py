@@ -93,6 +93,13 @@ AUTHOR_TIER_PORTS = {
     # where the body is thin (ears, nose wings, fingers), so light passes through them:
     # radius x (1 + SCATTER_GAIN x map). Empty, the image's default (0) leaves the radius.
     "scatter_map": ("filename", "", "Scatter Map", {}),
+    # Phase26 26.1 (RD-P26-2, LCDSchema §Makeup layer): the MESH's makeup, the reference merge's two
+    # pictures supplied when the article is bound. makeup_color_map: RGB the makeup's colour (sRGB),
+    # A its coverage (straight, linear); makeup_finish_map: R a target roughness, G the finish's
+    # coverage (linear). makeup_amount scales both coverages. Empty, both read coverage 0: the skin.
+    "makeup_color_map": ("filename", "", "Makeup Color Map", {}),
+    "makeup_finish_map": ("filename", "", "Makeup Finish Map", {}),
+    "makeup_amount": ("float", "1.0", "Makeup Amount", {}),
     "layer_blend_balance": ("float", "0.5", "Layer Blend Balance", {}),
     "layer_blend_contrast": ("float", "0.0", "Layer Blend Contrast", {}),
     "layer2_base_color": ("color3", "0.8, 0.8, 0.8", "Layer 2 Base Color", {}),
@@ -120,6 +127,10 @@ BASE_COLOR_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}
 # Masters that take the mesh's shine maps (Phase22 RD-P22-3): Subsurface only for now, since the
 # skins and lips are Subsurface. Another master takes one when an article needs it.
 SHINE_MAP_MASTERS = {"Subsurface"}
+
+# Masters that take the mesh's makeup (Phase26 RD-P26-2, RD-P26-3): Subsurface, the skins' master.
+MAKEUP_MASTERS = {"Subsurface"}
+MAKEUP_PORTS = ("makeup_color_map", "makeup_finish_map", "makeup_amount")
 
 
 def shine_maps(spec) -> dict:
@@ -239,6 +250,9 @@ class MaterialSpec:
     cavity_map_tex: Optional[str] = None
     # Phase22 22.3: its scatter map, the same way (scatter_map)
     scatter_map_tex: Optional[str] = None
+    # Phase26 26.1 (RD-P26-3): declares the makeup inputs (makeup_color_map, makeup_finish_map,
+    # makeup_amount), empty in the article; the binding supplies the merge's pictures
+    makeup: bool = False
     layer_blend_balance: Optional[float] = None   # TwoLayer
     layer_blend_contrast: Optional[float] = None  # TwoLayer
     layer2_base_color_tex: Optional[str] = None
@@ -395,6 +409,15 @@ def _check_spec(spec: MaterialSpec) -> None:
                              f"{sorted(SHINE_MAP_MASTERS)} (LCDSchema.md); this article is {spec.master}")
         if not spec.fits:
             raise ValueError("a shine map is drawn for a part mesh: declare `fits` (Phase22, RD-P22-3)")
+    if spec.makeup:
+        # Phase26 (RD-P26-2): the makeup mixes over the skin's base, and the scatter colour follows
+        # that mixed base; so the article's scatter must follow its base (connected, not its own)
+        if spec.master not in MAKEUP_MASTERS:
+            raise ValueError(f"makeup is an input of the masters {sorted(MAKEUP_MASTERS)} "
+                             f"(LCDSchema.md §Makeup layer); this article is {spec.master}")
+        if not (spec.base_color_map and spec.subsurface_weight > 0 and spec.subsurface_color is None):
+            raise ValueError("makeup goes on a skin whose scatter follows its base: base_color_map, "
+                             "subsurface_weight > 0 and no subsurface_color of its own (RD-P26-2)")
     if spec.master == "Hair":
         # Phase08 8.1 (the lead's interim hair: light through the strands, soft edges)
         if not spec.cutout_map or spec.opacity_cutoff is not None:
@@ -449,6 +472,9 @@ def assemble(spec: MaterialSpec) -> str:
         "normal_map": spec.normal_map_tex,
         "cavity_map": spec.cavity_map_tex,
         "scatter_map": spec.scatter_map_tex,
+        "makeup_color_map": None,            # the binding's (the merge's pictures); empty here
+        "makeup_finish_map": None,
+        "makeup_amount": None,               # 1: the whole layer
         "layer_blend_balance": spec.layer_blend_balance,
         "layer_blend_contrast": spec.layer_blend_contrast,
         "layer2_base_color": spec.layer2_base_color,
@@ -463,6 +489,8 @@ def assemble(spec: MaterialSpec) -> str:
     if spec.base_color_map:
         author_ports.append("base_color_map")
     author_ports += list(shine_maps(spec))
+    if spec.makeup:
+        author_ports += list(MAKEUP_PORTS)
     if has_layer2:
         author_ports += ["layer_blend_balance", "layer_blend_contrast"]
         if not spec.layer2_base_color_tex:
@@ -668,6 +696,29 @@ def assemble(spec: MaterialSpec) -> str:
         _add_input(tint, "in2", "color3", interfacename="base_color_tint")
         base_src = "base_color_tinted"
 
+    # Phase26 (RD-P26-2, LCDSchema §Makeup layer): the mesh's makeup, after the tint (the tint is the
+    # skin's, never the makeup's) and before any deposit (dust lies on the makeup):
+    # base = mix(base, makeup colour, colour coverage x makeup_amount). The coverage is the colour
+    # picture's A, straight and linear; read on texcoord 0 directly, like the mesh's picture. Empty,
+    # the image's default (0, 0, 0, 0) is coverage 0: the skin as before.
+    makeup_cov = {}
+    if spec.makeup:
+        _node("texcoord", "makeup_map_uv", "vector2", index=("integer", "value", 0))
+        img = ng.addNode("image", "makeup_color_map_tex", "color4")
+        img.setColorSpace("srgb_texture")
+        _add_input(img, "file", "filename", interfacename="makeup_color_map")
+        _add_input(img, "default", "color4", value="0.0, 0.0, 0.0, 0.0")
+        _add_input(img, "texcoord", "vector2", nodename="makeup_map_uv")
+        _node("convert", "makeup_color", "color3", **{"in": ("color4", "nodename", "makeup_color_map_tex")})
+        _node("extract", "makeup_color_coverage_map", "float",
+              **{"in": ("color4", "nodename", "makeup_color_map_tex"), "index": ("integer", "value", 3)})
+        makeup_cov["color"] = _node("multiply", "makeup_color_coverage", "float",
+                                    in1=("float", "nodename", "makeup_color_coverage_map"),
+                                    in2=("float", "interfacename", "makeup_amount"))
+        base_src = _node("mix", "base_color_makeup", "color3",
+                         bg=("color3", "nodename", base_src), fg=("color3", "nodename", "makeup_color"),
+                         mix=("float", "nodename", makeup_cov["color"]))
+
     # After the tint (a Creator who tints a car red does not tint its dust) and the mesh's picture.
     for i, eff, port in deposits:
         base_src = _node("mix", f"base_color_deposit{i}", "color3",
@@ -748,6 +799,24 @@ def assemble(spec: MaterialSpec) -> str:
                           **{"in": ("float", "nodename", "roughness_biased"),
                              "low": ("float", "value", 0.0),
                              "high": ("float", "value", 1.0)})
+    # Phase26 (RD-P26-2): the makeup's finish, after the skin's map, bias and clamp: roughness =
+    # mix(that, the finish's target roughness (R), finish coverage (G) x makeup_amount). Matte powder
+    # over a wet skin reads matte. Linear data on texcoord 0; empty, its default (0, 0, 0) covers nothing.
+    if spec.makeup:
+        img = ng.addNode("image", "makeup_finish_map_tex", "vector3")
+        _add_input(img, "file", "filename", interfacename="makeup_finish_map")
+        _add_input(img, "default", "vector3", value="0.0, 0.0, 0.0")
+        _add_input(img, "texcoord", "vector2", nodename="makeup_map_uv")
+        _node("extract", "makeup_roughness", "float",
+              **{"in": ("vector3", "nodename", "makeup_finish_map_tex"), "index": ("integer", "value", 0)})
+        _node("extract", "makeup_finish_coverage_map", "float",
+              **{"in": ("vector3", "nodename", "makeup_finish_map_tex"), "index": ("integer", "value", 1)})
+        _node("multiply", "makeup_finish_coverage", "float",
+              in1=("float", "nodename", "makeup_finish_coverage_map"),
+              in2=("float", "interfacename", "makeup_amount"))
+        rough_src = _node("mix", "roughness_makeup", "float",
+                          bg=("float", "nodename", rough_src), fg=("float", "nodename", "makeup_roughness"),
+                          mix=("float", "nodename", "makeup_finish_coverage"))
     ng.addOutput("roughness_out", "float").setNodeName(rough_src)
 
     # --- Metalness: a graph output whenever a texture OR a second layer exists ---

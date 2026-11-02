@@ -46,6 +46,7 @@
   "fuzz_color": "0.799, 0.485, 0.347",
   "fuzz_roughness": 0.5,
   "base_color_map": true,
+  "makeup": true,
   "base_color_map_tex": "../../../../textures/fit/makehuman/skin/FitzpatrickIISynthAll_basecolor_sUKN.png",
   "overlays": [
     {
