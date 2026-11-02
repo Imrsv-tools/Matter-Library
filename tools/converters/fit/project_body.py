@@ -683,7 +683,8 @@ def neck_fill(D, body, H, hm, P, near: float = 0.004, r: float = 0.008, along: f
 
 
 def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool, delight: bool = False,
-            levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False) -> None:
+            levelled: bool = False, keep_colour: bool = False, light_order: int = 2, fill_neck: bool = False,
+            outline_clear: float = 0.0) -> None:
     np = _np()
     from PIL import Image  # noqa: PLC0415
     import project_views as pv  # noqa: PLC0415
@@ -739,6 +740,11 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
             Dv = F[f"D_{yaw}"]
             ix, iy = ix + sample(Dv[..., 0], ix, iy), iy + sample(Dv[..., 1], ix, iy)
         vis &= sample(fg[:, x0:x0 + w].astype(float), ix, iy) > 0.5
+        if outline_clear > 0:
+            # the model paints a dark edge round the body's outline; a texel no view faces squarely (the shoulder's
+            # top: the front and back views at ~0.33) sampled it 1 px inside, as a row of dark dots (27.2.7)
+            from scipy.ndimage import distance_transform_edt  # noqa: PLC0415
+            vis &= sample(distance_transform_edt(fg[:, x0:x0 + w]), ix, iy) > outline_clear
         col = np.zeros((len(rr), 3))
         col[vis] = sample(pic[:, x0:x0 + w], ix[vis], iy[vis])
         # the model's grey background, or an outline pixel half of it, is never skin (grey dots along the
@@ -830,7 +836,7 @@ def cmd_put(d: Path, pic_path: Path, tag: str, head: Path | None, use_fit: bool,
     Image.fromarray((srgb(out) * 255 + 0.5).astype(np.uint8)).save(d / f"D_{tag}.png")
     save(d / f"D_{tag}_2048.png", D)
     rec = {"picture": pic_path.name, "fit": use_fit, "delight": delight, "light": light, "levelled": levelled,
-           "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck,
+           "keep_colour": keep_colour, "light_order": light_order, "neck_fill": fill_neck, "outline_clear_px": outline_clear,
            "level_log_max": None if lev_max is None else round(lev_max, 3),
            "cut_step_pct_median": step_before_gain["median"], "cut_step_pct_p90": step_before_gain["p90"],
            "head": head.name if head else None, "neck_join": neck_rec, "wrist_join": hand_rec, "nape_texels": int(nape.sum()),
@@ -1212,6 +1218,9 @@ def main(argv=None) -> int:
     s.add_argument("--neck-fill", action="store_true",
                    help="with --head: leave the head untouched and carry its level smoothly down the body's neck, "
                         "replacing the picture's slow tone there (its chin shadow), not split the step (27.2.6)")
+    s.add_argument("--outline-clear", type=float, default=0.0, metavar="PX",
+                   help="never sample within PX pixels of the model's outline in a view (its painted dark edge: the "
+                        "shoulder dots, 27.2.7)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1236,7 +1245,7 @@ def main(argv=None) -> int:
     elif a.cmd == "fit":
         cmd_fit(a.dir, a.dir / a.picture)
     elif a.cmd == "put":
-        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill)
+        cmd_put(a.dir, a.dir / a.picture, a.tag, a.head, not a.no_fit, a.delight, a.level, a.keep_colour, a.light_order, a.neck_fill, a.outline_clear)
     return 0
 
 
