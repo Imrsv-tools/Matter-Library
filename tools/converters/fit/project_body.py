@@ -1337,7 +1337,7 @@ def body_part(p) -> str:
     return "back" if z < 0 else "front"
 
 
-def cmd_pigments(atlas: Path, base: Path, head_field: Path, cfields: Path, out: Path) -> None:
+def cmd_pigments(atlas: Path, base: Path, head_field: Path, cfields: Path, out: Path, correct_from: Path | None = None) -> None:
     """The body as a structure (27.3, as Phase25's 25.2 for the face): every texel ``put`` wrote (where
     ``atlas`` differs from ``base``, the head atlas it was written on) turned back into melanin and blood on
     the maker's own skin model, and merged into Phase25's field (``head_field``: the face, its weight and its
@@ -1377,15 +1377,27 @@ def cmd_pigments(atlas: Path, base: Path, head_field: Path, cfields: Path, out: 
     n = nh
     lut = gss.Lut()
     lut.use("Tone34")
-    target = lut(Fc["melanin"].reshape(-1)[w].astype(np.float64), Fc["blood"].reshape(-1)[w].astype(np.float64),
-                 so2[w].astype(np.float64)) * (D / np.maximum(C, 1e-6))
+    # compose's colour is (table + EPS) / (base + EPS): D / C holds on table + EPS, not on the table alone
+    cpig = lut(Fc["melanin"].reshape(-1)[w].astype(np.float64), Fc["blood"].reshape(-1)[w].astype(np.float64),
+               so2[w].astype(np.float64)) + gss.EPS
+    want = cpig * (D / np.maximum(C, 1e-6))
+    gain = np.ones(3)
+    if correct_from is not None:
+        # C and the served head each hold their own face core to the subject's level, so D / C carries a scale
+        # per channel the structure does not: a first structure's body came out 1.8 % redder than D (27.4). Its
+        # body against D measures that scale (the face constant pins the rest), and one pass divides it out.
+        st = json.loads((correct_from / "SkinTone34_basecolor_stats.json").read_text())
+        S = dec[np.asarray(Image.open(correct_from / "SkinTone34_basecolor_sUKN.png").convert("RGB"))].reshape(-1, 3)[w]
+        gain = np.median(S * np.array(st["base_color_const"], np.float32) / np.maximum(D, 1e-6), 0)
+        want = want / gain
+    target = np.maximum(want - gss.EPS, 1e-6)
     del D, C
     inv = lut.inverse(target, so2[w])
     mel[w], bld[w] = inv["melanin"], inv["blood"]
     # what the pigments cannot make (the picture is yellower than the table at C's oxygenation; without it the
     # structure's body drew R/G 1.81 against D's 1.73, 27.3) travels as a factor on the skin's colour
-    made = lut(inv["melanin"], inv["blood"], so2[w].astype(np.float64))
-    factor = target / np.maximum(made, 1e-6)
+    made = lut(inv["melanin"], inv["blood"], so2[w].astype(np.float64)) + gss.EPS
+    factor = want / made                        # exact through compose's EPS (fitted on the bare table: 1.8 % too red)
     out.mkdir(parents=True, exist_ok=True)
     stem = "SkinTone34"
     meta = {"command": f"project_body.py pigments {atlas.name} --base {base.name} --head-field {head_field.name}",
@@ -1405,6 +1417,7 @@ def cmd_pigments(atlas: Path, base: Path, head_field: Path, cfields: Path, out: 
     meta["inverse"] = {"texels": int(len(w)), "clamped": inv["clamped"],
                        "resid_log_p50": round(float(np.median(r)), 5), "resid_log_p99": round(float(np.percentile(r, 99)), 4),
                        "share_resid_over_0.02": round(float((r > 0.02).mean()), 5),
+                       "correct_from": correct_from and correct_from.name, "gain": [round(float(v), 4) for v in gain],
                        "skin_factor_median": [round(float(v), 4) for v in np.median(factor, 0)],
                        "skin_factor_p1_p99": [[round(float(v), 3) for v in np.percentile(factor, q, 0)] for q in (1, 99)],
                        "seconds": round(time.time() - t0)}
@@ -1534,6 +1547,8 @@ def main(argv=None) -> int:
     s.add_argument("--head-field", type=Path, required=True, help="Phase25's field (project_face.py pigments)")
     s.add_argument("--c-fields", type=Path, required=True, help="C's fields with so2 (gen_skin_maps --fields)")
     s.add_argument("--out", type=Path, required=True)
+    s.add_argument("--correct-from", type=Path, help="a structure made from this field once (gen_skin_maps --out): "
+                   "its body's scale per channel against D divided out (27.4)")
     s = sub.add_parser("seams", help="the level step across each seam of an atlas (neck, wrists, ankles, spine)")
     s.add_argument("atlas", type=Path)
     s = sub.add_parser("close", help="the fine skin from one close camera per region (RD-P27-6): prep, paint, put")
@@ -1550,7 +1565,7 @@ def main(argv=None) -> int:
         else:
             cmd_close_put(a.dir, a.atlas, a.tag, a.seed, a.strength)
     elif a.cmd == "pigments":
-        cmd_pigments(a.atlas, a.base, a.head_field, a.c_fields, a.out)
+        cmd_pigments(a.atlas, a.base, a.head_field, a.c_fields, a.out, a.correct_from)
     elif a.cmd == "seams":
         cmd_seams(a.atlas)
     elif a.cmd == "prep":

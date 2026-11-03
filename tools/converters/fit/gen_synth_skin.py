@@ -176,7 +176,10 @@ SUBJECTS = {
                "ear": {"front": ["alae"], "rim": ["upper_lid"], "lobe": ["cheek"], "back": []},
                # Phase25 25.3: the served map is D, the image model's face as a structure, made only from
                # this record's picture (``gen_skin_maps --subject Tone34 --pigments <field>``; SkinMaps.md).
-               "source": "library/provenance/sources/fit/makehuman/SkinTone34_face.json"},
+               # Phase27 27.4: the body too, from the four-view picture and its close cameras (no picture
+               # committed, RD-P27-3: the record remakes each one, checked by pixels).
+               "source": ["library/provenance/sources/fit/makehuman/SkinTone34_face.json",
+                          "library/provenance/sources/fit/makehuman/SkinTone34_body.json"]},
 }
 # ``face`` scales the placed regional colour (``FACE``) as a whole: 1 is the bar's solve.
 # The first gains (23.3.1: sun 1.5 / 0.55, mottle 1.3 / 0.75, redness 0.6 / 1.5, no ``face``) moved the

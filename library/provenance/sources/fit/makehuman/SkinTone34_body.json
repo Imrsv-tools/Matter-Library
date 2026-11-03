@@ -1,0 +1,133 @@
+{
+ "what": "The source of SkinTone34's body (Phase27 27.4): an image model's picture of hm08 shown four times (front, profile, back, profile), fitted and projected onto the body island, with the skin finer than 2 mm from 18 close pictures; turned into melanin and blood on the skin maker's model (tools/converters/fit/project_body.py, then gen_skin_maps.py --subject Tone34 --pigments). The face is SkinTone34_face.json's; the hands and the groin are the maker's.",
+ "picture": null,
+ "picture_not_committed": "RD-P27-3: no picture of an unclothed person is committed to this public repository. Every picture is instead remade by the chain below and checked by its pixels; all 19 regenerated pixel-identical on 2026-11-03 (Phase27 27.4).",
+ "pixels_sha256_is": "sha256 of the RGB array's bytes (rows top to bottom, 8 bits a channel): a regeneration is checked by pixels, since a PNG encoder may write the same pixels as different bytes",
+ "made": "ai-assisted",
+ "licence": "CC0-1.0",
+ "model": {
+  "name": "Krea 2 Turbo (krea/Krea-2), the Comfy-Org ComfyUI repack in FP8",
+  "files": {
+   "diffusion_model": "krea2_turbo_fp8_scaled.safetensors",
+   "text_encoder": "qwen3vl_4b_fp8_scaled.safetensors",
+   "vae": "qwen_image_vae.safetensors"
+  },
+  "licence": "Krea 2 Community License",
+  "outputs": "owned by whoever generates them; Krea claims no ownership (the licence's section 5.3), so the pictures are dedicated CC0 here",
+  "conditions_met_when_made": "as SkinTone34_face.json; asking the model for unclothed bodies in this public CC0 library approved by the maintainer (2026-11-02, Phase27); whether the model writes a watermark is unverified (F-AIS-3)"
+ },
+ "generation": {
+  "runner": "ComfyUI 0.43.2, over its API (project_body.py paint and close paint; standard library only)",
+  "workflow": "tools/converters/fit/comfy/krea2turbo_img2img.json",
+  "workflow_sha256": "210e36da4e3072e02f113f68b074ef0ef9f3b2340017354e4bffaee7041a6bab",
+  "four_views": {
+   "seed": 7,
+   "steps": 8,
+   "cfg": 1.0,
+   "sampler": "euler / simple",
+   "strength": 0.5,
+   "prompt": "project_body.PROMPT",
+   "source": "project_body.py prep (hm08 four times in one picture, Tone34's maker colour)",
+   "source_sha256": "635960a4a4656e00ed0407e220ab6f0e641fb8915d8129d19b71ab86f5e98c38",
+   "pixels_sha256": "088dc5aaf578cde90e59471b824fc3d4223ec9d46d452970aaf043e40899a64f"
+  },
+  "close": {
+   "seed": 7,
+   "steps": 8,
+   "strength": 0.65,
+   "prompt": "project_body.CLOSE_PROMPT, per camera (close_part)",
+   "source": "project_body.py close prep --atlas D_seam9.png (hm08 through 18 close cameras wearing the four views' body as at 27.2.1)",
+   "pictures": {
+    "c000_00_s65_seed7": {
+     "pixels_sha256": "19964e14479a3b2c72506ce06e44339b3e783030d23ef7f47a71e11a5f3ba3b6",
+     "source_sha256": "342152214f73275166b36c0a144f2af0a4e9e436367d84918424724e9f115cfa"
+    },
+    "c000_01_s65_seed7": {
+     "pixels_sha256": "f07c677f96431e0462bb7868f5f189313bc743057cc2108def3cec22a0dd1f3c",
+     "source_sha256": "997446b48dee519fd600345bb5e812d6c771426b84e615e5ad40aa9ffb8bf1ab"
+    },
+    "c000_02_s65_seed7": {
+     "pixels_sha256": "1aecf1ffbb68dfdd1c7d6f071eedddb849d86ab667c37487e4aa5225f4b120a4",
+     "source_sha256": "aeb42205c5a491e5081bb4b194d27435222c28c762c14be4db82b6499d495627"
+    },
+    "c000_03_s65_seed7": {
+     "pixels_sha256": "bf9b50a82732c2ee19a19aee144b89da414000608d534ceb43b68ace1a06d11d",
+     "source_sha256": "b5bf64b7c88c508e246e33806fc09d2d14194eceb7264527f7938856f28959cd"
+    },
+    "c000_04_s65_seed7": {
+     "pixels_sha256": "0266b2a74f32ab5dd112937f779777ff88d22c7dcf693aae3152610e09917773",
+     "source_sha256": "9d652327f7ebd2ec496dcdff332ac8b53c11ce2252741641c42f52dc57407602"
+    },
+    "c000_05_s65_seed7": {
+     "pixels_sha256": "c8f929461cfb5ab6d34e510dcfef65895991db880032e53fe49566e0333964a5",
+     "source_sha256": "42c56eb32522f7026a389bae850ef6c76c59962b2a7f8174a5a166e614aa6d77"
+    },
+    "c090_00_s65_seed7": {
+     "pixels_sha256": "1abd156869e06586e96fd3ffd21fe91e537eab3fedceab1b237f639b27813c3c",
+     "source_sha256": "d0763821430322399bed4d315b0a1b3c1a46ac92d6e7e90af825a11d58cfe0bc"
+    },
+    "c090_01_s65_seed7": {
+     "pixels_sha256": "3918c0c6b34202bb0dd39b2bb69ebf021b91f276b9bb043e7bbe52f4164da803",
+     "source_sha256": "14fc6609bc174636d5c1621b1b8906bf18269c029f69dfc7f99967da9120444c"
+    },
+    "c090_02_s65_seed7": {
+     "pixels_sha256": "07d660a1b559f27daa89ced57b8d780664627f8b0cec49e7a79fdc436fc86c70",
+     "source_sha256": "0043b293e5f792b486aa8dc73cfec4acee3ff48c5dfda5be8bf0bd785afd857d"
+    },
+    "c180_00_s65_seed7": {
+     "pixels_sha256": "870f096822375b437cbd131d3e0a917f5960cb9d0ff19f76fc4484a992211fba",
+     "source_sha256": "21c038000e7e4139d4c46fa3f5bfcf4cc43c8cfc91aff081fab41da979342247"
+    },
+    "c180_01_s65_seed7": {
+     "pixels_sha256": "3f5c16261f3782f909c4ba76dec6f99329e78b6c7dc18cf21e2e64541c56c343",
+     "source_sha256": "49e29ac6e86b4eedfef967c8429a21fbbe114b2d603bb111bb484c9b03830b7e"
+    },
+    "c180_02_s65_seed7": {
+     "pixels_sha256": "8a0c09ba4e986c6a226a4fe16cd91e47ad0a339b004e1122c8dc6dda903296a3",
+     "source_sha256": "ac4683582dc394198cda95e85624d79ae1858d0720b20746e4a80649b3109c84"
+    },
+    "c180_03_s65_seed7": {
+     "pixels_sha256": "a732a5815fd9e7806a4599ca2d6d72225c77cb7300648be3854ba19b4d7ea6ce",
+     "source_sha256": "8638580f33a611eadcb6f894f92b4940d60cf654f61ac28c36ef1f3cf8a5a6cd"
+    },
+    "c180_04_s65_seed7": {
+     "pixels_sha256": "cdcbf3afa094616cc033bfbad82cdf0ba67258529e9da67ab0eb6cb817c56367",
+     "source_sha256": "022d433cc6dbf67c27b7eaaa4f9cfa10a2f09b8f836063b6d35e175f9f1bf071"
+    },
+    "c180_05_s65_seed7": {
+     "pixels_sha256": "938d78a20fadca585020a2259b743a4e174a675c93a97b36ff8f0be1fc7dba97",
+     "source_sha256": "36e7fcf6c78bc5cfd78029fb0bbd02c866be4edb355fd6245328806395bc6b41"
+    },
+    "c270_00_s65_seed7": {
+     "pixels_sha256": "a48b7d42b0212550b36c7feb83e6da117d1ceaa128e66b673320cbb73c152e8c",
+     "source_sha256": "1125bf9796b87592936abdb9284a8a216255ede1dc015e846309325f61b4c5d7"
+    },
+    "c270_01_s65_seed7": {
+     "pixels_sha256": "beae90038a5269b8f4b84a7de8b8b36b969821d68aa7f978f675442d1f3308b9",
+     "source_sha256": "6b5c6b5a401f19e474cc025ea61cb0358e499e430cad2d5b84bb84ff11ac836a"
+    },
+    "c270_02_s65_seed7": {
+     "pixels_sha256": "77d152e5e17e5d17e4687dc4a08d65d96582a285ab655b88e052697bdfd7cc08",
+     "source_sha256": "47d648cd66305aa30f6fde9513cc0d13d3bda11a651774bc57658a00e69fe85d"
+    }
+   }
+  },
+  "regenerated": "2026-11-03: all 19 pictures pixel-identical to those first made on 2026-11-02, their renders byte-identical (Phase27 27.4); D_seam9 (the close cameras' atlas) remade texel-identical by the chain's fourth line"
+ },
+ "chain": [
+  "uv run --with scipy tools/converters/fit/project_body.py prep <d>",
+  "python3 -I tools/converters/fit/project_body.py paint <d> --seeds 7 --strength 0.5",
+  "uv run --with scipy tools/converters/fit/project_body.py fit <d> f4_s50_seed7.png",
+  "uv run --with scipy tools/converters/fit/project_body.py put <d> f4_s50_seed7.png seam9 --delight --level --head library/parity/P25_Head/D_struct2.png",
+  "uv run --with scipy tools/converters/fit/project_body.py close prep <d> --atlas <d>/D_seam9.png",
+  "python3 -I tools/converters/fit/project_body.py close paint <d>",
+  "uv run --with scipy tools/converters/fit/project_body.py fit <d> f4_s50_seed7.png --front-pins",
+  "uv run --with scipy tools/converters/fit/project_body.py put <d> f4_s50_seed7.png kl3 --fit-suffix _pins --delight --keep-colour --light-order 1 --level --level-lum --light-blur 0.02 --outline-clear 3 --smooth-holes --neck-fill --jaw-free --head library/parity/P25_Head/D_struct2.png",
+  "uv run --with scipy tools/converters/fit/project_body.py close put <d> --atlas <d>/D_kl3.png --tag kl3f",
+  "uv run --with scipy tools/converters/fit/project_body.py pigments <d>/D_kl3f.png --base library/parity/P25_Head/D_struct2.png --head-field library/parity/P25_Head/field_corner2_4k --c-fields library/parity/P25_Fields --out <field1>",
+  "uv run --with scipy tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field1> --out <s1>",
+  "uv run --with scipy tools/converters/fit/project_body.py pigments <d>/D_kl3f.png --base library/parity/P25_Head/D_struct2.png --head-field library/parity/P25_Head/field_corner2_4k --c-fields library/parity/P25_Fields --out <field> --correct-from <s1>",
+  "uv run --with scipy tools/converters/fit/gen_skin_maps.py --subject Tone34 --pigments <field>"
+ ],
+ "chain_notes": "MATTER_SKIN_N=2048 for every project_body.py step (its default). D_struct2.png is Phase25's head as served at 8K (project_face.py structure); the served head is now 4K and matches it at the neck within 0.6 % (27.3)."
+}
