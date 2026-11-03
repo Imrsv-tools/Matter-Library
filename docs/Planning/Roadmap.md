@@ -11,7 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*Phase27 (AI Body Skin) is in execution again (from 27.2, 2026-11-02); its entry is under `## Future`. Phase25 closed 2026-11-02.*
+*No active phase. Phase27 closed 2026-11-03; Phase28 (AI Hands and Feet) is next, under `## Future`.*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -32,10 +32,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-15 (lead):** Skin Maps runs after Phase19 Scale Grids (*"Scale grids have started, Skin maps then as you list"*, RD-SV-1). *The Library Service* is re-scoped to a server without a GPU, on the platform's web server, with the laptop pulling the rig work (RD-SV-2). Entries the dev snapshots already deliver are marked complete or folded, and kept. Why: `docs/Planning/Research/261015_R_ServerWithoutTheGpu.md`.
 
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
-
-### Phase27 — AI Body Skin — IN EXECUTION *(2026-11-02, from 27.2, the fine skin)* *(BRIEF READY 2026-11-02, Pass 3: the skin split by size, the four-view picture above ~3 mm, a close camera per region below, RD-P27-6; execute resumes at 27.2)* *(was BRIEF READY, 2026-11-02: hm08 shown four times in one picture, repainted by Krea, each view fitted to hm08 before it is projected, RD-P27-5; 27.1 is the fit)* *(seeded 2026-11-02, on the lead's "Seed phase 27 as the body.."; the lead ruled the body its own phase, after Phase25, and approved asking the model for unclothed bodies: "1) yes"; discovery may run beside Phase25's execute, its execute after 25.2)*
-**Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, the wrists, the ankles, or down the back and the limbs, judged beside the maker's body on the same unclothed character; if it wins, the maker turns it into a calibrated skin structure.
-- `docs/Planning/Phases/Phase27_AiBodySkin.md`
 
 ### Phase28 — AI Hands and Feet — SEEDED *(2026-11-02, on the lead's "add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after")*
 **Outcome:** the character's hands and feet, palms and soles included, wear the same image-model person's skin as the body, so the whole skin map reads as one complete person from every side.
@@ -257,3 +253,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's face becomes the head's skin in the body's own layout, fitted through one front camera, with the ears coloured by the skin maker, judged beside the scanned skin and Phase24's skin on the same body; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Complete/Phase25_AiSkinStructure.md`
 *Closed 2026-11-02: `Tone34` served with Krea 2's face as a structure, the ear the maker's; the lead: "D looks best in both".*
+
+### Phase27 — AI Body Skin — COMPLETE
+**Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, the wrists, the ankles, or down the back and the limbs, judged beside the maker's body on the same unclothed character; if it wins, the maker turns it into a calibrated skin structure.
+- `docs/Planning/Phases/Complete/Phase27_AiBodySkin.md`
+*Closed 2026-11-03: `Tone34` served with the image model's body as a structure, joined to Phase25's face; the hands and feet go to Phase28; the lead: "yes 3 is better", then "close".*

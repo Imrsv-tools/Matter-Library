@@ -22,4 +22,6 @@ every run, up front. **Every row is a problem this project has already solved.**
 
 | 3 | **Making a skin from an image model's picture** (the picture carried onto hm08 through a camera, then turned into the maker's melanin and blood so tone and marks stay changeable), served with its source | `docs/specs/Authoring/SkinMaps.md` §How to make one, *An AI-assisted map* (Phase25) | `project_face.cmd_field` (the front projection and coordinate field) · `gen_synth_skin.Lut.inverse` + `project_face.cmd_pigments` (colour → pigment) · `gen_skin_maps.subject(pigments_dir=…)` (served, the ear by `gen_synth_skin.ear_paint`) |
 
-*Row 1 added at Phase24's close (2026-11-01); row 2 at Phase26's (2026-11-02); row 3 at Phase25's (2026-11-02).*
+| 4 | **Making the body's skin from an image model's picture** (no one camera sees hm08's body island: the back is split down the spine), joined to the head as one structure | `docs/specs/Authoring/SkinMaps.md` §How to make one, *The body* (Phase27) | `project_body.cmd_fit` (each view fitted to hm08's outline) · `cmd_put` (each texel from the view facing it most squarely; `--delight --keep-colour --level-lum --light-blur`) · `cmd_close_put` (skin finer than 2 mm from close cameras, a ratio) · `cmd_pigments` (into the head's field; the leftover a factor; `--correct-from`) |
+
+*Row 1 added at Phase24's close (2026-11-01); row 2 at Phase26's (2026-11-02); row 3 at Phase25's (2026-11-02); row 4 at Phase27's (2026-11-03).*
