@@ -15,6 +15,15 @@ import project_body as pb
 pic_path, out = Path(sys.argv[1]), Path(sys.argv[2])
 out.mkdir(parents=True, exist_ok=True)
 img, fg = pb.picture(pic_path)                      # linear colour, body mask, at the render's size
+CLIP = len(sys.argv) > 3                             # 3rd arg: Phase27's geom dir -> keep only near hm08's outline
+if CLIP:
+    from scipy.ndimage import binary_dilation
+    g = Path(sys.argv[3])
+    hm = np.zeros_like(fg)
+    for yaw, x0, w in pb.frames():
+        hm[:, x0:x0 + w] = binary_dilation(np.load(g / f"geom_{yaw}.npz")["mask"], iterations=12)   # ~2 cm
+    print(f"clip: {int((fg & ~hm).sum())} picture pixels outside hm08's outline + 2 cm dropped")
+    fg &= hm
 rgb = pb.srgb(img) if hasattr(pb, "srgb") else img
 rows = np.nonzero(fg.any(1))[0]
 top, bot = rows.min(), rows.max() + 1

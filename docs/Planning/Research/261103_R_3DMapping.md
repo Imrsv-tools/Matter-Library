@@ -99,13 +99,25 @@
 - **Not tried:** another field of view; the textured GLB (4K bake) instead of the vertex colours; a second seed or picture; a fix for the feet.
 - **Reproduce** (`<p>` = `library/parity`, the probe folder `<s>` = `docs/Planning/Research/261103_R_3DMapping_probe`; the lead's ComfyUI running, the five models in its model folders, `PIXAL3D_TEMPLATE` set to the template's path in ComfyUI's environment): `uv run --with scipy --with pillow python <s>/views.py <p>/P27_Probe/f4_s50_seed7.png <p>/TDM_Pixal3D/views` · `python3 -I <s>/run_pixal3d.py <p>/TDM_Pixal3D/views tdm_a 20` · `uv run --with scipy --with pillow --with trimesh python <s>/transfer.py <ComfyUI>/output/3d/tdm_a_painted_00001_.glb <p>/TDM_Pixal3D a` · `uv run python <s>/look_driver.py Skin_Tone34_Clean_Base_s001_v01 --bare --body --shine served --width 1536 --candidate "Tone34 served=<p>/TDM_Pixal3D/T_served.png" --candidate "Pixal3D whole map=<p>/TDM_Pixal3D/E_a_all.png" --candidate "Pixal3D body, served head=<p>/TDM_Pixal3D/E_a_body.png" --out <p>/TDM_Pixal3D/look_body` (and `--judge` for the face). `T_served.png` is the served map decoded × its `base_color_const`.
 
+## Pass 5 — Where the face and feet defects come from (2026-11-03)
+
+**The lead:** *"Pixal3d has no solve for the issues? Should we try other images that also have feet details?"*
+
+- **F-TDM-12 — Both defects are in Pixal3D's own output, before the transfer.** A point render of its painted mesh (`rawlook.py`, local scratch) shows the black eye sockets, the doubled lips and the dark feet on Pixal3D's own body.
+- **F-TDM-13 — The feet: the four eye-level views never see the soles, and see the tops only at a grazing angle; Pixal3D paints what it cannot see dark.** Run 1's cut-out also kept the ground shadow under the feet. Run 2 (`tdm_b`) cut each view along hm08's own outline + 2 cm (Phase27's `geom_*.npz`): the tops gained some skin, the undersides stayed black. **A better full-body picture alone will not fix it.**
+- **F-TDM-14 — The face: the multi-view node scales every view to 1024 px** (`Pixal3DMultiViewConditioning`, `common_upscale` to 1024²), so in a full-body view the head gets ~130 px whatever the picture's resolution.
+- **F-TDM-15 — Solves within Pixal3D (not yet run):**
+  - **(a) A Pixal3D run per part, framed close:** four views of the head alone and of the feet alone, each filling the frame (~8× the pixels on the face). Each result is fitted and transferred onto hm08's head or feet as the body was. This is where *"other images with feet details"* applies: close four-views, all four at the same scale.
+  - **(b) A view from above or below:** the ComfyUI node is a fixed eye-level rig (front, left, back, right); upstream's `inference_mv.py` takes any cameras (`transforms.json`), so a high view that sees the tops of the feet is possible there, or through the same internal call in a small custom node.
+  - **(c) Mixed:** Pixal3D's body, the served face, and the feet from (a) or the maker, joined at the neck and ankles.
+
 ## Open questions
 
 | Id | Question (as the lead would see it) | Recommendation |
 |---|---|---|
 | ~~Q-TDM-1~~ | ~~Library skins, or creators' own characters?~~ | *Withdrawn at Pass 3: the routes are probed for the library's hm08 map either way.* |
 | ~~Q-TDM-2~~ → **RD-TDM-5** | ~~Run the three probes, Hunyuan first?~~ | *Answered: Pixal3D first.* |
-| Q-TDM-3 | **After Pass 4: which way next?** (a) Pixal3D's body + the served face, joined at the neck, the feet fixed — a complete map to judge; (b) go on to Hunyuan3D-Paint and MV-Adapter as planned; (c) both. | (a) first: the body is the promising part and it is a short step. Then (b). |
+| Q-TDM-3 | **After Pass 5: which way next?** (a) Pixal3D per part: close four-views of the head and of the feet from Krea, each run through Pixal3D and transferred (F-TDM-15 (a)); (b) Pixal3D's body + the served face, joined at the neck, feet from (a) or the maker; (c) go on to Hunyuan3D-Paint and MV-Adapter. | (a): it tests whether Pixal3D can carry the face and feet at all, and it answers the lead's feet question directly. |
 
 ## Resolved
 
