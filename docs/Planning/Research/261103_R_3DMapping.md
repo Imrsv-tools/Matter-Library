@@ -16,12 +16,14 @@
 
 **The proof of concept is not won yet, so every route on the list stays open and gets judged by pictures, not by the reasons this doc first gave** (RD-TDM-1 … 4). Today's `Tone34` is better than the original maps, but not good. The test that counts is **a complete map on hm08 with no seams and its details in the right places**, and that beats a sharper map that is badly placed.
 
-**Three tools can be run on hm08 now, each giving a whole-body map to set beside `Tone34`** (Pass 3, the probe plan):
+**Pixal3D ran first, on the lead's choice (RD-TDM-5; Pass 4).** From the four-view picture the lead already liked, it built a textured body in **45 s** inside the lead's ComfyUI (built-in nodes, nothing compiled). That body sits on hm08 within 4.4 mm (median), and its colour copied onto hm08's layout gives **one continuous skin: no camera seams, the nipples, navel and groin crease in place, the tone held** (gains ~1). **Two defects:** the tops and soles of the feet came out purple-grey, and **the face is poor** (dark smears round the eyes and nostrils, soft doubled lips). The served face is far better. So the promising part is the body; a mixed map (Pixal3D's body, the served face) needs a neck join. Pictures: `library/parity/TDM_Pixal3D/show/` (local only, RD-P27-3).
+
+**The other tools in the plan** (Pass 3), each giving a whole-body map to set beside `Tone34`:
 1. **Hunyuan3D-Paint 2.1**: textures a given mesh from a reference picture. It makes its own UV layout, but on **hm08's own surface**, so its map copies across to hm08's layout in one bake.
 2. **MV-Adapter**: textures a given mesh from a reference picture, guided by the mesh's shape, and **keeps hm08's UVs**.
 3. **Pixal3D (multi-view)**: builds a textured body from the four-view picture Phase27 already has; hm08 is then wrapped onto it and the colour baked across.
 
-**MV2UV** (painting straight into the UV layout) has no code or weights out; it is watched (F-TDM-5). **Waiting on:** the lead's go for the probes (Q-TDM-2).
+**MV2UV** (painting straight into the UV layout) has no code or weights out; it is watched (F-TDM-5). **Waiting on:** the lead's look at Pass 4's pictures, and which way next (Q-TDM-3).
 
 ---
 
@@ -82,12 +84,28 @@
 - **Shown:** each map on the bare character in the library's Unreal look view, beside `Tone34` and the reference picture, the same body views Phase27 used. Judged by the lead: complete? seams? details in place?
 - **Cost:** about 40 GB of downloads in total (Hunyuan's ~20 GB, SDXL and the adapter ~10 GB, Pixal3D ~8 GB; a small share of the scratch disk's free space); two small CUDA builds for Hunyuan's rasteriser (minutes); each texturing run minutes on the GPU, which must be free of Unreal and ComfyUI's loaded models. Setup is the long part: roughly an hour per tool.
 
+## Pass 4 — Probe 3 run first: Pixal3D multi-view on hm08 (2026-11-03)
+
+**Run on the lead's choice (RD-TDM-5),** on the machine with Unreal. Scripts: [`261103_R_3DMapping_probe/`](261103_R_3DMapping_probe/). Pictures local only, under git-ignored `library/parity/TDM_Pixal3D/` (RD-P27-3).
+
+- **F-TDM-8 — Pixal3D runs inside the lead's ComfyUI with no build.** ComfyUI v0.43.2 carries Pixal3D natively (`comfy_extras/nodes_trellis2.py`: `Pixal3DMultiViewConditioning`, the TRELLIS.2 stages) and ships the official template `3d_pixal3d_multi_views`. Five model files (Comfy-Org's repacks: the multi-view model int8, two VAEs, the DINOv3 encoder, BiRefNet) were added to the shared model folder. The template was run over ComfyUI's API with its sampler, remesh and bake settings unchanged (`run_pixal3d.py`); **45 s** for the whole chain.
+- **F-TDM-9 — The input: Phase27's four-view picture `f4_s50_seed7.png`, as made** (no new generation). Its four orthographic views map one to one onto Pixal3D's rig (front, left = yaw 90, back, right = yaw 270; checked from `project_body.rot`). Each was framed **on the shared rotation axis**, the body's height 1/1.1 of a square frame, black background (`views.py`): **1.79 mm a pixel**. *(The template instead crops each view to its own outline, which would shift the views against each other.)* Field of view given as 20° (the rig's default) for orthographic views; not varied.
+- **F-TDM-10 — Pixal3D's body fits hm08 closely.** Its mesh (painted, 350k vertices) was set upright by trying four turns (the right one 22 mm chamfer, the next 143 mm), then fitted by ICP with one scale (`transfer.py`): **hm08 → Pixal3D's surface 4.4 mm median, 12 mm at the 90th percentile, 31 mm at the 99th**; 14.8 % of texels sit more than 1 cm from it (the feet, the fingers' sides, the mouth's inside, the eyes' openings). Each hm08 texel took the colour of the nearest painted vertices. Pixal3D's colour (linear, as glTF stores it) needed only **×1.13 / 0.97 / 1.16** to hold the served body's mean: it kept the person's tone.
+- **F-TDM-11 — What the look view shows** (`look.py --bare --body` and `--judge`, served shine, 1536 wide; columns: `Tone34` served · Pixal3D's whole map · Pixal3D's body with the served head; the default column is the `3d594fb` article, F-P27-6, not what ships):
+  - **The body is one continuous skin:** no camera seam anywhere, down the sides, the spine or the limbs; the nipples, navel and groin crease where hm08's are; smoother and less blotchy than the served body.
+  - **The feet are wrong:** the tops and soles are purple-grey (no view sees them squarely, the shapes differ by over 2 cm, and the views' dark ground shadow is near).
+  - **The face is poor:** dark smears round the eyes and the nostrils, soft doubled lips. The views give the face ~1.8 mm a pixel and Pixal3D's head shape differs from hm08's there. **The served face is far better.**
+  - **The mixed map** (Pixal3D's body, the served head) shows a tone step at the neck seam: it needs Phase27's neck join (`project_body.neck_join`).
+- **Not tried:** another field of view; the textured GLB (4K bake) instead of the vertex colours; a second seed or picture; a fix for the feet.
+- **Reproduce** (`<p>` = `library/parity`, the probe folder `<s>` = `docs/Planning/Research/261103_R_3DMapping_probe`; the lead's ComfyUI running, the five models in its model folders, `PIXAL3D_TEMPLATE` set to the template's path in ComfyUI's environment): `uv run --with scipy --with pillow python <s>/views.py <p>/P27_Probe/f4_s50_seed7.png <p>/TDM_Pixal3D/views` · `python3 -I <s>/run_pixal3d.py <p>/TDM_Pixal3D/views tdm_a 20` · `uv run --with scipy --with pillow --with trimesh python <s>/transfer.py <ComfyUI>/output/3d/tdm_a_painted_00001_.glb <p>/TDM_Pixal3D a` · `uv run python <s>/look_driver.py Skin_Tone34_Clean_Base_s001_v01 --bare --body --shine served --width 1536 --candidate "Tone34 served=<p>/TDM_Pixal3D/T_served.png" --candidate "Pixal3D whole map=<p>/TDM_Pixal3D/E_a_all.png" --candidate "Pixal3D body, served head=<p>/TDM_Pixal3D/E_a_body.png" --out <p>/TDM_Pixal3D/look_body` (and `--judge` for the face). `T_served.png` is the served map decoded × its `base_color_const`.
+
 ## Open questions
 
 | Id | Question (as the lead would see it) | Recommendation |
 |---|---|---|
 | ~~Q-TDM-1~~ | ~~Library skins, or creators' own characters?~~ | *Withdrawn at Pass 3: the routes are probed for the library's hm08 map either way.* |
-| Q-TDM-2 | **Run the three probes**, in the order 1 (Hunyuan) → 2 (MV-Adapter) → 3 (Pixal3D), each shown as soon as it has a map? | Yes. Hunyuan first: the most complete texturer of the three, and the quickest test of the core question (does a tool that paints *on the mesh* place details right with no fit step). |
+| ~~Q-TDM-2~~ → **RD-TDM-5** | ~~Run the three probes, Hunyuan first?~~ | *Answered: Pixal3D first.* |
+| Q-TDM-3 | **After Pass 4: which way next?** (a) Pixal3D's body + the served face, joined at the neck, the feet fixed — a complete map to judge; (b) go on to Hunyuan3D-Paint and MV-Adapter as planned; (c) both. | (a) first: the body is the promising part and it is a short step. Then (b). |
 
 ## Resolved
 
@@ -97,15 +115,17 @@ The lead, 2026-11-03, on Passes 1–2 (recorded as meaning; see Pass 3):
 - **RD-TDM-3 — One reaction of the lead's to one test is not a standing ruling.** A path is closed only when the lead is told plainly *"this closes X, because of your reaction to Y"* and agrees.
 - **RD-TDM-4 — An extra step is not a reason to skip a route.** A library that claims to work is worth a probe.
 - RD-TDM-1 … 4 reopen RD-P25-11 (route 2) for probing. The closed phase docs are not edited; this doc is where it stands.
+- **RD-TDM-5 — Pixal3D first** (the lead, 2026-11-03: *"I am most intersted in Pixal3d .. .It is more current and if this works, it has potential for other uses with AIgen..."*). Answers Q-TDM-2. Run as Pass 4.
 
 ## Status
 
-- **Passes captured:** 3 (2026-11-03): Pass 1, the eight projects read at their source; Pass 2, the approaches against what is built; Pass 3, the lead's correction (RD-TDM-1 … 4) and the probe plan.
-- **Current direction:** **probe** Hunyuan3D-Paint 2.1, MV-Adapter and Pixal3D on hm08, each map judged beside `Tone34` in the look view. Watch MV2UV.
-- **Found:** MV-Adapter keeps a mesh's UVs (F-TDM-2, correcting F-P25-9); Hunyuan3D-Paint re-unwraps on the same surface, so its map bakes across exactly (F-TDM-3); Pixal3D is MIT, code and weights (F-TDM-1).
-- **Unverified:** every tool's look on a human body (none run); MV-Adapter's resolution figure (inferred from defaults); Hunyuan's memory need (from the pasted summary); MV2UV's release status beyond a GitHub search and the paper.
-- **Open with the lead:** Q-TDM-2 (the go for the probes).
-- **▶ Next:** on the go, probe 1.
+- **Passes captured:** 4 (2026-11-03): Pass 1, the eight projects read at their source; Pass 2, the approaches against what is built; Pass 3, the lead's correction (RD-TDM-1 … 4) and the probe plan; Pass 4, Pixal3D run on hm08 (RD-TDM-5).
+- **Current direction:** Pixal3D's **body** is promising (one seamless skin, features in place, tone held); its face and feet are not. Hunyuan3D-Paint and MV-Adapter still to probe. Watch MV2UV.
+- **Found:** Pixal3D runs in the lead's ComfyUI with no build, 45 s (F-TDM-8); its body fits hm08 to 4.4 mm median (F-TDM-10); what the look view shows (F-TDM-11). Earlier: MV-Adapter keeps a mesh's UVs (F-TDM-2); Hunyuan3D-Paint re-unwraps on the same surface (F-TDM-3); Pixal3D is MIT, code and weights (F-TDM-1).
+- **Unverified:** Pixal3D on another seed, picture or field of view; Hunyuan3D-Paint and MV-Adapter on a body (not run); MV-Adapter's resolution figure (inferred); MV2UV's release status beyond a GitHub search and the paper.
+- **Open with the lead:** the look at `library/parity/TDM_Pixal3D/show/` (16 pictures), and Q-TDM-3.
+- **Left on the machine:** the five Pixal3D model files in the shared model folder (kept: the lead wants Pixal3D for other uses) and the probe's output under `library/parity/TDM_Pixal3D/` and ComfyUI's `output/3d/tdm_a_*`. ComfyUI, started by this run, stopped by its PID.
+- **▶ Next:** the lead's look and Q-TDM-3.
 
 ## Sources
 
