@@ -15,7 +15,7 @@
 ## The short version
 
 - **The asset tooling built the inside of a one-storey 1970s house** (23.9 × 9.7 m, 130 sub-objects): oak strip floors throughout, painted walls and ceilings, oak trim and doors, brass knobs, and a family room with a **fieldstone wall** of ~250 modelled stones, a flagstone hearth and a firebrick firebox. Twelve articles; every one resolves in Studio's catalog.
-- **Asks:** three articles into the library's Blender file (A1); a mortar, again (A2); a plastic laminate for counters (A3); a decision on tiled walls (RH-Q1); a buff stone the tints can reach (RH-Q2).
+- **Asks:** three articles into the library's Blender file (A1); a mortar, again (A2); a plastic laminate for counters (A3); a decision on tiled walls (RH-Q1); a buff stone the tints can reach (RH-Q2); a silvered mirror (A4, added with the kitchen and baths).
 
 ## Pass 1 — From the asset tooling's side
 
@@ -26,11 +26,15 @@
 - **RH-F3 — A joint of `Concrete_Smooth_Worn_Dusty` reads near-white** in a fieldstone wall even tinted to 0.42: its dust layer lightens a recessed joint that should sit in shadow.
 - **RH-F4 — Sandstone's base colour is warm and saturated** (linear mean 0.43, 0.31, 0.19). A tint multiplies, so it can darken and shift it but not grey it: buff took a tint of (0.72, 0.84, 1.02), brown (0.45, 0.47, 0.55).
 
+- **RH-F5 — The kitchen, the baths and the laundry (the Set's third pass, same day)** bind five more articles, all in Studio's catalog: `Porcelain_Glazed_Clean_Base_s01_v01` (toilets, basins, tubs; the wall tile, tinted bone and aqua), `Paint_Gloss_Clean_Base_s01_v01` (baked-enamel appliances in harvest gold and white, an oven's black glass), `StainlessSteel_Brushed_Clean_Base_s001_v01` (a sink), `StainlessSteel_Polished_Clean_Base_s01_v01` (chrome fittings, and a mirror, below), `PowderCoat_Textured_Clean_Base_s001_v01` (the counters and vanity tops, standing in for A3's laminate, tinted to a wheat). The tile was modelled tile by tile over a grout of `Concrete_Smooth_Worn_Dusty` tinted near white: RH-Q1's assembly reading, applied until the library says otherwise. Of the five, the library's Blender file lacks the two stainless steels, and draws them from their maps in the stills, as in RH-F2.
+- **RH-F6 — Polished stainless steel does not stand in for a mirror.** Its roughness blurs the reflection to a frosted plate. A bathroom mirror over a vanity needs a silvered glass.
+
 ### Asks
 
 - **A1 — Add the three articles to `blender/asset_library/MatterLibrary.blend`** (RH-F2), so a picture made from Blender shows the library's shader for them.
 - **A2 — A cement mortar** (with `261101_R_AssetToolingBrickAsks.md` A3): grey-brown, sandy, no dust layer, at mortar scale (`s01`); one article serves brick, stone and tile joints.
-- **A3 — A plastic laminate** for counters and a vanity top (high-pressure laminate, the 1970s *Formica*): a solid colour taken by tint, a faint texture, satin to gloss; `s01`. The kitchen and baths are the Set's next pass.
+- **A3 — A plastic laminate** for counters and a vanity top (high-pressure laminate, the 1970s *Formica*): a solid colour taken by tint, a faint texture, satin to gloss; `s01`. The kitchen and baths are now built with a powder coat standing in (RH-F5).
+- **A4 — A silvered mirror** (RH-F6): glass over a silver backing, near-zero roughness, `s01`. One article serves a bathroom mirror, a medicine cabinet's door and a dressing mirror.
 
 ### Questions
 
