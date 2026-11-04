@@ -111,14 +111,23 @@ None is chosen here. The fix is not the library's to make.
 
 ---
 
+## Pass 3 — Way (a) tried in the headset (2026-11-04)
+
+- **PTG-F20 — `r.Refraction.Blur 0` clears the windows at the house's normal frame rate.** The lead typed it in Studio's console in the headset, in the house. Their words: *"r.Refraction.Blur 0 cleared it, still 52 fps"*. **PTG-Q3 is answered:** (a) works and costs no frame rate. It also confirms PTG-F9 by eye: without rough refraction the merge's alpha is right.
+- **What (a) still costs:** the rough blur, in the headset only (PTG-F19). That is PTG-Q2, the lead's ruling, still open.
+
+---
+
 ## Status
 
-- **Passes captured:** 2 (2026-11-04; Pass 1 by reading the engine source, Pass 2 from the consumer's take and its logs).
-- **Current direction:** the cause is **confirmed by eye** (PTG-F14): Unreal 5.8's rough-refraction merge writes see-through alpha over every see-through article. The engine switch that cures it costs about four-fifths of the house's frame rate and has been reverted (PTG-F15). The cheap way is (a), turning the rough blur off while pass-through is on, which costs the blur in the headset only. The clean way is (b), an engine patch, which needs a source-built engine. The library's articles and masters are still not at fault (PTG-F12). *(Was, at Pass 1: "confirmed by reading and not yet by eye".)*
-- **Open:** PTG-Q2 (may pass-through drop the blur) · PTG-Q3 (the one-line test of (a) at the house's frame rate).
-- **Not run:** `r.Refraction.Blur 0` in the headset · any source build of the engine.
+- **Passes captured:** 3 (2026-11-04; Pass 1 by reading the engine source, Pass 2 from the consumer's take and its logs, Pass 3 the lead's console test).
+- **Current direction:** the cause is **confirmed by eye** (PTG-F14): Unreal 5.8's rough-refraction merge writes see-through alpha over every see-through article. **Way (a) is shown to work:** with the rough blur off, the windows are clear at the house's normal frame rate (PTG-F20). The engine switch also cures it, but at about a fifth of the frame rate, and is reverted (PTG-F15). (b), an engine patch, is the clean way and needs a source-built engine. The library's articles and masters are still not at fault (PTG-F12). *(Was, at Pass 2: "the cheap way is (a) … not yet tried by eye". At Pass 1: "confirmed by reading and not yet by eye".)*
+- **Open:** PTG-Q2 — may a consumer in pass-through drop the rough blur, until (b) or (d) exists? That is the lead's ruling, and the one thing between Studio and building (a).
+- **Not run:** any source build of the engine · (a) built into Studio (it was a console line, for one session).
 - **What was added:** this doc only. No article, master, tool, spec or ledger row is changed.
 
-▶ **Next:** the lead's one-line test of (a) (PTG-Q3) and their ruling on PTG-Q2. Then a quick fix can record the ask in `PlatformDependencies.md` (P36, the next free id as listed 2026-11-04) and the engine fact in `docs/Learnings/Unreal/`.
+▶ **Next:** the lead's ruling on PTG-Q2. If yes, Studio builds (a), turning the rough blur off when pass-through turns on, and `MasterSet.md`'s "every consumer" rule gets a dated note for the headset case. A quick fix records the ask in `PlatformDependencies.md` (P36, the next free id as listed 2026-11-04) and the engine fact in `docs/Learnings/Unreal/`.
+
+*(Superseded 2026-11-04 by Pass 3. Was: "the lead's one-line test of (a) (PTG-Q3) and their ruling on PTG-Q2. Then a quick fix can record the ask …".)*
 
 *(Superseded 2026-11-04 by Pass 2. Was: "the lead's one-line test (PTG-Q1). If it confirms, a quick fix can record the ask … and Studio chooses (a) or (b) after PTG-Q2.")*
