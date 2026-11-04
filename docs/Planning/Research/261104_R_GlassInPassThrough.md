@@ -118,6 +118,12 @@ None is chosen here. The fix is not the library's to make.
 
 ---
 
+## Resolved
+
+- **PTG-RD1 — In pass-through, a consumer may drop the rough blur (way (a)) until a fix keeps it; record it in the contract, the ledger and the engine notes (the lead, 2026-11-04).** Answers PTG-Q2. The question put to them: may Studio turn the glass blur off whenever pass-through is on, at the cost of rough see-through articles reading clear in the headset only, with a dated note on `MasterSet.md`'s *"every consumer"* rule? Their words: *"yes, do all three and push"*. The three were: a comment on the consumer's tracker, a library quick fix (the ask in `PlatformDependencies.md`, the note on the rule, the engine fact in `docs/Learnings/Unreal/`), and a push.
+
+---
+
 ## Status
 
 - **Passes captured:** 3 (2026-11-04; Pass 1 by reading the engine source, Pass 2 from the consumer's take and its logs, Pass 3 the lead's console test).
