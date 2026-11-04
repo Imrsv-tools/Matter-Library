@@ -71,12 +71,54 @@ None is chosen here. The fix is not the library's to make.
 
 ---
 
+## Pass 2 — The consumer's try: the engine's holdout switch cures it and costs the frame rate (2026-11-04)
+
+*The lead asked what the consumer had just tried, after a headset take: the room left the windows, and the house ran at 10 fps.*
+
+**Examined:** the consumer's record of the take (summarised by role) · its two run logs, before and with the switch · `DistortionRendering.cpp` (the merge) · `Engine/Build/InstalledBuild.txt` · `build_masters.py` (the thin master's refraction).
+
+- **PTG-F13 — What was tried.** The consumer turned on `r.Deferred.SupportPrimitiveAlphaHoldout`, the one setting under which the merge keeps the scene's alpha (PTG-F6). It did this for a problem of its own with a deliberate hole, and the same take looked at the house.
+- **PTG-F14 — The windows passed, which confirms the mechanism by eye.** The lead, in the headset: *"no more pass through in reflection"*. So the room in the glass was the merge's alpha (PTG-F5 – F7). **PTG-Q1 is answered by this, by a different test from the one asked.**
+- **PTG-F15 — The cost is the switch, measured from the logs.** Each log line carries the engine's frame counter, so the frame rate can be read from line spacing (median over the spans). Same house, same session order:
+
+  | | without the switch | with it |
+  |---|---|---|
+  | the house | 52 fps (164 spans) | 11 fps (two opens, 18 and 11 spans) |
+  | a scene without glass | 60 fps | 60 fps |
+
+  The switch makes the engine draw every translucent thing a second time into a holdout pass, with a copy of scene colour, per view. Which part costs this much in the house was not measured. **The consumer has reverted it.**
+- **PTG-F16 — The switch is the wrong tool for this.** It turns on a whole feature (holdouts for every translucent primitive) to reach one side effect, the merge's blend state. The fault needs none of that feature.
+- **PTG-F17 — The thin master refracts only for the blur.** It feeds an index of 1.0, so it bends nothing (`build_masters.py`, M6). The distortion pass draws it only to blur the view by roughness. A clear window (`Glass_Clear`, roughness near 0) gets almost nothing from the pass and still has its alpha broken by it.
+- **PTG-F18 — A fix inside the engine is one line, but this engine cannot be rebuilt in place.** In rough mode the apply pass's alpha is always 1 (PTG-F6). So the merge's output alpha is exactly the factor the scene's alpha should be multiplied by. Blending alpha as `dst × src` (`BF_Zero, BF_SourceAlpha`) whenever rough refraction is on would be correct, at no cost. But the engine on the machine with Unreal is an installed build (`InstalledBuild.txt`), so the renderer module cannot be rebuilt in place. Patching it means a source build of the engine, kept across every upgrade. That is the fix to report to Epic.
+
+### Ways out, revised
+
+| | What | Frame cost | Keeps the rough blur? | State |
+|---|---|---|---|---|
+| (s) | the engine's holdout switch | **about a fifth of the frame rate** in the house | yes | tried, cured, **reverted** (PTG-F13 – F15) |
+| (a) | Studio sets `r.Refraction.Blur 0` while pass-through is on (it already sets two settings when pass-through turns on) | none; it saves the mip chain | **no**, in the headset only: rough see-through articles read clear there | **not yet tried by eye**; by reading the plain path keeps alpha (PTG-F9) |
+| (b) | engine patch (PTG-F18) | none | yes | needs a source-built engine; report to Epic |
+| (d) | the thin master stops refracting and blurs in the material, from scene-colour taps | per glass pixel, only where rough | yes, every mode | a master redesign, re-judged on the rig: a phase, not a fix |
+| (c) | the masters stop refracting, no blur | none | no, every mode | ruled out (contract) |
+
+- **PTG-F19 — (a) is the cheap one, and its only loss is small.** The thin master bends nothing anyway (PTG-F17), so in the headset (a) changes only the rough articles' blur. The clear windows of this house would look the same. It still needs the lead's ruling, because `MasterSet.md` says the blur holds *"in every consumer"* (PTG-Q2).
+
+### Questions, revised
+
+- **PTG-Q1 — answered** (PTG-F14): the merge's alpha is the cause.
+- **PTG-Q2 — still open:** may a consumer in pass-through drop the rough blur (way (a)), until (b) or (d) exists?
+- **PTG-Q3 — new:** does `r.Refraction.Blur 0` clear the windows **at the house's normal frame rate**? It is one console line in the headset, and the last check before (a) is built.
+
+---
+
 ## Status
 
-- **Passes captured:** 1 (2026-11-04, the library's side, by reading the engine source).
-- **Current direction:** the cause is Unreal 5.8's rough-refraction pass writing see-through alpha over every see-through article (PTG-F5 – F7), confirmed by reading and **not yet by eye**. The library's articles and masters are not at fault (PTG-F12). The fix is Studio's or the engine's (Ways out).
-- **Open:** PTG-Q1 (the one-line headset test) · PTG-Q2 (whether pass-through may drop the blur).
-- **Not run:** nothing was rendered, launched or built. The amount of room let through (PTG-F7) is not predicted.
+- **Passes captured:** 2 (2026-11-04; Pass 1 by reading the engine source, Pass 2 from the consumer's take and its logs).
+- **Current direction:** the cause is **confirmed by eye** (PTG-F14): Unreal 5.8's rough-refraction merge writes see-through alpha over every see-through article. The engine switch that cures it costs about four-fifths of the house's frame rate and has been reverted (PTG-F15). The cheap way is (a), turning the rough blur off while pass-through is on, which costs the blur in the headset only. The clean way is (b), an engine patch, which needs a source-built engine. The library's articles and masters are still not at fault (PTG-F12). *(Was, at Pass 1: "confirmed by reading and not yet by eye".)*
+- **Open:** PTG-Q2 (may pass-through drop the blur) · PTG-Q3 (the one-line test of (a) at the house's frame rate).
+- **Not run:** `r.Refraction.Blur 0` in the headset · any source build of the engine.
 - **What was added:** this doc only. No article, master, tool, spec or ledger row is changed.
 
-▶ **Next:** the lead's one-line test (PTG-Q1). If it confirms, a quick fix can record the ask in `PlatformDependencies.md` (P36, the next free id as listed 2026-11-04) and the engine fact in `docs/Learnings/Unreal/`, and Studio chooses (a) or (b) after PTG-Q2.
+▶ **Next:** the lead's one-line test of (a) (PTG-Q3) and their ruling on PTG-Q2. Then a quick fix can record the ask in `PlatformDependencies.md` (P36, the next free id as listed 2026-11-04) and the engine fact in `docs/Learnings/Unreal/`.
+
+*(Superseded 2026-11-04 by Pass 2. Was: "the lead's one-line test (PTG-Q1). If it confirms, a quick fix can record the ask … and Studio chooses (a) or (b) after PTG-Q2.")*
