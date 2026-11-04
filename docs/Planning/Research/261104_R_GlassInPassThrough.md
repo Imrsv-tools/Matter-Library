@@ -128,11 +128,13 @@ None is chosen here. The fix is not the library's to make.
 
 - **Passes captured:** 3 (2026-11-04; Pass 1 by reading the engine source, Pass 2 from the consumer's take and its logs, Pass 3 the lead's console test).
 - **Current direction:** the cause is **confirmed by eye** (PTG-F14): Unreal 5.8's rough-refraction merge writes see-through alpha over every see-through article. **Way (a) is shown to work:** with the rough blur off, the windows are clear at the house's normal frame rate (PTG-F20). The engine switch also cures it, but at about a fifth of the frame rate, and is reverted (PTG-F15). (b), an engine patch, is the clean way and needs a source-built engine. The library's articles and masters are still not at fault (PTG-F12). *(Was, at Pass 2: "the cheap way is (a) … not yet tried by eye". At Pass 1: "confirmed by reading and not yet by eye".)*
-- **Open:** PTG-Q2 — may a consumer in pass-through drop the rough blur, until (b) or (d) exists? That is the lead's ruling, and the one thing between Studio and building (a).
+- **Open:** none at research altitude. **PTG-Q2 is ruled** (PTG-RD1): in pass-through a consumer may drop the rough blur until a fix keeps it. *(Was: "PTG-Q2 … the one thing between Studio and building (a)".)*
 - **Not run:** any source build of the engine · (a) built into Studio (it was a console line, for one session).
-- **What was added:** this doc only. No article, master, tool, spec or ledger row is changed.
+- **What was added:** this doc, and at the lead's direction a quick fix (the commit after the ruling) that made three edits. `MasterSet.md` gains the pass-through exception under the rough-transmission rule, plus a history line. `PlatformDependencies.md` gains **P36** (Studio turns the blur off while pass-through is on). `docs/Learnings/Unreal/Unreal.md` gains **U18** (the engine fact). No article, master or tool is changed. *(Was: "this doc only".)*
 
-▶ **Next:** the lead's ruling on PTG-Q2. If yes, Studio builds (a), turning the rough blur off when pass-through turns on, and `MasterSet.md`'s "every consumer" rule gets a dated note for the headset case. A quick fix records the ask in `PlatformDependencies.md` (P36, the next free id as listed 2026-11-04) and the engine fact in `docs/Learnings/Unreal/`.
+▶ **Next:** Studio builds P36 on its side. The exception lifts when a fix keeps the blur at no frame cost: way (b), an engine patch, or way (d), a blur drawn in the thin master, which would be a library phase.
+
+*(Superseded 2026-11-04 by the ruling. Was: "the lead's ruling on PTG-Q2. If yes, Studio builds (a) … A quick fix records the ask …".)*
 
 *(Superseded 2026-11-04 by Pass 3. Was: "the lead's one-line test of (a) (PTG-Q3) and their ruling on PTG-Q2. Then a quick fix can record the ask …".)*
 
