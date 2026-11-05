@@ -24,6 +24,7 @@ derivatives.
 | Compressor | `tools/compressors/compress_textures.py` | source PNG tree → mip-complete BCn `.dds`, per the role table below |
 | Staging producer | `tools/releases/stage_release.py` | assembles the self-contained per-release `{png, .dds}` snapshot |
 | Freeze | `tools/releases/freeze_release.py` | hash-locks the complete payload incl. `.dds` (`dds_set`) |
+| Role-format check | `tools/compressors/check_role_formats.py --header <consumer role table>` | every picture an article binds to a compressed role's node is compressed to the format the consumer's role table names (run by hand, not a `run_all.py` lane: the gate never reads a consumer's checkout) |
 
 *(Updated 2026-09-23, measured: `PINNED_VERSION = "V4.5.52"` and the `COMPRESSONATORCLI` override in `tools/compressors/compress_textures.py`; the compressor fails if the encoder is absent or not the pinned version.)*
 
@@ -35,7 +36,7 @@ never written into the authored `MatterLibrary/textures` source tree.
 
 **HDRIs skip the compression step** (2026-10-14, Phase14; `docs/Planning/Research/261013_R_PlatformSkyAsks.md` RD-SKY-4). The table below is low-dynamic-range BCn by texture role, and every consumer reads an HDRI's float file as it is, so an [HDRI](../../Glossary.md) ships as its Radiance `.hdr`.
 
-## Frozen role → BC-format contract (14 texture roles)
+## Frozen role → BC-format contract (21 texture roles)
 
 Keyed by role **name**. All roles use full mip chains. `specular` is a scalar (no texture field), so it is explicitly RULED OUT.
 
@@ -56,12 +57,18 @@ Keyed by role **name**. All roles use full mip chains. `specular` is a scalar (n
 | `layer2_roughness_texture` | **BC4** | linear |
 | `layer2_metalness_texture` | **BC4** | linear |
 | `layer2_normal_texture` | **BC5** | linear |
+| `base_color_map_texture` *(the mesh's own picture)* | **BC7** | sRGB |
+| `cutout_map_texture` *(the mesh's own cut-out)* | **BC4** | linear |
+| `roughness_map_texture` *(skin)* | **BC4** | linear |
+| `normal_map_texture` *(skin)* | **BC5** | linear |
+| `cavity_map_texture` *(skin)* | **BC4** | linear |
+| `scatter_map_texture` *(skin)* | **BC4** | linear |
 
-*Consumer-side (IMRSV): the stable numeric role ordering (bits 0–13) in the consumer's wire struct and the `compressed_roles_mask` — see [Consumers](../Consumers.md).*
+*Consumer-side (IMRSV): the stable numeric role ordering (bits 0–20, a 32-bit mask since the consumer's protocol v1.88) in the consumer's wire struct and the `compressed_roles_mask` — see [Consumers](../Consumers.md).*
 
 > Source-filename note: role detection keys on the OpenPBR-correct suffix — the metallic map ships as
 > `*_metalness_*.png` (canonicalised before the 0.1.0 freeze; `metallic` stays a legacy alias in the compressor's suffix table). The role name stays `metallic_texture`.
-> *(Updated 2026-09-23, measured: the suffix→BC table in `compress_textures.py` — `basecolor`/`diffuse`/`emissive`/`overlay`/`overlays`/`masks` → BC7, `metalness`/`metallic`/`roughness`/`opacity`/`ambient_occlusion`/`ao` → BC4, `normal` → BC5. 2026-10-27, Phase22 22.2: `cavity` → BC4, the skin's cavity map.)*
+> *(Updated 2026-09-23, measured: the suffix→BC table in `compress_textures.py` — `basecolor`/`diffuse`/`emissive`/`overlay`/`overlays`/`masks` → BC7, `metalness`/`metallic`/`roughness`/`opacity`/`ambient_occlusion`/`ao` → BC4, `normal` → BC5. 2026-10-27, Phase22 22.2: `cavity` → BC4, the skin's cavity map; 22.3: `scatter` → BC4, its scatter map.)*
 
 > **Reevaluate (2026-09-23):** role names such as `diffuse_texture` / `metallic_texture` come from a consumer's field naming, not from OpenPBR/LCD vocabulary; whether the published [master contract](../../Glossary.md) *(planned)* carries these names or OpenPBR-named roles is open — owned by the release-bundle / consumer-contract phase (R14).
 
