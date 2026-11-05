@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serve the working tree to a local Stage runtime, so USDLiveView can browse, apply and tune it.
 
-    serve_to_stage.py [--runtime DIR] [--no-restart] [--view COMPOSITION] [--off]
+    serve_to_stage.py [--runtime DIR] [--no-restart] [--compressed] [--view COMPOSITION] [--off]
 
 Pre-release dev loop (lead, 2026-09-25: "Make a material, serve it to stage. no versioning").
 Every article under ``MatterLibrary/materials/`` is served, as it is on disk right now. There
@@ -31,6 +31,16 @@ What it does, in ``$IMRSV_STAGE_RUNTIME/MatterLibrary/`` (or ``--runtime``):
     ``active-release.before-dev.json``; ``--off`` puts it back);
   * then (re)starts the Stage daemon from that runtime, unless ``--no-restart``.
 
+``--compressed`` serves each texture's block-compressed ``.dds`` beside its PNG, as a staged
+release carries them, for a runtime that binds them (the IMRSV platform's Studio, #249). The
+``.dds`` are built into ``library/staging/matterlib-dev/textures/`` (gitignored; only a PNG whose
+``.dds`` is missing or older is compressed), never into the checkout, and
+``releases/matterlib-dev/textures`` becomes a real folder of links: one per file of the checkout's
+``MatterLibrary/textures/`` and one per ``.dds``. A changed PNG is still live through its link,
+but its ``.dds`` is stale until the next serve, and a new PNG needs a serve. Without the pinned
+compressor the serve warns and keeps the plain link. Without ``--compressed`` a folder of links
+from an earlier compressed serve is replaced by the plain link again.
+
 The served catalog reports ``release: 0.1.0``: Stage treats the installed release as
 ``matterlib-<release>`` and every existing composition is stamped ``matterlib-0.1.0``, so they
 keep working. The release lifecycle (``stage/freeze/promote/activate_release.py``) is untouched.
@@ -51,11 +61,13 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import signal
 import socket
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -69,6 +81,8 @@ import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 import material_thumbnails as MT  # noqa: E402  (Phase17: each material's thumbnail, served)
+sys.path.insert(0, str(REPO / "tools" / "compressors"))
+import compress_textures as CT  # noqa: E402  (the release's .dds, for --compressed)
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
@@ -227,6 +241,144 @@ def link(path: Path, target: Path) -> None:
     path.symlink_to(target, target_is_directory=True)
 
 
+DEV_STAGING = REPO / "library" / "staging" / DEV / "textures"     # gitignored (library/staging/)
+
+
+def compress_png(src: Path, dst: Path, src_root: Path) -> str | None:
+    """One PNG's .dds, as the release's: its role's format, the full mip chain, then the release's
+    own check of the file. Returns why it could not be made, else None."""
+    try:
+        _, bc = CT.classify(src, src_root)
+    except CT.ClassifyError as e:
+        return str(e)
+    w, h = CT.png_dims(src)
+    mips = CT.full_miplevels(w, h)
+    if not CT.compress_one(src, dst, bc, mips):
+        return f"the compressor failed ({bc})"
+    good, detail = CT.validate_output({"dst": str(dst), "w": w, "h": h, "mips": mips, "bc": bc})
+    return None if good else detail
+
+
+# Encoder processes run at once: each is one texture, and the encoder threads only its BC7 work,
+# so the small BC4/BC5 maps and each process's start-up leave cores idle when run one by one.
+ENCODE_WORKERS = max(1, (os.cpu_count() or 2) // 2)
+
+
+def stage_dev_dds(src_root: Path, staging: Path, compress=compress_png) -> dict:
+    """Bring the dev staging tree's .dds up to date with the checkout's PNGs: a PNG whose .dds is
+    missing or older is compressed, a .dds whose PNG is gone is removed. A PNG that cannot be
+    compressed (no role in its name, a failed check) is reported and served without one: it takes
+    the raw path, as before. Returns the counts, the misses and the staged .dds (relative paths)."""
+    want, todo, kept = set(), [], 0
+    for src in CT.discover(src_root):
+        rel = src.relative_to(src_root).with_suffix(CT.OUT_EXT)
+        dst = staging / rel
+        want.add(rel)       # a miss's .dds is unlinked below, so the orphan sweep never sees it
+        if dst.is_file() and dst.stat().st_mtime >= src.stat().st_mtime:
+            kept += 1
+        else:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            todo.append((src, dst))
+
+    def one(job):
+        """One texture, settled on its own: a failure (a reason, or an exception such as a
+        malformed PNG) leaves no .dds behind, whatever the other jobs do, so a failed file is
+        never kept as up to date by the next serve."""
+        src, dst = job
+        try:
+            why = compress(src, dst, src_root)
+        except Exception as e:       # one bad texture must not stop the rest or skip their cleanup
+            why = f"{type(e).__name__}: {e}"
+        if why is not None:
+            dst.unlink(missing_ok=True)
+        return why
+
+    with ThreadPoolExecutor(max_workers=ENCODE_WORKERS) as pool:
+        whys = list(pool.map(one, todo))
+    missed = [f"{src.relative_to(src_root)}: {why}"
+              for (src, _), why in zip(todo, whys) if why is not None]
+    removed = 0
+    for dds in sorted(staging.rglob("*" + CT.OUT_EXT)) if staging.is_dir() else []:
+        if dds.relative_to(staging) not in want:
+            dds.unlink()
+            removed += 1
+    staged = sorted(rel for rel in want if (staging / rel).is_file())
+    return {"made": len(todo) - len(missed), "kept": kept, "removed": removed, "missed": missed,
+            "staged": staged}
+
+
+def is_link_farm(folder: Path) -> bool:
+    """A real folder holding nothing but links (and folders of them): what --compressed builds,
+    and so safe to remove. Anything else is refused, never deleted."""
+    if folder.is_symlink() or not folder.is_dir():
+        return False
+    for root, dirs, files in os.walk(folder):
+        for name in files + [d for d in dirs if (Path(root) / d).is_symlink()]:
+            if not (Path(root) / name).is_symlink():
+                return False
+    return True
+
+
+def discard(path: Path) -> None:
+    """Remove a link, or a folder holding nothing but links; refuse anything else. Never touches
+    what a link points at."""
+    if path.is_symlink():
+        path.unlink()
+    elif path.exists():
+        if not is_link_farm(path):
+            raise SystemExit(f"refusing to remove a folder that holds more than links: {path}")
+        shutil.rmtree(path)     # unlinks the links; never follows one
+
+
+def farm_textures(dev: Path, src_root: Path, staging: Path, staged: list[Path]) -> None:
+    """``dev/textures`` as a real folder of links: one per file of ``src_root`` and one per
+    ``staged`` .dds (relative to ``staging``) beside its PNG, built aside and swapped in, so a
+    reader never finds it empty. The plain link or an earlier farm it replaces is removed, never
+    what either points at."""
+    out, build, old = dev / "textures", dev / "textures.building", dev / "textures.old"
+    for stale in (build, old):
+        discard(stale)
+    for src in sorted(src_root.rglob("*")):
+        if src.is_file():
+            dst = build / src.relative_to(src_root)
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.symlink_to(src)
+    for rel in staged:
+        (build / rel).symlink_to(staging / rel)
+    build.mkdir(parents=True, exist_ok=True)      # an empty source still serves a folder
+    if out.is_symlink() or out.exists():
+        if not out.is_symlink() and not is_link_farm(out):
+            raise SystemExit(f"refusing to replace a real directory: {out}")
+        out.rename(old)
+    build.rename(out)
+    discard(old)
+
+
+def serve_textures(dev: Path, compressed: bool, src_root: Path = None, staging: Path = None,
+                   compress=compress_png, encoder_ok=None) -> str:
+    """Serve the checkout's textures: the plain link, or with --compressed the folder of links
+    with each PNG's .dds. Returns the line the serve prints."""
+    src_root = src_root or SOURCE / "textures"
+    staging = staging or DEV_STAGING
+    if compressed:
+        ok = CT._check_encoder() if encoder_ok is None else encoder_ok
+        if ok:
+            st = stage_dev_dds(src_root, staging, compress)
+            farm_textures(dev, src_root, staging, st["staged"])
+            for m in st["missed"]:
+                print(f"textures  no .dds for {m}", file=sys.stderr)
+            return (f"textures  {len(st['staged'])} .dds served beside their PNGs ({st['made']} compressed, "
+                    f"{st['kept']} up to date, {st['removed']} removed, {len(st['missed'])} without) "
+                    f"from {staging}")
+        print("textures  WARNING: --compressed without the pinned compressor: serving the PNGs only "
+              "(every texture takes the raw path)", file=sys.stderr)
+    out = dev / "textures"
+    if not out.is_symlink():
+        discard(out)        # an earlier compressed serve's farm; link() keeps a link to the same place
+    link(out, src_root)
+    return f"textures  linked to {src_root} (no .dds)"
+
+
 def stage_pids(runtime: Path) -> list[int]:
     exe = (runtime / STAGE_EXE).resolve()
     pids = []
@@ -293,6 +445,8 @@ def main(argv=None) -> int:
     ap.add_argument("--runtime", default=os.environ.get("IMRSV_STAGE_RUNTIME"),
                     help="the Stage runtime dir (default: $IMRSV_STAGE_RUNTIME)")
     ap.add_argument("--no-restart", action="store_true", help="don't (re)start the Stage daemon")
+    ap.add_argument("--compressed", action="store_true",
+                    help="serve each texture's .dds beside its PNG (built in library/staging/matterlib-dev)")
     ap.add_argument("--view", metavar="COMPOSITION", help="then open USDLiveView on this composition")
     ap.add_argument("--off", action="store_true", help="put the previous active release back")
     args = ap.parse_args(argv)
@@ -322,7 +476,7 @@ def main(argv=None) -> int:
         dev = lib / "releases" / DEV
         dev.mkdir(parents=True, exist_ok=True)
         link(dev / "materials", SOURCE / "materials")
-        link(dev / "textures", SOURCE / "textures")
+        print(serve_textures(dev, args.compressed))
         catalog = working_tree_catalog()
         if catalog.get("pieces"):
             link(dev / "makeup", PIECES)      # Phase26: the piece records, live like the materials

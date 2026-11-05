@@ -20,10 +20,11 @@ own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair; Phas
 picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the Sky (the rig's
 visible dome, unlit, which the runtime's sky light captures).
 
-Every texture slot samples as **LinearColor**: the runtime hands every texture over as linear
-float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
-(``MatterRuntimeGameMode::LoadTexture``). The slots' defaults are neutral: white, and an
-overlay's alpha 0 (no wear).
+By default every texture slot samples as **LinearColor**: the runtime hands every texture over as
+linear float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
+(``MatterRuntimeGameMode::LoadTexture``). The colour and normal switches below change that for a
+runtime that binds compressed textures. The slots' defaults are neutral: white, and an overlay's
+alpha 0 (no wear).
 
 A second project (PlatformDependencies M7, P20) tells the build what it is building for, by
 environment variable. Unset, every one leaves the build exactly the library's own runtime's:
@@ -49,11 +50,17 @@ script was run in the library's own project the same day: its "built ..." lines 
 build before the switches, byte for byte. MATTER_MASTERS_INSTANCED came later (2026-10-10) and
 sets one usage only, as the skinned switch does.
 
-One more is a CANDIDATE, for a question that is still open. It has never been built:
+Two more are for a runtime that binds the release's block-compressed .dds (BC7 sRGB colour, BC5
+normals) instead of decoding the PNGs itself (IMRSV_Platform #249):
 
   MATTER_MASTERS_COLOUR_SAMPLER=srgb    the colour slots sample an sRGB texture (a block-compressed
                                         colour picture carries its decode in its own flag, which a
                                         linear sampler refuses). Default linear
+  MATTER_MASTERS_NORMAL_SAMPLER=normal  the normal slots (normal_tex, layer2_normal_tex,
+                                        normal_map_tex) sample a normal map: the engine rebuilds Z
+                                        from R and G (BC5 carries two channels; Y is not flipped),
+                                        and the graph's own x 2 - 1 goes. Their default is a flat
+                                        normal-map texture. Default linear
 
 And one keeps the build that came before, to compare against:
 
@@ -92,6 +99,7 @@ MESH_V = _told("MATTER_MASTERS_MESH_V", "st", {"st", "unreal"})
 MESH_BINORMAL = _told("MATTER_MASTERS_MESH_BINORMAL", "st", {"st", "unreal"})
 SKY = _told("MATTER_MASTERS_SKY", "1", {"0", "1"}) == "1"
 COLOUR_SAMPLER = _told("MATTER_MASTERS_COLOUR_SAMPLER", "linear", {"linear", "srgb"})
+NORMAL_SAMPLER = _told("MATTER_MASTERS_NORMAL_SAMPLER", "linear", {"linear", "normal"})
 REFRACTION = _told("MATTER_MASTERS_REFRACTION", "index", {"function", "index"})
 FN_OPAQUE = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque"
 FN_TRANSLUCENT = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Translucent"
@@ -258,8 +266,10 @@ def _png(path, rgba, size=4):
                 + chunk(b"IDAT", zlib.compress(row * size)) + chunk(b"IEND", b""))
 
 
-def default_texture(name, rgba, srgb=False):
-    """A flat default for a texture slot, generated and imported (no binary asset in git)."""
+def default_texture(name, rgba, srgb=False, normal_map=False):
+    """A flat default for a texture slot, generated and imported (no binary asset in git).
+    ``normal_map`` makes it the default of a normal-map slot (MATTER_MASTERS_NORMAL_SAMPLER=normal):
+    the engine checks a Normal sampler's default for the normal-map compression."""
     import os
     folder = os.path.join(unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_saved_dir()), "MatterDefaults")
     os.makedirs(folder, exist_ok=True)
@@ -280,7 +290,10 @@ def default_texture(name, rgba, srgb=False):
     tex.set_editor_property("srgb", srgb)
     # uncompressed, so a flat value is exact: UserInterface2D (RGBA8) for colour, the vector
     # displacement format (BGRA8, never sRGB) for data
-    tex.set_editor_property("compression_settings", unreal.TextureCompressionSettings.TC_EDITOR_ICON if srgb
+    # A normal-map default is BC5, which keeps a flat 128 exact.
+    tex.set_editor_property("compression_settings",
+                            unreal.TextureCompressionSettings.TC_NORMALMAP if normal_map
+                            else unreal.TextureCompressionSettings.TC_EDITOR_ICON if srgb
                             else unreal.TextureCompressionSettings.TC_VECTOR_DISPLACEMENTMAP)
     EAL.save_loaded_asset(tex)
     return tex
@@ -366,16 +379,34 @@ def bayer4(g, col):
     return g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, k, 0.5, col - 12), 1.0 / 16.0, col - 13)
 
 
-def texture(g, name, default, uv, col, colour=None):
-    """A texture slot, sampled as linear. ``colour`` is given for a colour slot only, and only
-    under MATTER_MASTERS_COLOUR_SAMPLER=srgb (a CANDIDATE, not run): the slot's sRGB default, which
-    makes the slot sample an sRGB texture, decoded by the sampler."""
+def texture(g, name, default, uv, col, colour=None, normal_map=None):
+    """A texture slot: linear unless told otherwise. ``colour`` is given for a colour slot only, and only
+    under MATTER_MASTERS_COLOUR_SAMPLER=srgb: the slot's sRGB default, which makes the slot sample
+    an sRGB texture, decoded by the sampler. ``normal_map`` likewise for a normal slot under
+    MATTER_MASTERS_NORMAL_SAMPLER=normal: the slot's normal-map default, which makes it a Normal
+    sampler."""
+    S = unreal.MaterialSamplerType
+    if colour is not None:
+        tex, kind = colour, S.SAMPLERTYPE_COLOR
+    elif normal_map is not None:
+        tex, kind = normal_map, S.SAMPLERTYPE_NORMAL
+    else:
+        tex, kind = default, S.SAMPLERTYPE_LINEAR_COLOR
     t = g.node(unreal.MaterialExpressionTextureSampleParameter2D, col, parameter_name=name,
-               texture=default if colour is None else colour,
-               sampler_type=(unreal.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR if colour is None
-                             else unreal.MaterialSamplerType.SAMPLERTYPE_COLOR))
+               texture=tex, sampler_type=kind)
     g.link(uv, t, "UVs")
     return t
+
+
+def tangent_normal(g, name, flat, uv, col, flat_map=None):
+    """A normal slot's tangent-space normal, -1..1 (+Y up). On a linear sampler the graph decodes
+    the three channels, x 2 - 1. On a Normal sampler (``flat_map`` given) the engine has already
+    decoded R and G and rebuilt Z, so the graph takes its RGB as it is: no second decode."""
+    if flat_map is not None:
+        return g.mask(texture(g, name, flat, uv, col, normal_map=flat_map), "rgb", col - 1, "RGB")
+    return g.op_k(unreal.MaterialExpressionSubtract,
+                  g.op_k(unreal.MaterialExpressionMultiply, texture(g, name, flat, uv, col), 2.0, col - 1, "RGB"),
+                  1.0, col - 2)
 
 
 def lerp(g, a, b, alpha, col, a_out="", b_out=""):
@@ -387,7 +418,8 @@ def lerp(g, a, b, alpha, col, a_out="", b_out=""):
     return n
 
 
-def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None):
+def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None,
+                 flat_map=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -447,9 +479,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                  texture(g, f"{prefix}roughness_tex", white, uv, 12), 11, b_out="R")
         m = g.op(M.MaterialExpressionMultiply, g.scalar(m_name, m_def),
                  texture(g, f"{prefix}metalness_tex", white, uv, 12), 11, b_out="R")
-        n = g.op_k(M.MaterialExpressionSubtract,
-                   g.op_k(M.MaterialExpressionMultiply, texture(g, f"{prefix}normal_tex", flat, uv, 12), 2.0, 11, "RGB"),
-                   1.0, 10)
+        n = tangent_normal(g, f"{prefix}normal_tex", flat, uv, 12, flat_map)
         return b, r, m, n
 
     base, rough, metal, n_ts = layer(("base_color", "specular_roughness", "base_metalness", ""),
@@ -506,9 +536,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         # Phase22 22.2 (LCDSchema §Shine maps, RD-P22-5): the mesh's relief, tangent space (+Y up) on
         # its own st: its XY added to the article's normal before the overlays, normalised once
         # below. The slot's default is the flat normal; the driver binds an exact flat constant.
-        bn = g.op_k(M.MaterialExpressionSubtract,
-                    g.op_k(M.MaterialExpressionMultiply, texture(g, "normal_map_tex", flat, own_st, 12),
-                           2.0, 11, "RGB"), 1.0, 10)
+        bn = tangent_normal(g, "normal_map_tex", flat, own_st, 12, flat_map)
         bxy = g.op(M.MaterialExpressionMultiply, bn,
                    g.node(M.MaterialExpressionConstant3Vector, 10,
                           constant=unreal.LinearColor(1.0, 1.0, 0.0, 0.0)), 9)
@@ -810,7 +838,8 @@ def save(mat):
 
 def main():
     log(f"told root={ROOT} skinned={int(SKINNED)} instanced={int(INSTANCED)} mesh_v={MESH_V} "
-        f"mesh_binormal={MESH_BINORMAL} sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} refraction={REFRACTION}")
+        f"mesh_binormal={MESH_BINORMAL} sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} "
+        f"normal_sampler={NORMAL_SAMPLER} refraction={REFRACTION}")
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
@@ -819,7 +848,10 @@ def main():
     clear = default_texture("T_Matter_Clear", (0, 0, 0, 0))           # Phase26: makeup, coverage 0
     white_colour = (default_texture("T_Matter_WhiteColour", (255, 255, 255, 255), srgb=True)
                     if COLOUR_SAMPLER == "srgb" else None)
-    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black, clear) for t in MASTERS]
+    flat_map = (default_texture("T_Matter_FlatNormalMap", (128, 128, 255, 255), normal_map=True)
+                if NORMAL_SAMPLER == "normal" else None)
+    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black, clear, flat_map)
+                 for t in MASTERS]
                 + ([build_sky()] if SKY else [])):
         save(mat)
     log("RESULT ok")
