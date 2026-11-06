@@ -101,6 +101,12 @@ camera). Metric = CIE **ΔE2000** over the surface + SSIM + a per-role texture-s
 Cross-renderer-independent; OCIO-safe because both arms share one pinned pipeline. Gate-can-fail: A-vs-A
 control ΔE 0.0 (`--self-test`); a materially-wrong injected colour fires the gate (`--red-demo`).
 *(Updated 2026-09-23, measured: the tool path — the original said `tools/.../codec_ab.py`; it is `tools/conformance/codec_ab.py`, with `--self-test` and `--red-demo` flags.)*
+*(Updated 2026-11-06, measured: four faults fixed, units in `test_codec_ab.py`. The sphere was an implicit Sphere with
+no UVs, so a UV-addressed picture showed one texel and both arms agreed whatever its bytes; it is a UV-mapped mesh of
+the same radius. Pictures an article binds through its nodegraph's interface (a skin's maps) were left out of both arms;
+they are in. Pictures were read with premultiplied alpha, which zeroed a maskset's or overlay's R,G,B wherever A is 0;
+reads and writes are unassociated. The X11 settings for Qt are set on Linux only, so it runs on macOS. Pairs measured
+before this date sampled one texel of each UV-addressed picture: the 2026-07 figures below are from that rig.)*
 
 ### Per-class ΔE bars (from real first pairs)
 > **Scope (stated 2026-09-28):** these bars compare **one renderer with itself**: an article's source textures against their compressed release copies, through one pinned Storm pipeline. There, sameness is the point. They are **not** a cross-renderer bar. Between tools, the library measures whether each parameter moves every tool the same way, and lets each master look as good as its engine can (lead ruling, [_Architecture](../_Architecture.md) §Design principles).

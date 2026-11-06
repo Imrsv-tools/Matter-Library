@@ -43,12 +43,17 @@ the bar. Advisory (relaxed-bar) classes never fail the exit code.
 from __future__ import annotations
 
 import argparse
+import functools
+import math
 import os
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "parity" / "scene"))
+from build_scene import mesh_block  # noqa: E402
 
 # ---- toolchain pins (shared with render_leg_probe.py / check_conformance.sh) ----
 INST = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
@@ -71,15 +76,16 @@ NORMAL_TOKENS = ("normal", "_normal_", "normalmap")
 # env / subprocess helpers
 # ---------------------------------------------------------------------------
 def usd_env() -> dict:
-    """usdrecord + OIIO + colour env — Storm on this Wayland box needs xcb/glx + XAUTH."""
+    """usdrecord + OIIO + colour env — Storm on a Linux Wayland box needs xcb/glx + XAUTH; macOS needs none."""
     e = dict(os.environ)
     e.update(
         PYTHONPATH=f"{INST}/lib/python",
         LD_LIBRARY_PATH=f"{INST}/lib:{ENVP}/lib",
         PXR_MTLX_STDLIB_SEARCH_PATHS=f"{INST}/libraries",
-        QT_QPA_PLATFORM="xcb", QT_XCB_GL_INTEGRATION="glx",
-        DISPLAY=os.environ.get("DISPLAY", ":0"),
     )
+    if not sys.platform.startswith("linux"):
+        return e
+    e.update(QT_QPA_PLATFORM="xcb", QT_XCB_GL_INTEGRATION="glx", DISPLAY=os.environ.get("DISPLAY", ":0"))
     if "XAUTHORITY" not in e:
         xa = sorted(Path(f"/run/user/{os.getuid()}").glob("xauth_*"),
                     key=lambda p: p.stat().st_mtime, reverse=True)
@@ -104,9 +110,31 @@ def _compressonator_prefix() -> list[str]:
 # OIIO image IO (run inside the usd-tools python via a tiny worker so numpy +
 # colour + OIIO all resolve; the parent process may be any python)
 # ---------------------------------------------------------------------------
+# Every picture a worker reads or writes goes through `read_buf`/`write_buf`: OIIO premultiplies alpha on reading a
+# PNG or TGA (zeroing R,G,B wherever A is 0) and divides by it on writing, but a maskset's or an overlay's channels
+# are separate data, not a colour over a coverage.
+WORKER_PRELUDE = """
+import OpenImageIO as oiio, numpy as np
+def read_buf(p):
+    cfg = oiio.ImageSpec()
+    cfg.attribute("oiio:UnassociatedAlpha", 1)
+    return oiio.ImageBuf(str(p), 0, 0, cfg)
+def read_px(p, fmt=oiio.UINT8):
+    b = read_buf(p); s = b.spec()
+    return b.get_pixels(fmt).reshape(s.height, s.width, s.nchannels)
+def write_buf(p, px):
+    h, w, c = px.shape
+    sp = oiio.ImageSpec(w, h, c, oiio.UINT8)
+    sp.attribute("oiio:UnassociatedAlpha", 1)
+    buf = oiio.ImageBuf(sp)
+    buf.set_pixels(oiio.ROI(0, w, 0, h, 0, 1, 0, c), np.ascontiguousarray(px))
+    assert buf.write(str(p)), buf.geterror()
+"""
+
+
 def _worker(code: str, out_dir: Path) -> str:
-    """Run `code` in the usd-tools python; returns stdout (raises on failure)."""
-    r = subprocess.run([_py(), "-c", code], env=usd_env(),
+    """Run `code` in the usd-tools python, after WORKER_PRELUDE; returns stdout (raises on failure)."""
+    r = subprocess.run([_py(), "-c", WORKER_PRELUDE + code], env=usd_env(),
                        capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(f"usd-python worker failed:\n{r.stderr[-2000:]}")
@@ -127,13 +155,8 @@ def decode_dds_to_png(dds: Path, dst_png: Path, src_png: Path, tmp: Path) -> Non
         raise RuntimeError(f"compressonatorcli decode failed for {dds.name}:\n{r.stdout[-800:]}{r.stderr[-800:]}")
     is_normal = any(t in dds.stem.lower() for t in NORMAL_TOKENS)
     code = f"""
-import OpenImageIO as oiio, numpy as np
-def rd(p):
-    b=oiio.ImageBuf(p); s=b.spec()
-    return s, b.get_pixels(oiio.UINT8).reshape(s.height,s.width,s.nchannels)
-_, dec = rd({str(tga)!r})              # decoded, always 4ch from compressonator
-ssrc, _ = rd({str(src_png)!r})         # source png, to match channel count
-nch = ssrc.nchannels
+dec = read_px({str(tga)!r})                      # decoded, always 4ch from compressonator
+nch = read_buf({str(src_png)!r}).spec().nchannels  # source png's header, to match channel count
 is_normal = {is_normal}
 if is_normal:
     # BC5 stored R,G; reconstruct B = sqrt(1 - nx^2 - ny^2) as a correct consumer does.
@@ -147,11 +170,8 @@ elif nch == 3:
     out = dec[:,:,:3]
 else:
     out = dec[:,:,:4]
-h,w,c = out.shape
-sp = oiio.ImageSpec(w,h,c,oiio.UINT8)
-buf = oiio.ImageBuf(sp); buf.set_pixels(oiio.ROI(0,w,0,h,0,1,0,c), np.ascontiguousarray(out))
-assert buf.write({str(dst_png)!r}), buf.geterror()
-print("OK", w, h, c)
+write_buf({str(dst_png)!r}, out)
+print("OK", *out.shape)
 """
     _worker(code, tmp)
 
@@ -160,15 +180,10 @@ def _perturb_darken(png: Path, tmp: Path, factor: float = 0.6) -> None:
     """RED-DEMO helper: multiply a texture's RGB by `factor` in place (a deterministic,
     data-independent 'materially wrong base color' the gate MUST flag)."""
     code = f"""
-import OpenImageIO as oiio, numpy as np
-b=oiio.ImageBuf({str(png)!r}); s=b.spec()
-a=b.get_pixels(oiio.UINT8).reshape(s.height,s.width,s.nchannels).astype(np.float64)
-n=min(3,s.nchannels)
+a=read_px({str(png)!r}).astype(np.float64)
+n=min(3,a.shape[2])
 a[:,:,:n]=np.clip(a[:,:,:n]*{factor},0,255)
-out=a.round().astype(np.uint8)
-sp=oiio.ImageSpec(s.width,s.height,s.nchannels,oiio.UINT8)
-buf=oiio.ImageBuf(sp); buf.set_pixels(oiio.ROI(0,s.width,0,s.height,0,1,0,s.nchannels), np.ascontiguousarray(out))
-assert buf.write({str(png)!r}), buf.geterror()
+write_buf({str(png)!r}, a.round().astype(np.uint8))
 print("OK")
 """
     _worker(code, tmp)
@@ -195,13 +210,7 @@ def Xform "World"
     )
     {{
     }}
-    def Sphere "PreviewSphere" (
-        prepend apiSchemas = ["MaterialBindingAPI"]
-    )
-    {{
-        double radius = 1.0
-        rel material:binding = </World/Mat>
-    }}
+{sphere}
     def Cube "Backdrop"
     {{
         # unmaterialed -> Storm's default grey; gives Masked/transparent materials
@@ -220,6 +229,30 @@ def Xform "World"
     }}
 }}
 """
+
+
+@functools.cache
+def uv_sphere_mesh(segments: int = 128, rings: int = 64) -> str:
+    """The radius-1 preview sphere as a Mesh with primvars:st. An implicit Sphere has no UVs, so a UV-addressed
+    picture would show one texel over the whole surface and both arms would agree whatever its bytes."""
+    pts, st, idx = [], [], []
+    for r in range(rings + 1):
+        phi = math.pi * r / rings
+        for s in range(segments + 1):
+            th = 2 * math.pi * s / segments
+            pts.append((math.sin(phi) * math.cos(th), math.cos(phi), math.sin(phi) * math.sin(th)))
+            st.append((s / segments, 1 - r / rings))
+    row = segments + 1
+    for r in range(rings):
+        for s in range(segments):
+            a = r * row + s
+            idx.append((a, a + 1, a + row + 1, a + row))
+    return mesh_block("PreviewSphere", (pts, pts, st, idx), "/World/Mat", indent="    ").rstrip("\n")
+
+
+def preview_scene(hdri, mtlx: Path, matname: str) -> str:
+    """The matched-conditions scene both arms render in."""
+    return PREVIEW_TEMPLATE.format(hdri=hdri, mtlx=mtlx, matname=matname, sphere=uv_sphere_mesh())
 
 
 def material_name(mtlx: Path) -> str:
@@ -243,8 +276,7 @@ def material_class(mtlx: Path) -> str:
 
 def render(mtlx: Path, out_png: Path, width: int) -> None:
     scene = out_png.with_suffix(".preview.usda")
-    scene.write_text(PREVIEW_TEMPLATE.format(
-        hdri=HDRI, mtlx=mtlx, matname=material_name(mtlx)))
+    scene.write_text(preview_scene(HDRI, mtlx, material_name(mtlx)))
     r = subprocess.run(
         [_py(), str(INST / "bin/usdrecord"), "--renderer", "GL",
          "--complexity", "high", "--camera", "/World/Cam",
@@ -260,12 +292,8 @@ def render(mtlx: Path, out_png: Path, width: int) -> None:
 def compare(png_a: Path, png_b: Path, tmp: Path) -> dict:
     """Return {dE_mean, dE_p95, ssim, coverage} over the non-background surface."""
     code = f"""
-import OpenImageIO as oiio, numpy as np, colour, json
-def rd(p):
-    b=oiio.ImageBuf(p); s=b.spec()
-    a=b.get_pixels(oiio.FLOAT).reshape(s.height,s.width,s.nchannels)
-    return a[:,:,:3]
-A=rd({str(png_a)!r}); B=rd({str(png_b)!r})
+import colour, json
+A=read_px({str(png_a)!r}, oiio.FLOAT)[:,:,:3]; B=read_px({str(png_b)!r}, oiio.FLOAT)[:,:,:3]
 # background mask: the dome renders a near-uniform bright surround; the sphere is the
 # subject. Mask to pixels that differ from the median corner (background) — robust, and
 # identical for both arms so the delta is measured over the material only.
@@ -303,18 +331,15 @@ print(json.dumps({{"dE_mean":float(dEf.mean()),"dE_p95":float(np.percentile(dEf,
 def texture_codec_table(arm_a: Path, arm_b: Path, tmp: Path) -> str:
     """Per-role texture-space codec loss (diagnostic): color roles in ΔE2000, data roles in MAE/255."""
     code = f"""
-import OpenImageIO as oiio, numpy as np, colour
+import colour
 from pathlib import Path
-def rd(p):
-    b=oiio.ImageBuf(str(p)); s=b.spec()
-    return b.get_pixels(oiio.FLOAT).reshape(s.height,s.width,s.nchannels)
 A=Path({str(arm_a/'textures')!r}); B=Path({str(arm_b/'textures')!r})
 COLOR=("basecolor","diffuse","emissive")
 rows=[]
 for pa in sorted(A.glob("*.png")):
     pb=B/pa.name
     if not pb.exists(): rows.append(f"    {{pa.name:40s}} (no dds arm)"); continue
-    a=rd(pa); b=rd(pb); n=min(a.shape[2],b.shape[2]); a=a[:,:,:n]; b=b[:,:,:n]
+    a=read_px(pa, oiio.FLOAT); b=read_px(pb, oiio.FLOAT); n=min(a.shape[2],b.shape[2]); a=a[:,:,:n]; b=b[:,:,:n]
     stem=pa.stem.lower()
     if any(t in stem for t in COLOR) and n>=3:
         lab=lambda x: colour.XYZ_to_Lab(colour.sRGB_to_XYZ(np.clip(x[:,:,:3],0,1)))
@@ -340,7 +365,8 @@ def index_staging(staging: Path) -> dict[str, Path]:
 
 
 def texture_refs(mtlx: Path) -> list[str]:
-    """relative texture filenames the .mtlx references (textures/X.png)."""
+    """relative texture filenames the .mtlx references (textures/X.png): those written on an image node, and those
+    an image node takes through its nodegraph's interface (a skin's maps, `interfacename=`)."""
     root = ET.parse(mtlx).getroot()
     refs = []
     for img in root.iter():
@@ -348,6 +374,10 @@ def texture_refs(mtlx: Path) -> list[str]:
             for inp in img:
                 if inp.get("name") == "file" and inp.get("value"):
                     refs.append(inp.get("value"))   # a cut-out's file comes from the binding
+    for graph in root.iter("nodegraph"):
+        for inp in graph.findall("input"):
+            if inp.get("type") == "filename" and inp.get("value"):
+                refs.append(inp.get("value"))
     return sorted(set(refs))
 
 
