@@ -2,6 +2,7 @@
 """The look view: a character's skin in the library's Unreal runtime, lit to show its surface.
 
     uv run tools/parity/look.py <skin> [--today <git rev>] [--also <skin> ...] [--width 1024] [--out <dir>]
+    uv run tools/parity/look.py <skin> --crossfade <other skin>       # Phase29: two copies cross-fading
 
 Phase22 (RD-P22-11). The rig's matched light has no shadows, so its sheet cannot show whether a
 skin reads as plastic; it stays the tool-agreement check. This renders the rig's character, cast
@@ -414,8 +415,65 @@ def neutral_article(art: jobmod.Article, folder: Path) -> jobmod.Article:
     return _relocated(art, text, folder / art.name / f"{art.name}.mtlx")
 
 
+# ---------------------------------------------------------------- the cross-fade (Phase29) -------
+# 29.2 (MasterSet §Object fade): the character cast TWICE in one place, each copy its own skin and its
+# own object_fade, drawn at ONE sample per pixel (F-P29-1: averaging turns a dissolve into a see-through
+# fade). Copy A wears the skin given first; copy B (every mesh and slot suffixed "__b") the other.
+# (setting id, heading, A's object_fade, B's): B at 1 is gone, so the last column is A alone.
+CROSSFADE = (("xf_full", "A fully there", 0.0, 1.0),
+             ("xf_5050", "A 50 % out, B 50 % in", 0.5, -0.5),
+             ("xf_2575", "A 25 % present, B 75 %", 0.75, -0.25),
+             ("xf_alone", "A alone at 50 %", 0.5, 1.0))
+CROSSFADE_VIEWS = {"face": VIEWS["face"], "face34": VIEWS["face34"]}
+B = "__b"
+
+
+def crossfade(art: jobmod.Article, other: str, width: int, out: Path) -> Path:
+    """The cross-fade sheet: rows the face views, columns ``CROSSFADE``, every picture at its own size."""
+    work = out / "work"
+    shutil.rmtree(work, ignore_errors=True)
+    oart = jobmod.Article.read(jobmod.find_article(other))
+    mats_a, meshes = materials(rig.character_cast(art), work / "a")
+    mats_b, meshes_b = materials(rig.character_cast(oart), work / "b")
+    if [Path(m["file"]).read_bytes() for m in meshes_b] != [Path(m["file"]).read_bytes() for m in meshes]:
+        raise SystemExit(f"{oart.name}'s cast builds different meshes; the two copies would not overlap")
+    copy_b = [m | {"name": m["name"] + B, "material": m["material"] + B} for m in meshes]
+    mats = mats_a | {k + B: v for k, v in mats_b.items()}
+    views = [v for v in look_views(bc.load_parts()) if v["suffix"][2:] in CROSSFADE_VIEWS]
+    for v in views:
+        v["hide"] = v["hide"] + [h + B for h in v["hide"]]
+    settings = [{"id": sid, "materials": mats,
+                 "fade": {m["name"]: fa for m in meshes} | {m["name"]: fb for m in copy_b}}
+                for sid, _, fa, fb in CROSSFADE]
+    sun, sky = drv.lights()
+    ujob = {"format": drv.FADE_JOB_FORMAT, "width": width, "out_dir": str(work / "raw"),
+            "settle_frames": drv.SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes + copy_b,
+            "settings": [drv.warmup(settings)] + settings, "views": views, "look": look_lights()}
+    upath = work / "crossfade_job.json"
+    upath.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
+    cmd = drv.find_runtime()
+    if cmd is None:
+        raise SystemExit("no Unreal runtime: the cross-fade needs one built at Phase29 or later (job format 6)")
+    wanted = [(s["id"], v["suffix"]) for s in settings for v in views]
+    drv.run_runtime(cmd, upath, work / "unreal.log", [work / "raw" / f"{i}{x}.pfm" for i, x in wanted])
+    for i, x in wanted:
+        lin = drv.read_pfm(work / "raw" / f"{i}{x}.pfm") / drv.EXPOSURE_K
+        Image.fromarray(drv.srgb8(lin)).save(out / f"{i}{x}.png")
+    for pfm in (work / "raw").glob("*.pfm"):
+        pfm.unlink()
+    columns = [(sid, head) for sid, head, _, _ in CROSSFADE]
+    p = sheet(out, columns, width, CROSSFADE_VIEWS)
+    final = out / "crossfade_sheet.png"
+    p.replace(final)
+    print(f"A = {art.name}, B = {oart.name}")
+    return final
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--crossfade", metavar="SKIN",
+                    help="Phase29: the character cast twice in one place, the second copy in this skin, "
+                         "cross-faded (50/50, 25/75) and alone at 50 %%, at one sample per pixel; the face views only")
     ap.add_argument("skin", nargs="?", default=rig.CHARACTER_SKIN)
     ap.add_argument("--today", metavar="REV", help="also render the cast as it stood at this git revision")
     ap.add_argument("--also", action="append", default=[], metavar="SKIN",
@@ -455,6 +513,12 @@ def main(argv=None) -> int:
     BARE = a.bare
 
     art = jobmod.Article.read(jobmod.find_article(a.skin))
+    if a.crossfade:
+        oart = jobmod.find_article(a.crossfade).stem
+        out = (a.out or rig.OUT_ROOT / f"Crossfade__{art.name}__{oart}").resolve()
+        out.mkdir(parents=True, exist_ok=True)
+        print(f"crossfade sheet {crossfade(art, a.crossfade, a.width, out)}")
+        return 0
     cast = rig.character_cast(art)
     out = (a.out or rig.OUT_ROOT / (f"Look__{art.name}" + (f"__vs_{a.today}" if a.today else "")
                                     + ("__vs_reference" if a.reference else "")
