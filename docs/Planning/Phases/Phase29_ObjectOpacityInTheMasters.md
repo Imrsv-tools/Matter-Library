@@ -1,6 +1,6 @@
 # Phase29 — Object Opacity in the Masters
 
-**Status:** SEEDED (2026-11-09, by `/research` on the lead's word: *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"*, RD-POA-1). **Runs next**, ahead of the paused skin work (Phase28 included). Discovery is a deliberate gate the lead opens (`/discovery P29`). This doc is a pointer-shell; discovery fills it.
+**Status:** BRIEF READY (2026-11-09, discovery in session `ML_R_VariousQuestions`). Seeded the same day on the lead's *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1). Discovery was opened with *"go ahead with discovery"*. **Runs next**, ahead of the paused skin work (Phase28 included). Lane: **build**. ▶ `/execute P29`.
 
 ## Outcome
 
@@ -8,44 +8,172 @@
 
 *Who it is for:* the platform's Creators, who key an object's Opacity on the timeline (`PlatformDependencies.md` M15). Other USD apps see a clean swap. No article reads the value, so Blender and Storm are untouched.
 
-## Source
+**Source:** [`../Research/261105_R_PlatformObjectOpacityAsks.md`](../Research/261105_R_PlatformObjectOpacityAsks.md) — the platform's asks (Pass 1) and the library's reading (Pass 2, F-POA-1 … 8). This Brief is the one authoritative copy of what the phase builds. The research keeps the evidence.
 
-[`../Research/261105_R_PlatformObjectOpacityAsks.md`](../Research/261105_R_PlatformObjectOpacityAsks.md):
-- Pass 1 — the platform's reports and asks (R-POA-1 … 3, Q-POA-1 … 4);
-- Pass 2 — the library's reading (F-POA-1 … 8). Its proposals are this seed's scope. **They are not ruled:** discovery confirms or cuts each one.
+## First human test
 
-## Scope (seed — discovery confirms or cuts)
+**Where:** the lead's desktop on the machine with Unreal. The pictures are opened with `xdg-open`, and the handback carries their paths.
 
-- **Every master dissolves** against the 4 × 4 screen threshold that Hair already uses. A pixel is kept when its threshold is below *(how present the object is) × (the master's own coverage)* (F-POA-4):
-  - Hair: its soft coverage × presence;
-  - Masked: a second test beside its alpha test;
-  - the four solid masters: the same test on the opacity mask;
-  - the two glass masters: the same dither, not a smooth scale.
-- **One masked instance per solid master** (Opaque, TwoLayer, Emissive, Subsurface): blend mode overridden to masked, clip to 0.5 (Unreal's default is 0.3333), no graph of its own. The platform swaps a part to it while the object is part-present (F-POA-2, F-POA-6).
-- **The value, fixed in `MasterSet.md`:** one Custom Primitive Data float, slot 0, `object_fade`:
-  - how far the object has faded **out**; 0 = fully there, which is also what an unset slot reads;
-  - **negative** for the copy fading in, which takes the mirror pattern, so a cross-fade shows every pixel exactly once (F-POA-5, F-POA-7).
-- **The library's Unreal driver writes the value**, so the library can show the dissolve itself (F-POA-8).
-- **The judge:** a cross-fade pair at half, and one object at several presences, seen in Unreal under FXAA, with the four masked instances in the picture.
+**⛔ Native resolution, not the rig's supersampled picture.** The rig and the look view render 4× (look: 2×) and average each block (`drivers/unreal.py` `SUPERSAMPLE`; the capture has anti-aliasing off). That average turns a 4 × 4 dissolve into a smooth see-through fade, which is the look the platform ruled out and the headset never shows. **So every click's picture is rendered at one sample per pixel** (F-P29-1). At the click camera the dissolve's cell is 1 pixel and its tile is 4 × 4 pixels, read at 100 %.
+
+1. **Click 1 — every master at half (29.1).**
+   - **Picture:** the rig's 11-article sheet rendered at presence 0.5, one sample per pixel, beside the same sheet at presence 1.
+   - **Fixtures:** the 11 articles span Opaque (the grey card, ABS, Copper, Oak), TwoLayer (Rust), Masked (Lace), Emissive (Neon), TranslucentThin (Glass_Clear, Glass_Green), TranslucentThick (Diamond) and Subsurface (Marble). Near-white, near-black, metal, glass and a light are all in the set. Hair is in click 2.
+   - **What the lead judges:** each article is an even scatter of whole pixels, half the article and half the backdrop. None reads as tinted glass. Lace keeps its holes. The diamond's dropped pixels show the backdrop unbent.
+   - **The sentence afterwards:** *"every master dissolves at half, and none turns to glass."*
+2. **Click 2 — two versions of the character cross-fading (29.2).**
+   - **Picture:** the look view's `face` and `face34`, at one sample per pixel.
+   - **Fixture:** the rig's character, cast twice in the same place, wearing two skins far apart in tone (`Skin_Fitzpatrick` I and VI). One copy fades out and the other fades in, at 50/50 and 25/75. Beside it, the character alone at 50 %, in front of the look view's backdrop.
+   - **What the lead judges:**
+     - in the cross-fade, every pixel of the character is one skin or the other: no backdrop shows through the character, and the two skins' share follows the split;
+     - the character alone shows no teeth, eye interior or hair-under-skin through the face;
+     - the hair and eyes dissolve with the head;
+     - the shadow thins with the character.
+   - **The sentence afterwards:** *"two versions of one character cross-fade with no holes and no insides."*
+
+The headset's FXAA and its frame cost are judged in the platform's app, not here (§Not now).
 
 ## In now / not now
 
-- **In:** the eight masters' dissolve; the four masked instances; the value's spec in `MasterSet.md`; the driver writing it; the look in Unreal.
+- **In:**
+  - the eight masters' dissolve (29.1);
+  - the four masked instances (29.1);
+  - the value's spec in `MasterSet.md` (29.1);
+  - the runtime and driver writing the value and swapping to the instance (29.1);
+  - the rig's half-presence sheet (29.1) and the look view's cross-fade (29.2);
+  - the ledger's handover to the platform (at the close).
 - **Not now:**
-  - the platform's side: writing the value, the material swap, the start-up precache, the bake to a clean swap, and the effect overlay (the platform's lead, 2026-11-09: the effect is the platform's own overlay material, with no library change);
-  - any article, Creator port, Blender master or Storm change (F-POA-8).
+  - **the platform's side:** writing the value, its own swap, the start-up precache, the bake to a clean swap, the effect overlay, and the FXAA headset look (its own gate);
+  - any article, Creator port, Blender master or Storm change (F-POA-8);
+  - **publishing a new runtime** (RD-P29-5).
 
-## Dependencies
+## Decisions that bind
 
-- **The machine with Unreal** builds and looks (`LOCAL_DELTAS.md` §Two machines).
-- **No runtime is owed by the masters' change itself:** at `object_fade` = 0 every master draws exactly today's pixels (the lead's 2026-10-05 ruling). Whether the library's runtime is published so the driver can show the dissolve is a discovery question (Q-P29-4).
-- **The platform runs the library's builder itself,** so it gets the masked instances with its next masters build. Its object-fade work waits on this phase for the swap (M15).
+*The lead ruled the phase (RD-POA-1) but not its design. These are the agent's calls from Pass 2, settled **unless the lead says otherwise**.*
 
-## Questions for discovery (seed vs docs)
+- **RD-P29-1 — One rule for every master.** A pixel is kept when its 4 × 4 threshold (`bayer4()`, Hair's own) is below *(how present the object is) × (the master's own coverage)*:
+  - **Hair:** its soft coverage × presence.
+  - **Masked:** a second test beside its alpha test; the pixel must pass both.
+  - **Opaque, TwoLayer, Emissive, Subsurface:** the same test on the opacity mask, which an opaque master ignores.
+  - **TranslucentThin, TranslucentThick:** the same dither; a dropped pixel draws no glass **and bends nothing**. The bend is zeroed at dropped pixels always, rather than only if a probe shows it (this closes Q-P29-1).
+- **RD-P29-2 — One masked instance per solid master,** for Opaque, TwoLayer, Emissive and Subsurface:
+  - blend mode overridden to masked, clip overridden to 0.5 (Unreal's default is 0.3333);
+  - no graph and no parameter of its own;
+  - built by the same builder under `MATTER_MASTERS_ROOT`;
+  - named for the master it overrides (`M_Matter_<Token>` → `MI_Matter_<Token>_Fading`).
+  
+  A consumer re-parents a part's material to it while the object is part-present. Unreal 5.8 compiles an instance asset's overrides into its own shaders (F-POA-2), so the instances, like the masters, need their shaders ready before first use (U7).
+- **RD-P29-3 — The value.** One Custom Primitive Data float, `object_fade`, in **slot 0**:
+  - **`object_fade` = how far the object has faded out.** 0 = fully there, which is also what an unset slot reads (F-POA-3). 1 = gone. **Negative = the copy fading in.**
+  - **The tests:** the copy fading out keeps a pixel where `t ≤ 1 − |f|`. The copy fading in uses the mirrored threshold `1 − t`, which is the same 16 levels.
+  - **A tie shows both copies, never neither** (Unreal keeps a pixel at or above the clip). This closes Q-P29-6.
+  - The value is written into `MasterSet.md` beside the master table, as part of the producer↔consumer contract.
+  - **Slot 0 is confirmed free by the platform** (2026-11-09, by message, after searching its code). Nothing reads or writes per-component data on the components that draw a library material: scene meshes, a Character, or a scatter's instanced component. Its planned effect overlay takes its values from its own material and will not write slot 0. Q-P29-5 is closed.
+- **RD-P29-4 — A part-present object's shadow thins with it.** A masked shadow takes the same test in the shadow map's pixels. That is consistent with a dissolve, and at 0 the platform hides the object anyway (closes Q-P29-2).
+- **RD-P29-5 — The runtime is built locally, not published.** This follows Phase26's precedent (M14: its makeup runtime was built locally).
+  - The masters draw today's pixels at the default (the lead, 2026-10-05: *a builder change that alters nothing at its defaults needs no new runtime*).
+  - The platform runs the library's builder itself, so it does not need our runtime.
+  - The close offers the publish as the lead's word (closes Q-P29-4).
+- **RD-P29-6 — The cost while fading is measured in the platform's headset, not here.** A headless capture's timing says nothing about the headset's frame. Here the mechanism is stated: a masked part writes its mask in the depth pass and loses early depth rejection, only while it is part-present (closes Q-P29-3).
 
-1. **Q-P29-1** — On TranslucentThick, does a dropped pixel still bend what is behind it (refraction is a separate output)? If it does, zero the bend there too (F-POA-4 hypothesis).
-2. **Q-P29-2** — A part-present object's shadow: does it thin with presence, as the hypothesis says? Is that acceptable?
-3. **Q-P29-3** — The cost while fading: a masked part in the depth pass, and on Nanite. Measured on the machine with Unreal; the headset figure is the platform's.
-4. **Q-P29-4** — Is the library's runtime published with the driver's new write, or only built locally?
-5. **Q-P29-5** — Slot 0: confirm with the platform before it is written into the spec (F-POA-7: it reports no use of per-component data on its scene objects, 2026-11-09).
-6. **Q-P29-6** — The strict and non-strict tests (F-POA-5): which copy owns a threshold equal to the value, given that Unreal's clip keeps a pixel when the mask is at or above the clip value.
+## Rides on
+
+`docs/CoreMechanisms.md` rows 1–4 are skin-map mechanisms. **This phase meets none of them.** The peers it follows:
+
+| What in this phase | The peer we follow (opened this pass) |
+|---|---|
+| the dissolve's threshold | Hair's soft coverage: `build_masters.py` `bayer4()` and the Hair branch's `clip` (grep `bayer4(g, 10)`) |
+| a master's mask and clip | Masked: `MP_OPACITY_MASK` + `opacity_mask_clip_value` 0.5 (grep `cannot connect the opacity mask`) |
+| a second project builds the same assets | the M7 switches: `MATTER_MASTERS_ROOT` (grep `_told("MATTER_MASTERS_ROOT"`) |
+| an older runtime refuses a job it cannot draw | Phase26's makeup: `drivers/unreal.py` `MAKEUP_JOB_FORMAT`; runtime `JobFormat` / `OldestJobFormat` in `MatterRuntimeGameMode.h` |
+| a master's first use draws the engine default (U7) | `drivers/unreal.py` `warmup` |
+| a master loaded by token | `MatterRuntimeGameMode::LoadMaster` (`/Game/Masters/M_Matter_<Token>`) |
+| **NEW** — a value per object, and swapping a part to an instance | no peer. RD-P29-2 and RD-P29-3 (the agent's calls, above) |
+
+## Reuse check
+
+- **What the stack already gives:**
+  - Unreal's material-instance property overrides (no second graph);
+  - Custom Primitive Data (one value on a component reaches every section's material, with no per-material write);
+  - Hair's `bayer4()` (a frame-stable screen threshold, already in the masters).
+- **Custom layers proposed:** none. No custom dither, no per-material parameter write, no extra masters.
+- **The contracts touched:** `MasterSet.md`, which gains the value and the instances and is the producer↔consumer contract (`Consumers.md` §IMRSV). The job format gains one field per mesh.
+- **Not touched:** the frozen Creator-port vocabulary (`LCDSchema.md`).
+
+## Risk lane — build
+
+- **Controls read:**
+  - `run_all.py` runs no Unreal lane. No validator, snapshot or test globs or hashes `unreal/` or the drivers (grep for `build_masters`, `MatterRuntime` and `drivers/unreal` in `tools/`: only the rig, look view, job and character builders, which this phase edits on purpose).
+  - The one fingerprint is a doc tell: `JOB_FORMAT.md` §Which masters a runtime carries (`git log <pin source>..HEAD -- build_masters.py`). It will list this phase's commits. RD-P29-5 and the 2026-10-05 ruling answer it.
+- **No high-rigor trigger:** no authorization, secret, migration, data loss or public edge. Publishing a runtime is out of scope (RD-P29-5).
+
+## Step list
+
+- **29.1 — Every master dissolves (click 1).**
+  - The builder: the threshold test on all eight masters; the four masked instances; the glass bend zeroed at dropped pixels.
+  - The runtime: per mesh, reads `object_fade` from the job, writes it to slot 0 and swaps a solid master's part to its instance when it is non-zero. Job format 6; formats 3–5 still read.
+  - The driver and rig: `rig.py --fade <f>` with one sample per pixel.
+  - `MasterSet.md`: the value, the instances, and the two-sided `Drift` note resolved.
+  - **First clickable result:** click 1.
+  - Before the first edit, baseline the rig's sheet at presence 1 and keep it. After the change it must match pixel for pixel (the default draws as today).
+- **29.2 — Two versions of the character cross-fade (click 2).**
+  - The look view casts the character twice in one place, each copy with its own skin and `object_fade` (`look.py --crossfade <skin> --fade <f>`), at one sample per pixel. The character alone at 50 %.
+  - **First clickable result:** click 2.
+- **At the close:**
+  - M15's status: what the platform's next act is (re-run its masters build; write slot 0; swap to `MI_Matter_<Token>_Fading`; precache it);
+  - the Glossary's new words (*masked instance*, `object_fade`);
+  - the publish offered (RD-P29-5).
+
+*Reconciled click by click:* click 1 needs only 29.1's builder, runtime and rig. Click 2 needs 29.1 plus the look view's two-character cast in 29.2. Every In-now bullet names its step or the close.
+
+## Compact build map
+
+| Seam | Likely files | Note |
+|---|---|---|
+| the masters | `unreal/MatterRuntime/Scripts/build_masters.py` | `bayer4()` shared. The mask on the solid masters is ignored while opaque. The instances: `unreal.MaterialInstanceConstant` with `base_property_overrides` (blend mode, clip) after the master is saved. Check that the connect call accepts the mask on an opaque master. |
+| the runtime | `MatterRuntimeGameMode.{h,cpp}` | `JobFormat` 6. Per mesh, `SetCustomPrimitiveDataFloat(0, f)`; a `LoadMaster`-style cache for the instances. Built through `unreal/build.sh editor` + `masters`; the editor-hosted driver path (`MATTER_UNREAL_EDITOR`) avoids a package for the clicks. |
+| the job | `tools/parity/drivers/unreal.py`, `job.py`, `JOB_FORMAT.md` | `fade` per mesh; `FADE_JOB_FORMAT = 6`; a one-sample mode beside `SUPERSAMPLE`. |
+| the clicks | `tools/parity/rig.py`, `tools/parity/look.py`, `scene/build_character.py` | `--fade`; `--crossfade`, two casts of one character. |
+| the contract | `docs/specs/Ontology/MasterSet.md`, `tools/parity/JOB_FORMAT.md`, `docs/Glossary.md` | the value, the slot, the instances' names, the tests. |
+
+**Test surface (build ceiling):**
+- `run_all.py` (no lane should move; the WorkingDrive must be mounted, or `tool_tests` fails on `library/parity`);
+- the presence-1 sheet against its baseline (one real-path smoke);
+- the two clicks.
+- No new gate.
+
+**Cost to announce at execute:** the C++ editor build, capped at 8 jobs (CPU, minutes) and the masters commandlet (CPU, `-nullrhi`). The renders use the GPU. Check `ps -ef | grep "[U]nrealEditor"` first and ask once for the batch if an editor or Studio is up.
+
+## Discovery Log
+
+### Pass 1 — the product docs, the tree, the engine (2026-11-09)
+
+- **Read:**
+  - the phase seed; `_Architecture.md` (headings), `Consumers.md` §IMRSV, `MasterSet.md` §Material-settings intent, `CoreMechanisms.md` (whole);
+  - `Learnings/Unreal/Unreal.md` (U7, U8, U18 apply; the rest are shading facts this phase does not move);
+  - `JOB_FORMAT.md` (§The test set, §Which masters a runtime carries, the look view);
+  - `look.py`'s head; `drivers/unreal.py` (`SUPERSAMPLE`, the job formats); `MatterRuntimeGameMode` (`LoadMaster`, the capture's show flags, `JobFormat`);
+  - `unreal/build.sh`; the research doc (the source).
+- **The platform's side:** its object-fade phase is in discovery (2026-11-09). Its session was told this split by message: the library owns the masters, the instances, the value's spec and its own runtime's swap; the platform owns writing the value, its swap, the precache, the bake and the overlay. Asked whether slot 0 is free (Q-P29-5). It replied that it is, and that the split matches its own record.
+- **Grep for this phase's own names** (`object_fade`, Custom Primitive Data, dissolve, *object opacity*) across `tools/`, `unreal/`, `blender/` and `docs/specs/`: nothing built. The only hit is `MasterSet.md`'s 2026-11-09 history line.
+- **F-P29-1 — The rig's and the look view's averaging hides a dissolve.** `drivers/unreal.py` renders at `SUPERSAMPLE` 4 (look: 2) and averages each block, and the runtime's capture has `SetAntiAliasing(false)` (*"the driver supersamples instead"*). `bayer4()`'s docstring relies on exactly this to make Hair's coverage soft in the rig. A dissolve rendered that way reads as a smooth fade, the ruled-out look. The clicks render one sample per pixel (§First human test).
+- **F-P29-2 — The rig's test set covers seven of the eight masters.** Hair is not among the 11 articles, but the character wears it, so click 2 covers it.
+- **F-P29-3 — The runtime loads a master by token, from a fixed path.** A swap to an instance is a second, parallel lookup. It is the reference the platform's own swap can follow.
+
+## Open questions
+
+| # | Question | State |
+|---|---|---|
+| Q-P29-1 | does a dropped glass pixel still bend the view? | closed by RD-P29-1: the bend is zeroed there always |
+| Q-P29-2 | the shadow while fading | closed by RD-P29-4 |
+| Q-P29-3 | the cost while fading | closed by RD-P29-6: the platform measures it in the headset |
+| Q-P29-4 | publish the runtime? | closed by RD-P29-5: local; offered at the close |
+| Q-P29-5 | is slot 0 free on the platform's components? | closed: the platform confirmed it free, 2026-11-09 (RD-P29-3) |
+| Q-P29-6 | which copy owns a tie | closed by RD-P29-3: both |
+
+## Status footer
+
+- **Passes:** Pass 1 (2026-11-09). The Brief is complete; the lane is build.
+- **Decided:** RD-P29-1 … 6, the agent's calls from Pass 2, unless the lead says otherwise.
+- **Open:** none. Slot 0 was confirmed by the platform the same day (Q-P29-5).
+- **▶ Next:** `/execute P29` on the machine with Unreal.

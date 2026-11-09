@@ -35,7 +35,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-11-09 (lead):** Phase29 runs next, and the skin work is paused, Phase28 included: *"We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1, `docs/Planning/Research/261105_R_PlatformObjectOpacityAsks.md`).
 
-### Phase29 — Object Opacity in the Masters — SEEDED *(2026-11-09, the same word; discovery is the lead's to open)*
+### Phase29 — Object Opacity in the Masters — BRIEF READY *(seeded 2026-11-09, the same word; discovered the same day, on "go ahead with discovery")*
 **Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
 - `docs/Planning/Phases/Phase29_ObjectOpacityInTheMasters.md`
 
