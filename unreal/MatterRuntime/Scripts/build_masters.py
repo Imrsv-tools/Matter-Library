@@ -18,7 +18,9 @@ tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function
 darkening of the base, which is MaterialX's own), each with its
 own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair; Phase09: the mesh's
 picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the Sky (the rig's
-visible dome, unlit, which the runtime's sky light captures).
+visible dome, unlit, which the runtime's sky light captures). Phase29: every master dissolves an
+object part-present by its ``object_fade`` (Custom Primitive Data slot 0; ``fade_terms``), and the
+four solid masters each get a masked instance, ``MI_Matter_<Token>_Fading`` (``build_fading``).
 
 By default every texture slot samples as **LinearColor**: the runtime hands every texture over as
 linear float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
@@ -377,6 +379,39 @@ def bayer4(g, col):
     k = g.op(M.MaterialExpressionAdd, g.op_k(M.MaterialExpressionMultiply, m2(x0, y0), 4.0, col - 10),
              m2(x1, y1), col - 11)
     return g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, k, 0.5, col - 12), 1.0 / 16.0, col - 13)
+
+
+def fade_terms(g, col):
+    """Phase29 (MasterSet §Object fade, RD-P29-1, RD-P29-3): how present the object is, and this
+    pixel's threshold.
+
+    ``object_fade`` is Custom Primitive Data slot 0, written on the component, never on a material:
+    0 = fully there (also what an unset slot reads), 1 = gone, negative = the copy fading in.
+    Returns (presence, threshold): presence = 1 - |object_fade|; the threshold is ``bayer4``'s t for
+    a copy fading out (and fully there) and 1 - t for one fading in (the same 16 levels, mirrored),
+    so two copies at f and -(1 - f) keep complementary pixels. A pixel is kept where
+    threshold <= presence x the master's own coverage; a tie keeps it (Unreal keeps a pixel AT the
+    clip), so a tie shows both copies, never neither. At 0 both terms are exact (1, and t itself):
+    the master draws today's pixels."""
+    M = unreal
+    f = g.node(M.MaterialExpressionScalarParameter, col, parameter_name="object_fade", default_value=0.0,
+               use_custom_primitive_data=True, primitive_data_index=0)
+    presence = g.one(M.MaterialExpressionOneMinus, g.one(M.MaterialExpressionAbs, f, col - 1), col - 2)
+    t = bayer4(g, col)
+    # 1 where the copy is fading in (f < 0), else exactly 0: sign(0) is 0
+    fading_in = g.one(M.MaterialExpressionSaturate,
+                      g.op_k(M.MaterialExpressionMultiply, g.one(M.MaterialExpressionSign, f, col - 1), -1.0, col - 2),
+                      col - 3)
+    threshold = lerp(g, t, g.one(M.MaterialExpressionOneMinus, t, col - 14), fading_in, col - 15)
+    return presence, threshold
+
+
+def fade_mask(g, presence, threshold, col, coverage=None):
+    """The fade's own opacity mask, for a clip of 0.5: presence x coverage - threshold + 0.5 (kept
+    at or above 0.5). ``coverage`` is the master's own soft coverage (Hair's), or none (1)."""
+    M = unreal
+    keep = presence if coverage is None else g.op(M.MaterialExpressionMultiply, presence, coverage, col)
+    return g.op_k(M.MaterialExpressionAdd, g.op(M.MaterialExpressionSubtract, keep, threshold, col), 0.5, col - 1)
 
 
 def texture(g, name, default, uv, col, colour=None, normal_map=None):
@@ -743,6 +778,9 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
 
     outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
     front = next(o for o in outs if "front" in o.lower())
+    # Phase29 (MasterSet §Object fade, RD-P29-1): every master dissolves an object part-present, one
+    # rule, each in its own blend mode; at object_fade 0 every master draws today's pixels.
+    presence, threshold = fade_terms(g, 30)
     if spec.get("opacity") or spec.get("hair"):
         # The mesh's cut-out map (LCDSchema §Cut-out map, supplied per binding), on the mesh's own
         # st; white, so a card, when none is bound.
@@ -757,15 +795,33 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         clip = g.op_k(M.MaterialExpressionAdd,
                       g.op(M.MaterialExpressionSubtract, calls[0], g.scalar("opacity_cutoff", 0.5, col=3), 2,
                            a_out="OpacityMask"), 0.5, 1)
+        # Phase29: the fade is a second test beside the alpha test; the pixel must pass both
+        clip = g.op(M.MaterialExpressionMin, clip, fade_mask(g, presence, threshold, 2), 0)
     elif spec.get("hair"):
         # Hair (MasterSet: masked, DITHERED): the coverage is soft, never thresholded at a cutoff,
         # so each pixel keeps it against its own ordered-dither threshold. It is not fed to Epic's
-        # function, whose weight would scale the kept pixels by it a second time.
-        clip = g.op_k(M.MaterialExpressionAdd, g.op(M.MaterialExpressionSubtract, cov, bayer4(g, 10), 2), 0.5, 1)
-    if spec.get("opacity") or spec.get("hair"):
+        # function, whose weight would scale the kept pixels by it a second time. Phase29: the
+        # coverage x how present the object is, against the same threshold.
+        clip = fade_mask(g, presence, threshold, 2, coverage=cov)
+    elif spec["blend"] == "opaque":
+        # Phase29 (RD-P29-2): an opaque master ignores its mask; its masked instance
+        # (MI_Matter_<Token>_Fading, build_fading) takes the same graph and keeps the test.
+        clip = fade_mask(g, presence, threshold, 2)
+    if spec["blend"] != "translucent":
         if not MEL.connect_material_property(clip, "", unreal.MaterialProperty.MP_OPACITY_MASK):
             raise RuntimeError(f"{token}: cannot connect the opacity mask")
         mat.set_editor_property("opacity_mask_clip_value", 0.5)
+    else:
+        # Phase29: translucency keeps no pixel back by a clip, so a dropped pixel is given no coverage
+        # (no glass drawn) and, below, an index of 1 (it bends nothing). kept is exactly 1 or 0:
+        # saturate(sign(presence - threshold) + 1), 1 at a tie.
+        if "geometry_opacity" not in inputs:
+            raise RuntimeError(f"{token}: Epic's function has no input geometry_opacity")
+        kept = g.one(M.MaterialExpressionSaturate,
+                     g.op_k(M.MaterialExpressionAdd,
+                            g.one(M.MaterialExpressionSign,
+                                  g.op(M.MaterialExpressionSubtract, presence, threshold, 4), 3), 1.0, 3), 2)
+        feed(kept, "geometry_opacity")
     if len(calls) == 2:
         top = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
         top.set_editor_property("use_parameter_blending", False)
@@ -790,6 +846,12 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                             else params["specular_ior"]), ""
         else:
             ior_src, ior = calls[0], next(o for o in outs if "refraction" in o.lower())
+        # Phase29 (RD-P29-1): a dropped pixel bends nothing, always: mix(index, 1, 1 - kept), exactly
+        # the index where kept is 1
+        bend = g.node(M.MaterialExpressionLinearInterpolate, 1, const_b=1.0)
+        g.link(ior_src, bend, "A", ior)
+        g.link(g.one(M.MaterialExpressionOneMinus, kept, 1), bend, "Alpha")
+        ior_src, ior = bend, ""
         if not MEL.connect_material_property(ior_src, ior, unreal.MaterialProperty.MP_REFRACTION):
             raise RuntimeError(f"{token}: cannot connect the refraction")
         mat.set_editor_property("refraction_method", unreal.RefractionMode.RM_INDEX_OF_REFRACTION)
@@ -814,6 +876,37 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         # recompiles it every launch; a packaged run draws Unreal's default material.
         mat.set_editor_property("used_with_instanced_static_meshes", True)
     return mat
+
+
+FADING = ("Opaque", "TwoLayer", "Emissive", "Subsurface")     # Phase29 RD-P29-2: the solid masters
+
+
+def build_fading(master):
+    """Phase29 (RD-P29-2, MasterSet §Object fade): a solid master's MASKED INSTANCE,
+    MI_Matter_<Token>_Fading: the master with its blend mode overridden to masked and its clip to
+    0.5 (Unreal's default is 0.3333), and nothing else: no graph and no parameter of its own. A
+    consumer re-parents a part to it while the object is part-present. Unreal 5.8 compiles an
+    instance asset's overrides into the instance's own shaders (F-POA-2), so they must be ready
+    before first use, as a master's are."""
+    name = master.get_name().replace("M_Matter_", "MI_Matter_") + "_Fading"
+    path = f"{ROOT}/{name}"
+    if EAL.does_asset_exist(path):
+        EAL.delete_asset(path)
+    mic = TOOLS.create_asset(name, ROOT, unreal.MaterialInstanceConstant, unreal.MaterialInstanceConstantFactoryNew())
+    MEL.set_material_instance_parent(mic, master)
+    ov = mic.get_editor_property("base_property_overrides")
+    ov.set_editor_property("override_blend_mode", True)
+    ov.set_editor_property("blend_mode", unreal.BlendMode.BLEND_MASKED)
+    ov.set_editor_property("override_opacity_mask_clip_value", True)
+    ov.set_editor_property("opacity_mask_clip_value", 0.5)
+    mic.set_editor_property("base_property_overrides", ov)
+    MEL.update_material_instance(mic)
+    if not EAL.save_loaded_asset(mic):
+        raise RuntimeError(f"cannot save {name}")
+    got = mic.get_editor_property("base_property_overrides")
+    log(f"built {name} parent={master.get_name()} blend={got.get_editor_property('blend_mode')} "
+        f"clip={got.get_editor_property('opacity_mask_clip_value')} "
+        f"override_blend={got.get_editor_property('override_blend_mode')}")
 
 
 def build_sky():
@@ -850,10 +943,11 @@ def main():
                     if COLOUR_SAMPLER == "srgb" else None)
     flat_map = (default_texture("T_Matter_FlatNormalMap", (128, 128, 255, 255), normal_map=True)
                 if NORMAL_SAMPLER == "normal" else None)
-    for mat in ([build_master(t, white, no_wear, flat, white_colour, grey, black, clear, flat_map)
-                 for t in MASTERS]
-                + ([build_sky()] if SKY else [])):
+    masters = {t: build_master(t, white, no_wear, flat, white_colour, grey, black, clear, flat_map) for t in MASTERS}
+    for mat in list(masters.values()) + ([build_sky()] if SKY else []):
         save(mat)
+    for t in FADING:
+        build_fading(masters[t])
     log("RESULT ok")
 
 

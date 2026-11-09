@@ -136,6 +136,17 @@ bool AMatterRuntimeGameMode::LoadJob(const FString& Path)
 		Note(TEXT("MATTER a job with a \"look\" must be format 4"), true);
 		return false;
 	}
+	if (Format < 6)
+	{
+		for (const TSharedPtr<FJsonValue>& S : Job->GetArrayField(TEXT("settings")))
+		{
+			if (S->AsObject()->HasField(TEXT("fade")))
+			{
+				Note(TEXT("MATTER a setting with a \"fade\" must be in a format-6 job"), true);
+				return false;
+			}
+		}
+	}
 	Width = Job->GetIntegerField(TEXT("width"));
 	Job->TryGetNumberField(TEXT("settle_frames"), SettleFrames);
 	Note(FString::Printf(TEXT("MATTER job=%s width=%d out=%s"), *Path, Width, *OutDir), false);
@@ -464,6 +475,41 @@ UMaterialInterface* AMatterRuntimeGameMode::LoadMaster(const FString& Token)
 	return Master;
 }
 
+namespace
+{
+	// Phase29 (RD-P29-2; MasterSet §Object fade): the solid masters draw opaque, which keeps no
+	// pixel back, so a part-present object is drawn with the master's MASKED INSTANCE instead
+	// (M_Matter_<Token> -> MI_Matter_<Token>_Fading: blend mode masked, clip 0.5, nothing else). The
+	// other four masters dissolve in their own blend mode and need no swap.
+	const TSet<FString> FadingTokens = {TEXT("Opaque"), TEXT("TwoLayer"), TEXT("Emissive"), TEXT("Subsurface")};
+}
+
+UMaterialInterface* AMatterRuntimeGameMode::LoadFading(const FString& Token)
+{
+	if (TObjectPtr<UMaterialInterface>* Hit = Fading.Find(Token))
+	{
+		return *Hit;
+	}
+	const FString Name = FString::Printf(TEXT("MI_Matter_%s_Fading"), *Token);
+	const FString Path = FString::Printf(TEXT("/Game/Masters/%s.%s"), *Name, *Name);
+	UMaterialInterface* Instance = LoadObject<UMaterialInterface>(nullptr, *Path);
+	if (!Instance)
+	{
+		Note(FString::Printf(TEXT("MATTER no masked instance %s"), *Path), true);
+		return nullptr;
+	}
+#if WITH_EDITOR
+	// The instance's blend-mode override is compiled into its OWN shaders (F-POA-2): wait for them
+	// as for a master's
+	if (FMaterialResource* Res = Instance->GetMaterialResource(GMaxRHIShaderPlatform))
+	{
+		Res->FinishCompilation();
+	}
+#endif
+	Fading.Add(Token, Instance);
+	return Instance;
+}
+
 UTexture2D* AMatterRuntimeGameMode::LoadTexture(const TSharedPtr<FJsonObject>& Spec)
 {
 	// Every texture reaches its master as LINEAR FLOAT with its own mip chain (Phase06 6.3), so
@@ -624,15 +670,39 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 		}
 	}
 
-	TMap<FString, UMaterialInstanceDynamic*> Built;
-	const TSharedPtr<FJsonObject> Mats = S->GetObjectField(TEXT("materials"));
-	for (const auto& Pair : Mats->Values)
+	// Phase29 (MasterSet §Object fade): "fade" names a mesh's object_fade for this setting (0, fully
+	// there, when absent). It is written into the mesh's Custom Primitive Data slot 0, which every
+	// master reads; a solid master's part that is not fully there is drawn with its masked instance.
+	const TSharedPtr<FJsonObject>* FadeObj = nullptr;
+	S->TryGetObjectField(TEXT("fade"), FadeObj);
+	if (FadeObj)
 	{
-		const TSharedPtr<FJsonObject> Spec = Pair.Value->AsObject();
-		UMaterialInterface* Master = LoadMaster(Spec->GetStringField(TEXT("master")));
+		for (const auto& F : (*FadeObj)->Values)
+		{
+			const double V = F.Value->AsNumber();
+			if (!Meshes.Contains(FString(*F.Key)) || V < -1.0 || V > 1.0)
+			{
+				Note(FString::Printf(TEXT("MATTER setting %s fades %s by %f: no such mesh, or not in -1..1"),
+					*S->GetStringField(TEXT("id")), *FString(*F.Key), V), true);
+				return false;
+			}
+		}
+	}
+	TMap<FString, UMaterialInstanceDynamic*> Built;     // slot id, or slot id + "|fading"
+	const TSharedPtr<FJsonObject> Mats = S->GetObjectField(TEXT("materials"));
+	auto Build = [this, &Mats](const FString& Slot, bool bFading) -> UMaterialInstanceDynamic*
+	{
+		const TSharedPtr<FJsonObject>* SpecObj = nullptr;
+		if (!Mats->TryGetObjectField(Slot, SpecObj))
+		{
+			return nullptr;
+		}
+		const TSharedPtr<FJsonObject> Spec = *SpecObj;
+		const FString Token = Spec->GetStringField(TEXT("master"));
+		UMaterialInterface* Master = bFading ? LoadFading(Token) : LoadMaster(Token);
 		if (!Master)
 		{
-			return false;
+			return nullptr;
 		}
 		UMaterialInstanceDynamic* Mid = UMaterialInstanceDynamic::Create(Master, this);
 		const TSharedPtr<FJsonObject>* Obj = nullptr;
@@ -657,24 +727,44 @@ bool AMatterRuntimeGameMode::ApplySetting(int32 Index)
 				UTexture2D* Tex = LoadTexture(V.Value->AsObject());
 				if (!Tex)
 				{
-					return false;
+					return nullptr;
 				}
 				Mid->SetTextureParameterValue(*V.Key, Tex);
 			}
 		}
 		Mids.Add(Mid);
-		Built.Add(FString(*Pair.Key), Mid);   // 5.8: a JSON key is a TSharedString
-	}
+		return Mid;
+	};
 	for (const auto& Pair : Meshes)
 	{
-		UMaterialInstanceDynamic** Mid = Built.Find(MeshMaterial[Pair.Key]);
-		if (!Mid)
+		const FString& Slot = MeshMaterial[Pair.Key];
+		double Fade = 0.0;
+		if (FadeObj)
 		{
-			Note(FString::Printf(TEXT("MATTER setting %s has no material %s for mesh %s"),
-				*S->GetStringField(TEXT("id")), *MeshMaterial[Pair.Key], *Pair.Key), true);
-			return false;
+			(*FadeObj)->TryGetNumberField(Pair.Key, Fade);
 		}
-		Pair.Value->SetMaterial(0, *Mid);
+		const TSharedPtr<FJsonObject>* SpecObj = nullptr;
+		const bool bFading = Fade != 0.0 && Mats->TryGetObjectField(Slot, SpecObj)
+			&& FadingTokens.Contains((*SpecObj)->GetStringField(TEXT("master")));
+		const FString Key = bFading ? Slot + TEXT("|fading") : Slot;
+		UMaterialInstanceDynamic* Mid = nullptr;
+		if (UMaterialInstanceDynamic** Hit = Built.Find(Key))
+		{
+			Mid = *Hit;
+		}
+		else
+		{
+			Mid = Build(Slot, bFading);
+			if (!Mid)
+			{
+				Note(FString::Printf(TEXT("MATTER setting %s: no material %s for mesh %s, or it did not build"),
+					*S->GetStringField(TEXT("id")), *Slot, *Pair.Key), true);
+				return false;
+			}
+			Built.Add(Key, Mid);
+		}
+		Pair.Value->SetCustomPrimitiveDataFloat(0, float(Fade));
+		Pair.Value->SetMaterial(0, Mid);
 	}
 	SettingIndex = Index;
 	ReadyFrames = 0;

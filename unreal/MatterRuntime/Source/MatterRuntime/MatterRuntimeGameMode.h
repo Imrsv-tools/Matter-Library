@@ -54,6 +54,7 @@ private:
 	bool LoadMesh(const TSharedPtr<FJsonObject>& Spec);
 	bool ApplySetting(int32 Index);
 	UMaterialInterface* LoadMaster(const FString& Token);
+	UMaterialInterface* LoadFading(const FString& Token);
 	UTexture2D* LoadTexture(const TSharedPtr<FJsonObject>& Spec);
 	bool IsReady() const;
 	bool CaptureSetting();
@@ -70,6 +71,7 @@ private:
 	UPROPERTY() TObjectPtr<UStaticMeshComponent> SkySphere;
 	UPROPERTY() TMap<FString, TObjectPtr<UStaticMeshComponent>> Meshes;
 	UPROPERTY() TMap<FString, TObjectPtr<UMaterialInterface>> Masters;
+	UPROPERTY() TMap<FString, TObjectPtr<UMaterialInterface>> Fading;   // Phase29: the masked instances
 	UPROPERTY() TMap<FString, TObjectPtr<UTexture2D>> Textures;
 	UPROPERTY() TArray<TObjectPtr<UMaterialInstanceDynamic>> Mids;
 
@@ -78,7 +80,9 @@ private:
 	// format 3 plus an optional "look", which an older runtime would silently light as matched.
 	// Both 3 and 4 are read, so the matched jobs every caller writes keep working. 5 (Phase26 26.1):
 	// a binding carries the makeup layer, which an older Subsurface master would silently leave bare.
-	static constexpr int32 JobFormat = 5;
+	// 6 (Phase29 29.1): a setting may fade a mesh ("fade": mesh name -> object_fade), which an older
+	// master would silently draw fully there.
+	static constexpr int32 JobFormat = 6;
 	static constexpr int32 OldestJobFormat = 3;
 
 	TSharedPtr<FJsonObject> Job;

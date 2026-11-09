@@ -101,6 +101,10 @@ MAKEUP_JOB_FORMAT = 5
 MAKEUP_PORTS = {"makeup_color_map": [0.0, 0.0, 0.0, 0.0],     # -> the master's <port>_tex; an article
                 "makeup_finish_map": [0.0, 0.0, 0.0, 1.0]}    # without one gets coverage 0 exactly
 MAKEUP_MASTERS = {"Subsurface"}
+# Phase29 (RD-P29-3): a job whose settings fade a mesh (``settings[].fade``: mesh name -> object_fade)
+# is format 6, so a runtime whose masters cannot dissolve (built before Phase29) refuses it rather than
+# draw the object fully there. A format-6 job may also carry a look and the makeup layer.
+FADE_JOB_FORMAT = 6
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
 BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
@@ -710,11 +714,12 @@ def read_pfm(path: Path) -> np.ndarray:
     return np.flipud(data.reshape(h, w, 3 if kind == b"PF" else 1)).astype(np.float64)
 
 
-def linear(path: Path, exposure: float = 0.0) -> np.ndarray:
-    """A capture as the rig's linear picture: exposure applied, supersampling box-filtered."""
+def linear(path: Path, exposure: float = 0.0, supersample: int = SUPERSAMPLE) -> np.ndarray:
+    """A capture as the rig's linear picture: exposure applied, supersampling box-filtered.
+    ``supersample`` is the job's own when it is not the rig's (Phase29: 1, a dissolve as drawn)."""
     img = read_pfm(path) / EXPOSURE_K * (2.0 ** exposure)
     h, w, c = img.shape
-    return img.reshape(h // SUPERSAMPLE, SUPERSAMPLE, w // SUPERSAMPLE, SUPERSAMPLE, c).mean(axis=(1, 3))
+    return img.reshape(h // supersample, supersample, w // supersample, supersample, c).mean(axis=(1, 3))
 
 
 def srgb8(lin: np.ndarray) -> np.ndarray:

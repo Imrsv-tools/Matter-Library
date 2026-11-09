@@ -171,6 +171,16 @@ The headset's FXAA and its frame cost are judged in the platform's app, not here
 | Q-P29-5 | is slot 0 free on the platform's components? | closed: the platform confirmed it free, 2026-11-09 (RD-P29-3) |
 | Q-P29-6 | which copy owns a tie | closed by RD-P29-3: both |
 
+## Execution
+
+| Step | Result | Next |
+|---|---|---|
+| 29.1 | **Built; click 1 owed** (`⚠human`: ▶ SCAFFOLD COMPLETE — sitting owed). Masters, four `MI_Matter_<Token>_Fading`, runtime job format 6, `fade.py`, `MasterSet.md` §Object fade, `JOB_FORMAT.md`. Presence 1 against the pre-change baseline (4×, the rig's sampling): 10 of 11 articles bit for bit in linear float; Marble differs by the same amount between two launches of one build (mean 1.2 levels on the same 39k pixels, no bias): its subsurface pass's launch noise. At 0.5, one sample per pixel: on Grey, ABS, Copper, Oak, Rust, Lace, Neon and Glass_Green every subject pixel is exactly the article or exactly the backdrop, 50/50, and a copy at −0.5 keeps exactly the other half. **Every dropped pixel on all 11 is exactly the backdrop.** Kept pixels differ from fully there on Glass_Clear (7 %), Diamond (15 %) and Marble (42 %, median 2 levels): the glass shows the object's own half-gone parts through its blur or bend, and Marble's scatter has half its neighbours. | click 1, then 29.2 |
+
+- **Deviation (29.1):** click 1's sheet is drawn by a new `tools/parity/fade.py`, one launch for all 11 articles, not by `rig.py --fade`: the rig is one article per run and compares tools, and Storm and Blender cannot fade. `look.py` is the precedent for a caller of its own.
+- **Deviation (29.1):** the fade is per mesh **per setting** (`settings[].fade`), not a field on `meshes[]`: one launch then draws fully there and part-faded side by side, and the runtime swaps a part to its instance and back as a timeline would.
+- **Note:** the WorkingDrive was not mounted this run, so the pictures are under `~/.cache/matter-parity/` (`--out`), not `library/parity/`; mounting it asked for a password on the desk, and was cancelled.
+
 ## Status footer
 
 - **Passes:** Pass 1 (2026-11-09). The Brief is complete; the lane is build.
