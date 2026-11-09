@@ -147,6 +147,12 @@ bool AMatterRuntimeGameMode::LoadJob(const FString& Path)
 			}
 		}
 	}
+	Job->TryGetNumberField(TEXT("temporal_frames"), TemporalFrames);
+	if (TemporalFrames != 0 && (Format < 7 || TemporalFrames < 1))
+	{
+		Note(TEXT("MATTER \"temporal_frames\" must be 1 or more, in a format-7 job"), true);
+		return false;
+	}
 	Width = Job->GetIntegerField(TEXT("width"));
 	Job->TryGetNumberField(TEXT("settle_frames"), SettleFrames);
 	Note(FString::Printf(TEXT("MATTER job=%s width=%d out=%s"), *Path, Width, *OutDir), false);
@@ -264,6 +270,24 @@ bool AMatterRuntimeGameMode::BuildWorld()
 	SF.SetEyeAdaptation(false);
 	SF.SetTemporalAA(false);
 	SF.SetAntiAliasing(false);    // the driver supersamples instead
+	if (TemporalFrames > 0)
+	{
+		// Phase29 29.3: a desktop's TSR, on a still view. The view runs TSR (its jitter sequence is
+		// longer than 1, the tell the masters read) with a persistent state, so every capture is a new
+		// frame: a new frame index and jitter. A raw scene-colour capture cannot: the engine turns its
+		// post-processing off, and with it any anti-aliasing (SceneCaptureRendering.cpp, CaptureSceneColor),
+		// so this captures the post-processed colour, TSR's own output; CaptureView keeps the last of
+		// TemporalFrames frames. Every other job keeps the fixed, unjittered scene-colour view above.
+		if (IConsoleVariable* V = IConsoleManager::Get().FindConsoleVariable(TEXT("r.AntiAliasingMethod")))
+		{
+			V->Set(4, ECVF_SetByCode);    // AAM_TSR
+		}
+		CaptureComp->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
+		CaptureComp->bAlwaysPersistRenderingState = true;
+		SF.SetTemporalAA(true);
+		SF.SetAntiAliasing(true);
+		Note(FString::Printf(TEXT("MATTER temporal frames=%d (TSR view, persistent state)"), TemporalFrames), false);
+	}
 
 	const TSharedPtr<FJsonObject>* Look = nullptr;
 	if (Job->TryGetObjectField(TEXT("look"), Look))
@@ -894,15 +918,24 @@ bool AMatterRuntimeGameMode::CaptureView(const TSharedPtr<FJsonObject>& View, co
 			FlushRenderingCommands();
 		}
 	}
-	CaptureComp->CaptureScene();
-	FlushRenderingCommands();
-
-	FTextureRenderTargetResource* Res = Target->GameThread_GetRenderTargetResource();
+	// One capture, or (Phase29 29.3, a temporal job) TemporalFrames of them on a still view, the first
+	// a camera cut (TSR keeps no history from the previous view), and the last one written: what TSR
+	// shows once it has settled.
+	const int32 Shots = FMath::Max(1, TemporalFrames);
 	TArray<FLinearColor> Px;
-	if (!Res || !Res->ReadLinearColorPixels(Px, FReadSurfaceDataFlags(RCM_MinMax)) || Px.Num() != Width * Width)
+	for (int32 Shot = 0; Shot < Shots; ++Shot)
 	{
-		Note(FString::Printf(TEXT("MATTER readback failed for %s"), *OutPath), true);
-		return false;
+		CaptureComp->bCameraCutThisFrame = (TemporalFrames > 0 && Shot == 0);
+		CaptureComp->CaptureScene();
+		FlushRenderingCommands();
+		FTextureRenderTargetResource* Res = Target->GameThread_GetRenderTargetResource();
+		TArray<FLinearColor> One;
+		if (!Res || !Res->ReadLinearColorPixels(One, FReadSurfaceDataFlags(RCM_MinMax)) || One.Num() != Width * Width)
+		{
+			Note(FString::Printf(TEXT("MATTER readback failed for %s"), *OutPath), true);
+			return false;
+		}
+		Px = MoveTemp(One);
 	}
 	// Portable float map (PFM): a text header, then bottom-to-top rows of little-endian float RGB.
 	TArray<uint8> Bytes;

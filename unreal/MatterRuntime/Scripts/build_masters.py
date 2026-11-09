@@ -21,6 +21,8 @@ picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the 
 visible dome, unlit, which the runtime's sky light captures). Phase29: every master dissolves an
 object part-present by its ``object_fade`` (Custom Primitive Data slot 0; ``fade_terms``), and the
 four solid masters each get a masked instance, ``MI_Matter_<Token>_Fading`` (``build_fading``).
+29.3: the dissolve's threshold is a blue-noise tile the build generates, ``T_Matter_FadeNoise``
+(``fade_threshold``), shifted every frame on a view that averages over time.
 
 By default every texture slot samples as **LinearColor**: the runtime hands every texture over as
 linear float, decoding a colour texture's sRGB itself, so no slot's colour flag can mismatch
@@ -255,28 +257,33 @@ def fresh(name):
     return TOOLS.create_asset(name, ROOT, unreal.Material, unreal.MaterialFactoryNew())
 
 
-def _png(path, rgba, size=4):
-    """A tiny flat PNG (8-bit RGBA), written without any imaging library."""
+def _png(path, rgba, size=4, pixels=None):
+    """A tiny PNG (8-bit RGBA), written without any imaging library: flat ``rgba``, or ``pixels``,
+    one RGBA tuple per pixel, rows top to bottom."""
     import struct
     import zlib
 
     def chunk(kind, data):
         return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF)
-    row = b"\x00" + bytes(rgba) * size
+    if pixels is None:
+        raw = (b"\x00" + bytes(rgba) * size) * size
+    else:
+        raw = b"".join(b"\x00" + b"".join(bytes(p) for p in pixels[y * size:(y + 1) * size]) for y in range(size))
     with open(path, "wb") as f:
         f.write(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0))
-                + chunk(b"IDAT", zlib.compress(row * size)) + chunk(b"IEND", b""))
+                + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
 
 
-def default_texture(name, rgba, srgb=False, normal_map=False):
+def default_texture(name, rgba, srgb=False, normal_map=False, pixels=None, size=4):
     """A flat default for a texture slot, generated and imported (no binary asset in git).
     ``normal_map`` makes it the default of a normal-map slot (MATTER_MASTERS_NORMAL_SAMPLER=normal):
-    the engine checks a Normal sampler's default for the normal-map compression."""
+    the engine checks a Normal sampler's default for the normal-map compression. ``pixels`` (with
+    ``size``) gives a picture instead of a flat value (``fade_noise_texture``)."""
     import os
     folder = os.path.join(unreal.Paths.convert_relative_path_to_full(unreal.Paths.project_saved_dir()), "MatterDefaults")
     os.makedirs(folder, exist_ok=True)
     src = os.path.join(folder, f"{name}.png")
-    _png(src, rgba)
+    _png(src, rgba, size=size, pixels=pixels)
     if EAL.does_asset_exist(f"{ROOT}/{name}"):
         EAL.delete_asset(f"{ROOT}/{name}")
     task = unreal.AssetImportTask()
@@ -297,6 +304,93 @@ def default_texture(name, rgba, srgb=False, normal_map=False):
                             unreal.TextureCompressionSettings.TC_NORMALMAP if normal_map
                             else unreal.TextureCompressionSettings.TC_EDITOR_ICON if srgb
                             else unreal.TextureCompressionSettings.TC_VECTOR_DISPLACEMENTMAP)
+    EAL.save_loaded_asset(tex)
+    return tex
+
+
+FADE_NOISE = 64     # Phase29 29.3: the fade's blue-noise tile, FADE_NOISE x FADE_NOISE screen pixels
+
+
+def blue_noise_ranks(n=FADE_NOISE, sigma=1.5, seed=1):
+    """Phase29 29.3 (Q-OFL-1): every pixel of an n x n tile ranked 0 .. n*n - 1, each rank once, by
+    void-and-cluster (Ulichney 1993) on the torus, so the tile repeats with no seam. Every prefix of
+    the ranks (the pixels a presence keeps) is spread evenly with no grid. Pure Python from a fixed
+    seed: every build makes the same map, and no binary asset is committed (~1 s)."""
+    import math
+    size, r = n * n, 7
+    kern = [[math.exp(-(dx * dx + dy * dy) / (2 * sigma * sigma)) for dx in range(-r, r + 1)]
+            for dy in range(-r, r + 1)]
+
+    def splat(energy, i, sign):
+        y0, x0 = divmod(i, n)
+        for dy in range(-r, r + 1):
+            row, krow = ((y0 + dy) % n) * n, kern[dy + r]
+            for dx in range(-r, r + 1):
+                energy[row + (x0 + dx) % n] += sign * krow[dx + r]
+
+    def energy_of(bits):
+        e = [0.0] * size
+        for i in range(size):
+            if bits[i]:
+                splat(e, i, 1.0)
+        return e
+
+    def tightest(bits, e):          # the set pixel with the most energy around it
+        return max((i for i in range(size) if bits[i]), key=e.__getitem__)
+
+    def largest_void(bits, e):      # the empty pixel with the least
+        return min((i for i in range(size) if not bits[i]), key=e.__getitem__)
+
+    state, bits, ones = seed, [False] * size, 0      # a tenth of the pixels, from a fixed LCG
+    while ones < size // 10:
+        state = (state * 6364136223846793005 + 1442695040888963407) % (1 << 64)
+        i = (state >> 33) % size
+        if not bits[i]:
+            bits[i], ones = True, ones + 1
+    e = energy_of(bits)
+    while True:                     # relax: the tightest cluster into the largest void, until stable
+        a = tightest(bits, e)
+        bits[a] = False
+        splat(e, a, -1.0)
+        b = largest_void(bits, e)
+        bits[b] = True
+        splat(e, b, 1.0)
+        if b == a:
+            break
+    rank = [0] * size
+    pb, pe = bits[:], e[:]
+    for k in range(ones - 1, -1, -1):              # the prototype's own ranks, unwound
+        a = tightest(pb, pe)
+        pb[a] = False
+        splat(pe, a, -1.0)
+        rank[a] = k
+    k = ones
+    while k < size // 2:                           # the voids filled, to half
+        b = largest_void(bits, e)
+        bits[b] = True
+        splat(e, b, 1.0)
+        rank[b], k = k, k + 1
+    e = energy_of([not v for v in bits])           # past half, the empty pixels are the minority
+    while k < size:
+        b = max((i for i in range(size) if not bits[i]), key=e.__getitem__)
+        bits[b] = True
+        splat(e, b, -1.0)
+        rank[b], k = k, k + 1
+    if sorted(rank) != list(range(size)):
+        raise RuntimeError("blue_noise_ranks: the ranks are not a permutation")
+    return rank
+
+
+def fade_noise_texture():
+    """Phase29 29.3: the fade's threshold tile, T_Matter_FadeNoise: each pixel's rank (0 .. 4095)
+    split over R (rank // 16) and G (rank % 16), linear and uncompressed, sampled nearest with no
+    mips, so the master reads the rank back exactly (``fade_threshold``)."""
+    ranks = blue_noise_ranks()
+    tex = default_texture("T_Matter_FadeNoise", None, size=FADE_NOISE,
+                          pixels=[(k // 16, k % 16, 0, 255) for k in ranks])
+    tex.set_editor_property("filter", unreal.TextureFilter.TF_NEAREST)
+    tex.set_editor_property("mip_gen_settings", unreal.TextureMipGenSettings.TMGS_NO_MIPMAPS)
+    tex.set_editor_property("never_stream", True)
     EAL.save_loaded_asset(tex)
     return tex
 
@@ -381,23 +475,62 @@ def bayer4(g, col):
     return g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, k, 0.5, col - 12), 1.0 / 16.0, col - 13)
 
 
-def fade_terms(g, col):
+# Phase29 29.3 (Q-OFL-2): this frame's shift of the fade's threshold. On a view that averages over
+# time (its temporal jitter sequence is longer than 1, which the engine allows only under TAA or TSR:
+# SceneRendering.cpp, TemporalAAParams = (index, length, jitter x, y)) the shift walks the golden
+# ratio's sequence frame by frame, so each pixel's average over frames is the presence itself: an
+# even fade. On any other view (one sample per pixel, FXAA: the headset) it is 0, so the grain stays
+# fixed. Read per view, so a desktop window and a headset drawn together each get their own.
+FADE_FRAME_HLSL = ("return View.TemporalAAParams.y > 1.5 "
+                   "? frac(float(View.StateFrameIndex % 1024u) * 0.61803398875) : 0.0;")
+
+
+def fade_threshold(g, noise, col):
+    """Phase29 29.3 (Q-OFL-1, Q-OFL-2): this pixel's fade threshold, t = frac((rank + 0.5) / 4096 +
+    this frame's shift), rank the pixel's place in the blue-noise tile (``fade_noise_texture``,
+    repeated across the screen). 4096 levels, so a slow fade flips one pixel in 4096 per level, and
+    no grid. The shift is 0 on a view that does not average over time (``FADE_FRAME_HLSL``), where t
+    is exactly (rank + 0.5) / 4096."""
+    M = unreal
+    px = g.one(M.MaterialExpressionFloor,
+               g.mask(g.node(M.MaterialExpressionScreenPosition, col), "rg", col - 1, "PixelPosition"), col - 2)
+    uv = g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, px, 0.5, col - 3),
+                1.0 / FADE_NOISE, col - 4)
+    s = g.node(M.MaterialExpressionTextureSample, col - 5, texture=noise,
+               sampler_type=M.MaterialSamplerType.SAMPLERTYPE_LINEAR_COLOR)
+    g.link(uv, s, "UVs")
+
+    def byte(channel):          # the 8-bit value back from unorm, exactly
+        return g.one(M.MaterialExpressionFloor,
+                     g.op_k(M.MaterialExpressionAdd, g.op_k(M.MaterialExpressionMultiply, s, 255.0, col - 6, channel),
+                            0.5, col - 7), col - 8)
+    rank = g.op(M.MaterialExpressionAdd, g.op_k(M.MaterialExpressionMultiply, byte("R"), 16.0, col - 9),
+                byte("G"), col - 10)
+    t = g.op_k(M.MaterialExpressionMultiply, g.op_k(M.MaterialExpressionAdd, rank, 0.5, col - 11),
+               1.0 / (FADE_NOISE * FADE_NOISE), col - 12)
+    shift = g.node(M.MaterialExpressionCustom, col - 12, code=FADE_FRAME_HLSL,
+                   output_type=M.CustomMaterialOutputType.CMOT_FLOAT1, description="FadeFrameShift", inputs=[])
+    return g.one(M.MaterialExpressionFrac, g.op(M.MaterialExpressionAdd, t, shift, col - 13), col - 14)
+
+
+def fade_terms(g, col, noise):
     """Phase29 (MasterSet §Object fade, RD-P29-1, RD-P29-3): how present the object is, and this
     pixel's threshold.
 
     ``object_fade`` is Custom Primitive Data slot 0, written on the component, never on a material:
     0 = fully there (also what an unset slot reads), 1 = gone, negative = the copy fading in.
-    Returns (presence, threshold): presence = 1 - |object_fade|; the threshold is ``bayer4``'s t for
-    a copy fading out (and fully there) and 1 - t for one fading in (the same 16 levels, mirrored),
-    so two copies at f and -(1 - f) keep complementary pixels. A pixel is kept where
-    threshold <= presence x the master's own coverage; a tie keeps it (Unreal keeps a pixel AT the
-    clip), so a tie shows both copies, never neither. At 0 both terms are exact (1, and t itself):
-    the master draws today's pixels."""
+    Returns (presence, threshold): presence = 1 - |object_fade|; the threshold is
+    ``fade_threshold``'s t (29.3: blue noise, shifted per frame on a view that averages; it was
+    ``bayer4``'s 16 levels) for a copy fading out (and fully there) and 1 - t of the SAME t for one
+    fading in, so two copies at f and -(1 - f) keep complementary pixels in every frame. A pixel is
+    kept where threshold <= presence x the master's own coverage; a tie keeps it (Unreal keeps a
+    pixel AT the clip), so a tie shows both copies, never neither. At 0 presence is exactly 1 and
+    every threshold is below it: the master draws today's pixels."""
     M = unreal
     f = g.node(M.MaterialExpressionScalarParameter, col, parameter_name="object_fade", default_value=0.0,
                use_custom_primitive_data=True, primitive_data_index=0)
     presence = g.one(M.MaterialExpressionOneMinus, g.one(M.MaterialExpressionAbs, f, col - 1), col - 2)
-    t = bayer4(g, col)
+    t = fade_threshold(g, noise, col)
     # 1 where the copy is fading in (f < 0), else exactly 0: sign(0) is 0
     fading_in = g.one(M.MaterialExpressionSaturate,
                       g.op_k(M.MaterialExpressionMultiply, g.one(M.MaterialExpressionSign, f, col - 1), -1.0, col - 2),
@@ -454,7 +587,7 @@ def lerp(g, a, b, alpha, col, a_out="", b_out=""):
 
 
 def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None,
-                 flat_map=None):
+                 flat_map=None, noise=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
     TwoLayer's second layer mixed in by the maskset's R before the tint, Masked's alpha test,
     the pass-through inputs, the coverage), MaterialX's formulas as in
@@ -780,7 +913,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
     front = next(o for o in outs if "front" in o.lower())
     # Phase29 (MasterSet §Object fade, RD-P29-1): every master dissolves an object part-present, one
     # rule, each in its own blend mode; at object_fade 0 every master draws today's pixels.
-    presence, threshold = fade_terms(g, 30)
+    presence, threshold = fade_terms(g, 30, noise)
     if spec.get("opacity") or spec.get("hair"):
         # The mesh's cut-out map (LCDSchema §Cut-out map, supplied per binding), on the mesh's own
         # st; white, so a card, when none is bound.
@@ -800,9 +933,12 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
     elif spec.get("hair"):
         # Hair (MasterSet: masked, DITHERED): the coverage is soft, never thresholded at a cutoff,
         # so each pixel keeps it against its own ordered-dither threshold. It is not fed to Epic's
-        # function, whose weight would scale the kept pixels by it a second time. Phase29: the
-        # coverage x how present the object is, against the same threshold.
-        clip = fade_mask(g, presence, threshold, 2, coverage=cov)
+        # function, whose weight would scale the kept pixels by it a second time. Phase29 29.3: the
+        # fade is a second test beside it, on the fade's own threshold, which every part of the
+        # object shares: a pixel the fade drops on the head is dropped on the hair over it too, and
+        # at object_fade 0 the second test always passes, so the hair draws today's pixels.
+        clip = g.op(M.MaterialExpressionMin, fade_mask(g, cov, bayer4(g, 12), 2),
+                    fade_mask(g, presence, threshold, 2), 1)
     elif spec["blend"] == "opaque":
         # Phase29 (RD-P29-2): an opaque master ignores its mask; its masked instance
         # (MI_Matter_<Token>_Fading, build_fading) takes the same graph and keeps the test.
@@ -943,7 +1079,9 @@ def main():
                     if COLOUR_SAMPLER == "srgb" else None)
     flat_map = (default_texture("T_Matter_FlatNormalMap", (128, 128, 255, 255), normal_map=True)
                 if NORMAL_SAMPLER == "normal" else None)
-    masters = {t: build_master(t, white, no_wear, flat, white_colour, grey, black, clear, flat_map) for t in MASTERS}
+    noise = fade_noise_texture()                                       # Phase29 29.3: the fade's threshold
+    masters = {t: build_master(t, white, no_wear, flat, white_colour, grey, black, clear, flat_map, noise)
+               for t in MASTERS}
     for mat in list(masters.values()) + ([build_sky()] if SKY else []):
         save(mat)
     for t in FADING:

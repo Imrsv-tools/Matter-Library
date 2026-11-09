@@ -3,6 +3,7 @@
 
     uv run tools/parity/look.py <skin> [--today <git rev>] [--also <skin> ...] [--width 1024] [--out <dir>]
     uv run tools/parity/look.py <skin> --crossfade <other skin>       # Phase29: two copies cross-fading
+    uv run tools/parity/look.py <skin> --crossfade <other skin> --frames 64   # 29.3: under TSR
 
 Phase22 (RD-P22-11). The rig's matched light has no shadows, so its sheet cannot show whether a
 skin reads as plastic; it stays the tool-agreement check. This renders the rig's character, cast
@@ -428,8 +429,10 @@ CROSSFADE_VIEWS = {"face": VIEWS["face"], "face34": VIEWS["face34"]}
 B = "__b"
 
 
-def crossfade(art: jobmod.Article, other: str, width: int, out: Path) -> Path:
-    """The cross-fade sheet: rows the face views, columns ``CROSSFADE``, every picture at its own size."""
+def crossfade(art: jobmod.Article, other: str, width: int, out: Path, frames: int = 0) -> Path:
+    """The cross-fade sheet: rows the face views, columns ``CROSSFADE``, every picture at its own size.
+    ``frames`` N (29.3, job format 7): each picture TSR's output after N frames of a still view (a
+    desktop's look); 0, one fixed frame at one sample per pixel (the headset's look)."""
     work = out / "work"
     shutil.rmtree(work, ignore_errors=True)
     oart = jobmod.Article.read(jobmod.find_article(other))
@@ -449,6 +452,8 @@ def crossfade(art: jobmod.Article, other: str, width: int, out: Path) -> Path:
     ujob = {"format": drv.FADE_JOB_FORMAT, "width": width, "out_dir": str(work / "raw"),
             "settle_frames": drv.SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes + copy_b,
             "settings": [drv.warmup(settings)] + settings, "views": views, "look": look_lights()}
+    if frames:
+        ujob |= {"format": drv.TEMPORAL_JOB_FORMAT, "temporal_frames": frames}
     upath = work / "crossfade_job.json"
     upath.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
     cmd = drv.find_runtime()
@@ -461,7 +466,7 @@ def crossfade(art: jobmod.Article, other: str, width: int, out: Path) -> Path:
         Image.fromarray(drv.srgb8(lin)).save(out / f"{i}{x}.png")
     for pfm in (work / "raw").glob("*.pfm"):
         pfm.unlink()
-    columns = [(sid, head) for sid, head, _, _ in CROSSFADE]
+    columns = [(sid, head + (f" (TSR, {frames} frames)" if frames else "")) for sid, head, _, _ in CROSSFADE]
     p = sheet(out, columns, width, CROSSFADE_VIEWS)
     final = out / "crossfade_sheet.png"
     p.replace(final)
@@ -504,6 +509,8 @@ def main(argv=None) -> int:
     ap.add_argument("--body", action="store_true",
                     help="Phase27: the body's nine views (BODY_VIEWS) in place of the four look views; with --bare")
     ap.add_argument("--width", type=int, default=1024)
+    ap.add_argument("--frames", type=int, default=0,
+                    help="with --crossfade: each picture TSR's output after N frames of a still view (29.3, job format 7)")
     ap.add_argument("--cell", type=int, default=640, help="picture size on the sheet")
     ap.add_argument("--out", type=Path)
     a = ap.parse_args(argv)
@@ -517,7 +524,7 @@ def main(argv=None) -> int:
         oart = jobmod.find_article(a.crossfade).stem
         out = (a.out or rig.OUT_ROOT / f"Crossfade__{art.name}__{oart}").resolve()
         out.mkdir(parents=True, exist_ok=True)
-        print(f"crossfade sheet {crossfade(art, a.crossfade, a.width, out)}")
+        print(f"crossfade sheet {crossfade(art, a.crossfade, a.width, out, a.frames)}")
         return 0
     cast = rig.character_cast(art)
     out = (a.out or rig.OUT_ROOT / (f"Look__{art.name}" + (f"__vs_{a.today}" if a.today else "")

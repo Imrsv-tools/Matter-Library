@@ -2,9 +2,10 @@
 """The fade sheet: the rig's 11 test-set articles in Unreal, fully there and part-faded (Phase29).
 
     uv run tools/parity/fade.py [--fade 0 --fade 0.5] [--supersample 1] [--width 512] [--out <dir>]
+                                [--article grey ...] [--frames N]
 
 Phase29 (RD-P29-1, RD-P29-3): every master draws an object part-present as a DISSOLVE, each pixel
-kept or dropped against its 4 x 4 threshold. The rig's averaging hides that (F-P29-1: it renders 4x
+kept or dropped against its threshold (29.3: a blue-noise tile, 4096 levels). The rig's averaging hides that (F-P29-1: it renders 4x
 and box-filters each block, which turns a dissolve into a smooth see-through fade), so this renders
 at ONE SAMPLE PER PIXEL by default, the way a headset draws it.
 
@@ -21,6 +22,12 @@ builder change must match after it, pixel for pixel). Default ``<out>``: ``libra
 
 A fade other than 0 needs a runtime that reads job format 6 (built at Phase29 or later); a run of
 ``--fade 0`` alone is a format-3 job any runtime draws.
+
+``--article <short>`` (repeatable) draws only those articles (a slow fade on one article in many
+small steps). ``--frames N`` (Phase29 29.3, job format 7) is a desktop's TSR on a still view: the
+view runs TSR, so the masters shift the fade's threshold every frame, and each picture is TSR's own
+output after N frames (post-processed colour, so not pixel-comparable with a one-sample picture),
+which should read as an even fade.
 """
 
 from __future__ import annotations
@@ -57,12 +64,13 @@ def setting_id(fade: float) -> str:
     return f"fade{round(fade * 100):03d}" if fade >= 0 else f"fadein{round(-fade * 100):03d}"
 
 
-def build_job(fades: list[float], width: int, supersample: int, work: Path) -> tuple[Path, list, list]:
+def build_job(fades: list[float], width: int, supersample: int, work: Path, articles: dict,
+              frames: int = 0) -> tuple[Path, list, list]:
     """The runtime's job; returns its path, the settings and the views."""
     meshes_dir = work / "meshes"
     meshes_dir.mkdir(parents=True, exist_ok=True)
     meshes, mats, subjects = [], {}, {}
-    for short, stem in TEST_SET.items():
+    for short, stem in articles.items():
         art = jobmod.Article.read(jobmod.find_article(stem))
         slot = f"art_{short}"
         mats[slot] = drv.article_material(art.path)
@@ -82,7 +90,7 @@ def build_job(fades: list[float], width: int, supersample: int, work: Path) -> t
              "wall": drv.preview_surface(texture=(build_scene.HERE / build_scene.UVGRID).resolve(), roughness=0.8)}
     views = [drv.camera_view(build_scene.CAM_POS, (build_scene.CAM_PITCH, 0.0), f"__{short}",
                              [m for other, names in subjects.items() if other != short for m in names])
-             for short in TEST_SET]
+             for short in articles]
     settings = []
     for f in fades:
         s = {"id": setting_id(f), "materials": mats}
@@ -94,22 +102,26 @@ def build_job(fades: list[float], width: int, supersample: int, work: Path) -> t
     ujob = {"format": fmt, "width": width * supersample, "out_dir": str(work / "raw"),
             "settle_frames": drv.SETTLE_FRAMES, "sun": sun, "sky": sky, "meshes": meshes,
             "settings": [drv.warmup(settings)] + settings, "views": views}
+    if frames:
+        ujob |= {"format": drv.TEMPORAL_JOB_FORMAT, "temporal_frames": frames}
     p = work / "fade_job.json"
     p.write_text(json.dumps(ujob, indent=1) + "\n", encoding="utf-8")
     return p, settings, views
 
 
-def sheet(out: Path, fades: list[float], width: int) -> Path:
+def sheet(out: Path, fades: list[float], width: int, articles: dict, frames: int = 0) -> Path:
     """Rows: the articles; columns: the fades. Every picture at its own size, never resized."""
     font, small, pad, head, label = rig._font(22), rig._font(16), 8, 44, 250
     w = label + len(fades) * (width + pad) + pad
-    h = head + len(TEST_SET) * (width + pad) + pad
+    h = head + len(articles) * (width + pad) + pad
     img = Image.new("RGB", (w, h), (24, 24, 24))
     d = ImageDraw.Draw(img)
     for c, f in enumerate(fades):
-        title = "fully there" if f == 0 else f"object_fade {f:g}: {round((1 - abs(f)) * 100)} % present"
+        title = "fully there" if f == 0 else f"object_fade {f:g}: {round((1 - abs(f)) * 100, 1):g} % present"
+        if frames:
+            title += f", TSR after {frames} frames"
         d.text((label + pad + c * (width + pad), 12), title, fill=(235, 235, 235), font=font)
-    for r, (short, stem) in enumerate(TEST_SET.items()):
+    for r, (short, stem) in enumerate(articles.items()):
         y = head + pad + r * (width + pad)
         master = jobmod.Article.read(jobmod.find_article(stem)).master
         d.text((pad, y + width // 2 - 20), stem.split("_Base")[0].replace("_Clean", ""), fill=(220, 220, 220), font=small)
@@ -131,14 +143,21 @@ def main(argv=None) -> int:
                          f"the rig's is {drv.SUPERSAMPLE})")
     ap.add_argument("--width", type=int, default=512)
     ap.add_argument("--out", type=Path)
+    ap.add_argument("--article", action="append", choices=list(TEST_SET),
+                    help="draw only this article (repeatable; default all 11)")
+    ap.add_argument("--frames", type=int, default=0,
+                    help="a still view under TSR: each picture TSR's output after N frames (job format 7)")
     a = ap.parse_args(argv)
+    articles = {k: v for k, v in TEST_SET.items() if not a.article or k in a.article}
+    if a.frames < 0:
+        ap.error("--frames is 0 (one fixed frame) or more")
     fades = a.fade or [0.0, 0.5]
     if any(abs(f) > 1 for f in fades):
         ap.error("--fade is -1 .. 1")
     out = (a.out or rig.OUT_ROOT / "Fade").resolve()
     work = out / "work"
     shutil.rmtree(work, ignore_errors=True)
-    upath, settings, views = build_job(fades, a.width, a.supersample, work)
+    upath, settings, views = build_job(fades, a.width, a.supersample, work, articles, a.frames)
     cmd = drv.find_runtime()
     if cmd is None:
         raise SystemExit("no Unreal runtime (set MATTER_UNREAL_RUNTIME or MATTER_UNREAL_EDITOR)")
@@ -153,8 +172,9 @@ def main(argv=None) -> int:
     for pfm in raw.glob("*.pfm"):
         pfm.unlink()                                  # ~50 MB each at 4x; the hashes and PNGs are the record
     (out / "captures.json").write_text(json.dumps({"supersample": a.supersample, "width": a.width,
-                                                   "sha256": shas}, indent=1) + "\n", encoding="utf-8")
-    print(f"fade sheet {sheet(out, fades, a.width)}")
+                                                   "frames": a.frames, "sha256": shas}, indent=1) + "\n",
+                                       encoding="utf-8")
+    print(f"fade sheet {sheet(out, fades, a.width, articles, a.frames)}")
     return 0
 
 

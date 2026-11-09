@@ -81,8 +81,10 @@ private:
 	// Both 3 and 4 are read, so the matched jobs every caller writes keep working. 5 (Phase26 26.1):
 	// a binding carries the makeup layer, which an older Subsurface master would silently leave bare.
 	// 6 (Phase29 29.1): a setting may fade a mesh ("fade": mesh name -> object_fade), which an older
-	// master would silently draw fully there.
-	static constexpr int32 JobFormat = 6;
+	// master would silently draw fully there. 7 (Phase29 29.3): "temporal_frames" N renders every
+	// view as N frames of a still TSR view (a persistent view state, a camera cut first) and writes
+	// TSR's output on the last; an older runtime would silently write one fixed frame.
+	static constexpr int32 JobFormat = 7;
 	static constexpr int32 OldestJobFormat = 3;
 
 	TSharedPtr<FJsonObject> Job;
@@ -90,6 +92,7 @@ private:
 	FString OutDir;
 	int32 Width = 512;
 	int32 SettleFrames = 120;
+	int32 TemporalFrames = 0;     // Phase29 29.3: 0 = one sample per pixel, no temporal view (the default)
 	int32 SkyWaitFrames = 30;
 	int32 MaxFrames = 20000;
 	float SunIntensity = 1.f;

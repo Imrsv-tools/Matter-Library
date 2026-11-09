@@ -105,6 +105,11 @@ MAKEUP_MASTERS = {"Subsurface"}
 # is format 6, so a runtime whose masters cannot dissolve (built before Phase29) refuses it rather than
 # draw the object fully there. A format-6 job may also carry a look and the makeup layer.
 FADE_JOB_FORMAT = 6
+# Phase29 29.3: a job with ``temporal_frames`` N renders every view as N frames of a still view
+# running TSR (so the masters shift their fade threshold each frame) and writes TSR's own output on
+# the last: a desktop's TSR once it has settled. Format 7, so an older runtime refuses it rather than
+# write one fixed frame.
+TEMPORAL_JOB_FORMAT = 7
 BUILT_MASTERS = {"Opaque", "TwoLayer", "Masked", "Emissive", "Subsurface", "TranslucentThin",
                  "TranslucentThick", "Hair"}
 BASE_MAP_MASTERS = {"Opaque", "Masked", "Hair", "Subsurface"}   # build_masters.py MASTERS' base_map
