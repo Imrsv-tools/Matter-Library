@@ -11,7 +11,11 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase. Phase27 closed 2026-11-03. **Phase29 (Object Opacity in the Masters) is next**, under `## Future`. The skin work, Phase28 included, is paused (the lead, 2026-11-09).*
+### Phase29 — Object Opacity in the Masters — IN EXECUTION *(seeded 2026-11-09; discovered and executing the same day)*
+**Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
+- `docs/Planning/Phases/Phase29_ObjectOpacityInTheMasters.md`
+
+*The skin work, Phase28 included, is paused (the lead, 2026-11-09).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
 *(**Held 2026-10-14 until Phase15 – 19 are done** — done 2026-10-15, when Phase19 closed — Phase15 – 18 since RD-DS-8 took The Library Service out of the line; the lead: "get the entire chain established recategorized, documented and working correctly before we add more materials", RD-DS-7.)*
@@ -34,10 +38,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 > **Re-sequenced 2026-10-27 (lead):** the character materials go to the head of `## Future` (*"I suspect next?"*, then *"Ok."*), and run *Skin Maps Beyond Colour* → *Synthetic Skin Sets* → *Eyes in the Shader* → *Skin Layers* → *Hair Colour by Region*, and the *Character Materials Guide* last, after the pipeline has been used (RD-CMT-3, `docs/Planning/Research/261027_R_CharacterMaterials.md`).
 
 > **Re-sequenced 2026-11-09 (lead):** Phase29 runs next, and the skin work is paused, Phase28 included: *"We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1, `docs/Planning/Research/261105_R_PlatformObjectOpacityAsks.md`).
-
-### Phase29 — Object Opacity in the Masters — BRIEF READY *(seeded 2026-11-09, the same word; discovered the same day, on "go ahead with discovery")*
-**Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
-- `docs/Planning/Phases/Phase29_ObjectOpacityInTheMasters.md`
 
 ### Phase28 — AI Hands and Feet — SEEDED, paused 2026-11-09 *(2026-11-02, on the lead's "add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after")*
 **Outcome:** the character's hands and feet, palms and soles included, wear the same image-model person's skin as the body, so the whole skin map reads as one complete person from every side.

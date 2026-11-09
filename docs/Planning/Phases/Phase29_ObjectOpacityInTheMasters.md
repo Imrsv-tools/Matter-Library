@@ -1,6 +1,6 @@
 # Phase29 — Object Opacity in the Masters
 
-**Status:** BRIEF READY (2026-11-09, discovery in session `ML_R_VariousQuestions`). Seeded the same day on the lead's *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1). Discovery was opened with *"go ahead with discovery"*. **Runs next**, ahead of the paused skin work (Phase28 included). Lane: **build**. ▶ `/execute P29`.
+**Status:** IN EXECUTION (2026-11-09, `/execute P29` on the machine with Unreal). BRIEF READY the same day (discovery in session `ML_R_VariousQuestions`). Seeded the same day on the lead's *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1). Discovery was opened with *"go ahead with discovery"*. **Runs next**, ahead of the paused skin work (Phase28 included). Lane: **build**. ▶ `/execute P29`.
 
 ## Outcome
 
