@@ -138,6 +138,13 @@
 - **2026-11-09, the platform's lead** — an object's **effect** (an edge glow, a colour wash or an outline) is the platform's own overlay material, drawn over the whole outline at any Opacity, even 0. **It asks nothing of the library.** At Opacity 0, and when hidden, the object is gone for clicks and for walking through. Both are the platform's.
 - **The platform's own record repeats the premise F-POA-2 corrects** (an instance cannot change its parent's blend mode). The ledger row carries the correction to it.
 
+## Resolved
+
+- **RD-POA-1 — Both offers, and the build is the next phase** (the lead, 2026-11-09, on Q-POA-5: *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"*).
+  - The ledger row and the `MasterSet.md` `Drift` note land as a `/quick-fix`.
+  - The build is seeded as a numbered phase that runs next, ahead of the paused skin work (Phase28 included).
+  - **What is not ruled:** the design proposals F-POA-4 … 7. They go to the phase's discovery as its seed.
+
 ## Open questions
 
 | # | Question | Why it matters | Library review |
@@ -146,7 +153,7 @@
 | Q-POA-2 | the opposite pattern for the copy fading in | a clean cross-fade | **answered, proposal:** F-POA-5 — one signed `object_fade`, 0 = fully there |
 | Q-POA-3 | full presence costs nothing extra | the headset frame | **answered, proposal:** F-POA-6 — (a), as four masked instances; the cost while fading is unmeasured |
 | Q-POA-4 | how the value is read | the platform's runtime writes it | **answered, proposal:** F-POA-7 — Custom Primitive Data, slot 0 |
-| Q-POA-5 | **for the lead:** take F-POA-4 … 7 as the design, and in which lane is it built? | the platform's decision on the material swap waits on it | open — the offers below |
+| Q-POA-5 | **for the lead:** take F-POA-4 … 7 as the design, and in which lane is it built? | the platform's decision on the material swap waits on it | **ruled, RD-POA-1:** both offers, and the build runs next; the design goes to the phase's discovery |
 | Q-POA-6 | the glass hypotheses (does a dropped pixel still bend the view? the shadow) and the headset cost while fading | the build's own checks | open — measured when it is built |
 
 ## Status
