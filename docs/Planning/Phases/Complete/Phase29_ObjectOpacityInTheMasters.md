@@ -1,6 +1,6 @@
 # Phase29 — Object Opacity in the Masters
 
-**Status:** IN EXECUTION (2026-11-09, `/execute P29` on the machine with Unreal). BRIEF READY the same day (discovery in session `ML_R_VariousQuestions`). Seeded the same day on the lead's *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1). Discovery was opened with *"go ahead with discovery"*. **Runs next**, ahead of the paused skin work (Phase28 included). Lane: **build**. ▶ `/execute P29`.
+**Status:** 🎉 COMPLETE (closed 2026-11-09; the lead: *"close publish push etc"*). Executed the same day on the machine with Unreal. BRIEF READY the same day (discovery in session `ML_R_VariousQuestions`). Seeded the same day on the lead's *"do both — quick-fix the ledger row, then seed the phase... We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1). Discovery was opened with *"go ahead with discovery"*. **Runs next**, ahead of the paused skin work (Phase28 included). Lane: **build**. ▶ `/execute P29`.
 
 ## Outcome
 
@@ -8,7 +8,7 @@
 
 *Who it is for:* the platform's Creators, who key an object's Opacity on the timeline (`PlatformDependencies.md` M15). Other USD apps see a clean swap. No article reads the value, so Blender and Storm are untouched.
 
-**Source:** [`../Research/261105_R_PlatformObjectOpacityAsks.md`](../Research/261105_R_PlatformObjectOpacityAsks.md) — the platform's asks (Pass 1) and the library's reading (Pass 2, F-POA-1 … 8). This Brief is the one authoritative copy of what the phase builds. The research keeps the evidence.
+**Source:** [`../Research/261105_R_PlatformObjectOpacityAsks.md`](../../Research/261105_R_PlatformObjectOpacityAsks.md) — the platform's asks (Pass 1) and the library's reading (Pass 2, F-POA-1 … 8). This Brief is the one authoritative copy of what the phase builds. The research keeps the evidence.
 
 ## First human test
 
@@ -177,6 +177,7 @@ The headset's FXAA and its frame cost are judged in the platform's app, not here
 |---|---|---|
 | 29.1 | ✅ **Click 1, the lead (2026-11-09), on `fade_sheet.png`:** *"looks right, every master dissolves — go on to 29.2"*.  Masters, four `MI_Matter_<Token>_Fading`, runtime job format 6, `fade.py`, `MasterSet.md` §Object fade, `JOB_FORMAT.md`. Presence 1 against the pre-change baseline (4×, the rig's sampling): 10 of 11 articles bit for bit in linear float; Marble differs by the same amount between two launches of one build (mean 1.2 levels on the same 39k pixels, no bias): its subsurface pass's launch noise. At 0.5, one sample per pixel: on Grey, ABS, Copper, Oak, Rust, Lace, Neon and Glass_Green every subject pixel is exactly the article or exactly the backdrop, 50/50, and a copy at −0.5 keeps exactly the other half. **Every dropped pixel on all 11 is exactly the backdrop.** Kept pixels differ from fully there on Glass_Clear (7 %), Diamond (15 %) and Marble (42 %, median 2 levels): the glass shows the object's own half-gone parts through its blur or bend, and Marble's scatter has half its neighbours. | click 1, then 29.2 |
 | 29.2 | ✅ **Click 2, the lead (2026-11-09), on `crossfade_sheet.png`:** column 4 (A alone at 50 %) *"looks right to me"*; column 3 (25/75) *"There is a ton of dithering on column 3 (lots of squares) could be a render issue... no idea.."*. Measured: the 4 × 4 pattern as built, 25 % light skin on a regular two-pixel grid (at 50/50 a one-pixel checkerboard). Asked to keep the grid and judge the look in the headset, or change to an irregular grain now: *"keep it"*. **The cross-fade's look at 25/75 is judged in the platform's headset sitting (FXAA, motion), not here.**  `look.py --crossfade <skin>`: the character twice in one place (copy B's meshes and slots `__b`), face and three quarters, one sample per pixel; columns A fully there · 50/50 · 25/75 · A alone at 50 %. **First render: copy B never showed**, every pixel was A's skin with no holes. Cause, from the engine source: Unreal 5.8 defaults `r.EarlyZPassOnlyMaterialMasking` to 1, the mask tested only in the depth pre-pass and colour drawn where depth is equal, and two coplanar copies have equal depth everywhere. Fixed in the runtime's `DefaultEngine.ini` (=0) and written into `MasterSet.md` §Object fade as a consumer requirement. After: B's pixels differ from A by a median 88–111 levels, A's kept pixels match A fully there (median 2), backdrop inside the outline 0.01 % (edge pixels), the dark share rises from 50/50 to 25/75. Presence 1 re-checked under the new setting against the pre-change baseline (4×): the same 10 of 11 bit for bit, Lace among them; Marble its launch noise, as before. | the close |
+| CLOSE | ✅ **DONE 2026-11-09.** M15 → the platform's next acts (incl. `r.EarlyZPassOnlyMaterialMasking=0`); Glossary *`object_fade`*, *Masked instance*; CoreMechanisms row 5; Learnings Unreal U19, U20; runtime published as `unreal-runtime-v8` and pinned (the lead's word, overriding RD-P29-5's local-only default). `run_all.py` at the close, the WorkingDrive mounted: 18 lanes, 18 PASS. No open DEFER. | — |
 
 - **Deviation (29.1):** click 1's sheet is drawn by a new `tools/parity/fade.py`, one launch for all 11 articles, not by `rig.py --fade`: the rig is one article per run and compares tools, and Storm and Blender cannot fade. `look.py` is the precedent for a caller of its own.
 - **Deviation (29.1):** the fade is per mesh **per setting** (`settings[].fade`), not a field on `meshes[]`: one launch then draws fully there and part-faded side by side, and the runtime swaps a part to its instance and back as a timeline would.
@@ -187,4 +188,4 @@ The headset's FXAA and its frame cost are judged in the platform's app, not here
 - **Passes:** Pass 1 (2026-11-09). The Brief is complete; the lane is build.
 - **Decided:** RD-P29-1 … 6, the agent's calls from Pass 2, unless the lead says otherwise.
 - **Open:** none. Slot 0 was confirmed by the platform the same day (Q-P29-5).
-- **▶ Next:** `/execute P29` on the machine with Unreal.
+- **Closed 2026-11-09.** Historical: the work ran as `/execute P29`; nothing is next in this doc.

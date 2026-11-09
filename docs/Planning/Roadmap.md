@@ -11,9 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase29 — Object Opacity in the Masters — IN EXECUTION *(seeded 2026-11-09; discovered and executing the same day)*
-**Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
-- `docs/Planning/Phases/Phase29_ObjectOpacityInTheMasters.md`
+*No active phase. Phase29 closed 2026-11-09.*
 
 *The skin work, Phase28 included, is paused (the lead, 2026-11-09).*
 
@@ -264,3 +262,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** an image model's picture of a real person's body becomes the body's skin in the body's own layout, joined to Phase25's head with no visible seam at the neck, the wrists, the ankles, or down the back and the limbs, judged beside the maker's body on the same unclothed character; if it wins, the maker turns it into a calibrated skin structure.
 - `docs/Planning/Phases/Complete/Phase27_AiBodySkin.md`
 *Closed 2026-11-03: `Tone34` served with the image model's body as a structure, joined to Phase25's face; the hands and feet go to Phase28; the lead: "yes 3 is better", then "close".*
+
+### Phase29 — Object Opacity in the Masters — COMPLETE
+**Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
+- `docs/Planning/Phases/Complete/Phase29_ObjectOpacityInTheMasters.md`
+*Closed 2026-11-09: every master dissolves, the cross-fade needs `r.EarlyZPassOnlyMaterialMasking=0`; the lead: "looks right, every master dissolves", then "close publish push etc".*

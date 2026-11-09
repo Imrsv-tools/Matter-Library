@@ -37,6 +37,10 @@
 
 The library's rig cannot see any of this: its runtime does not propagate alpha and its captures are RGB. MasterSet's exception for pass-through rests on this entry.
 
+**U19 — Two copies of one mesh in one place cannot dissolve into each other at Unreal 5.8's default.** `r.EarlyZPassOnlyMaterialMasking` defaults to **1** on desktop (`RendererScene.cpp`; `MaskedInEarlyPass()`): a masked material's mask is tested only in the depth pre-pass, and the colour pass then draws wherever the depth is **equal**. Two coplanar copies have equal depth at every pixel, so the copy drawn last paints all of them, whatever its own mask kept: a cross-fade showed one skin and never the other, with no hole anywhere (the tell: a lone fading copy dissolves correctly). `r.EarlyZPassOnlyMaterialMasking=0` (a project setting; restart) makes the colour pass test the mask again. At full presence it changed no pixel of the rig's 11 articles. *(Phase29 29.2.)*
+
+**U20 — A Subsurface master's picture is not repeatable from one launch to the next.** Two launches of one build, one job, differ on Marble alone: every pixel of the scatter, a mean 1.2 levels, no bias; every other master is bit for bit. Compare a subsurface article to a baseline by a tolerance, not a hash. *(Phase29 29.1.)*
+
 ## Headless capture (`USceneCaptureComponent2D`)
 
 **U7 — A capture can draw a material as Unreal's default (world-grid) material while everything reports ready.** `GShaderCompilingManager->GetNumRemainingJobs() == 0`, no PSO precaching and 120 settle frames all held, and **the launch's FIRST material assignment** still drew the character's Subsurface and Hair parts as the checker, every launch; any later assignment of the same materials was right. `FMaterialResource::IsGameThreadShaderMapComplete()` is no signal either (it read false for 200,000 frames on a master that rendered). **The runtime renders a throwaway first setting** (`drivers/unreal.py` `warmup`). **Look at the picture before reading its number:** the checker is unmistakable, and a ΔE of 25 is not. *(UR-F7; Phase06 6.5, bisected on the character's own job.)*
