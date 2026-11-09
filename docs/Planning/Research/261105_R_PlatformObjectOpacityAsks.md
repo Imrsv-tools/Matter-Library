@@ -154,7 +154,7 @@
 | Q-POA-3 | full presence costs nothing extra | the headset frame | **answered, proposal:** F-POA-6 — (a), as four masked instances; the cost while fading is unmeasured |
 | Q-POA-4 | how the value is read | the platform's runtime writes it | **answered, proposal:** F-POA-7 — Custom Primitive Data, slot 0 |
 | Q-POA-5 | **for the lead:** take F-POA-4 … 7 as the design, and in which lane is it built? | the platform's decision on the material swap waits on it | **ruled, RD-POA-1:** both offers, and the build runs next; the design goes to the phase's discovery |
-| Q-POA-6 | the glass hypotheses (does a dropped pixel still bend the view? the shadow) and the headset cost while fading | the build's own checks | open — measured when it is built |
+| Q-POA-6 | the glass hypotheses (does a dropped pixel still bend the view? the shadow) and the headset cost while fading | the build's own checks | open — carried to Phase29 as Q-P29-1 … 3 |
 
 ## Status
 
@@ -162,19 +162,26 @@
 - Pass 1 — the platform's reports R-POA-1 … 3 and asks Q-POA-1 … 4 (2026-11-05);
 - Pass 2 — the library's reading, F-POA-1 … 8 (2026-11-09).
 
-**Current direction (proposals, not yet ruled):**
+**Ruled (RD-POA-1, 2026-11-09):**
+- both offers;
+- the build is **Phase29 — Object Opacity in the Masters**, seeded and running next, ahead of the paused skin work.
+
+**Current direction (proposals, now Phase29's seed scope; ruled at its discovery):**
 - every master dissolves against the 4 × 4 screen threshold that Hair already uses;
 - the four solid masters get one masked instance each, which the platform swaps to while an object is part-present;
 - the value is one Custom Primitive Data float, slot 0, `object_fade`: how far faded out, 0 by default, negative for the copy fading in;
 - nothing changes at the default, so no runtime is owed;
 - articles, ports, Blender and Storm are untouched.
 
-**Correction owed:** `MasterSet.md`'s two-sided note overstates Unreal's limit (F-POA-2). A `Drift` note is owed there.
+**Landed:**
+- **`96ae48c` (`/quick-fix`):**
+  - ledger row **M15**: the asks, this reading, and the premise correction for the platform;
+  - the dated `Drift` note on `MasterSet.md`'s two-sided bullet, and a History line.
+- **The seed commit:**
+  - `docs/Planning/Phases/Phase29_ObjectOpacityInTheMasters.md` (SEEDED), with its Roadmap entry at the head of `## Future`;
+  - M15's *Pairs with* now points at it;
+  - Phase28 is marked paused.
 
-**Ledger row:** not yet written. The next free id is **M15**: the ledger lists M1 … M14 (checked 2026-11-09).
+**Not yet run:** nothing is built. Q-POA-6 (glass, shadow, cost) is Phase29's Q-P29-1 … 3.
 
-**Offers, for the lead:**
-1. **A `/quick-fix` now, docs only:** the M15 row (the asks, this reading, and the premise correction for the platform), plus the dated `Drift` note in `MasterSet.md`.
-2. **The build, as a small phase:** the masters' fade, the four masked instances, the value fixed in `MasterSet.md`, and the library's Unreal driver writing it, seen in Unreal on a cross-fade pair at half. It fixes a contract the platform codes against, so it is a phase, not a quick fix (`LOCAL_DELTAS.md` §Weighting). It needs the machine with Unreal.
-
-**▶ Next:** the lead rules Q-POA-5. Until then the doc is parked, with no seed.
+**▶ Next:** `/discovery P29`, on the machine with Unreal, when the lead opens it.

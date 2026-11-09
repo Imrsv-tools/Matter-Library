@@ -1,6 +1,6 @@
 # Phase28 — AI Hands and Feet
 
-**Status:** SEEDED (2026-11-02, by `ML_P27_D2` on the lead's direct ask: *"add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after"* — lead-directed, written beside `ML_P27_E3`'s live execute, which this doc does not touch). Runs **right after Phase27**.
+**Status:** SEEDED (2026-11-02, by `ML_P27_D2` on the lead's direct ask: *"add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after"* — lead-directed, written beside `ML_P27_E3`'s live execute, which this doc does not touch). Runs **right after Phase27**. *(**Paused 2026-11-09** with all the skin work: Phase29, Object Opacity in the Masters, runs first. The lead: "We are paused on all the skin work right now".)*
 
 ## Outcome
 
