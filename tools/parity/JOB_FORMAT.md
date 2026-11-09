@@ -193,6 +193,7 @@ git log <the "source" in unreal/RUNTIME.json>..HEAD -- unreal/MatterRuntime/Scri
 ```
 
 - **`unreal-runtime-v4` (source `47954ea`, published and pinned 2026-10-11) carries two changes that alter pictures and that v3 (source `e1fc83e`, 1 October) did not:** the coat darkens the base as OpenPBR does (10 October: every article with a coat), and a light's brightness no longer depends on its colour (11 October: every Emissive article but Neon). A machine holding v3 fetches v4 the next time the driver looks for the pinned build. *(Was, earlier the same day: "A build with both is made on the machine with Unreal and is not yet published".)*
+- **`unreal-runtime-v8` (source: the Phase29 close, published and pinned 2026-11-09) reads job format 6** (`settings[].fade`): every master dissolves by `object_fade`, the four `MI_Matter_<token>_Fading` instances ship beside the masters, and its config sets `r.EarlyZPassOnlyMaterialMasking=0` (Learnings Unreal U19). At full presence it draws the rig's articles as v7's sources did (Phase29: 10 of 11 bit for bit, Marble within its own launch noise). Checked before the publish: the packaged build's fade sheet and cross-fade match the editor-mode pictures.
 - **A builder change that alters nothing at its defaults needs no new build** (the lead, 2026-10-05). One that does alter them needs one before the rig's Unreal column, or a second caller's pictures, show it.
 
 ## The look view *(2026-10-27, Phase22 RD-P22-11)*
