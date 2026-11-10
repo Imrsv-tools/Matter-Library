@@ -29,12 +29,23 @@
 - **RH-F5 — The kitchen, the baths and the laundry (the Set's third pass, same day)** bind five more articles, all in Studio's catalog: `Porcelain_Glazed_Clean_Base_s01_v01` (toilets, basins, tubs; the wall tile, tinted bone and aqua), `Paint_Gloss_Clean_Base_s01_v01` (baked-enamel appliances in harvest gold and white, an oven's black glass), `StainlessSteel_Brushed_Clean_Base_s001_v01` (a sink), `StainlessSteel_Polished_Clean_Base_s01_v01` (chrome fittings, and a mirror, below), `PowderCoat_Textured_Clean_Base_s001_v01` (the counters and vanity tops, standing in for A3's laminate, tinted to a wheat). The tile was modelled tile by tile over a grout of `Concrete_Smooth_Worn_Dusty` tinted near white: RH-Q1's assembly reading, applied until the library says otherwise. The library's Blender file has all five; the stills drew them through its own shader.
 - **RH-F6 — Polished stainless steel does not stand in for a mirror.** Its roughness blurs the reflection to a frosted plate. A bathroom mirror over a vanity needs a silvered glass.
 
+- **RH-F7 — Tints above 1 passed every check, then Studio refused them** (2026-11-10). The Set raised nine finishes'
+  `base_color_tint` above 1 (up to 1.30) to brighten pale articles. The LCD schema's port table gives the range as
+  0–1, frozen. Neither `tools/conformance/assert_profile.py lightweight` nor the asset tooling's own checks looked at
+  it. Studio's runtime refuses a write out of range, so the Creator's Base Color and Saturation rows could not change
+  those materials. Fixed on the asset's side: each tint scaled to a top channel of 1. The whites came out a little
+  grey, since `Porcelain_Glazed`'s base is 0.745 and the paints' bases are cream.
+
 ### Asks
 
 - **A1 — Add the three articles to `blender/asset_library/MatterLibrary.blend`** (RH-F2), so a picture made from Blender shows the library's shader for them.
 - **A2 — A cement mortar** (with `261101_R_AssetToolingBrickAsks.md` A3): grey-brown, sandy, no dust layer, at mortar scale (`s01`); one article serves brick, stone and tile joints.
 - **A3 — A plastic laminate** for counters and a vanity top (high-pressure laminate, the 1970s *Formica*): a solid colour taken by tint, a faint texture, satin to gloss; `s01`. The kitchen and baths are now built with a powder coat standing in (RH-F5).
 - **A4 — A silvered mirror** (RH-F6): glass over a silver backing, near-zero roughness, `s01`. One article serves a bathroom mirror, a medicine cabinet's door and a dressing mirror.
+- **A5 — The profile asserter checks authored inputs against the port table's ranges** (RH-F7), so an asset that sets
+  `base_color_tint` (or any port) out of range fails conformance before Studio meets it.
+- **A6 — A bright white for vitreous china and white paint** (RH-F7): a base a tint can reach without going above 1
+  (near 0.9 linear), for toilets, basins, tubs and white gloss.
 
 ### Questions
 
