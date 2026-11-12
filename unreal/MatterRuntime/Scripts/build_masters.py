@@ -105,6 +105,10 @@ SKY = _told("MATTER_MASTERS_SKY", "1", {"0", "1"}) == "1"
 COLOUR_SAMPLER = _told("MATTER_MASTERS_COLOUR_SAMPLER", "linear", {"linear", "srgb"})
 NORMAL_SAMPLER = _told("MATTER_MASTERS_NORMAL_SAMPLER", "linear", {"linear", "normal"})
 REFRACTION = _told("MATTER_MASTERS_REFRACTION", "index", {"function", "index"})
+# PROTOTYPE (IMRSV_Platform #410), throwaway: o2 builds the Opaque master as one coat slab over a
+# horizontal mix of a dielectric and a metal slab, instead of Epic's function twice (two coats a
+# pixel). Its slab mapping is rough, for cost and topology only: not a picture to judge against Storm.
+OPAQUE = _told("MATTER_MASTERS_OPAQUE", "functions", {"functions", "o2"})
 FN_OPAQUE = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Opaque"
 FN_TRANSLUCENT = "/Engine/Functions/Substrate/MF_Substrate_OpenPBR_Translucent"
 
@@ -586,6 +590,75 @@ def lerp(g, a, b, alpha, col, a_out="", b_out=""):
     return n
 
 
+def _pin(node, want, outputs=False):
+    """A Substrate node's pin by its name with spaces and case ignored ("SSS MFP" = "sssmfp"):
+    the Python names were not read from a running 5.8, so a miss stops the build naming them."""
+    names = [str(n) for n in (MEL.get_material_expression_output_names(node) if outputs
+                              else MEL.get_material_expression_input_names(node))]
+    for n in names:
+        if n.replace(" ", "").lower() == want:
+            return n
+    raise RuntimeError(f"o2: {node.get_name()} has no {'output' if outputs else 'input'} {want!r}: {names}")
+
+
+def o2_front(g, pins, metal):
+    """PROTOTYPE (#410): OpenPBR's layout in Substrate's own nodes. A dielectric slab and a metal
+    slab, mixed by metalness with parameter blending off (the linear mix of Phase06 6.3), under ONE
+    coat slab, weighted by coat_weight and layered with parameter blending off. Fed what the function
+    was fed (base colour already darkened by the coat). Rough mapping, enough for cost and topology:
+    dielectric F0 = ((ior - 1) / (ior + 1))^2 x specular_color x specular_weight, F90 1; metal F0 =
+    base x specular_weight, F90 specular_color (an edge tint, not F82); fuzz on both base slabs;
+    the coat's colour through TransmittanceToMFP; anisotropy passed as it is."""
+    M = unreal
+
+    def slab(col, **wires):
+        s = g.node(M.MaterialExpressionSubstrateSlabBSDF, col)
+        for want, (src, out) in wires.items():
+            g.link(src, s, _pin(s, want), out)
+        return s
+
+    def f0(ior, col):
+        r = g.op(M.MaterialExpressionDivide, g.op_k(M.MaterialExpressionSubtract, ior[0], 1.0, col + 1, ior[1]),
+                 g.op_k(M.MaterialExpressionAdd, ior[0], 1.0, col + 1, ior[1]), col)
+        return g.op(M.MaterialExpressionMultiply, r, r, col - 1)
+
+    one = (g.node(M.MaterialExpressionConstant, -1, r=1.0), "")
+    black = (g.node(M.MaterialExpressionConstant3Vector, -1, constant=unreal.LinearColor(0, 0, 0, 0)), "")
+    spec_w = pins["specular_weight"]
+    common = dict(roughness=pins["specular_roughness"], anisotropy=pins["specular_roughness_anisotropy"],
+                  normal=pins["geometry_normal"], fuzzamount=pins["fuzz_weight"],
+                  fuzzcolor=pins["fuzz_color"], fuzzroughness=pins["fuzz_roughness"])
+    d_f0 = g.op(M.MaterialExpressionMultiply,
+                g.op(M.MaterialExpressionMultiply, f0(pins["specular_ior"], -3), pins["specular_color"][0], -4,
+                     b_out=pins["specular_color"][1]),
+                spec_w[0], -5, b_out=spec_w[1])
+    dielectric = slab(-6, diffusealbedo=pins["base_color"], f0=(d_f0, ""), f90=one, **common)
+    m_f0 = g.op(M.MaterialExpressionMultiply, pins["base_color"][0], spec_w[0], -5,
+                a_out=pins["base_color"][1], b_out=spec_w[1])
+    metal_slab = slab(-6, diffusealbedo=black, f0=(m_f0, ""), f90=pins["specular_color"], **common)
+    base = g.node(M.MaterialExpressionSubstrateHorizontalMixing, -7)
+    base.set_editor_property("use_parameter_blending", False)
+    g.link(dielectric, base, "Background")
+    g.link(metal_slab, base, "Foreground")
+    g.link(metal, base, "Mix")
+
+    tint = g.node(M.MaterialExpressionSubstrateTransmittanceToMFP, -5)
+    g.link(pins["coat_color"][0], tint, _pin(tint, "transmittancecolor"), pins["coat_color"][1])
+    coat = slab(-6, diffusealbedo=black, f0=(f0(pins["coat_ior"], -3), ""), f90=one,
+                roughness=pins["coat_roughness"], sssmfp=(tint, _pin(tint, "mfp", outputs=True)))
+    coat.set_editor_property("sub_surface_type", M.MaterialSubSurfaceType.MSS_SIMPLE_VOLUME)
+    weighted = g.node(M.MaterialExpressionSubstrateWeight, -7)
+    g.link(coat, weighted, _pin(weighted, "a"))
+    g.link(pins["coat_weight"][0], weighted, _pin(weighted, "weight"), pins["coat_weight"][1])
+    top = g.node(M.MaterialExpressionSubstrateVerticalLayering, -8)
+    top.set_editor_property("use_parameter_blending", False)
+    g.link(weighted, top, _pin(top, "top"))
+    g.link(base, top, _pin(top, "bottom"))
+    log(f"o2: Opaque is one coat over a mixed dielectric/metal base (slab pins "
+        f"{[str(n) for n in MEL.get_material_expression_input_names(coat)]})")
+    return top
+
+
 def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None,
                  flat_map=None, noise=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
@@ -625,8 +698,10 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         c.set_material_function(fn)
         calls.append(c)
     inputs = set(MEL.get_material_expression_input_names(calls[0]))
+    pins = {}   # what each of the function's pins is fed, for the o2 prototype's slabs
 
     def feed(src, name, src_out=""):
+        pins[name] = (src, src_out)
         for c in calls:
             g.link(src, c, name, src_out)
 
@@ -958,7 +1033,9 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                             g.one(M.MaterialExpressionSign,
                                   g.op(M.MaterialExpressionSubtract, presence, threshold, 4), 3), 1.0, 3), 2)
         feed(kept, "geometry_opacity")
-    if len(calls) == 2:
+    if token == "Opaque" and OPAQUE == "o2":
+        top, top_out = o2_front(g, pins, metal), ""
+    elif len(calls) == 2:
         top = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
         top.set_editor_property("use_parameter_blending", False)
         g.link(calls[0], top, "Background", front)
@@ -1068,7 +1145,8 @@ def save(mat):
 def main():
     log(f"told root={ROOT} skinned={int(SKINNED)} instanced={int(INSTANCED)} mesh_v={MESH_V} "
         f"mesh_binormal={MESH_BINORMAL} sky={int(SKY)} colour_sampler={COLOUR_SAMPLER} "
-        f"normal_sampler={NORMAL_SAMPLER} refraction={REFRACTION}")
+        f"normal_sampler={NORMAL_SAMPLER} refraction={REFRACTION}"
+        + (f" opaque={OPAQUE}" if OPAQUE != "functions" else ""))
     white = default_texture("T_Matter_White", (255, 255, 255, 255))
     no_wear = default_texture("T_Matter_NoWear", (128, 128, 0, 0))     # an overlay at alpha 0
     flat = default_texture("T_Matter_FlatNormal", (128, 128, 255, 255))
