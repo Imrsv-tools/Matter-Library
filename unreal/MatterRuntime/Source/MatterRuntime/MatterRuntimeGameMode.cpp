@@ -440,8 +440,8 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 		MD.CreateTriangle(Group, Tri);
 	}
 
-	AActor* Owner = GetWorld()->SpawnActor<AActor>(FVector::ZeroVector, FRotator::ZeroRotator);
-	UStaticMesh* Mesh = NewObject<UStaticMesh>(Owner, *(Name + TEXT("_Mesh")));
+	AActor* MeshOwner = GetWorld()->SpawnActor<AActor>(FVector::ZeroVector, FRotator::ZeroRotator);
+	UStaticMesh* Mesh = NewObject<UStaticMesh>(MeshOwner, *(Name + TEXT("_Mesh")));
 	Mesh->GetStaticMaterials().Add(FStaticMaterial(nullptr, TEXT("Matter")));
 	UStaticMesh::FBuildMeshDescriptionsParams Build;
 	Build.bMarkPackageDirty = false;
@@ -456,9 +456,9 @@ bool AMatterRuntimeGameMode::LoadMesh(const TSharedPtr<FJsonObject>& Spec)
 		Note(FString::Printf(TEXT("MATTER mesh %s: the static mesh did not build"), *Name), true);
 		return false;
 	}
-	UStaticMeshComponent* SMC = NewObject<UStaticMeshComponent>(Owner, *Name);
+	UStaticMeshComponent* SMC = NewObject<UStaticMeshComponent>(MeshOwner, *Name);
 	SMC->SetStaticMesh(Mesh);
-	Owner->SetRootComponent(SMC);
+	MeshOwner->SetRootComponent(SMC);
 	SMC->RegisterComponent();
 	SMC->SetMobility(EComponentMobility::Movable);
 	SMC->SetCastShadow(false);

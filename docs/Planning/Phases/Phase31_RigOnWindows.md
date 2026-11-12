@@ -149,4 +149,7 @@ Click 1 needs both steps: it is the first point where all three columns exist. E
 
 ## Execution Log
 
-_(populated during execution)_
+- **2026-11-12 — the rig runs on Windows, as a `/quick-fix`** (`git log --grep "✅ Quick Fix — the parity rig on Windows"`). The Storm environment's Windows branch, the Unreal driver's Windows editor default and priority, the `Owner` rename, `unreal/build.ps1` (editor + masters), and a Windows section in `DefaultEngine.ini`.
+  - **D-P31-2 measured** on the grey card. D3D12 with no Windows section ran at **SM5: 6.72 / 14.36** ΔE2000 Unreal–Blender. `-vulkan` was refused by the project's data and fell back to SM5 with the same numbers. **D3D12 at SM6: 0.85 / 1.43** (close-up 0.77 / 1.28), with Storm–Blender at 0.31 / 0.98. **Kept: D3D12 SM6** (`Unreal.md` U23).
+  - Blender 5.3.0 and Storm agree on the grey card (0.31), so the version change shows no drift there.
+  - **Not done:** the USD recipe's Windows twin (the hand build stands; D-P31-4); the 11-article click-1 sheet; `USDValidationToolchain.md`'s Windows section.

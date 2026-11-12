@@ -34,9 +34,10 @@ Where the runtime comes from, first found wins: ``$MATTER_UNREAL_RUNTIME`` (a pa
 launcher); editor mode on request, ``$MATTER_UNREAL_EDITOR`` (an Unreal 5.8 ``UnrealEditor``) on
 ``unreal/MatterRuntime``; else the build ``unreal/RUNTIME.json`` pins, a GitHub Release asset of
 this repo, downloaded once into the git-ignored ``unreal/package/`` and checked by sha256
-(Phase06 D2), so a machine with no Unreal renders the column. That build is Linux-only: on a Mac,
-with neither variable set, the driver runs editor mode on the Unreal 5.8 under ``$UE_ROOT``
-(default ``/Users/Shared/Epic Games/UE_5.8``). ``find_runtime()`` returns None when there is
+(Phase06 D2), so a machine with no Unreal renders the column. That build is Linux-only: on a Mac
+or on Windows, with neither variable set, the driver runs editor mode on the Unreal 5.8 under
+``$UE_ROOT`` (default ``/Users/Shared/Epic Games/UE_5.8`` on a Mac, ``C:/Program Files/Epic
+Games/UE_5.8`` on Windows; 2026-11-12). ``find_runtime()`` returns None when there is
 none, and the rig then skips the column with a notice. ``find_runtime(fetch=False)`` only asks:
 it answers from this machine as it is and never downloads (2026-10-11).
 
@@ -619,8 +620,8 @@ def find_runtime(fetch: bool = True) -> list[str] | None:
 
     First found wins: ``$MATTER_UNREAL_RUNTIME`` (a launcher), editor mode when asked for by
     ``$MATTER_UNREAL_EDITOR``, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
-    downloaded and checked on first use. The pinned build is Linux-only, so a Mac runs editor
-    mode on the Unreal 5.8 under ``$UE_ROOT`` instead, or has no runtime.
+    downloaded and checked on first use. The pinned build is Linux-only, so a Mac or Windows runs
+    editor mode on the Unreal 5.8 under ``$UE_ROOT`` instead, or has no runtime.
 
     ``fetch=False`` only asks: a pinned build that is not unpacked here is None, and nothing is
     downloaded (a caller that wants to know whether a runtime is present, and to launch nothing).
@@ -635,6 +636,12 @@ def find_runtime(fetch: bool = True) -> list[str] | None:
         if not mac.is_file():
             return None
         editor = str(mac)
+    if not editor and sys.platform == "win32":
+        ue = Path(os.environ.get("UE_ROOT", "C:/Program Files/Epic Games/UE_5.8"))
+        win = ue / "Engine" / "Binaries" / "Win64" / "UnrealEditor.exe"
+        if not win.is_file():
+            return None
+        editor = str(win)
     if editor:
         return [editor, str(PROJECT), "-game"]
     if PIN.is_file():
@@ -698,12 +705,18 @@ def run_runtime(cmd: list[str], ujob: Path, log: Path, expect: list[Path] = ()) 
     if packaged:        # a package runs with no display at all, on SDL's dummy driver (UR-F8)
         env.pop("DISPLAY", None)
         env.pop("WAYLAND_DISPLAY", None)
-    full = ["nice", "-n", "19", *cmd, f"-MatterJob={ujob}", "-RenderOffscreen", "-unattended",
+    full = [*cmd, f"-MatterJob={ujob}", "-RenderOffscreen", "-unattended",
             "-nosound", "-stdout", "-FullStdOutLogOutput"]
+    low = {}            # the lowest priority: other work on the machine comes first
+    if sys.platform == "win32":
+        low["creationflags"] = subprocess.BELOW_NORMAL_PRIORITY_CLASS
+    else:
+        full = ["nice", "-n", "19", *full]
     record = ujob.parent / "raw" / "matter_runtime.log"     # the app's own record (Shipping has no log)
     record.unlink(missing_ok=True)
     with log.open("w", encoding="utf-8") as fh:
-        rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S).returncode
+        rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S,
+                            **low).returncode
     missing = [p for p in expect if not p.is_file()]
     if rc != 0 or missing:
         why = f"exit {rc}" if rc != 0 else f"exit 0 but {len(missing)} of {len(expect)} pictures missing"
