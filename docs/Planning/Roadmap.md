@@ -11,7 +11,11 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-*No active phase.*
+### Phase30 — One Coat on the Opaque Master — SEEDED, discovery opening *(2026-11-12, numbered by the lead, "Phase30, open discovery", on the lead's ruling of the same day on the platform's master-cost ticket)*
+
+**Outcome:** opaque articles in Unreal draw with one clear coat over their base, match the reference at least as well as today, and cost less to draw.
+
+- `docs/Planning/Phases/Phase30_OneCoatOpaqueMaster.md`
 
 *The skin work, Phase28 included, is paused (the lead, 2026-11-09).*
 
