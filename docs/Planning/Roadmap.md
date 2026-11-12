@@ -11,13 +11,7 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase31 — The Rig on Windows — ACTIVE, discovery *(numbered 2026-11-12 by the lead's `/discovery 31`; seeded the same day by Phase30's discovery on the lead's "i only have this windows machine, not linux" and "2"; runs ahead of Phase30, RD-P30-2)*
-
-**Outcome:** on a Windows machine with Unreal, the maintainer sees a material in Storm, Blender and Unreal side by side, and the Unreal masters and test runtime build there.
-
-- `docs/Planning/Phases/Phase31_RigOnWindows.md`
-
-### Phase30 — One Coat on the Opaque Master — ACTIVE (parked on Phase31) *(Brief written 2026-11-12, both blockers ruled; parked the same day on the lead's "2": the rig runs on Windows first, RD-P30-2. 2026-11-12, numbered by the lead, "Phase30, open discovery", on the lead's ruling of the same day on the platform's master-cost ticket)*
+### Phase30 — One Coat on the Opaque Master — ACTIVE (parked on the rig running on Windows, a quick fix) *(Brief written 2026-11-12, both blockers ruled; parked the same day on the lead's "2": the rig runs on Windows first, RD-P30-2. 2026-11-12, numbered by the lead, "Phase30, open discovery", on the lead's ruling of the same day on the platform's master-cost ticket)*
 
 **Outcome:** opaque articles in Unreal draw with one clear coat over their base, match the reference at least as well as today, and cost less to draw.
 
@@ -126,6 +120,12 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ### UVs in Metres — SEEDED *(added 2026-10-15 by Phase19's execution, on the lead's RD-P19-4, "1 now, 4 as a next phase": the builder lays out UVs in metres so that any material picked maps to its real size)*
 
 - `docs/Planning/Phases/Future/PhaseTBD_UVsInMetres.md`
+
+### Phase31 — The Rig on Windows — WITHDRAWN as a phase 2026-11-12 *(numbered the same day by the lead's `/discovery 31`, and withdrawn after its Brief: *"i feel a phase for this is overkill, also it only concerns this machine"*; the work goes as a `/quick-fix`, the doc its input; kept so its intent survives)*
+
+**Outcome:** on the lead's Windows machine, the rig shows a material in Storm, Blender and Unreal side by side, and the Unreal masters build there.
+
+- `docs/Planning/Phases/Phase31_RigOnWindows.md`
 
 ### Parking lot — TBD
 **Outcome:** unsequenced ideas, kept so their intent survives (Don't Delete Spec Functionality).

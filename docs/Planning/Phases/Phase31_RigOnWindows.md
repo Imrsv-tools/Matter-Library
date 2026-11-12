@@ -1,6 +1,6 @@
 # Phase31 — The Rig on Windows
 
-**Status:** DISCOVERY — Brief written 2026-11-12, waiting on two lead answers (§Blockers). Opened and numbered by the lead's `/discovery 31` the same day; seeded earlier that day by Phase30's discovery. Runs ahead of Phase30, which is parked on it (RD-P30-2). Lane: **build**.
+**Status:** WITHDRAWN AS A PHASE 2026-11-12, after its Brief. The lead: *"i feel a phase for this is overkill, also it only concerns this machine"*. *My reading:* the Windows rig work goes as a `/quick-fix` (or a few), with this doc as its input. The findings, the probe, the gate baseline and the two rulings (RD-P31-1, RD-P31-2) stay in force. The work's machine-specific settings (install paths, environment variables) stay on the machine and out of tracked files. Only the portable changes are committed: the platform branches in the drivers, the `Owner` rename, and the build twin. Kept, not deleted, so its intent survives. *(Historical: BRIEF READY the same day, both blockers ruled.)* Opened and numbered by the lead's `/discovery 31` the same day; seeded earlier that day by Phase30's discovery. Runs ahead of Phase30, which is parked on it (RD-P30-2). Lane: **build**.
 
 **Why it exists:** the lead has only a Windows machine now (*"i only have this windows machine, not linux"*, 2026-11-12). Asked how Phase30 should be judged, the lead chose *"2"*: get the rig running on Windows first ([Phase30](Phase30_OneCoatOpaqueMaster.md) RD-P30-2).
 
@@ -35,7 +35,7 @@
   - **31.1 — Storm and Blender columns on Windows.**
     - `tools/parity/drivers/storm.py` and `tools/preview_generators/make_preview.py` `usd_env`: a Windows branch. The interpreter comes from the toolchain's venv, since a `#!` line does not run on Windows. Also `inst/lib` on `PATH` for the DLLs, and no `LD_LIBRARY_PATH` / GLX settings.
     - A Windows twin of the USD recipe, `tools/usd-toolchain/build-usd-tools.cmd` (or `.ps1`), carrying what the hand build did: vcvars64 + Ninja, `build_usd.py`, MaterialX pinned to 1.39.5, and the `AIRY_FRESNEL_ITERATIONS` define re-applied after every build (the bash recipe's step 3).
-    - Blender 5.2.x, official portable build, as `$MATTER_BLENDER` (Blocker 2).
+    - Blender 5.3.0, already installed on the lead's machine (official build, 2026-11-10), as `$MATTER_BLENDER` (RD-P31-2).
   - **31.2 — Unreal column on Windows.**
     - `MatterRuntimeGameMode.cpp`: the local `Owner` renamed. MSVC refuses it as C4458 (it hides `AActor::Owner`); clang on Linux never said.
     - `unreal/build.ps1 [editor|masters]`, the twin of `build.sh`'s two CPU steps. It keeps the masters step's double check: the exit code AND *"MATTER RESULT ok"*.
@@ -46,7 +46,7 @@
     - `docs/specs/Tooling/USDValidationToolchain.md`: a Windows section;
     - Learnings: Unreal (C4458; the RHI result), Storm (the Windows run form, `UsdGeom.Sphere` has no UVs).
 - **Not now:**
-  - a packaged Win64 runtime and its publish, unless Blocker 1 says otherwise;
+  - a packaged Win64 runtime and its publish (RD-P31-1);
   - `blender/addons/` and `tools/conformance/check_exporter.sh` (bash; untouched by this phase, so not baselined);
   - the platform's own Windows scripts.
   - `LOCAL_DELTAS.md` §Two machines no longer describing the machines in use: a `/retro` item for the Refiner.
@@ -71,29 +71,29 @@ No `docs/CoreMechanisms.md` row is met: its five rows are skin and makeup author
 
 ## Decisions that bind
 
-- **D-P31-1 — Unreal on Windows runs in editor mode** (`UnrealEditor.exe <project> -game`, the driver's existing editor path), not as a package. The machine has Unreal. The package exists for machines that do not (Phase06 D2). *(Unless you say otherwise; Blocker 1 asks what becomes of the published runtime.)*
+- **D-P31-1 — Unreal on Windows runs in editor mode** (`UnrealEditor.exe <project> -game`, the driver's existing editor path), not as a package. The machine has Unreal. The package exists for machines that do not (Phase06 D2). *(The published runtime: RD-P31-1.)*
 - **D-P31-2 — The renderer: measured at 31.2, not assumed.** The Linux history is Vulkan SM6. Windows defaults to D3D12. The grey card and Copper are rendered on both (`-d3d12` / `-vulkan`). **The one nearer Phase06's grey card (0.70 / 1.28) is kept, D3D12 on a tie** (the consumer's default on Windows). Both numbers are recorded.
-- **D-P31-3 — Blender's version is the official 5.2.x build**, the version the rig was last measured on (`Blender.md` B22), not the 4.0 installed today.
+- **D-P31-3 — Blender is the official 5.3.0 build the lead has installed** (RD-P31-2), not the 4.0 also there. The rig was last measured on 5.2.2 (`Blender.md` B22); 31.1's sheet is the first reading on 5.3, so a Storm–Blender ΔE that moves from the Linux sheets is checked against the version before it is blamed on Windows.
 - **D-P31-4 — The hand-built USD toolchain is kept and given a recipe in the tree** rather than rebuilt. It is already OpenUSD 26.03 + MaterialX 1.39.5, the library's pins, and it matched MaterialX's GLSL reference within 2 % on three coated articles (the platform's check). The recipe makes a rebuild repeatable.
 
 ## Blockers — the lead's
 
-1. **The published Unreal test runtime, with no Linux machine.** Today `unreal/RUNTIME.json` pins `unreal-runtime-v9`, a Linux package. The rule that a master change *"owes a new runtime"* assumes a Linux machine can build one. Phase30 will owe one.
+1. **RULED 2026-11-12 → (a), RD-P31-1.** The lead: *"d1 a"*. *My reading:* no package is built or published from Windows for now; `RUNTIME.json` keeps `unreal-runtime-v9` as the last Linux runtime; a master change that owes a runtime (Phase30's) writes a dated *runtime owed* line instead. *The fork as it was put:* **The published Unreal test runtime, with no Linux machine.** Today `unreal/RUNTIME.json` pins `unreal-runtime-v9`, a Linux package. The rule that a master change *"owes a new runtime"* assumes a Linux machine can build one. Phase30 will owe one.
    - **(a) Recommended — no new package for now.** The rig on Windows runs editor mode (D-P31-1). The v9 pin stays as the last Linux runtime. A runtime a change owes is written as a dated *runtime owed* line, as `LOCAL_DELTAS.md` already says for a machine that cannot build it. Smallest; nothing is published.
    - **(b)** Package and publish a **Win64** runtime from here (`RunUAT BuildCookRun -platform=Win64`, a `MatterRuntime-Win64-…` asset, `RUNTIME.json` naming it). The rig then also runs on a Windows machine without Unreal. It adds a package step, a publish twin of `publish.sh`, and a public asset per change.
-2. **Install Blender 5.2 on your machine** — the official portable zip, unpacked to a folder of your choosing; no installer, and Blender 4.0 is left alone. Without it the Blender column cannot run (D-P31-3).
+2. **RULED 2026-11-12, RD-P31-2.** The lead: *"d2 blender 5.3 is installed"*. Read on the machine: the official Blender 5.3.0 (build date 2026-11-10). Nothing is installed by this phase. *The fork as it was put:* **Install Blender 5.2 on your machine** — the official portable zip, unpacked to a folder of your choosing; no installer, and Blender 4.0 is left alone. Without it the Blender column cannot run (D-P31-3).
    - **Recommended:** yes, at 31.1.
    - **Otherwise:** the rig runs with Storm and Unreal only, and the sheet says Blender is missing.
 
 ## Step list
 
 - **31.1 — Storm and Blender draw on Windows.**
-  - The Storm driver's and `usd_env`'s Windows branch, the recipe twin, and Blender 5.2 as `$MATTER_BLENDER`.
+  - The Storm driver's and `usd_env`'s Windows branch, the recipe twin, and Blender 5.3 as `$MATTER_BLENDER`.
   - Its evidence is the agent's: the 11-article sheet in two columns, ΔE Storm–Blender per article.
 - **31.2 — Unreal draws on Windows.**
   - The `Owner` rename, `unreal/build.ps1`, the driver's Windows editor default and priority, the masters built into the library's project, and the renderer measured (D-P31-2).
   - First clickable result: **click 1**.
-- **At the close:** the doc sweep and the learnings; Blocker 1's outcome applied.
+- **At the close:** the doc sweep and the learnings; no runtime published (RD-P31-1).
 
 Click 1 needs both steps: it is the first point where all three columns exist. Every §In now bullet names its step or *at the close*.
 
@@ -115,12 +115,16 @@ Click 1 needs both steps: it is the first point where all three columns exist. E
 
 ## Risk lane — `build`
 
-- **What it touches:** no authorisation, secrets, data or public edge. Nothing is published unless Blocker 1 is (b), and then only through the existing producer, on the lead's word.
+- **What it touches:** no authorisation, secrets, data or public edge. Nothing is published (RD-P31-1).
 - **Controls read:**
   - nothing hashes the drivers (`rig.py`, `look.py`: only LFS objects are hashed);
   - `run_all.py` is the gate: its Windows baseline is below;
   - `check_exporter.sh` is bash and guards `blender/addons/` and `tools/conformance/`, which this phase does not touch.
-- **The gate's baseline on Windows, before any edit:** *(pending: running at the Brief's commit)*.
+- **The gate's baseline on Windows, before any edit** (`uv run tools/validators/run_all.py`, 2026-11-12, at `d33cbdd`): **18 lanes, 15 PASS, 0 SKIP, 3 FAIL** — `release_verify`, `activation`, `tool_tests`.
+  - `release_verify`: `matterlib-0.1.0`'s recorded `payload_sha256` (catalog, manifest, mtlx_set) do not match the files on disk. Most likely the Windows checkout's line endings (Git warns *"LF will be replaced by CRLF"* on this clone); not verified.
+  - `activation`: the installed catalog's hash is not the approval's frozen one, which follows from the same mismatch.
+  - `tool_tests`: `tools/releases/test_build_snapshot.py` fails with `UnicodeDecodeError: 'charmap'`, a file read without an explicit encoding (Windows' default code page).
+  - None comes from this work; each is a Windows-machine defect of its own, for its own fix.
 
 ## Discovery Log
 
@@ -137,7 +141,7 @@ Click 1 needs both steps: it is the first point where all three columns exist. E
 
 - **Passes captured:** 1.
 - **Current working direction:** 31.1 Storm + Blender, 31.2 Unreal in editor mode.
-- **Open decisions:** Blockers 1 and 2.
+- **Open decisions:** none (RD-P31-1, RD-P31-2). Withdrawn as a phase; the work goes as a `/quick-fix`.
 - **Checks to carry forward:**
   - the gate baseline;
   - D-P31-2's renderer measurement;

@@ -1,6 +1,6 @@
 # Phase30 — One Coat on the Opaque Master
 
-**Status:** DISCOVERY — Brief written 2026-11-12, **parked on [Phase31 — The Rig on Windows](Phase31_RigOnWindows.md)** (RD-P30-2). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
+**Status:** DISCOVERY — Brief written 2026-11-12, **parked on the rig running on Windows** (a `/quick-fix` since 2026-11-12, when the lead withdrew [Phase31 — The Rig on Windows](Phase31_RigOnWindows.md) as a phase: *"i feel a phase for this is overkill, also it only concerns this machine"*) (RD-P30-2). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
 
 **Where the ask came from:** on 2026-11-12 the lead ruled, on the platform's ticket about what the Matter masters cost to draw, that the Opaque master is built from Substrate's own nodes ("O2"). The platform session relayed the ruling here the same day. Its research and measurements are private to the platform and are cited by content, never by id. *The ruling as relayed, not verbatim:* a dielectric slab and a metal slab, mixed by metalness (`SubstrateHorizontalMixing`, parameter blending off), under ONE coat slab weighted by `coat_weight` (`SubstrateVerticalLayering`, parameter blending off). It replaces two calls of Epic's `MF_Substrate_OpenPBR_Opaque`, each carrying its own coat. *"TwoLayer, Masked and Emissive keep the two calls until Opaque holds; then they follow."*
 
@@ -155,7 +155,7 @@ Every §In now bullet names a step above or *at the close*. Click 1 needs only 3
 
 - **Passes captured:** 1.
 - **Current working direction:** 30.1 Opaque, then 30.2 the other two-call masters and the 80 B runtime.
-- **Open decisions:** none. Both blockers ruled (RD-P30-1, RD-P30-2). The phase is parked until Phase31 (The Rig on Windows) closes.
+- **Open decisions:** none. Both blockers ruled (RD-P30-1, RD-P30-2). The phase is parked until the rig runs on Windows (the quick fix that replaced Phase31).
 - **Checks to carry forward:** T1 at 80 B per master; ΔE per swatch against today's master; FilmToneMap undone before reading any Studio PNG.
 
 ## Execution Log
