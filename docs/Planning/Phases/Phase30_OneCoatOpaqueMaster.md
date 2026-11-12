@@ -1,6 +1,6 @@
 # Phase30 — One Coat on the Opaque Master
 
-**Status:** DISCOVERY — Brief written 2026-11-12, waiting on two lead answers (§Blockers). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
+**Status:** DISCOVERY — Brief written 2026-11-12, waiting on one lead answer (§Blockers, 2). Blocker 1 ruled (a) the same day (RD-P30-1). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
 
 **Where the ask came from:** on 2026-11-12 the lead ruled, on the platform's ticket about what the Matter masters cost to draw, that the Opaque master is built from Substrate's own nodes ("O2"). The platform session relayed the ruling here the same day. Its research and measurements are private to the platform and are cited by content, never by id. *The ruling as relayed, not verbatim:* a dielectric slab and a metal slab, mixed by metalness (`SubstrateHorizontalMixing`, parameter blending off), under ONE coat slab weighted by `coat_weight` (`SubstrateVerticalLayering`, parameter blending off). It replaces two calls of Epic's `MF_Substrate_OpenPBR_Opaque`, each carrying its own coat. *"TwoLayer, Masked and Emissive keep the two calls until Opaque holds; then they follow."*
 
@@ -35,7 +35,7 @@
      - the coat reads as a coat, with no brightened base;
      - at 80 B and 160 B, O2 draws alike.
    - **The sentence afterwards:** *"the opaque master with one coat matches Storm as well as the old one, at the small budget."*
-2. **Click 2 — the other masters at the small budget (30.2, if Blocker 1 goes (a)).**
+2. **Click 2 — the other masters at the small budget (30.2, RD-P30-1).**
    - **Picture:** the same four columns.
    - **Fixtures:** Rust_OnSteel_Flaking and Paint_OnMetal_Chipped (TwoLayer); Lace_Floral, OakLeaf_Natural and Hair_DarkBrown (Masked); Neon_Signage and LED_WarmWhite (Emissive); Marble_Veined_Polished and a skin (Subsurface); Hair_Natural (Hair).
    - **What the lead judges:** nothing gets brighter at 80 B.
@@ -50,7 +50,7 @@
   - 30.1: the three uncommitted `o2_front` edits: fuzz on the dielectric slab only, F90 unwired where it is 1, and the base's index under the coat as OpenPBR's `eta_s`.
   - 30.1: each mapping gap, closed or dropped as §Decisions says.
   - 30.1: the 80-byte render (a launch override; see the build map) and the T1 read.
-  - 30.2: TwoLayer, Masked and Emissive onto the same front, and the runtime's budget set to 80 (if Blocker 1 goes (a)).
+  - 30.2: TwoLayer, Masked and Emissive onto the same front, and the runtime's budget set to 80 (RD-P30-1).
   - At the close: the docs, a new Unreal test runtime (owed: this changes what Opaque draws at its defaults), and the `PlatformDependencies.md` row the platform reads.
 - **Not now:**
   - the platform's side: pinning the release, cascading into Studio, Studio's budget setting, and re-measuring. This goes in the ledger row, not here.
@@ -87,7 +87,7 @@
 
 ## Blockers — the lead's
 
-1. **The small budget and the masters that still make two calls.** At 80 B, Substrate flattens the coat of every master built from two function calls, and the master gets brighter (`Unreal.md` U3: the grey card ×1.14–1.39). After O2 that is still TwoLayer, Masked and Emissive: **8 library articles**: Rust and Paint on metal (TwoLayer); Lace, Oak leaf and Hair_DarkBrown's cards (Masked); Neon and two LEDs (Emissive), plus whatever Studio's own scenes put on them. So the platform's planned budget move to 80 B would brighten them in Studio. The one-call masters (Subsurface, 66 articles; Hair; the two translucent ones) have never been read at 80 B.
+1. **RULED 2026-11-12 → (a), RD-P30-1.** The lead: *"decision 1) a"*. *My reading:* TwoLayer, Masked and Emissive move to the one-coat front inside this phase (30.2), after Opaque holds, and the runtime and the ledger row go to 80 B only once every master reads clean there. **The platform agreed the same day** (its session, relayed): Studio stays at 160 B until the library's Phase30 ledger row says 80 B. *The fork as it was put:* **The small budget and the masters that still make two calls.** At 80 B, Substrate flattens the coat of every master built from two function calls, and the master gets brighter (`Unreal.md` U3: the grey card ×1.14–1.39). After O2 that is still TwoLayer, Masked and Emissive: **8 library articles**: Rust and Paint on metal (TwoLayer); Lace, Oak leaf and Hair_DarkBrown's cards (Masked); Neon and two LEDs (Emissive), plus whatever Studio's own scenes put on them. So the platform's planned budget move to 80 B would brighten them in Studio. The one-call masters (Subsurface, 66 articles; Hair; the two translucent ones) have never been read at 80 B.
    - **(a) Recommended.** This phase takes all three to the same front once Opaque holds (step 30.2), reads every master at 80 B (T1), and only then sets the runtime to 80 B and tells the platform it may. That keeps your ordering, *"until Opaque holds; then they follow"*, inside one phase. The code is shared: `o2_front` already takes the pins every master is fed.
    - **(b)** Opaque only. The runtime and Studio stay at 160 B until a later phase moves the rest, so the 80 B saving waits.
    - *(Studio going to 80 B with three masters still on two calls is not offered: it ships 8 known-bright articles.)*
@@ -101,7 +101,7 @@
   - Remove the switch and the function-call path; take in the three o2_front edits; close the gaps per D-P30-2.
   - Render the rig at 80 B and 160 B, and read the T1 shader dump.
   - First clickable result: **click 1**.
-- **30.2 — TwoLayer, Masked and Emissive follow; the runtime goes to 80 B** *(if Blocker 1 is (a))*.
+- **30.2 — TwoLayer, Masked and Emissive follow; the runtime goes to 80 B** *(RD-P30-1)*.
   - Masked: its coverage clip reads the coverage directly, since there is no `OpacityMask` output without the function.
   - Emissive: its light on the base slab's Emissive Color, keeping U4's length rule.
   - TwoLayer: the second layer is already mixed before the front.
@@ -150,7 +150,7 @@ Every §In now bullet names a step above or *at the close*. Click 1 needs only 3
 
 - **Passes captured:** 1.
 - **Current working direction:** 30.1 Opaque, then 30.2 the other two-call masters and the 80 B runtime.
-- **Open decisions:** Blockers 1 and 2.
+- **Open decisions:** Blocker 2 (the machine). Blocker 1 ruled (a), RD-P30-1.
 - **Checks to carry forward:** T1 at 80 B per master; ΔE per swatch against today's master; FilmToneMap undone before reading any Studio PNG.
 
 ## Execution Log
