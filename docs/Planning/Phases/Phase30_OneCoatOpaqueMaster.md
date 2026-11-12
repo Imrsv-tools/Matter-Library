@@ -1,6 +1,6 @@
 # Phase30 — One Coat on the Opaque Master
 
-**Status:** DISCOVERY — Brief written 2026-11-12, **parked on the rig running on Windows** (a `/quick-fix` since 2026-11-12, when the lead withdrew [Phase31 — The Rig on Windows](Phase31_RigOnWindows.md) as a phase: *"i feel a phase for this is overkill, also it only concerns this machine"*) (RD-P30-2). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
+**Status:** IN EXECUTION — 2026-11-12 (the lead: *"/execute P30"*). The rig runs on the Windows machine since the quick fix `c0ddfa8`, which unparked it (RD-P30-2; [Phase31](Phase31_RigOnWindows.md) was withdrawn as a phase: *"i feel a phase for this is overkill, also it only concerns this machine"*). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
 
 **Where the ask came from:** on 2026-11-12 the lead ruled, on the platform's ticket about what the Matter masters cost to draw, that the Opaque master is built from Substrate's own nodes ("O2"). The platform session relayed the ruling here the same day. Its research and measurements are private to the platform and are cited by content, never by id. *The ruling as relayed, not verbatim:* a dielectric slab and a metal slab, mixed by metalness (`SubstrateHorizontalMixing`, parameter blending off), under ONE coat slab weighted by `coat_weight` (`SubstrateVerticalLayering`, parameter blending off). It replaces two calls of Epic's `MF_Substrate_OpenPBR_Opaque`, each carrying its own coat. *"TwoLayer, Masked and Emissive keep the two calls until Opaque holds; then they follow."*
 
@@ -160,4 +160,5 @@ Every §In now bullet names a step above or *at the close*. Click 1 needs only 3
 
 ## Execution Log
 
-_(populated during execution)_
+- **Start (2026-11-12):** tree `main` at `c0ddfa8`; uncommitted: `build_masters.py` (the three `o2_front` edits this phase takes in, 30.1) and `tools/compressors/compress_textures.py` (the lead's, never staged). No Unreal running.
+  - **Deviation (the Brief's "today's master at 160 B (the pinned runtime)"):** the pinned runtime is Linux-only, so "today" is the editor-mode build of `HEAD`'s builder (`MATTER_MASTERS_OPAQUE` unset) on the Windows machine, rendered before 30.1's build replaces it.
