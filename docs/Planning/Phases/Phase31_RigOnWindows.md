@@ -1,8 +1,8 @@
-# Phase TBD — The Rig on Windows
+# Phase31 — The Rig on Windows
 
-**Status:** SEEDED 2026-11-12 (phase doc exists; discovery has not opened). Not numbered: numbering is the lead's.
+**Status:** DISCOVERY — opened 2026-11-12 by the lead's `/discovery 31`, which numbered it (seeded the same day, un-numbered). Runs ahead of Phase30, which is parked on it (RD-P30-2).
 
-**Why it exists:** the lead has only a Windows machine now (*"i only have this windows machine, not linux"*, 2026-11-12). Asked how Phase30 should be judged, the lead chose *"2"*: get the rig running on Windows first, with Phase30 waiting behind it ([Phase30](../Phase30_OneCoatOpaqueMaster.md) RD-P30-2).
+**Why it exists:** the lead has only a Windows machine now (*"i only have this windows machine, not linux"*, 2026-11-12). Asked how Phase30 should be judged, the lead chose *"2"*: get the rig running on Windows first, with Phase30 waiting behind it ([Phase30](Phase30_OneCoatOpaqueMaster.md) RD-P30-2).
 
 ## Outcome
 

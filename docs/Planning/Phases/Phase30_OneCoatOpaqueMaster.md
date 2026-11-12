@@ -1,6 +1,6 @@
 # Phase30 — One Coat on the Opaque Master
 
-**Status:** DISCOVERY — Brief written 2026-11-12, **parked on [The Rig on Windows](Future/PhaseTBD_RigOnWindows.md)** (RD-P30-2). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
+**Status:** DISCOVERY — Brief written 2026-11-12, **parked on [Phase31 — The Rig on Windows](Phase31_RigOnWindows.md)** (RD-P30-2). Both blockers ruled the same day (RD-P30-1, RD-P30-2). Numbered by the lead the same day (*"Phase30, open discovery"*). Lane: **build**.
 
 **Where the ask came from:** on 2026-11-12 the lead ruled, on the platform's ticket about what the Matter masters cost to draw, that the Opaque master is built from Substrate's own nodes ("O2"). The platform session relayed the ruling here the same day. Its research and measurements are private to the platform and are cited by content, never by id. *The ruling as relayed, not verbatim:* a dielectric slab and a metal slab, mixed by metalness (`SubstrateHorizontalMixing`, parameter blending off), under ONE coat slab weighted by `coat_weight` (`SubstrateVerticalLayering`, parameter blending off). It replaces two calls of Epic's `MF_Substrate_OpenPBR_Opaque`, each carrying its own coat. *"TwoLayer, Masked and Emissive keep the two calls until Opaque holds; then they follow."*
 
@@ -91,7 +91,7 @@
    - **(a) Recommended.** This phase takes all three to the same front once Opaque holds (step 30.2), reads every master at 80 B (T1), and only then sets the runtime to 80 B and tells the platform it may. That keeps your ordering, *"until Opaque holds; then they follow"*, inside one phase. The code is shared: `o2_front` already takes the pins every master is fed.
    - **(b)** Opaque only. The runtime and Studio stay at 160 B until a later phase moves the rest, so the 80 B saving waits.
    - *(Studio going to 80 B with three masters still on two calls is not offered: it ships 8 known-bright articles.)*
-2. **RULED 2026-11-12 → the rig on Windows first, RD-P30-2.** The lead: *"i only have this windows machine, not linux"*, then, offered (1) judge in Studio with Blender as the reference, (2) get the rig running on Windows first, (3) park: *"2"*. *My reading:* there is no machine with Unreal on Linux any more. The rig's three columns, the Unreal app's build and the runtime publish move to this Windows machine in a unit of their own ([The Rig on Windows](Future/PhaseTBD_RigOnWindows.md), seeded the same day, which holds what was measured). This Brief's clicks run there once it closes. Every "the machine with Unreal" in this doc now means the Windows machine. What that machine has and lacks today:
+2. **RULED 2026-11-12 → the rig on Windows first, RD-P30-2.** The lead: *"i only have this windows machine, not linux"*, then, offered (1) judge in Studio with Blender as the reference, (2) get the rig running on Windows first, (3) park: *"2"*. *My reading:* there is no machine with Unreal on Linux any more. The rig's three columns, the Unreal app's build and the runtime publish move to this Windows machine in a unit of their own ([Phase31 — The Rig on Windows](Phase31_RigOnWindows.md), seeded the same day, which holds what was measured). This Brief's clicks run there once it closes. Every "the machine with Unreal" in this doc now means the Windows machine. What that machine has and lacks today:
   - Storm is built by hand (its driver is still Linux-shaped);
   - Blender 5.x is missing (4.0 is installed);
   - the library's Unreal app has never been built (Visual Studio 2026 is present).
@@ -155,7 +155,7 @@ Every §In now bullet names a step above or *at the close*. Click 1 needs only 3
 
 - **Passes captured:** 1.
 - **Current working direction:** 30.1 Opaque, then 30.2 the other two-call masters and the 80 B runtime.
-- **Open decisions:** none. Both blockers ruled (RD-P30-1, RD-P30-2). The phase is parked until The Rig on Windows closes.
+- **Open decisions:** none. Both blockers ruled (RD-P30-1, RD-P30-2). The phase is parked until Phase31 (The Rig on Windows) closes.
 - **Checks to carry forward:** T1 at 80 B per master; ΔE per swatch against today's master; FilmToneMap undone before reading any Studio PNG.
 
 ## Execution Log
