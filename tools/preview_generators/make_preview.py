@@ -108,7 +108,12 @@ def usd_env(inst: Path) -> dict:
     env = dict(os.environ)
     env["PATH"] = f"{inst / 'bin'}{os.pathsep}{env.get('PATH', '')}"
     env["PYTHONPATH"] = f"{inst / 'lib' / 'python'}{os.pathsep}{env.get('PYTHONPATH', '')}"
-    env["LD_LIBRARY_PATH"] = str(inst / "lib")
+    if sys.platform == "win32":
+        # Windows finds the build's DLLs on PATH (pxr adds each PATH entry with
+        # os.add_dll_directory), and they sit in lib/ as well as bin/.
+        env["PATH"] = f"{inst / 'lib'}{os.pathsep}{env['PATH']}"
+    else:
+        env["LD_LIBRARY_PATH"] = str(inst / "lib")
     env["PXR_MTLX_STDLIB_SEARCH_PATHS"] = str(inst / "libraries")
     if sys.platform.startswith("linux"):
         # The build's Garch is GLX-only: Qt must use xcb + GLX (see activate-usd-tools.sh).

@@ -34,9 +34,11 @@ Where the runtime comes from, first found wins: ``$MATTER_UNREAL_RUNTIME`` (a pa
 launcher); editor mode on request, ``$MATTER_UNREAL_EDITOR`` (an Unreal 5.8 ``UnrealEditor``) on
 ``unreal/MatterRuntime``; else the build ``unreal/RUNTIME.json`` pins, a GitHub Release asset of
 this repo, downloaded once into the git-ignored ``unreal/package/`` and checked by sha256
-(Phase06 D2), so a machine with no Unreal renders the column. That build is Linux-only: on a Mac,
-with neither variable set, the driver runs editor mode on the Unreal 5.8 under ``$UE_ROOT``
-(default ``/Users/Shared/Epic Games/UE_5.8``). ``find_runtime()`` returns None when there is
+(Phase06 D2), so a machine with no Unreal renders the column. On a Mac or on Windows, with neither
+variable set, the driver runs editor mode on the Unreal 5.8 under ``$UE_ROOT`` when it is there
+(default ``/Users/Shared/Epic Games/UE_5.8`` on a Mac, ``C:/Program Files/Epic Games/UE_5.8`` on
+Windows; 2026-11-12). The pinned build runs only on the platform the pin names (``"platform"``,
+``Linux`` when absent; ``Win64`` since 2026-11-13). ``find_runtime()`` returns None when there is
 none, and the rig then skips the column with a notice. ``find_runtime(fetch=False)`` only asks:
 it answers from this machine as it is and never downloads (2026-10-11).
 
@@ -618,9 +620,9 @@ def find_runtime(fetch: bool = True) -> list[str] | None:
     """The command that starts the runtime, or None (the rig skips the column with a notice).
 
     First found wins: ``$MATTER_UNREAL_RUNTIME`` (a launcher), editor mode when asked for by
-    ``$MATTER_UNREAL_EDITOR``, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
-    downloaded and checked on first use. The pinned build is Linux-only, so a Mac runs editor
-    mode on the Unreal 5.8 under ``$UE_ROOT`` instead, or has no runtime.
+    ``$MATTER_UNREAL_EDITOR``, editor mode on the Unreal 5.8 under ``$UE_ROOT`` on a Mac or on
+    Windows when it is installed, else the build ``unreal/RUNTIME.json`` pins (Phase06 D2),
+    downloaded and checked on first use, on the platform it was built for only.
 
     ``fetch=False`` only asks: a pinned build that is not unpacked here is None, and nothing is
     downloaded (a caller that wants to know whether a runtime is present, and to launch nothing).
@@ -632,15 +634,28 @@ def find_runtime(fetch: bool = True) -> list[str] | None:
     if not editor and sys.platform == "darwin":
         ue = Path(os.environ.get("UE_ROOT", "/Users/Shared/Epic Games/UE_5.8"))
         mac = ue / "Engine" / "Binaries" / "Mac" / "UnrealEditor.app" / "Contents" / "MacOS" / "UnrealEditor"
-        if not mac.is_file():
-            return None
-        editor = str(mac)
+        if mac.is_file():
+            editor = str(mac)
+    if not editor and sys.platform == "win32":
+        ue = Path(os.environ.get("UE_ROOT", "C:/Program Files/Epic Games/UE_5.8"))
+        win = ue / "Engine" / "Binaries" / "Win64" / "UnrealEditor.exe"
+        if win.is_file():
+            editor = str(win)
     if editor:
         return [editor, str(PROJECT), "-game"]
-    if PIN.is_file():
+    if PIN.is_file() and pin_platform() == HOST_PLATFORM:
         launcher = pinned_package(fetch)
         return [str(launcher)] if launcher else None
     return None
+
+
+HOST_PLATFORM = {"linux": "Linux", "win32": "Win64", "darwin": "Mac"}.get(sys.platform, sys.platform)
+LAUNCHERS = {"Linux": ("Linux", "MatterRuntime.sh"), "Win64": ("Windows", "MatterRuntime.exe")}
+
+
+def pin_platform() -> str:
+    """The platform the pinned build was made for (a pin before 2026-11-13 names none: Linux)."""
+    return json.loads(PIN.read_text(encoding="utf-8")).get("platform", "Linux")
 
 
 def pinned_package(fetch: bool = True) -> Path | None:
@@ -648,7 +663,8 @@ def pinned_package(fetch: bool = True) -> Path | None:
     ``fetch`` off, None where it would have downloaded."""
     pin = json.loads(PIN.read_text(encoding="utf-8"))
     root = PACKAGES / pin["tag"]
-    launcher, stamp = root / "Linux" / "MatterRuntime.sh", root / ".sha256"
+    folder, exe = LAUNCHERS[pin.get("platform", "Linux")]
+    launcher, stamp = root / folder / exe, root / ".sha256"
     if launcher.is_file() and stamp.is_file() and stamp.read_text().strip() == pin["sha256"]:
         return launcher
     if not fetch:
@@ -657,6 +673,7 @@ def pinned_package(fetch: bool = True) -> Path | None:
     import shutil  # noqa: PLC0415
     import tarfile  # noqa: PLC0415
     import urllib.request  # noqa: PLC0415
+    import zipfile  # noqa: PLC0415
     url = f"{RELEASES}/{pin['tag']}/{pin['asset']}"
     print(f"unreal: downloading {url} ({pin['size'] / 1e6:.0f} MB, once per machine)")
     PACKAGES.mkdir(parents=True, exist_ok=True)
@@ -671,12 +688,16 @@ def pinned_package(fetch: bool = True) -> Path | None:
         raise SystemExit(f"unreal: {url} has sha256 {h.hexdigest()}, the pin says {pin['sha256']}")
     shutil.rmtree(root, ignore_errors=True)
     root.mkdir(parents=True)
-    with tarfile.open(part) as t:
-        t.extractall(root, filter="data")
+    if pin["asset"].endswith(".zip"):
+        with zipfile.ZipFile(part) as z:
+            z.extractall(root)
+    else:
+        with tarfile.open(part) as t:
+            t.extractall(root, filter="data")
     part.unlink()
     stamp.write_text(pin["sha256"] + "\n")
     if not launcher.is_file():
-        raise SystemExit(f"unreal: {pin['asset']} has no Linux/MatterRuntime.sh")
+        raise SystemExit(f"unreal: {pin['asset']} has no {folder}/{exe}")
     return launcher
 
 
@@ -698,12 +719,18 @@ def run_runtime(cmd: list[str], ujob: Path, log: Path, expect: list[Path] = ()) 
     if packaged:        # a package runs with no display at all, on SDL's dummy driver (UR-F8)
         env.pop("DISPLAY", None)
         env.pop("WAYLAND_DISPLAY", None)
-    full = ["nice", "-n", "19", *cmd, f"-MatterJob={ujob}", "-RenderOffscreen", "-unattended",
+    full = [*cmd, f"-MatterJob={ujob}", "-RenderOffscreen", "-unattended",
             "-nosound", "-stdout", "-FullStdOutLogOutput"]
+    low = {}            # the lowest priority: other work on the machine comes first
+    if sys.platform == "win32":
+        low["creationflags"] = subprocess.BELOW_NORMAL_PRIORITY_CLASS
+    else:
+        full = ["nice", "-n", "19", *full]
     record = ujob.parent / "raw" / "matter_runtime.log"     # the app's own record (Shipping has no log)
     record.unlink(missing_ok=True)
     with log.open("w", encoding="utf-8") as fh:
-        rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S).returncode
+        rc = subprocess.run(full, stdout=fh, stderr=subprocess.STDOUT, env=env, timeout=TIMEOUT_S,
+                            **low).returncode
     missing = [p for p in expect if not p.is_file()]
     if rc != 0 or missing:
         why = f"exit {rc}" if rc != 0 else f"exit 0 but {len(missing)} of {len(expect)} pictures missing"

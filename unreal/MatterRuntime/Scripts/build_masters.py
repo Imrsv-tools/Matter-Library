@@ -6,7 +6,9 @@ Run as a commandlet (no GPU; unreal/build.sh does it):
       -EnablePlugins=PythonScriptPlugin,EditorScriptingUtilities -unattended -nullrhi
 
 Each master is Epic's Substrate OpenPBR function (``MF_Substrate_OpenPBR_{Opaque,Translucent}``,
-engine content, UR-F4) plus our network around it (Phase06 D6), a port of
+engine content, UR-F4) plus our network around it (Phase06 D6), but for the masters that carry
+metal (Opaque, TwoLayer, Masked, Emissive), whose BSDF is built from Substrate's own nodes with ONE
+coat (``one_coat_front``, Phase30 D-P30-1, 30.2); a port of
 ``blender/masters/build_masters.py``'s ``_build``; the formulas are MaterialX's, and that file
 names each one's source. Parameter names are the article's (D5): OpenPBR's for lane A, the frozen
 Creator ports, and the author-tier names. Every master is deleted and rebuilt, so the output
@@ -14,7 +16,8 @@ depends only on this script and the engine.
 
 Built: the 8 masters (``MASTERS``), all on the Opaque core (6.3: ``place2d``, the per-article
 textures, the mask set, three overlays each at its own real-world size, the roughness bias and the
-tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function, but for the coat's
+tangent-space normal; coat, fuzz and anisotropy pass straight to Epic's function, or to the
+one-coat front's slabs, but for the coat's
 darkening of the base, which is MaterialX's own), each with its
 own part (6.4; 6.5: Hair, and the mesh's ``cutout_tex`` on Masked and Hair; Phase09: the mesh's
 picture ``base_color_map_tex`` on Opaque, Masked, Hair and Subsurface), and the Sky (the rig's
@@ -136,10 +139,13 @@ SCALED = {"subsurface_radius": 100.0, "transmission_depth": 100.0}
 SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: radius x (1 + 4 x scatter_map), as the assembler's
 
 # Each master (MasterSet §Material-settings intent, normative: coverage, two-sided, refraction):
-#   calls    2 = Epic's function at metalness 0 and 1, mixed by the article's metalness
-#            (OpenPBR's linear metal mix, 6.3), on the masters that carry metal; 1 on the ones
-#            whose articles are dielectric by definition (Epic's single call is exact at metalness
-#            0), which also keeps their Substrate bytes down
+#   calls    0 = no call of Epic's function: Substrate's own slabs, one coat over a linear mix of a
+#            dielectric and a metal slab (one_coat_front, Phase30), on every master that carries
+#            metal (Opaque at 30.1; TwoLayer, Masked and Emissive at 30.2). They made two calls
+#            before, Epic's function at metalness 0 and 1 mixed by the article's metalness (6.3):
+#            two coats a pixel, which needed the 160-byte budget (Learnings Unreal U3). 1 on the
+#            ones whose articles are dielectric by definition (Epic's single call is exact at
+#            metalness 0), which also keeps their Substrate bytes down
 #   thin     geometry_thin_walled, a property of the master (its settings row), not a parameter
 #   base_map the mesh's picture, base_color_map_tex (LCDSchema §Base colour map, Phase09 RD-P09-1),
 #            on the masters whose author tier carries it
@@ -154,14 +160,14 @@ SCATTER_GAIN = 4.0   # Phase22 RD-P22-18: radius x (1 + 4 x scatter_map), as the
 #            black default) mixed in after the roughness clamp; both coverages x makeup_amount.
 #            Coverage 0 at the defaults, so the master draws as before (no runtime owed)
 MASTERS = {
-    "Opaque":           dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, base_map=True),
-    "TwoLayer":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, layer2=True),
-    "Masked":           dict(fn=FN_OPAQUE, calls=2, blend="masked", two_sided=True, opacity=True, base_map=True),
+    "Opaque":           dict(fn=FN_OPAQUE, calls=0, blend="opaque", two_sided=False, base_map=True),
+    "TwoLayer":         dict(fn=FN_OPAQUE, calls=0, blend="opaque", two_sided=False, layer2=True),
+    "Masked":           dict(fn=FN_OPAQUE, calls=0, blend="masked", two_sided=True, opacity=True, base_map=True),
     # Hair (Phase06 D12, 6.5): matte on cards, default lit (not Unreal's hair shading model, which
     # reads a flat card as one glossy sheet); the cut-out as soft coverage, dithered; the light
     # through the card folded into its colour (build_master's hair part). Dielectric: one call.
     "Hair":             dict(fn=FN_OPAQUE, calls=1, blend="masked", two_sided=True, hair=True, base_map=True),
-    "Emissive":         dict(fn=FN_OPAQUE, calls=2, blend="opaque", two_sided=False, extra=EMISSION),
+    "Emissive":         dict(fn=FN_OPAQUE, calls=0, blend="opaque", two_sided=False, extra=EMISSION),
     "Subsurface":       dict(fn=FN_OPAQUE, calls=1, blend="opaque", two_sided=False, extra=SUBSURFACE,
                              base_map=True, shine=True, makeup=True),
     "TranslucentThin":  dict(fn=FN_TRANSLUCENT, calls=1, blend="translucent", two_sided=True,
@@ -586,6 +592,137 @@ def lerp(g, a, b, alpha, col, a_out="", b_out=""):
     return n
 
 
+def _pin(node, want, outputs=False):
+    """A Substrate node's pin by its name with spaces and case ignored ("SSS MFP" = "sssmfp"):
+    the Python names were not read from a running 5.8, so a miss stops the build naming them."""
+    names = [str(n) for n in (MEL.get_material_expression_output_names(node) if outputs
+                              else MEL.get_material_expression_input_names(node))]
+    for n in names:
+        if n.replace(" ", "").lower() == want:
+            return n
+    raise RuntimeError(f"front: {node.get_name()} has no {'output' if outputs else 'input'} {want!r}: {names}")
+
+
+def one_coat_front(g, pins, metal):
+    """Phase30 (D-P30-1): OpenPBR's layout in Substrate's own nodes, the Blender master's layout (one
+    Principled BSDF, one coat over a linear mix). A dielectric slab and a metal slab, mixed by
+    metalness with parameter blending off (the linear mix of Phase06 6.3), under ONE coat slab,
+    weighted by coat_weight and layered with parameter blending off. Fed what Epic's function was fed
+    (the base colour already darkened by the coat, MaterialX's own factor), and (D-P30-2):
+
+    * base colour x base_weight, before both slabs, as OpenPBR does;
+    * dielectric F0 = ((eta_s - 1) / (eta_s + 1))^2 x specular_color x min(specular_weight, 1 / eta_s),
+      F90 1, eta_s the base's index relative to the coat's under it; the min is Epic's function's, not
+      open_pbr_surface.mtlx's (which scales by specular_weight alone), kept because Storm agrees with it;
+      metal F0 = base x specular_weight, F90 white:
+      no edge tint (Drift 2026-11-12: the 5.8 slab has no F82 pin, and an F90 edge tint costs a uint
+      80 B does not have; the library carries none, F-LC-6);
+    * fuzz on the dielectric slab only, one fuzz a pixel (Drift 2026-11-12: a fuzzy metal loses it);
+    * base_diffuse_roughness on the dielectric slab's Roughness, its specular roughness on Second
+      Roughness at weight 1, as Epic's function does (the 5.8 slab has no diffuse-roughness pin);
+    * the coat's colour, square-rooted, through TransmittanceToMFP; anisotropy passed as it is;
+    * the light (the Emissive master, 30.2), emission_luminance x emission_color, on both base slabs;
+    * the Masked master's coverage (geometry_opacity) on a Weight over the whole stack (30.2)."""
+    M = unreal
+
+    def slab(col, **wires):
+        s = g.node(M.MaterialExpressionSubstrateSlabBSDF, col)
+        for want, (src, out) in wires.items():
+            g.link(src, s, _pin(s, want), out)
+        return s
+
+    def f0(ior, col):
+        r = g.op(M.MaterialExpressionDivide, g.op_k(M.MaterialExpressionSubtract, ior[0], 1.0, col + 1, ior[1]),
+                 g.op_k(M.MaterialExpressionAdd, ior[0], 1.0, col + 1, ior[1]), col)
+        return g.op(M.MaterialExpressionMultiply, r, r, col - 1)
+
+    # F90 is left unwired where it is 1: an unwired F90 is white (MaterialExpressionSubstrate.cpp), and a wired one
+    # costs an edge-colour uint a slab (SubstrateTranslatorCommon.cpp, EdgeColor). A byte test for 80 B.
+    black = (g.node(M.MaterialExpressionConstant3Vector, -1, constant=unreal.LinearColor(0, 0, 0, 0)), "")
+    bc, bw = pins["base_color"], pins["base_weight"]
+    base_c = (g.op(M.MaterialExpressionMultiply, bc[0], bw[0], -2, a_out=bc[1], b_out=bw[1]), "")
+    spec_w = pins["specular_weight"]
+    common = dict(anisotropy=pins["specular_roughness_anisotropy"], normal=pins["geometry_normal"])
+    # The dielectric's diffuse roughness, as Epic's function feeds it (read from its compiled shader,
+    # 2026-11-12): a slab's Roughness pin also sets its diffuse (Chan) lobe, so the dielectric slab takes
+    # base_diffuse_roughness there and its specular roughness as Second Roughness at weight 1. With the
+    # specular roughness on Roughness the grey card drew x1.06 (sphere) to x1.12 (floor) of Storm.
+    one = (g.node(M.MaterialExpressionConstant, -5, r=1.0), "")
+    diffuse_rough = dict(roughness=pins["base_diffuse_roughness"], secondroughness=pins["specular_roughness"],
+                         secondroughnessweight=one)
+    # Fuzz on the dielectric slab only (one fuzz a pixel, not two): a byte test for 80 B. A fuzzy metal loses its fuzz.
+    fuzz = dict(fuzzamount=pins["fuzz_weight"], fuzzcolor=pins["fuzz_color"], fuzzroughness=pins["fuzz_roughness"])
+    # Phase30 30.2: the Emissive master's light on both base slabs, so under the coat (and the dielectric's
+    # fuzz), where Epic's function puts it (Unreal.md U4); mixed by metalness, the two sum to it. The slab
+    # takes the radiance as it is, emission_luminance x emission_color (U4's length rule was the function's).
+    glow = dict(emissivecolor=pins["emission"]) if "emission" in pins else {}
+    # Under the coat the base's index is relative to the coat's (open_pbr_surface.mtlx eta_s, as Epic's
+    # MF_OpenPBR_IOR does for the function): mix(s, max(s/c, c/s), coat_weight), the max being the TIR fix
+    s, c, w = pins["specular_ior"], pins["coat_ior"], pins["coat_weight"]
+    ratio = g.op(M.MaterialExpressionMax,
+                 g.op(M.MaterialExpressionDivide, s[0], c[0], -1, a_out=s[1], b_out=c[1]),
+                 g.op(M.MaterialExpressionDivide, c[0], s[0], -1, a_out=c[1], b_out=s[1]), 0)
+    eta_s = g.node(M.MaterialExpressionLinearInterpolate, 1)
+    g.link(s[0], eta_s, "A", s[1])
+    g.link(ratio, eta_s, "B")
+    g.link(w[0], eta_s, "Alpha", w[1])
+    # specular_weight enters as min(specular_weight, 1 / eta_s), as Epic's function has it (read from its
+    # compiled shader at 160 B, 2026-11-12), not as open_pbr_surface.mtlx's plain x specular_weight: at
+    # index 1.5 that is F0 x 0.67. With the plain weight the slab drew every rough dielectric brighter
+    # than Storm (grey card x1.03, Leather x1.05 to x1.07); with Epic's factor it draws as today's master
+    # to three decimals (grey card, Leather, Felt, Porcelain). F0 is wired either way: no byte cost.
+    d_f0 = g.op(M.MaterialExpressionMultiply,
+                g.op(M.MaterialExpressionMultiply, f0((eta_s, ""), -3), pins["specular_color"][0], -4,
+                     b_out=pins["specular_color"][1]),
+                g.op(M.MaterialExpressionMin, spec_w[0],
+                     g.op(M.MaterialExpressionDivide, one[0], eta_s, -5), -4, a_out=spec_w[1]), -5)
+    dielectric = slab(-6, diffusealbedo=base_c, f0=(d_f0, ""), **diffuse_rough, **common, **fuzz, **glow)
+    m_f0 = g.op(M.MaterialExpressionMultiply, base_c[0], spec_w[0], -5, b_out=spec_w[1])
+    # The metal's F90 is left white (no edge tint): a wired F90 costs the slab a uint, and with the
+    # dielectric's haziness uint the three slabs came to 21 of 80 B's 20, so the compiler blended the
+    # metal mix's parameters (Verdigris drew 3.10 dE at 80 B, 0.98 at 160 B). The library carries no
+    # edge tint (F-LC-6), so no article changes (Drift 2026-11-12).
+    metal_slab = slab(-6, diffusealbedo=black, f0=(m_f0, ""), roughness=pins["specular_roughness"], **common,
+                      **glow)
+    base = g.node(M.MaterialExpressionSubstrateHorizontalMixing, -7)
+    base.set_editor_property("use_parameter_blending", False)
+    g.link(dielectric, base, "Background")
+    g.link(metal_slab, base, "Foreground")
+    g.link(metal, base, "Mix")
+
+    # The coat as Epic's function makes it: its colour is the transmittance of the light's whole way down
+    # and back up, so each pass takes its square root (a coat tinted (0.55, 0.75, 1) drew the base x0.58 /
+    # x0.77 of Storm without it), over a coat 5 thick in both the layering and the conversion.
+    tint = g.node(M.MaterialExpressionSubstrateTransmittanceToMFP, -5)
+    g.link(g.one(M.MaterialExpressionSquareRoot, pins["coat_color"][0], -4, pins["coat_color"][1]),
+           tint, _pin(tint, "transmittancecolor"))
+    thick = (g.node(M.MaterialExpressionConstant, -4, r=5.0), "")
+    g.link(thick[0], tint, _pin(tint, "thickness"))
+    coat = slab(-6, diffusealbedo=black, f0=(f0(pins["coat_ior"], -3), ""), roughness=pins["coat_roughness"],
+                sssmfp=(tint, _pin(tint, "mfp", outputs=True)))
+    # coat_weight on a Weight node over the coat, as Epic's function weights its coat. Tried 2026-11-12
+    # and rejected: the coat's coverage (the Weight under a parameter-blended self-mix), which drew
+    # alike to 3 decimals on every fixture but puts parameter blending in the shader; and the coat's
+    # F0 scaled by the weight, which drew Leather (coat 0.3) x1.09 to x1.20 of Storm.
+    weighted = g.node(M.MaterialExpressionSubstrateWeight, -7)
+    g.link(coat, weighted, _pin(weighted, "a"))
+    g.link(w[0], weighted, _pin(weighted, "weight"), w[1])
+    top = g.node(M.MaterialExpressionSubstrateVerticalLayering, -8)
+    top.set_editor_property("use_parameter_blending", False)
+    g.link(weighted, top, _pin(top, "top"))
+    g.link(base, top, _pin(top, "bottom"))
+    g.link(thick[0], top, _pin(top, "topthickness"))    # the top layer's thickness is the layering's
+    if "geometry_opacity" not in pins:
+        return top
+    # The Masked master's coverage on a Weight over the whole stack, as Epic's function weights it: a
+    # kept pixel draws x its coverage. Drawn whole instead (Blender's reading), Lace_Floral's wide view
+    # drew 4/255 brighter than today's master and further from Storm (2.62 dE against 2.09).
+    covered = g.node(M.MaterialExpressionSubstrateWeight, -9)
+    g.link(top, covered, _pin(covered, "a"))
+    g.link(pins["geometry_opacity"][0], covered, _pin(covered, "weight"), pins["geometry_opacity"][1])
+    return covered
+
+
 def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None,
                  flat_map=None, noise=None):
     """One master: Epic's function plus the core network (``MASTERS`` says what each adds —
@@ -598,7 +735,8 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
       mesh's picture, on the mesh's own st, where the master has it: Phase09 RD-P09-1);
     * roughness: specular_roughness x roughness_tex, + each overlay's B x effect, then
       roughness_biased_clamped = saturate(+ roughness_bias);
-    * metalness: base_metalness x metalness_tex, the Mix of the two calls (metalness 0 and 1);
+    * metalness: base_metalness x metalness_tex, the Mix of the one-coat front's two slabs (or a
+      single call's own metalness);
     * the normal, in TANGENT space: normal_tex x 2 - 1, + each overlay's (RG x 2 - 1, 0) x effect,
       normalised ONCE (MasterSet, since 5.3);
     * an overlay's effect = overlayN_density x overlay.A x gate, gate = mix(1, maskset[G|B|A],
@@ -615,18 +753,22 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
     fn = unreal.load_asset(spec["fn"])
     # OpenPBR's base is a LINEAR mix of the dielectric and metal lobes by metalness. Epic's
     # function mixes them by blending parameters (its "Is Metal?" mix), which reads 0 < metalness
-    # < 1 wrong (Copper's floor x1.16 / x1.31). So: two calls, metalness 0 (dielectric) and 1
-    # (metal), every other input the same, mixed per pixel by our own horizontal mix with
-    # parameter blending off (Phase06 6.3, the lead's ruling "c then b"). It needs Substrate's
-    # 160-byte budget (Config/DefaultEngine.ini), or the compiler flattens each coat to fit.
+    # < 1 wrong (Copper's floor x1.16 / x1.31). So Phase06 6.3 made two calls, metalness 0
+    # (dielectric) and 1 (metal), mixed per pixel by our own horizontal mix with parameter blending
+    # off (the lead's ruling "c then b"); that needed Substrate's 160-byte budget, or the compiler
+    # flattened each coat to fit. Phase30: a master that carries metal makes no call (calls 0): the
+    # same linear mix, of Substrate's own slabs, under one coat (one_coat_front), fed what a call
+    # would be fed.
     calls = []
     for col in range(1, spec["calls"] + 1):
         c = g.node(M.MaterialExpressionMaterialFunctionCall, col)
         c.set_material_function(fn)
         calls.append(c)
-    inputs = set(MEL.get_material_expression_input_names(calls[0]))
+    inputs = set(MEL.get_material_expression_input_names(calls[0])) if calls else None
+    pins = {}   # what each of the function's pins is fed: the one-coat front's slabs read them
 
     def feed(src, name, src_out=""):
+        pins[name] = (src, src_out)
         for c in calls:
             g.link(src, c, name, src_out)
 
@@ -759,11 +901,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         base = g.op(M.MaterialExpressionLinearInterpolate, base,
                     g.op(M.MaterialExpressionMultiply, base, base, 5), 4)
         g.link(w, base, "Alpha")
-    if len(calls) == 2:
-        for c, m in zip(calls, (0.0, 1.0)):
-            g.link(g.node(M.MaterialExpressionConstant, 2, r=m), c, "base_metalness")
-    else:
-        feed(metal, "base_metalness")
+    feed(metal, "base_metalness")
 
     if spec.get("shine"):
         # Phase22 (LCDSchema §Shine maps, RD-P22-4): the mesh's roughness map, linear on its own st,
@@ -816,7 +954,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
     params = {}     # each pass-through parameter as the article sets it, before any scaling
     fed = {}        # ... and as Epic's function is given it
     for name, default in {**PASS_THROUGH, **spec.get("extra", {})}.items():
-        if name not in inputs:
+        if inputs is not None and name not in inputs:
             missing.append(name)
             continue
         p = g.vector(name, default) if isinstance(default, tuple) else g.scalar(name, default)
@@ -855,7 +993,7 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         # below too, times the length of its colour
         if name not in ("subsurface_color", "emission_luminance"):
             feed(p, name)
-    if "coat_darkening" not in inputs:
+    if inputs is not None and "coat_darkening" not in inputs:
         missing.append("coat_darkening")
     if missing:
         raise RuntimeError(f"{token}: Epic's function has no input {missing}")
@@ -894,23 +1032,29 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
     feed(g.op(M.MaterialExpressionMultiply, base, factor, 1), "base_color")
     if "subsurface_color" in fed:
         feed(g.op(M.MaterialExpressionMultiply, fed["subsurface_color"], factor, 1), "subsurface_color")
-    feed(g.node(M.MaterialExpressionConstant, 2, r=0.0), "coat_darkening")
+    if calls:
+        feed(g.node(M.MaterialExpressionConstant, 2, r=0.0), "coat_darkening")
     if "emission_luminance" in fed:
         # The light. OpenPBR's radiance is emission_luminance x emission_color. Epic's function
         # draws emission_luminance x the colour's DIRECTION, the colour over its own length:
         # white, a 0.5 grey and a 0.2 grey read alike, and over twelve colours the reading x the
         # colour's length is one number to 5 parts in 10,000 (2026-10-11: float captures, black
-        # base, sun and sky scaled to zero, Storm renders the product exactly). So the luminance
-        # is given the colour's length, and a black colour gives no light.
+        # base, sun and sky scaled to zero, Storm renders the product exactly). So a call's
+        # luminance is given the colour's length, and a black colour gives no light. Phase30 30.2:
+        # the one-coat front's slabs take the radiance itself.
         colour = params["emission_color"]
-        length = g.one(M.MaterialExpressionSquareRoot,
-                       g.op(M.MaterialExpressionDotProduct, colour, colour, 4), 3)
-        feed(g.op(M.MaterialExpressionMultiply, fed["emission_luminance"], length, 2), "emission_luminance")
+        if calls:
+            length = g.one(M.MaterialExpressionSquareRoot,
+                           g.op(M.MaterialExpressionDotProduct, colour, colour, 4), 3)
+            feed(g.op(M.MaterialExpressionMultiply, fed["emission_luminance"], length, 2), "emission_luminance")
+        else:
+            pins["emission"] = (g.op(M.MaterialExpressionMultiply, fed["emission_luminance"], colour, 2), "")
     if "thin" in spec:
         feed(g.node(M.MaterialExpressionConstant, 2, r=1.0 if spec["thin"] else 0.0), "geometry_thin_walled")
 
-    outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
-    front = next(o for o in outs if "front" in o.lower())
+    if calls:
+        outs = [str(o) for o in MEL.get_material_expression_output_names(calls[0])]
+        front = next(o for o in outs if "front" in o.lower())
     # Phase29 (MasterSet §Object fade, RD-P29-1): every master dissolves an object part-present, one
     # rule, each in its own blend mode; at object_fade 0 every master draws today's pixels.
     presence, threshold = fade_terms(g, 30, noise)
@@ -921,13 +1065,14 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                    texture(g, "cutout_tex", white, own_st, 12), 11, b_out="R")
     if spec.get("opacity"):
         # Masked (MasterSet: alpha-tested at the cutoff): coverage = geometry_opacity x
-        # opacity_tex x cutout_tex, through Epic's function; kept where coverage >=
-        # opacity_cutoff, which a fixed clip of 0.5 does on (coverage - cutoff + 0.5).
+        # opacity_tex x cutout_tex; kept where coverage >= opacity_cutoff, which a fixed clip of 0.5
+        # does on (coverage - cutoff + 0.5). Phase30 30.2: the clip reads the coverage itself (it read
+        # Epic's function's OpacityMask), and one_coat_front weights a kept pixel by the coverage, as
+        # the function did.
         cov = g.op(M.MaterialExpressionMultiply, cov, texture(g, "opacity_tex", white, uv, 12), 10, b_out="R")
         feed(cov, "geometry_opacity")
         clip = g.op_k(M.MaterialExpressionAdd,
-                      g.op(M.MaterialExpressionSubtract, calls[0], g.scalar("opacity_cutoff", 0.5, col=3), 2,
-                           a_out="OpacityMask"), 0.5, 1)
+                      g.op(M.MaterialExpressionSubtract, cov, g.scalar("opacity_cutoff", 0.5, col=3), 2), 0.5, 1)
         # Phase29: the fade is a second test beside the alpha test; the pixel must pass both
         clip = g.op(M.MaterialExpressionMin, clip, fade_mask(g, presence, threshold, 2), 0)
     elif spec.get("hair"):
@@ -958,13 +1103,8 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
                             g.one(M.MaterialExpressionSign,
                                   g.op(M.MaterialExpressionSubtract, presence, threshold, 4), 3), 1.0, 3), 2)
         feed(kept, "geometry_opacity")
-    if len(calls) == 2:
-        top = g.node(M.MaterialExpressionSubstrateHorizontalMixing, 0)
-        top.set_editor_property("use_parameter_blending", False)
-        g.link(calls[0], top, "Background", front)
-        g.link(calls[1], top, "Foreground", front)
-        g.link(metal, top, "Mix")
-        top_out = ""
+    if not calls:
+        top, top_out = one_coat_front(g, pins, metal), ""
     else:
         top, top_out = calls[0], front
     if not MEL.connect_material_property(top, top_out, unreal.MaterialProperty.MP_FRONT_MATERIAL):

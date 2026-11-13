@@ -6,3 +6,8 @@ MatterLibrary/hdris/** filter=lfs diff=lfs merge=lfs -text
 # A map's source picture, kept beside its provenance record (Phase25 25.3: an image model's picture).
 # Not under textures/: every picture there is a shipped texture to the compressor and the release.
 library/provenance/sources/**/*.png filter=lfs diff=lfs merge=lfs -text
+# Text a release hash-locks byte for byte (freeze_release.py): LF on every checkout, so a clone with
+# core.autocrlf=true (Git for Windows' default) still reproduces the frozen release (2026-11-13).
+*.mtlx text eol=lf
+library/releases/*.json text eol=lf
+library/releases/*.yaml text eol=lf
