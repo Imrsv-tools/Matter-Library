@@ -239,7 +239,7 @@ check(working_tree.declared({"contributor": "MatterBot", "licence": "", "fits": 
 fitted = {a["identity"]: a["fits"] for a in arts if a["fits"]}
 # Phase21: the set GROWS (the skins and lips are fitted), so it is held to the recipes that declare
 # `fits`, not to a list: the entry carries exactly what each recipe declares, and no more
-_recipes = [json.loads(r.read_text()) for r in (B.REPO / "tools" / "converters" / "recipes").glob("*.json")]
+_recipes = [json.loads(r.read_text(encoding="utf-8")) for r in (B.REPO / "tools" / "converters" / "recipes").glob("*.json")]
 declared_fits = {r["name"]: r["fits"] for r in _recipes if r.get("fits")}
 check(fitted == declared_fits and {"Teeth_Natural_Clean_Base_sUKN_v01": "MakeHuman_Teeth_v01",
                                    "Eye_Green_Clean_Base_sUKN_v01": "MakeHuman_Eyes_v01"}.items() <= fitted.items(),
