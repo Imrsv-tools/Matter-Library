@@ -621,7 +621,8 @@ def one_coat_front(g, pins, metal):
     * base_diffuse_roughness on the dielectric slab's Roughness, its specular roughness on Second
       Roughness at weight 1, as Epic's function does (the 5.8 slab has no diffuse-roughness pin);
     * the coat's colour, square-rooted, through TransmittanceToMFP; anisotropy passed as it is;
-    * the light (the Emissive master, 30.2), emission_luminance x emission_color, on both base slabs."""
+    * the light (the Emissive master, 30.2), emission_luminance x emission_color, on both base slabs;
+    * the Masked master's coverage (geometry_opacity) on a Weight over the whole stack (30.2)."""
     M = unreal
 
     def slab(col, **wires):
@@ -711,7 +712,15 @@ def one_coat_front(g, pins, metal):
     g.link(weighted, top, _pin(top, "top"))
     g.link(base, top, _pin(top, "bottom"))
     g.link(thick[0], top, _pin(top, "topthickness"))    # the top layer's thickness is the layering's
-    return top
+    if "geometry_opacity" not in pins:
+        return top
+    # The Masked master's coverage on a Weight over the whole stack, as Epic's function weights it: a
+    # kept pixel draws x its coverage. Drawn whole instead (Blender's reading), Lace_Floral's wide view
+    # drew 4/255 brighter than today's master and further from Storm (2.62 dE against 2.09).
+    covered = g.node(M.MaterialExpressionSubstrateWeight, -9)
+    g.link(top, covered, _pin(covered, "a"))
+    g.link(pins["geometry_opacity"][0], covered, _pin(covered, "weight"), pins["geometry_opacity"][1])
+    return covered
 
 
 def build_master(token, white, no_wear, flat, white_colour=None, grey=None, black=None, clear=None,
@@ -1058,8 +1067,8 @@ def build_master(token, white, no_wear, flat, white_colour=None, grey=None, blac
         # Masked (MasterSet: alpha-tested at the cutoff): coverage = geometry_opacity x
         # opacity_tex x cutout_tex; kept where coverage >= opacity_cutoff, which a fixed clip of 0.5
         # does on (coverage - cutoff + 0.5). Phase30 30.2: the clip reads the coverage itself (it read
-        # Epic's function's OpacityMask), and a kept pixel is drawn whole, as Blender's master keeps it;
-        # the function also weighted it by the coverage.
+        # Epic's function's OpacityMask), and one_coat_front weights a kept pixel by the coverage, as
+        # the function did.
         cov = g.op(M.MaterialExpressionMultiply, cov, texture(g, "opacity_tex", white, uv, 12), 10, b_out="R")
         feed(cov, "geometry_opacity")
         clip = g.op_k(M.MaterialExpressionAdd,
