@@ -1,7 +1,8 @@
 {
-  "tag": "unreal-runtime-v9",
-  "asset": "MatterRuntime-Linux-unreal-runtime-v9.tar.gz",
-  "sha256": "484e0d61f9e7f058961174f0a51d31ae19b5cb638e55747809d9e835e4205254",
-  "size": 245838889,
-  "source": "28fa7f390965df718ce97b00bc34533c723a7f32"
+  "tag": "unreal-runtime-v10",
+  "platform": "Win64",
+  "asset": "MatterRuntime-Win64-unreal-runtime-v10.zip",
+  "sha256": "37bddf7d492cc8cc504305b8c2729f75f82018bff9c87ceae710021e32a89f42",
+  "size": 230881304,
+  "source": "d9b92cb089422022db163c181b95362b1f4deb96"
 }
