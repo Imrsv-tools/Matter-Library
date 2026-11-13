@@ -2,7 +2,7 @@
 
 **Status:** WITHDRAWN AS A PHASE 2026-11-12, after its Brief. The lead: *"i feel a phase for this is overkill, also it only concerns this machine"*. *My reading:* the Windows rig work goes as a `/quick-fix` (or a few), with this doc as its input. The findings, the probe, the gate baseline and the two rulings (RD-P31-1, RD-P31-2) stay in force. The work's machine-specific settings (install paths, environment variables) stay on the machine and out of tracked files. Only the portable changes are committed: the platform branches in the drivers, the `Owner` rename, and the build twin. Kept, not deleted, so its intent survives. *(Historical: BRIEF READY the same day, both blockers ruled.)* Opened and numbered by the lead's `/discovery 31` the same day; seeded earlier that day by Phase30's discovery. Runs ahead of Phase30, which is parked on it (RD-P30-2). Lane: **build**.
 
-**Why it exists:** the lead has only a Windows machine now (*"i only have this windows machine, not linux"*, 2026-11-12). Asked how Phase30 should be judged, the lead chose *"2"*: get the rig running on Windows first ([Phase30](Phase30_OneCoatOpaqueMaster.md) RD-P30-2).
+**Why it exists:** the lead has only a Windows machine now (*"i only have this windows machine, not linux"*, 2026-11-12). Asked how Phase30 should be judged, the lead chose *"2"*: get the rig running on Windows first ([Phase30](Complete/Phase30_OneCoatOpaqueMaster.md) RD-P30-2).
 
 ## Outcome
 

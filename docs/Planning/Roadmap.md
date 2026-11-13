@@ -11,12 +11,6 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 ==================================================================================
 ## Active
 
-### Phase30 — One Coat on the Opaque Master — ACTIVE (parked on the rig running on Windows, a quick fix) *(Brief written 2026-11-12, both blockers ruled; parked the same day on the lead's "2": the rig runs on Windows first, RD-P30-2. 2026-11-12, numbered by the lead, "Phase30, open discovery", on the lead's ruling of the same day on the platform's master-cost ticket)*
-
-**Outcome:** opaque articles in Unreal draw with one clear coat over their base, match the reference at least as well as today, and cost less to draw.
-
-- `docs/Planning/Phases/Phase30_OneCoatOpaqueMaster.md`
-
 *The skin work, Phase28 included, is paused (the lead, 2026-11-09).*
 
 *Material-making runs as a standing process outside the phase line: `/matter-batch` over the wish list.*
@@ -277,3 +271,8 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 **Outcome:** a Character, Prop or Set drawn with the library's materials fades in and out in Unreal, dissolving into what is behind it and never turning to glass, so two versions of one character cross-fade cleanly; fully there, it draws and costs exactly what it does today.
 - `docs/Planning/Phases/Complete/Phase29_ObjectOpacityInTheMasters.md`
 *Closed 2026-11-09, reopened for 29.3 and closed again 2026-11-10: the dissolve as blue-noise grain, an even fade under TSR; the lead: "looks good", then "close".*
+
+### Phase30 — One Coat on the Opaque Master — COMPLETE
+**Outcome:** opaque articles in Unreal draw with one clear coat over their base, match the reference at least as well as today, and cost less to draw.
+- `docs/Planning/Phases/Complete/Phase30_OneCoatOpaqueMaster.md`
+*Closed 2026-11-13: Opaque, TwoLayer, Masked and Emissive under one coat, the runtime at 80 B; the lead: "i dont see a difference between the unreal versions", then "ok".*
