@@ -176,3 +176,4 @@ Every §In now bullet names a step above or *at the close*. Click 1 needs only 3
     - `release_verify` and `activation`: the recorded payload hashes do not match the files on disk, because `core.autocrlf=true` rewrites the hashed text files' line endings.
     - Not this phase's errand; carried to the handback as a quick-fix candidate.
   - **Click 1 ready** for the lead's judgement. The ⚠human step is not marked here.
+- **Click 1 ✅ (the lead, 2026-11-13):** *"i went though the click sheet, looks ok to me"* (sheets: `library/parity/_P30/click1_sheet.png` and `click1_copper_sweep.png`, from `4e229e1`). 30.1 holds; 30.2 opens.
