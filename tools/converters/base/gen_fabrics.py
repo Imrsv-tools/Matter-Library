@@ -18,6 +18,8 @@ fabric at real size, on a 1 cm tile (scale `s001`, 1024 px, ~10 um per pixel).
   centimetre, crowned floats and thread-to-thread slub. Normal and roughness.
 - **Tape_Cotton** (batch 261114-1) — woven cotton tape and webbing: the same plain weave in a
   heavy yarn, 8 ends x 6 picks per centimetre. Normal and roughness.
+- **Velvet_Pile** (Phase11 wish list) — a cut warp-pile velvet: a dense stipple of ~0.2 mm tuft
+  tips, 48 x 48 per centimetre, over cloudy shearing. Normal and roughness.
 
 Seamless (tileable.py; every count divides the tile, and the cell pattern wraps), fixed seeds,
 no network. Writes MatterLibrary/textures/base/synthetic/textile/<Set>_<channel>_s001.png.
@@ -246,10 +248,28 @@ def felt(seed: int = 7506, fibres: int = 2400) -> dict:
     return {"normal": tl.normal_map(height, strength=3.0), "roughness": tl.gray(rough)}
 
 
+def velvet(seed: int = 7509, tufts: int = 48) -> dict:
+    """Phase11 (wish-list row Velvet_Natural): a cut warp-pile velvet. The ground weave is
+    buried under a dense, even pile of short cut tufts (~0.2 mm across, 48 x 48 per cm, each a
+    jittered cell), so no thread structure shows: only a fine stipple of tuft tips, with faint
+    rows where the pile warps were woven in and cloudy tip-to-tip height variation. The sheen is
+    the article's fuzz layer, not these maps. Normal and roughness only."""
+    d1, d2, cid = tl.cells(tufts, seed)
+    tip = np.clip(1.0 - d1 / 0.7, 0, 1) ** 1.5             # a rounded tip on each tuft
+    rng = np.random.RandomState(seed)
+    tuft_h = rng.rand(tufts * tufts)[cid]                    # each tuft cut a touch shorter or longer
+    rows = 0.5 + 0.5 * np.cos(2 * np.pi * Y * tufts / 2)     # pile warps woven in every other row
+    cloud = tl.fbm((16, 32, 64), seed + 1)                   # uneven shearing of the pile
+    fibre = tl.fbm((128, 256), seed + 2)                     # loose fibre ends
+    height = tip * (0.7 + 0.3 * tuft_h) + 0.08 * rows + 0.25 * cloud + 0.12 * fibre
+    rough = 0.68 + 0.05 * (fibre - 0.5) + 0.04 * (cloud - 0.5) - 0.05 * tip
+    return {"normal": tl.normal_map(height, strength=1.6), "roughness": tl.gray(rough)}
+
+
 SETS = {"Cotton_Jersey": jersey, "Denim_Twill": twill, "Leather_Grain": grain,
         "Denim_TwillLight": twill_light, "Canvas_Duck": canvas, "Satin_Warp": satin,
         "Felt_Wool": felt, "Knit_Stretch": stretch_knit, "Wool_Suiting": suiting,
-        "Tape_Cotton": tape}
+        "Tape_Cotton": tape, "Velvet_Pile": velvet}
 
 
 def main(argv=None) -> int:

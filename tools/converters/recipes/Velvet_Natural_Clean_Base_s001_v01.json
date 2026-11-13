@@ -1,0 +1,52 @@
+{
+  "summary": "Undyed cut-pile velvet, a soft ivory pile with a bright sheen at the edges, as on cushions, drapes and evening wear; tint it any colour.",
+  "search_words": ["velvet", "velour", "velveteen", "pile", "plush", "fabric", "cloth", "textile", "upholstery"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "Undyed cut-pile velvet (Phase11 wish list). A dense pile of short cut fibre ends stands on a buried ground weave, so the face shows no threads, only a fine stipple of tuft tips, and its look is the pile's sheen at grazing angles. OPAQUE with full FUZZ (the most of any textile; Felt 0.9) and a lower fuzz roughness than felt, so the sheen gathers at the silhouette as velvet's does. Authored at an undyed ivory so a Creator's tint reaches the dyed colours below it; the fuzz colour is a constant the tint does not reach. Lane L2: ambientCG has no velvet scan at a scale option's size. Layers: Pilling01 (damage), Creases01 (crushed fold lines), Dust01 (a deposit), under Grime01 (an older mask: the row's order kept).",
+  "name": "Velvet_Natural_Clean_Base_s001_v01",
+  "status": "draft",
+  "contributor": "MatterBot",
+  "path": "synthetic/textile/Velvet_Natural_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Velvet_Pile_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Velvet_Pile_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.40, 0.36, 0.29",
+  "specular_ior": 1.53,
+  "fuzz_weight": 1.0,
+  "fuzz_color": "0.92, 0.89, 0.82",
+  "fuzz_roughness": 0.3,
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Pilling01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Creases01_overlay_s1.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "lcd_ports": [
+    "base_color_tint",
+    "uv_scale",
+    "uv_offset",
+    "uv_rotation",
+    "overlay1_density",
+    "overlay2_density",
+    "overlay3_density",
+    "maskset_blend",
+    "roughness_bias",
+    "overlay3_color"
+  ],
+  "sources": [
+    {
+      "kind": "judgement",
+      "why": "Colour: undyed cotton or silk pile, an ivory (linear 0.40, 0.36, 0.29 face-on; no measured value; Physically Based has no fabric entries), well darker than Canvas or Felt because a deep pile traps light face-on: the sheen at the edges is what reads as ivory, and at 0.55 it had nothing to stand out against (rig run 1 read as matte plaster). IOR 1.53: cellulose. Roughness ~0.67 in the map. Fuzz 1.0, colour 0.92, 0.89, 0.82, roughness 0.3: velvet's look is its pile's grazing-angle sheen, stronger and tighter than felt's (0.9, 0.7)."
+    },
+    {
+      "kind": "procedural",
+      "script": "tools/converters/base/gen_fabrics.py",
+      "provenance": "library/provenance/sources/base/synthetic/textile/Velvet_Pile.yaml"
+    }
+  ]
+}
