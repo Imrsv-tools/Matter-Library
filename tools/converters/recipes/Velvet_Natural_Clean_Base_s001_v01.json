@@ -2,7 +2,7 @@
   "summary": "Undyed cut-pile velvet, a soft ivory pile with a bright sheen at the edges, as on cushions, drapes and evening wear; tint it any colour.",
   "search_words": ["velvet", "velour", "velveteen", "pile", "plush", "fabric", "cloth", "textile", "upholstery"],
   "origin": ["procedural", "agent-drafted"],
-  "_comment": "Undyed cut-pile velvet (Phase11 wish list). A dense pile of short cut fibre ends stands on a buried ground weave, so the face shows no threads, only a fine stipple of tuft tips, and its look is the pile's sheen at grazing angles. OPAQUE with full FUZZ (the most of any textile; Felt 0.9) and a lower fuzz roughness than felt, so the sheen gathers at the silhouette as velvet's does. Authored at an undyed ivory so a Creator's tint reaches the dyed colours below it; the fuzz colour is a constant the tint does not reach. Lane L2: ambientCG has no velvet scan at a scale option's size. Layers: Pilling01 (damage), Creases01 (crushed fold lines), Dust01 (a deposit), under Grime01 (an older mask: the row's order kept).",
+  "_comment": "Undyed cut-pile velvet (Phase11 wish list). A dense pile of short cut fibre ends stands on a buried ground weave, so the face shows no threads, only a fine stipple of tuft tips, and its look is the pile's sheen at grazing angles. OPAQUE with heavy FUZZ (0.7: at 1.0 the pale sheen frosted every tinted velvet; the lead's redo, batch 261113-2) and a lower fuzz roughness than felt, so the sheen gathers at the silhouette as velvet's does. Authored at an undyed ivory so a Creator's tint reaches the dyed colours below it; the fuzz colour is a constant the tint does not reach. Lane L2: ambientCG has no velvet scan at a scale option's size. Layers: Pilling01 (damage), Creases01 (crushed fold lines), Dust01 (a deposit), under Grime01 (an older mask: the row's order kept).",
   "name": "Velvet_Natural_Clean_Base_s001_v01",
   "status": "draft",
   "contributor": "MatterBot",
@@ -17,7 +17,7 @@
   "metalness_const": 0.0,
   "base_color_const": "0.40, 0.36, 0.29",
   "specular_ior": 1.53,
-  "fuzz_weight": 1.0,
+  "fuzz_weight": 0.7,
   "fuzz_color": "0.92, 0.89, 0.82",
   "fuzz_roughness": 0.3,
   "overlays": [
@@ -41,7 +41,7 @@
   "sources": [
     {
       "kind": "judgement",
-      "why": "Colour: undyed cotton or silk pile, an ivory (linear 0.40, 0.36, 0.29 face-on; no measured value; Physically Based has no fabric entries), well darker than Canvas or Felt because a deep pile traps light face-on: the sheen at the edges is what reads as ivory, and at 0.55 it had nothing to stand out against (rig run 1 read as matte plaster). IOR 1.53: cellulose. Roughness ~0.67 in the map. Fuzz 1.0, colour 0.92, 0.89, 0.82, roughness 0.3: velvet's look is its pile's grazing-angle sheen, stronger and tighter than felt's (0.9, 0.7)."
+      "why": "Colour: undyed cotton or silk pile, an ivory (linear 0.40, 0.36, 0.29 face-on; no measured value; Physically Based has no fabric entries), well darker than Canvas or Felt because a deep pile traps light face-on: the sheen at the edges is what reads as ivory, and at 0.55 it had nothing to stand out against (rig run 1 read as matte plaster). IOR 1.53: cellulose. Roughness ~0.67 in the map. Fuzz 0.7 (the lead's redo after a trial in Blender, red tint, one sphere and light: 1.0 left a pale halo at the silhouette, 0.5 and below lost the velvet edge; 1.0 in batch 261113-1), colour 0.92, 0.89, 0.82, roughness 0.3: velvet's look is its pile's grazing-angle sheen, brighter and tighter than felt's (weight 0.9, colour 0.85, roughness 0.7)."
     },
     {
       "kind": "procedural",
