@@ -1,19 +1,21 @@
-# Build the Matter Unreal runtime's editor target and masters on Windows: the twin of build.sh's
-# two CPU steps (2026-11-12). Needs Unreal Engine 5.8.
+# Build the Matter Unreal runtime on Windows: the twin of build.sh (2026-11-12; package 2026-11-13).
+# Needs Unreal Engine 5.8.
 #
-#   $env:UE = '<an Unreal 5.8 install>'; powershell -File unreal/build.ps1 [editor|masters|all]
+#   $env:UE = '<an Unreal 5.8 install>'; powershell -File unreal/build.ps1 [editor|masters|package|all]
 #
 #   editor   the C++ editor target (capped jobs, below-normal priority)    — CPU
 #   masters  the masters, by commandlet with no GPU (-nullrhi)             — CPU
-#   all      editor, then masters (default)
+#   package  cook + a Shipping build, symbols removed, archived to
+#            unreal/dist/MatterRuntime-Win64.zip                           — CPU
+#   all      editor, masters, package (default)
 #
-# No package step: the published test runtime is built on Linux only (build.sh package), and a
-# master change made on Windows writes a dated "runtime owed" line instead (Phase31 RD-P31-1).
-# The rig on Windows runs editor mode on this project (tools/parity/drivers/unreal.py).
+# The package is published by unreal/publish.sh N Win64. (Phase31 RD-P31-1 first ruled no package
+# from Windows; the lead revised it 2026-11-13: "we should be able to publish with a windows build".)
+# The rig on Windows still runs editor mode on this project by default (tools/parity/drivers/unreal.py).
 #
 # The masters step reads the MATTER_MASTERS_* switches exactly as build.sh's does (the head of
 # Scripts/build_masters.py lists them). Every Unreal asset is generated here; none is committed.
-param([ValidateSet('editor', 'masters', 'all')][string]$Step = 'all')
+param([ValidateSet('editor', 'masters', 'package', 'all')][string]$Step = 'all')
 $ErrorActionPreference = 'Stop'
 
 if (-not $env:UE) { Write-Error 'set UE to an Unreal Engine 5.8 install' }
@@ -50,8 +52,30 @@ function Build-Masters {
     Write-Output "masters: ok. $told"
 }
 
+function Build-Package {
+    $Staged = Join-Path $PSScriptRoot 'MatterRuntime\Packaged'
+    $Dist = Join-Path $PSScriptRoot 'dist'
+    if (Test-Path $Staged) { Remove-Item -Recurse -Force $Staged }
+    & (Join-Path $env:UE 'Engine\Build\BatchFiles\RunUAT.bat') BuildCookRun "-project=$Project" -noP4 `
+        -platform=Win64 -clientconfig=Shipping -build -cook -stage -pak -iostore -archive `
+        "-archivedirectory=$Staged" -nodebuginfo -unattended -nocompileeditor `
+        "-ubtargs=-MaxParallelActions=$Jobs"
+    if ($LASTEXITCODE -ne 0) { Write-Error "package: FAILED (RunUAT exited $LASTEXITCODE)" }
+    # What a run does not need (build.sh's UR-F8 strip): debug symbols
+    Get-ChildItem -Recurse -File (Join-Path $Staged 'Windows') -Include '*.pdb', '*.debug', '*.sym' |
+        Remove-Item -Force
+    New-Item -ItemType Directory -Force $Dist | Out-Null
+    $Zip = Join-Path $Dist 'MatterRuntime-Win64.zip'
+    if (Test-Path $Zip) { Remove-Item -Force $Zip }
+    & "$env:SystemRoot\System32\tar.exe" -a -c -f $Zip -C $Staged Windows      # Windows' bsdtar writes a zip
+    if ($LASTEXITCODE -ne 0) { Write-Error "package: the zip FAILED (tar exited $LASTEXITCODE)" }
+    $mb = [math]::Round((Get-Item $Zip).Length / 1MB)
+    Write-Output "package: ok. $Zip ($mb MB)"
+}
+
 switch ($Step) {
     'editor' { Build-Editor }
     'masters' { Build-Masters }
-    'all' { Build-Editor; Build-Masters }
+    'package' { Build-Package }
+    'all' { Build-Editor; Build-Masters; Build-Package }
 }
