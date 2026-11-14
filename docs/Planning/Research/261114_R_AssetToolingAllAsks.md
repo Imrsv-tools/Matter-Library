@@ -69,7 +69,7 @@ These answer:
 
 | Finish | Asked by (date) | Row | Note |
 |---|---|---|---|
-| **Brick clay**, with colour, roughness and normal maps, light enough to tint down | bricks A1 (11-01); historical Sets: an engine house (11-14) | `BrickClay_Natural_Clean_Base_s01_v01` | the row's *also wanted* is the efflorescence colour the bricks' A2 asks for |
+| **Brick clay**, with colour, roughness and normal maps, light enough to tint down | bricks A1 (11-01); historical Sets: an engine house (11-14) | `BrickClay_Natural_Clean_Base_s01_v01` | the row's *also wanted* is the efflorescence colour the bricks' A2 asks for. **Built 2026-11-14 as `BrickClay_Natural_Clean_Base_s1_v01`** (a 1 m tile; batch 261114-1) |
 | **Brick conditions:** soot and grime, efflorescence, a spalled face | bricks A2 (11-01) | (part of the brick row) | possibly overlay colours on one article, as the ask itself suggests |
 | **Mortar** (cement or lime: sandy, gritty, no dust layer, `s01`) | bricks A3 (11-01); house A2 (11-04); historical Sets: an abbey (11-14) | **none** | asked three times. A dusty concrete stands in, and its dust lightens a joint that should sit in shadow |
 | **Lime plaster or render** | historical Sets (11-14): *"the single ask that opens the most of history"* | `Plaster_Smooth_Clean_Base_s1_v01` | whether a smooth plaster is the lime plaster asked for is a question for the batch |
@@ -169,14 +169,15 @@ The asset tooling's own doc arrived after Pass 1 (`afd5d1b`). It repeats the lim
 
 **Landed (2026-11-14):**
 - `322685c` (`/quick-fix`): the Blender asset file rebuilt. 146 articles conform; current names; granite, sandstone, brass and copper in; no missing overlay pictures. It answers four asks (F-ATA-1).
+- **batch 261114-1 (`/matter-batch`, 2026-11-14): ten of the asked materials built and kept** (the lead: *"looks good"*): `Mortar_Cement`, `BrickClay_Natural` (as `_s1_v01`), `Plaster_Smooth` (the lime plaster), `Bronze_Aged`, `Marble_Black`, `Granite_AswanRed`, `Calcite_Egyptian`, `Tape_CottonWoven`, `CandleFlame_Warm`, `Tinplate_Raw`. Six `approved`, four `candidate`; each row's verdict and limits are in `library/batches/261114-1.md`. The conditions asked on the brick (efflorescence, soot, a spalled face) are its layers; a pale lime mortar is not covered (lighter than the mortar's base).
 - the next commit (`/quick-fix`): `library/wishlist.yaml`. The asked rows move to the top in RD-ATA-1's order (`wishlist.py next`: the two standing redo rows, then mortar → brick clay → plaster → aged bronze → black marble → laminate…). **Nine new rows:** `Mortar_Cement`, `Marble_Black`, `Laminate_Gloss`, `VitreousChina_White`, `Porphyry_Red`, `Marble_GialloAntico`, `EarthPlaster_Natural`, `Tatami_Natural`, `Linoleum_Plain`. Each asked row's note names who asked and what for.
 
 **Not yet done:**
-- **the materials themselves:** `/matter-batch` from the top of the list;
+- **the rest of the materials** (the first ten are built, batch 261114-1, above): `/matter-batch` from the top of the list: laminate (matte and gloss), a bright white, the mirror, then the rest;
 - **RD-ATA-2's build** (a retired article's successor in the catalog). It changes the catalog's contract, and `LOCAL_DELTAS.md` reserves a `schema_version` change to a contract phase, so it is a phase. **Seeded 2026-11-14** on the lead's *"seed"*: `Phases/Future/PhaseTBD_RenamedArticlesNameTheirSuccessor.md`, at the head of the Roadmap's `## Future`;
 - F-ATA-3 rows 2–5, and HR-Q1–Q2;
 - the historical-room doc's own Pass 2;
 - each source doc's Pass 2;
 - ledger row M16.
 
-**▶ Next:** `/matter-batch` on the top rows (a session started 2026-11-14 on the lead's word), then the retirement phase's discovery when the lead opens it.
+**▶ Next:** `/matter-batch` on the next rows (the first batch, 261114-1, is done and kept), then the retirement phase's discovery when the lead opens it.
