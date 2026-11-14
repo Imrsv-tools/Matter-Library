@@ -117,12 +117,17 @@ These answer:
 4. **Write the library's Pass 2 into each of the three unreviewed docs** at the end, pointing here, so each ask's own thread closes.
 5. **A ledger row** in `PlatformDependencies.md` for the asset tooling's open asks, as M8 was for its first ones: **M16**, the next free id (M1–M15 listed 2026-11-14).
 
+## Resolved
+
+- **RD-ATA-1 — The order** (the lead, 2026-11-14: *"go"*, to the order put to them): the Blender file first, then the materials most asked: mortar → brick clay → lime plaster → aged bronze → black marble, then the rest. Answers Q-ATA-1.
+- **RD-ATA-2 — A replaced article: the catalog records its successor** (the lead, 2026-11-14: *"take (a) for retirement"*). The old name is not kept as a stand-in file. The catalog says which article replaced a retired one, so a builder can rebind. Answers Q-ATA-2, and the retirement doc's A1 in its second form. *Reading, mine:* it also answers that doc's A2 (*"say when an article is retired"*), since a catalog entry is where a builder looks. AR-Q1 (is a scale change meant to retire a name?) is answered by practice: it does, and now it leaves a successor behind.
+
 ## Open questions
 
 | # | Question | For |
 |---|---|---|
-| Q-ATA-1 | the order above: start with the Blender file and the mortar? | the lead |
-| Q-ATA-2 | F-ATA-3 row 1: when the library re-scales or replaces an article, keep the old name working for a stated time, or record its successor in the catalog? (The asset tooling says the second is enough for it.) | the lead |
+| Q-ATA-1 | the order above | **ruled, RD-ATA-1** |
+| Q-ATA-2 | F-ATA-3 row 1: keep an old name working, or record its successor? | **ruled, RD-ATA-2:** record the successor |
 | Q-ATA-3 | F-ATA-3 rows 2, 3 and 5 | the lead, or a phase's discovery |
 
 ## Status
@@ -140,4 +145,6 @@ These answer:
 - whether `Plaster_Smooth`, `Chrome_Mirror` and `Laminate_Matte` as planned meet the asks (each batch's own judging);
 - the historical-Sets asks are read from the asset tooling's unpushed commits and may still change there.
 
-**▶ Next:** the lead's order (Q-ATA-1). Nothing is seeded.
+**Ruled (2026-11-14):** RD-ATA-1 (the order), RD-ATA-2 (a successor recorded in the catalog).
+
+**▶ Next:** the Blender file rebuild (a lead-directed `/quick-fix`), then the wish-list rows. Nothing is seeded.
