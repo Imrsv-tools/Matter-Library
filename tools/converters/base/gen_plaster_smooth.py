@@ -8,8 +8,8 @@ shallow curved ridges swept its own way and lapping the last, the surface gently
 tone where the lime cured unevenly, the fine sand of the mix as a tooth, and a few pinholes.
 All of it is slight: at arm's length the wall is one matte off-white.
 
-No scan fits: ambientCG's plasters state no physical size, and a scan is used only at a scale
-option's size. The colour is a JUDGEMENT: the mean linear albedo is (0.76, 0.72, 0.64), sRGB
+Generated, not scanned: ambientCG's plasters are rough modern renders or painted and broken
+walls, and none states a physical size (they were not tried; a redo may). The colour is a JUDGEMENT: the mean linear albedo is (0.76, 0.72, 0.64), sRGB
 about 225, 220, 208, a warm off-white lime, re-normalised so the mean is exact; a colour wash
 is the article's tint. The mean roughness is 0.88 (matte, with a trace of burnish where the
 trowel closed the face).
