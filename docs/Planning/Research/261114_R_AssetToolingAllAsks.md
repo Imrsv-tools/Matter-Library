@@ -147,4 +147,15 @@ These answer:
 
 **Ruled (2026-11-14):** RD-ATA-1 (the order), RD-ATA-2 (a successor recorded in the catalog).
 
-**▶ Next:** the Blender file rebuild (a lead-directed `/quick-fix`), then the wish-list rows. Nothing is seeded.
+**Landed (2026-11-14):**
+- `322685c` (`/quick-fix`): the Blender asset file rebuilt. 146 articles conform; current names; granite, sandstone, brass and copper in; no missing overlay pictures. It answers four asks (F-ATA-1).
+- the next commit (`/quick-fix`): `library/wishlist.yaml`. The asked rows move to the top in RD-ATA-1's order (`wishlist.py next`: the two standing redo rows, then mortar → brick clay → plaster → aged bronze → black marble → laminate…). **Nine new rows:** `Mortar_Cement`, `Marble_Black`, `Laminate_Gloss`, `VitreousChina_White`, `Porphyry_Red`, `Marble_GialloAntico`, `EarthPlaster_Natural`, `Tatami_Natural`, `Linoleum_Plain`. Each asked row's note names who asked and what for.
+
+**Not yet done:**
+- **the materials themselves:** `/matter-batch` from the top of the list;
+- **RD-ATA-2's build** (a retired article's successor in the catalog). It changes the catalog's contract, and `LOCAL_DELTAS.md` reserves a `schema_version` change to a contract phase, so it is a phase to seed;
+- F-ATA-3 rows 2–5;
+- each source doc's Pass 2;
+- ledger row M16.
+
+**▶ Next:** `/matter-batch` on the top rows (a fresh session), and the lead's word to seed the retirement phase.
