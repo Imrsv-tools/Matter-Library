@@ -1,0 +1,30 @@
+{
+  "summary": "Smooth hand-trowelled lime plaster, a matte warm off-white with faint trowel sweeps, as on walls and ceilings from Roman rooms to the 1950s.",
+  "search_words": ["plaster", "lime plaster", "render", "limewash", "wall", "stucco", "whitewash", "ceiling"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "A lime plaster finish coat, trowelled smooth and left bare or limewashed: the asked wall finish for historical rooms. Matte warm off-white; the trowel shows as very shallow curved ridges in passes 25 to 40 cm across, with a faint curing cloud, the sand's tooth and a few pinholes. Opaque: a matte porous solid. The maps are generated (L2, gen_plaster_smooth.py; the wish list said L3, but the plaster scans state no physical size and a scan is used only at a scale option's size). The mean albedo (0.76, 0.72, 0.64) is a judgement; a colour wash (ochre, pink, a distemper) is the article's tint, which only darkens. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage) and a deposit (overlay 2, Dust01) whose colour makes it dust, soot or the water stain the wish list wants, gated by the new Drip01 mask (cracks in patches, the deposit as runs down the wall; lay the UVs upright or turn them with uv_rotation). Built by the Phase11 batch.",
+  "name": "Plaster_Smooth_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "engineered/cementitious/Plaster_Smooth_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "cementitious",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/engineered/cementitious/Plaster_Smooth_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/engineered/cementitious/Plaster_Smooth_roughness_s1.png",
+  "normal_tex": "../../../textures/base/engineered/cementitious/Plaster_Smooth_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Drip01_s1.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Cracks01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.76, 0.72, 0.64), about sRGB 225, 220, 208, for a warm off-white lime plaster; mean roughness 0.88 for a matte face with a trace of trowel burnish; specular_ior 1.5 as for Physically Based Concrete. Physically Based has no plaster entry. Trowel passes, curing cloud and pinholes sized from hand-trowelled walls. meters_per_tile 1.0 is the s1 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_plaster_smooth.py", "provenance": "library/provenance/sources/base/engineered/cementitious/Plaster_Smooth.yaml"}
+  ]
+}

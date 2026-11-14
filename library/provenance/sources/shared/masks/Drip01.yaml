@@ -1,0 +1,11 @@
+# Draft provenance for one texture set (Phase11 batch 261114-1; lead ruling Q2 = A, 2026-09-25).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: shared/masks/Drip01    # MASK (R layer-2 · G/B/A overlay gates; B = drip runs for a deposit)
+version: v01
+files:
+  - MatterLibrary/textures/shared/masks/Drip01_s1.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/layers/gen_drip01.py
