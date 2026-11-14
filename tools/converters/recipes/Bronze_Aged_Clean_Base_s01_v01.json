@@ -5,7 +5,7 @@
   "_comment": "Aged architectural and statuary bronze: cast bronze under a deep brown patina, waxed and handled: doors, eagles, urns, grilles. Opaque, a metal: the patina is drawn as a darker, softly mottled base colour and a satin roughness that wanders with it, on metalness 1, so it still reflects as metal and not as brown paint. The maps are generated (L2, gen_bronze_aged.py; the wish list said L3, but the bronze scans are tagged eroded, rusted and scratched, and this is a kept, waxed patina; they were not tried). The mean colour (0.20, 0.125, 0.062) is a judgement: a bright bronze darkened to under a third by its patina. APPROXIMATE: the metal edge tint (F82) and complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1), in the wish list's order on the older Grime mask: scratches (overlay 1, damage), pitting (overlay 2), and a deposit (overlay 3, Dust01) whose colour set green makes the verdigris the wish list also wants. Built by the Phase11 batch.",
   "name": "Bronze_Aged_Clean_Base_s01_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "engineered/metal/Bronze_Aged_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

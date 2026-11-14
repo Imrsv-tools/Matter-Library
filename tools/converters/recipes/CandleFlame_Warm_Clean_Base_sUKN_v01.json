@@ -5,7 +5,7 @@
   "_comment": "A small live flame's glow: a candle, an oil lamp's wick, the mouth of a stove. Emissive: its defining observable is that it glows, a deep warm orange (about 1900 K), warmer than LED_WarmWhite (3000 K) and at a sixth of its brightness on the rig's relative scale (at 4 it clipped to pure yellow at the rig's exposure; at 2 it reads warm orange). Unlike the LED articles there is no solid face under the glow: the base colour is black and fully rough, so with the glow turned down the surface shows nothing, where an LED's milky diffuser would. Param-only, sUKN: it tiles nothing and carries no wear layers (a flame cannot be scratched or dusty). It draws a flame's light, not its shape: the teardrop, the blue base and the flicker are the builder's mesh and animation. CLOSE TO COLOUR-ONLY (Identity.md, Phase12): against LED_WarmWhite it differs by emission colour and brightness, which are Creator settings, and by the black base; the maintainer may judge it a setting of that article (emission_color 1.0, 0.227, 0.0, emission_luminance 2, base_color_tint black). Built by the Phase11 batch.",
   "name": "CandleFlame_Warm_Clean_Base_sUKN_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "utility/emissive/CandleFlame_Warm_Clean_Base_sUKN_v01.mtlx",
   "master": "Emissive",
   "domain": "utility",

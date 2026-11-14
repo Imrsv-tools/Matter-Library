@@ -5,7 +5,7 @@
   "_comment": "The fired clay of a common building brick: coarser and more open than terracotta, with broad firing mottle (15 to 50 cm clouds), dark iron spots, sand on its face and open voids. It is the clay only (one substance, D1): the brick's shape, its joints and its bond are the builder's. Opaque: a rough porous solid. The maps are generated (L2, gen_brickclay_natural.py; the wish list said L1 constants, but the ask is for colour, roughness and normal maps), as a 1 m tile (the list said s01) so the firing clouds do not repeat within several bricks and a builder can offset the UVs per brick. The mean albedo (0.40, 0.17, 0.10) is a judgement, deliberately lighter than Physically Based Brick (0.262, 0.095, 0.061): a tint only darkens, so a light base reaches a dark or burnt firing (a tint of about 0.66, 0.56, 0.61 gives that entry's colour). The asked conditions ride on its layers at 0 (C1): a spalled, chipped face is the edge wear (overlay 1, damage); efflorescence and soot are the deposit (overlay 2, Dust01) with its colour set white or black; both gated by the Crevice mask (chips in broken patches, deposits in the recesses). Built by the Phase11 batch.",
   "name": "BrickClay_Natural_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "engineered/ceramic/BrickClay_Natural_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

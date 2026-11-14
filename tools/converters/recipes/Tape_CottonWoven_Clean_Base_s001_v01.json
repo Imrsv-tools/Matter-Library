@@ -5,7 +5,7 @@
   "_comment": "Woven cotton tape: a narrow, heavy plain-woven cotton band, the stuff of Shaker chair seats, webbing and strapping. The article is the tape's own weave (one substance, D1): the checkerboard of a seat is an assembly of tapes laid over and under, and its one or two colours are two tints of this article on the builder's strips. Authored at unbleached cotton's pale ecru so a tint (a 0-1 multiply) reaches the reds, blues, olives and blacks below it. OPAQUE with a little FUZZ, as Canvas_Natural. The weave (8 ends x 6 picks per cm, threads about 1.5 mm) is the article's own normal and roughness (L2, gen_fabrics.py `tape`, the canvas's weave in a heavier yarn; the wish list said L3, a scan). Carries every relevant wear layer at 0 (C1), in the wish list's order on the older Grime mask: scuffs (overlay 1, damage) and dust as a deposit (Phase10). Built by the Phase11 batch.",
   "name": "Tape_CottonWoven_Clean_Base_s001_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "synthetic/textile/Tape_CottonWoven_Clean_Base_s001_v01.mtlx",
   "master": "Opaque",
   "domain": "synthetic",

@@ -5,7 +5,7 @@
   "_comment": "Egyptian alabaster: banded calcite (not gypsum alabaster), cut across its layers and polished. A creamy white-to-honey body with faint wavy bands 1 to 15 cm wide and an occasional thin whiter seam; no dark veins. SUBSURFACE: the stone's look is light getting well into it, a warm glow at thin edges; it is more translucent than marble, as the library's onyx (the same mineral), so it takes that article's radius (0.015 m) with a paler, warm per-channel scale, and subsurface_color is the texture's mean. The maps are generated (L2, gen_calcite_egyptian.py; the wish list said L3, but ambientCG's pale onyx scans, looked at, are cool grey, green-lined or brown and strongly banded). The mean albedo (0.72, 0.63, 0.47) is a judgement. Carries every relevant wear layer at 0 (C1), as the other polished stones: scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Calcite_Egyptian_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "natural/stone/Calcite_Egyptian_Clean_Base_s1_v01.mtlx",
   "master": "Subsurface",
   "domain": "natural",

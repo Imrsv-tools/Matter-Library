@@ -5,7 +5,7 @@
   "_comment": "Polished black marble: a true black calcite marble with a fine network of pale veins, polished to a mirror. It is its own article and not a tint of a white marble: a dark tint on a white marble darkens its veins too, and this stone's veins are pale on black. The maps are the ambientCG scan Marble016 (tagged 'black, marble, reflective, shiny'), used as downloaded; the scan names no quarry, so the name says only Black ('nero marquina' is a search word, not a claim). SUBSURFACE, as the library's other marbles (Physically Based 'Marble' IOR, radius and radius scale), but a black stone absorbs nearly all the light that enters it: subsurface_weight is 0.1 and subsurface_color the scan's dark mean, so the scatter is all but invisible and the article reads by its polish and veins. The scan states no size: meters_per_tile 1.0 by judgement from its vein network (main veins 10 to 30 cm apart, hairlines between), the s1 option's length exactly, nothing stretched. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Marble_Black_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "natural/stone/Marble_Black_Clean_Base_s1_v01.mtlx",
   "master": "Subsurface",
   "domain": "natural",

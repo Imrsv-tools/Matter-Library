@@ -5,7 +5,7 @@
   "_comment": "A lime plaster finish coat, trowelled smooth and left bare or limewashed: the asked wall finish for historical rooms. Matte warm off-white; the trowel shows as very shallow curved ridges in passes 25 to 40 cm across, with a faint curing cloud, the sand's tooth and a few pinholes. Opaque: a matte porous solid. The maps are generated (L2, gen_plaster_smooth.py; the wish list said L3, but the plaster scans are rough modern renders or painted, broken walls and state no physical size; they were not tried). The mean albedo (0.76, 0.72, 0.64) is a judgement; a colour wash (ochre, pink, a distemper) is the article's tint, which only darkens. Carries every relevant wear layer at 0 (C1): cracks (overlay 1, damage) and a deposit (overlay 2, Dust01) whose colour makes it dust, soot or the water stain the wish list wants, gated by the new Drip01 mask (cracks in patches, the deposit as runs down the wall; lay the UVs upright or turn them with uv_rotation). Built by the Phase11 batch.",
   "name": "Plaster_Smooth_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "engineered/cementitious/Plaster_Smooth_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

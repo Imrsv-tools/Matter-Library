@@ -5,7 +5,7 @@
   "_comment": "Tinplate: thin sheet iron coated in tin, the bright-but-soft silver of sconces, lanterns, stove pipe, pails and cans, here as it leaves the tinsmith: clean, unlacquered, with a soft hazy sheen and no mirror. Opaque, param-only: a solid metal with no texture of its own at this scale; the finish is the roughness. What reflects is the tin, so the colour is tin's: a near-neutral silver a little greyer and a touch warmer than aluminium (Aluminium_Raw, the stand-in until now, is brighter and bluer). Physically Based has no tin entry; the colour is a judgement from tin's normal-incidence reflectance. APPROXIMATE: the metal edge tint (F82) and complex IOR are not carried by the library (F-LC-6). The spangle of hot-dipped tin and the grey bloom of old tinware are not drawn. Carries every relevant wear layer at 0 (C1), in the wish list's order on the older Grime mask: scratches (overlay 1, damage), fingerprints, and dust as a deposit (Phase10; its colour set brown makes the rust that takes tinware at its seams). Built by the Phase11 batch.",
   "name": "Tinplate_Raw_Clean_Base_s01_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "approved",
   "path": "engineered/metal/Tinplate_Raw_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

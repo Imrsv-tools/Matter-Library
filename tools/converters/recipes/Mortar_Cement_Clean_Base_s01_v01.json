@@ -5,7 +5,7 @@
   "_comment": "A cement-lime bedding mortar: grey-brown binder paste holding sharp sand (grains 0.3 to 1.5 mm, mostly tan quartz, a few dark and a few white) with small air voids, matte and gritty. One article for brick, stone and tile joints. Opaque: a rough porous solid. The maps are generated (L2, gen_mortar_cement.py; the wish list said L3, but the scans that name mortar are brick walls, which are assemblies); nothing in the 0.1 m tile is larger than a few mm, so its repeat shows no grid. The mean albedo (0.33, 0.30, 0.25) is a judgement, set darker than concrete because a joint sits in shadow; it is tinted down for a dark or sooted joint. A pale lime mortar for older rooms is lighter than this base and a tint cannot go above 1, so it would be its own article. Carries cracks (overlay 1, damage) gated by the Crevice mask, at 0 (C1). It carries NO dust layer on purpose: the asset tooling's ask is that a joint never lightens, and a dusty joint reads near-white. Built by the Phase11 batch.",
   "name": "Mortar_Cement_Clean_Base_s01_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "engineered/cementitious/Mortar_Cement_Clean_Base_s01_v01.mtlx",
   "master": "Opaque",
   "domain": "engineered",

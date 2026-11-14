@@ -5,7 +5,7 @@
   "_comment": "The red granite of Aswan, polished: a coarse granite of rose-to-red potassium feldspar (crystals 1 to 3 cm) with grey quartz, a little white plagioclase and black biotite in ragged flakes that gather in clots. Opaque: a hard polished crystalline stone (granite scatters too little to need the Subsurface master, as Granite_Polished). The maps are generated (L2, gen_granite_aswanred.py; the wish list said L3, but ambientCG's granites are countertop stones with no red or rose one among their tags). The mineral colours and shares are a judgement; the mean linear albedo is (0.310, 0.163, 0.148). A honed or dressed face for unpolished work is this article with roughness_bias raised; a distinct dressed (tooled) relief would be its own article. Carries every relevant wear layer at 0 (C1), as Granite_Polished: scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
   "name": "Granite_AswanRed_Clean_Base_s1_v01",
   "contributor": "MatterBot",
-  "status": "draft",
+  "status": "candidate",
   "path": "natural/stone/Granite_AswanRed_Clean_Base_s1_v01.mtlx",
   "master": "Opaque",
   "domain": "natural",
