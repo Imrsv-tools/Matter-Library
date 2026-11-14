@@ -1,0 +1,30 @@
+{
+  "summary": "Old bronze darkened to a deep brown patina with a soft satin sheen, as on doors, grilles, urns and statues.",
+  "search_words": ["bronze", "aged bronze", "patina", "statuary bronze", "dark metal", "oil rubbed bronze", "metal"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "Aged architectural and statuary bronze: cast bronze under a deep brown patina, waxed and handled: doors, eagles, urns, grilles. Opaque, a metal: the patina is drawn as a darker, softly mottled base colour and a satin roughness that wanders with it, on metalness 1, so it still reflects as metal and not as brown paint. The maps are generated (L2, gen_bronze_aged.py; the wish list said L3, but the bronze scans are tagged eroded, rusted and scratched, and this is a kept, waxed patina; they were not tried). The mean colour (0.20, 0.125, 0.062) is a judgement: a bright bronze darkened to under a third by its patina. APPROXIMATE: the metal edge tint (F82) and complex IOR are not carried by the library (F-LC-6). Carries every relevant wear layer at 0 (C1), in the wish list's order on the older Grime mask: scratches (overlay 1, damage), pitting (overlay 2), and a deposit (overlay 3, Dust01) whose colour set green makes the verdigris the wish list also wants. Built by the Phase11 batch.",
+  "name": "Bronze_Aged_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "engineered/metal/Bronze_Aged_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "metal",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/metal/Bronze_Aged_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/metal/Bronze_Aged_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/metal/Bronze_Aged_normal_s01.png",
+  "metalness_const": 1,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Pitting01_overlay_s001.png", "density_port": "overlay2_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay3_density", "color_port": "overlay3_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay3_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear base colour (0.20, 0.125, 0.062): a bright bronze's reflectance (about 0.71, 0.43, 0.18) darkened to under a third by a brown patina; mean roughness 0.38 for a waxed satin; metalness 1 (the patina is thin and the face still reflects as metal). Physically Based has no bronze entry. meters_per_tile 0.1 is the s01 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_bronze_aged.py", "provenance": "library/provenance/sources/base/engineered/metal/Bronze_Aged.yaml"}
+  ]
+}
