@@ -14,6 +14,7 @@
 | [`261104_R_AssetToolingHouseAsks.md`](261104_R_AssetToolingHouseAsks.md) | 2026-11-04, added to 11-10 | A1–A6, RH-Q1–Q2 | **not written** |
 | [`261113_R_AssetToolingArticleRetirementAsks.md`](261113_R_AssetToolingArticleRetirementAsks.md) (also GitHub Issue #7) | 2026-11-13 | A1–A3, AR-Q1 | **not written** |
 | **Not in this repo yet:** the asset tooling's research on historical Sets, read in place in its own clone (2 commits ahead of its origin, 2026-11-14 12:39 and 12:53) | 2026-11-14 | the finishes in Pass 1 below | — |
+| [`261114_R_AssetToolingHistoricalRoomAsks.md`](261114_R_AssetToolingHistoricalRoomAsks.md), **arrived during this gather** (`afd5d1b`, 13:12) | 2026-11-14 | A1–A8, HR-Q1–Q2 | **not written**; folded in by Pass 2 below |
 
 The asks in the first four docs stay where they were written. Each doc's own Pass 2 is still owed. This doc gathers them so they can be addressed together.
 
@@ -103,6 +104,25 @@ These answer:
 - On 2026-11-13 the asset tooling also asked the platform's app to open an asset that names a missing article, with that material marked unmapped instead of refusing the whole asset. That ask is the platform's.
 - The library's half is F-ATA-3 row 1.
 
+## Pass 2 — The historical-room asks, folded in (2026-11-14)
+
+The asset tooling's own doc arrived after Pass 1 (`afd5d1b`). It repeats the lime plaster (A1, now detailed: matte, off-white, trowel relief, a tint for colour) and the mortar (A2, with a paler lime version for older rooms). It also asks **six finishes Pass 1 did not have**:
+
+| Finish | Its ask | Row (added 2026-11-14, after `Marble_Black`) |
+|---|---|---|
+| a red Aswan granite, polished | A3 (the Egyptian build) | `Granite_AswanRed_Clean_Base_s1_v01` |
+| an Egyptian calcite (alabaster) | A4 (the Egyptian build) | `Calcite_Egyptian_Clean_Base_s1_v01` |
+| a painted softwood | A5 (the Shaker build) | a note on `Pine_Knotty_Clean_Base_s01_v01`: one article, or an overlay, waits on HR-Q2 |
+| a woven cotton tape (chair seats, webbing) | A6 (the Shaker build) | `Tape_CottonWoven_Clean_Base_s001_v01` |
+| a candle flame, warmer and dimmer than an LED | A7 (the Shaker build) | `CandleFlame_Warm_Clean_Base_sUKN_v01` |
+| tinplate | A8 (the Shaker build) | `Tinplate_Raw_Clean_Base_s01_v01` |
+
+*Placed after black marble, ahead of Pass 1's "rest", because they serve the two builds the lead has picked. That placement is the agent's call within RD-ATA-1's "the rest".*
+
+**Two more questions** join F-ATA-3:
+- **HR-Q1:** shift a patterned stone's hue without multiplying its whole map?
+- **HR-Q2:** is a thin paint over wood one article, or an overlay any wood can carry?
+
 ## A proposed order to address them (not ruled)
 
 *Each is named by the verb that would land it. The lead cuts the order.*
@@ -132,7 +152,7 @@ These answer:
 
 ## Status
 
-**Passes captured:** Pass 1, the gather (2026-11-14).
+**Passes captured:** Pass 1, the gather; Pass 2, the historical-room asks folded in (both 2026-11-14).
 
 **Current direction:**
 - one rebuild for the Blender file;
@@ -154,7 +174,8 @@ These answer:
 **Not yet done:**
 - **the materials themselves:** `/matter-batch` from the top of the list;
 - **RD-ATA-2's build** (a retired article's successor in the catalog). It changes the catalog's contract, and `LOCAL_DELTAS.md` reserves a `schema_version` change to a contract phase, so it is a phase to seed;
-- F-ATA-3 rows 2–5;
+- F-ATA-3 rows 2–5, and HR-Q1–Q2;
+- the historical-room doc's own Pass 2;
 - each source doc's Pass 2;
 - ledger row M16.
 
