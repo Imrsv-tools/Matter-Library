@@ -1,0 +1,12 @@
+# Draft provenance for one texture set (Phase11 batch 261114-1; lead ruling Q2 = A, 2026-09-25).
+# Holds exactly the `provenance:` block a release lock will carry for this texture when a
+# maintainer promotes it, so nothing is re-derived at promotion time.
+id: base/synthetic/textile/Tape_Cotton    # woven cotton tape, plain weave, 8 ends x 6 picks per cm
+version: v01
+files:
+  - MatterLibrary/textures/base/synthetic/textile/Tape_Cotton_normal_s001.png
+  - MatterLibrary/textures/base/synthetic/textile/Tape_Cotton_roughness_s001.png
+provenance:
+  source: procedural
+  license: CC0-1.0
+  evidence: tools/converters/base/gen_fabrics.py

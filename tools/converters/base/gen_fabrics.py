@@ -16,6 +16,8 @@ fabric at real size, on a 1 cm tile (scale `s001`, 1024 px, ~10 um per pixel).
   normal and roughness are Denim_Twill's).
 - **Canvas_Duck** (Phase08 8.4) — cotton duck, a heavy plain weave, 16 ends x 14 picks per
   centimetre, crowned floats and thread-to-thread slub. Normal and roughness.
+- **Tape_Cotton** (batch 261114-1) — woven cotton tape and webbing: the same plain weave in a
+  heavy yarn, 8 ends x 6 picks per centimetre. Normal and roughness.
 
 Seamless (tileable.py; every count divides the tile, and the cell pattern wraps), fixed seeds,
 no network. Writes MatterLibrary/textures/base/synthetic/textile/<Set>_<channel>_s001.png.
@@ -157,13 +159,13 @@ def half_thread(ends: int, picks: int) -> tuple:
     return (X + 0.5 / ends) % 1.0, (Y + 0.5 / picks) % 1.0
 
 
-def canvas(seed: int = 7504) -> dict:
+def canvas(seed: int = 7504, ends: int = 16, picks: int = 14) -> dict:
     """Phase08 8.4: cotton duck, a heavy plain weave, 16 ends x 14 picks per centimetre (plied
     yarn about 0.6 mm thick). Each thread passes over one and under the next, so every cell is a
     short float that crowns in its middle (the crimp). Yarn thickness varies thread to thread
     (the duck's irregular slub), and loose fibres fuzz the surface. Normal and roughness only:
-    the colour is the article's constant, which a Creator tints."""
-    ends, picks = 16, 14
+    the colour is the article's constant, which a Creator tints. `ends` and `picks` are the
+    thread counts per centimetre (the duck's by default; `tape` weaves it coarser)."""
     X, Y = half_thread(ends, picks)
     i = np.floor(X * ends).astype(int)
     j = np.floor(Y * picks).astype(int)
@@ -187,6 +189,13 @@ def canvas(seed: int = 7504) -> dict:
     height = np.maximum(warp_z, weft_z) + ply + 0.08 * fibre
     rough = 0.86 + 0.05 * (fibre - 0.5) - 0.04 * height
     return {"normal": tl.normal_map(height, strength=6.0), "roughness": tl.gray(rough)}
+
+
+def tape(seed: int = 7509) -> dict:
+    """Batch 261114-1: woven cotton tape (chair-seat tape, webbing, strapping): the canvas's plain
+    weave in a much heavier yarn, 8 ends x 6 picks per centimetre (threads about 1.3 to 1.7 mm),
+    so the over-and-under reads from across a room. Normal and roughness only."""
+    return canvas(seed, ends=8, picks=6)
 
 
 def satin(seed: int = 7505) -> dict:
@@ -239,7 +248,8 @@ def felt(seed: int = 7506, fibres: int = 2400) -> dict:
 
 SETS = {"Cotton_Jersey": jersey, "Denim_Twill": twill, "Leather_Grain": grain,
         "Denim_TwillLight": twill_light, "Canvas_Duck": canvas, "Satin_Warp": satin,
-        "Felt_Wool": felt, "Knit_Stretch": stretch_knit, "Wool_Suiting": suiting}
+        "Felt_Wool": felt, "Knit_Stretch": stretch_knit, "Wool_Suiting": suiting,
+        "Tape_Cotton": tape}
 
 
 def main(argv=None) -> int:

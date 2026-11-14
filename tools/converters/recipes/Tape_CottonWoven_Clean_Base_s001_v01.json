@@ -1,0 +1,33 @@
+{
+  "summary": "Heavy woven cotton tape, undyed, as on the woven seats of Shaker chairs and in webbing and strapping; tint it any colour.",
+  "search_words": ["tape", "cotton tape", "webbing", "strapping", "shaker tape", "chair seat", "woven", "fabric", "textile"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "Woven cotton tape: a narrow, heavy plain-woven cotton band, the stuff of Shaker chair seats, webbing and strapping. The article is the tape's own weave (one substance, D1): the checkerboard of a seat is an assembly of tapes laid over and under, and its one or two colours are two tints of this article on the builder's strips. Authored at unbleached cotton's pale ecru so a tint (a 0-1 multiply) reaches the reds, blues, olives and blacks below it. OPAQUE with a little FUZZ, as Canvas_Natural. The weave (8 ends x 6 picks per cm, threads about 1.5 mm) is the article's own normal and roughness (L2, gen_fabrics.py `tape`, the canvas's weave in a heavier yarn; the wish list said L3, a scan). Carries every relevant wear layer at 0 (C1), in the wish list's order on the older Grime mask: scuffs (overlay 1, damage) and dust as a deposit (Phase10). Built by the Phase11 batch.",
+  "name": "Tape_CottonWoven_Clean_Base_s001_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "synthetic/textile/Tape_CottonWoven_Clean_Base_s001_v01.mtlx",
+  "master": "Opaque",
+  "domain": "synthetic",
+  "class": "textile",
+  "scale_tag": "s001",
+  "meters_per_tile": 0.01,
+  "roughness_tex": "../../../textures/base/synthetic/textile/Tape_Cotton_roughness_s001.png",
+  "normal_tex": "../../../textures/base/synthetic/textile/Tape_Cotton_normal_s001.png",
+  "metalness_const": 0.0,
+  "base_color_const": "0.66, 0.60, 0.48",
+  "specular_ior": 1.53,
+  "fuzz_weight": 0.3,
+  "fuzz_color": "0.85, 0.82, 0.74",
+  "fuzz_roughness": 0.6,
+  "maskset_tex": "../../../textures/shared/masks/Grime01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scuffs01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Colour: unbleached cotton's pale ecru (linear 0.66, 0.60, 0.48), as Canvas_Natural, so a tint dyes it; no measured value (Physically Based has no fabric entries). IOR 1.53: cellulose. Roughness about 0.86 in the map: matte. Fuzz 0.3: a tight heavy tape sheds a little less than canvas (0.35). Thread count 8 x 6 per cm from heavy cotton chair tape and webbing. meters_per_tile 0.01 is the s001 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_fabrics.py", "provenance": "library/provenance/sources/base/synthetic/textile/Tape_Cotton.yaml"}
+  ]
+}
