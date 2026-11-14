@@ -173,10 +173,10 @@ The asset tooling's own doc arrived after Pass 1 (`afd5d1b`). It repeats the lim
 
 **Not yet done:**
 - **the materials themselves:** `/matter-batch` from the top of the list;
-- **RD-ATA-2's build** (a retired article's successor in the catalog). It changes the catalog's contract, and `LOCAL_DELTAS.md` reserves a `schema_version` change to a contract phase, so it is a phase to seed;
+- **RD-ATA-2's build** (a retired article's successor in the catalog). It changes the catalog's contract, and `LOCAL_DELTAS.md` reserves a `schema_version` change to a contract phase, so it is a phase. **Seeded 2026-11-14** on the lead's *"seed"*: `Phases/Future/PhaseTBD_RenamedArticlesNameTheirSuccessor.md`, at the head of the Roadmap's `## Future`;
 - F-ATA-3 rows 2–5, and HR-Q1–Q2;
 - the historical-room doc's own Pass 2;
 - each source doc's Pass 2;
 - ledger row M16.
 
-**▶ Next:** `/matter-batch` on the top rows (a fresh session), and the lead's word to seed the retirement phase.
+**▶ Next:** `/matter-batch` on the top rows (a session started 2026-11-14 on the lead's word), then the retirement phase's discovery when the lead opens it.

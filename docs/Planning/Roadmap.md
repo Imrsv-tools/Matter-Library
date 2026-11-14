@@ -35,6 +35,10 @@ Lightweight phase guide. Three sections: **`## Active`** (live work) → **`## F
 
 > **Re-sequenced 2026-11-09 (lead):** Phase29 runs next, and the skin work is paused, Phase28 included: *"We are paused on all the skin work right now... this will be the next phase we do"* (RD-POA-1, `docs/Planning/Research/261105_R_PlatformObjectOpacityAsks.md`).
 
+### Renamed Articles Name Their Successor — SEEDED *(2026-11-14, on the lead's "seed", after "take (a) for retirement", RD-ATA-2; discovery is the lead's to open)*
+**Outcome:** an asset built against an article the library later renames or re-scales still finds its material: the catalog names its successor, so a builder or an app can rebind instead of refusing the asset.
+- `docs/Planning/Phases/Future/PhaseTBD_RenamedArticlesNameTheirSuccessor.md`
+
 ### Phase28 — AI Hands and Feet — SEEDED, paused 2026-11-09 *(2026-11-02, on the lead's "add the hands, feet, palms and soles plan to a phase 28 doc and we will do it right after")*
 **Outcome:** the character's hands and feet, palms and soles included, wear the same image-model person's skin as the body, so the whole skin map reads as one complete person from every side.
 - `docs/Planning/Phases/Phase28_AiHandsAndFeet.md`
