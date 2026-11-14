@@ -1,0 +1,33 @@
+{
+  "summary": "The fired clay of a common red brick: a coarse, sandy, light orange-red body with firing mottle, dark iron spots and small voids.",
+  "search_words": ["brick", "clay", "red brick", "fired clay", "masonry", "ceramic", "terracotta"],
+  "origin": ["procedural", "measured", "agent-drafted"],
+  "_comment": "The fired clay of a common building brick: coarser and more open than terracotta, with broad firing mottle (15 to 50 cm clouds), dark iron spots, sand on its face and open voids. It is the clay only (one substance, D1): the brick's shape, its joints and its bond are the builder's. Opaque: a rough porous solid. The maps are generated (L2, gen_brickclay_natural.py; the wish list said L1 constants, but the ask is for colour, roughness and normal maps), as a 1 m tile (the list said s01) so the firing clouds do not repeat within several bricks and a builder can offset the UVs per brick. The mean albedo (0.40, 0.17, 0.10) is a judgement, deliberately lighter than Physically Based Brick (0.262, 0.095, 0.061): a tint only darkens, so a light base reaches a dark or burnt firing (a tint of about 0.66, 0.56, 0.61 gives that entry's colour). The asked conditions ride on its layers at 0 (C1): a spalled, chipped face is the edge wear (overlay 1, damage); efflorescence and soot are the deposit (overlay 2, Dust01) with its colour set white or black; both gated by the Crevice mask (chips in broken patches, deposits in the recesses). Built by the Phase11 batch.",
+  "name": "BrickClay_Natural_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "engineered/ceramic/BrickClay_Natural_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "ceramic",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/engineered/ceramic/BrickClay_Natural_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/engineered/ceramic/BrickClay_Natural_roughness_s1.png",
+  "normal_tex": "../../../textures/base/engineered/ceramic/BrickClay_Natural_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/EdgeWear01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "physicallybased", "entry": "Brick", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202611031901, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.262, 0.095, 0.061", "metalness_const": 0, "roughness_const": 1.0, "specular_ior": 1.5},
+     "note": "specular_ior and metalness are taken as given. The entry's colour is NOT the texture's mean: the mean is (0.40, 0.17, 0.10), lighter by judgement, so the article tints down to this entry's colour. Roughness 1.0 is the ceiling; the map's mean is 0.94."},
+    {"kind": "judgement", "why": "Mean linear albedo (0.40, 0.17, 0.10), a light orange-red brick body, lighter than Physically Based Brick so one article tints down to dark and burnt firings; firing clouds, iron spots, sand and voids sized from common facing bricks. meters_per_tile 1.0 is the s1 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_brickclay_natural.py", "provenance": "library/provenance/sources/base/engineered/ceramic/BrickClay_Natural.yaml"}
+  ]
+}
