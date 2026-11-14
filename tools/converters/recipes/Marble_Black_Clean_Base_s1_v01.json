@@ -1,0 +1,38 @@
+{
+  "summary": "Polished black marble crossed by fine pale veins, as on Art Deco lobbies, columns, floors and desk tops.",
+  "search_words": ["marble", "black marble", "nero marquina", "polished stone", "stone", "floor", "countertop", "veined"],
+  "origin": ["scan", "measured", "agent-drafted"],
+  "_comment": "Polished black marble: a true black calcite marble with a fine network of pale veins, polished to a mirror. It is its own article and not a tint of a white marble: a dark tint on a white marble darkens its veins too, and this stone's veins are pale on black. The maps are the ambientCG scan Marble016 (tagged 'black, marble, reflective, shiny'), used as downloaded; the scan names no quarry, so the name says only Black ('nero marquina' is a search word, not a claim). SUBSURFACE, as the library's other marbles (Physically Based 'Marble' IOR, radius and radius scale), but a black stone absorbs nearly all the light that enters it: subsurface_weight is 0.1 and subsurface_color the scan's dark mean, so the scatter is all but invisible and the article reads by its polish and veins. The scan states no size: meters_per_tile 1.0 by judgement from its vein network (main veins 10 to 30 cm apart, hairlines between), the s1 option's length exactly, nothing stretched. Carries every relevant wear layer at 0 (C1): scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Marble_Black_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Marble_Black_Clean_Base_s1_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Marble_Black_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Marble_Black_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Marble_Black_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "subsurface_weight": 0.1,
+  "subsurface_color": "0.053, 0.058, 0.055",
+  "subsurface_radius": 0.00851,
+  "subsurface_radius_scale": "1, 0.655, 0.464",
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "ambientcg", "asset": "Marble016", "url": "https://ambientcg.com/view?id=Marble016", "license": "CC0-1.0", "provenance": "library/provenance/sources/base/natural/stone/Marble_Black.yaml", "note": "The colour, roughness (mean 0.114, a polished face) and normal maps. Its mean linear albedo is (0.053, 0.058, 0.055)."},
+    {"kind": "physicallybased", "entry": "Marble", "api": "https://api.physicallybased.info/v2/materials", "schema_version": 2.2, "updated": 202610261136, "license": "CC0 1.0 Universal",
+     "used": {"base_color_const": "0.83, 0.791, 0.753", "metalness_const": 0, "roughness_const": 0, "specular_ior": 1.5, "subsurface_radius": 0.00851, "subsurface_radius_scale": "1, 0.655, 0.464"},
+     "note": "specular_ior, subsurface_radius and subsurface_radius_scale are taken. base_color_const is not (the entry is a white marble; the scan's colour map carries the colour) and roughness 0 is not (the scan's own roughness map carries the polish)."},
+    {"kind": "judgement", "why": "meters_per_tile 1.0 (the scan states no size; main veins 10 to 30 cm apart, as in slab marble); subsurface_weight 0.1 because a black stone absorbs nearly all the light that enters it; subsurface_color the scan's mean linear albedo."}
+  ]
+}

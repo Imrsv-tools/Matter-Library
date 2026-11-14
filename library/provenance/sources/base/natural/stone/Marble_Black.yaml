@@ -1,0 +1,19 @@
+# Draft provenance for one texture set (Phase03, lead ruling Q2 = A).
+# Holds the `provenance:` block a release lock will carry when this texture is promoted.
+id: base/natural/stone/Marble_Black
+version: v01
+provenance:
+  source: ambientCG
+  license: CC0-1.0
+  evidence:
+    url: https://ambientcg.com/view?id=Marble016
+    sha256_scope: shipped_source_set
+    sha256: a6c78e420d0f724d7bba7a03fbd59907a74007a23c00df90cefc22dcf5891fe7
+    note: Shipped source textures are byte-identical copies of the maps in the ambientCG Marble016_1K-PNG download. sha256 attests the shipped release-source set.
+    files:
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Black_basecolor_s1.png
+      sha256: c3f7518a964457a43278fdfaa1ac69d639a41512b05ee022781b319d5d1ca83c
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Black_normal_s1.png
+      sha256: ca8c755622099c2ddb1afa9533f8fc08eebd461945b08f36ef88c978b68db676
+    - path: MatterLibrary/textures/base/natural/stone/Marble_Black_roughness_s1.png
+      sha256: 8059ae16cde9aa28371e152b94afb0871362a2b3f5e2d1434f11512701a5b898
