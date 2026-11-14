@@ -618,8 +618,10 @@ def one_coat_front(g, pins, metal):
       no edge tint (Drift 2026-11-12: the 5.8 slab has no F82 pin, and an F90 edge tint costs a uint
       80 B does not have; the library carries none, F-LC-6);
     * fuzz on the dielectric slab only, one fuzz a pixel (Drift 2026-11-12: a fuzzy metal loses it);
-    * base_diffuse_roughness on the dielectric slab's Roughness, its specular roughness on Second
-      Roughness at weight 1, as Epic's function does (the 5.8 slab has no diffuse-roughness pin);
+    * the specular roughness on the dielectric slab's Roughness, no Second Roughness (issue #8,
+      2026-11-14); the diffuse is Lambert by r.Substrate.RoughDiffuse=0 (DefaultEngine.ini), so
+      base_diffuse_roughness is not drawn (Drift: the 5.8 slab has no diffuse-roughness pin; no
+      article sets it);
     * the coat's colour, square-rooted, through TransmittanceToMFP; anisotropy passed as it is;
     * the light (the Emissive master, 30.2), emission_luminance x emission_color, on both base slabs;
     * the Masked master's coverage (geometry_opacity) on a Weight over the whole stack (30.2)."""
@@ -643,13 +645,16 @@ def one_coat_front(g, pins, metal):
     base_c = (g.op(M.MaterialExpressionMultiply, bc[0], bw[0], -2, a_out=bc[1], b_out=bw[1]), "")
     spec_w = pins["specular_weight"]
     common = dict(anisotropy=pins["specular_roughness_anisotropy"], normal=pins["geometry_normal"])
-    # The dielectric's diffuse roughness, as Epic's function feeds it (read from its compiled shader,
-    # 2026-11-12): a slab's Roughness pin also sets its diffuse (Chan) lobe, so the dielectric slab takes
-    # base_diffuse_roughness there and its specular roughness as Second Roughness at weight 1. With the
-    # specular roughness on Roughness the grey card drew x1.06 (sphere) to x1.12 (floor) of Storm.
+    # The dielectric's roughness (issue #8, 2026-11-14; platform #404). Phase30 first fed it as Epic's
+    # function does: base_diffuse_roughness on Roughness, the specular roughness on Second Roughness at
+    # weight 1, because a slab's Roughness also roughens its diffuse (EON, direct light, when
+    # r.Substrate.RoughDiffuse=1, the engine's PC default): with the specular roughness on Roughness the
+    # grey card drew x1.06 (sphere) to x1.12 (floor) of Storm. But a slab with a second roughness is
+    # hazy, and Lumen traces a hazy slab's smoother lobe (LumenMaterial.ush), here the 0.0 one: every
+    # rough dielectric traced a mirror. Now the specular roughness is on Roughness alone and the project
+    # sets r.Substrate.RoughDiffuse=0, so the diffuse is Lambert (EON at 0 is Lambert: as before).
     one = (g.node(M.MaterialExpressionConstant, -5, r=1.0), "")
-    diffuse_rough = dict(roughness=pins["base_diffuse_roughness"], secondroughness=pins["specular_roughness"],
-                         secondroughnessweight=one)
+    diffuse_rough = dict(roughness=pins["specular_roughness"])
     # Fuzz on the dielectric slab only (one fuzz a pixel, not two): a byte test for 80 B. A fuzzy metal loses its fuzz.
     fuzz = dict(fuzzamount=pins["fuzz_weight"], fuzzcolor=pins["fuzz_color"], fuzzroughness=pins["fuzz_roughness"])
     # Phase30 30.2: the Emissive master's light on both base slabs, so under the coat (and the dielectric's
