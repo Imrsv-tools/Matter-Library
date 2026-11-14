@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<materialx version="1.39" colorspace="lin_rec709">
+  <nodegraph name="NG_CandleFlame_Warm_Clean_Base_sUKN_v01">
+    <input name="emission_color" type="color3" value="1.0, 0.227, 0.0" uiname="Emission Color" />
+    <input name="emission_luminance" type="float" value="2.0" uiname="Emission Luminance" />
+    <constant name="base_color_const" type="color3">
+      <input name="value" type="color3" value="0.0, 0.0, 0.0" />
+    </constant>
+    <output name="base_color_out" type="color3" nodename="base_color_const" />
+    <constant name="roughness_const" type="float">
+      <input name="value" type="float" value="1.0" />
+    </constant>
+    <output name="roughness_out" type="float" nodename="roughness_const" />
+    <dot name="emission_color_port" type="color3">
+      <input name="in" type="color3" interfacename="emission_color" />
+    </dot>
+    <output name="emission_color_out" type="color3" nodename="emission_color_port" />
+    <dot name="emission_luminance_port" type="float">
+      <input name="in" type="float" interfacename="emission_luminance" />
+    </dot>
+    <output name="emission_luminance_out" type="float" nodename="emission_luminance_port" />
+  </nodegraph>
+  <open_pbr_surface name="SR_CandleFlame_Warm_Clean_Base_sUKN_v01" type="surfaceshader">
+    <input name="base_weight" type="float" value="1.0" />
+    <input name="base_color" type="color3" nodegraph="NG_CandleFlame_Warm_Clean_Base_sUKN_v01" output="base_color_out" />
+    <input name="base_metalness" type="float" value="0.0" />
+    <input name="specular_roughness" type="float" nodegraph="NG_CandleFlame_Warm_Clean_Base_sUKN_v01" output="roughness_out" />
+    <input name="specular_ior" type="float" value="1.5" />
+    <input name="emission_luminance" type="float" nodegraph="NG_CandleFlame_Warm_Clean_Base_sUKN_v01" output="emission_luminance_out" />
+    <input name="emission_color" type="color3" nodegraph="NG_CandleFlame_Warm_Clean_Base_sUKN_v01" output="emission_color_out" />
+  </open_pbr_surface>
+  <surfacematerial name="CandleFlame_Warm_Clean_Base_sUKN_v01" type="material">
+    <input name="surfaceshader" type="surfaceshader" nodename="SR_CandleFlame_Warm_Clean_Base_sUKN_v01" />
+  </surfacematerial>
+  <nodedef name="ND_imrsv_metadata" node="imrsv_metadata" nodegroup="metadata">
+    <output name="out" type="string" />
+    <input name="master_material" type="string" value="Emissive" uniform="true" />
+    <input name="scale_tag" type="string" value="sUKN" uniform="true" />
+    <input name="meters_per_tile" type="float" value="0.0" />
+    <input name="domain" type="string" value="utility" uniform="true" />
+    <input name="class" type="string" value="emissive" uniform="true" />
+    <input name="contributor" type="string" value="MatterBot" uniform="true" />
+    <input name="licence" type="string" value="CC0-1.0" uniform="true" />
+  </nodedef>
+</materialx>

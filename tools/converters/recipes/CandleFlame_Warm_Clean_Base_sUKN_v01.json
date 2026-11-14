@@ -1,0 +1,25 @@
+{
+  "summary": "The glow of a small live flame, a deep warm orange far dimmer than a lamp: a candle, an oil lamp, the mouth of a stove; set its colour and brightness.",
+  "search_words": ["candle", "flame", "fire", "oil lamp", "candlelight", "glow", "emissive", "light"],
+  "origin": ["measured", "agent-drafted"],
+  "_comment": "A small live flame's glow: a candle, an oil lamp's wick, the mouth of a stove. Emissive: its defining observable is that it glows, a deep warm orange (about 1900 K), warmer than LED_WarmWhite (3000 K) and at a sixth of its brightness on the rig's relative scale (at 4 it clipped to pure yellow at the rig's exposure; at 2 it reads warm orange). Unlike the LED articles there is no solid face under the glow: the base colour is black and fully rough, so with the glow turned down the surface shows nothing, where an LED's milky diffuser would. Param-only, sUKN: it tiles nothing and carries no wear layers (a flame cannot be scratched or dusty). It draws a flame's light, not its shape: the teardrop, the blue base and the flicker are the builder's mesh and animation. CLOSE TO COLOUR-ONLY (Identity.md, Phase12): against LED_WarmWhite it differs by emission colour and brightness, which are Creator settings, and by the black base; the maintainer may judge it a setting of that article (emission_color 1.0, 0.227, 0.0, emission_luminance 2, base_color_tint black). Built by the Phase11 batch.",
+  "name": "CandleFlame_Warm_Clean_Base_sUKN_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "utility/emissive/CandleFlame_Warm_Clean_Base_sUKN_v01.mtlx",
+  "master": "Emissive",
+  "domain": "utility",
+  "class": "emissive",
+  "scale_tag": "sUKN",
+  "meters_per_tile": 0.0,
+  "base_color_const": "0.0, 0.0, 0.0",
+  "roughness_const": 1.0,
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "emission_color": "1.0, 0.227, 0.0",
+  "emission_luminance": 2.0,
+  "lcd_ports": ["emission_color", "emission_luminance"],
+  "sources": [
+    {"kind": "judgement", "why": "emission_color 1.0, 0.227, 0.0 is a 1900 K blackbody in linear sRGB (sRGB about 255, 131, 0), a candle flame's colour temperature; emission_luminance 2 is a sixth of the library's LED and neon emitters (12) on the rig's relative scale, not measured nits. Base colour black and roughness 1: a flame has no reflecting face. Physically Based's materials list has no flame or light entry."}
+  ]
+}
