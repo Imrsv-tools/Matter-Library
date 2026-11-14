@@ -1,0 +1,29 @@
+{
+  "summary": "Sandy grey-brown bedding mortar, gritty and matte, as in the joints between bricks, stones and tiles.",
+  "search_words": ["mortar", "cement", "joint", "grout", "pointing", "sand", "masonry", "lime mortar"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "A cement-lime bedding mortar: grey-brown binder paste holding sharp sand (grains 0.3 to 1.5 mm, mostly tan quartz, a few dark and a few white) with small air voids, matte and gritty. One article for brick, stone and tile joints. Opaque: a rough porous solid. The maps are generated (L2, gen_mortar_cement.py; the wish list said L3, but the scans that name mortar are brick walls, which are assemblies); nothing in the 0.1 m tile is larger than a few mm, so its repeat shows no grid. The mean albedo (0.33, 0.30, 0.25) is a judgement, set darker than concrete because a joint sits in shadow; it is tinted down for a dark or sooted joint. A pale lime mortar for older rooms is lighter than this base and a tint cannot go above 1, so it would be its own article. Carries cracks (overlay 1, damage) gated by the Crevice mask, at 0 (C1). It carries NO dust layer on purpose: the asset tooling's ask is that a joint never lightens, and a dusty joint reads near-white. Built by the Phase11 batch.",
+  "name": "Mortar_Cement_Clean_Base_s01_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "engineered/cementitious/Mortar_Cement_Clean_Base_s01_v01.mtlx",
+  "master": "Opaque",
+  "domain": "engineered",
+  "class": "cementitious",
+  "scale_tag": "s01",
+  "meters_per_tile": 0.1,
+  "base_color_tex": "../../../textures/base/engineered/cementitious/Mortar_Cement_basecolor_s01.png",
+  "roughness_tex": "../../../textures/base/engineered/cementitious/Mortar_Cement_roughness_s01.png",
+  "normal_tex": "../../../textures/base/engineered/cementitious/Mortar_Cement_normal_s01.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.5,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Cracks01_overlay_s01.png", "density_port": "overlay1_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "maskset_blend", "roughness_bias"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.33, 0.30, 0.25), about sRGB 155, 148, 136, for a grey-brown sandy cement-lime mortar, darker than Physically Based Concrete (0.51) because a joint sits in shadow; mean roughness 0.93 for a matte gritty face; specular_ior 1.5 as for Physically Based Concrete. Physically Based has no mortar entry. meters_per_tile 0.1 is the s01 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_mortar_cement.py", "provenance": "library/provenance/sources/base/engineered/cementitious/Mortar_Cement.yaml"}
+  ]
+}
