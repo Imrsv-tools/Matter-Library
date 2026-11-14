@@ -1,0 +1,31 @@
+{
+  "summary": "Polished red Aswan granite: coarse rose-red crystals with grey quartz and black flecks, the stone of Egyptian obelisks, columns and sarcophagi.",
+  "search_words": ["granite", "red granite", "aswan granite", "rose granite", "pink granite", "egyptian", "stone", "obelisk", "polished stone"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "The red granite of Aswan, polished: a coarse granite of rose-to-red potassium feldspar (crystals 1 to 3 cm) with grey quartz, a little white plagioclase and black biotite in ragged flakes that gather in clots. Opaque: a hard polished crystalline stone (granite scatters too little to need the Subsurface master, as Granite_Polished). The maps are generated (L2, gen_granite_aswanred.py; the wish list said L3, but ambientCG's granites are countertop stones with no red or rose one among their tags). The mineral colours and shares are a judgement; the mean linear albedo is (0.310, 0.163, 0.148). A honed or dressed face for unpolished work is this article with roughness_bias raised; a distinct dressed (tooled) relief would be its own article. Carries every relevant wear layer at 0 (C1), as Granite_Polished: scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Granite_AswanRed_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Granite_AswanRed_Clean_Base_s1_v01.mtlx",
+  "master": "Opaque",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Granite_AswanRed_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Granite_AswanRed_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Granite_AswanRed_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.54,
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mineral colours (rose-red feldspar, grey quartz, white plagioclase, black biotite), their shares (about 55, 25, 7 and 13 percent) and crystal sizes from Aswan red granite as quarried and polished; mean linear albedo (0.310, 0.163, 0.148); mean roughness 0.12 for a polished face; specular_ior 1.54, that of quartz, as on Granite_Polished. Physically Based has no granite entry. meters_per_tile 1.0 is the s1 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_granite_aswanred.py", "provenance": "library/provenance/sources/base/natural/stone/Granite_AswanRed.yaml"}
+  ]
+}
