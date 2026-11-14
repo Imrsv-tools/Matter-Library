@@ -1,0 +1,35 @@
+{
+  "summary": "Egyptian alabaster: polished creamy-white calcite with faint honey bands that glows softly where light enters it, as in ancient vessels and lamps.",
+  "search_words": ["alabaster", "egyptian alabaster", "calcite", "travertine onyx", "onyx marble", "stone", "polished stone", "translucent stone"],
+  "origin": ["procedural", "agent-drafted"],
+  "_comment": "Egyptian alabaster: banded calcite (not gypsum alabaster), cut across its layers and polished. A creamy white-to-honey body with faint wavy bands 1 to 15 cm wide and an occasional thin whiter seam; no dark veins. SUBSURFACE: the stone's look is light getting well into it, a warm glow at thin edges; it is more translucent than marble, as the library's onyx (the same mineral), so it takes that article's radius (0.015 m) with a paler, warm per-channel scale, and subsurface_color is the texture's mean. The maps are generated (L2, gen_calcite_egyptian.py; the wish list said L3, but ambientCG's pale onyx scans, looked at, are cool grey, green-lined or brown and strongly banded). The mean albedo (0.72, 0.63, 0.47) is a judgement. Carries every relevant wear layer at 0 (C1), as the other polished stones: scratches (overlay 1, damage), dust as a deposit (Phase10), water spots, gated by the Crevice mask. Built by the Phase11 batch.",
+  "name": "Calcite_Egyptian_Clean_Base_s1_v01",
+  "contributor": "MatterBot",
+  "status": "draft",
+  "path": "natural/stone/Calcite_Egyptian_Clean_Base_s1_v01.mtlx",
+  "master": "Subsurface",
+  "domain": "natural",
+  "class": "stone",
+  "scale_tag": "s1",
+  "meters_per_tile": 1.0,
+  "base_color_tex": "../../../textures/base/natural/stone/Calcite_Egyptian_basecolor_s1.png",
+  "roughness_tex": "../../../textures/base/natural/stone/Calcite_Egyptian_roughness_s1.png",
+  "normal_tex": "../../../textures/base/natural/stone/Calcite_Egyptian_normal_s1.png",
+  "metalness_const": 0.0,
+  "specular_ior": 1.57,
+  "subsurface_weight": 0.6,
+  "subsurface_color": "0.72, 0.63, 0.47",
+  "subsurface_radius": 0.015,
+  "subsurface_radius_scale": "1.0, 0.8, 0.55",
+  "maskset_tex": "../../../textures/shared/masks/Crevice01_s01.png",
+  "overlays": [
+    {"texture": "../../../textures/shared/overlays/Scratches01_overlay_s01.png", "density_port": "overlay1_density"},
+    {"texture": "../../../textures/shared/overlays/Dust01_overlay_s001.png", "density_port": "overlay2_density", "color_port": "overlay2_color"},
+    {"texture": "../../../textures/shared/overlays/WaterSpots01_overlay_s01.png", "density_port": "overlay3_density"}
+  ],
+  "lcd_ports": ["base_color_tint", "uv_scale", "uv_offset", "uv_rotation", "overlay1_density", "overlay2_density", "overlay3_density", "maskset_blend", "roughness_bias", "overlay2_color"],
+  "sources": [
+    {"kind": "judgement", "why": "Mean linear albedo (0.72, 0.63, 0.47), about sRGB 220, 208, 183, a creamy Egyptian alabaster; mean roughness 0.08 for a polished face; specular_ior 1.57, the mean of calcite's two indices (1.486, 1.658), as on Onyx_Polished; subsurface_weight 0.6, subsurface_color the texture's mean, subsurface_radius 0.015 m as that onyx (banded calcite is far more translucent than marble's 0.0085 m) with a warm scale (1.0, 0.8, 0.55). Physically Based has no calcite or alabaster entry. meters_per_tile 1.0 is the s1 option's length; the generator makes the tile at that size."},
+    {"kind": "procedural", "script": "tools/converters/base/gen_calcite_egyptian.py", "provenance": "library/provenance/sources/base/natural/stone/Calcite_Egyptian.yaml"}
+  ]
+}
