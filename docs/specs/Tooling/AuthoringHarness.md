@@ -53,7 +53,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
 | `fixtures/recipes/*.json` | RED recipe fixtures, each rejected by one named guard |
 
-**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)). `--only` / `--skip` run part of it by lane name; a partial run names every lane it left out as NOT RUN, never reads ALL PASS, and cannot be combined with `--strict` (2026-11-15).
+**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)). `--only` / `--skip` run part of it by lane name; a partial run names every lane it left out as NOT RUN, never reads ALL PASS, and cannot be combined with `--strict` (2026-11-15). `--fresh` makes the `compression` lane trust no earlier proof: the run before a release.
 
 | Lane | Checks |
 |---|---|
@@ -69,8 +69,8 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `asset_library_current` *(2026-11-15)* | the **committed** `blender/asset_library/MatterLibrary.blend` carries a proxy for every Creator-selectable article in the tree and none for an article that has left it: `verify_asset_library.py`, in Blender, against the committed file rather than a fresh build. About two seconds; a SKIP without Blender (`MATTER_BLENDER`, else `blender` on PATH — the `tool_tests` lane finds it the same way since 2026-11-15). It prints which Blender saved the file and WARNs when that differs from the running one |
 | ~~`fixture_sync`~~ | *Removed from the gate 2026-09-23 (Phase02).* A consumer's fixture catalog + payloads are byte-current (cross-repo). The intent is kept: the check moves to the consumer side (`PlatformDependencies.md` P8), and `check_fixture_sync.py` remains as its tool. |
 | `compression_negative` | the compressed-output validator rejects corrupt / mismatched `.dds` fixtures |
-| `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated) |
-| `staging` | the release-staging producer assembles a complete `{png, dds}` snapshot (encoder-gated) |
+| `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated). Since 2026-11-15 only a new or changed texture is encoded: a proof is kept in the encode cache ([CompressedDistribution](CompressedDistribution.md)); a cold cache or `--fresh` encodes every texture twice, about an hour with the emulated encoder |
+| `staging` | the release-staging producer assembles a complete `{png, dds}` snapshot (encoder-gated); copies what the encode cache holds (2026-11-15) |
 | `approval_gate` | approval artifacts are well-formed (positive + shallow-negative fixtures) |
 | `freeze_lock` | the complete-payload hash-lock is deterministic + tamper-detecting |
 | `approval_binds_freeze` | a promoted approval references the release's actual frozen hashes |
@@ -196,5 +196,5 @@ proof subset through it. The **production tool-stack** (Matter Manager, a genera
 - 2026-07: the gate grew lanes for the runtime catalog, provenance, compression, staging, freeze, approval and activation, plus the conformance and Blender-generator tools.
 - 2026-09-23: brought home; tool list refreshed against the live tree.
 - 2026-10-16 (Phase20 20.1): the `tool_tests` lane (18 lanes). Until then the gate ran none of the tools' own test scripts, and a broken `test_hdri.py` stayed green.
-- 2026-11-15 (a quick fix): the `asset_library_current` lane (19 lanes) and `--only` / `--skip`. Until then the committed asset file fell 30 days behind unseen, and adding one article meant the full hour-long gate. Later that day (a quick fix): `tool_tests` fails a Blender test that raises, and a test past its timeout is a FAIL instead of a traceback that ended the gate.
+- 2026-11-15 (a quick fix): the `asset_library_current` lane (19 lanes) and `--only` / `--skip`. Until then the committed asset file fell 30 days behind unseen, and adding one article meant the full hour-long gate. Later that day (a quick fix): `tool_tests` fails a Blender test that raises, and a test past its timeout is a FAIL instead of a traceback that ended the gate. Then (a quick fix): the encode cache and `--fresh`. Until then every run encoded all ~300 textures twice, so the gate took about an hour whatever had changed.
 - 2026-09-25 (Phase03): the recipe lane (17 lanes), the recipe schema, the Physically Based lookup, the ambientCG importer, layer and base-set generators, the working headless preview; freeze and staging scoped to each release's lock.

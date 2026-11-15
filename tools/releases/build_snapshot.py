@@ -42,7 +42,6 @@ import datetime as dt
 import hashlib
 import io
 import json
-import os
 import re
 import subprocess
 import sys
@@ -63,6 +62,7 @@ from lcd_ports import LCD_MIN_EXCLUSIVE, LCD_PORTS, LCD_RANGES  # noqa: E402
 from project_runtime_catalog import derive_entry, derive_hdri_entry  # noqa: E402
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
+import atomic_write as AW  # noqa: E402  (a zip written whole)
 sys.path.insert(0, str(REPO / "tools" / "thumbnails"))
 import showcase as T  # noqa: E402  (Phase17: the thumbnails' record and its hashes)
 import job as jobmod  # noqa: E402  (the rig's article reader: the textures an article names)
@@ -328,14 +328,12 @@ def sha256(path: Path) -> str:
 
 
 def write_zip(dest: Path, identity: str, mtlx_text: str, files: dict[str, Path]) -> None:
-    tmp = dest.with_name(dest.name + ".tmp")
-    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+    with AW.replacing(dest) as tmp, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
         z.writestr(zipfile.ZipInfo(f"{identity}.mtlx", ZIP_TIME), mtlx_text)
         for base in sorted(files):
             info = zipfile.ZipInfo(f"textures/{base}", ZIP_TIME)
             info.compress_type = zipfile.ZIP_DEFLATED
             z.writestr(info, files[base].read_bytes())
-    os.replace(tmp, dest)
 
 
 KIT_FILES = (".usda", ".obj", "_layout.png", "_islands.png")
@@ -360,13 +358,11 @@ def write_kit_zip(dest: Path, mesh_id: str) -> None:
     sys.path.insert(0, str(REPO / "tools" / "converters" / "fit"))
     import make_kits  # noqa: PLC0415 (heavy: parses the pinned CC0 pack)
     kit = make_kits.make(mesh_id)
-    tmp = dest.with_name(dest.name + ".tmp")
-    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
+    with AW.replacing(dest) as tmp, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as z:
         for name in [f"{mesh_id}{s}" for s in KIT_FILES] + ["README.md"]:
             info = zipfile.ZipInfo(f"{mesh_id}/{name}", ZIP_TIME)
             info.compress_type = zipfile.ZIP_DEFLATED
             z.writestr(info, (kit / name).read_bytes())
-    os.replace(tmp, dest)
 
 
 def write_jpeg(src: Path, dest: Path, size: int | None = None) -> None:

@@ -87,6 +87,7 @@ import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 import material_thumbnails as MT  # noqa: E402  (Phase17: each material's thumbnail, served)
+import atomic_write as AW  # noqa: E402
 sys.path.insert(0, str(REPO / "tools" / "compressors"))
 import compress_textures as CT  # noqa: E402  (the release's .dds, for --compressed)
 import hdri_cube as HC  # noqa: E402  (an HDRI's BC6H cube sibling, for --compressed: #424)
@@ -268,9 +269,7 @@ def make_thumbnails(dev: Path, entries: list[dict]) -> int:
 
 
 def write_atomic(path: Path, text: str) -> None:
-    tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    os.replace(tmp, path)
+    AW.write_bytes(path, text.encode("utf-8"))
 
 
 def link(path: Path, target: Path) -> None:

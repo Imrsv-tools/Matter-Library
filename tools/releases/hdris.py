@@ -21,7 +21,6 @@ install) and ``build_snapshot.py`` (the site file), so the two never disagree:
 from __future__ import annotations
 
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -35,6 +34,8 @@ sys.path.insert(0, str(REPO / "tools" / "validators"))
 import validate_manifest as vm  # noqa: E402
 sys.path.insert(0, str(REPO / "tools" / "converters"))
 import groups as G  # noqa: E402  (Phase15: the HDRI group, and when and sky from the record)
+sys.path.insert(0, str(REPO / "tools" / "releases"))
+import atomic_write as AW  # noqa: E402
 
 HDRIS = REPO / "MatterLibrary" / "hdris"
 RECORDS = REPO / "library" / "provenance" / "sources" / "hdris"
@@ -121,10 +122,9 @@ def thumbnail(src: Path, dst: Path) -> None:
     if not magick:
         raise SystemExit("ImageMagick's `magick` is needed to make HDRI thumbnails")
     dst.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dst.with_name(dst.stem + ".tmp" + dst.suffix)
-    subprocess.run([magick, str(src), "-resize", THUMBNAIL + "!", *TONE, "-quality", QUALITY, str(tmp)],
-                   check=True)
-    tmp.replace(dst)
+    with AW.replacing(dst) as tmp:  # the format from dst's suffix: the temp's own is .tmp
+        subprocess.run([magick, str(src), "-resize", THUMBNAIL + "!", *TONE, "-quality", QUALITY,
+                        f"{dst.suffix[1:]}:{tmp}"], check=True)
 
 
 # ------------------------------------------------------------------ Phase16: what it says it is
@@ -198,9 +198,7 @@ def stamp(src: Path, dst: Path, f: dict) -> None:
     new = ("\n".join(kept) + "\n").encode("latin-1") + \
         ("\n".join(header_lines(f)) + "\n").encode("utf-8")
     dst.parent.mkdir(parents=True, exist_ok=True)
-    tmp = dst.with_name(dst.name + ".tmp")
-    tmp.write_bytes(new + rest)
-    os.replace(tmp, dst)
+    AW.write_bytes(dst, new + rest)
 
 
 def read_stamp(path: Path) -> dict:

@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Validator orchestrator (Phase 53) — runs the full §6 automated gate set.
 
-    uv run tools/validators/run_all.py [--strict] [--only L,…] [--skip L,…] [--list] [--repo-root <dir>]
+    uv run tools/validators/run_all.py [--strict] [--only L,…] [--skip L,…] [--list] [--fresh] [--repo-root <dir>]
 
 --only / --skip run part of the gate by lane name (--list prints the names). A partial run
 reports each lane it left out as NOT RUN and never reads ALL PASS; --strict refuses one.
-Adding one article: --skip compression,staging, plus compress_textures.py --determinism
---only <its texture> (the full compression sweep takes about an hour; see that lane).
+The compression and staging lanes encode only what the encode cache (compress_textures.py)
+does not hold, so adding one article encodes only its textures; a cold cache, or --fresh
+(before a release), encodes them all: about an hour with the emulated encoder.
 
 Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the reason):
   1. grammar fixtures        — fixtures/grammar_cases.json (must-pass / must-fail)
@@ -336,15 +337,13 @@ def run_compression_negative(root: Path) -> bool:
     return ok
 
 
-def run_compression(root: Path) -> bool:
+def run_compression(root: Path, fresh: bool = False) -> bool:
     """Phase 60sq2.4: the source texture tree compresses to deterministic, structurally
-    valid, mip-complete BCn .dds. Compresses the tree TWICE, validates every output, and
-    sha256-compares the two runs (byte-identical determinism gate).
+    valid, mip-complete BCn .dds: compress_textures.prove_tree (two encodes, the same bytes;
+    its header says what the encode cache spares and what --fresh, passed on as fresh, redoes).
 
     Encoder-gated: skips with a note when compressonatorcli is absent (CI without the
-    pinned encoder) — mirrors run_all's skip-if-surface-absent policy. Where the encoder is
-    present the full sweep runs: about an hour for ~300 source textures with the emulated
-    encoder on Apple Silicon (measured 2026-11-13; it was ~12 s over 30 textures natively)."""
+    pinned encoder) — mirrors run_all's skip-if-surface-absent policy."""
     src_root = root / "MatterLibrary" / "textures"
     if not src_root.exists():
         print("== compression == (skip: no MatterLibrary/textures)")
@@ -353,29 +352,7 @@ def run_compression(root: Path) -> bool:
         print(f"== compression == (skip: {encoder_absent()})")
         return SKIP
     print("== compression ==")
-    import tempfile as _tf
-    a = Path(_tf.mkdtemp(prefix="mtc_run_a_"))
-    b = Path(_tf.mkdtemp(prefix="mtc_run_b_"))
-    try:
-        ok_a, recs = ct.compress_tree(src_root, a)
-        ok_b, _ = ct.compress_tree(src_root, b)
-        if not (ok_a and ok_b):
-            print("  [FAIL] compression errored (see above)")
-            return False
-        ok = True
-        for rec in recs:
-            good, detail = ct.validate_output(rec)
-            rel = Path(rec["dst"]).relative_to(a)
-            same = ct.sha256(a / rel) == ct.sha256(b / rel)
-            good_all = good and same
-            reason = detail if not good else ("byte-identical" if same else "NON-DETERMINISTIC")
-            print(f"  [{'PASS' if good_all else 'FAIL'}] {rel}: {reason}")
-            ok = ok and good_all
-        return ok
-    finally:
-        import shutil as _sh
-        _sh.rmtree(a, ignore_errors=True)
-        _sh.rmtree(b, ignore_errors=True)
+    return ct.prove_tree(src_root, fresh=fresh)
 
 
 def run_staging(root: Path) -> bool:
@@ -878,6 +855,9 @@ def main(argv=None) -> int:
     ap.add_argument("--skip", type=lane_list, default=[], metavar="LANE[,LANE…]",
                     help="run every lane but these")
     ap.add_argument("--list", action="store_true", help="print the lane names in run order and exit")
+    ap.add_argument("--fresh", action="store_true",
+                    help="the compression lane trusts no earlier proof: every texture encoded twice "
+                         "anew (about an hour), as before a release")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
 
@@ -902,7 +882,8 @@ def main(argv=None) -> int:
     # subprocess.run on the way out.
     signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(128 + signum))
 
-    results = {name: lane(root) for name, lane in LANES if name in selected}
+    lanes = dict(LANES, compression=lambda root: run_compression(root, fresh=args.fresh))
+    results = {name: lanes[name](root) for name in selected}
     print("\n=== SUMMARY ===")
     for k, v in results.items():
         print(f"  {k}: {'SKIP' if v == SKIP else 'PASS' if v else 'FAIL'}")

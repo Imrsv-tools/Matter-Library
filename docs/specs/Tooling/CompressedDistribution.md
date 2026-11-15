@@ -30,7 +30,12 @@ derivatives.
 *(Updated 2026-09-23, measured: `PINNED_VERSION = "V4.5.52"` and the `COMPRESSONATORCLI` override in `tools/compressors/compress_textures.py`; the compressor fails if the encoder is absent or not the pinned version.)*
 
 **Determinism gate:** byte-identical `.dds` across two runs at the pinned encoder + flags (`run_all.py`
-`compression` lane). **Output validation:** dimensions · role↔BC-format agreement · complete mip chain ·
+`compression` lane). Since 2026-11-15 the proof is kept: every encode goes into the **encode cache**,
+`library/dds_cache/` (git-ignored), under the source's bytes, the encoder version and the flags, and an
+unchanged texture is copied from there rather than encoded again, by the gate, staging and the dev
+server alike. An HDRI's cube is not kept (about 2 GB for 59 skies; the dev server builds each once). `--fresh` (`run_all.py`, `compress_textures.py --determinism`) trusts no earlier proof:
+two new encodes of every texture, compared with each other and with the cached one; run it before a
+release. A texture edited while it is encoded (another session) is never kept, and the gate FAILs it: run again. Deleting the cache is always safe; the next run encodes everything. A full cache is about twice the size of the source textures (2026-11-15). **Output validation:** dimensions · role↔BC-format agreement · complete mip chain ·
 colour-space/normal/alpha policy per role; a corrupt/mismatched `.dds` is rejected (`compression_negative`
 lane, RED fixtures in `tools/compressors/fixtures/`). The staging tree is a **gitignored reproducible build artifact** — never committed,
 never written into the authored `MatterLibrary/textures` source tree.

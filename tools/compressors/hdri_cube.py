@@ -93,7 +93,8 @@ def build_cube_dds(hdr: Path, dst: Path) -> None:
         src, out = Path(tmp) / "float.dds", Path(tmp) / "bc6h.dds"
         src.write_bytes(_float_cube_dds(cube))
         size = cube.shape[1]
-        if not CT.compress_one(src, out, "BC6H", CT.full_miplevels(size, size)):
+        # Not kept in the encode cache: ~33 MB a cube, and the dev server builds each once anyway
+        if not CT.compress_one(src, out, "BC6H", CT.full_miplevels(size, size), cache=False):
             raise RuntimeError(f"the compressor failed on {hdr.name}")
         with out.open("r+b") as f:         # the encoder writes arraySize 6 (the faces), not 1 cube
             f.seek(_ARRAY_SIZE_AT)

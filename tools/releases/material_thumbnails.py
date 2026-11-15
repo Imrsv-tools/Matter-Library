@@ -35,6 +35,8 @@ sys.path.insert(0, str(REPO / "tools" / "thumbnails"))
 sys.path.insert(0, str(REPO / "tools" / "parity"))
 import showcase as T  # noqa: E402  (the record and its hashes)
 import job as jobmod  # noqa: E402  (the textures an article names)
+sys.path.insert(0, str(HERE))
+import atomic_write as AW  # noqa: E402
 
 SERVED = 512                  # px square: the consumer draws it at ~200 px, many at once (PIC-F4)
 JPEG_QUALITY = 90
@@ -118,9 +120,7 @@ def write_jpeg(src: Path, dst: Path) -> None:
         im = im.resize((SERVED, SERVED), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=JPEG_QUALITY, optimize=True, progressive=False)
-    tmp = dst.with_name(dst.name + ".tmp")
-    tmp.write_bytes(buf.getvalue())
-    tmp.replace(dst)
+    AW.write_bytes(dst, buf.getvalue())
 
 
 def serve(dev: Path, entries: list[dict], source_root: Path) -> dict:
