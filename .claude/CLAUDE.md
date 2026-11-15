@@ -87,7 +87,7 @@ Same class as a backtick inside `git commit -m`: **the tool reports success and 
 
 ## Codebase search — HARD RULE (overrides default behavior)
 
-**⛔ Your FIRST message names your search mode** — the Grep/Glob tools, the single-statement fallback, or a non-prompting mode's compound shapes — so the next reader can tell a considered choice from a violation. **Name it from the tools this session actually lists:** some harness builds offer no Grep/Glob tool, and a mode you announce but cannot use is a false record.
+**⛔ Your FIRST message names your search mode** — the Grep/Glob tools, the single-statement fallback, or a non-prompting mode's compound shapes — so the next reader can tell a considered choice from a violation. **Name it from the tools this session lists** — some builds have no Grep/Glob, and an announced mode you cannot use is a false record.
 
 Use the main session's **Grep / Glob / Read** tools directly — they never prompt.
 
