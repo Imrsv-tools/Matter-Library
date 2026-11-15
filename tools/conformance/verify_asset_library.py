@@ -84,10 +84,11 @@ released = [os.path.splitext(os.path.basename(m["payload_path"]))[0]
             for m in load_catalog().get("materials", []) if m.get("creator_selectable", True)]
 
 libdir = os.path.dirname(bpy.data.filepath)
-# Which Blender last saved this file, and which is reading it (2026-11-15): a rebuild re-saves the
-# file in the running Blender, so a version move rides any commit that copies a rebuild in.
-print("  Blender: this file saved by %d.%d (file subversion %d); running %s"
-      % (bpy.data.version[0], bpy.data.version[1], bpy.data.version[2], bpy.app.version_string))
+saved, running = "%d.%d" % bpy.data.version[:2], "%d.%d" % bpy.app.version[:2]
+print("  Blender: this file saved by %s; running %s" % (saved, bpy.app.version_string))
+if saved != running:  # a rebuild here re-saves the file in this Blender (a warning, never a FAIL)
+    print("  WARN: a rebuild in this Blender moves the file from %s to %s; say so in the commit"
+          % (saved, running))
 cats_path = os.path.join(libdir, "blender_assets.cats.txt")
 cats_txt = open(cats_path).read() if os.path.isfile(cats_path) else ""
 check(bool(cats_txt), "blender_assets.cats.txt exists beside the library", cats_path)
@@ -146,14 +147,12 @@ for m in system:
     check(mat is None or mat.asset_data is None,
           "%s: system material NOT asset-marked (RD-5 exclusion)" % identity)
 
-# no browsable proxy for an article that has left the tree (renamed or retired) — 2026-11-15: run
-# against the COMMITTED file (run_all's asset_library_current lane), a stale file offers it still
-selectable_ids = {os.path.splitext(m["payload_path"])[0] for m in selectable}
+# no browsable proxy for an article that has left the tree (renamed or retired)
 for mat in bpy.data.materials:
     if mat.asset_data is None:
         continue
     identity = mat.get(IDENTITY_PROP) or mat.name
-    check(identity in selectable_ids,
+    check(identity in tree_ids,
           "%s: browsable proxy's article is in the working tree" % identity,
           "no Creator-selectable article of that identity (renamed or retired?)")
 

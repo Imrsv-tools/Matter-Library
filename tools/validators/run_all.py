@@ -344,9 +344,7 @@ def run_compression(root: Path) -> bool:
     Encoder-gated: skips with a note when compressonatorcli is absent (CI without the
     pinned encoder) — mirrors run_all's skip-if-surface-absent policy. Where the encoder is
     present the full sweep runs: about an hour for ~300 source textures with the emulated
-    encoder on Apple Silicon (measured 2026-11-13; it was ~12 s over 30 textures natively).
-    For one article's textures, `compress_textures.py --determinism --only <substring>` takes
-    about a minute; `run_all.py --skip compression,staging` runs the rest of the gate."""
+    encoder on Apple Silicon (measured 2026-11-13; it was ~12 s over 30 textures natively)."""
     src_root = root / "MatterLibrary" / "textures"
     if not src_root.exists():
         print("== compression == (skip: no MatterLibrary/textures)")
@@ -718,6 +716,24 @@ def run_activation(root: Path) -> bool:
         _sh.rmtree(rt, ignore_errors=True)
 
 
+NO_BLENDER = "needs Blender (set MATTER_BLENDER or put `blender` on PATH)"
+
+
+def _blender():
+    """The Blender the tools run — $MATTER_BLENDER, else `blender` on PATH, else None — and an env
+    without the host's USD/Python variables (Blender bundles its own; see check_exporter.sh)."""
+    import os
+    import shutil
+    drop = ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS", "PXR_AR_DEFAULT_SEARCH_PATH")
+    return (os.environ.get("MATTER_BLENDER") or shutil.which("blender"),
+            {k: v for k, v in os.environ.items() if k not in drop})
+
+
+def _print_tail(proc, n: int = 8) -> None:
+    for line in (proc.stdout + proc.stderr).strip().splitlines()[-n:]:
+        print(f"      {line}")
+
+
 def _tool_test_runner(script: Path, scratch: Path):
     """How to run one tool test script: (argv, env) or (None, the reason it cannot run here).
     Chosen by what the script imports, never by a list of names, so a new test joins by itself:
@@ -725,15 +741,11 @@ def _tool_test_runner(script: Path, scratch: Path):
     USD-tools Python check_exporter.sh uses; anything else -> this Python."""
     import os
     import re
-    import shutil
     text = script.read_text(encoding="utf-8")
     if re.search(r"^\s*import bpy\b", text, re.M):
-        blender = shutil.which("blender")
+        blender, env = _blender()
         if not blender:
-            return None, "needs Blender (`blender` not on PATH)"
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS",
-                            "PXR_AR_DEFAULT_SEARCH_PATH")}
+            return None, NO_BLENDER
         return [blender, "--background", "--factory-startup", "--python", str(script), "--",
                 str(scratch)], env
     if re.search(r"^\s*from pxr import\b", text, re.M):
@@ -774,8 +786,7 @@ def run_tool_tests(root: Path):
         else:
             failed.append(str(rel))
             print(f"  [FAIL] {rel} (exit {proc.returncode}); its last lines:")
-            for line in (proc.stdout + proc.stderr).strip().splitlines()[-8:]:
-                print(f"      {line}")
+            _print_tail(proc)
     if failed:
         return False
     if unrun:
@@ -785,50 +796,34 @@ def run_tool_tests(root: Path):
 
 
 def run_asset_library_current(root: Path):
-    """The COMMITTED Blender asset file is current (2026-11-15, backlog Open 17(b)): runs
-    tools/conformance/verify_asset_library.py against blender/asset_library/MatterLibrary.blend
-    as committed, not against a fresh build. FAILs when an article in the working tree has no
-    proxy there, when a proxy's article has left the tree, or on any structure check. About two
-    seconds. SKIPs without Blender ($MATTER_BLENDER, else `blender` on PATH, as
-    check_asset_library.sh finds it). The fix for a FAIL: rebuild with check_asset_library.sh
-    and copy its MatterLibrary.blend + blender_assets.cats.txt over the committed pair.
-    Until this lane the file fell 30 days behind unseen, and an article reached main without it."""
-    import os
-    import shutil
+    """The COMMITTED blender/asset_library/MatterLibrary.blend is current (backlog Open 17(b),
+    2026-11-15): verify_asset_library.py in Blender against it, exit 0 = PASS; SKIPs without
+    Blender. Fix a FAIL by rebuilding with check_asset_library.sh and copying its .blend and
+    cats file in."""
     import subprocess
     lib = root / "blender" / "asset_library" / "MatterLibrary.blend"
-    verify = root / "tools" / "conformance" / "verify_asset_library.py"
     if not lib.is_file():
         print("== asset library current == (skip: no committed blender/asset_library/MatterLibrary.blend)")
         return SKIP
-    blender = os.environ.get("MATTER_BLENDER") or shutil.which("blender")
+    blender, env = _blender()
     if not blender:
-        print("== asset library current == (skip: needs Blender — set MATTER_BLENDER or put `blender` on PATH)")
+        print(f"== asset library current == (skip: {NO_BLENDER})")
         return SKIP
     print("== asset library current ==")
-    env = {k: v for k, v in os.environ.items()
-           if k not in ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS",
-                        "PXR_AR_DEFAULT_SEARCH_PATH")}
-    proc = subprocess.run([blender, "--background", "--factory-startup", str(lib), "--python", str(verify)],
+    # --python-exit-code: without it a script that raises leaves Blender exiting 0
+    proc = subprocess.run([blender, "--background", "--factory-startup", "--python-exit-code", "1", str(lib),
+                           "--python", str(root / "tools" / "conformance" / "verify_asset_library.py")],
                           cwd=root, env=env, capture_output=True, text=True, timeout=600)
-    lines = proc.stdout.splitlines()
-    fails = [ln for ln in lines if ln.strip().startswith("[FAIL]")]
-    for ln in fails[:20]:
-        print(f"  {ln.strip()}")
-    if len(fails) > 20:
-        print(f"  … and {len(fails) - 20} more [FAIL] lines")
-    for ln in lines:
-        if ln.strip().startswith(("Blender:", "=> asset-library")):
-            print(f"  {ln.strip()}")
-    good = proc.returncode == 0 and "CONFORMS" in proc.stdout
-    if not good and not fails:
+    shown = [ln.strip() for ln in proc.stdout.splitlines()
+             if ln.strip().startswith(("[FAIL]", "Blender:", "WARN:", "=> asset-library"))]
+    for ln in shown:
+        print(f"  {ln}")
+    if proc.returncode != 0 and not any(ln.startswith("[FAIL]") for ln in shown):
         print(f"  [FAIL] the verifier exited {proc.returncode} without a verdict; its last lines:")
-        for ln in (proc.stdout + proc.stderr).strip().splitlines()[-8:]:
-            print(f"      {ln}")
-    elif not good:
-        print("  the committed asset file is behind the tree: rebuild it with "
-              "tools/conformance/check_asset_library.sh <scratch> and copy the pair in")
-    return good
+        _print_tail(proc)
+    elif proc.returncode != 0:
+        print("  fix: tools/conformance/check_asset_library.sh <scratch>, then copy its .blend and cats file in")
+    return proc.returncode == 0
 
 
 # Run order. Each lane takes the repo root and returns True (PASS), False (FAIL) or SKIP;
@@ -861,10 +856,11 @@ def main(argv=None) -> int:
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
     ap.add_argument("--strict", action="store_true",
                     help="treat a SKIPPED lane as a failure: every lane must run (the full check before merging)")
-    ap.add_argument("--only", default="", metavar="LANE[,LANE…]",
+    lane_list = lambda s: [n.strip() for n in s.split(",") if n.strip()]  # noqa: E731
+    ap.add_argument("--only", type=lane_list, default=[], metavar="LANE[,LANE…]",
                     help="run only these lanes (a partial run: it never reports ALL PASS)")
-    ap.add_argument("--skip", default="", metavar="LANE[,LANE…]",
-                    help="run every lane but these (e.g. compression,staging when adding one article)")
+    ap.add_argument("--skip", type=lane_list, default=[], metavar="LANE[,LANE…]",
+                    help="run every lane but these")
     ap.add_argument("--list", action="store_true", help="print the lane names in run order and exit")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
@@ -873,8 +869,7 @@ def main(argv=None) -> int:
     if args.list:
         print("\n".join(names))
         return 0
-    only = [n.strip() for n in args.only.split(",") if n.strip()]
-    skip = [n.strip() for n in args.skip.split(",") if n.strip()]
+    only, skip = args.only, args.skip
     unknown = [n for n in only + skip if n not in names]
     if unknown:
         ap.error(f"unknown lane(s): {', '.join(unknown)} (--list prints them)")
