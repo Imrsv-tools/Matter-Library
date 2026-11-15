@@ -270,7 +270,7 @@ with tempfile.TemporaryDirectory() as t:
     for i in range(45):
         (out / f"a{i:02}.zip").write_bytes(b"x")
     (out / "NOTES.md").write_text("notes")
-    calls, drafts = [], iter([None, {"id": 1, "assets": []}])
+    calls, drafts = [], iter([None])   # listed once: a draft just created holds nothing yet
     real = (B.subprocess.run, B.git, B.existing_draft)
 
     class _Done:

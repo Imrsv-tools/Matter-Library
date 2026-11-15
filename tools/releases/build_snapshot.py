@@ -31,8 +31,8 @@ Real fields only: a field the library does not hold yet (a thumbnail, a summary)
 never filled in (SiteFile.md §Absent means not known yet).
 
 ``--publish`` runs ``gh release create --draft --prerelease --target <sha>``, uploads the assets
-twenty at a time, then publishes the draft; it refuses unless the target commit is on origin/main. Publishing is public and
-irreversible: the agent runs it only on the lead's word.
+twenty at a time, then publishes the draft; it refuses unless the target commit is on
+origin/main. Publishing is public and irreversible: the agent runs it only on the lead's word.
 """
 
 from __future__ import annotations
@@ -580,9 +580,7 @@ def publish(tag: str, out: Path, target: str) -> None:
         subprocess.run(["gh", "release", "create", tag, "--repo", REPO_SLUG, "--draft", "--prerelease",
                         "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
                         "--notes-file", str(out / "NOTES.md")], check=True)
-        draft = existing_draft(tag)
-        if draft is None:
-            raise SystemExit(f"{tag}: the draft just created is not listed; re-run to resume")
+        draft = {"id": "new", "assets": []}
     # Upload only what the draft lacks (all of it, fresh; the rest after an interrupted upload,
     # Phase13 13.1: a slow network, a battery), then publish it. A file whose upload never
     # finished is not "uploaded" and is sent again.
@@ -591,7 +589,7 @@ def publish(tag: str, out: Path, target: str) -> None:
         if a["state"] != "uploaded":
             subprocess.run(["gh", "api", "-X", "DELETE", f"repos/{REPO_SLUG}/releases/assets/{a['id']}"], check=True)
     missing = [str(p) for p in files if p.name not in have]
-    print(f"resuming draft {draft['id']}: {len(have)} uploaded, {len(missing)} to send")
+    print(f"draft {draft['id']}: {len(have)} uploaded, {len(missing)} to send")
     for i in range(0, len(missing), 20):
         subprocess.run(["gh", "release", "upload", tag, *missing[i:i + 20], "--repo", REPO_SLUG], check=True)
     subprocess.run(["gh", "release", "edit", tag, "--repo", REPO_SLUG, "--draft=false", "--prerelease",
