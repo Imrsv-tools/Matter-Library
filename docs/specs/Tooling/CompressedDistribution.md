@@ -29,6 +29,8 @@ derivatives.
 
 *(Updated 2026-09-23, measured: `PINNED_VERSION = "V4.5.52"` and the `COMPRESSONATORCLI` override in `tools/compressors/compress_textures.py`; the compressor fails if the encoder is absent or not the pinned version.)*
 
+*(2026-11-15: on macOS arm64, where AMD ships no build, the pin is met by a native build of the same V4.5.52 tag from `Imrsv-tools/compressonator` (`docs/ToolingConventions.md` §Tool locations). It was measured byte-identical to AMD's Linux release on all 299 library textures (BC4/BC5/BC7) and on three BC6H cubes. The pin stays the version and its output, not one binary.)*
+
 **Determinism gate:** byte-identical `.dds` across two runs at the pinned encoder + flags (`run_all.py`
 `compression` lane). Since 2026-11-15 the proof is kept: every encode goes into the **encode cache**,
 `library/dds_cache/` (git-ignored), under the source's bytes, the encoder version and the flags, and an

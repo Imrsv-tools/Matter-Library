@@ -99,11 +99,15 @@ def _py():
 
 
 def _compressonator_prefix() -> list[str]:
+    """A binary (ELF, PE, Mach-O) runs directly; AMD's Linux wrapper script goes through bash.
+    Same test as compress_textures._encoder_prefix."""
     try:
         head = Path(COMPRESSONATOR).read_bytes()[:4]
     except OSError:
         return [COMPRESSONATOR]
-    return [COMPRESSONATOR] if head == b"\x7fELF" else ["/bin/bash", COMPRESSONATOR]
+    binary = head in (b"\x7fELF", b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xca\xfe\xba\xbe") \
+        or head[:2] == b"MZ"
+    return [COMPRESSONATOR] if binary else ["/bin/bash", COMPRESSONATOR]
 
 
 # ---------------------------------------------------------------------------
