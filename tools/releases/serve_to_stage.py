@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serve the working tree to a local Stage runtime, so USDLiveView can browse, apply and tune it.
 
-    serve_to_stage.py [--runtime DIR] [--no-restart] [--compressed] [--view COMPOSITION] [--off]
+    serve_to_stage.py [--runtime DIR] [--no-restart] [--compressed [--cubes]] [--view COMPOSITION] [--off]
 
 Pre-release dev loop (lead, 2026-09-25: "Make a material, serve it to stage. no versioning").
 Every article under ``MatterLibrary/materials/`` is served, as it is on disk right now. There
@@ -43,9 +43,11 @@ from an earlier compressed serve is replaced by the plain link again.
 
 ``--compressed`` also serves each HDRI's BC6H cube sibling (#424, ``hdri_cube.py``) as
 ``releases/matterlib-dev/hdris/<identity>.dds`` beside its stamped ``.hdr``: a link into
-``library/staging/matterlib-dev/hdris/``, where a cube is built only when missing or older than its
-``.hdr`` (minutes a sky at the pinned encoder, so the first such serve is long). A sky whose cube
-fails is served as its ``.hdr`` alone, and without ``--compressed`` no cube is served.
+``library/staging/matterlib-dev/hdris/``. Only ``--cubes`` builds a cube that is missing or older
+than its ``.hdr`` (about 7 minutes a sky at the pinned encoder under emulation, so a first
+``--cubes`` serve of the whole library takes hours); without it such a sky is served as its ``.hdr``
+alone, so a deploy never waits on the encoder. A sky whose cube fails is served as its ``.hdr``
+alone, and without ``--compressed`` no cube is served.
 
 The served catalog reports ``release: 0.1.0``: Stage treats the installed release as
 ``matterlib-<release>`` and every existing composition is stamped ``matterlib-0.1.0``, so they
@@ -227,25 +229,28 @@ def stamp_hdris(dev: Path, listed: list[dict], cubes: list[Path]) -> int:
     return made
 
 
-def serve_hdris(dev: Path, compressed: bool, listed: list[dict] = None, staging: Path = None,
-                build=None, encoder_ok=None) -> str:
+def serve_hdris(dev: Path, compressed: bool, build_cubes: bool, listed: list[dict] = None,
+                staging: Path = None, build=None, encoder_ok=None) -> str:
     """Serve the checkout's HDRIs, stamped; with --compressed, each one's BC6H cube sibling
-    (#424) beside it, built in the dev staging tree. Returns the line the serve prints."""
+    (#424) beside it from the dev staging tree. Only --cubes builds a missing or stale cube
+    (minutes a sky): without it such a sky is served as its .hdr alone, so a deploy never waits on
+    the encoder. Returns the line the serve prints."""
     listed = H.on_disk() if listed is None else listed
     staging = staging or DEV_HDRI_STAGING
     cubes, note = [], "no cubes"
-    if compressed:
-        if CT._check_encoder() if encoder_ok is None else encoder_ok:
-            jobs = [(h["path"], Path(h["identity"] + CT.OUT_EXT)) for h in listed]
-            st = stage_dev(jobs, staging, build or HC.build_cube_dds, CUBE_WORKERS)
+    if compressed and build_cubes and not (CT._check_encoder() if encoder_ok is None else encoder_ok):
+        print("hdris  WARNING: --cubes without the pinned compressor: serving the .hdr only",
+              file=sys.stderr)
+    elif compressed:
+        jobs = [(h["path"], Path(h["identity"] + CT.OUT_EXT)) for h in listed]
+        make = (build or HC.build_cube_dds) if build_cubes else (lambda src, dst: "not built")
+        st = stage_dev(jobs, staging, make, CUBE_WORKERS)
+        if build_cubes:
             for m in st["missed"]:
                 print(f"hdris  no cube for {m}", file=sys.stderr)
-            cubes = [staging / rel for rel in st["staged"]]
-            note = (f"{len(cubes)} cube(s) served ({st['made']} built, {len(st['missed'])} without) "
-                    f"from {staging}")
-        else:
-            print("hdris  WARNING: --compressed without the pinned compressor: serving the .hdr only",
-                  file=sys.stderr)
+        cubes = [staging / rel for rel in st["staged"]]
+        note = (f"{len(cubes)} cube(s) served ({st['made']} built, {len(st['missed'])} without"
+                f"{'' if build_cubes else '; --cubes builds them'}) from {staging}")
     stamped = stamp_hdris(dev, listed, cubes)
     return f"{stamped} stamped in {dev / 'hdris'}; {note}"
 
@@ -490,10 +495,14 @@ def main(argv=None) -> int:
     ap.add_argument("--no-restart", action="store_true", help="don't (re)start the Stage daemon")
     ap.add_argument("--compressed", action="store_true",
                     help="serve each texture's .dds beside its PNG, and each HDRI's BC6H cube .dds beside "
-                         "its .hdr (built in library/staging/matterlib-dev)")
+                         "its .hdr when one is built (in library/staging/matterlib-dev)")
+    ap.add_argument("--cubes", action="store_true",
+                    help="with --compressed, build each missing or stale HDRI cube first (minutes a sky)")
     ap.add_argument("--view", metavar="COMPOSITION", help="then open USDLiveView on this composition")
     ap.add_argument("--off", action="store_true", help="put the previous active release back")
     args = ap.parse_args(argv)
+    if args.cubes and not args.compressed:
+        ap.error("--cubes builds the cubes --compressed serves: pass both")
     if os.name == "nt" and not args.no_restart:
         # stage_pids / restart_stage read /proc and set LD_LIBRARY_PATH: POSIX only.
         ap.error("on Windows pass --no-restart: the daemon restart is POSIX-only (Studio starts Stage)")
@@ -529,7 +538,7 @@ def main(argv=None) -> int:
               f"machine's masters, {mt['published']} from {mt['tag'] or 'no published snapshot'}), "
               f"{mt['none']} without; {mt['made']} made in {dev / MT.FOLDER}")
         if catalog.get("hdris"):
-            served = serve_hdris(dev, args.compressed)
+            served = serve_hdris(dev, args.compressed, args.cubes)
             made = make_thumbnails(dev, catalog["hdris"])
             print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
                   f"{served}; {made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
