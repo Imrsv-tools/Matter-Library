@@ -172,19 +172,16 @@ def _encoder_prefix() -> list[str]:
     ``compressonatorcli-bin``) whose ``#!/bin/bash`` shebang is NOT on line 1
     (a leading blank line precedes it), so ``execve``/``posix_spawn`` fails
     ENOEXEC even though an interactive shell runs it. Route a text/script
-    encoder through bash; exec a real binary (ELF, a Windows PE, or the native
-    macOS build: Mach-O, thin or universal) directly.
+    encoder through bash; exec a binary directly. Every binary format (ELF, a
+    Windows PE, the native macOS Mach-O) has a non-text byte in its first four.
     """
     try:
-        head = Path(COMPRESSONATOR).read_bytes()[:4]
+        with open(COMPRESSONATOR, "rb") as f:
+            head = f.read(4)
     except OSError:
         return [COMPRESSONATOR]
-    binary = head in _BINARY_MAGIC or head[:2] == b"MZ"
-    return [COMPRESSONATOR] if binary else ["/bin/bash", COMPRESSONATOR]
-
-
-# ELF · Mach-O 64-bit · Mach-O 32-bit · Mach-O universal. A PE starts with "MZ".
-_BINARY_MAGIC = (b"\x7fELF", b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xca\xfe\xba\xbe")
+    script = all(32 <= b < 127 or b in b"\t\n\r" for b in head)
+    return ["/bin/bash", COMPRESSONATOR] if script else [COMPRESSONATOR]
 
 
 def _flags(bc: str, miplevels: int) -> list[str]:

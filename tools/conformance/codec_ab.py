@@ -54,13 +54,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "parity" / "scene"))
 from build_scene import mesh_block  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "compressors"))
+import compress_textures as CT  # noqa: E402  (the pinned encoder: its path and how to run it)
 
 # ---- toolchain pins (shared with render_leg_probe.py / check_conformance.sh) ----
 INST = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
 ENVP = Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools"))
 HDRI = INST / "resources/Lights/san_giuseppe_bridge.hdr"
-COMPRESSONATOR = os.environ.get(
-    "COMPRESSONATORCLI", str(Path.home() / ".local/bin/compressonatorcli"))
+COMPRESSONATOR = CT.COMPRESSONATOR
 DEFAULT_STAGING = Path(__file__).resolve().parents[2] / "library/staging/matterlib-0.1.0"
 
 # Per-class parity bar (Experience_Materials.md — ΔE2000 under standardized lighting).
@@ -96,18 +97,6 @@ def usd_env() -> dict:
 
 def _py():
     return str(ENVP / "bin/python")
-
-
-def _compressonator_prefix() -> list[str]:
-    """A binary (ELF, PE, Mach-O) runs directly; AMD's Linux wrapper script goes through bash.
-    Same test as compress_textures._encoder_prefix."""
-    try:
-        head = Path(COMPRESSONATOR).read_bytes()[:4]
-    except OSError:
-        return [COMPRESSONATOR]
-    binary = head in (b"\x7fELF", b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xca\xfe\xba\xbe") \
-        or head[:2] == b"MZ"
-    return [COMPRESSONATOR] if binary else ["/bin/bash", COMPRESSONATOR]
 
 
 # ---------------------------------------------------------------------------
@@ -153,7 +142,7 @@ def decode_dds_to_png(dds: Path, dst_png: Path, src_png: Path, tmp: Path) -> Non
     samples it identically). BC5 normals get their Z reconstructed."""
     tmp.mkdir(parents=True, exist_ok=True)
     tga = tmp / (dds.stem + "_decode.tga")
-    r = subprocess.run(_compressonator_prefix() + ["-noprogress", str(dds), str(tga)],
+    r = subprocess.run(CT._encoder_prefix() + ["-noprogress", str(dds), str(tga)],
                        capture_output=True, text=True)
     if not tga.exists():
         raise RuntimeError(f"compressonatorcli decode failed for {dds.name}:\n{r.stdout[-800:]}{r.stderr[-800:]}")
