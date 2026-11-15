@@ -264,5 +264,38 @@ check(all(k["file"] == f"kit__{k['id']}.zip" and k["sha256"] == "0" * 64 and k["
 print("== ranges ==")
 check(set(LCD_RANGES) == set(LCD_PORTS), "every Creator port has a range, and no range names a non-port")
 
+print("== publish: an empty draft, then batches (WinError 206, dev.15, 2026-11-15) ==")
+with tempfile.TemporaryDirectory() as t:
+    out = Path(t)
+    for i in range(45):
+        (out / f"a{i:02}.zip").write_bytes(b"x")
+    (out / "NOTES.md").write_text("notes")
+    calls, drafts = [], iter([None, {"id": 1, "assets": []}])
+    real = (B.subprocess.run, B.git, B.existing_draft)
+
+    class _Done:
+        returncode = 0
+
+    def fake_run(cmd, **kw):
+        calls.append(list(cmd))
+        return _Done()
+
+    B.subprocess.run, B.git, B.existing_draft = fake_run, lambda *a: "f" * 40, lambda tag: next(drafts)
+    try:
+        B.publish("matterlib-0.0.0-dev.0", out, "HEAD")
+    finally:
+        B.subprocess.run, B.git, B.existing_draft = real
+    gh = [c for c in calls if c[0] == "gh"]
+    create = [c for c in gh if c[1:3] == ["release", "create"]]
+    uploads = [c for c in gh if c[1:3] == ["release", "upload"]]
+    check(len(create) == 1 and "--draft" in create[0] and not any(a.endswith(".zip") for a in create[0]),
+          "a fresh tag is created as an empty draft: no asset rides the create call")
+    check(create[0][create[0].index("--target") + 1] == "f" * 40, "the target is the full SHA")
+    sent = [a for c in uploads for a in c if a.endswith(".zip")]
+    check(len(sent) == 45 and all(sum(a.endswith(".zip") for a in c) <= 20 for c in uploads),
+          "every asset is uploaded, twenty at most a call")
+    check(not any(a.endswith("NOTES.md") for c in uploads for a in c), "NOTES.md is the notes, not an asset")
+    check(gh[-1][1:3] == ["release", "edit"] and "--draft=false" in gh[-1], "the draft is published last")
+
 print(f"\n{'PASS' if not fails else 'FAIL'}: {len(fails)} failed")
 sys.exit(1 if fails else 0)

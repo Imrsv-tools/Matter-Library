@@ -30,8 +30,8 @@ credit and tagging (``hdris``, ``default_hdri``).
 Real fields only: a field the library does not hold yet (a thumbnail, a summary) is left out,
 never filled in (SiteFile.md §Absent means not known yet).
 
-``--publish`` runs ``gh release create --prerelease --target <sha>``, the shape unreal/publish.sh
-uses, and refuses unless the target commit is on origin/main. Publishing is public and
+``--publish`` runs ``gh release create --draft --prerelease --target <sha>``, uploads the assets
+twenty at a time, then publishes the draft; it refuses unless the target commit is on origin/main. Publishing is public and
 irreversible: the agent runs it only on the lead's word.
 """
 
@@ -577,14 +577,19 @@ def publish(tag: str, out: Path, target: str) -> None:
         raise SystemExit(f"{len(files)} assets: over {MAX_ASSETS}")
     draft = existing_draft(tag)
     if draft is None:
-        # gh keeps the release a draft until every asset is up, then publishes it
-        subprocess.run(["gh", "release", "create", tag, *map(str, files), "--repo", REPO_SLUG,
-                        "--prerelease", "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
+        # An empty draft first, then the batched upload below. One `gh release create` naming
+        # every asset (~480) overruns Windows' command-line limit (WinError 206, dev.15,
+        # 2026-11-15); the batches keep every call short, and a fresh publish and a resumed one
+        # take the same path. `sha` is the full SHA: the API refuses an abbreviated --target.
+        subprocess.run(["gh", "release", "create", tag, "--repo", REPO_SLUG, "--draft", "--prerelease",
+                        "--target", sha, "--title", f"Matter Library dev snapshot {tag}",
                         "--notes-file", str(out / "NOTES.md")], check=True)
-        return
-    # An interrupted upload (Phase13 13.1: a slow network, a battery) left a draft: upload only
-    # what it lacks, then publish it. A file whose upload never finished is not "uploaded" and
-    # is sent again.
+        draft = existing_draft(tag)
+        if draft is None:
+            raise SystemExit(f"{tag}: the draft just created is not listed; re-run to resume")
+    # Upload only what the draft lacks (all of it, fresh; the rest after an interrupted upload,
+    # Phase13 13.1: a slow network, a battery), then publish it. A file whose upload never
+    # finished is not "uploaded" and is sent again.
     have = {a["name"] for a in draft["assets"] if a["state"] == "uploaded"}
     for a in draft["assets"]:
         if a["state"] != "uploaded":
