@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Validator orchestrator (Phase 53) — runs the full §6 automated gate set.
 
-    uv run tools/validators/run_all.py [--strict] [--repo-root <dir>]
+    uv run tools/validators/run_all.py [--strict] [--only L,…] [--skip L,…] [--list] [--repo-root <dir>]
+
+--only / --skip run part of the gate by lane name (--list prints the names). A partial run
+reports each lane it left out as NOT RUN and never reads ALL PASS; --strict refuses one.
+Adding one article: --skip compression,staging, plus compress_textures.py --determinism
+--only <its texture> (the full compression sweep takes about an hour; see that lane).
 
 Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the reason):
   1. grammar fixtures        — fixtures/grammar_cases.json (must-pass / must-fail)
@@ -13,6 +18,9 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
                                fixtures/recipes/*.json, each rejected by its own guard
   5. catalog freshness/valid — projected runtime catalog is byte-current + rejects dangling ids
   6. provenance / projection — promotion-metadata gates + no-runtime-projection guard
+  6b. asset library current  — the COMMITTED blender/asset_library/MatterLibrary.blend carries
+                               every Creator-selectable article in the tree and none that left it
+                               (verify_asset_library.py in Blender; skips without Blender)
   (7. fixture sync — REMOVED from the gate 2026-09-23: it read a consumer's checkout, and a
       producer gate must not (R1). The check lives on as tools/validators/check_fixture_sync.py,
       moving to the consumer side — docs/Planning/PlatformDependencies.md P8.)
@@ -45,6 +53,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import sys
 from pathlib import Path
 
@@ -333,8 +342,11 @@ def run_compression(root: Path) -> bool:
     sha256-compares the two runs (byte-identical determinism gate).
 
     Encoder-gated: skips with a note when compressonatorcli is absent (CI without the
-    pinned encoder) — mirrors run_all's skip-if-surface-absent policy. On the dev box the
-    encoder is present so the full sweep (~12 s over 30 textures) runs."""
+    pinned encoder) — mirrors run_all's skip-if-surface-absent policy. Where the encoder is
+    present the full sweep runs: about an hour for ~300 source textures with the emulated
+    encoder on Apple Silicon (measured 2026-11-13; it was ~12 s over 30 textures natively).
+    For one article's textures, `compress_textures.py --determinism --only <substring>` takes
+    about a minute; `run_all.py --skip compression,staging` runs the rest of the gate."""
     src_root = root / "MatterLibrary" / "textures"
     if not src_root.exists():
         print("== compression == (skip: no MatterLibrary/textures)")
@@ -772,49 +784,132 @@ def run_tool_tests(root: Path):
     return True
 
 
+def run_asset_library_current(root: Path):
+    """The COMMITTED Blender asset file is current (2026-11-15, backlog Open 17(b)): runs
+    tools/conformance/verify_asset_library.py against blender/asset_library/MatterLibrary.blend
+    as committed, not against a fresh build. FAILs when an article in the working tree has no
+    proxy there, when a proxy's article has left the tree, or on any structure check. About two
+    seconds. SKIPs without Blender ($MATTER_BLENDER, else `blender` on PATH, as
+    check_asset_library.sh finds it). The fix for a FAIL: rebuild with check_asset_library.sh
+    and copy its MatterLibrary.blend + blender_assets.cats.txt over the committed pair.
+    Until this lane the file fell 30 days behind unseen, and an article reached main without it."""
+    import os
+    import shutil
+    import subprocess
+    lib = root / "blender" / "asset_library" / "MatterLibrary.blend"
+    verify = root / "tools" / "conformance" / "verify_asset_library.py"
+    if not lib.is_file():
+        print("== asset library current == (skip: no committed blender/asset_library/MatterLibrary.blend)")
+        return SKIP
+    blender = os.environ.get("MATTER_BLENDER") or shutil.which("blender")
+    if not blender:
+        print("== asset library current == (skip: needs Blender — set MATTER_BLENDER or put `blender` on PATH)")
+        return SKIP
+    print("== asset library current ==")
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS",
+                        "PXR_AR_DEFAULT_SEARCH_PATH")}
+    proc = subprocess.run([blender, "--background", "--factory-startup", str(lib), "--python", str(verify)],
+                          cwd=root, env=env, capture_output=True, text=True, timeout=600)
+    lines = proc.stdout.splitlines()
+    fails = [ln for ln in lines if ln.strip().startswith("[FAIL]")]
+    for ln in fails[:20]:
+        print(f"  {ln.strip()}")
+    if len(fails) > 20:
+        print(f"  … and {len(fails) - 20} more [FAIL] lines")
+    for ln in lines:
+        if ln.strip().startswith(("Blender:", "=> asset-library")):
+            print(f"  {ln.strip()}")
+    good = proc.returncode == 0 and "CONFORMS" in proc.stdout
+    if not good and not fails:
+        print(f"  [FAIL] the verifier exited {proc.returncode} without a verdict; its last lines:")
+        for ln in (proc.stdout + proc.stderr).strip().splitlines()[-8:]:
+            print(f"      {ln}")
+    elif not good:
+        print("  the committed asset file is behind the tree: rebuild it with "
+              "tools/conformance/check_asset_library.sh <scratch> and copy the pair in")
+    return good
+
+
+# Run order. Each lane takes the repo root and returns True (PASS), False (FAIL) or SKIP;
+# --only/--skip select by these names.
+LANES = [
+    ("grammar", lambda root: run_grammar_fixtures()),
+    ("materials", run_materials),
+    ("manifest", run_manifest),
+    ("determinism", run_determinism),
+    ("recipe", run_recipe),
+    ("catalog_freshness", run_catalog_freshness),
+    ("catalog_validation", run_catalog_validation),
+    ("provenance_gate", run_provenance_gate),
+    ("no_projection_guard", run_no_projection_guard),
+    ("asset_library_current", run_asset_library_current),
+    ("compression_negative", run_compression_negative),
+    ("compression", run_compression),
+    ("staging", run_staging),
+    ("approval_gate", run_approval_gate),
+    ("freeze_lock", run_freeze_lock),
+    ("approval_binds_freeze", run_approval_binds_freeze),
+    ("release_verify", run_release_verify),
+    ("activation", run_activation),
+    ("tool_tests", run_tool_tests),
+]
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
     ap.add_argument("--strict", action="store_true",
                     help="treat a SKIPPED lane as a failure: every lane must run (the full check before merging)")
+    ap.add_argument("--only", default="", metavar="LANE[,LANE…]",
+                    help="run only these lanes (a partial run: it never reports ALL PASS)")
+    ap.add_argument("--skip", default="", metavar="LANE[,LANE…]",
+                    help="run every lane but these (e.g. compression,staging when adding one article)")
+    ap.add_argument("--list", action="store_true", help="print the lane names in run order and exit")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
 
-    results = {
-        "grammar": run_grammar_fixtures(),
-        "materials": run_materials(root),
-        "manifest": run_manifest(root),
-        "determinism": run_determinism(root),
-        "recipe": run_recipe(root),
-        "catalog_freshness": run_catalog_freshness(root),
-        "catalog_validation": run_catalog_validation(root),
-        "provenance_gate": run_provenance_gate(root),
-        "no_projection_guard": run_no_projection_guard(root),
-        "compression_negative": run_compression_negative(root),
-        "compression": run_compression(root),
-        "staging": run_staging(root),
-        "approval_gate": run_approval_gate(root),
-        "freeze_lock": run_freeze_lock(root),
-        "approval_binds_freeze": run_approval_binds_freeze(root),
-        "release_verify": run_release_verify(root),
-        "activation": run_activation(root),
-        "tool_tests": run_tool_tests(root),
-    }
+    names = [name for name, _ in LANES]
+    if args.list:
+        print("\n".join(names))
+        return 0
+    only = [n.strip() for n in args.only.split(",") if n.strip()]
+    skip = [n.strip() for n in args.skip.split(",") if n.strip()]
+    unknown = [n for n in only + skip if n not in names]
+    if unknown:
+        ap.error(f"unknown lane(s): {', '.join(unknown)} (--list prints them)")
+    if args.strict and (only or skip):
+        ap.error("--strict is the full check before merging: it cannot be combined with --only or --skip")
+    selected = [n for n in names if (not only or n in only) and n not in skip]
+    if not selected:
+        ap.error("--only/--skip leave no lane to run")
+    not_run = [n for n in names if n not in selected]
+
+    # A SIGTERM (a stopped background run) would otherwise kill the process without running any
+    # lane's `finally`, leaving its temp folders behind (~1.5 GB from the compression lane,
+    # 2026-11-13). As SystemExit it unwinds through them; a running encoder child is killed by
+    # subprocess.run on the way out.
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(128 + signum))
+
+    results = {name: lane(root) for name, lane in LANES if name in selected}
     print("\n=== SUMMARY ===")
     for k, v in results.items():
         print(f"  {k}: {'SKIP' if v == SKIP else 'PASS' if v else 'FAIL'}")
+    for k in not_run:
+        print(f"  {k}: NOT RUN (deselected)")
     passed = [k for k, v in results.items() if v is True]
     skipped = [k for k, v in results.items() if v == SKIP]
     failed = [k for k, v in results.items() if v is False]
-    print(f"{len(results)} lanes: {len(passed)} PASS, {len(skipped)} SKIP, {len(failed)} FAIL"
+    print(f"{len(results)} of {len(names)} lanes run: {len(passed)} PASS, {len(skipped)} SKIP, {len(failed)} FAIL"
+          + (f", {len(not_run)} NOT RUN" if not_run else "")
           + (" (--strict: a SKIP fails the run)" if args.strict else ""))
     ok = not failed and not (args.strict and skipped)
     if failed:
         print("OVERALL: FAIL —", ", ".join(failed))
     elif skipped and args.strict:
         print("OVERALL: FAIL (strict) — skipped:", ", ".join(skipped))
-    elif skipped:
-        print("OVERALL: PASS with skips — not checked:", ", ".join(skipped))
+    elif skipped or not_run:
+        print("OVERALL: PASS, PARTIAL — not checked:", ", ".join(skipped + not_run))
     else:
         print("OVERALL: ALL PASS — every lane ran")
     return 0 if ok else 1

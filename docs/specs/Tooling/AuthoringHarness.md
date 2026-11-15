@@ -18,7 +18,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 
 ## Tools
 
-*(Updated 2026-09-23, measured: `ls tools/*/` on the live tree and each script's module docstring; the `run_all.py` lanes are the `results` keys of its `main()`.)*
+*(Updated 2026-09-23, measured: `ls tools/*/` on the live tree and each script's module docstring; the `run_all.py` lanes are the entries of its `LANES` table, in run order — `run_all.py --list` prints them, since 2026-11-15.)*
 
 ### `tools/converters/` — stage C (assembly) and procedural textures
 
@@ -53,7 +53,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
 | `fixtures/recipes/*.json` | RED recipe fixtures, each rejected by one named guard |
 
-**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
+**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)). `--only` / `--skip` run part of it by lane name; a partial run names every lane it left out as NOT RUN, never reads ALL PASS, and cannot be combined with `--strict` (2026-11-15).
 
 | Lane | Checks |
 |---|---|
@@ -66,6 +66,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `catalog_validation` | the projector rejects a manifest with dangling ids |
 | `provenance_gate` | promotion-metadata RED fixtures are rejected (missing provenance, under-promoted coverage, shallow evidence) |
 | `no_projection_guard` | provenance / evidence / licence data never leaks into the runtime catalog |
+| `asset_library_current` *(2026-11-15)* | the **committed** `blender/asset_library/MatterLibrary.blend` carries a proxy for every Creator-selectable article in the tree and none for an article that has left it: `verify_asset_library.py`, in Blender, against the committed file rather than a fresh build. About two seconds; a SKIP without Blender. It prints which Blender saved the file |
 | ~~`fixture_sync`~~ | *Removed from the gate 2026-09-23 (Phase02).* A consumer's fixture catalog + payloads are byte-current (cross-repo). The intent is kept: the check moves to the consumer side (`PlatformDependencies.md` P8), and `check_fixture_sync.py` remains as its tool. |
 | `compression_negative` | the compressed-output validator rejects corrupt / mismatched `.dds` fixtures |
 | `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated) |
@@ -195,4 +196,5 @@ proof subset through it. The **production tool-stack** (Matter Manager, a genera
 - 2026-07: the gate grew lanes for the runtime catalog, provenance, compression, staging, freeze, approval and activation, plus the conformance and Blender-generator tools.
 - 2026-09-23: brought home; tool list refreshed against the live tree.
 - 2026-10-16 (Phase20 20.1): the `tool_tests` lane (18 lanes). Until then the gate ran none of the tools' own test scripts, and a broken `test_hdri.py` stayed green.
+- 2026-11-15 (a quick fix): the `asset_library_current` lane (19 lanes) and `--only` / `--skip`. Until then the committed asset file fell 30 days behind unseen, and adding one article meant the full hour-long gate.
 - 2026-09-25 (Phase03): the recipe lane (17 lanes), the recipe schema, the Physically Based lookup, the ambientCG importer, layer and base-set generators, the working headless preview; freeze and staging scoped to each release's lock.
