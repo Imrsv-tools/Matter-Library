@@ -134,5 +134,59 @@ with tempfile.TemporaryDirectory() as tmp:
     check(sorted(calls) == ["Badcheck_normal.png", "Raises_roughness.png"],
           f"the next serve retries both failures instead of keeping them: {calls}")
 
+print("== an HDRI's cube sibling is served beside its .hdr (#424) ==")
+built = []
+
+
+def fake_cube(hdr, dds):
+    built.append(hdr.name)
+    if "Broken" in hdr.name:
+        raise RuntimeError("the compressor failed")
+    dds.write_text(f"cube of {hdr.name}")
+
+
+def radiance(path):
+    path.write_bytes(b"#?RADIANCE\nFORMAT=32-bit_rle_rgbe\n\n-Y 2048 +X 4096\n" + b"\x02\x02" * 8)
+
+
+with tempfile.TemporaryDirectory() as tmp:
+    tmp = Path(tmp)
+    src, staging, dev = tmp / "hdris", tmp / "staging", tmp / "dev"
+    src.mkdir()
+    dev.mkdir()
+    rows = []
+    for name in ("Noon", "Dusk", "Broken"):
+        radiance(src / f"{name}_PureSky_v01.hdr")
+        rows.append({"id": name, "version": "v01", "identity": f"{name}_v01", "record": {},
+                     "path": src / f"{name}_PureSky_v01.hdr"})
+    hdris = dev / "hdris"
+
+    line = S.serve_hdris(dev, True, rows, staging, fake_cube, encoder_ok=True)
+    check(listing(hdris) == ["Broken_v01.hdr", "Dusk_v01.dds", "Dusk_v01.hdr", "Noon_v01.dds", "Noon_v01.hdr"],
+          f"each stamped .hdr has its cube beside it, but the one that failed: {listing(hdris)}")
+    check((hdris / "Noon_v01.dds").resolve() == (staging / "Noon_v01.dds").resolve(),
+          "a served cube links to the staging tree")
+    check(listing(src) == ["Broken_PureSky_v01.hdr", "Dusk_PureSky_v01.hdr", "Noon_PureSky_v01.hdr"],
+          "the checkout's HDRIs folder is not written")
+    check("2 cube(s)" in line and "1 without" in line, f"the serve says what it did: {line!r}")
+
+    built.clear()
+    time.sleep(0.02)
+    os.utime(src / "Noon_PureSky_v01.hdr")                 # a changed sky: restamped and rebuilt
+    S.serve_hdris(dev, True, rows, staging, fake_cube, encoder_ok=True)
+    check(sorted(built) == ["Broken_PureSky_v01.hdr", "Noon_PureSky_v01.hdr"],
+          f"only a stale cube (and the failed one) is built again: {built}")
+    check((hdris / "Dusk_v01.dds").is_file() and (hdris / "Noon_v01.dds").is_file(),
+          "the cubes survive a restamp")
+
+    S.serve_hdris(dev, True, rows[:1], staging, fake_cube, encoder_ok=True)
+    check(listing(hdris) == ["Noon_v01.dds", "Noon_v01.hdr"] and listing(staging) == ["Noon_v01.dds"],
+          "a sky the checkout no longer holds loses its cube, served and staged")
+
+    S.serve_hdris(dev, False, rows[:1], staging, fake_cube)
+    check(listing(hdris) == ["Noon_v01.hdr"], "without --compressed no cube is served")
+    S.serve_hdris(dev, True, rows[:1], staging, fake_cube, encoder_ok=False)
+    check(listing(hdris) == ["Noon_v01.hdr"], "without the compressor no cube is served")
+
 print("RESULT:", "PASS" if not fails else f"FAIL ({len(fails)})")
 sys.exit(1 if fails else 0)

@@ -232,14 +232,14 @@ def read_dds_header(dst: Path) -> dict:
         # DDS_PIXELFORMAT begins at offset 72 within the 124-byte header
         pf = hdr[72:72 + 32]
         pf_size, pf_flags, fourcc = struct.unpack("<II4s", pf[:12])
-        dxgi = None
+        dxgi = misc = array_size = None
         if pf_flags & _DDPF_FOURCC and fourcc == _FOURCC_DX10:
-            dx10 = f.read(20)  # DDS_HEADER_DXT10
+            dx10 = f.read(20)  # DDS_HEADER_DXT10: dxgiFormat, dimension, miscFlag, arraySize, misc2
             if len(dx10) < 20:
                 raise ValueError(f"{dst} truncated DX10 header")
-            dxgi = struct.unpack("<I", dx10[:4])[0]
+            dxgi, _, misc, array_size = struct.unpack("<4I", dx10[:16])
     return {"width": width, "height": height, "mipcount": mipcount,
-            "fourcc": fourcc, "dxgi": dxgi}
+            "fourcc": fourcc, "dxgi": dxgi, "misc": misc, "array_size": array_size}
 
 
 def validate_output(rec: dict) -> tuple[bool, str]:
