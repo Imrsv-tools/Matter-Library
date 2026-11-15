@@ -229,28 +229,33 @@ def stamp_hdris(dev: Path, listed: list[dict], cubes: list[Path]) -> int:
     return made
 
 
-def serve_hdris(dev: Path, compressed: bool, build_cubes: bool, listed: list[dict] = None,
-                staging: Path = None, build=None, encoder_ok=None) -> str:
+def cube_jobs(listed: list[dict]) -> list[tuple[Path, Path]]:
+    """Each HDRI and its cube's path in the dev staging tree (#424)."""
+    return [(h["path"], Path(h["identity"] + CT.OUT_EXT)) for h in listed]
+
+
+def build_cubes(listed: list[dict], staging: Path = None, build=None, encoder_ok=None) -> str:
+    """--cubes: bring the dev staging tree's BC6H cubes up to date with the checkout's HDRIs, before
+    the serve (minutes a sky; hours for the library the first time). Returns the line it prints."""
+    staging = staging or DEV_HDRI_STAGING
+    if not (CT._check_encoder() if encoder_ok is None else encoder_ok):
+        print("hdris  WARNING: --cubes without the pinned compressor: no cube built", file=sys.stderr)
+        return "no cube built"
+    st = stage_dev(cube_jobs(listed), staging, build or HC.build_cube_dds, CUBE_WORKERS)
+    for m in st["missed"]:
+        print(f"hdris  no cube for {m}", file=sys.stderr)
+    return f"{st['made']} cube(s) built, {len(st['missed'])} failed, in {staging}"
+
+
+def serve_hdris(dev: Path, compressed: bool, listed: list[dict] = None, staging: Path = None) -> str:
     """Serve the checkout's HDRIs, stamped; with --compressed, each one's BC6H cube sibling
-    (#424) beside it from the dev staging tree. Only --cubes builds a missing or stale cube
-    (minutes a sky): without it such a sky is served as its .hdr alone, so a deploy never waits on
-    the encoder. Returns the line the serve prints."""
+    (#424) beside it, when the dev staging tree holds it up to date. Nothing is built here (that
+    is --cubes, build_cubes), so a deploy never waits on the encoder; a sky without its cube is
+    served as its .hdr alone. Returns the line the serve prints."""
     listed = H.on_disk() if listed is None else listed
     staging = staging or DEV_HDRI_STAGING
-    cubes, note = [], "no cubes"
-    if compressed and build_cubes and not (CT._check_encoder() if encoder_ok is None else encoder_ok):
-        print("hdris  WARNING: --cubes without the pinned compressor: serving the .hdr only",
-              file=sys.stderr)
-    elif compressed:
-        jobs = [(h["path"], Path(h["identity"] + CT.OUT_EXT)) for h in listed]
-        make = (build or HC.build_cube_dds) if build_cubes else (lambda src, dst: "not built")
-        st = stage_dev(jobs, staging, make, CUBE_WORKERS)
-        if build_cubes:
-            for m in st["missed"]:
-                print(f"hdris  no cube for {m}", file=sys.stderr)
-        cubes = [staging / rel for rel in st["staged"]]
-        note = (f"{len(cubes)} cube(s) served ({st['made']} built, {len(st['missed'])} without"
-                f"{'' if build_cubes else '; --cubes builds them'}) from {staging}")
+    cubes = [staging / rel for src, rel in cube_jobs(listed) if up_to_date(src, staging / rel)] if compressed else []
+    note = f"{len(cubes)} of {len(listed)} cube(s) served from {staging}" if compressed else "no cubes"
     stamped = stamp_hdris(dev, listed, cubes)
     return f"{stamped} stamped in {dev / 'hdris'}; {note}"
 
@@ -310,6 +315,11 @@ def compress_png(src: Path, dst: Path, src_root: Path) -> str | None:
 ENCODE_WORKERS = max(1, (os.cpu_count() or 2) // 2)
 
 
+def up_to_date(src: Path, dds: Path) -> bool:
+    """A staged .dds made from src as it is now: there, and no older than it."""
+    return dds.is_file() and dds.stat().st_mtime >= src.stat().st_mtime
+
+
 def stage_dev(jobs: list[tuple[Path, Path]], staging: Path, make, workers: int) -> dict:
     """Bring a dev staging tree's .dds up to date with their sources: each job is a source and its
     .dds's path in ``staging``; a .dds missing or older than its source is made (``make(src, dst)``
@@ -321,7 +331,7 @@ def stage_dev(jobs: list[tuple[Path, Path]], staging: Path, make, workers: int) 
     for src, rel in jobs:
         dst = staging / rel
         want.add(rel)       # a miss's .dds is unlinked below, so the orphan sweep never sees it
-        if dst.is_file() and dst.stat().st_mtime >= src.stat().st_mtime:
+        if up_to_date(src, dst):
             kept += 1
         else:
             dst.parent.mkdir(parents=True, exist_ok=True)
@@ -538,7 +548,9 @@ def main(argv=None) -> int:
               f"machine's masters, {mt['published']} from {mt['tag'] or 'no published snapshot'}), "
               f"{mt['none']} without; {mt['made']} made in {dev / MT.FOLDER}")
         if catalog.get("hdris"):
-            served = serve_hdris(dev, args.compressed, args.cubes)
+            if args.cubes:
+                print("hdris  " + build_cubes(H.on_disk()))
+            served = serve_hdris(dev, args.compressed)
             made = make_thumbnails(dev, catalog["hdris"])
             print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
                   f"{served}; {made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")

@@ -161,40 +161,50 @@ with tempfile.TemporaryDirectory() as tmp:
                      "path": src / f"{name}_PureSky_v01.hdr"})
     hdris = dev / "hdris"
 
-    line = S.serve_hdris(dev, True, True, rows, staging, fake_cube, encoder_ok=True)
+    def cubes_then_serve(rows, encoder_ok=True):
+        """--compressed --cubes: build, then serve."""
+        S.build_cubes(rows, staging, fake_cube, encoder_ok=encoder_ok)
+        return S.serve_hdris(dev, True, rows, staging)
+
+    line = cubes_then_serve(rows)
     check(listing(hdris) == ["Broken_v01.hdr", "Dusk_v01.dds", "Dusk_v01.hdr", "Noon_v01.dds", "Noon_v01.hdr"],
           f"each stamped .hdr has its cube beside it, but the one that failed: {listing(hdris)}")
     check((hdris / "Noon_v01.dds").resolve() == (staging / "Noon_v01.dds").resolve(),
           "a served cube links to the staging tree")
     check(listing(src) == ["Broken_PureSky_v01.hdr", "Dusk_PureSky_v01.hdr", "Noon_PureSky_v01.hdr"],
           "the checkout's HDRIs folder is not written")
-    check("2 cube(s)" in line and "1 without" in line, f"the serve says what it did: {line!r}")
+    check("2 of 3 cube(s)" in line, f"the serve says what it did: {line!r}")
 
     built.clear()
     time.sleep(0.02)
     os.utime(src / "Noon_PureSky_v01.hdr")                 # a changed sky: restamped and rebuilt
-    S.serve_hdris(dev, True, True, rows, staging, fake_cube, encoder_ok=True)
+    cubes_then_serve(rows)
     check(sorted(built) == ["Broken_PureSky_v01.hdr", "Noon_PureSky_v01.hdr"],
           f"only a stale cube (and the failed one) is built again: {built}")
     check((hdris / "Dusk_v01.dds").is_file() and (hdris / "Noon_v01.dds").is_file(),
           "the cubes survive a restamp")
 
-    S.serve_hdris(dev, True, True, rows[:1], staging, fake_cube, encoder_ok=True)
+    cubes_then_serve(rows[:1])
     check(listing(hdris) == ["Noon_v01.dds", "Noon_v01.hdr"] and listing(staging) == ["Noon_v01.dds"],
           "a sky the checkout no longer holds loses its cube, served and staged")
 
-    S.serve_hdris(dev, False, True, rows[:1], staging, fake_cube)
+    S.serve_hdris(dev, False, rows[:1], staging)
     check(listing(hdris) == ["Noon_v01.hdr"], "without --compressed no cube is served")
-    S.serve_hdris(dev, True, True, rows[:1], staging, fake_cube, encoder_ok=False)
-    check(listing(hdris) == ["Noon_v01.hdr"], "without the compressor no cube is served")
 
-    S.serve_hdris(dev, True, True, rows[:1], staging, fake_cube, encoder_ok=True)   # Noon's cube again
     built.clear()
-    line = S.serve_hdris(dev, True, False, rows[:2], staging, fake_cube)
-    check(built == [], f"without --cubes the encoder never runs (a deploy never waits on it): {built}")
+    S.build_cubes(rows[:2], staging, fake_cube, encoder_ok=False)
+    check(built == [], f"without the compressor no cube is built: {built}")
+
+    line = S.serve_hdris(dev, True, rows[:2], staging)
+    check(built == [], f"the serve never runs the encoder (a deploy never waits on it): {built}")
     check(listing(hdris) == ["Dusk_v01.hdr", "Noon_v01.dds", "Noon_v01.hdr"],
-          f"without --cubes a built cube is served and a missing one is not: {listing(hdris)}")
-    check("1 cube(s)" in line and "--cubes builds them" in line, f"the serve says how to build: {line!r}")
+          f"a built cube is served and a missing one is not: {listing(hdris)}")
+    check("1 of 2 cube(s)" in line, f"the serve says how many: {line!r}")
+
+    time.sleep(0.02)
+    os.utime(src / "Noon_PureSky_v01.hdr")
+    S.serve_hdris(dev, True, rows[:1], staging)
+    check(listing(hdris) == ["Noon_v01.hdr"], "a cube older than its sky is not served")
 
 print("RESULT:", "PASS" if not fails else f"FAIL ({len(fails)})")
 sys.exit(1 if fails else 0)
