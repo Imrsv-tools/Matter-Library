@@ -729,6 +729,21 @@ def _blender():
             {k: v for k, v in os.environ.items() if k not in drop})
 
 
+CHILD_TIMEOUT = 600  # seconds
+
+
+def _run_child(argv, root: Path, env):
+    """subprocess.run, output captured. A child still running after CHILD_TIMEOUT is killed and
+    comes back with returncode None and what it printed so far: its lane reports a FAIL and the
+    gate goes on (until 2026-11-15 the timeout was an exception that ended the whole gate)."""
+    import subprocess
+    try:
+        return subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, timeout=CHILD_TIMEOUT)
+    except subprocess.TimeoutExpired as e:  # its output arrives as bytes, even with text=True
+        text = lambda b: b.decode(errors="replace") if isinstance(b, bytes) else (b or "")
+        return subprocess.CompletedProcess(argv, None, text(e.stdout), text(e.stderr))
+
+
 def _print_tail(proc, n: int = 8) -> None:
     for line in (proc.stdout + proc.stderr).strip().splitlines()[-n:]:
         print(f"      {line}")
@@ -746,8 +761,9 @@ def _tool_test_runner(script: Path, scratch: Path):
         blender, env = _blender()
         if not blender:
             return None, NO_BLENDER
-        return [blender, "--background", "--factory-startup", "--python", str(script), "--",
-                str(scratch)], env
+        # --python-exit-code: without it a test that raises leaves Blender exiting 0, a PASS
+        return [blender, "--background", "--factory-startup", "--python-exit-code", "1",
+                "--python", str(script), "--", str(scratch)], env
     if re.search(r"^\s*from pxr import\b", text, re.M):
         envp = Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools"))
         inst = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
@@ -762,8 +778,8 @@ def run_tool_tests(root: Path):
     """Phase20 20.1 (Q-P20-1, taken on the lead's go-ahead 2026-10-16): every tool's own test
     script, `test_*.py` under tools/ and blender/, each run as its docstring says (exit 0 = PASS).
     Until then the gate ran none of them, and a broken test_hdri.py stayed green (F-LBL-13).
-    FAIL if any ran and failed; SKIP (naming each) if none failed but one could not run here."""
-    import subprocess
+    FAIL if any ran and failed (a Blender test that raises, or a test past CHILD_TIMEOUT, is a
+    FAIL since 2026-11-15); SKIP (naming each) if none failed but one could not run here."""
     import tempfile
     print("== tool tests (Phase20) ==")
     scripts = sorted(p for top in ("tools", "blender") for p in (root / top).rglob("test_*.py")
@@ -780,12 +796,13 @@ def run_tool_tests(root: Path):
                 print(f"  [SKIP] {rel}: {env}")
                 unrun.append(str(rel))
                 continue
-            proc = subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, timeout=600)
+            proc = _run_child(argv, root, env)
         if proc.returncode == 0:
             print(f"  [PASS] {rel}")
         else:
             failed.append(str(rel))
-            print(f"  [FAIL] {rel} (exit {proc.returncode}); its last lines:")
+            why = f"still running after {CHILD_TIMEOUT} s" if proc.returncode is None else f"exit {proc.returncode}"
+            print(f"  [FAIL] {rel} ({why}); its last lines:")
             _print_tail(proc)
     if failed:
         return False
@@ -800,7 +817,6 @@ def run_asset_library_current(root: Path):
     2026-11-15): verify_asset_library.py in Blender against it, exit 0 = PASS; SKIPs without
     Blender. Fix a FAIL by rebuilding with check_asset_library.sh and copying its .blend and
     cats file in."""
-    import subprocess
     lib = root / "blender" / "asset_library" / "MatterLibrary.blend"
     if not lib.is_file():
         print("== asset library current == (skip: no committed blender/asset_library/MatterLibrary.blend)")
@@ -811,15 +827,15 @@ def run_asset_library_current(root: Path):
         return SKIP
     print("== asset library current ==")
     # --python-exit-code: without it a script that raises leaves Blender exiting 0
-    proc = subprocess.run([blender, "--background", "--factory-startup", "--python-exit-code", "1", str(lib),
-                           "--python", str(root / "tools" / "conformance" / "verify_asset_library.py")],
-                          cwd=root, env=env, capture_output=True, text=True, timeout=600)
+    proc = _run_child([blender, "--background", "--factory-startup", "--python-exit-code", "1", str(lib),
+                       "--python", str(root / "tools" / "conformance" / "verify_asset_library.py")], root, env)
     shown = [ln.strip() for ln in proc.stdout.splitlines()
              if ln.strip().startswith(("[FAIL]", "Blender:", "WARN:", "=> asset-library"))]
     for ln in shown:
         print(f"  {ln}")
-    if proc.returncode != 0 and not any(ln.startswith("[FAIL]") for ln in shown):
-        print(f"  [FAIL] the verifier exited {proc.returncode} without a verdict; its last lines:")
+    if proc.returncode is None or (proc.returncode != 0 and not any(ln.startswith("[FAIL]") for ln in shown)):
+        why = f"was still running after {CHILD_TIMEOUT} s" if proc.returncode is None else f"exited {proc.returncode}"
+        print(f"  [FAIL] the verifier {why} without a verdict; its last lines:")
         _print_tail(proc)
     elif proc.returncode != 0:
         print("  fix: tools/conformance/check_asset_library.sh <scratch>, then copy its .blend and cats file in")
