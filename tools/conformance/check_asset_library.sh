@@ -34,5 +34,18 @@ grep -E '^\s*\[(PASS|FAIL)\]|=> asset-library' "$OUT/verify.log" || { cat "$OUT/
 grep -q 'CONFORMS' "$OUT/verify.log" || rc=1
 
 echo ""
+echo "### 3. Blender version of the committed asset file (copying this build in re-saves it in this Blender)"
+# The verifier owns the comparison and its WARN; its verdict on the committed file is run_all's
+# asset_library_current lane, so only the version lines are shown here (Velvet's landing moved
+# 5.2 -> 5.3 inside a commit about velvet, 2026-11-15).
+COMMITTED="$REPO/blender/asset_library/MatterLibrary.blend"
+if [ -f "$COMMITTED" ]; then
+  $CLEAN "$BLENDER" --background --factory-startup "$COMMITTED" --python "$VERIFY" 2>/dev/null \
+    | grep -E '^\s*(Blender:|WARN:)' || echo "  (could not read the committed file's version)"
+else
+  echo "  no committed asset file"
+fi
+
+echo ""
 echo "### ASSET-LIBRARY GATE $([ $rc -eq 0 ] && echo PASS || echo FAIL) (rc=$rc)"
 exit $rc

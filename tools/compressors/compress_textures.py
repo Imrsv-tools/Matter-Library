@@ -32,6 +32,13 @@ Usage:
   compress_textures.py <src-textures-root> <out-root> [--only <substr>] [--dry-run]
   compress_textures.py --determinism <src-textures-root>   # byte-identical re-run gate
   compress_textures.py --validate <src-textures-root> <out-root>  # structural+semantic
+  compress_textures.py --determinism --fresh <src-textures-root>  # trust no earlier proof
+
+The encode cache (2026-11-15): every encode is kept in ``library/dds_cache/`` (git-ignored) under
+its source's bytes, the encoder version and the flags, and an unchanged texture is copied from
+there instead of encoded again. The determinism gate proves each cache entry once (two encodes,
+the same bytes) and trusts that proof afterwards; ``--fresh`` re-proves every texture with two new
+encodes and also compares them with the cached one. Deleting the cache is always safe.
 
 Exit 0 iff every discovered source texture compressed to a byte-valid, correctly
 formatted, mip-complete ``.dds``.
@@ -41,8 +48,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import os
-import shutil
+import signal
 import struct
 import subprocess
 import sys
@@ -55,6 +63,10 @@ COMPRESSONATOR = os.environ.get(
     str(Path.home() / ".local" / "bin" / "compressonatorcli"),
 )
 PINNED_VERSION = "V4.5.52"
+
+CACHE_DIR = Path(__file__).resolve().parents[2] / "library" / "dds_cache"  # the encode cache, see above
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "releases"))
+import atomic_write as AW  # noqa: E402  (a cache entry written whole)
 
 SRC_EXT = ".png"
 OUT_EXT = ".dds"
@@ -160,23 +172,29 @@ def _encoder_prefix() -> list[str]:
     ``compressonatorcli-bin``) whose ``#!/bin/bash`` shebang is NOT on line 1
     (a leading blank line precedes it), so ``execve``/``posix_spawn`` fails
     ENOEXEC even though an interactive shell runs it. Route a text/script
-    encoder through bash; exec a real binary (ELF, or a Windows PE) directly.
+    encoder through bash; exec a binary directly. Every binary format (ELF, a
+    Windows PE, the native macOS Mach-O) has a non-text byte in its first four.
     """
     try:
-        head = Path(COMPRESSONATOR).read_bytes()[:4]
+        with open(COMPRESSONATOR, "rb") as f:
+            head = f.read(4)
     except OSError:
         return [COMPRESSONATOR]
-    binary = head == b"\x7fELF" or head[:2] == b"MZ"
-    return [COMPRESSONATOR] if binary else ["/bin/bash", COMPRESSONATOR]
+    script = all(32 <= b < 127 or b in b"\t\n\r" for b in head)
+    return ["/bin/bash", COMPRESSONATOR] if script else [COMPRESSONATOR]
 
 
-def compress_one(src: Path, dst: Path, bc: str, miplevels: int, dry_run: bool = False) -> bool:
+def _flags(bc: str, miplevels: int) -> list[str]:
+    return ["-fd", bc, "-miplevels", str(miplevels)]
+
+
+def _cmd(src: Path, dst: Path, bc: str, miplevels: int) -> list[str]:
+    return _encoder_prefix() + _flags(bc, miplevels) + [str(src), str(dst)]
+
+
+def _encode(src: Path, dst: Path, bc: str, miplevels: int) -> bool:
     dst.parent.mkdir(parents=True, exist_ok=True)
-    cmd = _encoder_prefix() + ["-fd", bc, "-miplevels", str(miplevels), str(src), str(dst)]
-    if dry_run:
-        print("  [DRY] " + " ".join(cmd))
-        return True
-    res = subprocess.run(cmd, capture_output=True, text=True)
+    res = subprocess.run(_cmd(src, dst, bc, miplevels), capture_output=True, text=True)
     if res.returncode != 0 or not dst.exists():
         sys.stderr.write(res.stdout + res.stderr + "\n")
         print(f"  [FAIL] {src.name} -> {bc}: compressonatorcli rc={res.returncode}")
@@ -184,9 +202,108 @@ def compress_one(src: Path, dst: Path, bc: str, miplevels: int, dry_run: bool = 
     return True
 
 
-def compress_tree(src_root: Path, out_root: Path, only: str | None = None,
-                  dry_run: bool = False, sources: list[Path] | None = None) -> tuple[bool, list[dict]]:
-    """Compress every source texture (or exactly `sources`, e.g. one release's); return (ok, [record...])."""
+def _cache_key(src_sha: str, bc: str, miplevels: int) -> str:
+    """The source's bytes (their sha256), the encoder version and the flags: a change to any is
+    another key."""
+    return hashlib.sha256("\0".join([src_sha, PINNED_VERSION] + _flags(bc, miplevels)).encode()).hexdigest()
+
+
+def _cache_read(key: str) -> tuple[dict, bytes] | None:
+    """key's cache entry and its .dds bytes, or None. The bytes are read once and checked against
+    the entry's hash, so what a caller writes out is what was checked, even if another session
+    replaces the entry meanwhile. An entry whose .dds does not have its recorded hash (damaged, or
+    overwritten mid-read) is removed and reads as absent."""
+    meta, dds = CACHE_DIR / f"{key}.json", CACHE_DIR / f"{key}.dds"
+    if not meta.exists():
+        return None
+    try:
+        entry = json.loads(meta.read_text(encoding="utf-8"))
+        data = dds.read_bytes()
+        if hashlib.sha256(data).hexdigest() == entry["dds_sha256"]:
+            return entry, data
+    except (OSError, ValueError, KeyError):
+        pass
+    meta.unlink(missing_ok=True)
+    dds.unlink(missing_ok=True)
+    return None
+
+
+def _put(dst: Path, data: bytes) -> None:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_bytes(data)
+
+
+def _cache_write(key: str, dds: Path, digest: str, proven: bool) -> None:
+    """Keep dds (whose sha256 is digest) as key's entry, each file written whole; the .json goes
+    last, so it names a whole .dds."""
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    AW.write_bytes(CACHE_DIR / f"{key}.dds", dds.read_bytes())
+    AW.write_bytes(CACHE_DIR / f"{key}.json", json.dumps({"dds_sha256": digest, "proven": proven}).encode())
+
+
+def compress_one(src: Path, dst: Path, bc: str, miplevels: int, dry_run: bool = False,
+                 cache: bool = True) -> bool:
+    """Encode src into dst, or copy an earlier encode of the same bytes, encoder version and flags
+    from the encode cache; a new encode is kept there, unproven, unless src changed while it was
+    encoded (another session editing it): that output is not the key's. cache=False encodes and
+    keeps nothing."""
+    if dry_run:
+        print("  [DRY] " + " ".join(_cmd(src, dst, bc, miplevels)))
+        return True
+    if not cache:
+        return _encode(src, dst, bc, miplevels)
+    src_sha = sha256(src)
+    key = _cache_key(src_sha, bc, miplevels)
+    hit = _cache_read(key)
+    if hit:
+        _put(dst, hit[1])
+        return True
+    if not _encode(src, dst, bc, miplevels):
+        return False
+    if sha256(src) == src_sha:
+        _cache_write(key, dst, sha256(dst), proven=False)
+    return True
+
+
+def prove_one(src: Path, dst: Path, bc: str, miplevels: int, fresh: bool = False) -> tuple[bool, str, bool]:
+    """The determinism gate for one texture: encode src into dst and show that another encode of
+    the same bytes gives the same bytes. Returns (ok, how, from the cache). A passed proof is kept
+    in the encode cache and trusted later; an earlier unproven encode counts as the other run.
+    fresh trusts no earlier proof: two new encodes, both also compared with the cached one. A
+    source that changed while it was encoded FAILs, and nothing is kept: run again."""
+    src_sha = sha256(src)
+    key = _cache_key(src_sha, bc, miplevels)
+    hit = _cache_read(key)
+    entry = hit[0] if hit else None
+    if entry and entry["proven"] and not fresh:
+        _put(dst, hit[1])
+        return True, "byte-identical (proven by an earlier run; from the encode cache)", True
+    if not _encode(src, dst, bc, miplevels):
+        return False, "the encoder failed", False
+    got, again_sha = sha256(dst), None
+    if not entry or fresh:  # else the earlier, unproven encode is the other run
+        with tempfile.TemporaryDirectory(dir=dst.parent, prefix=".again-") as t:
+            again = Path(t) / dst.name
+            if not _encode(src, again, bc, miplevels):
+                return False, "the encoder failed (second encode)", False
+            again_sha = sha256(again)
+    if sha256(src) != src_sha:
+        return False, "the source changed while it was encoded (another session editing it?): run again", False
+    if entry and entry["dds_sha256"] != got:
+        return False, ("NON-DETERMINISTIC: differs from an earlier run's encode "
+                       f"(if the encoder was reinstalled, delete {CACHE_DIR})"), False
+    if again_sha is not None and again_sha != got:
+        return False, "NON-DETERMINISTIC: two encodes differ", False
+    _cache_write(key, dst, got, proven=True)
+    return True, ("byte-identical (encoded twice)" if again_sha is not None
+                  else "byte-identical with an earlier run's encode"), False
+
+
+def compress_tree(src_root: Path, out_root: Path, only: str | None = None, dry_run: bool = False,
+                  sources: list[Path] | None = None, prove: bool = False,
+                  fresh: bool = False) -> tuple[bool, list[dict]]:
+    """Compress every source texture (or exactly `sources`, e.g. one release's); return (ok, [record...]).
+    prove: each texture passes the determinism gate too (prove_one, with fresh)."""
     records: list[dict] = []
     ok = True
     picked = discover(src_root, only) if sources is None else \
@@ -202,13 +319,34 @@ def compress_tree(src_root: Path, out_root: Path, only: str | None = None,
         mips = full_miplevels(w, h)
         rel = src.relative_to(src_root).with_suffix(OUT_EXT)
         dst = out_root / rel
-        good = compress_one(src, dst, bc, mips, dry_run)
+        good, how, cached = prove_one(src, dst, bc, mips, fresh) if prove else \
+            (compress_one(src, dst, bc, mips, dry_run), "", False)
         if good and not dry_run:
             print(f"  [OK]   {src.relative_to(src_root)}  role={role} fmt={bc} {w}x{h} mips={mips}")
         records.append({"src": str(src), "dst": str(dst), "role": role, "bc": bc,
-                        "w": w, "h": h, "mips": mips, "ok": good})
+                        "w": w, "h": h, "mips": mips, "ok": good, "how": how, "cached": cached})
         ok = ok and good
     return ok, records
+
+
+def prove_tree(src_root: Path, only: str | None = None, fresh: bool = False) -> bool:
+    """The determinism gate over the tree (or its --only part), every output also validated, into
+    a temp folder it removes; prints a line per texture and how many the encode cache held. Run by
+    run_all.py's compression lane and by --determinism."""
+    with tempfile.TemporaryDirectory(prefix="mtc_det_", ignore_cleanup_errors=True) as t:
+        out = Path(t)
+        ok, recs = compress_tree(src_root, out, only=only, prove=True, fresh=fresh)
+        if not ok and all(rec["ok"] for rec in recs):
+            print("  [FAIL] a texture could not be compressed (see above)")
+        for rec in recs:
+            good, detail = validate_output(rec) if rec["ok"] else (False, rec["how"])
+            print(f"  [{'PASS' if good else 'FAIL'}] {Path(rec['dst']).relative_to(out)}: "
+                  f"{rec['how'] if good else detail}")
+            ok = ok and good
+        cached = sum(rec["cached"] for rec in recs)
+        print(f"  {len(recs)} textures: {cached} proven by an earlier run (the encode cache), "
+              f"{len(recs) - cached} encoded now")
+        return ok
 
 
 # ---------------------------------------------------------------------------
@@ -232,14 +370,14 @@ def read_dds_header(dst: Path) -> dict:
         # DDS_PIXELFORMAT begins at offset 72 within the 124-byte header
         pf = hdr[72:72 + 32]
         pf_size, pf_flags, fourcc = struct.unpack("<II4s", pf[:12])
-        dxgi = None
+        dxgi = misc = array_size = None
         if pf_flags & _DDPF_FOURCC and fourcc == _FOURCC_DX10:
-            dx10 = f.read(20)  # DDS_HEADER_DXT10
+            dx10 = f.read(20)  # DDS_HEADER_DXT10: dxgiFormat, dimension, miscFlag, arraySize, misc2
             if len(dx10) < 20:
                 raise ValueError(f"{dst} truncated DX10 header")
-            dxgi = struct.unpack("<I", dx10[:4])[0]
+            dxgi, _, misc, array_size = struct.unpack("<4I", dx10[:16])
     return {"width": width, "height": height, "mipcount": mipcount,
-            "fourcc": fourcc, "dxgi": dxgi}
+            "fourcc": fourcc, "dxgi": dxgi, "misc": misc, "array_size": array_size}
 
 
 def validate_output(rec: dict) -> tuple[bool, str]:
@@ -266,7 +404,8 @@ def validate_output(rec: dict) -> tuple[bool, str]:
 
 
 def sha256(p: Path) -> str:
-    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+    with open(p, "rb") as f:  # in chunks, never the whole file in memory
+        return hashlib.file_digest(f, "sha256").hexdigest()
 
 
 # ---------------------------------------------------------------------------
@@ -307,43 +446,32 @@ def cmd_validate(args) -> int:
 
 
 def cmd_determinism(args) -> int:
-    """Byte-identical re-run gate: compress the tree twice, sha256-compare every .dds."""
     if not _check_encoder():
         return 1
-    src_root = Path(args.src_root)
-    a = Path(tempfile.mkdtemp(prefix="mtc_det_a_"))
-    b = Path(tempfile.mkdtemp(prefix="mtc_det_b_"))
-    try:
-        ok_a, recs = compress_tree(src_root, a, only=args.only)
-        ok_b, _ = compress_tree(src_root, b, only=args.only)
-        if not (ok_a and ok_b):
-            print("RESULT: FAILURES (compression)")
-            return 1
-        all_ok = True
-        for rec in recs:
-            rel = Path(rec["dst"]).relative_to(a)
-            ha, hb = sha256(a / rel), sha256(b / rel)
-            same = ha == hb
-            print(f"  [{'PASS' if same else 'FAIL'}] {rel}: {'byte-identical' if same else 'NON-DETERMINISTIC'}")
-            all_ok = all_ok and same
-        print("RESULT:", "ALL PASS" if all_ok else "FAILURES")
-        return 0 if all_ok else 1
-    finally:
-        shutil.rmtree(a, ignore_errors=True)
-        shutil.rmtree(b, ignore_errors=True)
+    ok = prove_tree(Path(args.src_root), only=args.only, fresh=args.fresh)
+    print("RESULT:", "ALL PASS" if ok else "FAILURES")
+    return 0 if ok else 1
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="BCn texture compressor for Matter release staging.")
     ap.add_argument("--determinism", action="store_true",
-                    help="byte-identical re-run gate (compress twice, sha256-compare)")
+                    help="determinism gate: two encodes of each texture give the same bytes (a texture "
+                         "proven before is copied from the encode cache)")
     ap.add_argument("--validate", action="store_true",
                     help="compress then structurally+semantically validate every .dds")
     ap.add_argument("--only", default=None, help="restrict to sources whose path contains this substring")
     ap.add_argument("--dry-run", action="store_true", help="print compressonatorcli commands, do not run")
     ap.add_argument("src_root", help="source texture tree root (e.g. MatterLibrary/textures)")
     ap.add_argument("out_root", nargs="?", default=None, help="output .dds root (omit for --determinism)")
+    ap.add_argument("--fresh", action="store_true",
+                    help="with --determinism: trust no earlier proof (two new encodes of every texture, "
+                         "also compared with the encode cache)")
     args = ap.parse_args(argv)
+    if args.fresh and not args.determinism:
+        ap.error("--fresh goes with --determinism")
+    # A SIGTERM (a stopped background run) unwinds as SystemExit, so the temp folders go too.
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(128 + signum))
 
     if args.determinism:
         return cmd_determinism(args)

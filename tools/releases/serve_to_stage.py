@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Serve the working tree to a local Stage runtime, so USDLiveView can browse, apply and tune it.
 
-    serve_to_stage.py [--runtime DIR] [--no-restart] [--compressed] [--view COMPOSITION] [--off]
+    serve_to_stage.py [--runtime DIR] [--no-restart] [--compressed [--cubes]] [--view COMPOSITION] [--off]
 
 Pre-release dev loop (lead, 2026-09-25: "Make a material, serve it to stage. no versioning").
 Every article under ``MatterLibrary/materials/`` is served, as it is on disk right now. There
@@ -40,6 +40,14 @@ release carries them, for a runtime that binds them (the IMRSV platform's Studio
 but its ``.dds`` is stale until the next serve, and a new PNG needs a serve. Without the pinned
 compressor the serve warns and keeps the plain link. Without ``--compressed`` a folder of links
 from an earlier compressed serve is replaced by the plain link again.
+
+``--compressed`` also serves each HDRI's BC6H cube sibling (#424, ``hdri_cube.py``) as
+``releases/matterlib-dev/hdris/<identity>.dds`` beside its stamped ``.hdr``: a link into
+``library/staging/matterlib-dev/hdris/``. Only ``--cubes`` builds a cube that is missing or older
+than its ``.hdr`` (about 7 minutes a sky at the pinned encoder under emulation, so a first
+``--cubes`` serve of the whole library takes hours); without it such a sky is served as its ``.hdr``
+alone, so a deploy never waits on the encoder. A sky whose cube fails is served as its ``.hdr``
+alone, and without ``--compressed`` no cube is served.
 
 The served catalog reports ``release: 0.1.0``: Stage treats the installed release as
 ``matterlib-<release>`` and every existing composition is stamped ``matterlib-0.1.0``, so they
@@ -81,8 +89,10 @@ import groups as G  # noqa: E402  (Phase15: the groups and each group's taxonomy
 sys.path.insert(0, str(HERE))
 import hdris as H  # noqa: E402  (the HDRI list, default and thumbnail recipe: Phase14)
 import material_thumbnails as MT  # noqa: E402  (Phase17: each material's thumbnail, served)
+import atomic_write as AW  # noqa: E402
 sys.path.insert(0, str(REPO / "tools" / "compressors"))
 import compress_textures as CT  # noqa: E402  (the release's .dds, for --compressed)
+import hdri_cube as HC  # noqa: E402  (an HDRI's BC6H cube sibling, for --compressed: #424)
 
 DEV = "matterlib-dev"
 SERVED_RELEASE = "0.1.0"
@@ -182,17 +192,24 @@ def working_tree_hdris() -> tuple[list[dict], str | None]:
     return entries, H.default(listed)
 
 
-def stamp_hdris(dev: Path) -> int:
+DEV_HDRI_STAGING = REPO / "library" / "staging" / DEV / "hdris"   # gitignored (library/staging/)
+# Cubes built at once: each is one encoder run that threads its own BC6H work, and each holds a sky
+# and its cube in memory (about 1 GB at peak), so two keep the cores busy without crowding them.
+CUBE_WORKERS = 2
+
+
+def stamp_hdris(dev: Path, listed: list[dict], cubes: list[Path]) -> int:
     """Phase16 (RD-P16-12): the dev install serves a stamped copy of each HDRI, in place of
     Phase14's link into the checkout, so the repo keeps Poly Haven's bytes. Each copy is remade
-    only when stale (H.stamp_stale); one the checkout no longer holds is removed. The first time,
+    only when stale (H.stamp_stale); one the checkout no longer holds is removed. Beside them, a
+    link to each staged file of ``cubes``, by its name; any other file is removed. The first time,
     the copies are built beside the link and swapped in, so a reader never finds the folder empty.
     Returns how many were (re)stamped."""
     out = dev / "hdris"
     build = dev / "hdris.stamping" if out.is_symlink() else out
     build.mkdir(exist_ok=True)
-    want, made = set(), 0
-    for h in H.on_disk():
+    want, made = {c.name for c in cubes}, 0
+    for h in listed:
         f, dst = H.facts(h), build / f"{h['identity']}.hdr"    # the published name (RD-LBL-5)
         want.add(dst.name)
         if H.stamp_stale(h["path"], dst, f):
@@ -201,10 +218,46 @@ def stamp_hdris(dev: Path) -> int:
     for p in build.iterdir():
         if (p.is_file() or p.is_symlink()) and p.name not in want:
             p.unlink()
+    for target in cubes:
+        link_ = build / target.name
+        if not (link_.is_symlink() and link_.resolve() == target.resolve()):
+            link_.unlink(missing_ok=True)
+            link_.symlink_to(target)
     if build != out:
         out.unlink()                  # the link only: never what it points at
         build.rename(out)
     return made
+
+
+def cube_jobs(listed: list[dict]) -> list[tuple[Path, Path]]:
+    """Each HDRI and its cube's path in the dev staging tree (#424)."""
+    return [(h["path"], Path(h["identity"] + CT.OUT_EXT)) for h in listed]
+
+
+def build_cubes(listed: list[dict], staging: Path = None, build=None, encoder_ok=None) -> str:
+    """--cubes: bring the dev staging tree's BC6H cubes up to date with the checkout's HDRIs, before
+    the serve (minutes a sky; hours for the library the first time). Returns the line it prints."""
+    staging = staging or DEV_HDRI_STAGING
+    if not (CT._check_encoder() if encoder_ok is None else encoder_ok):
+        print("hdris  WARNING: --cubes without the pinned compressor: no cube built", file=sys.stderr)
+        return "no cube built"
+    st = stage_dev(cube_jobs(listed), staging, build or HC.build_cube_dds, CUBE_WORKERS)
+    for m in st["missed"]:
+        print(f"hdris  no cube for {m}", file=sys.stderr)
+    return f"{st['made']} cube(s) built, {len(st['missed'])} failed, in {staging}"
+
+
+def serve_hdris(dev: Path, compressed: bool, listed: list[dict] = None, staging: Path = None) -> str:
+    """Serve the checkout's HDRIs, stamped; with --compressed, each one's BC6H cube sibling
+    (#424) beside it, when the dev staging tree holds it up to date. Nothing is built here (that
+    is --cubes, build_cubes), so a deploy never waits on the encoder; a sky without its cube is
+    served as its .hdr alone. Returns the line the serve prints."""
+    listed = H.on_disk() if listed is None else listed
+    staging = staging or DEV_HDRI_STAGING
+    cubes = [staging / rel for src, rel in cube_jobs(listed) if up_to_date(src, staging / rel)] if compressed else []
+    note = f"{len(cubes)} of {len(listed)} cube(s) served from {staging}" if compressed else "no cubes"
+    stamped = stamp_hdris(dev, listed, cubes)
+    return f"{stamped} stamped in {dev / 'hdris'}; {note}"
 
 
 def make_thumbnails(dev: Path, entries: list[dict]) -> int:
@@ -226,9 +279,7 @@ def make_thumbnails(dev: Path, entries: list[dict]) -> int:
 
 
 def write_atomic(path: Path, text: str) -> None:
-    tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    os.replace(tmp, path)
+    AW.write_bytes(path, text.encode("utf-8"))
 
 
 def link(path: Path, target: Path) -> None:
@@ -264,39 +315,45 @@ def compress_png(src: Path, dst: Path, src_root: Path) -> str | None:
 ENCODE_WORKERS = max(1, (os.cpu_count() or 2) // 2)
 
 
-def stage_dev_dds(src_root: Path, staging: Path, compress=compress_png) -> dict:
-    """Bring the dev staging tree's .dds up to date with the checkout's PNGs: a PNG whose .dds is
-    missing or older is compressed, a .dds whose PNG is gone is removed. A PNG that cannot be
-    compressed (no role in its name, a failed check) is reported and served without one: it takes
-    the raw path, as before. Returns the counts, the misses and the staged .dds (relative paths)."""
+def up_to_date(src: Path, dds: Path) -> bool:
+    """A staged .dds made from src as it is now: there, and no older than it."""
+    return dds.is_file() and dds.stat().st_mtime >= src.stat().st_mtime
+
+
+def stage_dev(jobs: list[tuple[Path, Path]], staging: Path, make, workers: int) -> dict:
+    """Bring a dev staging tree's .dds up to date with their sources: each job is a source and its
+    .dds's path in ``staging``; a .dds missing or older than its source is made (``make(src, dst)``
+    returns None, or a reason it cannot), a .dds no job names is removed. A source that cannot be
+    made (a texture with no role in its name, a failed check, a sky the encoder fails on) is
+    reported and served without one: a texture takes the raw path, a sky its .hdr alone. Returns
+    the counts, the misses and the staged .dds (relative paths)."""
     want, todo, kept = set(), [], 0
-    for src in CT.discover(src_root):
-        rel = src.relative_to(src_root).with_suffix(CT.OUT_EXT)
+    for src, rel in jobs:
         dst = staging / rel
         want.add(rel)       # a miss's .dds is unlinked below, so the orphan sweep never sees it
-        if dst.is_file() and dst.stat().st_mtime >= src.stat().st_mtime:
+        if up_to_date(src, dst):
             kept += 1
         else:
             dst.parent.mkdir(parents=True, exist_ok=True)
-            todo.append((src, dst))
+            todo.append((src, dst, rel))
 
     def one(job):
-        """One texture, settled on its own: a failure (a reason, or an exception such as a
+        """One source, settled on its own: a failure (a reason, or an exception such as a
         malformed PNG) leaves no .dds behind, whatever the other jobs do, so a failed file is
         never kept as up to date by the next serve."""
-        src, dst = job
+        src, dst, _ = job
         try:
-            why = compress(src, dst, src_root)
-        except Exception as e:       # one bad texture must not stop the rest or skip their cleanup
+            why = make(src, dst)
+        except Exception as e:       # one bad source must not stop the rest or skip their cleanup
             why = f"{type(e).__name__}: {e}"
         if why is not None:
             dst.unlink(missing_ok=True)
         return why
 
-    with ThreadPoolExecutor(max_workers=ENCODE_WORKERS) as pool:
+    with ThreadPoolExecutor(max_workers=workers) as pool:
         whys = list(pool.map(one, todo))
-    missed = [f"{src.relative_to(src_root)}: {why}"
-              for (src, _), why in zip(todo, whys) if why is not None]
+    missed = [f"{rel.with_suffix(src.suffix)}: {why}"
+              for (src, _, rel), why in zip(todo, whys) if why is not None]
     removed = 0
     for dds in sorted(staging.rglob("*" + CT.OUT_EXT)) if staging.is_dir() else []:
         if dds.relative_to(staging) not in want:
@@ -363,7 +420,8 @@ def serve_textures(dev: Path, compressed: bool, src_root: Path = None, staging: 
     if compressed:
         ok = CT._check_encoder() if encoder_ok is None else encoder_ok
         if ok:
-            st = stage_dev_dds(src_root, staging, compress)
+            jobs = [(src, src.relative_to(src_root).with_suffix(CT.OUT_EXT)) for src in CT.discover(src_root)]
+            st = stage_dev(jobs, staging, lambda src, dst: compress(src, dst, src_root), ENCODE_WORKERS)
             farm_textures(dev, src_root, staging, st["staged"])
             for m in st["missed"]:
                 print(f"textures  no .dds for {m}", file=sys.stderr)
@@ -446,10 +504,15 @@ def main(argv=None) -> int:
                     help="the Stage runtime dir (default: $IMRSV_STAGE_RUNTIME)")
     ap.add_argument("--no-restart", action="store_true", help="don't (re)start the Stage daemon")
     ap.add_argument("--compressed", action="store_true",
-                    help="serve each texture's .dds beside its PNG (built in library/staging/matterlib-dev)")
+                    help="serve each texture's .dds beside its PNG, and each HDRI's BC6H cube .dds beside "
+                         "its .hdr when one is built (in library/staging/matterlib-dev)")
+    ap.add_argument("--cubes", action="store_true",
+                    help="with --compressed, build each missing or stale HDRI cube first (minutes a sky)")
     ap.add_argument("--view", metavar="COMPOSITION", help="then open USDLiveView on this composition")
     ap.add_argument("--off", action="store_true", help="put the previous active release back")
     args = ap.parse_args(argv)
+    if args.cubes and not args.compressed:
+        ap.error("--cubes builds the cubes --compressed serves: pass both")
     if os.name == "nt" and not args.no_restart:
         # stage_pids / restart_stage read /proc and set LD_LIBRARY_PATH: POSIX only.
         ap.error("on Windows pass --no-restart: the daemon restart is POSIX-only (Studio starts Stage)")
@@ -485,11 +548,12 @@ def main(argv=None) -> int:
               f"machine's masters, {mt['published']} from {mt['tag'] or 'no published snapshot'}), "
               f"{mt['none']} without; {mt['made']} made in {dev / MT.FOLDER}")
         if catalog.get("hdris"):
-            stamped = stamp_hdris(dev)
+            if args.cubes:
+                print("hdris  " + build_cubes(H.on_disk()))
+            served = serve_hdris(dev, args.compressed)
             made = make_thumbnails(dev, catalog["hdris"])
             print(f"hdris  {len(catalog['hdris'])} served, default {catalog['default_hdri']}; "
-                  f"{stamped} stamped in {dev / 'hdris'}; "
-                  f"{made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
+                  f"{served}; {made} thumbnail(s) made in {dev / 'thumbnails' / 'hdris'}")
         write_atomic(dev / f"{DEV}.catalog.json",
                      json.dumps(catalog, indent=2, sort_keys=True) + "\n")
         current = json.loads(selector.read_text()).get("active_release") if selector.exists() else None

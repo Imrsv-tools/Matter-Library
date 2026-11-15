@@ -22,19 +22,27 @@ derivatives.
 |---|---|---|
 | Encoder (pinned) | `compressonatorcli` **V4.5.52** (located via `$COMPRESSONATORCLI`, else a per-user default) | the BCn encoder — pinned for deterministic output |
 | Compressor | `tools/compressors/compress_textures.py` | source PNG tree → mip-complete BCn `.dds`, per the role table below |
+| HDRI cube | `tools/compressors/hdri_cube.py` | an HDRI's `.hdr` → its BC6H cubemap `.dds` sibling for Unreal (below) |
 | Staging producer | `tools/releases/stage_release.py` | assembles the self-contained per-release `{png, .dds}` snapshot |
 | Freeze | `tools/releases/freeze_release.py` | hash-locks the complete payload incl. `.dds` (`dds_set`) |
 | Role-format check | `tools/compressors/check_role_formats.py --header <consumer role table>` | every picture an article binds to a compressed role's node is compressed to the format the consumer's role table names (run by hand, not a `run_all.py` lane: the gate never reads a consumer's checkout) |
 
 *(Updated 2026-09-23, measured: `PINNED_VERSION = "V4.5.52"` and the `COMPRESSONATORCLI` override in `tools/compressors/compress_textures.py`; the compressor fails if the encoder is absent or not the pinned version.)*
 
+*(2026-11-15: on macOS arm64, where AMD ships no build, the pin is met by a native build of the same V4.5.52 tag from `Imrsv-tools/compressonator` (`docs/ToolingConventions.md` §Tool locations). It was measured byte-identical to AMD's Linux release on all 299 library textures (BC4/BC5/BC7) and on three BC6H cubes. The pin stays the version and its output, not one binary.)*
+
 **Determinism gate:** byte-identical `.dds` across two runs at the pinned encoder + flags (`run_all.py`
-`compression` lane). **Output validation:** dimensions · role↔BC-format agreement · complete mip chain ·
+`compression` lane). Since 2026-11-15 the proof is kept: every encode goes into the **encode cache**,
+`library/dds_cache/` (git-ignored), under the source's bytes, the encoder version and the flags, and an
+unchanged texture is copied from there rather than encoded again, by the gate, staging and the dev
+server alike. An HDRI's cube is not kept (about 2 GB for 59 skies; `serve_to_stage.py --compressed --cubes` builds each once). `--fresh` (`run_all.py`, `compress_textures.py --determinism`) trusts no earlier proof:
+two new encodes of every texture, compared with each other and with the cached one; run it before a
+release. A texture edited while it is encoded (another session) is never kept, and the gate FAILs it: run again. Deleting the cache is always safe; the next run encodes everything. A full cache is about twice the size of the source textures (2026-11-15). **Output validation:** dimensions · role↔BC-format agreement · complete mip chain ·
 colour-space/normal/alpha policy per role; a corrupt/mismatched `.dds` is rejected (`compression_negative`
 lane, RED fixtures in `tools/compressors/fixtures/`). The staging tree is a **gitignored reproducible build artifact** — never committed,
 never written into the authored `MatterLibrary/textures` source tree.
 
-**HDRIs skip the compression step** (2026-10-14, Phase14; `docs/Planning/Research/261013_R_PlatformSkyAsks.md` RD-SKY-4). The table below is low-dynamic-range BCn by texture role, and every consumer reads an HDRI's float file as it is, so an [HDRI](../../Glossary.md) ships as its Radiance `.hdr`.
+**An HDRI ships as its `.hdr` (unchanged); the staging tool may build a BC6H cubemap sibling for Unreal** (RD-SKY-4, `docs/Planning/Research/261013_R_PlatformSkyAsks.md`; narrowed 2026-11-15 from "HDRIs skip the compression step", the platform's ask for that sibling). The `.hdr` stays the source every consumer can read: Blender and Storm read only it. The sibling, `<name>.dds` beside `<name>.hdr`, is a **BC6H_UF16 cube with 2048² faces and the full mip chain**, built by `tools/compressors/hdri_cube.py`. Its faces are the cube the IMRSV runtime builds from the `.hdr` (its `SphericalToCubemap.cpp`: the same faces, turns and sampling), so a Sky looks the same whichever file Studio loads. The pinned encoder compresses the six faces in one run, and the tool writes the DX10 `arraySize` as 1 (one cube; the encoder writes 6). The dev install serves it with `serve_to_stage.py --compressed`, from `library/staging/matterlib-dev/hdris/` and never from `MatterLibrary/hdris/`. Only `--cubes` builds a missing or stale cube (about 7 minutes a sky at the pinned encoder under emulation; hours for the whole library the first time), so a deploy that serves `--compressed` never waits on the encoder and serves a sky without a built cube as its `.hdr` alone. The role table below does not cover it: an HDRI is not a texture role.
 
 ## Frozen role → BC-format contract (21 texture roles)
 

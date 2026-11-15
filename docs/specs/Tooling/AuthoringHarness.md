@@ -18,7 +18,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 
 ## Tools
 
-*(Updated 2026-09-23, measured: `ls tools/*/` on the live tree and each script's module docstring; the `run_all.py` lanes are the `results` keys of its `main()`.)*
+*(Updated 2026-09-23, measured: `ls tools/*/` on the live tree and each script's module docstring; the `run_all.py` lanes are the entries of its `LANES` table, in run order — `run_all.py --list` prints them, since 2026-11-15.)*
 
 ### `tools/converters/` — stage C (assembly) and procedural textures
 
@@ -53,7 +53,7 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `fixtures/*.lock.yaml` | RED manifest fixtures (dangling id, missing provenance, under-promoted coverage, shallow evidence) |
 | `fixtures/recipes/*.json` | RED recipe fixtures, each rejected by one named guard |
 
-**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)).
+**`run_all.py` lanes** (in run order). Each reports **PASS**, **FAIL** or **SKIP** with the reason when its surface or tool is absent. A SKIP is never counted as a pass, and `--strict` (the full check a maintainer runs before merging) fails on any SKIP. Run it as `uv run tools/validators/run_all.py` ([ToolingConventions §Entry points](../../ToolingConventions.md)). `--only` / `--skip` run part of it by lane name; a partial run names every lane it left out as NOT RUN, never reads ALL PASS, and cannot be combined with `--strict` (2026-11-15). `--fresh` makes the `compression` lane trust no earlier proof: the run before a release.
 
 | Lane | Checks |
 |---|---|
@@ -66,16 +66,17 @@ authoring in the consumer application" [Experience](../Experience/Experience_Mat
 | `catalog_validation` | the projector rejects a manifest with dangling ids |
 | `provenance_gate` | promotion-metadata RED fixtures are rejected (missing provenance, under-promoted coverage, shallow evidence) |
 | `no_projection_guard` | provenance / evidence / licence data never leaks into the runtime catalog |
+| `asset_library_current` *(2026-11-15)* | the **committed** `blender/asset_library/MatterLibrary.blend` carries a proxy for every Creator-selectable article in the tree and none for an article that has left it: `verify_asset_library.py`, in Blender, against the committed file rather than a fresh build. About two seconds; a SKIP without Blender (`MATTER_BLENDER`, else `blender` on PATH — the `tool_tests` lane finds it the same way since 2026-11-15). It prints which Blender saved the file and WARNs when that differs from the running one |
 | ~~`fixture_sync`~~ | *Removed from the gate 2026-09-23 (Phase02).* A consumer's fixture catalog + payloads are byte-current (cross-repo). The intent is kept: the check moves to the consumer side (`PlatformDependencies.md` P8), and `check_fixture_sync.py` remains as its tool. |
 | `compression_negative` | the compressed-output validator rejects corrupt / mismatched `.dds` fixtures |
-| `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated) |
-| `staging` | the release-staging producer assembles a complete `{png, dds}` snapshot (encoder-gated) |
+| `compression` | source textures compress to deterministic, valid BCn `.dds` (encoder-gated). Since 2026-11-15 only a new or changed texture is encoded: a proof is kept in the encode cache ([CompressedDistribution](CompressedDistribution.md)); a cold cache or `--fresh` encodes every texture twice, about an hour with the emulated encoder |
+| `staging` | the release-staging producer assembles a complete `{png, dds}` snapshot (encoder-gated); copies what the encode cache holds (2026-11-15) |
 | `approval_gate` | approval artifacts are well-formed (positive + shallow-negative fixtures) |
 | `freeze_lock` | the complete-payload hash-lock is deterministic + tamper-detecting |
 | `approval_binds_freeze` | a promoted approval references the release's actual frozen hashes |
 | `release_verify` | *(Since Phase03, a release's source textures are the ones its lock names, not every PNG on disk.)* Every **committed** freeze record (`library/releases/*.freeze.json`) still reproduces from the tree, naming any changed, missing or added file. A shipped file edited in place, or LFS pointer files in place of textures, fail here. The `.dds` set is included when the encoder or a staging tree is present. This is the hash mechanism only; the `vNN` immutability rule belongs to Version Management. |
 | `activation` | `activate_release.py` verifies install-readiness and switches the selector atomically |
-| `tool_tests` *(Phase20, 2026-10-16)* | every tool's own `test_*.py` under `tools/` and `blender/`, found by glob, each under the interpreter its imports need: Blender for `bpy` (as `check_exporter.sh` runs its selection test), the USD-tools Python for `pxr` (`USD_TOOLS_ENV`, `USD_TOOLS_ROOT`), this Python otherwise. A script whose interpreter is absent is a SKIP that names it, never a pass |
+| `tool_tests` *(Phase20, 2026-10-16)* | every tool's own `test_*.py` under `tools/` and `blender/`, found by glob, each under the interpreter its imports need: Blender for `bpy` (as `check_exporter.sh` runs its selection test), the USD-tools Python for `pxr` (`USD_TOOLS_ENV`, `USD_TOOLS_ROOT`), this Python otherwise. A script whose interpreter is absent is a SKIP that names it, never a pass. Since 2026-11-15 a Blender test runs with `--python-exit-code 1` (without it a test that raises exits 0 and passes), and a test still running after 600 s is killed and is a FAIL line, not the end of the gate |
 
 > **Drift (2026-09-23), narrowed by Phase02:** the **gate** no longer reads a consumer's checkout (`fixture_sync` left `run_all.py`). **Promotion still does:** `promote_release.py` runs `check_fixture_sync` against IMRSV Stage's fixture mirror as one of its preconditions — owned by the release-bundle / consumer-contract phase (R1; `PlatformDependencies.md` P8).
 
@@ -195,4 +196,5 @@ proof subset through it. The **production tool-stack** (Matter Manager, a genera
 - 2026-07: the gate grew lanes for the runtime catalog, provenance, compression, staging, freeze, approval and activation, plus the conformance and Blender-generator tools.
 - 2026-09-23: brought home; tool list refreshed against the live tree.
 - 2026-10-16 (Phase20 20.1): the `tool_tests` lane (18 lanes). Until then the gate ran none of the tools' own test scripts, and a broken `test_hdri.py` stayed green.
+- 2026-11-15 (a quick fix): the `asset_library_current` lane (19 lanes) and `--only` / `--skip`. Until then the committed asset file fell 30 days behind unseen, and adding one article meant the full hour-long gate. Later that day (a quick fix): `tool_tests` fails a Blender test that raises, and a test past its timeout is a FAIL instead of a traceback that ended the gate. Then (a quick fix): the encode cache and `--fresh`. Until then every run encoded all ~300 textures twice, so the gate took about an hour whatever had changed.
 - 2026-09-25 (Phase03): the recipe lane (17 lanes), the recipe schema, the Physically Based lookup, the ambientCG importer, layer and base-set generators, the working headless preview; freeze and staging scoped to each release's lock.

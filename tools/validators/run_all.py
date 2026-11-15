@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 """Validator orchestrator (Phase 53) — runs the full §6 automated gate set.
 
-    uv run tools/validators/run_all.py [--strict] [--repo-root <dir>]
+    uv run tools/validators/run_all.py [--strict] [--only L,…] [--skip L,…] [--list] [--fresh] [--repo-root <dir>]
+
+--only / --skip run part of the gate by lane name (--list prints the names). A partial run
+reports each lane it left out as NOT RUN and never reads ALL PASS; --strict refuses one.
+The compression and staging lanes encode only what the encode cache (compress_textures.py)
+does not hold, so adding one article encodes only its textures; a cold cache, or --fresh
+(before a release), encodes them all: about an hour with the emulated encoder.
 
 Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the reason):
   1. grammar fixtures        — fixtures/grammar_cases.json (must-pass / must-fail)
@@ -13,6 +19,9 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
                                fixtures/recipes/*.json, each rejected by its own guard
   5. catalog freshness/valid — projected runtime catalog is byte-current + rejects dangling ids
   6. provenance / projection — promotion-metadata gates + no-runtime-projection guard
+  6b. asset library current  — the COMMITTED blender/asset_library/MatterLibrary.blend carries
+                               every Creator-selectable article in the tree and none that left it
+                               (verify_asset_library.py in Blender; skips without Blender)
   (7. fixture sync — REMOVED from the gate 2026-09-23: it read a consumer's checkout, and a
       producer gate must not (R1). The check lives on as tools/validators/check_fixture_sync.py,
       moving to the consumer side — docs/Planning/PlatformDependencies.md P8.)
@@ -45,6 +54,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import signal
 import sys
 from pathlib import Path
 
@@ -327,14 +337,13 @@ def run_compression_negative(root: Path) -> bool:
     return ok
 
 
-def run_compression(root: Path) -> bool:
+def run_compression(root: Path, fresh: bool = False) -> bool:
     """Phase 60sq2.4: the source texture tree compresses to deterministic, structurally
-    valid, mip-complete BCn .dds. Compresses the tree TWICE, validates every output, and
-    sha256-compares the two runs (byte-identical determinism gate).
+    valid, mip-complete BCn .dds: compress_textures.prove_tree (two encodes, the same bytes;
+    its header says what the encode cache spares and what --fresh, passed on as fresh, redoes).
 
     Encoder-gated: skips with a note when compressonatorcli is absent (CI without the
-    pinned encoder) — mirrors run_all's skip-if-surface-absent policy. On the dev box the
-    encoder is present so the full sweep (~12 s over 30 textures) runs."""
+    pinned encoder) — mirrors run_all's skip-if-surface-absent policy."""
     src_root = root / "MatterLibrary" / "textures"
     if not src_root.exists():
         print("== compression == (skip: no MatterLibrary/textures)")
@@ -343,29 +352,7 @@ def run_compression(root: Path) -> bool:
         print(f"== compression == (skip: {encoder_absent()})")
         return SKIP
     print("== compression ==")
-    import tempfile as _tf
-    a = Path(_tf.mkdtemp(prefix="mtc_run_a_"))
-    b = Path(_tf.mkdtemp(prefix="mtc_run_b_"))
-    try:
-        ok_a, recs = ct.compress_tree(src_root, a)
-        ok_b, _ = ct.compress_tree(src_root, b)
-        if not (ok_a and ok_b):
-            print("  [FAIL] compression errored (see above)")
-            return False
-        ok = True
-        for rec in recs:
-            good, detail = ct.validate_output(rec)
-            rel = Path(rec["dst"]).relative_to(a)
-            same = ct.sha256(a / rel) == ct.sha256(b / rel)
-            good_all = good and same
-            reason = detail if not good else ("byte-identical" if same else "NON-DETERMINISTIC")
-            print(f"  [{'PASS' if good_all else 'FAIL'}] {rel}: {reason}")
-            ok = ok and good_all
-        return ok
-    finally:
-        import shutil as _sh
-        _sh.rmtree(a, ignore_errors=True)
-        _sh.rmtree(b, ignore_errors=True)
+    return ct.prove_tree(src_root, fresh=fresh)
 
 
 def run_staging(root: Path) -> bool:
@@ -706,6 +693,39 @@ def run_activation(root: Path) -> bool:
         _sh.rmtree(rt, ignore_errors=True)
 
 
+NO_BLENDER = "needs Blender (set MATTER_BLENDER or put `blender` on PATH)"
+
+
+def _blender():
+    """The Blender the tools run — $MATTER_BLENDER, else `blender` on PATH, else None — and an env
+    without the host's USD/Python variables (Blender bundles its own; see check_exporter.sh)."""
+    import os
+    import shutil
+    drop = ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS", "PXR_AR_DEFAULT_SEARCH_PATH")
+    return (os.environ.get("MATTER_BLENDER") or shutil.which("blender"),
+            {k: v for k, v in os.environ.items() if k not in drop})
+
+
+CHILD_TIMEOUT = 600  # seconds
+
+
+def _run_child(argv, root: Path, env):
+    """subprocess.run, output captured. A child still running after CHILD_TIMEOUT is killed and
+    comes back with returncode None and what it printed so far: its lane reports a FAIL and the
+    gate goes on (until 2026-11-15 the timeout was an exception that ended the whole gate)."""
+    import subprocess
+    try:
+        return subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, timeout=CHILD_TIMEOUT)
+    except subprocess.TimeoutExpired as e:  # its output arrives as bytes, even with text=True
+        text = lambda b: b.decode(errors="replace") if isinstance(b, bytes) else (b or "")
+        return subprocess.CompletedProcess(argv, None, text(e.stdout), text(e.stderr))
+
+
+def _print_tail(proc, n: int = 8) -> None:
+    for line in (proc.stdout + proc.stderr).strip().splitlines()[-n:]:
+        print(f"      {line}")
+
+
 def _tool_test_runner(script: Path, scratch: Path):
     """How to run one tool test script: (argv, env) or (None, the reason it cannot run here).
     Chosen by what the script imports, never by a list of names, so a new test joins by itself:
@@ -713,17 +733,14 @@ def _tool_test_runner(script: Path, scratch: Path):
     USD-tools Python check_exporter.sh uses; anything else -> this Python."""
     import os
     import re
-    import shutil
     text = script.read_text(encoding="utf-8")
     if re.search(r"^\s*import bpy\b", text, re.M):
-        blender = shutil.which("blender")
+        blender, env = _blender()
         if not blender:
-            return None, "needs Blender (`blender` not on PATH)"
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("LD_LIBRARY_PATH", "PYTHONPATH", "PXR_MTLX_STDLIB_SEARCH_PATHS",
-                            "PXR_AR_DEFAULT_SEARCH_PATH")}
-        return [blender, "--background", "--factory-startup", "--python", str(script), "--",
-                str(scratch)], env
+            return None, NO_BLENDER
+        # --python-exit-code: without it a test that raises leaves Blender exiting 0, a PASS
+        return [blender, "--background", "--factory-startup", "--python-exit-code", "1",
+                "--python", str(script), "--", str(scratch)], env
     if re.search(r"^\s*from pxr import\b", text, re.M):
         envp = Path(os.environ.get("USD_TOOLS_ENV", Path.home() / ".conda" / "envs" / "imrsv-usd-tools"))
         inst = Path(os.environ.get("USD_TOOLS_ROOT", Path.home() / "usd-tools")) / "inst" / "usd-26.03"
@@ -738,8 +755,8 @@ def run_tool_tests(root: Path):
     """Phase20 20.1 (Q-P20-1, taken on the lead's go-ahead 2026-10-16): every tool's own test
     script, `test_*.py` under tools/ and blender/, each run as its docstring says (exit 0 = PASS).
     Until then the gate ran none of them, and a broken test_hdri.py stayed green (F-LBL-13).
-    FAIL if any ran and failed; SKIP (naming each) if none failed but one could not run here."""
-    import subprocess
+    FAIL if any ran and failed (a Blender test that raises, or a test past CHILD_TIMEOUT, is a
+    FAIL since 2026-11-15); SKIP (naming each) if none failed but one could not run here."""
     import tempfile
     print("== tool tests (Phase20) ==")
     scripts = sorted(p for top in ("tools", "blender") for p in (root / top).rglob("test_*.py")
@@ -756,14 +773,14 @@ def run_tool_tests(root: Path):
                 print(f"  [SKIP] {rel}: {env}")
                 unrun.append(str(rel))
                 continue
-            proc = subprocess.run(argv, cwd=root, env=env, capture_output=True, text=True, timeout=600)
+            proc = _run_child(argv, root, env)
         if proc.returncode == 0:
             print(f"  [PASS] {rel}")
         else:
             failed.append(str(rel))
-            print(f"  [FAIL] {rel} (exit {proc.returncode}); its last lines:")
-            for line in (proc.stdout + proc.stderr).strip().splitlines()[-8:]:
-                print(f"      {line}")
+            why = f"still running after {CHILD_TIMEOUT} s" if proc.returncode is None else f"exit {proc.returncode}"
+            print(f"  [FAIL] {rel} ({why}); its last lines:")
+            _print_tail(proc)
     if failed:
         return False
     if unrun:
@@ -772,49 +789,119 @@ def run_tool_tests(root: Path):
     return True
 
 
+def run_asset_library_current(root: Path):
+    """The COMMITTED blender/asset_library/MatterLibrary.blend is current (backlog Open 17(b),
+    2026-11-15): verify_asset_library.py in Blender against it, exit 0 = PASS; SKIPs without
+    Blender. Fix a FAIL by rebuilding with check_asset_library.sh and copying its .blend and
+    cats file in."""
+    lib = root / "blender" / "asset_library" / "MatterLibrary.blend"
+    if not lib.is_file():
+        print("== asset library current == (skip: no committed blender/asset_library/MatterLibrary.blend)")
+        return SKIP
+    blender, env = _blender()
+    if not blender:
+        print(f"== asset library current == (skip: {NO_BLENDER})")
+        return SKIP
+    print("== asset library current ==")
+    # --python-exit-code: without it a script that raises leaves Blender exiting 0
+    proc = _run_child([blender, "--background", "--factory-startup", "--python-exit-code", "1", str(lib),
+                       "--python", str(root / "tools" / "conformance" / "verify_asset_library.py")], root, env)
+    shown = [ln.strip() for ln in proc.stdout.splitlines()
+             if ln.strip().startswith(("[FAIL]", "Blender:", "WARN:", "=> asset-library"))]
+    for ln in shown:
+        print(f"  {ln}")
+    if proc.returncode is None or (proc.returncode != 0 and not any(ln.startswith("[FAIL]") for ln in shown)):
+        why = f"was still running after {CHILD_TIMEOUT} s" if proc.returncode is None else f"exited {proc.returncode}"
+        print(f"  [FAIL] the verifier {why} without a verdict; its last lines:")
+        _print_tail(proc)
+    elif proc.returncode != 0:
+        print("  fix: tools/conformance/check_asset_library.sh <scratch>, then copy its .blend and cats file in")
+    return proc.returncode == 0
+
+
+# Run order. Each lane takes the repo root and returns True (PASS), False (FAIL) or SKIP;
+# --only/--skip select by these names.
+LANES = [
+    ("grammar", lambda root: run_grammar_fixtures()),
+    ("materials", run_materials),
+    ("manifest", run_manifest),
+    ("determinism", run_determinism),
+    ("recipe", run_recipe),
+    ("catalog_freshness", run_catalog_freshness),
+    ("catalog_validation", run_catalog_validation),
+    ("provenance_gate", run_provenance_gate),
+    ("no_projection_guard", run_no_projection_guard),
+    ("asset_library_current", run_asset_library_current),
+    ("compression_negative", run_compression_negative),
+    ("compression", run_compression),
+    ("staging", run_staging),
+    ("approval_gate", run_approval_gate),
+    ("freeze_lock", run_freeze_lock),
+    ("approval_binds_freeze", run_approval_binds_freeze),
+    ("release_verify", run_release_verify),
+    ("activation", run_activation),
+    ("tool_tests", run_tool_tests),
+]
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Run the full Phase-53 validator gate set.")
     ap.add_argument("--repo-root", default=str(HERE.parent.parent))
     ap.add_argument("--strict", action="store_true",
                     help="treat a SKIPPED lane as a failure: every lane must run (the full check before merging)")
+    lane_list = lambda s: [n.strip() for n in s.split(",") if n.strip()]  # noqa: E731
+    ap.add_argument("--only", type=lane_list, default=[], metavar="LANE[,LANE…]",
+                    help="run only these lanes (a partial run: it never reports ALL PASS)")
+    ap.add_argument("--skip", type=lane_list, default=[], metavar="LANE[,LANE…]",
+                    help="run every lane but these")
+    ap.add_argument("--list", action="store_true", help="print the lane names in run order and exit")
+    ap.add_argument("--fresh", action="store_true",
+                    help="the compression lane trusts no earlier proof: every texture encoded twice "
+                         "anew (about an hour), as before a release")
     args = ap.parse_args(argv)
     root = Path(args.repo_root)
 
-    results = {
-        "grammar": run_grammar_fixtures(),
-        "materials": run_materials(root),
-        "manifest": run_manifest(root),
-        "determinism": run_determinism(root),
-        "recipe": run_recipe(root),
-        "catalog_freshness": run_catalog_freshness(root),
-        "catalog_validation": run_catalog_validation(root),
-        "provenance_gate": run_provenance_gate(root),
-        "no_projection_guard": run_no_projection_guard(root),
-        "compression_negative": run_compression_negative(root),
-        "compression": run_compression(root),
-        "staging": run_staging(root),
-        "approval_gate": run_approval_gate(root),
-        "freeze_lock": run_freeze_lock(root),
-        "approval_binds_freeze": run_approval_binds_freeze(root),
-        "release_verify": run_release_verify(root),
-        "activation": run_activation(root),
-        "tool_tests": run_tool_tests(root),
-    }
+    names = [name for name, _ in LANES]
+    if args.list:
+        print("\n".join(names))
+        return 0
+    only, skip = args.only, args.skip
+    unknown = [n for n in only + skip if n not in names]
+    if unknown:
+        ap.error(f"unknown lane(s): {', '.join(unknown)} (--list prints them)")
+    if args.strict and (only or skip):
+        ap.error("--strict is the full check before merging: it cannot be combined with --only or --skip")
+    selected = [n for n in names if (not only or n in only) and n not in skip]
+    if not selected:
+        ap.error("--only/--skip leave no lane to run")
+    not_run = [n for n in names if n not in selected]
+
+    # A SIGTERM (a stopped background run) would otherwise kill the process without running any
+    # lane's `finally`, leaving its temp folders behind (~1.5 GB from the compression lane,
+    # 2026-11-13). As SystemExit it unwinds through them; a running encoder child is killed by
+    # subprocess.run on the way out.
+    signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(128 + signum))
+
+    lanes = dict(LANES, compression=lambda root: run_compression(root, fresh=args.fresh))
+    results = {name: lanes[name](root) for name in selected}
     print("\n=== SUMMARY ===")
     for k, v in results.items():
         print(f"  {k}: {'SKIP' if v == SKIP else 'PASS' if v else 'FAIL'}")
+    for k in not_run:
+        print(f"  {k}: NOT RUN (deselected)")
     passed = [k for k, v in results.items() if v is True]
     skipped = [k for k, v in results.items() if v == SKIP]
     failed = [k for k, v in results.items() if v is False]
-    print(f"{len(results)} lanes: {len(passed)} PASS, {len(skipped)} SKIP, {len(failed)} FAIL"
+    print(f"{len(results)} of {len(names)} lanes run: {len(passed)} PASS, {len(skipped)} SKIP, {len(failed)} FAIL"
+          + (f", {len(not_run)} NOT RUN" if not_run else "")
           + (" (--strict: a SKIP fails the run)" if args.strict else ""))
     ok = not failed and not (args.strict and skipped)
     if failed:
         print("OVERALL: FAIL —", ", ".join(failed))
     elif skipped and args.strict:
         print("OVERALL: FAIL (strict) — skipped:", ", ".join(skipped))
-    elif skipped:
-        print("OVERALL: PASS with skips — not checked:", ", ".join(skipped))
+    elif skipped or not_run:
+        print("OVERALL: PASS, PARTIAL — not checked:", ", ".join(skipped + not_run))
     else:
         print("OVERALL: ALL PASS — every lane ran")
     return 0 if ok else 1
