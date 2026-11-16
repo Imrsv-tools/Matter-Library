@@ -74,11 +74,11 @@ hdris:
 default_hdri: IndustrialSunset02_PureSky    # the HDRI a new scene starts with: names a listed one
 ```
 
-> **Todo (2026-10-16, Phase20 F-P20-9):** the example uses the source name, which is what `validate_manifest.py` accepts today. [Identity](../Ontology/Identity.md) §HDRI names says a release takes the **published** name (`IndustrialSunset02`, since 2026-10-16). The check and this example change together, with the first release that lists HDRIs (*Release Bundle*).
+> **The lock names the source** *(settled 2026-11-16, #426; was Phase20 F-P20-9's todo)*: `id` is the source id, as above, because it resolves the source file in `MatterLibrary/hdris/`. The release **catalog** publishes it under its published name ([Identity](../Ontology/Identity.md) §HDRI names), and so do the staged file and thumbnail.
 
 `tools/validators/validate_manifest.py` checks each entry: the id and version, the status, the file itself (`check_hdri`: the name, a Radiance RGBE header, 4096 × 2048), provenance when promoted (the shipped-pixel rule, as for a texture), and the evidence `sha256` against the file. It refuses a `default_hdri` that names no listed HDRI. The projector writes them into the [runtime catalog](RuntimeCatalog.md) §HDRIs, at `schema_version` 3. An HDRI's record also carries its full credit and tagging, which never reach the catalog.
 
-> **Planned (2026-10-14):** freezing a release that lists HDRIs. `tools/releases/freeze_release.py` refuses one until staging and the freeze hash them (Phase14 §Not now).
+> **Freezing a release that lists HDRIs** *(#426, 2026-11-16)*: it is frozen from its staging tree (`freeze_release.py compute <ver> --staging library/staging/matterlib-<ver>/`), which holds each HDRI's stamped `.hdr` and cube; see [RuntimeCatalog](RuntimeCatalog.md) §HDRIs.
 
 ### Off-grammar exception — `IMRSV_MissingMaterial`
 

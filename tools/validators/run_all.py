@@ -39,7 +39,8 @@ Each lane reports PASS, FAIL or SKIP (a surface or tool not present, with the re
                                skips pre-promotion
  12b. release verify        — every COMMITTED freeze record still reproduces from the tree (a
                                shipped file edited in place, or LFS pointer files, fail here);
-                               the .dds set is re-verified when the encoder or staging is present
+                               the staged .dds/.hdr sets are re-verified when the staging tree is
+                               present (or, for a release without HDRIs, the encoder can build it)
  13. activation             — activate_release.py verifies install-readiness + switches the
                                active-release selector ATOMICALLY (a failure leaves the prior
                                release active — RD-3/RD-5); skips pre-promotion
@@ -529,9 +530,10 @@ def run_release_verify(root: Path):
     shipped texture or .mtlx is edited in place, or when the textures are Git LFS pointer files
     rather than the real pixels (a clone without git-lfs).
 
-    The encoder-built `.dds` set is re-verified when a staging tree exists or the pinned encoder
-    can build one (into a temp dir); otherwise the lane checks every other part and names the
-    `.dds` set as not re-verified. This is the hash MECHANISM only: the vNN immutability rule
+    The staged sets (`.dds`, and the stamped `.hdr` of a release that lists HDRIs, #426) are
+    re-verified when the release's staging tree exists, or when the pinned encoder can build one
+    for a release without HDRIs (a release's cubes take minutes a sky, so it is never rebuilt
+    here); otherwise the lane checks every other part and names the staged sets as not re-verified. This is the hash MECHANISM only: the vNN immutability rule
     is Version Management's."""
     releases = root / "library" / "releases"
     records = sorted(releases.glob("*.freeze.json")) if releases.exists() else []
@@ -552,7 +554,8 @@ def run_release_verify(root: Path):
         created = None
         staging_root = sr.default_staging_root(root)
         staging = staging_root / f"matterlib-{version}"
-        if not staging.is_dir() and "dds_set" in rec.get("payload_sha256", {}) and encoder:
+        staged_sets = [k for k in ("dds_set", "hdris_set") if k in rec.get("payload_sha256", {})]
+        if not staging.is_dir() and staged_sets == ["dds_set"] and encoder:
             created = staging
             built, _ = sr.build(root, version, staging_root)
             if not built:
@@ -565,21 +568,23 @@ def run_release_verify(root: Path):
         try:
             if full:  # the complete payload, .dds included
                 errs = fr.verify_freeze(root, rec, staging)
-                note = "complete payload incl. .dds"
+                note = "complete payload incl. the staged files"
                 if errs:
                     fresh = fr.compute_freeze(root, version, staging)
-            else:  # every part but the encoder-built .dds set, key by key
+            else:  # every part but the staged sets, key by key
                 try:
                     fresh = fr.compute_freeze(root, version, None)
                     ps = fresh["payload_sha256"]
                     errs = [f"payload_sha256[{k}] mismatch: recorded {v[:12]}… != on-disk {str(ps.get(k))[:12]}…"
                             for k, v in rec.get("payload_sha256", {}).items()
-                            if k != "dds_set" and ps.get(k) != v]
+                            if k not in staged_sets and ps.get(k) != v]
                 except FileNotFoundError as exc:
                     errs = [f"cannot recompute: {exc}"]
-                note = ("every part except the .dds set (not re-verified: "
-                        + encoder_absent() + ")") if "dds_set" in rec.get("payload_sha256", {}) \
-                    else "complete payload"
+                why = ("no staging tree; a release with HDRIs is not rebuilt here" if "hdris_set" in staged_sets
+                       else encoder_absent())
+                verb = "neither" if len(staged_sets) > 1 else "not"
+                note = (f"every part except {' and '.join(staged_sets)} ({verb} re-checked: {why})"
+                        if staged_sets else "complete payload")
         finally:
             if created is not None:
                 _sh.rmtree(created, ignore_errors=True)
@@ -594,7 +599,7 @@ def run_release_verify(root: Path):
                 return {e["path"]: e["sha256"] for group in files.values() for e in group}
             was, now = _by_path(rec.get("files", {})), _by_path(fresh.get("files", {}))
             if not full:
-                was ={p: h for p, h in was.items() if not p.endswith(".dds")}
+                was = {p: h for p, h in was.items() if not p.endswith((".dds", ".hdr"))}
             changed = sorted(p for p in was if p in now and was[p] != now[p])
             missing = sorted(p for p in was if p not in now)
             added = sorted(p for p in now if p not in was)
@@ -614,12 +619,13 @@ def run_activation(root: Path) -> bool:
     active-release selector ATOMICALLY — a failure before the switch leaves the prior release active.
 
     Builds a SELF-CONTAINED synthetic runtime install root from the committed release artifacts (the
-    approved release's catalog + a materials/ payload dir + the staged .dds when present) and drives:
+    approved release's catalog + a materials/ payload dir + the whole staged release folder when
+    present: textures/, hdris/, thumbnails/) and drives:
       (1) positive  — a ready install activates (selector switches) + resolve-check resolves;
       (2) atomicity — a corrupt installed catalog is REFUSED and the PRIOR selector is UNCHANGED,
                       the RED half that proves the switch is guarded (§14a).
-    Needs a promoted approval; skips pre-promotion. The .dds re-check is encoder-gated (falls back to
-    catalog-only when the staging tree is absent — the catalog guard is still failable)."""
+    Needs a promoted approval; skips pre-promotion. The .dds/.hdr re-check needs the staging tree
+    (falls back to catalog-only when it is absent — the catalog guard is still failable)."""
     import tempfile as _tf
     import shutil as _sh
     releases = root / "library" / "releases"
@@ -633,33 +639,33 @@ def run_activation(root: Path) -> bool:
         print(f"== activation == (skip: no catalog for approved release {version})")
         return SKIP
     print("== activation ==")
-    staging = root / "library" / "staging" / f"matterlib-{version}" / "textures"
+    staging = root / "library" / "staging" / f"matterlib-{version}"
     rt = Path(_tf.mkdtemp(prefix="mtc_activate_"))
     ok = True
     try:
         inst = rt / "releases" / f"matterlib-{version}"
+        check_files = staging.is_dir()
+        if check_files:
+            _sh.copytree(staging, inst)
         (inst / "materials").mkdir(parents=True, exist_ok=True)
         _sh.copy2(src_catalog, inst / f"matterlib-{version}.catalog.json")
-        check_dds = staging.is_dir()
-        if check_dds:
-            _sh.copytree(staging, inst / "textures")
         # A prior selector must survive a BLOCKED activation.
         (rt / "active-release.json").write_text('{"active_release": "matterlib-PRIOR"}\n', encoding="utf-8")
 
         # (1) positive — a ready install activates + resolves.
-        pos = ar.activate(root, rt, version, None, check_dds) == 0
+        pos = ar.activate(root, rt, version, None, check_files) == 0
         active = ar._read_active(rt)
         resolves = ar.resolve_check(rt) == 0
         good1 = pos and active == f"matterlib-{version}" and resolves
         print(f"  [{'PASS' if good1 else 'FAIL'}] positive: "
-              f"{'ready install activated + resolves (.dds ' + ('re-checked' if check_dds else 'skipped — no staging') + ')' if good1 else 'a ready install did NOT activate/resolve'}")
+              f"{'ready install activated + resolves (.dds/.hdr ' + ('re-checked' if check_files else 'skipped — no staging') + ')' if good1 else 'a ready install did NOT activate/resolve'}")
         ok = ok and good1
 
         # (2) atomicity — corrupt the installed catalog; activation must REFUSE and NOT touch the selector.
         (rt / "active-release.json").write_text('{"active_release": "matterlib-PRIOR"}\n', encoding="utf-8")
         cat = inst / f"matterlib-{version}.catalog.json"
         cat.write_bytes(cat.read_bytes() + b"\x00tamper")  # no longer the frozen catalog hash
-        refused = ar.activate(root, rt, version, None, check_dds) != 0
+        refused = ar.activate(root, rt, version, None, check_files) != 0
         unchanged = ar._read_active(rt) == "matterlib-PRIOR"
         good2 = refused and unchanged
         print(f"  [{'PASS' if good2 else 'FAIL'}] atomicity: "

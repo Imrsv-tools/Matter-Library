@@ -23,13 +23,15 @@ Install-readiness re-check (RD-4 "re-check the frozen-payload hashes against the
   approval-valid   the release's approval artifact validates clean (validate_approval)
   install-present  <runtime-dir>/releases/matterlib-<version>/ + its catalog exist
   catalog-frozen   the installed catalog's sha256 == the approval's frozen `catalog` hash
-  dds-frozen       every installed .dds byte-matches the freeze record's hash for that basename,
-                   and every frozen .dds is present (the complete compressed payload IS installed)
-The frozen `dds_set` DIGEST folds in the staging paths, so it can't be recomputed over the differently
--pathed install tree; the per-file sha256 (path-independent) IS re-checked against the freeze record.
+  files-frozen     every installed .dds and .hdr byte-matches the freeze record's hash for that
+                   basename, and every frozen one is present (the complete compressed payload and
+                   the stamped HDRIs ARE installed; #426)
+The frozen `dds_set`/`hdris_set` DIGESTS fold in the staging paths, so they can't be recomputed over
+the differently-pathed install tree; the per-file sha256 (path-independent) IS re-checked against the
+freeze record.
 
     activate_release.py activate <version> --runtime-dir <MatterLibrary-root> [--repo-root <dir>]
-                        [--approval <file>] [--no-dds-check]
+                        [--approval <file>] [--no-file-check]
     activate_release.py resolve-check --runtime-dir <MatterLibrary-root>   # post-activation verify
     activate_release.py recover-unapproved <version> --runtime-dir <dir> --reason <text> --confirm
 
@@ -68,8 +70,8 @@ def _install_dir(runtime_dir: Path, version: str) -> Path:
 
 
 def check_install_ready(repo_root: Path, runtime_dir: Path, version: str,
-                        approval_path: Path, check_dds: bool = True) -> list[tuple[str, bool, str]]:
-    """The complete-install-ready gate: approval valid + the installed catalog/.dds ARE the frozen
+                        approval_path: Path, check_files: bool = True) -> list[tuple[str, bool, str]]:
+    """The complete-install-ready gate: approval valid + the installed catalog/.dds/.hdr ARE the frozen
     approved payload (path-independent per-file sha256). Any FAIL means DO NOT switch the selector."""
     releases_dir = repo_root / "library" / "releases"
     results: list[tuple[str, bool, str]] = []
@@ -96,27 +98,29 @@ def check_install_ready(repo_root: Path, runtime_dir: Path, version: str,
                     "installed catalog == frozen approved catalog"
                     if cat_ok else "installed catalog sha256 != approval's frozen `catalog` hash"))
 
-    if check_dds and "dds_set" in frozen:
+    if check_files and ("dds_set" in frozen or "hdris_set" in frozen):
         freeze_name = approval.get("freeze_record", f"matterlib-{version}.freeze.json")
         freeze_path = releases_dir / freeze_name
         if not freeze_path.exists():
-            results.append(("dds-frozen", False,
-                            f"approval references {freeze_name} but it is missing (cannot re-check .dds)"))
+            results.append(("files-frozen", False,
+                            f"approval references {freeze_name} but it is missing (cannot re-check .dds/.hdr)"))
             return results
         freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
-        frozen_dds = {Path(e["path"]).name: e["sha256"] for e in freeze.get("files", {}).get("dds", [])}
-        installed_dds = {p.name: sp.file_sha256(p) for p in sorted(inst.rglob("*.dds"))}
-        missing = [n for n in frozen_dds if n not in installed_dds]
-        mismatched = [n for n, h in frozen_dds.items() if n in installed_dds and installed_dds[n] != h]
-        dds_ok = bool(frozen_dds) and not missing and not mismatched
-        if not frozen_dds:
-            detail = "freeze record carries no .dds entries (nothing to re-check)"
-        elif dds_ok:
-            detail = f"all {len(frozen_dds)} installed .dds byte-match the frozen payload"
+        frozen_files = {Path(e["path"]).name: e["sha256"]
+                        for cat in ("dds", "hdris") for e in freeze.get("files", {}).get(cat, [])}
+        installed = {p.name: sp.file_sha256(p) for p in sorted(inst.rglob("*"))
+                     if p.suffix in (".dds", ".hdr") and p.is_file()}
+        missing = [n for n in frozen_files if n not in installed]
+        mismatched = [n for n, h in frozen_files.items() if n in installed and installed[n] != h]
+        files_ok = bool(frozen_files) and not missing and not mismatched
+        if not frozen_files:
+            detail = "freeze record carries no .dds/.hdr entries (nothing to re-check)"
+        elif files_ok:
+            detail = f"all {len(frozen_files)} installed .dds/.hdr byte-match the frozen payload"
         else:
             detail = (f"{len(missing)} missing, {len(mismatched)} byte-mismatched vs the frozen payload"
-                      + (f" (e.g. {(missing + mismatched)[0]})" if (missing or mismatched) else ""))
-        results.append(("dds-frozen", dds_ok, detail))
+                      f" (e.g. {(missing + mismatched)[0]})")
+        results.append(("files-frozen", files_ok, detail))
     return results
 
 
@@ -144,7 +148,7 @@ def _read_active(runtime_dir: Path) -> str:
 
 
 def activate(repo_root: Path, runtime_dir: Path, version: str,
-             approval_path: Path | None, check_dds: bool) -> int:
+             approval_path: Path | None, check_files: bool) -> int:
     repo_root, runtime_dir = repo_root.resolve(), runtime_dir.resolve()
     if not runtime_dir.is_dir():
         print(f"  [FAIL] runtime-dir does not exist: {runtime_dir}")
@@ -155,7 +159,7 @@ def activate(repo_root: Path, runtime_dir: Path, version: str,
     prior = _read_active(runtime_dir)
 
     print(f"== activate {active_id} — install-readiness (prior active: {prior or '<none>'}) ==")
-    checks = check_install_ready(repo_root, runtime_dir, version, approval_path, check_dds)
+    checks = check_install_ready(repo_root, runtime_dir, version, approval_path, check_files)
     ok = True
     for name, good, detail in checks:
         print(f"  [{'PASS' if good else 'FAIL'}] {name}: {detail}")
@@ -284,8 +288,8 @@ def main(argv=None) -> int:
                    help="the deployed MatterLibrary root (contains releases/ + active-release.json)")
     a.add_argument("--repo-root", type=Path, default=_HERE.parent.parent)
     a.add_argument("--approval", type=Path, default=None, help="approval artifact (default: repo library/releases/)")
-    a.add_argument("--no-dds-check", action="store_true",
-                   help="skip the per-file .dds re-check (catalog re-check still runs)")
+    a.add_argument("--no-file-check", action="store_true",
+                   help="skip the per-file .dds/.hdr re-check (catalog re-check still runs)")
     r = sub.add_parser("resolve-check", help="post-activation: the active release resolves headless")
     r.add_argument("--runtime-dir", type=Path, required=True)
     g = sub.add_parser("recover-unapproved",
@@ -299,7 +303,7 @@ def main(argv=None) -> int:
 
     if args.cmd == "activate":
         return activate(args.repo_root, args.runtime_dir, args.version,
-                        args.approval, not args.no_dds_check)
+                        args.approval, not args.no_file_check)
     if args.cmd == "recover-unapproved":
         return recover_unapproved(args.runtime_dir, args.version, args.reason, args.confirm)
     return resolve_check(args.runtime_dir)

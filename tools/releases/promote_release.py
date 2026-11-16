@@ -15,13 +15,13 @@ Before writing the artifact, promotion re-asserts atomic version-surface agreeme
 surfaces it owns (invariant #9), refusing to promote if any fails:
 
   release-record       library/releases/matterlib-<version>.lock.yaml exists
-  all-approved         every manifest entry (materials + textures) is status `approved`
+  all-approved         every manifest entry (materials + textures + HDRIs) is status `approved`
                        (RD-4 settle-before-freeze; promotion first EXPOSES `approved`, never invents it)
   freeze-present       library/releases/matterlib-<version>.freeze.json exists (freeze BEFORE promote)
   catalog-current      the committed .catalog.json re-projects byte-identically from the lockfile
   fixture-sync         the cross-repo Stage fixture mirror is byte-current with the projected catalog
   freeze-matches       the freeze record STILL verifies against the on-disk complete payload
-                       (catalog/manifest/.mtlx/source-textures/.dds) — the approved release IS the
+                       (catalog/manifest/.mtlx/source-textures/.dds/.hdr) — the approved release IS the
                        frozen candidate, byte-for-byte (RD-4)
 
 The wire ABI axes (IOX_PROTOCOL_VERSION / SKELETAL_MESH_HEADER_VERSION / the sizeof static_asserts /
@@ -68,12 +68,12 @@ def _releases_dir(repo_root: Path) -> Path:
 
 
 def _all_entries_approved(manifest: Path) -> tuple[bool, str]:
-    """Every material + texture entry in the lockfile is status `approved` (RD-4)."""
+    """Every material, texture and HDRI entry in the lockfile is status `approved` (RD-4)."""
     if yaml is None:
         return False, "PyYAML unavailable — cannot read the manifest"
     data = yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}
     not_approved: list[str] = []
-    for section in ("materials", "textures"):
+    for section in ("materials", "textures", "hdris"):
         for entry in data.get(section, []) or []:
             ident = entry.get("id") or entry.get("name") or "?"
             if entry.get("status") != "approved":
@@ -208,7 +208,7 @@ def main(argv=None) -> int:
     ap.add_argument("--approver", required=True, help="who approves (recorded in the artifact)")
     ap.add_argument("--repo-root", type=Path, default=_HERE.parent.parent)
     ap.add_argument("--staging", type=Path, default=None,
-                    help="the staging tree (enables the .dds half of the freeze re-verify)")
+                    help="the staging tree (enables the .dds and .hdr half of the freeze re-verify)")
     ap.add_argument("--freeze", type=Path, default=None, help="(unused override) freeze record path")
     ap.add_argument("--out", type=Path, default=None, help="approval artifact output path")
     ap.add_argument("--approved-at", default=None, help="ISO-8601 timestamp (default: now, UTC)")

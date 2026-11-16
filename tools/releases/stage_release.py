@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Release-staging tree producer for a Matter release (Phase 60sq2.5).
 
-Assembles a self-contained, deterministic per-release texture snapshot:
+Assembles a self-contained, deterministic per-release snapshot of its textures and (#426) HDRIs:
 
     library/staging/matterlib-<version>/textures/<subtree>/<name>.png
     library/staging/matterlib-<version>/textures/<subtree>/<name>.dds   <- BCn sibling
+    library/staging/matterlib-<version>/hdris/<published>_<vNN>.hdr     <- stamped (hdris.stamp)
+    library/staging/matterlib-<version>/hdris/<published>_<vNN>.dds     <- its BC6H cube (#424)
+    library/staging/matterlib-<version>/thumbnails/hdris/<published>_<vNN>.jpg
+
+Each HDRI the lock lists is staged under its published name (RD-LBL-5), at the release catalog's
+own payload and thumbnail paths, so the folder installs as the release root.
 
 The ``.dds`` are offline-compressed release DERIVATIVES (compress_textures.py, 60sq2.4),
 NEVER written back into the authored ``MatterLibrary/textures`` source tree (Phase 60sq2
@@ -15,9 +21,10 @@ tree is a self-contained release payload snapshot (freeze / qualification consum
 Downstream:
   * deploy-to-studio.sh overlays this staging tree's ``.dds`` into the deployed install
     root (``releases/matterlib-<version>/textures/``) so the Plugin by-path load (60sq2.6)
-    finds a ``.dds`` sibling next to each resolved ``.png``.
-  * freeze_release.py ``--staging <this tree>`` hash-locks the ``.dds`` into the complete
-    frozen payload (RD-4); the approval artifact references those hashes.
+    finds a ``.dds`` sibling next to each resolved ``.png``, and installs its ``hdris/`` and
+    ``thumbnails/hdris/``.
+  * freeze_release.py ``--staging <this tree>`` hash-locks the ``.dds`` and the staged ``.hdr``
+    into the complete frozen payload (RD-4); the approval artifact references those hashes.
 
 The staging tree is a REPRODUCIBLE build artifact and is GITIGNORED (``library/staging/``):
 compress_textures is deterministic at the pinned encoder + flags, so it regenerates
@@ -34,7 +41,7 @@ pipeline driver; this is a standalone CLI invoked in the staging flow.
     stage_release.py verify <version> [--repo-root <dir>] [--staging-root <dir>]
 
 Exit 0 iff build produced / verify found a complete, valid {png, dds} snapshot for every
-shipped source texture.
+shipped source texture, and a stamped .hdr, valid cube and thumbnail for every listed HDRI.
 """
 from __future__ import annotations
 
@@ -46,8 +53,13 @@ from pathlib import Path
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE.parent / "compressors"))
 sys.path.insert(0, str(_HERE.parent / "validators"))
+sys.path.insert(0, str(_HERE))
 import compress_textures as ct  # noqa: E402
+import hdri_cube as hc  # noqa: E402
 import source_provenance as sp  # noqa: E402
+import validate_manifest as vm  # noqa: E402
+import hdris as H  # noqa: E402
+import yaml  # noqa: E402
 
 _MATTERLIB = "MatterLibrary"
 
@@ -56,8 +68,64 @@ def default_staging_root(repo_root: Path) -> Path:
     return repo_root / "library" / "staging"
 
 
+def release_root(staging_root: Path, version: str) -> Path:
+    return staging_root / f"matterlib-{version}"
+
+
 def release_dir(staging_root: Path, version: str) -> Path:
-    return staging_root / f"matterlib-{version}" / "textures"
+    return release_root(staging_root, version) / "textures"
+
+
+def release_hdris(repo_root: Path, version: str, only: str | None = None) -> list[dict]:
+    """The HDRIs the release's lock lists, as ``hdris.on_disk`` rows (published id, source file,
+    record). A listed HDRI with no file on disk is an error, as a missing texture is."""
+    lock = repo_root / "library" / "releases" / f"matterlib-{version}.lock.yaml"
+    listed = {(h["id"], h["version"]) for h in (yaml.safe_load(lock.read_text(encoding="utf-8")) or {})
+              .get("hdris") or []}
+    rows = [r for r in H.on_disk(repo_root) if (r["source_id"], r["version"]) in listed]
+    missing = listed - {(r["source_id"], r["version"]) for r in rows}
+    if missing:
+        raise FileNotFoundError(f"release {version} lists HDRIs not on disk: {sorted(missing)}")
+    return [r for r in rows if not only or only.lower() in str(r["path"]).lower()]
+
+
+def _hdri_paths(out: Path, row: dict) -> tuple[Path, Path, Path]:
+    """A staged HDRI's .hdr, cube .dds and thumbnail: the release catalog's paths (#426)."""
+    hdr = out / "hdris" / f"{row['identity']}{vm.HDRI_EXT}"
+    return hdr, hdr.with_suffix(ct.OUT_EXT), out / "thumbnails" / "hdris" / f"{row['identity']}.jpg"
+
+
+def stage_hdris(repo_root: Path, version: str, out: Path, only: str | None = None,
+                cube=hc.build_cube_dds, thumb=H.thumbnail) -> list[str]:
+    """Stage each HDRI the lock lists into the release folder ``out``: its stamped copy (as the dev
+    serve stamps it), its BC6H cube (minutes a sky) and its thumbnail. Returns the staged
+    identities; a cube that cannot be made raises."""
+    rows = release_hdris(repo_root, version, only)
+    for row in rows:
+        hdr, dds, jpg = _hdri_paths(out, row)
+        H.stamp(row["path"], hdr, H.facts(row))
+        cube(row["path"], dds)
+        thumb(row["path"], jpg)
+    return [r["identity"] for r in rows]
+
+
+def verify_hdris(repo_root: Path, version: str, out: Path, only: str | None = None) -> list[str]:
+    """What is wrong with the release folder ``out``'s HDRIs ([] when nothing): each listed HDRI's
+    stamped .hdr says its facts, its cube is valid, its thumbnail is there."""
+    errs = []
+    for row in release_hdris(repo_root, version, only):
+        hdr, dds, jpg = _hdri_paths(out, row)
+        if not hdr.is_file():
+            errs.append(f"missing staged HDRI: {hdr.name}")
+        elif not H.stamp_says(hdr, H.facts(row)):
+            errs.append(f"staged HDRI {hdr.name}: its stamp does not say {row['source_id']}'s facts")
+        _, _, height = vm.read_hdr_header(row["path"])
+        problems = hc.validate_cube_dds(dds, min(height, hc.MAX_FACE)) if dds.is_file() else ["missing"]
+        if problems:
+            errs.append(f"staged cube {dds.name}: {'; '.join(problems)}")
+        if not jpg.is_file():
+            errs.append(f"missing staged thumbnail: {jpg.name}")
+    return errs
 
 
 def _source_root(repo_root: Path) -> Path:
@@ -94,6 +162,15 @@ def build(repo_root: Path, version: str, staging_root: Path | None = None,
         png_dst = dst / rel
         png_dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, png_dst)
+
+    # HDRIs (#426): stamped, each with its cube and thumbnail.
+    try:
+        staged = stage_hdris(repo_root, version, dst.parent, only)
+    except (RuntimeError, OSError) as e:
+        print(f"  [FAIL] staging the release's HDRIs: {e}")
+        return False, records
+    for identity in staged:
+        print(f"  [PASS] {identity}: stamped .hdr, cube and thumbnail")
     return ok, records
 
 
@@ -118,6 +195,7 @@ def verify(repo_root: Path, version: str, staging_root: Path | None = None,
                if not only or only.lower() in str(p).lower()]
     if not sources:
         return [f"no source textures discovered under {src_root}"]
+    errs.extend(verify_hdris(repo_root, version, dst.parent, only))
     for src in sources:
         rel = src.relative_to(src_root)
         png_dst = dst / rel
@@ -161,7 +239,7 @@ def main(argv=None) -> int:
             print(f"  [{'PASS' if good else 'FAIL'}] {Path(rec['dst']).name}: {detail}")
             ok = ok and good
         staging = (args.staging_root or default_staging_root(args.repo_root.resolve())).resolve()
-        print(f"staged release {args.version} -> {release_dir(staging, args.version)}")
+        print(f"staged release {args.version} -> {release_root(staging, args.version)}")
         print("RESULT:", "ALL PASS" if ok else "FAILURES")
         return 0 if ok else 1
 

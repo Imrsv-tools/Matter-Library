@@ -3,7 +3,9 @@
 
 RD-4: per-entry statuses are settled BEFORE the freeze; the freeze then hash-locks the COMPLETE
 final payload — catalog + manifest + every referenced .mtlx + the shipped source textures + the
-compressed .dds outputs (when present, post-60sq2.5). The external approval artifact (RD-1,
+compressed .dds outputs (when present, post-60sq2.5) + the staged, stamped .hdr of every HDRI the
+catalog lists (#426; their cube .dds go with the other .dds). A release that lists HDRIs is frozen
+from its staging tree. The external approval artifact (RD-1,
 validate_approval.py) REFERENCES these hashes; it does not rewrite the payload, so the tested
 candidate stays byte-identical to the approved release. CI re-runs this and asserts a match on
 later builds.
@@ -17,7 +19,7 @@ payload. Reuses source_provenance.py's file_sha256 / canonical_listing / set_dig
 
 The record (deterministic — NO wall-clock field is hashed):
     { "release": "<version>",
-      "payload_sha256": { "catalog", "manifest", "mtlx_set", "source_textures_set"[, "dds_set"] },
+      "payload_sha256": { "catalog", "manifest", "mtlx_set", "source_textures_set"[, "dds_set"][, "hdris_set"] },
       "payload_digest": <sha256 over the canonical payload_sha256 listing>,
       "files": { <category>: [ {path, sha256, lfs_pointer?}, ... ] } }
 
@@ -61,16 +63,10 @@ def _payload_files(repo_root: Path, version: str, staging: Path | None) -> dict:
         raise FileNotFoundError(f"no catalog for release {version}: {catalog}")
     if not manifest.exists():
         raise FileNotFoundError(f"no manifest for release {version}: {manifest}")
-    # Phase14 guard: a release that lists HDRIs cannot be frozen until staging and this freeze hash
-    # them (planned, with the first release that holds one). Refuse loudly rather than freeze a
-    # payload whose HDRIs no hash covers.
-    import yaml  # noqa: PLC0415  (only this guard needs it)
-    if (yaml.safe_load(manifest.read_text(encoding="utf-8")) or {}).get("hdris"):
-        raise ValueError(f"release {version} lists HDRIs; freezing them is not built yet "
-                         "(Phase14 Not now: staging, freezing and activating HDRIs)")
+    cat = json.loads(catalog.read_text(encoding="utf-8"))
 
     # .mtlx: exactly the payloads the catalog names (catalog-relative == MatterLibrary-relative).
-    entries = json.loads(catalog.read_text(encoding="utf-8")).get("materials", [])
+    entries = cat.get("materials", [])
     mtlx = []
     for m in entries:
         rel = m.get("payload_path", "")
@@ -85,10 +81,17 @@ def _payload_files(repo_root: Path, version: str, staging: Path | None) -> dict:
     # disk, which let a draft texture break the frozen hash of every earlier release).
     textures = sp.release_textures(repo_root, version)
 
-    # .dds compressed outputs: only exist post-60sq2.5, in the staging tree — include IF present.
+    # .dds compressed outputs (the textures' and the HDRIs' cubes) and the stamped .hdr: only in the
+    # staging tree — included IF present. A staged .hdr sits at its catalog payload_path
+    # (catalog-relative == staging-relative, #426).
     dds: list[Path] = []
+    hdrs: list[Path] = []
     if staging is not None and staging.exists():
         dds = sorted(staging.rglob("*.dds"))
+        hdrs = sorted(staging / h["payload_path"] for h in cat.get("hdris", []))
+        missing = [p for p in hdrs if not p.exists()]
+        if missing:
+            raise FileNotFoundError(f"missing staged HDRI: {missing[0]}")
 
     files = {
         "catalog": [_file_entry(repo_root, catalog)],
@@ -98,6 +101,8 @@ def _payload_files(repo_root: Path, version: str, staging: Path | None) -> dict:
     }
     if dds:
         files["dds"] = [_file_entry(repo_root, p) for p in dds]
+    if hdrs:
+        files["hdris"] = [_file_entry(repo_root, p) for p in hdrs]
     return files
 
 
@@ -111,6 +116,8 @@ def compute_freeze(repo_root: Path, version: str, staging: Path | None = None) -
     }
     if "dds" in files:
         payload_sha256["dds_set"] = sp.set_digest(files["dds"])
+    if "hdris" in files:
+        payload_sha256["hdris_set"] = sp.set_digest(files["hdris"])
     # payload_digest: one number over the canonical (sorted-key) payload_sha256 listing.
     listing = "".join(f"{k}  {payload_sha256[k]}\n" for k in sorted(payload_sha256))
     payload_digest = hashlib.sha256(listing.encode("utf-8")).hexdigest()
@@ -157,6 +164,12 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     if args.cmd == "compute":
+        catalog = args.repo_root / "library" / "releases" / f"matterlib-{args.version}.catalog.json"
+        if (catalog.exists() and json.loads(catalog.read_text(encoding="utf-8")).get("hdris")
+                and not (args.staging and args.staging.is_dir())):
+            print(f"release {args.version} lists HDRIs: freeze it from its staging tree "
+                  f"(--staging library/staging/matterlib-{args.version}/)", file=sys.stderr)
+            return 1
         rec = compute_freeze(args.repo_root.resolve(), args.version, args.staging)
         text = json.dumps(rec, indent=2, sort_keys=True) + "\n"
         if args.out:

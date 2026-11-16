@@ -83,6 +83,15 @@ with tempfile.TemporaryDirectory() as tmp:
           and entry.get("creator_selectable") is True and entry.get("display_name") == "IndustrialSunset02_PureSky",
           "the HDRI entry carries its payload, thumbnail, display name and creator_selectable")
     check(cat.get("default_hdri") == "IndustrialSunset02_PureSky", "the catalog names its default HDRI")
+    (root / "library" / "hdris.yaml").write_text("published_drop_variant: PureSky\n")
+    cat = prc.build_catalog(with_h, lib / "materials")
+    entry = (cat.get("hdris") or [{}])[0]
+    check(entry.get("id") == "IndustrialSunset02" and entry.get("display_name") == "IndustrialSunset02"
+          and entry.get("payload_path") == "hdris/IndustrialSunset02_v01.hdr"
+          and entry.get("thumbnail_path") == "thumbnails/hdris/IndustrialSunset02_v01.jpg"
+          and cat.get("default_hdri") == "IndustrialSunset02",
+          "a release catalog names its HDRIs and its default by their published names (RD-LBL-5, #426)")
+    (root / "library" / "hdris.yaml").unlink()
     check(not any(k in json.dumps(cat) for k in ("provenance", "license", "evidence")),
           "no provenance reaches the catalog (no_projection_guard's rule)")
 
@@ -104,13 +113,6 @@ with tempfile.TemporaryDirectory() as tmp:
     except ValueError as exc:
         check("size 2048 x 1024" in str(exc), "a listed HDRI of the wrong size is refused, for its size")
 
-    print("== freeze guard ==")
-    (rel / "matterlib-9.1.0.catalog.json").write_text(json.dumps(prc.build_catalog(with_h, lib / "materials")))
-    try:
-        fr._payload_files(root, "9.1.0", None)
-        check(False, "freezing a release that lists HDRIs is refused")
-    except ValueError as exc:
-        check("lists HDRIs" in str(exc), "freezing a release that lists HDRIs is refused, for that reason")
 
 # ---------------------------------------------------------------- Phase16 16.2: the stamp
 import hdris as H  # noqa: E402
@@ -187,6 +189,128 @@ check(len(entries) == len(H.on_disk()) and all(e["creator_selectable"] for e in 
       "every HDRI on disk is listed once, to choose from, and nothing else is (no old names)")
 check(all(e.get("contributor") and e.get("licence") and e.get("credit") for e in entries),
       "every served HDRI entry has a contributor, a licence and a credit")
+
+
+# ---------------------------------------------------------------- #426: a release carries its HDRIs
+import struct  # noqa: E402
+import stage_release as sr  # noqa: E402
+import activate_release as ar  # noqa: E402
+import promote_release as pr  # noqa: E402
+sys.path.insert(0, str(HERE.parent / "compressors"))
+import hdri_cube as HC  # noqa: E402
+
+
+def fake_cube(hdr: Path, dst: Path) -> None:
+    """A file shaped as the encoder's cube of a 4096 x 2048 sky (2048 faces, every mip), without
+    the encoder: the header, then zeros to the six faces' length (sparse)."""
+    size, mips = 2048, HC.CT.full_miplevels(2048, 2048)
+    head = bytearray(124)
+    struct.pack_into("<7I", head, 0, 124, 0x100F, size, size, 0, 0, mips)
+    struct.pack_into("<II4s", head, 72, 32, 0x4, b"DX10")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    with dst.open("wb") as fh:
+        fh.write(b"DDS " + bytes(head) + struct.pack("<5I", 95, 3, 0x4, 1, 0))
+        fh.truncate(148 + 6 * HC._mip_bytes(size))
+
+
+def fake_thumb(hdr: Path, dst: Path) -> None:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    dst.write_bytes(b"jpeg")
+
+
+print("== a release with HDRIs: stage, freeze, activate, promote (#426) ==")
+with tempfile.TemporaryDirectory() as tmp:
+    root = Path(tmp)
+    (root / "MatterLibrary" / "hdris").mkdir(parents=True)
+    src = root / "MatterLibrary" / "hdris" / "IndustrialSunset02_PureSky_v01.hdr"
+    src.write_bytes(header() + bytes(range(256)) * 4)
+    mtlx = root / "MatterLibrary" / "materials" / "natural" / "stone"
+    mtlx.mkdir(parents=True)
+    (mtlx / "Granite_Polished_Clean_Base_s1_v01.mtlx").write_text("<materialx/>")
+    (root / "library" / "hdris.yaml").parent.mkdir(parents=True)
+    (root / "library" / "hdris.yaml").write_text("default: IndustrialSunset02_PureSky\npublished_drop_variant: PureSky\n")
+    recs = root / "library" / "provenance" / "sources" / "hdris"
+    recs.mkdir(parents=True)
+    (recs / "IndustrialSunset02_PureSky.yaml").write_text("status: approved\nprovenance:\n  license: CC0-1.0\n")
+    rel = root / "library" / "releases"
+    rel.mkdir(parents=True)
+    lock_text = ("release: 9.1.0\nmaterials:\n  - id: natural/stone/Granite_Polished_Clean_Base_s1\n"
+                 "    version: v01\n    status: {m}\nhdris:\n  - id: IndustrialSunset02_PureSky\n"
+                 "    version: v01\n    status: {h}\ndefault_hdri: IndustrialSunset02_PureSky\n")
+    lock = rel / "matterlib-9.1.0.lock.yaml"
+    lock.write_text(lock_text.format(m="draft", h="draft"))   # draft: projected with no provenance
+    (rel / "matterlib-9.1.0.catalog.json").write_text(
+        prc.project_to_string(lock, root / "MatterLibrary" / "materials"))
+    staging = root / "library" / "staging" / "matterlib-9.1.0"
+
+    sr.stage_hdris(root, "9.1.0", staging, cube=fake_cube, thumb=fake_thumb)
+    hdr, dds = staging / "hdris" / "IndustrialSunset02_v01.hdr", staging / "hdris" / "IndustrialSunset02_v01.dds"
+    jpg = staging / "thumbnails" / "hdris" / "IndustrialSunset02_v01.jpg"
+    check(hdr.is_file() and dds.is_file() and jpg.is_file(),
+          "staging writes each listed HDRI by its published name: the stamped .hdr, its cube and its thumbnail")
+    check(H.read_stamp(hdr).get("id") == "IndustrialSunset02" and H.read_stamp(hdr).get("licence") == "CC0-1.0",
+          "the staged .hdr is stamped with the HDRI's facts, as the dev serve stamps it")
+    check(sr.verify_hdris(root, "9.1.0", staging) == [], "a complete HDRI staging verifies clean")
+    good_hdr = hdr.read_bytes()
+    H.stamp(src, hdr, {**H.read_stamp(hdr), "licence": "CC-BY-4.0"})
+    check(any("stamp" in e for e in sr.verify_hdris(root, "9.1.0", staging)),
+          "a staged .hdr whose stamp says other than the HDRI's facts fails verify, for its stamp")
+    hdr.write_bytes(good_hdr)
+    good_dds = dds.read_bytes()
+    with dds.open("r+b") as fh:
+        fh.truncate(1000)
+    check(any("cube" in e for e in sr.verify_hdris(root, "9.1.0", staging)),
+          "a broken cube fails verify, for its cube")
+    dds.write_bytes(good_dds)
+    jpg.unlink()
+    check(any("thumbnail" in e for e in sr.verify_hdris(root, "9.1.0", staging)),
+          "a missing thumbnail fails verify")
+    fake_thumb(src, jpg)
+
+    rec = fr.compute_freeze(root, "9.1.0", staging)
+    paths = {cat: [e["path"] for e in rec["files"].get(cat, [])] for cat in ("hdris", "dds")}
+    check(paths["hdris"] == ["library/staging/matterlib-9.1.0/hdris/IndustrialSunset02_v01.hdr"]
+          and paths["dds"] == ["library/staging/matterlib-9.1.0/hdris/IndustrialSunset02_v01.dds"]
+          and {"hdris_set", "dds_set"} <= set(rec["payload_sha256"]),
+          "the freeze hashes the staged .hdr as its own `hdris` category, and its cube with the .dds")
+    check(fr.verify_freeze(root, rec, staging) == [], "the freeze verifies against its staging tree")
+    hdr.write_bytes(good_hdr + b"x")
+    check(any("hdris_set" in e for e in fr.verify_freeze(root, rec, staging)), "a changed .hdr fails the freeze verify")
+    hdr.unlink()
+    check(any("cannot recompute" in e and "IndustrialSunset02_v01.hdr" in e
+              for e in fr.verify_freeze(root, rec, staging)), "a missing .hdr fails the freeze verify, naming it")
+    hdr.write_bytes(good_hdr)
+    dds.unlink()
+    check(any("dds_set" in e for e in fr.verify_freeze(root, rec, staging)), "a missing cube fails the freeze verify")
+    dds.write_bytes(good_dds)
+    check(fr.main(["compute", "9.1.0", "--repo-root", str(root)]) != 0,
+          "a release that lists HDRIs is not frozen without its staging tree")
+
+    (rel / "matterlib-9.1.0.freeze.json").write_text(json.dumps(rec))
+    approval = rel / "matterlib-9.1.0.approval.json"
+    approval.write_text(json.dumps(pr.build_approval("9.1.0", rec, "test", "2026-11-16", "matterlib-9.1.0.freeze.json")))
+    runtime = root / "runtime"
+    inst = runtime / "releases" / "matterlib-9.1.0"
+    import shutil  # noqa: E402
+    shutil.copytree(staging, inst)
+    shutil.copy2(rel / "matterlib-9.1.0.catalog.json", inst)
+
+    def frozen_check():
+        return next((r for r in ar.check_install_ready(root, runtime, "9.1.0", approval) if r[0] == "files-frozen"),
+                    ("files-frozen", False, "no files-frozen check"))
+    check(frozen_check()[1], "an install of the staged release passes the per-file freeze check (.hdr and .dds)")
+    (inst / "hdris" / "IndustrialSunset02_v01.hdr").write_bytes(good_hdr + b"x")
+    check(not frozen_check()[1], "activation refuses an installed .hdr that is not the frozen one")
+    (inst / "hdris" / "IndustrialSunset02_v01.hdr").write_bytes(good_hdr)
+    (inst / "hdris" / "IndustrialSunset02_v01.dds").unlink()
+    check(not frozen_check()[1], "activation refuses an install missing a frozen cube")
+
+    lock.write_text(lock_text.format(m="approved", h="approved"))
+    check(pr._all_entries_approved(lock)[0], "a release whose HDRIs are approved may be promoted")
+    lock.write_text(lock_text.format(m="approved", h="draft"))
+    ok, detail = pr._all_entries_approved(lock)
+    check(not ok and "hdris:IndustrialSunset02_PureSky='draft'" in detail,
+          "promotion refuses a release that lists a draft HDRI, naming it")
 
 print("RESULT:", "ALL PASS" if not fails else f"{len(fails)} FAIL")
 sys.exit(1 if fails else 0)

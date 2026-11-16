@@ -37,9 +37,10 @@ import groups as G  # noqa: E402  (Phase15: the HDRI group, and when and sky fro
 sys.path.insert(0, str(REPO / "tools" / "releases"))
 import atomic_write as AW  # noqa: E402
 
-HDRIS = REPO / "MatterLibrary" / "hdris"
-RECORDS = REPO / "library" / "provenance" / "sources" / "hdris"
-SETTINGS = REPO / "library" / "hdris.yaml"
+# Under a repo root: the HDRIs, their records and the library-wide settings.
+HDRIS = Path("MatterLibrary") / "hdris"
+RECORDS = Path("library") / "provenance" / "sources" / "hdris"
+SETTINGS = Path("library") / "hdris.yaml"
 THUMBNAIL = "1024x512"                     # 2:1, the HDRI's own shape
 # The tone curve, in linear light, before sRGB: exposure 0.6 into Reinhard (u / (1 + u)), then
 # saturation +35 % and a gentle contrast. A plain conversion clips everything above 1.0 (a sun is
@@ -66,8 +67,10 @@ CREDIT_SCALARS = ("title", "source", "source_url", "asset_url", "edited_from_nam
 CREDIT_LISTS = {"authors": "AUTHOR", "sponsors": "SPONSOR"}
 
 
-def _settings() -> dict:
-    return (yaml.safe_load(SETTINGS.read_text(encoding="utf-8")) or {}) if SETTINGS.is_file() else {}
+def settings(root: Path = REPO) -> dict:
+    """library/hdris.yaml under ``root`` ({} when there is none)."""
+    path = root / SETTINGS
+    return (yaml.safe_load(path.read_text(encoding="utf-8")) or {}) if path.is_file() else {}
 
 
 def published(source_id: str, drop: str | None) -> str:
@@ -78,36 +81,37 @@ def published(source_id: str, drop: str | None) -> str:
     return name if drop and variant == drop else source_id
 
 
-def on_disk() -> list[dict]:
-    """Every HDRI on disk: id and identity as PUBLISHED (RD-LBL-5; the source's own when
-    ``published_drop_variant`` is unset), source_id, version, path (the source file) and record
-    ({} if none; keyed by the source id)."""
-    files = sorted(p for p in HDRIS.iterdir() if p.is_file()) if HDRIS.is_dir() else []
-    drop = _settings().get("published_drop_variant")
+def on_disk(root: Path = REPO) -> list[dict]:
+    """Every HDRI on disk under ``root``: id and identity as PUBLISHED (RD-LBL-5; the source's own
+    when ``published_drop_variant`` is unset), source_id, version, path (the source file) and
+    record ({} if none; keyed by the source id)."""
+    folder = root / HDRIS
+    files = sorted(p for p in folder.iterdir() if p.is_file()) if folder.is_dir() else []
+    drop = settings(root).get("published_drop_variant")
     out = []
     for hdr in files:
         errs = vm.check_hdri(hdr)
         if errs:
-            raise SystemExit(f"{hdr.relative_to(REPO)}: {'; '.join(errs)}")
+            raise SystemExit(f"{hdr.relative_to(root)}: {'; '.join(errs)}")
         hid, version = vm.hdri_id_version(hdr)
-        rec_path = RECORDS / f"{hid}.yaml"
+        rec_path = root / RECORDS / f"{hid}.yaml"
         record = (yaml.safe_load(rec_path.read_text(encoding="utf-8")) or {}) if rec_path.is_file() else {}
         pid = published(hid, drop)
         out.append({"id": pid, "source_id": hid, "version": version, "identity": f"{pid}_{version}",
                     "path": hdr, "record": record})
     seen = [h["identity"] for h in out]
     if len(seen) != len(set(seen)):
-        raise SystemExit(f"{SETTINGS.relative_to(REPO)}: published_drop_variant makes two HDRIs one name")
+        raise SystemExit(f"{SETTINGS}: published_drop_variant makes two HDRIs one name")
     return out
 
 
 def default(listed: list[dict]) -> str | None:
     """The default HDRI's published id. The setting names the source id (RD-LBL-5); one that names
     no listed HDRI is refused."""
-    name = _settings().get("default")
+    name = settings().get("default")
     by_source = {h.get("source_id", h["id"]): h["id"] for h in listed}
     if listed and name not in by_source:
-        raise SystemExit(f"{SETTINGS.relative_to(REPO)}: default {name!r} names no HDRI on disk")
+        raise SystemExit(f"{SETTINGS}: default {name!r} names no HDRI on disk")
     return by_source.get(name, name)
 
 
@@ -229,15 +233,18 @@ def read_stamp(path: Path) -> dict:
     return out
 
 
-def stamp_stale(src: Path, dst: Path, f: dict) -> bool:
-    """True when the stamped copy is missing, older than its HDRI, or says other than the facts
-    (the header is compared, so a changed record restamps without any clock)."""
-    if not dst.is_file() or dst.stat().st_mtime < src.stat().st_mtime:
-        return True
+def stamp_says(path: Path, f: dict) -> bool:
+    """True when the stamped file's header says exactly the facts ``f``."""
     want = dict(f)
     if "credit" in want:   # the Markdown line is not in the header (header_lines)
         want["credit"] = {k: v for k, v in want["credit"].items() if k != "edited_from"}
-    return read_stamp(dst) != want
+    return read_stamp(path) == want
+
+
+def stamp_stale(src: Path, dst: Path, f: dict) -> bool:
+    """True when the stamped copy is missing, older than its HDRI, or says other than the facts
+    (the header is compared, so a changed record restamps without any clock)."""
+    return not dst.is_file() or dst.stat().st_mtime < src.stat().st_mtime or not stamp_says(dst, f)
 
 
 def main(argv=None) -> int:
@@ -252,7 +259,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     row = next((h for h in on_disk() if h["id"] == args.id), None)
     if row is None:
-        raise SystemExit(f"no HDRI {args.id!r} in {HDRIS}")
+        raise SystemExit(f"no HDRI {args.id!r} in {REPO / HDRIS}")
     stamp(row["path"], args.out, facts(row))
     print(f"stamped {row['path'].name} -> {args.out}")
     return 0

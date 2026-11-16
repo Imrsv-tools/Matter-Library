@@ -41,6 +41,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "validators"))
 import validate_manifest as vman  # noqa: E402
+sys.path.insert(0, str(HERE.parent / "releases"))
+import hdris as H  # noqa: E402  (an HDRI's published name: RD-LBL-5)
 
 import yaml  # noqa: E402
 
@@ -101,9 +103,9 @@ def derive_entry(material: dict) -> dict:
 
 
 def derive_hdri_entry(hdri: dict) -> dict:
-    """Project one lockfile HDRI entry (Identity.md §HDRI names). Paths are catalog-relative: the
-    payload under hdris/, its thumbnail under thumbnails/hdris/ (made from the HDRI, never stored in
-    git: Q-P14-3)."""
+    """Project one HDRI entry (Identity.md §HDRI names), its ``id`` the PUBLISHED one (RD-LBL-5).
+    Paths are catalog-relative: the payload under hdris/, its thumbnail under thumbnails/hdris/
+    (made from the HDRI, never stored in git: Q-P14-3)."""
     hid, version = hdri["id"], hdri["version"]
     return {
         "id": hid,
@@ -133,8 +135,12 @@ def build_catalog(lockfile: Path, materials_root: Path) -> dict:
     hdris = data.get("hdris") or []
     if hdris:  # Q-P14-2: only a catalog that lists HDRIs moves to schema 3
         catalog["schema_version"] = SCHEMA_VERSION_HDRIS
-        catalog["hdris"] = sorted((derive_hdri_entry(h) for h in hdris), key=lambda e: e["id"])
-        catalog["default_hdri"] = data["default_hdri"]
+        # The lock names each HDRI by its source id; the release publishes it as the dev catalog
+        # does, without library/hdris.yaml's dropped Variant (RD-LBL-5, #426).
+        drop = H.settings(lockfile.parent.parent.parent).get("published_drop_variant")
+        catalog["hdris"] = sorted((derive_hdri_entry({**h, "id": H.published(h["id"], drop)}) for h in hdris),
+                                  key=lambda e: e["id"])
+        catalog["default_hdri"] = H.published(data["default_hdri"], drop)
     return catalog
 
 

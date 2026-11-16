@@ -84,18 +84,18 @@ An [HDRI](../../Glossary.md) is a kind beside the taxonomy ([Identity](../Ontolo
 | Field | Type | Meaning | Source |
 |-------|------|---------|--------|
 | `hdris[]` | array | One entry per HDRI, ordered by `id`. **Present only when the release holds HDRIs.** A consumer built before it does not read it (it reads `materials` and `release` by name). | lockfile `hdris[]` |
-| `hdris[].id` | string | `<Name>_<Variant>`: the identity, and the resolution key with `version`. | lockfile `id` |
+| `hdris[].id` | string | The **published** name ([Identity](../Ontology/Identity.md) §HDRI names): `<Name>_<Variant>` without `library/hdris.yaml`'s `published_drop_variant` (`IndustrialSunset02`). The identity, and the resolution key with `version`. A release catalog takes it as the dev catalog does (#426, 2026-11-16). | lockfile `id`, published |
 | `hdris[].display_name` | string | The id; UI metadata, never a resolution key. | derived from `id` |
 | `hdris[].version` | string (`vNN`) | The HDRI's own version axis. | lockfile `version` |
 | `hdris[].status` | string | The lifecycle status, as a material's. | lockfile `status` |
 | `hdris[].creator_selectable` | bool | Whether a Creator may pick it. Default `true`. | lockfile / default |
 | `hdris[].payload_path` | string | `hdris/<id>_<version>.hdr`, relative to the catalog file. **A scene names the file's bare name** (`@<id>_<version>.hdr@` on a `DomeLight`'s `inputs:texture:file`), found through the stock USD search path on the `hdris/` folder, as a material's `@<Name>.mtlx@` is. | derived from `id` + `version` |
-| `hdris[].thumbnail_path` | string | `thumbnails/hdris/<id>_<version>.jpg`: a 1024 × 512 JPEG made from the HDRI (tone-mapped), relative to the catalog file. Made, never stored in git ([`261014_R_MaterialPipeline.md`](../../Planning/Research/261014_R_MaterialPipeline.md) RD-MP-5, RD-MP-6). In the dev install it is made at serve time; in a release it is a release asset *(planned, with the first release that holds HDRIs)*. | derived from `id` + `version` |
-| `default_hdri` | string | The id of the HDRI a new scene starts with: **one top-level key, so two defaults cannot be written** (A3). It names a listed HDRI, or the lockfile check refuses the release. | lockfile `default_hdri` |
+| `hdris[].thumbnail_path` | string | `thumbnails/hdris/<id>_<version>.jpg`: a 1024 × 512 JPEG made from the HDRI (tone-mapped), relative to the catalog file. Made, never stored in git ([`261014_R_MaterialPipeline.md`](../../Planning/Research/261014_R_MaterialPipeline.md) RD-MP-5, RD-MP-6). In the dev install it is made at serve time; in a release it is staged with the release (`stage_release.py build`, #426) and installed beside the catalog. | derived from `id` + `version` |
+| `default_hdri` | string | The (published) id of the HDRI a new scene starts with: **one top-level key, so two defaults cannot be written** (A3). It names a listed HDRI, or the lockfile check refuses the release. | lockfile `default_hdri` |
 
 Provenance stays out of the catalog for HDRIs as for textures (`no_projection_guard`); it lives in each HDRI's record, `library/provenance/sources/hdris/<id>.yaml`. **Licence, contributor and credit are not provenance:** since Phase16 (2026-10-14) the **dev catalog** carries them on every entry (§Who gave it and its licence, below; the lead's RD-DS-2). A released catalog does not yet *(planned, with the first release after Phase16)*.
 
-> **Planned (2026-10-14):** a release that holds HDRIs. Staging, freezing and activating one are not built yet, and `tools/releases/freeze_release.py` refuses a lockfile that lists HDRIs until they are (Phase14 §Not now). The dev install serves HDRIs today.
+> **A release that holds HDRIs** *(#426, 2026-11-16)*: `stage_release.py build` stages each one the lock lists into `library/staging/matterlib-<ver>/` at the catalog's paths (the stamped `.hdr`, its BC6H cube `.dds` beside it, its thumbnail); `freeze_release.py` hashes the staged `.hdr` as the `hdris` category (their cubes go with the other `.dds`) and freezes such a release only from its staging tree; `activate_release.py` re-checks each installed `.hdr` and `.dds` against the freeze; promotion refuses a release that lists an HDRI that is not `approved`; Stage's `deploy-to-studio` installs the staged `hdris/` and `thumbnails/hdris/`.
 
 ### Planned: the per-article master token *(planned)*
 
