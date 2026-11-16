@@ -243,7 +243,30 @@ with tempfile.TemporaryDirectory() as tmp:
         prc.project_to_string(lock, root / "MatterLibrary" / "materials"))
     staging = root / "library" / "staging" / "matterlib-9.1.0"
 
-    sr.stage_hdris(root, "9.1.0", staging, cube=fake_cube, thumb=fake_thumb)
+    dev = root / "library" / "staging" / "matterlib-dev" / "hdris"
+    builders = (sr.hc.build_cube_dds, sr.H.thumbnail, sr.sts.DEV_HDRI_STAGING)
+    sr.hc.build_cube_dds, sr.H.thumbnail, sr.sts.DEV_HDRI_STAGING = fake_cube, fake_thumb, dev
+    try:
+        check(sr.stage_hdris(root, "9.1.0", staging) == [], "staging the release's HDRIs misses no cube")
+        fake_cube(src, dev / "IndustrialSunset02_v01.dds")
+        with (dev / "IndustrialSunset02_v01.dds").open("r+b") as fh:
+            fh.seek(200)
+            fh.write(b"dev")                       # tell the dev cube from a fresh one
+
+        def no_encoder(hdr, dst):
+            raise RuntimeError("the encoder ran")
+        sr.hc.build_cube_dds = no_encoder
+        reused = root / "reused"
+        check(sr.stage_hdris(root, "9.1.0", reused) == []
+              and (reused / "hdris" / "IndustrialSunset02_v01.dds").read_bytes()
+              == (dev / "IndustrialSunset02_v01.dds").read_bytes(),
+              "an up-to-date dev cube is staged as it is, with no encoder run")
+        (dev / "IndustrialSunset02_v01.dds").unlink()
+        missed = sr.stage_hdris(root, "9.1.0", root / "failed")
+        check(len(missed) == 1 and "the encoder ran" in missed[0] and not (root / "failed" / "hdris" / "IndustrialSunset02_v01.dds").exists(),
+              "a cube the encoder fails on is reported as missed, and no file is left for it")
+    finally:
+        sr.hc.build_cube_dds, sr.H.thumbnail, sr.sts.DEV_HDRI_STAGING = builders
     hdr, dds = staging / "hdris" / "IndustrialSunset02_v01.hdr", staging / "hdris" / "IndustrialSunset02_v01.dds"
     jpg = staging / "thumbnails" / "hdris" / "IndustrialSunset02_v01.jpg"
     check(hdr.is_file() and dds.is_file() and jpg.is_file(),

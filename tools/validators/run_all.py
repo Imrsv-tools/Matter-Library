@@ -555,7 +555,7 @@ def run_release_verify(root: Path):
         staging_root = sr.default_staging_root(root)
         staging = staging_root / f"matterlib-{version}"
         staged_sets = [k for k in ("dds_set", "hdris_set") if k in rec.get("payload_sha256", {})]
-        if not staging.is_dir() and staged_sets == ["dds_set"] and encoder:
+        if not staging.is_dir() and staged_sets and "hdris_set" not in staged_sets and encoder:
             created = staging
             built, _ = sr.build(root, version, staging_root)
             if not built:
@@ -582,8 +582,7 @@ def run_release_verify(root: Path):
                     errs = [f"cannot recompute: {exc}"]
                 why = ("no staging tree; a release with HDRIs is not rebuilt here" if "hdris_set" in staged_sets
                        else encoder_absent())
-                verb = "neither" if len(staged_sets) > 1 else "not"
-                note = (f"every part except {' and '.join(staged_sets)} ({verb} re-checked: {why})"
+                note = (f"every part except {' and '.join(staged_sets)} (not re-checked: {why})"
                         if staged_sets else "complete payload")
         finally:
             if created is not None:

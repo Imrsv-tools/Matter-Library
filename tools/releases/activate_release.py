@@ -108,8 +108,7 @@ def check_install_ready(repo_root: Path, runtime_dir: Path, version: str,
         freeze = json.loads(freeze_path.read_text(encoding="utf-8"))
         frozen_files = {Path(e["path"]).name: e["sha256"]
                         for cat in ("dds", "hdris") for e in freeze.get("files", {}).get(cat, [])}
-        installed = {p.name: sp.file_sha256(p) for p in sorted(inst.rglob("*"))
-                     if p.suffix in (".dds", ".hdr") and p.is_file()}
+        installed = {p.name: sp.file_sha256(p) for ext in (".dds", ".hdr") for p in inst.rglob("*" + ext)}
         missing = [n for n in frozen_files if n not in installed]
         mismatched = [n for n, h in frozen_files.items() if n in installed and installed[n] != h]
         files_ok = bool(frozen_files) and not missing and not mismatched

@@ -59,6 +59,7 @@ import hdri_cube as hc  # noqa: E402
 import source_provenance as sp  # noqa: E402
 import validate_manifest as vm  # noqa: E402
 import hdris as H  # noqa: E402
+import serve_to_stage as sts  # noqa: E402  (stage_dev and the dev cubes: one cube builder for both)
 import yaml  # noqa: E402
 
 _MATTERLIB = "MatterLibrary"
@@ -70,10 +71,6 @@ def default_staging_root(repo_root: Path) -> Path:
 
 def release_root(staging_root: Path, version: str) -> Path:
     return staging_root / f"matterlib-{version}"
-
-
-def release_dir(staging_root: Path, version: str) -> Path:
-    return release_root(staging_root, version) / "textures"
 
 
 def release_hdris(repo_root: Path, version: str, only: str | None = None) -> list[dict]:
@@ -95,18 +92,26 @@ def _hdri_paths(out: Path, row: dict) -> tuple[Path, Path, Path]:
     return hdr, hdr.with_suffix(ct.OUT_EXT), out / "thumbnails" / "hdris" / f"{row['identity']}.jpg"
 
 
-def stage_hdris(repo_root: Path, version: str, out: Path, only: str | None = None,
-                cube=hc.build_cube_dds, thumb=H.thumbnail) -> list[str]:
+def _cube(src: Path, dst: Path) -> None:
+    """An HDRI's cube: the dev staging tree's copy when it is up to date with src (the same
+    builder made it), else built (minutes a sky)."""
+    dev = sts.DEV_HDRI_STAGING / dst.name
+    if sts.up_to_date(src, dev):
+        shutil.copy2(dev, dst)
+    else:
+        hc.build_cube_dds(src, dst)
+
+
+def stage_hdris(repo_root: Path, version: str, out: Path, only: str | None = None) -> list[str]:
     """Stage each HDRI the lock lists into the release folder ``out``: its stamped copy (as the dev
-    serve stamps it), its BC6H cube (minutes a sky) and its thumbnail. Returns the staged
-    identities; a cube that cannot be made raises."""
+    serve stamps it), its BC6H cube (``stage_dev``, as the dev serve's: CUBE_WORKERS at once) and
+    its thumbnail. Returns the HDRIs whose cube could not be made, each with why."""
     rows = release_hdris(repo_root, version, only)
     for row in rows:
-        hdr, dds, jpg = _hdri_paths(out, row)
+        hdr, _, jpg = _hdri_paths(out, row)
         H.stamp(row["path"], hdr, H.facts(row))
-        cube(row["path"], dds)
-        thumb(row["path"], jpg)
-    return [r["identity"] for r in rows]
+        H.thumbnail(row["path"], jpg)
+    return sts.stage_dev(sts.cube_jobs(rows), out / "hdris", _cube, sts.CUBE_WORKERS)["missed"]
 
 
 def verify_hdris(repo_root: Path, version: str, out: Path, only: str | None = None) -> list[str]:
@@ -144,10 +149,11 @@ def build(repo_root: Path, version: str, staging_root: Path | None = None,
         print(f"  [FAIL] no source texture tree at {src_root}")
         return False, []
     staging_root = (staging_root or default_staging_root(repo_root)).resolve()
-    dst = release_dir(staging_root, version)
+    out = release_root(staging_root, version)
+    dst = out / "textures"
     # Clean rebuild of THIS release's subtree only (siblings — other releases — untouched).
-    if dst.parent.exists():
-        shutil.rmtree(dst.parent)
+    if out.exists():
+        shutil.rmtree(out)
     dst.mkdir(parents=True, exist_ok=True)
 
     # .dds derivatives (mirrors src subtree, .png -> .dds).
@@ -164,14 +170,10 @@ def build(repo_root: Path, version: str, staging_root: Path | None = None,
         shutil.copy2(src, png_dst)
 
     # HDRIs (#426): stamped, each with its cube and thumbnail.
-    try:
-        staged = stage_hdris(repo_root, version, dst.parent, only)
-    except (RuntimeError, OSError) as e:
-        print(f"  [FAIL] staging the release's HDRIs: {e}")
-        return False, records
-    for identity in staged:
-        print(f"  [PASS] {identity}: stamped .hdr, cube and thumbnail")
-    return ok, records
+    missed = stage_hdris(repo_root, version, out, only)
+    for m in missed:
+        print(f"  [FAIL] no cube for {m}")
+    return ok and not missed, records
 
 
 def verify(repo_root: Path, version: str, staging_root: Path | None = None,
@@ -186,7 +188,8 @@ def verify(repo_root: Path, version: str, staging_root: Path | None = None,
     if not src_root.exists():
         return [f"no source texture tree at {src_root}"]
     staging_root = (staging_root or default_staging_root(repo_root)).resolve()
-    dst = release_dir(staging_root, version)
+    out = release_root(staging_root, version)
+    dst = out / "textures"
     if not dst.exists():
         return [f"staging tree absent for release {version}: {dst} (run `stage_release.py build {version}`)"]
 
@@ -195,7 +198,7 @@ def verify(repo_root: Path, version: str, staging_root: Path | None = None,
                if not only or only.lower() in str(p).lower()]
     if not sources:
         return [f"no source textures discovered under {src_root}"]
-    errs.extend(verify_hdris(repo_root, version, dst.parent, only))
+    errs.extend(verify_hdris(repo_root, version, out, only))
     for src in sources:
         rel = src.relative_to(src_root)
         png_dst = dst / rel
